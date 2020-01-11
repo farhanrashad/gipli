@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="external_layout_inherit" inherit_id="web.external_layout">
+        <xpath expr="/t" position="inside">
+            Tax ID: <span t-field="company.partner_id.vat"/>
+        </xpath>
+    </template>
+    
+    <template id="external_layout_standard_inherit" inherit_id="web.external_layout_standard">
+        <xpath expr="/t/div/div[2]" position="inside">
+            Tax ID: <span t-field="company.partner_id.vat"/>
+        </xpath>
+    </template>
+    
+    <template id="external_layout_background_inherit" inherit_id="web.external_layout_background">
+        <xpath expr="//t/div/div/div[2]" position="after">
+            <div class="" style="padding-left:15px;">
+                <div t-if="o.partner_id.vat" class="mt0" style="padding-left:15px;">
+                    <strong> Tax ID:</strong> <span t-field="company.partner_id.vat"/>
+                </div>
+                <div t-if="o.partner_id.ntn" class="mt0">
+                    <strong> NTN:</strong> <span t-field="company.partner_id.ntn"/>
+                </div>
+            </div>
+        </xpath>
+        <!--
+        <xpath expr="//t/div/div/div[2]" position="replace">
+            <div class="col-5 col-md-6">
+                this is address a very long address description, very veyr long
+            </div>
+        </xpath>
+
+        <xpath expr="//t/div/div/div[2]" position="attributes">
+            <attribute name="class">
+                col-auto
+            </attribute>
+        </xpath>
+        -->
+    </template>
+    
+</odoo>

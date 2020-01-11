@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_inherit" inherit_id="account.report_invoice_document">
+        <xpath expr="/t[1]/t[1]/t[2]/div[1]" position="after">
+    <div t-if="not o.partner_id.vat and o.partner_id.ntn" class="mt0">
+        NTN: <span t-field="o.partner_id.ntn"/>
+    </div>
+    <div t-if="not o.partner_id.ntn and o.partner_id.nic" class="mt0">
+        NIC: <span t-field="o.partner_id.nic"/>
+    </div>
+  </xpath>
+  <xpath expr="/t[1]/t[1]/t[2]/div[1]" position="attributes">
+    <attribute name="class">mt0</attribute>
+  </xpath>
+    </template>
+</odoo>
