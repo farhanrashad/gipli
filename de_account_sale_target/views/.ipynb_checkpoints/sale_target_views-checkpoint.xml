@@ -1,0 +1,77 @@
+<odoo>
+  <data>
+    <!-- Sale Target Form-->
+    <record id="account_sale_target_list_view" model="ir.ui.view">
+        <field name="name">account.sale.target.list.view</field>
+        <field name="model">account.sale.target</field>
+        <field name="arch" type="xml">
+            <tree string="Sale Target">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Withholdig Tax type form view-->
+    <record id="account_sale_target_form_view" model="ir.ui.view">
+        <field name="name">account.sale.target.form.view</field>
+        <field name="model">account.sale.target</field>
+        <field name="arch" type="xml">
+            <form string="Withholding Tax Type">
+                <header>
+                        <button string="Validate" name="action_validate" type="object" states="draft" class="oe_highlight"/>
+                        <button string="Cancel" name="action_cancel" type="object" states="draft" class=""/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                    </header>
+                <sheet>
+                    
+                    <div class="oe_title">
+                        <h1><field name="name" /></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="journal_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="targets" string="Targets">
+                            <field name="sale_target_line_ids" widget="one2many_list">
+                                <tree string="Sale Target Lines" editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="target_qty"/>
+                                    <field name="invoiced_qty"/>
+                                    <field name="remaining_qty"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+      
+      <!-- Action Sale Target -->
+    <record id="action_sale_target_view" model="ir.actions.act_window">
+        <field name="name">Sale Target</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.sale.target</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new sale target
+            </p>
+        </field>
+    </record>
+      
+      <menuitem name="Sale Target" id="sale_target_menu" parent="account.menu_finance_entries_actions"  action="action_sale_target_view" sequence="30" />
+      
+  </data>
+</odoo>
