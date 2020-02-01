@@ -10,11 +10,10 @@ from odoo.addons import decimal_precision as dp
 class AccountMove(models.Model):
     _inherit = 'account.move'
     
-    @api.model
     def _get_default_invoice_date(self):
         #last_id = self.env['account.move'].search([])[-1]
         invoice_id = self.invoice_date
-        last_rs = last_confirmed_order = self.env['account.move'].search([], order='id desc',limit=1)
+        last_rs = last_confirmed_order = self.env['account.move'].search([('create_uid','=',self._context.get('uid'))], order='id desc',limit=1)
         for rs in last_rs:
             invoice_id = rs.invoice_date
         return invoice_id
