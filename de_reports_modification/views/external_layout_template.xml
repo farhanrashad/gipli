@@ -12,6 +12,19 @@
         </xpath>
     </template>
     
+    <template id="external_layout_standard_inherit" inherit_id="web.external_layout_background">
+        <xpath expr="//div[hasclass('company_address')]" position="after">
+            
+           
+                <div style="margin-right:10px;padding:10px;left:10px;display:table-cell;">
+                    <strong>STRN:</strong> <span t-field="company.partner_id.vat"/> <br/>
+                    <strong>NTN:</strong> <span t-field="company.partner_id.ntn"/>
+                </div>
+            
+            
+        </xpath>
+    </template>
+    
     <template id="external_layout_background_inherit" inherit_id="web.external_layout_background">
         <xpath expr="//t/div/div/div[2]" position="after">
             <div class="" style="padding-left:15px;">
@@ -37,5 +50,7 @@
         </xpath>
         -->
     </template>
+    
+    
     
 </odoo>
