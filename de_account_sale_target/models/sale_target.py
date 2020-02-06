@@ -39,8 +39,8 @@ class SaleTargetLine(models.Model):
     
     target_qty = fields.Float(string='Target Qty',required=True,default='1.0')
     
-    invoiced_qty = fields.Float(string='Invoiced Qty',store=True, readonly=True,compute='_compute_invoiced_quantity')
-    remaining_qty = fields.Float(string='Remaining Qty',readonly=True,compute='_compute_all_quantity')
+    invoiced_qty = fields.Float(string='Invoiced Qty',store=False, readonly=True,compute='_compute_invoiced_quantity')
+    remaining_qty = fields.Float(string='Remaining Qty',readonly=False,compute='_compute_all_quantity')
     
     def _compute_invoiced_quantity(self):
         for line in self:
