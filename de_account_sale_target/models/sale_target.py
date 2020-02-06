@@ -34,7 +34,7 @@ class SaleTargetLine(models.Model):
     
     sale_target_id = fields.Many2one('account.sale.target', string='Sale Target', index=True, required=True, ondelete='cascade')
     product_id = fields.Many2one('product.product', string='Product', index=True, required=True, ondelete='cascade')
-    product_uom_id = fields.Many2one('uom.uom', required=True, string='Unit of Measure', domain="[('category_id', '=', product_uom_category_id)]")
+    product_uom_id = fields.Many2one('uom.uom', required=False, string='Unit of Measure', domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True)
     
     target_qty = fields.Float(string='Target Qty',required=True,default='1.0')
