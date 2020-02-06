@@ -23,7 +23,8 @@
             <form string="Withholding Tax Type">
                 <header>
                         <button string="Validate" name="action_validate" type="object" states="draft" class="oe_highlight"/>
-                        <button string="Cancel" name="action_cancel" type="object" states="draft" class=""/>
+                        <button string="Cancel" name="action_cancel" type="object" states="done" class=""/>
+                    <button string="Set to Draft" name="action_draft" type="object" states="cancel" class=""/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
                     </header>
                 <sheet>

@@ -20,11 +20,17 @@ class AccountMove(models.Model):
         for line in self:
             target_qty = 0
             invoice_date = line.move_id.invoice_date
-            if line.product_id.id:
+            if line.product_id.id and line.move_id.invoice_date:
                 sale_target_obj = self.env['account.sale.target'].search([('date_from', '>=', invoice_date), ('date_to', '<=', invoice_date), ],limit=1)
                 sale_target_line = self.env['account.sale.target.line'].search([('product_id', '=', line.product_id.id),])
-                for target in sale_target_line.filtered(lambda x: x.sale_target_id.state in ('done') and line.move_id.invoice_date >= x.sale_target_id.date_from and line.move_id.invoice_date <= x.sale_target_id.date_to):
-                    target_qty = target.remaining_qty
+                for target in sale_target_line.filtered(lambda x: x.sale_target_id.state not in ('cancel') and line.move_id.invoice_date >= x.sale_target_id.date_from and line.move_id.invoice_date <= x.sale_target_id.date_to and x.sale_target_id.journal_id.id == line.move_id.journal_id.id):
+                    if target.product_uom_id.id == line.product_uom_id.id:
+                        target_qty = target.remaining_qty
+                    elif line.product_uom_id.uom_type == 'reference' and target.product_uom_id.uom_type == 'bigger':
+                        target_qty = target.remaining_qty / target.product_uom_id.factor_inv
+                    elif line.product_uom_id.uom_type == 'reference' and target.product_uom_id.uom_type == 'smaller':
+                        target_qty = target.remaining_qty * target.product_uom_id.factor_inv
+                    
             line.update({
                 'invoiced_qty': target_qty
             })
