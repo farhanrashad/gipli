@@ -12,6 +12,8 @@ class AccountMove(models.Model):
     
     invoiced_qty = fields.Float(string='Tgt.Bal.Qty',store=False, readonly=True,compute='_compute_invoiced_quantity')
     
+   
+    
     #@api.model
     def _compute_invoiced_quantity(self):
         target_id = 0
@@ -32,9 +34,24 @@ class AccountMove(models.Model):
                         target_qty = target.remaining_qty * target.product_uom_id.factor_inv
                     
             line.update({
-                'invoiced_qty': target_qty
+                'invoiced_qty': target_qty,
+               
             })
     
+    @api.onchange('price_unit')
+    def _onchange_price_unit(self):
+        sale_target_line = self.env['account.sale.target.line'].search([('product_id', '=', self.product_id.id),])
+        warning = {}
+        for line in self:
+            sale_target_line = self.env['account.sale.target.line'].search([('product_id', '=', line.product_id.id),])
+            for target in sale_target_line.filtered(lambda x: x.sale_target_id.state not in ('cancel') and line.move_id.invoice_date >= x.sale_target_id.date_from and line.move_id.invoice_date <= x.sale_target_id.date_to and x.sale_target_id.journal_id.id == line.move_id.journal_id.id):
+                if line.price_unit > target.to_price_unit or line.price_unit < target.from_price_unit:
+                    warning = {
+                        'title': _("Warning for %s") % self.product_id.name,
+                        'message': 'Price msut be >= ' + str(target.from_price_unit)
+                    }
+                    return {'warning': warning}
+        
     @api.model
     def _compute_invoiced_quantity1(self):
         target_id = 0

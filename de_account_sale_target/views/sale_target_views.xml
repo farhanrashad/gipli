@@ -52,6 +52,8 @@
                                     <field name="target_qty"/>
                                     <field name="invoiced_qty"/>
                                     <field name="remaining_qty"/>
+                                    <field name="from_price_unit"/>
+                                    <field name="to_price_unit"/>
                                 </tree>
                             </field>
                         </page>

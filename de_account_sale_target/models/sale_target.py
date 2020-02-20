@@ -49,6 +49,9 @@ class SaleTargetLine(models.Model):
     invoiced_qty = fields.Float(string='Invoiced Qty',store=False, readonly=True,compute='_compute_invoiced_quantity')
     remaining_qty = fields.Float(string='Remaining Qty',readonly=False,compute='_compute_all_quantity')
     
+    from_price_unit = fields.Float(string='From Price', digits='Product Price')
+    to_price_unit = fields.Float(string='To Price', digits='Product Price')
+    
     def _compute_invoiced_quantity(self):
         for line in self:
             #acc_ids = line.general_budget_id.account_ids.ids
