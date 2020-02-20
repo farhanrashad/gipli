@@ -14,8 +14,8 @@ class SaleTarget(models.Model):
     name = fields.Char(string='Name',  copy=False,  index=True, required=True,states={'cancel': [('readonly', True)], 'done': [('readonly', True)]})
     journal_id = fields.Many2one('account.journal', string='Journal', required=True, states={'cancel': [('readonly', True)], 'done': [('readonly', True)]})
     company_id = fields.Many2one('res.company', 'Company', required=True, index=True, default=lambda self: self.env.company,states={'cancel': [('readonly', True)], 'done': [('readonly', True)]})
-    date_from = fields.Date(string='Date From',required=False, readonly=True, states={'cancel': [('readonly', True)], 'done': [('readonly', True)]})
-    date_to = fields.Date(string='Date To',required=False, readonly=True, states={'cancel': [('readonly', True)], 'done': [('readonly', True)]})
+    date_from = fields.Date(string='Date From',required=False, readonly=False, states={'cancel': [('readonly', True)], 'done': [('readonly', True)]})
+    date_to = fields.Date(string='Date To',required=False, readonly=False, states={'cancel': [('readonly', True)], 'done': [('readonly', True)]})
     state = fields.Selection([('draft','New'),
                               ('done','Validate'),
                               ('cancel','Cancel')],string = "Status", default='draft',track_visibility='onchange')
