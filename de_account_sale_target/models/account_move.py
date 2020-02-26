@@ -14,7 +14,7 @@ class AccountMove(models.Model):
     
    
     
-    #@api.model
+    @api.depends('product_id')
     def _compute_invoiced_quantity(self):
         target_id = 0
         target_qty = 0
