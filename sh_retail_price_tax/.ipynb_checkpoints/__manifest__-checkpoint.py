@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 # Part of Softhealer Technologies.
 {
-    "name" : "Softhealer Retail Price Tax Calculation",
-    "author" : "Softhealer Technologies",
-    "website": "https://www.softhealer.com",
-    "support": "support@softhealer.com",
+    "name" : "Dynexcel Retail Price Tax Calculation",
+    "author" : "Dynexcel",
+    "website": "http://www.dynexcel.com",
+    "support": "support@dynexcel.com",
     "category": "Account",
     "summary": "",
     "description": """
 
                     """,
-    "version":"13.0.3",
+    "version":"13.0.4",
     "depends" : ["base","sale_management","account"],
     "application" : True,
     "data" : [

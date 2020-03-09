@@ -9,11 +9,23 @@ class ShAccountMoveLine(models.Model):
     
     
     @api.onchange('product_id')
-    def _onchange_product_id_custom(self):
+    def _onchange_product_id(self):
         if self:
             for rec in self:
                 rec.sh_retail_price = rec.product_id.sh_retail_price
+        res = super(ShAccountMoveLine,self)._onchange_product_id()
+        return res
+                
     
+    @api.onchange('amount_currency', 'currency_id', 'debit', 'credit', 'tax_ids', 'account_id', 'analytic_account_id', 'analytic_tag_ids','sh_retail_price')
+    def _onchange_mark_recompute_taxes(self):
+        ''' Recompute the dynamic onchange based on taxes.
+        If the edited line is a tax line, don't recompute anything as the user must be able to
+        set a custom value.
+        '''
+        for line in self:
+            if not line.tax_repartition_line_id:
+                line.recompute_tax_line = True    
 
 class ShAccountMove(models.Model):
     _inherit='account.move'
