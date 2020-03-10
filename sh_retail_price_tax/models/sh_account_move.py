@@ -5,14 +5,17 @@ from odoo import models,fields,api,_
 class ShAccountMoveLine(models.Model):
     _inherit='account.move.line'
     
-    sh_retail_price = fields.Float("Retail Price")
+    def _get_default_price(self):
+        return self.product_id.sh_retail_price or self.product_id.product_tmpl_id.sh_retail_price
+    
+    sh_retail_price = fields.Float("Retail Price",default=_get_default_price)
     
     
     @api.onchange('product_id')
     def _onchange_product_id(self):
         if self:
             for rec in self:
-                rec.sh_retail_price = rec.product_id.sh_retail_price
+                rec.sh_retail_price = rec.product_id.sh_retail_price or rec.product_id.product_tmpl_id.sh_retail_price
         res = super(ShAccountMoveLine,self)._onchange_product_id()
         return res
                 
