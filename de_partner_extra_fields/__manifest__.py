@@ -22,13 +22,15 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account'],
+    'depends': ['base','account','account_payment'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/partner_views.xml',
         'views/account_invoice_views.xml',
+        'views/account_payment_views.xml',
+        'views/account_batch_payment_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
