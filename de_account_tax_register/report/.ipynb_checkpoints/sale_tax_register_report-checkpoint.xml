@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="open_sale_tax_register_action"
+            string="Sale Tax Register"
+            model="report.de_account_tax_register.sale_tax_register"
+            report_type="qweb-pdf"
+            file="de_account_tax_register.sale_tax_register"
+            name="de_account_tax_register.sale_tax_register"
+        />
+    </data>
+</odoo>

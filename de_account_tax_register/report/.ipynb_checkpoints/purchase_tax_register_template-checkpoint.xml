@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="purchase_tax_register">
+    <t t-call="web.html_container">
+    <t t-call="web.external_layout">
+        <t t-set="docs" t-value="docs.with_context()"/>
+        <div class="page">
+            <div class="oe_structure"/>
+            <div align="center"> 
+                <br/>                  
+                <h2> Purchase Tax Register</h2>
+            </div>
+            <br/>
+            <table class="table table-sm table-striped table-bordered">
+                <tr style="height:30%">
+                    <th  align="center">From Date</th>
+                    <th  align="center"><span t-field="docs.start_date"/></th>
+                    <th  align="center">To Date</th>
+                    <th  align="center"> <span t-field="docs.end_date"/></th>                  
+                </tr>
+            </table>
+            <br/>
+            <table class="table table-sm table-striped table-bordered">
+                    <t t-set="qtysum" t-value="0"/>
+                    <t t-set="exvsum" t-value="0"/>
+                    <t t-set="taxsum" t-value="0"/>
+                <thead>
+                    <tr>
+                        <th>DATE</th>
+                        <th>SUPPLIER NAME</th>
+                        <th>INVOICE NO</th>
+                        <th>ITEM NAME</th>
+                        <th>QUANTITY</th>
+                        <th>VALUE EXC S.TAX </th>
+                       
+                            <t t-set="taxes" t-value="[]"/>
+                            <t t-foreach="invoices" t-as="inv">
+                                <t t-foreach="inv.tax_ids" t-as="t">
+                                    <t t-set="taxes" t-value="taxes+[t]"/>
+                                </t>
+                            </t>
+                            
+                       
+                        <t t-foreach="set(taxes)" t-as="t">
+                            <th><span t-field="t.description"/></th>
+                        </t>
+                        
+                        <th  >VALUE INC S.TAX</th>
+                    </tr>
+                </thead>
+                <tbody class="sale_tbody">
+                    <t t-foreach="invoices" t-as="invoice">
+                        <t t-if="invoice.tax_ids">
+                        <tr>
+                            <td ><span t-field="invoice.date"/></td>
+                            <td ><span t-field="invoice.partner_id"/></td>
+                            <td ><span t-field="invoice.move_id"/></td>
+                            <td ><span t-field="invoice.product_id"/></td>
+                            <td ><span t-field="invoice.quantity"/></td>
+                            <t t-set="qtysum" t-value="qtysum + invoice.quantity"/>
+                            <td><span t-field="invoice.debit"/></td>
+                            <t t-set="exvsum" t-value="exvsum + invoice.debit"/>
+                            <t t-set="taxsum" t-value="0"/>
+                            <t t-foreach="set(taxes)" t-as="t">
+                                <td>
+                                <t t-foreach="invoice.tax_ids" t-as="tax">                               
+                                    <t t-if="t.id==tax.id">
+                                        <t t-set="taxsum" t-value="taxsum + ((int(tax.amount) / 100) * invoice.debit)"/>
+                                        <span t-esc="round(((int(tax.amount) / 100) * invoice.debit),2)"/>
+                                    </t>
+                                </t>
+                                </td>
+                            </t>
+                            <td><span t-esc="invoice.move_id.amount_total"/></td>
+                           </tr>
+                         </t>
+		              </t>
+                     <tr>
+                         <td colspan="4">Total</td>
+                         <td><span t-esc="qtysum"></span></td> 
+                         <td><span t-esc="round(exvsum,2)"></span></td>
+                         <t t-foreach="set(taxes)" t-as="t">
+                             <td>
+                                 <!--
+                                 <t t-esc="sum((l.tax_ids.amount/100)*l.debit for l in invoices.filtered(lambda x: x.tax_ids.id == t.id)) " />
+-->
+                            </td>
+                         </t>
+                         <td>
+                             <t t-esc="sum(l.move_id.amount_total for l in invoices)" />
+                        </td>
+                         
+                          
+                    </tr>
+                </tbody>
+            </table>
+            <br/>
+            <br/>                  
+
+        </div>
+    </t>
+    </t>
+</template>
+</odoo>

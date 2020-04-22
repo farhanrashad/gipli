@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--      Create menu to open wizard for report -->
+    <menuitem
+        id="sale_tax_register"
+        name="Sale Tax Register"
+        parent="account_tax_register"
+        sequence="4"
+        action="de_account_tax_register.open_sale_tax_register_action"
+    />
+        <menuitem
+        id="purchase_tax_register"
+        name="Purchase Tax Register"
+        parent="account_tax_register"
+        sequence="6"
+        action="de_account_tax_register.open_purchase_tax_register_action"
+    />
+    <menuitem
+        id="account_tax_register"
+        name="Account Tax Register"
+        parent="account.menu_finance_reports"
+        sequence="1"
+    />
+
+</odoo>

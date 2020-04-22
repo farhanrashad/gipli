@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="sale_tax_register">
+    <t t-call="web.html_container">
+    <t t-call="web.external_layout">
+        <t t-set="docs" t-value="docs.with_context()"/>
+        <div class="page">
+            <div class="oe_structure"/>
+            <div align="center"> 
+                <br/>                  
+                <h2> Sale Tax Register</h2>
+            </div>
+            <br/>
+            <table  class="table table-condensed">
+                <tr style="height:30%">
+                    <th  align="center">From Date</th>
+                    <td  align="center"><span t-field="docs.start_date"/></td>
+                    <th  align="center">To Date</th>
+                    <td  align="center"> <span t-field="docs.end_date"/></td>                  
+                </tr>
+            </table>
+            
+            <table class="table table-sm table-striped table-bordered">
+                    <t t-set="qty" t-value="0"/>
+                    <t t-set="exvalue" t-value="0"/>
+                    <t t-set="tottaxsum" t-value="0"/>
+                    <t t-set="totamount" t-value="0"/>
+                <thead>
+                    <tr>
+                        <th >INV NO</th>
+                        <th >DATE</th>
+                        <th  >ITEM NAME</th>
+                        <th  >QUANTITY</th>
+                        <th  >EX- <br/>
+                        VALUE
+                        </th>
+                        <th  align="center">TAX</th>
+                        <th  >TOTAL AMOUNT</th>
+                        <th >PARTY NAME ADDRESS</th>
+                    </tr>
+                </thead>
+                <tbody class="sale_tbody">
+                    <t t-foreach="invoices" t-as="invoice">
+                        <t t-if="invoice.product_id">
+                        <tr>
+                            <td><span t-field="invoice.move_id"/></td>
+                            <td><span t-field="invoice.date"/></td>
+                            <td><span t-field="invoice.product_id"/></td>
+                            <td><span t-field="invoice.quantity"/></td>
+                            
+                            <t t-set="qty" t-value="qty + invoice.quantity"/>
+
+                            <td><span t-field="invoice.credit"/></td>
+                            
+                            <t t-set="exvalue" t-value="exvalue + invoice.credit"/>
+                            
+                            <td>
+                                <table class="table table-sm">
+                                    <t t-set="tottax" t-value="0"/>
+                                    <t t-foreach="invoice.tax_ids" t-as="tax">
+                                <tr>
+                                    <th>
+                                        <t t-set="tottax" t-value="tottax + ((int(tax.amount) / 100) * invoice.credit)"/>
+                                        <span t-field="tax.description"/>
+                                    </th>
+
+                                    <td>
+                                      <span t-esc="round(((int(tax.amount) / 100) * invoice.credit),2)"/>
+                                    </td>
+                                      <t t-set="tottaxsum" t-value="tottaxsum + ((int(tax.amount) / 100) * invoice.credit)"/>
+
+                                    </tr>
+                               
+                            </t>
+                            </table>
+                            </td>
+                            <td><span t-esc="invoice.credit + tottax"/></td>  
+                            
+                              <t t-set="totamount" t-value="totamount + (invoice.credit + tottax)"/>
+
+                            
+                                <td><span t-field="invoice.partner_id"/></td>
+                            
+                        </tr>
+                        </t>
+		             </t>
+                    <br/>
+                    <br/> 
+                     <tr>
+                         <td style="border-top: 1px solid black"></td>
+                         <td style="border-top: 1px solid black">Total Invoices</td>
+                         <td style="border-top: 1px solid black">
+                             
+                             
+                         </td> 
+                         <td style="border-top: 1px solid black">
+                                 <span t-esc="qty"></span> 
+
+                         </td> 
+                         <td style="border-top: 1px solid black">
+                                  <span t-esc="round(exvalue,2)"></span> 
+
+                         </td> 
+  
+                         <td style="border-top: 1px solid black">
+                             
+                             
+                                 <span t-esc="round(tottaxsum,2)"></span>
+
+                         </td> 
+                         <td style="border-top: 1px solid black">
+                                    <span t-esc="round(totamount,2)"></span> 
+
+                         </td> 
+                         <td style="border-top: 1px solid black"></td>
+
+                        
+                    </tr>  
+              </tbody>             
+            </table>
+            <table class="table table-condensed  table-striped table-sm table-bordered">
+                   
+            </table>    
+            
+            <br/>
+            <br/> 
+            
+
+        </div>
+    </t>
+    </t>
+</template>
+</odoo>
