@@ -65,26 +65,10 @@ class SaleTargetLine(models.Model):
                           ('move_id.state', '!=', 'cancel'),
                           ('move_id.journal_id', '=', line.sale_target_id.journal_id.id)
                           ]
-                #if acc_ids:
-                    #domain += [('general_account_id', 'in', acc_ids)]
-
                 where_query = account_line_obj._where_calc(domain)
                 account_line_obj._apply_ir_rules(where_query, 'read')
                 from_clause, where_clause, where_clause_params = where_query.get_sql()
                 select = "SELECT SUM(quantity) from " + from_clause + " where " + where_clause
-
-            #else:
-                #aml_obj = self.env['account.move.line']
-                #domain = [('account_id', 'in',
-                           #line.general_budget_id.account_ids.ids),
-                          #('date', '>=', date_from),
-                          #('date', '<=', date_to),
-                          #('move_id.state', '=', 'posted')
-                          #]
-                #where_query = aml_obj._where_calc(domain)
-                #aml_obj._apply_ir_rules(where_query, 'read')
-                #from_clause, where_clause, where_clause_params = where_query.get_sql()
-                #select = "SELECT sum(credit)-sum(debit) from " + from_clause + " where " + where_clause
 
             self.env.cr.execute(select, where_clause_params)
             line.invoiced_qty = self.env.cr.fetchone()[0] or 0.0
@@ -94,6 +78,7 @@ class SaleTargetLine(models.Model):
         if not self.product_uom_id:
             self.product_uom_id = self.product_id.uom_id.id
     
+    @api.depends('target_qty','invoiced_qty')
     def _compute_all_quantity(self):
         for rs in self:
             #move_lines = self.env['account.move.line'].search([('product_id', '=', rs.product_id.id),('date', '>=', rs.sale_target_id.date_from),('date', '<=', rs.sale_target_id.date_to)])
