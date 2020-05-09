@@ -20,6 +20,7 @@
                 </tr>
             </table>
             <br/>
+            <t t-foreach="invoices" t-as="invoice">
             <table class="table table-sm table-striped table-bordered">
                     <t t-set="qtysum" t-value="0"/>
                     <t t-set="exvsum" t-value="0"/>
@@ -34,7 +35,7 @@
                         <th>VALUE EXC S.TAX </th>
                        
                             <t t-set="taxes" t-value="[]"/>
-                            <t t-foreach="invoices" t-as="inv">
+                            <t t-foreach="invoice.invoice_line_ids" t-as="inv">
                                 <t t-foreach="inv.tax_ids" t-as="t">
                                     <t t-set="taxes" t-value="taxes+[t]"/>
                                 </t>
@@ -49,29 +50,29 @@
                     </tr>
                 </thead>
                 <tbody class="sale_tbody">
-                    <t t-foreach="invoices" t-as="invoice">
-                        <t t-if="invoice.tax_ids">
+                    <t t-foreach="invoice.invoice_line_ids" t-as="line">
+                        <t t-if="line.tax_ids">
                         <tr>
-                            <td ><span t-field="invoice.date"/></td>
-                            <td ><span t-field="invoice.partner_id"/></td>
-                            <td ><span t-field="invoice.move_id"/></td>
-                            <td ><span t-field="invoice.product_id"/></td>
-                            <td ><span t-field="invoice.quantity"/></td>
-                            <t t-set="qtysum" t-value="qtysum + invoice.quantity"/>
-                            <td><span t-field="invoice.debit"/></td>
-                            <t t-set="exvsum" t-value="exvsum + invoice.debit"/>
+                            <td ><span t-field="line.date"/></td>
+                            <td ><span t-field="line.partner_id"/></td>
+                            <td ><span t-field="line.move_id"/></td>
+                            <td ><span t-field="line.product_id"/></td>
+                            <td ><span t-field="line.quantity"/></td>
+                            <t t-set="qtysum" t-value="qtysum + line.quantity"/>
+                            <td><span t-field="line.debit"/></td>
+                            <t t-set="exvsum" t-value="exvsum + line.debit"/>
                             <t t-set="taxsum" t-value="0"/>
                             <t t-foreach="set(taxes)" t-as="t">
                                 <td>
-                                <t t-foreach="invoice.tax_ids" t-as="tax">                               
+                                <t t-foreach="line.tax_ids" t-as="tax">                               
                                     <t t-if="t.id==tax.id">
-                                        <t t-set="taxsum" t-value="taxsum + ((int(tax.amount) / 100) * invoice.debit)"/>
-                                        <span t-esc="round(((int(tax.amount) / 100) * invoice.debit),2)"/>
+<!--                                         <t t-set="taxsum" t-value="taxsum + ((int(tax.amount) / 100) * line.debit)"/> -->
+                                        <span t-esc="round(((int(tax.amount) / 100) * line.debit),2)"/>
                                     </t>
                                 </t>
                                 </td>
                             </t>
-                            <td><span t-esc="invoice.move_id.amount_total"/></td>
+                            <td><span t-esc="line.move_id.amount_total"/></td>
                            </tr>
                          </t>
 		              </t>
@@ -87,7 +88,7 @@
                             </td>
                          </t>
                          <td>
-                             <t t-esc="sum(l.move_id.amount_total for l in invoices)" />
+                             <t t-esc="sum(l.amount_total for l in invoices)" />
                         </td>
                          
                           
@@ -96,7 +97,7 @@
             </table>
             <br/>
             <br/>                  
-
+            </t>
         </div>
     </t>
     </t>

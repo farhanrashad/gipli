@@ -17,15 +17,15 @@ class SaleTaxRegister(models.AbstractModel):
 
     '''Find Sale invoices between the date and find total outstanding amount'''
     @api.model
-    def _get_report_values(self, docids, data=None):
+    def _get_report_values(self, docids ,data=None):
         self.model = self.env.context.get('active_model')
         docs = self.env[self.model].browse(self.env.context.get('active_id'))
-        outstanding_invoice = []
+        sale_invoice = []                                               
         if docs.target_move == 'posted':
-            invoices = self.env['account.move.line'].search([('date', '>=', docs.start_date),('date', '<=', docs.end_date),('journal_id.type','=', 'sale'),('move_id.state','=', 'posted')])
+            invoices = self.env['account.move'].search([('date', '>=', docs.start_date),('date', '<=', docs.end_date),('journal_id.type','=', 'sale'),('state','=', 'posted')])
         else:
-            invoices = self.env['account.move.line'].search([('date', '>=', docs.start_date),('date', '<=', docs.end_date),('journal_id.type','=', 'sale')])
-            
+            invoices = self.env['account.move'].search([('date', '>=', docs.start_date),('date', '<=', docs.end_date),('journal_id.type','=', 'sale')])
+                                              
         if invoices:
         #    amount_due = 0
         #    for total_amount in invoices:
@@ -37,4 +37,4 @@ class SaleTaxRegister(models.AbstractModel):
                 'invoices': invoices,
             }
         else:
-            raise UserError("There is not any Outstanding invoice")
+            raise UserError("There is not any Purchase invoice in between selected dates")
