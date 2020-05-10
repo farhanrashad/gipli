@@ -60,8 +60,8 @@ class SaleTargetLine(models.Model):
             if line.product_id.id:
                 account_line_obj = self.env['account.move.line']
                 domain = [('product_id', '=', line.product_id.id),
-                          ('date', '>=', date_from),
-                          ('date', '<=', date_to),
+                          ('move_id.invoice_date', '>=', line.sale_target_id.date_from),
+                          ('move_id.invoice_date', '<=', line.sale_target_id.date_to),
                           ('move_id.state', '!=', 'cancel'),
                           ('move_id.journal_id', '=', line.sale_target_id.journal_id.id)
                           ]
