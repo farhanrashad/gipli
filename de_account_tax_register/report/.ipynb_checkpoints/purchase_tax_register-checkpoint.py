@@ -11,21 +11,22 @@ from odoo import api, models
 from dateutil.parser import parse
 from odoo.exceptions import UserError
 
-class SaleTaxRegister(models.AbstractModel):
-    _name = 'report.de_account_tax_register.sale_tax_register'
-    _description = 'Sale Tax Register Report'
+class PurchaseTaxRegister(models.AbstractModel):
+    _name = 'report.de_account_tax_register.purchase_tax_register'
+    _description = 'Purchase Tax Register Report'
 
-    '''Find Sale invoices between the date and find total outstanding amount'''
+    '''Find Purchase invoices between the date and find total outstanding amount'''
     @api.model
-    def _get_report_values(self, docids ,data=None):
+    def _get_report_values(self, docids, data=None):
         self.model = self.env.context.get('active_model')
         docs = self.env[self.model].browse(self.env.context.get('active_id'))
-        sale_invoice = []                                               
+        outstanding_invoice = []       
+        
         if docs.target_move == 'posted':
-            invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'sale'),('state','=', 'posted')])
+            invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'purchase'),('state','=', 'posted')])
         else:
-            invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'sale')])
-                                              
+            invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'purchase')])
+            
         if invoices:
         #    amount_due = 0
         #    for total_amount in invoices:
@@ -38,3 +39,6 @@ class SaleTaxRegister(models.AbstractModel):
             }
         else:
             raise UserError("There is not any Purchase invoice in between selected dates")
+
+            
+    
