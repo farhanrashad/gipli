@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="open_purchase_tax_register_action"
+            string="Purchase Tax Register"
+            model="report.de_account_tax_register.purchase_tax_register"
+            report_type="qweb-pdf"
+            file="de_account_tax_register.purchase_tax_register"
+            name="de_account_tax_register.purchase_tax_register"
+        />
+    </data>
+</odoo>
