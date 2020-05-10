@@ -23,9 +23,9 @@ class PurchaseTaxRegister(models.AbstractModel):
         outstanding_invoice = []       
         
         if docs.target_move == 'posted':
-            invoices = self.env['account.move'].search([('date', '>=', docs.start_date),('date', '<=', docs.end_date),('journal_id.type','=', 'purchase'),('state','=', 'posted')])
+            invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'purchase'),('state','=', 'posted')])
         else:
-            invoices = self.env['account.move'].search([('date', '>=', docs.start_date),('date', '<=', docs.end_date),('journal_id.type','=', 'purchase')])
+            invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'purchase')])
             
         if invoices:
         #    amount_due = 0
