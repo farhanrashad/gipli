@@ -20,21 +20,13 @@
                     <th  align="center"> <span t-field="docs.end_date"/></th>                  
                 </tr>
             </table>
-            
-            <table class="table table-sm table-striped table-bordered">
-                <tr style="height:30%">
-                    <th  align="center">Invoice Number:</th>
-                    <th  align="center"><span t-field="o.name"/></th>
-                    <th  align="center">To Date</th>
-                    <th  align="center"> <span t-field="o.invoice_date"/></th>                  
-                </tr>
-            </table>
             <br/>
             <t t-foreach="invoices" t-as="invoice">
             <table class="table table-sm table-striped table-bordered">
                     <t t-set="qtysum" t-value="0"/>
                     <t t-set="exvsum" t-value="0"/>
                     <t t-set="taxsum" t-value="0"/>
+                    <t t-set="totsum" t-value="0"/>
                 <thead>
                     <tr>
                        <th>INVOICE NO</th>
@@ -83,6 +75,7 @@
                                 </td>
                             </t>
                             <td><span t-esc="line.move_id.amount_total"/></td>
+                            <t t-set="totsum" t-value="totsum + line.move_id.amount_total"/>
                             <td ><span t-field="line.partner_id"/></td> 
  
                            </tr>
@@ -96,7 +89,7 @@
                          <td><span t-esc="round(exvsum,2)"></span></td>
                          <t t-foreach="set(taxes)" t-as="t">
                              <td>
-                                <span t-field="o.amount_by_group"/>
+<!--                                <span t-field="o.amount_by_group"/>-->
 
                                  <!--
                                  <t t-esc="sum((l.tax_ids.amount/100)*l.debit for l in invoices.filtered(lambda x: x.tax_ids.id == t.id)) " />
@@ -104,8 +97,9 @@
                             </td>
                          </t>
                          <td>
+                             <span t-esc="round(totsum,2)"></span>
 <!--                              <span t-field="o.amount_total"/> -->
-                             <t t-esc="round(sum(l.amount_total for l in invoices),2)" />
+<!--                             <t t-esc="round(sum(l.amount_total for l in invoices),2)" />-->
                         </td>
                          
                          

@@ -25,6 +25,7 @@
                     <t t-set="qtysum" t-value="0"/>
                     <t t-set="exvsum" t-value="0"/>
                     <t t-set="taxsum" t-value="0"/>
+                    <t t-set="totsum" t-value="0"/>
                 <thead>
                     <tr>
                         <th>DATE</th>
@@ -73,6 +74,7 @@
                                 </td>
                             </t>
                             <td><span t-esc="line.move_id.amount_total"/></td>
+                            <t t-set="totsum" t-value="totsum + line.move_id.amount_total"/>
                            </tr>
                          </t>
 		              </t>
@@ -88,7 +90,8 @@
                             </td>
                          </t>
                          <td>
-                             <t t-esc="sum(l.amount_total for l in invoices)" />
+                             <span t-esc="round(totsum,2)"></span>
+<!--                             <t t-esc="sum(l.amount_total for l in invoices)" />-->
                         </td>
                          
                           
