@@ -22,9 +22,9 @@ class SaleTaxRegister(models.AbstractModel):
         docs = self.env[self.model].browse(self.env.context.get('active_id'))
         sale_invoice = []                                               
         if docs.target_move == 'posted':
-            invoices = self.env['account.move'].search([('date', '>=', docs.start_date),('date', '<=', docs.end_date),('journal_id.type','=', 'sale'),('state','=', 'posted')])
+            invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'sale'),('state','=', 'posted')])
         else:
-            invoices = self.env['account.move'].search([('date', '>=', docs.start_date),('date', '<=', docs.end_date),('journal_id.type','=', 'sale')])
+            invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'sale')])
                                               
         if invoices:
         #    amount_due = 0
@@ -37,4 +37,4 @@ class SaleTaxRegister(models.AbstractModel):
                 'invoices': invoices,
             }
         else:
-            raise UserError("There is not any Purchase invoice in between selected dates")
+            raise UserError("There is not any Sale invoice in between selected dates")

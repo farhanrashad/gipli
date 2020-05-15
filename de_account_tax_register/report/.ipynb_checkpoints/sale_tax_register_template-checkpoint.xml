@@ -3,7 +3,7 @@
 <template id="sale_tax_register">
     <t t-call="web.html_container">    
         <t t-foreach="invoices" t-as="o">
-        <t t-call="web.external_layout">
+        <t t-call="web.internal_layout">
         <t t-set="docs" t-value="docs.with_context()"/>
         <div class="page">
             <div class="oe_structure"/>
@@ -83,7 +83,7 @@
 		              </t>
                      <tr>
                          <td colspan="3">Total</td>
-                         <td><span t-esc="qtysum"></span></td> 
+                         <td><span t-esc="qtysum"></span></td>
                          <td><span t-esc="round(exvsum,2)"></span></td>
                          <t t-foreach="set(taxes)" t-as="t">
                              <td>
@@ -93,8 +93,6 @@
                          <td>
                              <span t-esc="round(totsum,2)"></span>
                         </td>
-                         
-                         
                     </tr>
                 </tbody>
             </table>

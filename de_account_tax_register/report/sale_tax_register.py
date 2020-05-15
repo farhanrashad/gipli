@@ -37,4 +37,4 @@ class SaleTaxRegister(models.AbstractModel):
                 'invoices': invoices,
             }
         else:
-            raise UserError("There is not any Purchase invoice in between selected dates")
+            raise UserError("There is not any Sale invoice in between selected dates")

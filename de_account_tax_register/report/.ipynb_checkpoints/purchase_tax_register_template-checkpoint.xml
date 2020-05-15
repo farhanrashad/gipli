@@ -2,7 +2,7 @@
 <odoo>
 <template id="purchase_tax_register">
     <t t-call="web.html_container">
-    <t t-call="web.external_layout">
+    <t t-call="web.internal_layout">
         <t t-set="docs" t-value="docs.with_context()"/>
         <div class="page">
             <div class="oe_structure"/>
@@ -87,16 +87,15 @@
                          </t>
                          <td>
                              <span t-esc="round(totsum,2)"></span>
-                        </td>
-                         
-                          
+                            
+                        </td>              
                     </tr>
                 </tbody>
             </table>
             <br/>
             <br/>                  
             </t>
-        </div>
+          </div>
     </t>
     </t>
 </template>
