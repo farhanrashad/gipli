@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <menuitem
+<!--      Create menu to open wizard for report -->
+     <menuitem
         id="account_tax_register"
         name="Account Tax Register"
         parent="account.menu_finance_reports"
@@ -11,12 +12,13 @@
         name="Sale Tax Register"
         parent="account_tax_register"
         sequence="4"
-        action="open_sale_tax_register_action"/>
-
+        action="de_account_tax_register.open_sale_tax_register_action"
+    />
         <menuitem
         id="purchase_tax_register"
         name="Purchase Tax Register"
         parent="account_tax_register"
-        sequence="5"
-        action="open_purchase_tax_register_action"/>
+        sequence="6"
+        action="de_account_tax_register.open_purchase_tax_register_action"
+    />
 </odoo>

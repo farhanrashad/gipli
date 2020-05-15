@@ -67,7 +67,6 @@
                                 <td>
                                 <t t-foreach="line.tax_ids" t-as="tax">                               
                                     <t t-if="t.id==tax.id">
-<!--                                         <t t-set="taxsum" t-value="taxsum + ((int(tax.amount) / 100) * line.debit)"/> -->
                                         <span t-esc="round(((int(tax.amount) / 100) * line.debit),2)"/>
                                     </t>
                                 </t>
@@ -84,14 +83,10 @@
                          <td><span t-esc="round(exvsum,2)"></span></td>
                          <t t-foreach="set(taxes)" t-as="t">
                              <td>
-                                 <!--
-                                 <t t-esc="sum((l.tax_ids.amount/100)*l.debit for l in invoices.filtered(lambda x: x.tax_ids.id == t.id)) " />
--->
                             </td>
                          </t>
                          <td>
                              <span t-esc="round(totsum,2)"></span>
-<!--                             <t t-esc="sum(l.amount_total for l in invoices)" />-->
                         </td>
                          
                           

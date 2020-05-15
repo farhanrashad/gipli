@@ -20,6 +20,7 @@
                     <th  align="center"> <span t-field="docs.end_date"/></th>                  
                 </tr>
             </table>
+            
             <br/>
             <t t-foreach="invoices" t-as="invoice">
             <table class="table table-sm table-striped table-bordered">
@@ -68,7 +69,6 @@
                                 <td>
                                 <t t-foreach="line.tax_ids" t-as="tax">                               
                                     <t t-if="t.id==tax.id">
-<!--                                         <t t-set="taxsum" t-value="taxsum + ((int(tax.amount) / 100) * line.credit)"/> -->
                                         <span t-esc="round(((int(tax.amount) / 100) * line.credit),2)"/>
                                     </t>
                                 </t>
@@ -81,30 +81,21 @@
                            </tr>
                          </t>
 		              </t>
-<!--                      <t t-if="o.name == o.name">
- -->
                      <tr>
                          <td colspan="3">Total</td>
                          <td><span t-esc="qtysum"></span></td> 
                          <td><span t-esc="round(exvsum,2)"></span></td>
                          <t t-foreach="set(taxes)" t-as="t">
                              <td>
-<!--                                <span t-field="o.amount_by_group"/>-->
 
-                                 <!--
-                                 <t t-esc="sum((l.tax_ids.amount/100)*l.debit for l in invoices.filtered(lambda x: x.tax_ids.id == t.id)) " />
--->
                             </td>
                          </t>
                          <td>
                              <span t-esc="round(totsum,2)"></span>
-<!--                              <span t-field="o.amount_total"/> -->
-<!--                             <t t-esc="round(sum(l.amount_total for l in invoices),2)" />-->
                         </td>
                          
                          
                     </tr>
-<!--                     </t> -->
                 </tbody>
             </table>
             <br/>
