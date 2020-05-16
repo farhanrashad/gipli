@@ -25,6 +25,7 @@ class SaleTaxRegister(models.AbstractModel):
             invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'sale'),('state','=', 'posted')])
         else:
             invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'sale')])
+
                                               
         if invoices:
         #    amount_due = 0
