@@ -35,7 +35,6 @@ class PurchaseTaxRegister(models.AbstractModel):
 
             return {
                 'docs': docs,
-                'companyntn':companyntn,
                 'invoices': invoices,
             }
         else:
