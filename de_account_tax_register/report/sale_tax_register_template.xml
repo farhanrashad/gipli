@@ -9,17 +9,9 @@
             <div class="oe_structure"/>
             <div align="center"> 
                 <br/>                  
-                <h2> Sale Tax Register</h2>
+                <h2> Sale Register</h2>
             </div>
             <br/>
-            <table class="table table-sm table-striped table-bordered">
-                <tr style="height:30%">
-                    <th  align="center">From Date</th>
-                    <th  align="center"><span t-field="docs.start_date"/></th>
-                    <th  align="center">To Date</th>
-                    <th  align="center"> <span t-field="docs.end_date"/></th>                  
-                </tr>
-            </table>
             
             <br/>
             <t t-foreach="invoices" t-as="invoice">
@@ -55,7 +47,7 @@
                 </thead>
                 <tbody class="sale_tbody">
                     <t t-foreach="invoice.invoice_line_ids" t-as="line">
-                        <t t-if="line.tax_ids">
+<!--                         <t t-if="line.tax_ids"> -->
                         <tr>
                             <td ><span t-field="line.move_id"/></td>
                             <td ><span t-field="line.date"/></td>
@@ -80,7 +72,7 @@
  
                            </tr>
                          </t>
-		              </t>
+<!-- 		              </t> -->
                      <tr>
                          <td colspan="3">Total</td>
                          <td><span t-esc="qtysum"></span></td>

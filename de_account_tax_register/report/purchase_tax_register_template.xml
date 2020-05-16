@@ -7,18 +7,10 @@
         <div class="page">
             <div class="oe_structure"/>
             <div align="center"> 
-                <br/>                  
-                <h2> Purchase Tax Register</h2>
+                <br/>
+                <h2> Purchase Register</h2>
             </div>
             <br/>
-            <table class="table table-sm table-striped table-bordered">
-                <tr style="height:30%">
-                    <th  align="center">From Date</th>
-                    <th  align="center"><span t-field="docs.start_date"/></th>
-                    <th  align="center">To Date</th>
-                    <th  align="center"> <span t-field="docs.end_date"/></th>                  
-                </tr>
-            </table>
             <br/>
             <t t-foreach="invoices" t-as="invoice">
             <table class="table table-sm table-striped table-bordered">
@@ -52,7 +44,7 @@
                 </thead>
                 <tbody class="sale_tbody">
                     <t t-foreach="invoice.invoice_line_ids" t-as="line">
-                        <t t-if="line.tax_ids">
+<!--                         <t t-if="line.tax_ids"> -->
                         <tr>
                             <td ><span t-field="line.date"/></td>
                             <td ><span t-field="line.partner_id"/></td>
@@ -76,7 +68,7 @@
                             <t t-set="totsum" t-value="totsum + line.move_id.amount_total"/>
                            </tr>
                          </t>
-		              </t>
+<!-- 		              </t> -->
                      <tr>
                          <td colspan="4">Total</td>
                          <td><span t-esc="qtysum"></span></td> 
