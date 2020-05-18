@@ -5,6 +5,9 @@
     <t t-call="web.internal_layout">
         <t t-set="docs" t-value="docs.with_context()"/>
         <div class="page">
+            <t t-set="qtysumtot" t-value="0"/>
+            <t t-set="exvsumtot" t-value="0"/>
+            <t t-set="totsumtot" t-value="0"/>
             <div class="oe_structure"/>
             <div align="center"> 
                 <br/>
@@ -72,13 +75,16 @@
                      <tr>
                          <td colspan="4">Total</td>
                          <td><span t-esc="qtysum"></span></td> 
+                         <t t-set="qtysumtot" t-value="qtysumtot + qtysum"/>
                          <td><span t-esc="round(exvsum,2)"></span></td>
+                         <t t-set="exvsumtot" t-value="exvsumtot + exvsum"/>
                          <t t-foreach="set(taxes)" t-as="t">
                              <td>
                             </td>
                          </t>
                          <td>
                              <span t-esc="round(totsum,2)"></span>
+                             <t t-set="totsumtot" t-value="totsumtot + totsum"/>
                             
                         </td>              
                     </tr>
@@ -87,6 +93,29 @@
             <br/>
             <br/>                  
             </t>
+        <table class="table table-sm table-striped table-bordered">
+                 <tr>
+                        <th width="15%"></th>
+                        <th width="15%"></th>
+                        <th width="15%"></th>
+                        <th width="15%"></th>
+                        <th>QUANTITY</th>
+                        <th>VALUE EXC S.TAX </th>
+                        <th>SALE TAX</th>
+                        <th  >VALUE INC S.TAX</th>
+                    </tr>
+
+                <tr>
+                    <td colspan="4">Total</td>
+                         <td><span t-esc="qtysumtot"></span></td>
+                         <td><span t-esc="exvsumtot"></span></td>
+                             <td>
+                            </td>
+                         <td>
+                             <span t-esc="totsumtot"></span>
+                         </td>
+                </tr>
+            </table>
           </div>
     </t>
     </t>
