@@ -5,6 +5,12 @@
         <t t-call="web.internal_layout">
         <t t-set="docs" t-value="docs.with_context()"/>
         <div class="page">
+	    <t t-foreach="companyt" t-as="t">
+             <div  class="mt0" style="padding-left:15px;">
+                 <span t-esc="t.vat"/><br/>
+                 <span t-esc="t.ntn"/><br/>
+                </div>
+             </t>		
             <t t-set="qtysumtot" t-value="0"/>
             <t t-set="exvsumtot" t-value="0"/>
             <t t-set="totsumtot" t-value="0"/>
@@ -87,9 +93,9 @@
                             </td>
                          </t>
                          <td>
-                             <span t-esc="round(totsum,2)"></span>
+                             <span t-esc="invoice.amount_total"></span>
                         </td>
-                        <t t-set="totsumtot" t-value="totsumtot + totsum"/>
+                        <t t-set="totsumtot" t-value="totsumtot + invoice.amount_total"/>
                     </tr>
                 </tbody>
             </table>
@@ -111,8 +117,8 @@
 
                 <tr>
                     <td colspan="3">Total</td>
-                         <td><span t-esc="qtysumtot"></span></td>
-                         <td><span t-esc="exvsumtot"></span></td>
+                         <td><span t-esc="round(qtysumtot,2)"></span></td>
+                         <td><span t-esc="round(exvsumtot,2)"></span></td>
                              <td>
                             </td>
                          <td>
