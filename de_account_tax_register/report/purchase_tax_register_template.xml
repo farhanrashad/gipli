@@ -73,7 +73,7 @@
                          </t>
 <!-- 		              </t> -->
                      <tr>
-                         <td colspan="4">Total</td>
+                         <td colspan="4">Sub Total</td>
                          <td><span t-esc="qtysum"></span></td> 
                          <t t-set="qtysumtot" t-value="qtysumtot + qtysum"/>
                          <td><span t-esc="round(exvsum,2)"></span></td>
