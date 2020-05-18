@@ -7,8 +7,8 @@
         <div class="page">
 	    <t t-foreach="companyt" t-as="t">
              <div  class="mt0" style="padding-left:15px;">
-                 <span t-esc="t.vat"/><br/>
-                 <span t-esc="t.ntn"/><br/>
+                 <span t-esc="t.partner_id.vat"/><br/>
+                 <span t-esc="t.partner_id.ntn"/><br/>
                 </div>
              </t>		
             <t t-set="qtysumtot" t-value="0"/>
