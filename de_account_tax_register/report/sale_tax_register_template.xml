@@ -69,7 +69,7 @@
                             <th><span t-field="t.description"/></th>
                            </t>
                         </t>
-                        </t>
+                    
                         
                         <th  >TOTAL AMOUNT</th>
                         <th>PARTY NAME ADDRESS</th>
