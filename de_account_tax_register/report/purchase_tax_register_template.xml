@@ -46,6 +46,8 @@
                     <t t-set="exvsum" t-value="0"/>
                     <t t-set="taxsum" t-value="0"/>
                     <t t-set="totsum" t-value="0"/>
+		<t t-foreach="invoice.invoice_line_ids" t-as="line">
+                <t t-if="line.date == invoice.invoice_date">
                 <thead>
                     <tr>
                         <th>DATE</th>
@@ -64,10 +66,10 @@
                             
                        
                         <t t-foreach="set(taxes)" t-as="t">
-                            <t t-if="taxes">
+                            <t t-if="set(taxes)">
                               <th><span t-field="t.description"/></th>
                             </t>
-                            <t t-if="not taxes">
+                            <t t-if="not set(taxes)">
                               <th>SALES TAX</th>
                             </t>
                         </t>
@@ -75,6 +77,8 @@
                         <th  >VALUE INC S.TAX</th>
                     </tr>
                 </thead>
+		</t>
+		</t>
                 <tbody class="sale_tbody">
                     <t t-foreach="invoice.invoice_line_ids" t-as="line">
                        <t t-if="line.date == invoice.invoice_date">
