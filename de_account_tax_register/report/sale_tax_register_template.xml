@@ -2,17 +2,42 @@
 <odoo>
 <template id="sale_tax_register">
     <t t-call="web.html_container">    
-        <t t-foreach="invoices" t-as="o">
         <t t-call="web.internal_layout">
         <t t-set="docs" t-value="docs.with_context()"/>
-        <div class="page">
+        <div class="page">	
+            <t t-set="qtysumtot" t-value="0"/>
+            <t t-set="exvsumtot" t-value="0"/>
+            <t t-set="totsumtot" t-value="0"/>
             <div class="oe_structure"/>
+            <table class="table table-sm table-striped table-bordered">
+               <t t-foreach="companyt" t-as="t">
+                <t t-if="t.partner_id.vat">
+                <tr style="height:30%">
+                    <th  align="center">SALES TAX REG. NO.</th>
+                    <th  align="center"><span t-field="t.partner_id.vat"/></th>
+                </tr>
+                </t>
+                <t t-if="t.partner_id.ntn">
+                <tr style="height:30%">
+                    <th  align="center">NATIONAL TAX NO.</th>
+                    <th  align="center"><span t-field="t.partner_id.ntn"/></th>
+                </tr>
+                </t>
+               </t>
+
+                <tr style="height:30%">
+                    <th  align="center">From Date</th>
+                    <th  align="center"><span t-field="docs.start_date"/></th>
+                    <th  align="center">To Date</th>
+                    <th  align="center"> <span t-field="docs.end_date"/></th>
+                </tr>
+
+            </table>
             <div align="center"> 
                 <br/>                  
                 <h2> Sale Register</h2>
             </div>
             <br/>
-            
             <br/>
             <t t-foreach="invoices" t-as="invoice">
             <table class="table table-sm table-striped table-bordered">
@@ -37,8 +62,14 @@
                             
                        
                         <t t-foreach="set(taxes)" t-as="t">
+                           <t t-if="taxes">
                             <th><span t-field="t.description"/></th>
+                           </t>
+                           <t t-if="not taxes">
+                            <th>SALES TAX</th>
+                           </t>
                         </t>
+                    
                         
                         <th  >TOTAL AMOUNT</th>
                         <th>PARTY NAME ADDRESS</th>
@@ -47,7 +78,7 @@
                 </thead>
                 <tbody class="sale_tbody">
                     <t t-foreach="invoice.invoice_line_ids" t-as="line">
-<!--                         <t t-if="line.tax_ids"> -->
+                        <t t-if="line.date == invoice.invoice_date">
                         <tr>
                             <td ><span t-field="line.move_id"/></td>
                             <td ><span t-field="line.date"/></td>
@@ -71,28 +102,57 @@
                             <td ><span t-field="line.partner_id"/></td> 
  
                            </tr>
-                         </t>
-<!-- 		              </t> -->
+                           </t>
+		         </t> 
                      <tr>
-                         <td colspan="3">Total</td>
+                         <td colspan="3">Sub Total</td>
                          <td><span t-esc="qtysum"></span></td>
+                         <t t-set="qtysumtot" t-value="qtysumtot + qtysum"/>
                          <td><span t-esc="round(exvsum,2)"></span></td>
+                         <t t-set="exvsumtot" t-value="exvsumtot + exvsum"/>
                          <t t-foreach="set(taxes)" t-as="t">
                              <td>
 
                             </td>
                          </t>
                          <td>
-                             <span t-esc="round(totsum,2)"></span>
+                             <span t-esc="invoice.amount_total"></span>
                         </td>
+                        <t t-set="totsumtot" t-value="totsumtot + invoice.amount_total"/>
                     </tr>
                 </tbody>
             </table>
             <br/>
             <br/>                  
             </t>
+          <table class="table table-sm table-striped table-bordered">
+                  <tr>
+                       <th width="20%"></th>
+                        <th width="20%"></th>
+                        <th width="20%"></th>
+                        <th>QUANTITY</th>
+                        <th>EX-<br/>VALUE</th>
+                            <th width="20%">SALE TAX</th>
+                        <th  >TOTAL AMOUNT</th>
+                        <th width="20%"></th>
+
+                    </tr>
+
+                <tr>
+                    <td colspan="3">Total</td>
+                         <td><span t-esc="round(qtysumtot,2)"></span></td>
+                         <td><span t-esc="round(exvsumtot,2)"></span></td>
+                             <td>
+                                <span t-esc="round((totsumtot-exvsumtot),2)"></span>
+                            </td>
+                         <td>
+                             <span t-esc="round(totsumtot,2)"></span>
+                        </td>
+                        <td>
+                        </td>
+                </tr>
+             </table>
         </div>
-        </t>
     </t>
     </t>
 </template>

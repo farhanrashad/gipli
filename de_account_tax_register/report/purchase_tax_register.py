@@ -24,9 +24,11 @@ class PurchaseTaxRegister(models.AbstractModel):
         
         if docs.target_move == 'posted':
             invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'purchase'),('state','=', 'posted')])
+            companyt = self.env['res.company'].search([])
         else:
             invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'purchase')])
-    
+            companyt = self.env['res.company'].search([])
+
         if invoices:
         #    amount_due = 0
         #    for total_amount in invoices:
@@ -35,7 +37,7 @@ class PurchaseTaxRegister(models.AbstractModel):
 
             return {
                 'docs': docs,
-                'companyntn':companyntn,
+                'companyt': companyt,
                 'invoices': invoices,
             }
         else:

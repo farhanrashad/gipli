@@ -23,8 +23,10 @@ class SaleTaxRegister(models.AbstractModel):
         sale_invoice = []                                               
         if docs.target_move == 'posted':
             invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'sale'),('state','=', 'posted')])
+            companyt = self.env['res.company'].search([])
         else:
             invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),('journal_id.type','=', 'sale')])
+            companyt = self.env['res.company'].search([])
 
                                               
         if invoices:
@@ -35,6 +37,7 @@ class SaleTaxRegister(models.AbstractModel):
 
             return {
                 'docs': docs,
+                'companyt': companyt,
                 'invoices': invoices,
             }
         else:
