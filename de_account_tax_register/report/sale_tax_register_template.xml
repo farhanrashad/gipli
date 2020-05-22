@@ -40,13 +40,15 @@
             <br/>
             <br/>
             <t t-foreach="invoices" t-as="invoice">
+                 <t t-foreach="invoice.invoice_line_ids" t-as="line">
+                        <t t-if="line.date == invoice.invoice_date">
             <table class="table table-sm table-striped table-bordered">
                     <t t-set="qtysum" t-value="0"/>
                     <t t-set="exvsum" t-value="0"/>
                     <t t-set="taxsum" t-value="0"/>
                     <t t-set="totsum" t-value="0"/>
-	       <t t-foreach="invoice.invoice_line_ids" t-as="line">
-                <t t-if="line.date == invoice.invoice_date">
+		<t t-foreach="invoice.invoice_line_ids" t-as="line">
+                     <t t-if="line.date == invoice.invoice_date">
                 <thead>
                     <tr>
                        <th>INVOICE NO</th>
@@ -56,33 +58,31 @@
                         <th>EX-<br/>VALUE</th>
                        
                             <t t-set="taxes" t-value="[]"/>
-                            <t t-foreach="invoice.invoice_line_ids" t-as="inv">
-                                <t t-foreach="inv.tax_ids" t-as="t">
+                            <!-- <t t-foreach="invoice.invoice_line_ids" t-as="inv"> -->
+                                <t t-foreach="line.tax_ids" t-as="t">
                                     <t t-set="taxes" t-value="taxes+[t]"/>
-                                </t>
+                               <!-- </t> -->
                             </t>
                             
                        
                         <t t-foreach="set(taxes)" t-as="t">
-                           <t t-if="set(taxes)">
+                           <t t-if="taxes">
                             <th><span t-field="t.description"/></th>
                            </t>
-                           <t t-if="not set(taxes)">
-                            <th>SALES TAX</th>
+                           <t t-if="not taxes">
+                            <th><span t-field="t.description"/></th>
                            </t>
                         </t>
                     
                         
-                        <th>TOTAL AMOUNT</th>
+                        <th  >TOTAL AMOUNT</th>
                         <th>PARTY NAME ADDRESS</th>
 
                     </tr>
                 </thead>
-		 </t>
-		</t>
+		
                 <tbody class="sale_tbody">
-                    <t t-foreach="invoice.invoice_line_ids" t-as="line">
-                        <t t-if="line.date == invoice.invoice_date">
+                    
                         <tr>
                             <td ><span t-field="line.move_id"/></td>
                             <td ><span t-field="line.date"/></td>
@@ -127,7 +127,9 @@
                 </tbody>
             </table>
             <br/>
-            <br/>                  
+            <br/> 
+                 </t>
+		</t>                 
             </t>
           <table class="table table-sm table-striped table-bordered">
                   <tr>
