@@ -41,13 +41,14 @@
         
             <br/>
             <t t-foreach="invoices" t-as="invoice">
+               <t t-foreach="invoice.invoice_line_ids" t-as="line">
+                   <t t-if="line.date == invoice.invoice_date">
             <table class="table table-sm table-striped table-bordered">
                     <t t-set="qtysum" t-value="0"/>
                     <t t-set="exvsum" t-value="0"/>
                     <t t-set="taxsum" t-value="0"/>
                     <t t-set="totsum" t-value="0"/>
-		<t t-foreach="invoice.invoice_line_ids" t-as="line">
-                       <t t-if="line.date == invoice.invoice_date">
+		
                 <thead>
                     <tr>
                         <th>DATE</th>
@@ -74,11 +75,7 @@
                         <th  >VALUE INC S.TAX</th>
                     </tr>
                 </thead>
-		 </t>
-		</t>
                 <tbody class="sale_tbody">
-                    <t t-foreach="invoice.invoice_line_ids" t-as="line">
-                       <t t-if="line.date == invoice.invoice_date">
                         <tr>
                             <td ><span t-field="line.date"/></td>
                             <td ><span t-field="line.partner_id"/></td>
@@ -101,29 +98,27 @@
                             <td><span t-esc="line.move_id.amount_total"/></td>
                             <t t-set="totsum" t-value="totsum + line.move_id.amount_total"/>
                            </tr>
-                            </t>
-		          </t>
                      <tr>
                          <td colspan="4">Sub Total</td>
                          <td><span t-esc="qtysum"></span></td> 
                          <t t-set="qtysumtot" t-value="qtysumtot + qtysum"/>
                          <td><span t-esc="round(exvsum,2)"></span></td>
                          <t t-set="exvsumtot" t-value="exvsumtot + exvsum"/>
-                         <t t-foreach="set(taxes)" t-as="t">
+                        <t t-foreach="set(taxes)" t-as="t">
                              <td>
                             </td>
-                         </t>
+                       </t>
                          <td>
                              <span t-esc="invoice.amount_total"></span>
                              <t t-set="totsumtot" t-value="totsumtot + invoice.amount_total"/>
-
-                            
                         </td>              
                     </tr>
                 </tbody>
             </table>
             <br/>
-            <br/>                  
+            <br/> 
+		       </t>
+		      </t>
             </t>
         <table class="table table-sm table-striped table-bordered">
                  <tr>

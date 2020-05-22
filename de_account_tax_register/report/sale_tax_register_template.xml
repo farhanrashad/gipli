@@ -40,13 +40,13 @@
             <br/>
             <br/>
             <t t-foreach="invoices" t-as="invoice">
+                 <t t-foreach="invoice.invoice_line_ids" t-as="line">
+                        <t t-if="line.date == invoice.invoice_date">
             <table class="table table-sm table-striped table-bordered">
                     <t t-set="qtysum" t-value="0"/>
                     <t t-set="exvsum" t-value="0"/>
                     <t t-set="taxsum" t-value="0"/>
                     <t t-set="totsum" t-value="0"/>
-		<t t-foreach="invoice.invoice_line_ids" t-as="line">
-                     <t t-if="line.date == invoice.invoice_date">
                 <thead>
                     <tr>
                        <th>INVOICE NO</th>
@@ -67,8 +67,8 @@
                            <t t-if="taxes">
                             <th><span t-field="t.description"/></th>
                            </t>
-                           <t t-if="not taxes">
-                            <th><span t-field="t.description"/></th>
+                           <t t-if="taxes==[]">
+                            <th>Sale Tax</th>
                            </t>
                         </t>
                     
@@ -78,11 +78,8 @@
 
                     </tr>
                 </thead>
-		  </t>
-		</t>
+		
                 <tbody class="sale_tbody">
-                    <t t-foreach="invoice.invoice_line_ids" t-as="line">
-                        <t t-if="line.date == invoice.invoice_date">
                         <tr>
                             <td ><span t-field="line.move_id"/></td>
                             <td ><span t-field="line.date"/></td>
@@ -106,8 +103,6 @@
                             <td ><span t-field="line.partner_id"/></td> 
  
                            </tr>
-                           </t>
-		         </t> 
                      <tr>
                          <td colspan="3">Sub Total</td>
                          <td><span t-esc="qtysum"></span></td>
@@ -127,11 +122,13 @@
                 </tbody>
             </table>
             <br/>
-            <br/>                  
+            <br/> 
+                 </t>
+		</t>                 
             </t>
           <table class="table table-sm table-striped table-bordered">
                   <tr>
-                       <th width="20%"></th>
+                       <th width="20%" style="border-top="></th>
                         <th width="20%"></th>
                         <th width="20%"></th>
                         <th>QUANTITY</th>
