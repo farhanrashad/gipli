@@ -58,10 +58,10 @@
                         <th>VALUE EXC S.TAX </th>
                        
                             <t t-set="taxes" t-value="[]"/>
-                            <t t-foreach="invoice.invoice_line_ids" t-as="inv">
-                                <t t-foreach="inv.tax_ids" t-as="t">
+                        <!--    <t t-foreach="invoice.invoice_line_ids" t-as="inv"> -->
+                                <t t-foreach="line.tax_ids" t-as="t">
                                     <t t-set="taxes" t-value="taxes+[t]"/>
-                                </t>
+                           <!--     </t> -->
                             </t>
                             
                        

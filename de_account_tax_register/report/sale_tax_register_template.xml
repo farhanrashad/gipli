@@ -46,7 +46,7 @@
                     <t t-set="taxsum" t-value="0"/>
                     <t t-set="totsum" t-value="0"/>
 		<t t-foreach="invoice.invoice_line_ids" t-as="line">
-                        <t t-if="line.date == invoice.invoice_date">
+                     <t t-if="line.date == invoice.invoice_date">
                 <thead>
                     <tr>
                        <th>INVOICE NO</th>
@@ -56,10 +56,10 @@
                         <th>EX-<br/>VALUE</th>
                        
                             <t t-set="taxes" t-value="[]"/>
-                            <t t-foreach="invoice.invoice_line_ids" t-as="inv">
-                                <t t-foreach="inv.tax_ids" t-as="t">
+                            <!-- <t t-foreach="invoice.invoice_line_ids" t-as="inv"> -->
+                                <t t-foreach="line.tax_ids" t-as="t">
                                     <t t-set="taxes" t-value="taxes+[t]"/>
-                                </t>
+                               <!-- </t> -->
                             </t>
                             
                        
