@@ -67,8 +67,8 @@
                            <t t-if="taxes">
                             <th><span t-field="t.description"/></th>
                            </t>
-                           <t t-if="not taxes">
-                            <th><span t-field="t.description"/></th>
+                           <t t-if="taxes==[]">
+                            <th>Sale Tax</th>
                            </t>
                         </t>
                     
