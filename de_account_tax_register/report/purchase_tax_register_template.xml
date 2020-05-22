@@ -104,23 +104,21 @@
                          <t t-set="qtysumtot" t-value="qtysumtot + qtysum"/>
                          <td><span t-esc="round(exvsum,2)"></span></td>
                          <t t-set="exvsumtot" t-value="exvsumtot + exvsum"/>
-                         <t t-foreach="set(taxes)" t-as="t">
+<!--                         <t t-foreach="set(taxes)" t-as="t">-->
                              <td>
                             </td>
-                         </t>
+<!--                         </t>-->
                          <td>
                              <span t-esc="invoice.amount_total"></span>
                              <t t-set="totsumtot" t-value="totsumtot + invoice.amount_total"/>
-
-                            
                         </td>              
                     </tr>
                 </tbody>
             </table>
             <br/>
             <br/> 
-		 </t>
-		</t>                 
+		       </t>
+		      </t>
             </t>
         <table class="table table-sm table-striped table-bordered">
                  <tr>
