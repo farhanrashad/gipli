@@ -10,21 +10,6 @@
             <t t-set="totsumtot" t-value="0"/>
             <div class="oe_structure"/>
             <table class="table table-sm table-striped table-bordered">
-               <t t-foreach="companyt" t-as="t">
-                <t t-if="t.partner_id.vat">
-                <tr style="height:30%">
-                    <th  align="center">SALES TAX REG. NO.</th>
-                    <th  align="center"><span t-field="t.partner_id.vat"/></th>
-                </tr>
-                </t>
-                <t t-if="t.partner_id.ntn">
-                <tr style="height:30%">
-                    <th  align="center">NATIONAL TAX NO.</th>
-                    <th  align="center"><span t-field="t.partner_id.ntn"/></th>
-                </tr>
-                </t>
-               </t>
-
                 <tr style="height:30%">
                     <th  align="center">From Date</th>
                     <th  align="center"><span t-field="docs.start_date"/></th>
