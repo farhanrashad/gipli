@@ -65,7 +65,11 @@
                         <tr>
                             <td ><span t-field="line.date"/></td>
                             <td >
-                                <span t-field="line.move_id.partner_id.contact_address"/>
+                                <span t-field="line.move_id.partner_id"/><br/>
+                                <span t-field="line.move_id.partner_id.street"/>
+                                <span t-field="line.move_id.partner_id.street2"/>
+                                <span t-field="line.move_id.partner_id.city"/>
+                                <span t-field="line.move_id.partner_id.country_id"/>
                             </td>
                             <td ><span t-field="line.move_id"/></td>
                             <td ><span t-field="line.product_id"/></td>
