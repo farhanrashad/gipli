@@ -2,7 +2,7 @@
 #################################################################################
 #
 #    Odoo, Open Source Management Solution
-#    Copyright (C) 2019-today Ascetic Business Solution <www.dynexcel.com>
+#    Copyright (C) 2019-today Dynexcel Business Solution <www.dynexcel.com>
 
 #################################################################################
 
@@ -29,7 +29,6 @@ class SaleTaxRegister(models.AbstractModel):
             invoices = self.env['account.move'].search([('invoice_date', '>=', docs.start_date),('invoice_date', '<=', docs.end_date),
                             ('invoice_line_ids.date', '>=', docs.start_date),('invoice_line_ids.date', '<=', docs.end_date),
                                                         ('journal_id.type','=', 'sale')])
-
                                               
         if invoices:
         #    amount_due = 0
@@ -39,7 +38,6 @@ class SaleTaxRegister(models.AbstractModel):
 
             return {
                 'docs': docs,
-#                 'companyt': companyt,
                 'invoices': invoices,
             }
         else:
