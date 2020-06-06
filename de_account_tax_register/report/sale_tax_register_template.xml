@@ -63,7 +63,7 @@
                           <t t-if='line.tax_ids'>
                         <tr>
                              <t t-set='invno' t-value="line.move_id.name.split('/')"/>
-                             <td ><span t-esc="invno[2]"</td> 
+                             <td ><span t-esc="invno[2]"/></td>
                             <td ><span t-field="line.date"/></td>
                             <td ><span t-field="line.product_id"/></td>
                             <td ><span t-field="line.quantity"/></td>
