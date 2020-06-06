@@ -53,6 +53,7 @@
                    <t t-if="invoice.invoice_line_ids.tax_ids">
                     <t t-set="qtysum" t-value="0"/>
                     <t t-set="exvsum" t-value="0"/>
+                    <t t-set='invno' t-value="0"/>   
                     <t t-set="taxsum" t-value="0"/>    
                     <t t-set="totsum" t-value="0"/>
                     <t t-set="lineitem" t-value="0"/>   
@@ -61,7 +62,8 @@
                           <t t-set="lineitem" t-value="lineitem + 1"/>   
                           <t t-if='line.tax_ids'>
                         <tr>
-                             <td ><span t-field="line.move_id"/></td> 
+                             <t t-set='invno' t-value="line.move_id.name.split('/')"/>
+                             <td ><span t-esc="invno[2]"/></td>
                             <td ><span t-field="line.date"/></td>
                             <td ><span t-field="line.product_id"/></td>
                             <td ><span t-field="line.quantity"/></td>
@@ -93,7 +95,11 @@
                             <t t-set="totsum" t-value="round((totsum + line.price_subtotal + taxsum),2)"/>
                             <t t-set="totsumtot" t-value="round((totsumtot + line.price_subtotal + taxsum),2)"/>
                             <td>
-                                <span t-field="line.move_id.partner_id.contact_address"/>
+                                <span t-field="line.move_id.partner_id"/><br/>
+                                <span t-field="line.move_id.partner_id.street"/>
+                                <span t-field="line.move_id.partner_id.street2"/>
+                                <span t-field="line.move_id.partner_id.city"/>
+                                <span t-field="line.move_id.partner_id.country_id"/> 
                             </td> 
                            </tr>
                           </t>    
