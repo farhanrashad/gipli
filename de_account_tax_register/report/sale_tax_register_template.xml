@@ -99,7 +99,9 @@
                                 <span t-field="line.move_id.partner_id.street"/>
                                 <span t-field="line.move_id.partner_id.street2"/>
                                 <span t-field="line.move_id.partner_id.city"/>
-                                <span t-field="line.move_id.partner_id.country_id"/> 
+                                <span t-field="line.move_id.partner_id.country_id"/><br/> 
+                                <span t-field="line.move_id.partner_id.ntn"/><br/>
+                                <span t-field="line.move_id.partner_id.nic"/><br/>  
                             </td> 
                            </tr>
                           </t>    

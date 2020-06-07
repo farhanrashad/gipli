@@ -28,6 +28,6 @@ class InvoiceOutstanding(models.TransientModel):
 
     def _print_report(self, data):
         data['form'].update(self.read(['start_date', 'end_date','target_move'])[0])
-        return self.env.ref('de_account_tax_register.open_sale_tax_register_action').report_action(self, data=data, config=False)
+        return self.env.ref('de_account_tax_register.open_sale_tax_register_action').with_context(landscape=True).report_action(self, data=data, config=False)
 
 
