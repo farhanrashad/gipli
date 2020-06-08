@@ -51,23 +51,32 @@
                         <th  >VALUE INC S.TAX</th>
                     </tr>
                 </thead>
-                      <t t-foreach="invoices" t-as="invoice">
-                       <t t-if="invoice.invoice_line_ids.tax_ids">    
+                      <t t-foreach="invoices.sorted(key=lambda x: x.name)" t-as="invoice">
+                       <t t-if="invoice.invoice_line_ids.tax_ids">
+                       <t t-if=" not 'IMPORT' in invoice.invoice_line_ids.partner_id.name">     
                         <t t-set="qtysum" t-value="0"/>
                         <t t-set="exvsum" t-value="0"/>
+                        <t t-set='invno' t-value="0"/>   
                         <t t-set="taxsum" t-value="0"/>
                         <t t-set="totsum" t-value="0"/>
                         <t t-set="lineitem" t-value="0"/>      
                 <tbody class="sale_tbody">
                         <t t-foreach="invoice.invoice_line_ids" t-as="line">
-                          <t t-if='line.tax_ids'>
+                          <t t-if='line.tax_ids'>       
                           <t t-set="lineitem" t-value="lineitem + 1"/>         
                         <tr>
                             <td ><span t-field="line.date"/></td>
                             <td >
-                                <span t-field="line.move_id.partner_id.contact_address"/>
+                                <span t-field="line.move_id.partner_id"/><br/>
+                                <span t-field="line.move_id.partner_id.street"/>
+                                <span t-field="line.move_id.partner_id.street2"/>
+                                <span t-field="line.move_id.partner_id.city"/>
+                                <span t-field="line.move_id.partner_id.country_id"/><br/>
+                                <span t-field="line.move_id.partner_id.ntn"/><br/>
+                                <span t-field="line.move_id.partner_id.nic"/><br/>                               
                             </td>
-                            <td ><span t-field="line.move_id"/></td>
+                           <t t-set='invno' t-value="line.move_id.name.split('/')"/>
+                            <td ><span t-esc="invno[2]"/></td>
                             <td ><span t-field="line.product_id"/></td>
                             <td ><span t-field="line.quantity"/></td>
                             <t t-set="qtysum" t-value="qtysum + line.quantity"/>
@@ -117,6 +126,7 @@
                     </tr>
                     </t>        
                 </tbody>
+                    </t>        
                    </t>         
                  </t>
             </table>
