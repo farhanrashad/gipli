@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_de_customize_ext_de_customize_ext,de_customize_ext.de_customize_ext,model_de_customize_ext_de_customize_ext,,1,0,0,0

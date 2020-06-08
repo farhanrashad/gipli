@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+
+<odoo>
+    <data>
+
+<!--        product template ext form view-->
+        <record id="de_customize_ext.product_template_ext_view_form" model="ir.ui.view">
+            <field name="name">product template ext view form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Contractual Production" attrs="{'invisible':[('type','!=', 'consu')]}">
+                        <group string="Contractual Production">
+                            <group>
+                                <field name="activate_production"/>
+                                <field name="partner_id" attrs="{'invisible':[('activate_production','!=', True)]}"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+
+        <record id="de_customize_ext.mrp_bom_line_ext_view_form" model="ir.ui.view">
+            <field name="name">mrp bom line ext view form</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page/field[@name='bom_line_ids']/tree/field[@name='product_qty']" position="after">
+                    <field name="wage_price"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="de_customize_ext.account_invoice_ext_view_form" model="ir.ui.view">
+            <field name="name">account invoice ext view form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="de_production_id" widget="many2many_tags"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
