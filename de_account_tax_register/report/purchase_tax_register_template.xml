@@ -52,7 +52,8 @@
                     </tr>
                 </thead>
                       <t t-foreach="invoices.sorted(key=lambda x: x.name)" t-as="invoice">
-                       <t t-if="invoice.invoice_line_ids.tax_ids">    
+                       <t t-if="invoice.invoice_line_ids.tax_ids">
+                       <t t-if=" not 'IMPORT' in invoice.invoice_line_ids.partner_id.name">     
                         <t t-set="qtysum" t-value="0"/>
                         <t t-set="exvsum" t-value="0"/>
                         <t t-set='invno' t-value="0"/>   
@@ -61,7 +62,7 @@
                         <t t-set="lineitem" t-value="0"/>      
                 <tbody class="sale_tbody">
                         <t t-foreach="invoice.invoice_line_ids" t-as="line">
-                          <t t-if='line.tax_ids'>
+                          <t t-if='line.tax_ids'>       
                           <t t-set="lineitem" t-value="lineitem + 1"/>         
                         <tr>
                             <td ><span t-field="line.date"/></td>
@@ -125,6 +126,7 @@
                     </tr>
                     </t>        
                 </tbody>
+                    </t>        
                    </t>         
                  </t>
             </table>
