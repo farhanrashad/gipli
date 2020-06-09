@@ -5,9 +5,19 @@
 #    Copyright (C) 2019-today Ascetic Business Solution <www.asceticbs.com>
 #################################################################################
 
-from . import wizard
-from . import report
-from . import models
+import time
+from odoo import api, models
+from dateutil.parser import parse
+from odoo.exceptions import UserError
+
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+    _order = 'date asc'
+
+
+
+
 
 
 
