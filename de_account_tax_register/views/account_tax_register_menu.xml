@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-         <template id="report_header_custom" inherit_id="web.internal_layout">
-            <xpath expr="//div[@class='header']" position="replace">
-                <div class ="header">
-<!--                     <t t-if="company.partner_id.name == 'GMSA Industries Pvt. Ltd'"> -->
-                    <div style="margin-right:10px;padding:10px;left:10px;display:table-cell;">
-                     <t t-esc="company.partner_id.name"/> <br/>
-                     <strong>STRN:</strong> <t t-esc="company.partner_id.vat"/> <br/>
-                     <strong>NTN:</strong> <t t-esc="company.partner_id.ntn"/>
-                   </div>
-<!--                     </t>  -->
-<!--                    <t t-if="company.partner_id.name == 'GMSA International CO.'"> 
-                    <div style="margin-right:10px;padding:10px;left:10px;display:table-cell;">
-                     <span t-field="company.partner_id"/> <br/>
-                     <strong>STRN:</strong> <span t-field="company.partner_id.vat"/> <br/>
-                     <strong>NTN:</strong> <span t-field="company.partner_id.ntn"/>
-                   </div>
-                   </t>     -->
-                </div>
-            </xpath>
-        </template>
     
 <!--      Create menu to open wizard for report -->
      <menuitem
