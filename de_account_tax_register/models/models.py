@@ -11,7 +11,7 @@ from dateutil.parser import parse
 from odoo.exceptions import UserError
 
 
-class AccountMove(models.Models):
+class AccountMove(model.Models):
     _inherit = 'account.move'
     _order = 'date asc'
 
