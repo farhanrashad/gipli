@@ -49,6 +49,7 @@ class de_employee_customization(models.Model):
     def get_number_children(self):
         for rec in self:
             if not rec.children:
+                rec.children = False
                 rec.children = len(rec.dependants)
     
     def manually_add_dependants(self):
