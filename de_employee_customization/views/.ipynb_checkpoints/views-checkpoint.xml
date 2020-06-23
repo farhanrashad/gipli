@@ -71,6 +71,24 @@
                  </field>
                 </group>
             </xpath>
+            <xpath expr="//page[@name='personal_information']/group/group[1]/field[@name='private_email']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']/group/group[1]/field[@name='phone']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+            <xpath expr="//page[@name='public']//field[@name='coach_id']" position="after">
+                <field name='major_responsibilities'>
+                     <tree editable="bottom">
+                         <field name="responsibility"/>
+                     </tree>
+                 </field>
+                <field name='minor_responsibilities'>
+                     <tree editable="bottom">
+                         <field name="responsibility"/>
+                     </tree>
+                 </field>
+            </xpath>
         </field>
       </record>
   </data>

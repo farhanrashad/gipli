@@ -28,10 +28,14 @@ class de_employee_customization(models.Model):
     father_occupation = fields.Char(string="Father's Occupation")
     domicile = fields.Char()
     dependants = fields.One2many('children.data','employee_id')
-    children = fields.Integer(string='Number of Children', groups="hr.group_hr_user", tracking=True,compute='get_number_children')
+    children = fields.Integer(string='Number of Children', groups="hr.group_hr_user", tracking=True,compute='get_number_children',inverse='manually_add_dependants',store=True)
     languages = fields.Char()
     computer_literacy = fields.Char()
     educations = fields.One2many('employee.education','employee_edu')
+    is_child = fields.Boolean()
+    major_responsibilities = fields.One2many('major.responsibilities','employee_major')
+    minor_responsibilities = fields.One2many('minor.responsibilities','employee_minor')
+    
     
     @api.onchange('educations')
     def get_level(self):
@@ -47,8 +51,12 @@ class de_employee_customization(models.Model):
     @api.depends('dependants')
     def get_number_children(self):
         for rec in self:
-            rec.children = len(rec.dependants)
+            if not rec.children:
+                rec.children = len(rec.dependants)
     
+    def manually_add_dependants(self):
+        for rec in self:
+            rec.is_child = True
 
 class Children(models.Model):
     _name = 'children.data'
@@ -67,3 +75,15 @@ class EmployeeEducation(models.Model):
     grade = fields.Char(string="Grade/Div")
     employee_edu =  fields.Many2one('hr.employee')
     
+
+class MajorResponsiblities(models.Model):
+    _name = 'major.responsibilities'
+    
+    responsibility = fields.Char(required=True)
+    employee_major =  fields.Many2one('hr.employee')
+    
+class MinorResponsiblities(models.Model):
+    _name = 'minor.responsibilities'
+    
+    responsibility = fields.Char(required=True)
+    employee_minor =  fields.Many2one('hr.employee')
