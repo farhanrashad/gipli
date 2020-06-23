@@ -69,7 +69,7 @@ class EmployeeEducation(models.Model):
     
     level = fields.Selection([('middle','Middle'),('matric','Matric'),('fa','FA/FSC/I.COM'),('ba','BA/BSC/B.COM'),('ma','MA/MSC/M.COM'),('other','Other')],required=True)
     major = fields.Char(required=True)
-    passed_year = fields.Integer()
+    passed_year = fields.Char()
     grade = fields.Char(string="Grade/Div")
     employee_edu =  fields.Many2one('hr.employee')
     
@@ -92,8 +92,8 @@ class EmployeeExperience(models.Model):
     last_designation = fields.Char(string="Designation")
     last_company = fields.Char(string="Company")
     last_city = fields.Char()
-    years_worked = fields.Integer(string="Years Worked")
+    years_worked = fields.Char(string="Years Worked")
     date_from = fields.Date(string="From")
     date_to = fields.Date(string="To")
     last_salary = fields.Integer(string="Last Salary")
-    employee_exp =  fields.Many2one('hr.employee')
+    employee_exp = fields.Many2one('hr.employee')
