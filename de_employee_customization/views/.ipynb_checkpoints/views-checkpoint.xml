@@ -9,12 +9,6 @@
                 <field name="date_of_joining"/>
             </xpath>
             <xpath expr="//page[@name='hr_settings']/group[1]" position="inside">
-                <group string="Last work Info">
-                    <field name="last_company"/>
-                    <field name="last_department"/>
-                    <field name="source_name"/>
-                    <field name="last_salary"/>
-                </group>
                 <group string="Reference">
                     <field name="ref_name"/>
                     <field name="ref_phone_number"/>
@@ -24,6 +18,17 @@
                 <group string="Govt's Benefits">
                     <field name="eobi_number"/>
                 </group>
+                <field name="experiences">
+                    <tree editable="bottom">
+                        <field name="last_designation" width="20"/>
+                        <field name="last_company" width="20"/>
+                        <field name="last_city" width="20"/>
+                        <field name="years_worked" width="20"/>
+                        <field name="date_from" width="20"/>
+                        <field name="date_to" width="20"/>
+                        <field name="last_salary" width="20"/>
+                    </tree>
+                </field>
             </xpath>
             <xpath expr="//page[@name='personal_information']/group/group[1]/field[@name='address_home_id']" position="after">
                 <field name="permanent_address"/>
@@ -63,10 +68,10 @@
                 <group string="Education">
                     <field name='educations'>
                      <tree editable="bottom">
-                         <field name="level"/>
-                         <field name="major"/>
-                         <field name="passed_year"/>
-                         <field name="grade"/>
+                         <field name="level" width="20"/>
+                         <field name="major" width="20"/>
+                         <field name="passed_year" width="20"/>
+                         <field name="grade" width="20"/>
                      </tree>
                  </field>
                 </group>

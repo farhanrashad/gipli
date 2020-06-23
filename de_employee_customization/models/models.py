@@ -8,10 +8,6 @@ class de_employee_customization(models.Model):
     _inherit = 'hr.employee'
     
     date_of_joining = fields.Date(string='Date of Joining')
-    last_company = fields.Char(string="Company")
-    last_department = fields.Char(string="Department")
-    source_name = fields.Char(string="Source Name")
-    last_salary = fields.Integer(string="Last Salary")
     eobi_number = fields.Integer(string="EOBI Number")
     ref_name = fields.Char(string="Name")
     ref_phone_number = fields.Integer(string="Phone Number")
@@ -35,6 +31,7 @@ class de_employee_customization(models.Model):
     is_child = fields.Boolean()
     major_responsibilities = fields.One2many('major.responsibilities','employee_major')
     minor_responsibilities = fields.One2many('minor.responsibilities','employee_minor')
+    experiences = fields.One2many('employee.expereince','employee_exp',string="Experience")
     
     
     @api.onchange('educations')
@@ -87,3 +84,15 @@ class MinorResponsiblities(models.Model):
     
     responsibility = fields.Char(required=True)
     employee_minor =  fields.Many2one('hr.employee')
+    
+class EmployeeExperience(models.Model):
+    _name = 'employee.expereince'
+    
+    last_designation = fields.Char(string="Designation")
+    last_company = fields.Char(string="Company")
+    last_city = fields.Char()
+    years_worked = fields.Integer(string="Years Worked")
+    date_from = fields.Date(string="From")
+    date_to = fields.Date(string="To")
+    last_salary = fields.Integer(string="Last Salary")
+    employee_exp =  fields.Many2one('hr.employee')
