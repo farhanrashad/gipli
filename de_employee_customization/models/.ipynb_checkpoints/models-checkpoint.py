@@ -8,15 +8,15 @@ class de_employee_customization(models.Model):
     _inherit = 'hr.employee'
     
     date_of_joining = fields.Date(string='Date of Joining')
-    eobi_number = fields.Integer(string="EOBI Number")
+    eobi_number = fields.Char(string="EOBI Number")
     ref_name = fields.Char(string="Name")
-    ref_phone_number = fields.Integer(string="Phone Number")
+    ref_phone_number = fields.Char(string="Phone Number")
     ref_relationship = fields.Char(string="Relationship")
     ref_address = fields.Char(string="Address")
     permanent_address = fields.Char(string="Permanent Address")
     temporary_address = fields.Char(string="Temproray Address")
     age = fields.Integer()
-    cnic = fields.Integer()
+    cnic = fields.Char(string="CNIC")
     siblings = fields.Integer()
     religion = fields.Char()
     mother_name = fields.Char(string="Mother's Name")
