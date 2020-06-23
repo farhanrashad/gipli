@@ -1,0 +1,77 @@
+<odoo>
+  <data>
+      <record model="ir.ui.view" id="de_employee_inherit_form">
+        <field name="name">de_employee_customization form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='public']//field[@name='address_id']" position="after">
+                <field name="date_of_joining"/>
+            </xpath>
+            <xpath expr="//page[@name='hr_settings']/group[1]" position="inside">
+                <group string="Last work Info">
+                    <field name="last_company"/>
+                    <field name="last_department"/>
+                    <field name="source_name"/>
+                    <field name="last_salary"/>
+                </group>
+                <group string="Reference">
+                    <field name="ref_name"/>
+                    <field name="ref_phone_number"/>
+                    <field name="ref_relationship"/>
+                    <field name="ref_address"/>
+                </group>
+                <group string="Govt's Benefits">
+                    <field name="eobi_number"/>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']/group/group[1]/field[@name='address_home_id']" position="after">
+                <field name="permanent_address"/>
+                <field name="temporary_address"/>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']/group/group[2]" position="after">
+                <group string="Personal Info">
+                    <field name="age"/>
+                    <field name="cnic"/>
+                    <field name="siblings"/>
+                    <field name="religion"/>
+                    <field name="mother_name"/>
+                    <field name="father_name"/>
+                    <field name="father_occupation"/>
+                    <field name="domicile"/>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']/group/group[1]/field[@name='address_home_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+             <xpath expr="//page[@name='personal_information']/group//group[5]" position="inside">
+                 <field name='dependants'>
+                     <tree editable="bottom">
+                         <field name="name"/>
+                         <field name="age"/>
+                         <field name="gender"/>
+                     </tree>
+                 </field>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']/group//group[8]" position="replace">
+                <group string="Other Info">
+                    <field name="languages"/>
+                    <field name="computer_literacy"/>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']/group" position="after">
+                <group string="Education">
+                    <field name='educations'>
+                     <tree editable="bottom">
+                         <field name="level"/>
+                         <field name="major"/>
+                         <field name="passed_year"/>
+                         <field name="grade"/>
+                     </tree>
+                 </field>
+                </group>
+            </xpath>
+        </field>
+      </record>
+  </data>
+</odoo>
