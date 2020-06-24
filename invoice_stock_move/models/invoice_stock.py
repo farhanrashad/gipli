@@ -49,9 +49,6 @@ class InvoiceStockMove(models.Model):
     picking_type_id = fields.Many2one('stock.picking.type', 'Picking Type', required=True,
                                       default=_default_picking_receive,
                                       help="This will determine picking type of incoming shipment")
-    picking_transfer_id = fields.Many2one('stock.picking.type', 'Deliver To', required=True,
-                                          default=_default_picking_transfer,
-                                          help="This will determine picking type of outgoing shipment")
     state = fields.Selection([
         ('draft', 'Draft'),
         ('proforma', 'Pro-forma'),
