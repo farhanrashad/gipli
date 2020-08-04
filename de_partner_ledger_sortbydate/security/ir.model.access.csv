@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_de_partner_ledger_sortbydate_de_partner_ledger_sortbydate,de_partner_ledger_sortbydate.de_partner_ledger_sortbydate,model_de_partner_ledger_sortbydate_de_partner_ledger_sortbydate,base.group_user,1,1,1,1
