@@ -8,10 +8,9 @@
 				<xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='price_unit']" position="before">
 					<field name="roll"/>
                     <field name="pcs"/>
+                    <field name="weight_price"/>
+                    <field name="subtotal_weight"/>
 				</xpath>
-<!-- 				<xpath expr="//field[@name='line_ids']//tree//field[@name='price_unit']" position="before">
-					<field name="sh_retail_price"/>
-				</xpath> -->
 			</field>
 		</record>
   </data>
