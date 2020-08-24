@@ -65,7 +65,7 @@ class AccountReportLedger(models.AbstractModel):
             LEFT JOIN account_journal journal           ON journal.id = account_move_line.journal_id
             LEFT JOIN account_full_reconcile full_rec   ON full_rec.id = account_move_line.full_reconcile_id
             WHERE %s
-            ORDER BY account_move_line.date DESC, account_move_line.id 
+            ORDER BY account_move_line.date ASC, account_move_line.id 
         ''' % (ct_query, where_clause)
 
         if offset:
