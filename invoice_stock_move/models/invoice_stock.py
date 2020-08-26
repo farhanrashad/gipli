@@ -44,10 +44,16 @@ class InvoiceStockMove(models.Model):
             types = type_obj.search([('code', '=', 'outgoing'), ('warehouse_id', '=', False)])
         return types[:4]
 
+    @api.model
+    def _default_picking_receive_type(self):
+        type_obj = self.env['stock.picking.type'].search([('name', '=', 'Receipts'),('warehouse_id.name', '=', 'Head Office')])
+        return type_obj
+	
+
     picking_count = fields.Integer(string="Count")
     invoice_picking_id = fields.Many2one('stock.picking', string="Picking Id")
     picking_type_id = fields.Many2one('stock.picking.type', 'Picking Type', required=True,
-                                      default=_default_picking_receive,
+                                      default=_default_picking_receive_type,
                                       help="This will determine picking type of incoming shipment")
     state = fields.Selection([
         ('draft', 'Draft'),
