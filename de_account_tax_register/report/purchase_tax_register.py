@@ -40,6 +40,7 @@ class PurchaseTaxRegister(models.AbstractModel):
             return {
                 'docs': docs,
                 'invoices': invoices,
+                'o': invoices,
             }
         else:
             raise UserError("There is not any Purchase invoice in between selected dates")

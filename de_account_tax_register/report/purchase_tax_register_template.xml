@@ -4,9 +4,9 @@
             <xpath expr="//div[@class='header']" position="replace">
                 <div class ="header">                
                     <div style="margin-right:10px;padding:10px;left:10px;display:table-cell;">
-                     <t t-esc="invoices.company_id.name"/> <br/>
-                     <strong>STRN:</strong> <t t-esc="invoices.company_id.partner_id.vat"/>  <br/>
-                     <strong>NTN:</strong> <t t-esc="invoices.company_id.partner_id.ntn"/>
+                     <t t-esc="o.company_id.name"/> <br/>
+                     <strong>STRN:</strong> <t t-esc="o.company_id.partner_id.vat"/>  <br/>
+                     <strong>NTN:</strong> <t t-esc="o.company_id.partner_id.ntn"/>
                    </div>
                 </div>
             </xpath>
