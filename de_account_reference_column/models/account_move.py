@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# from odoo import models, fields, api
+from odoo import models, fields, api,_
 #
-# class AccountMoveInherit(models.Model):
-#     _inherit = 'account.move'
+class AccountMoveInherit(models.Model):
+    _inherit = 'res.partner'
 #
-#     account_id = fields.Many2one('account.account', string='Account Reference')
+    nic = fields.Char(string='NIC')
+    ntn = fields.Char(string="NTN")
 
 # class de_account_reference_column(models.Model):
 #     _name = 'de_account_reference_column.de_account_reference_column'
