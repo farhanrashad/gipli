@@ -3,7 +3,7 @@
 from odoo import models, fields, api,_
 #
 class AccountMoveInherit(models.Model):
-    _inherit = 'res.partner'
+    _inherit = 'account.move'
 #
     nic = fields.Char(string='NIC')
     ntn = fields.Char(string="NTN")

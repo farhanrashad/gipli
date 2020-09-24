@@ -1,6 +1,6 @@
 <odoo>
   <data>
-        <record id="res_partner_category_inherit" model="ir.ui.view">
+        <record id="account_move_tree_view_inherit" model="ir.ui.view">
             <field name="name">account.move.inherit</field>
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_invoice_tree"/>
