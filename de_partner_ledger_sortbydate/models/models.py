@@ -3,6 +3,12 @@
 from odoo import models, fields, api, _
 
 
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+    
+    city = fields.Char(string="City", related='partner_id.city')
+
+
 class AccountReportLedger(models.AbstractModel):
     _inherit = 'account.partner.ledger'
     
