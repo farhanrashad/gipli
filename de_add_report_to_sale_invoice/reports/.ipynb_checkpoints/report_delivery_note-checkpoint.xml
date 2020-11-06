@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            id="action_delivery_note"
+            model="account.move"
+            string="Delivery Note"
+            report_type="qweb-pdf"
+            name="de_add_report_to_sale_invoice.delivery_note"
+            file="de_add_report_to_sale_invoice.delivery_note"
+            />
+     <template id="delivery_note">
+        <t t-call="web.html_container">
+           <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+
+                        <h2 class="text-center">Outward  Gate Pass  </h2>
+                          <div style="float:left">Gate Pass # : <span t-esc="o.id"/></div>
+                          <div style="float:right">DATED :  <span  t-esc="o.invoice_date"/></div><br />
+
+                          <div style="float:left">PARTY NAME: <span  t-esc="o.partner_id.name"/></div><br />
+
+                          <div style="float:left">ADDRESS : <span  t-esc="o.partner_id.street"/>&#160;
+                           <span  t-esc="o.partner_id.street2"/>&#160;
+                           <span  t-esc="o.partner_id.city"/>&#160;
+                           <span  t-esc="o.partner_id.state_id.name"/>&#160;
+                           <span  t-esc="o.partner_id.zip"/>&#160;
+                           <span  t-esc="o.partner_id.country_id.name"/>&#160;
+                           </div><br />
+                          <div>
+                              <div style="float:left">ST.RG.NO. : <span  t-esc="o.partner_id.strg"/>
+                              &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                              &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                              &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                              &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                              &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                              &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                              &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                              &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+
+                              NIC : <span  t-esc="o.partner_id.nic"/>
+                              </div>
+
+                                <div style="float:right">NTN : <span  t-esc="o.partner_id.ntn"/></div>
+                          </div>
+
+
+                            <table class="table table-sm table-reports">
+                                <thead>
+                                    <tr>
+                                        <th>SR.#</th>
+                                        <th>ITEM NAME</th>
+                                        <th>UNITS</th>
+                                        <th>QUANTITY</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <t t-set="i" t-value="1" />
+                                    <t t-foreach="o.invoice_line_ids" t-as="ol">
+                                       <tr>
+                                            <td>
+                                                <span t-esc="i" />
+                                             </td>
+                                            <td>
+                                                <span  t-esc="ol.product_id.name"/>
+                                            </td>
+                                             <td>
+                                                <span  t-esc="ol.product_uom_id.name"/>
+                                            </td>
+                                             <td>
+                                                <span  t-esc="ol.quantity"/>
+                                            </td>
+                                             <t t-set="i" t-value="i+1" />
+                                        </tr>
+                                     </t>
+                                </tbody>
+                            </table>
+                            <p>This is the system generated gate pass. No signature/stamp is required</p>
+                    </div>
+                </t>
+           </t>
+        </t>
+    </template>
+   </data>
+</odoo>
