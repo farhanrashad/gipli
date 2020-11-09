@@ -34,7 +34,8 @@ class InvoiceStockMove(models.Model):
             types = type_obj.search([('code', '=', 'outgoing'), ('warehouse_id', '=', False)])
         return types[:4]
 
-    
+    nic = fields.Char(string='NIC')
+    ntn = fields.Char(string='NTN')
     picking_transfer_id = fields.Many2one('stock.picking.type', 'Deliver To', required=True,
                                           default=_default_picking_transfer,
                                           help="This will determine picking type of outgoing shipment")
