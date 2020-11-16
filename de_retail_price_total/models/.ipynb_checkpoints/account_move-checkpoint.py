@@ -1,4 +1,16 @@
 # -*- coding: utf-8 -*-
+from odoo import models, fields, api, _
+
+
+class DeAccountMoveLine(models.Model):
+    _inherit='account.move.line'
+    
+    city = fields.Char(string="City")
+    
+    
+
+
+
 
 from odoo import models, fields, api, _
 
