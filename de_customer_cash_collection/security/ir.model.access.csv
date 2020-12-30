@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+2,access_account_customer_collection,model_account_customer_collection,base.group_user,1,1,1,1
+3,access_account_customer_collection_line,model_account_customer_collection_line,base.group_user,1,1,1,1

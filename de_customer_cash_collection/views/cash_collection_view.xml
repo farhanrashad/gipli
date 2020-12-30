@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <data noupdate="0">
+        <function model="account.journal" name="_create_cash_payment_outbound_sequence"/>
+        <function model="account.journal" name="_create_cash_payment_inbound_sequence"/>
+    </data>
+
+    <record id="view_cash_collection_form" model="ir.ui.view">
+        <field name="name">account.customer.collection.form</field>
+        <field name="model">account.customer.collection</field>
+        <field name="arch" type="xml">
+            <form string="Cash Collection">
+                <header>
+                    <button name="post_payment_button" string="Post Payments" class="oe_highlight" type="object" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="cash_deposit_button" string="Cash Deposit" class="oe_highlight" type="object" attrs="{'invisible': [('state', '!=', 'payment')]}" />
+                    <field name="state" widget="statusbar"/> 
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="batch_type" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="journal_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="available_payment_method_ids" invisible="1"/>
+                            <field name="payment_method_id" required="1"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="payment_method_code" invisible="1"/>
+                            <field name="payment_line" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="city" placeholder="enter exact city name of partner..." attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="bank_date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="bank" attrs="{'readonly': [('state', '=', 'deposit')]}"/>
+                            <field name="name" placeholder="auto ..." required="0" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        </group>
+                    </group>
+                  
+                    <notebook>
+                        <page string="Cash Collection" name="collection_content">
+                            <field name="payment_lines_ids" attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                <tree editable="bottom" string="Payments">
+                                    <field name="name" readonly="1" force_save="1"/>
+                                    <field name="partner_id"/>
+                                    <field name="payment_ids" invisible="1"/>
+                                    <field name="city" invisible="1"/>
+                                    <field name="amount"/>
+                                </tree>
+                                <form string='Payment Lines'>
+                                    <group>
+                                        <group>
+                                            <field name="name" readonly="1" force_save="1"/>
+                                            <field name="partner_id"/>
+                                        </group>
+                                        <group>
+                                            <field name="payment_ids" invisible="1"/>
+                                            <field name="city" invisible="1"/>
+                                            <field name="amount"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cash_collection" model="ir.actions.act_window">
+        <field name="name">Cash Collection</field>
+        <field name="res_model">account.customer.collection</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new customer cash collection record
+            </p>
+        </field>
+    </record>
+
+   <menuitem action="action_cash_collection" name="Cash Collections" id="menu_cash_collection_customer" parent="account.menu_finance_receivables" sequence="16"/>
+</odoo>
