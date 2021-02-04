@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="inherit_vendor_bill_form_view" model="ir.ui.view">
+            <field name="name">inherit.vendor.bill.form.view</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//header" position="inside">
+                    <button name="send_approval" class="oe_highlight"  string="Send For Approval" type="object" attrs="{'invisible': ['|','|',('state', '!=', 'draft'), ('type', '!=', 'in_invoice'),('invoice_origin','!=', False)]}"/>
+                    <button name="approve_bill" class="oe_highlight" states="waiting" groups="de_vendor_bill.group_waiting_for_approval" string="Approve" type="object"
+                    />
+                    <button name="action_reset_draft" type="object" states="waiting" string="Not Approved" class="oe_highlight" id="bid_confirm" groups="de_vendor_bill.group_waiting_for_approval"/>
+                    
+                </xpath>
+                <xpath expr="//header/button[@name='action_post']" position="replace">
+                    <button name="action_post" string="Post" class="oe_highlight" type="object" groups="account.group_account_invoice" attrs="{'invisible': ['|','|',('state', '!=', 'draft'),('type', 'not in', ['in_invoice','out_invoice']),('invoice_origin','=', False)]}"/>
+                </xpath>
+                <xpath expr="//header/button[@name='action_post']" position="after">
+                <button name="action_post" string="Post" class="oe_highlight" type="object" groups="account.group_account_invoice" attrs="{'invisible': ['|','|',('state', '!=', 'draft'),('type', 'not in', ['out_invoice','entry','out_refund','in_refund','out_receipt','in_receipt'])]}"/>
+                </xpath>
+                
+                <xpath expr="//header/button[@name='action_post']" position="after">
+                    <button name="action_post" class="oe_highlight" states="approved" string="Post" type="object"/>
+                </xpath>
+                
+<!--                 <xpath expr="//header/button[@name='button_draft']" position="attributes">-->
+<!--                     <attribute name="groups">de_vendor_bill.group_show_reset_to_draft_button</attribute>-->
+<!--                 </xpath>-->
+                
+<!--                <xpath expr="//button[@name='%(account.action_view_account_move_reversal)d']" position="attributes">-->
+<!--                    <attribute name='groups'>de_vendor_bill.group_can_reverse_journal_entry_button</attribute>-->
+<!--                </xpath>-->
+                
+                
+            </field>
+        </record>
+
+</odoo>

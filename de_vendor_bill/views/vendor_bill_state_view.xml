@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Vendor Bill State Form View -->
+        <record id="bill_state_form_view" model="ir.ui.view">
+            <field name="name">bill.state.form.view</field>
+            <field name="model">account.vendor_bill_state</field>
+            <field name="arch" type="xml">
+                <form string="Bill State">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="authority"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Payment State Tree View -->
+        <record id="bill_state_tree_view" model="ir.ui.view">
+            <field name="name">bill.state.tree.view</field>
+            <field name="model">account.vendor_bill_state</field>
+            <field name="arch" type="xml">
+                <tree string="Bill States">
+                    <field name="name"/>
+                    <field name="authority"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Bill Action View -->
+        <record id="bill_state_action" model="ir.actions.act_window">
+            <field name="name">Bill State</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.vendor_bill_state</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'in_invoice')]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new Payment State
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
