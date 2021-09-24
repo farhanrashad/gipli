@@ -16,6 +16,27 @@
                 <field name="city" attrs="{'invisible': [('city', '=', False)]}" />
                 </group>
             </xpath>
+            
+            
+            
+            <xpath expr="//sheet[1]/notebook[1]/page[1]/field[@name='payment_ids']/tree" position="inside">
+                <field name="partner_type" invisible="1"/>
+                <field name="payment_method_id" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <field name="payment_type" invisible="1"/>
+                <field name="journal_id" invisible="1"/>
+            </xpath>
+            
+            
+            
+            <xpath expr="//sheet[1]/notebook[1]/page[1]/field[@name='payment_ids']" position="attributes">
+                <attribute name="widget">""</attribute>
+            </xpath>
+            
+             <xpath expr="//sheet[1]/notebook[1]/page[1]/field[@name='payment_ids']/tree" position="attributes">
+                <attribute name="editable">bottom</attribute>
+            </xpath>
+            
             <!--
             
             <xpath expr="//sheet[1]/notebook[1]/page[1]/field[@name='payment_ids']" position="attributes">

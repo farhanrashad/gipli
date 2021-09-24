@@ -46,7 +46,7 @@ class InvoiceStockMove(models.Model):
 
     @api.model
     def _default_picking_receive_type(self):
-        type_obj = self.env['stock.picking.type'].search([('name', '=', 'Receipts'),('warehouse_id.name', '=', 'Head Office')])
+        type_obj = self.env['stock.picking.type'].search([('name', '=', 'Receipts'),('warehouse_id.name', '=', 'Head Office')], order="id desc", limit=1)
         return type_obj
 	
 
