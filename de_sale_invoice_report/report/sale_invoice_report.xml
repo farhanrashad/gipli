@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+ <report
+            id="report_sale_invoice"
+            string="Sale Invoice Report"
+            model="account.move"
+            report_type="qweb-pdf"
+            file="de_sale_invoice_report.report_sale_invoices"
+            name="de_sale_invoice_report.report_sale_invoices"/>
+</odoo>

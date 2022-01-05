@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="open_bank_payment_voucher_report_action"
+            string="Bank Payment Voucher"
+            model="account.move"
+            report_type="qweb-pdf"
+            file="de_account_voucher_report.bank_payment_voucher_report"
+            name="de_account_voucher_report.bank_payment_voucher_report"
+        />
+    </data>
+</odoo>
