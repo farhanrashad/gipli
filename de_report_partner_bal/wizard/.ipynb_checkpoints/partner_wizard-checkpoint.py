@@ -16,6 +16,8 @@ class PartnerWizard(models.TransientModel):
             ('all', 'All'),
         ], string='Target Moves', default='draft')
     
+    
+    
     def print_report(self):
         data = {}
         data['form'] = self.read(['date', 'partner_ids', 'state'])[0]
@@ -24,6 +26,10 @@ class PartnerWizard(models.TransientModel):
     def _print_report(self, data):
         data['form'].update(self.read(['date', 'partner_ids', 'state'])[0])
         return self.env.ref('de_report_partner_bal.partner_bal_report_xlsx').report_action(self, data=data, config=False)
+    
+    
+    
+    
     
     
     

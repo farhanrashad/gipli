@@ -1,26 +1,26 @@
-import json
-from odoo import api, models, _ , fields 
-from odoo.exceptions import UserError
+# -*- coding: utf-8 -*-
+from odoo import models, fields
 from datetime import datetime
+from datetime import date, timedelta
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from dateutil.relativedelta import relativedelta
+import pytz
 
 
 class PartnerBalanceXlS(models.AbstractModel):
     _name = 'report.de_report_partner_bal.partner_bal_report_xlsx'
-    _description = 'Partner Balance Xlsx Report'
+    _description = 'Partner Balence Xlsx report'
     _inherit = 'report.report_xlsx.abstract'
-
     
+  
     def generate_xlsx_report(self, workbook, data, lines):
-        data = self.env['partner.wizard'].browse(self.env.context.get('active_ids'))
-    
-
+        data = self.env["partner.wizard"].browse(self.env.context.get('active_ids'))
+        format1 = workbook.add_format({'font_size': '12', 'align': 'center', 'bold': False})
+        sheet = workbook.add_worksheet('Employee Attendance Report')
+        bold = workbook.add_format({'bold': True, 'align': 'center', 'border': True})
         
-        sheet = workbook.add_worksheet('Partner Balance Xlsx Report')
-        bold = workbook. add_format({'bold': True, 'align': 'center','bg_color': '#8CBDD6','border': True})
-        title = workbook.add_format({'bold': True, 'align': 'center', 'font_size': 14, 'border': True})
-        header_row_style = workbook.add_format({'bold': True, 'align': 'center', 'border':True})
-        format2 = workbook.add_format({'align': 'center'})
-        format3 = workbook.add_format({'align': 'center','bold': True,'border': True,})   
+       
+        sheet.write('C1:C1', data.date, bold)
         
         
         format0 = workbook.add_format({'font_size': '12', 'align': 'vcenter', 'bold': True,})
@@ -51,7 +51,7 @@ class PartnerBalanceXlS(models.AbstractModel):
         sheet.write(1,5 , 'STRN',bold)
         sheet.write(1,6 , 'Balance',bold)
 
-        sheet.write('A0:A0', data.state, format1)
+       
         entery_type = ''
         if not data['state'] == 'all':
             entery_type == " and parent_state = " + data['state']
@@ -60,7 +60,9 @@ class PartnerBalanceXlS(models.AbstractModel):
             
             
             
-        to_char = data['date']                                                                                                                              
+        to_char = (data.date).strftime('%d-%b-%Y')  
+#         current_date=str((data.date))
+#         sssssssss = datetime.strptime(current_date, "%Y-%m-%d").strftime("%d/%m/%Y")
         # -------------------------------------------------------------------------
         # Query for lease agreement
         # -------------------------------------------------------------------------
@@ -76,7 +78,7 @@ class PartnerBalanceXlS(models.AbstractModel):
         rs_move = self._cr.dictfetchall()
         
         for move in rs_move:
-            sheet.write(row,0, move['ref'], format_txt)
+            sheet.write(row,0, to_char, format_txt)
             sheet.write(row,1, move['name'], format_txt)
             sheet.write(row,2, move['city'], format_txt)
             sheet.write(row,3, move['nic'], format_txt)

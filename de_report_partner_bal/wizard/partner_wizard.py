@@ -29,3 +29,7 @@ class PartnerWizard(models.TransientModel):
     
     
     
+    
+    
+    
+    
