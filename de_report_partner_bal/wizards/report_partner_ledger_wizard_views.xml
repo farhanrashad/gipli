@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record id="report_partner_ledger_wizard_form_view" model="ir.ui.view">
+			<field name="name">partner.ledger.wizard.form.view</field>
+			<field name="model">partner.ledger.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Partner Ledger">
+                    <group>
+                        <group>
+                            <field name="from_date" required="1"/>
+                            <field name="state" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="to_date" required="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Partners">
+                            <field name="partner_ids" required="1">
+                                <tree>
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+					<footer>
+						<button name="print_report" type="object" string="Print" class="oe_highlight" />
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record id="action_report_partner_ledger_wizard" model="ir.actions.act_window">
+			<field name="name">Partner Ledger Report</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">partner.ledger.wizard</field>
+			<field name="view_id" ref="de_report_partner_ledger.report_partner_ledger_wizard_form_view" />
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+        
+        <menuitem action="de_report_partner_ledger.action_report_partner_ledger_wizard" id="report_partner_ledger_report_item" name="Partner Ledger Report" parent="account.menu_finance_reports" sequence="5"/>
+
+
+    </data>
+</odoo>

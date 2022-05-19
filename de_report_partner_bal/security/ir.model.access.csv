@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_partner_ledger_wizard,partner.ledger.wizard,model_partner_ledger_wizard,base.group_user,1,1,1,1
+access_report_de_report_partner_ledger_partner_ledger_xlsx,access_report_de_report_partner_ledger_partner_ledger_xlsx,model_report_de_report_partner_ledger_partner_ledger_xlsx,base.group_user,1,1,1,1

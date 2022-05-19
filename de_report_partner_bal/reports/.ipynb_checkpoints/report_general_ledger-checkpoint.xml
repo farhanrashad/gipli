@@ -1,0 +1,13 @@
+<odoo>
+    <data>
+        <record id="general_ledger_report" model="ir.actions.report">
+            <field name="name">General Ledger Report</field>
+            <field name="model">general.ledger.wizard</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">de_report_general_ledger.general_ledger_xlsx</field>
+            <field name="report_file">General Ledger Report</field>
+<!--             <field name="binding_model_id" ref="de_requisition_line_report.model_stock_transfer_order"/>
+            <field name="binding_type">report</field> -->
+        </record>
+    </data>
+</odoo>
