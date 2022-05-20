@@ -20,7 +20,7 @@ class PartnerBalanceXlS(models.AbstractModel):
         bold = workbook.add_format({'bold': True, 'align': 'center', 'border': True})
         
        
-        sheet.write('C1:C1', data.date, bold)
+        sheet.write('C1:C1', data.date.strftime('%d-%m-%Y'), bold)
         
         
         format0 = workbook.add_format({'font_size': '12', 'align': 'vcenter', 'bold': True,})
@@ -43,24 +43,26 @@ class PartnerBalanceXlS(models.AbstractModel):
         
        
         
-        sheet.write(1,0,'Code', bold)
-        sheet.write(1,1 , 'Name',bold)
-        sheet.write(1,2 , 'City',bold)
-        sheet.write(1,3 , 'CNIC',bold)
-        sheet.write(1,4 , 'NTN',bold)
-        sheet.write(1,5 , 'STRN',bold)
-        sheet.write(1,6 , 'Balance',bold)
+        sheet.write(2,0,'Code', bold)
+        sheet.write(2,1 , 'Name',bold)
+        sheet.write(2,2 , 'City',bold)
+        sheet.write(2,3 , 'CNIC',bold)
+        sheet.write(2,4 , 'NTN',bold)
+        sheet.write(2,5 , 'STRN',bold)
+        sheet.write(2,6 , 'Balance',bold)
 
        
         entery_type = ''
-        if not data['state'] == 'all':
-            entery_type == " and parent_state = " + data['state']
+#         if data['state'] == 'draft':
+#             entery_type == "and parent_state = " + data['draft']
+#         elif data['state'] == 'draft':
+#             entery_type == "and parent_state = " + data['']
 #             raise UserError("test")
            
             
             
             
-        to_char = (data.date).strftime('%d-%b-%Y')  
+        to_char = data['date'].strftime("%Y-%m-%d")
 #         current_date=str((data.date))
 #         sssssssss = datetime.strptime(current_date, "%Y-%m-%d").strftime("%d/%m/%Y")
         # -------------------------------------------------------------------------
@@ -70,7 +72,7 @@ class PartnerBalanceXlS(models.AbstractModel):
             select p.ref, p.name, p.vat as strn, p.ntn, p.nic,p.city, sum(a.debit) - sum(a.credit) as bal
             from account_move_line a
             join res_partner p on a.partner_id = p.id
-            where a.date <= '""" + str(to_char) + entery_type + """' 
+            where a.date = '""" + str(to_char) + entery_type + """' 
             group by p.ref, p.name, p.vat, p.ntn, p.nic, p.city
             """)
         
@@ -78,7 +80,7 @@ class PartnerBalanceXlS(models.AbstractModel):
         rs_move = self._cr.dictfetchall()
         
         for move in rs_move:
-            sheet.write(row,0, to_char, format_txt)
+            sheet.write(row,0, move['ref'], format_txt)
             sheet.write(row,1, move['name'], format_txt)
             sheet.write(row,2, move['city'], format_txt)
             sheet.write(row,3, move['nic'], format_txt)

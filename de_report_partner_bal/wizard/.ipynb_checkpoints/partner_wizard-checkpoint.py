@@ -10,11 +10,11 @@ class PartnerWizard(models.TransientModel):
     date = fields.Date(string='Date')
         
     partner_ids = fields.Many2many('res.partner')
-    state = fields.Selection(selection=[
-            ('draft', 'All Draft Entries'),
-            ('posted', 'All Posted Entries'),
-            ('all', 'All'),
-        ], string='Target Moves', default='draft')
+#     state = fields.Selection(selection=[
+#             ('draft', 'All Draft Entries'),
+#             ('posted', 'All Posted Entries'),
+#             ('all', 'All'),
+#         ], string='Target Moves', default='draft')
     
     
     

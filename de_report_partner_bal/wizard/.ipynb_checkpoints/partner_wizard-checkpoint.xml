@@ -11,9 +11,9 @@
                             <field name="date"/>
                            
                         </group>
-                        <group>
+<!--                         <group>
                            <field name="state" widget="radio"/>
-                        </group>
+                        </group> -->
                     </group>
                     <notebook>
                         <page string="Partners">
