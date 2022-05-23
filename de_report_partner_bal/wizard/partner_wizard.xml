@@ -15,7 +15,7 @@
                            <field name="state" widget="radio"/>
                         </group> -->
                     </group>
-                    <notebook>
+<!--                     <notebook>
                         <page string="Partners">
                             <field name="partner_ids" required="1">
                                 <tree>
@@ -23,7 +23,7 @@
                                 </tree>
                             </field>
                         </page>
-                    </notebook>
+                    </notebook> -->
 					<footer>
 						<button name="print_report" type="object" string="Print" class="oe_highlight" />
                         or
