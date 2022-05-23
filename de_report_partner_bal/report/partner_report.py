@@ -33,7 +33,7 @@ class PartnerBalanceXlS(models.AbstractModel):
         
         sheet.set_column(0, 0, 20)
         sheet.set_column(1, 1, 50)
-        sheet.set_column(2, 2, 20)
+        sheet.set_column(2, 2, 40)
         sheet.set_column(3, 3, 20)
         sheet.set_column(4, 4, 20)
         sheet.set_column(5, 5, 20)
@@ -45,14 +45,15 @@ class PartnerBalanceXlS(models.AbstractModel):
         
         sheet.write(2,0,'Code', bold)
         sheet.write(2,1 , 'Name',bold)
-        sheet.write(2,2 , 'City',bold)
-        sheet.write(2,3 , 'CNIC',bold)
-        sheet.write(2,4 , 'NTN',bold)
-        sheet.write(2,5 , 'STRN',bold)
-        sheet.write(2,6 , 'Balance',bold)
+        sheet.write(2,2 , 'Email',bold)
+        sheet.write(2,3 , 'City',bold)
+        sheet.write(2,4 , 'CNIC',bold)
+        sheet.write(2,5 , 'NTN',bold)
+        sheet.write(2,6 , 'STRN',bold)
+        sheet.write(2,7 , 'Balance',bold)
 
        
-        entery_type = ''
+#         entery_type = ''
 #         if data['state'] == 'draft':
 #             entery_type == "and parent_state = " + data['draft']
 #         elif data['state'] == 'draft':
@@ -60,21 +61,26 @@ class PartnerBalanceXlS(models.AbstractModel):
 #             raise UserError("test")
            
             
-            
-            
-        to_char = data['date'].strftime("%Y-%m-%d")
+        company_id = ''  
+        if data['date']:
+            date_param = " to_char(date) <= " + data['date'].strftime("%Y-%m-%d")
+        company_id = data.company_id.id            
+        dated = data['date'].strftime("%Y-%m-%d")
 #         current_date=str((data.date))
 #         sssssssss = datetime.strptime(current_date, "%Y-%m-%d").strftime("%d/%m/%Y")
         # -------------------------------------------------------------------------
         # Query for lease agreement
         # -------------------------------------------------------------------------
         self._cr.execute("""
-            select p.ref, p.name, p.vat as strn, p.ntn, p.nic,p.city, sum(a.debit) - sum(a.credit) as bal
-            from account_move_line a
-            join res_partner p on a.partner_id = p.id
-            where a.date <= '""" + str(to_char) + entery_type + """' 
-            group by p.ref, p.name, p.vat, p.ntn, p.nic, p.city
+            select p.ref, p.name, p.vat as strn, p.ntn, p.email, p.nic, p.city, sum(l.debit) - sum(l.credit) as bal
+            from account_move_line l
+            join account_account a on l.account_id = a.id
+            join res_partner p on l.partner_id = p.id
+            where a.internal_type = '""" + str(data.account_type) +  """' and l.date <= '""" + str(dated) +  """' and l.company_id='"""+ str(company_id)  + """'
+            
+            group by p.ref, p.name, p.vat, p.email, p.ntn, p.nic, p.city
             """)
+        
         
                          
         rs_move = self._cr.dictfetchall()
@@ -82,11 +88,12 @@ class PartnerBalanceXlS(models.AbstractModel):
         for move in rs_move:
             sheet.write(row,0, move['ref'], format_txt)
             sheet.write(row,1, move['name'], format_txt)
-            sheet.write(row,2, move['city'], format_txt)
-            sheet.write(row,3, move['nic'], format_txt)
-            sheet.write(row,4, move['ntn'], format_txt)
-            sheet.write(row,5, move['strn'], format_txt)
-            sheet.write(row,6, move['bal'], format_num)
+            sheet.write(row,2, move['email'], format_txt)
+            sheet.write(row,3, move['city'], format_txt)
+            sheet.write(row,4, move['nic'], format_txt)
+            sheet.write(row,5, move['ntn'], format_txt)
+            sheet.write(row,6, move['strn'], format_txt)
+            sheet.write(row,7, move['bal'], format_num)
             
 
              
