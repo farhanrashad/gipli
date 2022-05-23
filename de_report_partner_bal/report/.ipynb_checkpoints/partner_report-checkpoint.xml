@@ -1,0 +1,14 @@
+<!--<?xml version="1.0" encoding="UTF-8" ?>-->
+<odoo>
+    <data>
+        <report
+            id="partner_bal_report_xlsx"
+            model="partner.wizard"
+            string="Partner Balance Report"
+            report_type="xlsx"
+            name="de_report_partner_bal.partner_bal_report_xlsx"
+            file="de_report_partner_bal.partner_bal_report_xlsx"
+
+        />
+    </data>
+</odoo>
