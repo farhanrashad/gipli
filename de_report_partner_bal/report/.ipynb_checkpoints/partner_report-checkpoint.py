@@ -72,7 +72,7 @@ class PartnerBalanceXlS(models.AbstractModel):
             select p.ref, p.name, p.vat as strn, p.ntn, p.nic,p.city, sum(a.debit) - sum(a.credit) as bal
             from account_move_line a
             join res_partner p on a.partner_id = p.id
-            where a.date = '""" + str(to_char) + entery_type + """' 
+            where a.date <= '""" + str(to_char) + entery_type + """' 
             group by p.ref, p.name, p.vat, p.ntn, p.nic, p.city
             """)
         
