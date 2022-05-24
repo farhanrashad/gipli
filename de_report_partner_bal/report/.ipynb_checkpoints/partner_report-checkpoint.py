@@ -71,15 +71,29 @@ class PartnerBalanceXlS(models.AbstractModel):
         # -------------------------------------------------------------------------
         # Query for lease agreement
         # -------------------------------------------------------------------------
-        self._cr.execute("""
-            select p.ref, p.name, p.vat as strn, p.ntn, p.email, p.nic, p.city, sum(l.debit) - sum(l.credit) as bal
-            from account_move_line l
-            join account_account a on l.account_id = a.id
-            join res_partner p on l.partner_id = p.id
-            where a.internal_type = '""" + str(data.account_type) +  """' and l.date <= '""" + str(dated) +  """' and l.company_id='"""+ str(company_id)  + """'
+        if data.account_type == 'payable':
+            self._cr.execute("""
+                select p.ref, p.name, p.vat as strn, p.ntn, p.email, p.nic, p.city, sum(l.debit) - sum(l.credit) as bal
+                from account_move_line l
+                join account_account a on l.account_id = a.id
+                join account_move m on l.move_id = m.id
+                join res_partner p on l.partner_id = p.id
+                where l.credit > 0 and  a.internal_type = '""" + str(data.account_type) +  """' and l.date <= '""" + str(dated) +  """' and l.company_id='"""+ str(company_id)  + """'
+
+                group by p.ref, p.name, p.vat, p.email, p.ntn, p.nic, p.city
+                """)
+        elif data.account_type == 'receivable':
+             self._cr.execute("""
+                select p.ref, p.name, p.vat as strn, p.ntn, p.email, p.nic, p.city, sum(l.debit) - sum(l.credit) as bal
+                from account_move_line l
+                join account_account a on l.account_id = a.id
+                join account_move m on l.move_id = m.id
+                join res_partner p on l.partner_id = p.id
+                where l.debit > 0 and  a.internal_type = '""" + str(data.account_type) +  """' and l.date <= '""" + str(dated) +  """' and l.company_id='"""+ str(company_id)  + """'
+
+                group by p.ref, p.name, p.vat, p.email, p.ntn, p.nic, p.city
+                """)
             
-            group by p.ref, p.name, p.vat, p.email, p.ntn, p.nic, p.city
-            """)
         
         
                          
