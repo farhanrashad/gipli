@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_de_retail_price_total_de_retail_price_total,de_retail_price_total.de_retail_price_total,model_de_retail_price_total_de_retail_price_total,base.group_user,1,1,1,1

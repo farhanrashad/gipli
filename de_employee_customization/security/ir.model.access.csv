@@ -1,6 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_children_data,children.data,model_children_data,base.group_user,1,1,1,1
-access_employee_education,employee.education,model_employee_education,base.group_user,1,1,1,1
-access_major_responsibilities,major.responsibilities,model_major_responsibilities,base.group_user,1,1,1,1
-access_minor_responsibilities,minor.responsibilities,model_minor_responsibilities,base.group_user,1,1,1,1
-access_employee_expereince,employee.expereince,model_employee_expereince,base.group_user,1,1,1,1
