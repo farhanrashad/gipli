@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- add fields and button in MultipleProductpurchase-->
+    <record id="view_account_multiple_products_form" model="ir.ui.view">
+        <field name="name">view.account.multiple.products.form</field>
+        <field name="model">account.multiple.products</field>
+        <field name="arch" type="xml">
+            <form string ="Products">
+                <field name="product_ids">
+                    <field name="name"/>
+                </field>
+
+<!--
+                <field name="product_ids" widget="section_and_note_one2many" mode="tree">
+                    <tree editable="bottom" string="Products" >
+                        <field name="id"/>
+                    </tree>
+                </field>
+-->
+                <footer>
+                    <button string='Add Products' name="add_multiple_products" type='object' class='btn-primary'/>
+                </footer>
+            </form>	   		
+        </field>
+    </record>
+
+    <!-- Wizard view Action-->
+    <record id="action_account_multiple_products_form" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">account.multiple.products</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_account_multiple_products_form"/>	
+    </record>
+
+</odoo>

@@ -1,0 +1,14 @@
+<odoo>
+  <data>
+     <record id="account_move_line_form_view" model="ir.ui.view">
+			<field name="name">account.move.line.form.view</field>
+			<field name="model">account.move.line</field>
+			<field name="inherit_id" ref="account.view_move_line_tree_grouped"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='name']" position="after">
+					<field name="city"/>
+				</xpath>
+			</field>
+		</record>
+  </data>
+</odoo>

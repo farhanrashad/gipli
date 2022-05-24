@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_V3_document">
+    <t t-call="web.html_container"> 
+        <t t-call="web.internal_layout">
+                      
+        <t t-set="o" t-value="o.with_context()"/>
+        <div class="page" style="font-size:18px;">
+             <div class= "pull-left">
+               <img style="height:100px;width:100px" t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" class="float-left" alt="Logo"/>
+                <span t-esc='o.company_id.name' style="margin-top:5px;"/><br/>
+                <span t-esc='o.company_id.street'/>
+                <span t-esc='o.company_id.street2'/>
+                <span t-esc='o.company_id.city'/>
+                <span t-esc='o.company_id.country_id.name'/>
+            </div>
+            <div class="oe_structure"/>
+            <div align="center"> 
+                <br/>                  
+              <h2>Cash Payment Voucher</h2>
+            </div>
+            <br/>
+            <table class="table table-sm table-striped table-bordered">
+
+                <tr style="height:30%">
+                    <th align="center">V.NO.:</th>
+                    <th><span t-field="o.name"/></th>
+                    <th align="center">DATE :</th>
+                    <th> <span t-field="o.date"/></th>
+                    <th align="center">Cash Account</th>
+                    <th> <span t-field="o.journal_id.default_credit_account_id"/></th>
+                </tr>
+            </table>
+            <br/>
+            <table class="table table-sm table-striped table-bordered">
+                <thead>
+                    <tr>
+                       <th> A/C CODE</th>
+                        <th>TITLE OF ACCOUNT</th>
+                        <th>NARRATION</th>
+                        <th>Amount</th>
+                    </tr>
+                    </thead>
+                <tbody class="sale_tbody">
+                    <t t-set= "total_credit" t-value="0"/>
+                      <t t-foreach="o.line_ids" t-as="line">
+                          <t t-if="line.credit &gt; 0">
+                        <tr>
+                            <td ><span t-field="line.account_id.code"/></td>
+                            <td ><span t-field="line.partner_id.name"/></td>
+                            <td ><span t-field="line.name"/></td>
+                              <td ><span t-field="line.credit"/>
+                                <t t-set= "total_credit" t-value="total_credit+line.credit"/></td>
+                             
+                           </tr> 
+                         
+                       </t>
+                 
+                           </t>
+                     <tr>
+                         <td colspan="3" style="font-size:12px;">
+                             <p><strong>Rupees:</strong>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                            <strong> <span t-esc="o.company_id.currency_id.amount_to_text(total_credit)"/></strong>
+                              <b  style="font-size:14px;" class='pull-right'>Total: </b>
+                                </p>
+                         </td>
+
+                         <th>
+                            <t t-esc="total_credit"/> 
+                         </th>
+                      </tr>
+                  
+                </tbody>
+                
+            </table>
+            <br/>
+            <br/>
+              <br/>
+            <br/>
+            
+
+        </div>
+              <t t-if="o.type=='entry'">
+    <table class="table table-sm ">
+       
+                <tr>
+                    <th style="max-width:100px; word-wrap:break-word;padding-left:5px;"></th>
+                    <th style="border-top: 1px solid black;padding:5px;text-align:center;"> Prepared By</th>
+                    <th style="max-width:100px; word-wrap:break-word;padding:5px;"> </th>
+                    <th style="border-top: 1px solid black;padding:5px;text-align:center;">Checked By</th>
+                    <th style="max-width:100px; word-wrap:break-word;padding-left:5px;"> </th>
+                    <th style="border-top: 1px solid black;padding:5px;text-align:center;">Approved By</th>
+                    <th style="max-width:100px; word-wrap:break-word;padding-left:5px;"> </th>
+                    <th style="border-top: 1px solid black;padding:5px;text-align:center;">Receiver Sign</th>
+                </tr>
+         </table>
+        </t>
+    </t>
+    </t>
+           
+</template>
+    <template id="cash_payment_report">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="de_account_voucher_report.report_V3_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+</template>
+</odoo>

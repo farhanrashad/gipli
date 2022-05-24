@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="open_account_bill_action"
+            string="Purchase/journal Voucher"
+            model="account.move"
+            report_type="qweb-pdf"
+            file="de_account_voucher_report.bill_report"
+            name="de_account_voucher_report.bill_report"
+        />
+    </data>
+</odoo>
