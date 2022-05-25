@@ -9,7 +9,7 @@ class PartnerWizard(models.TransientModel):
     
     date = fields.Date(string='Date')
     
-    company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env.company.id)
+    company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env.company)
     account_type = fields.Selection(selection=[
             ('payable', 'Payable'),
             ('receivable', 'Receivable'),

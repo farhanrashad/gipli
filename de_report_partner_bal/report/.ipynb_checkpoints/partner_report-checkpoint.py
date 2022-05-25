@@ -80,7 +80,7 @@ class PartnerBalanceXlS(models.AbstractModel):
                 join account_move m on l.move_id = m.id
                 join res_partner p on l.partner_id = p.id
                 where  a.internal_type = '""" + str(data.account_type) +  """' and l.date <= '""" + str(dated) +  """' and l.company_id='"""+ str(company_id)  + """'
-                and m.state = 'posted'
+                and m.state = 'posted' and .state = 'draft'
                 group by p.ref, p.name, p.vat, p.email, p.ntn, p.nic, p.city
                 """)
         if data.account_type == 'receivable':
@@ -91,7 +91,7 @@ class PartnerBalanceXlS(models.AbstractModel):
                 join account_move m on l.move_id = m.id
                 join res_partner p on l.partner_id = p.id
                 where a.internal_type = '""" + str(data.account_type) +  """' and l.date <= '""" + str(dated) +  """' and l.company_id='"""+ str(company_id)  + """'
-                and m.state = 'posted'
+                and m.state = 'posted' and .state = 'draft'
                 group by p.ref, p.name, p.vat, p.email, p.ntn, p.nic, p.city
                 """)
             
