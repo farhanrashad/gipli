@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<!--  Added domain in sale order -->
+	<record id="sh_view_order_form_inh" model="ir.ui.view">
+          <field name="name">sale.order.form.inh</field>
+          <field name="model">sale.order</field>
+          <field name="inherit_id" ref="sale.view_order_form"/>
+          <field name="arch" type="xml">
+          		<field name="partner_id" position="attributes">
+          			<attribute name="domain">[('is_customer','=',True)]</attribute>
+          			<attribute name="context">{'default_is_customer':True,'default_is_company':True,'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}</attribute>
+          		</field>
+          </field>
+  	</record>
+             
+</odoo>
