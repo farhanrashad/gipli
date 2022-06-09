@@ -1,0 +1,14 @@
+<!--<?xml version="1.0" encoding="UTF-8" ?>-->
+<odoo>
+    <data>
+        <report
+            id="hr_attendance_report_xlsx"
+            model="hr.attendance.report.wizard"
+            string="Attendance Report"
+            report_type="xlsx"
+            name="de_daily_hr_attendance_report.hr_attendance_report_xlsx"
+            file="de_daily_hr_attendance_report.hr_attendance_report_xlsx"
+
+        />
+    </data>
+</odoo>

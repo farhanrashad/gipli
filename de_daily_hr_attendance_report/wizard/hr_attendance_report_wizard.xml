@@ -1,0 +1,47 @@
+<!-- <?xml version="1.0" encoding="UTF-8" ?> -->
+<odoo>
+    <data>
+        <record id="hr_attendance_report_wizard_view_form" model="ir.ui.view">
+            <field name="name">hr.attendance.report.wizard.form</field>
+            <field name="model">hr.attendance.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Daily Attendance Report">
+                    <group>
+                        <group >
+                            <field name="on_date" required="1"/>
+                            <field name="printed_by" widget="radio"/>
+                            <field name="all_employees"/>
+                            <field name="employee" attrs="{'invisible': [('all_employees', '=', True)]}"/>
+                        </group>
+<!--                         <group >
+                            <field name="stop_at"/>
+                        </group>
+                        <group>
+                            <field name="shop_ids" widget="many2many_tags"/>
+                        </group> -->
+                    </group>
+                    <footer>
+                        <button name="print_hr_attendance_report_xls" type="object" string="GENERATE EXCEL" class="oe_highlight"/>
+                        or 
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_daily_hr_attendance_report" model="ir.actions.act_window">
+            <field name="name">Daily Attendance Report</field>
+            <field name="res_model">hr.attendance.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem
+                id="hr_daily_attendance_report_menu"
+                name="Attendance Report"
+                parent="hr_attendance.menu_hr_attendance_manage_attendances"
+                sequence="20"
+                action="action_daily_hr_attendance_report"
+        />
+    </data>
+</odoo>
