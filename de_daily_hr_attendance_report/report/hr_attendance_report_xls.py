@@ -23,12 +23,14 @@ class EmployeeAttendanceXlS(models.AbstractModel):
         bold = workbook.add_format({'bold': True, 'align': 'center', 'border': True})
         
         sheet.write('D2:D2', 'Employee Attendance', bold)
-        sheet.write('D3:D3', 'daily: '+ data.on_date .strftime('%d-%b-%Y'), bold)
+        sheet.write('C3:C3', 'date from: '+ data.on_date .strftime('%d-%b-%Y'), bold)
+        sheet.write('E3:E3', 'date to: '+ data.date_to .strftime('%d-%b-%Y'), bold)
+
         
         
         
         sheet.set_column('A:B', 20, )
-        sheet.set_column('C:C', 20, )
+        sheet.set_column('C:C', 30, )
         sheet.set_column('D:D', 30, )
         sheet.set_column('E:F', 30, )
         sheet.set_column('G:H', 20, )
@@ -37,7 +39,7 @@ class EmployeeAttendanceXlS(models.AbstractModel):
         
         sheet.write(5, 0, 'Sr No', bold)
         sheet.write(5, 1, 'Empolyee', bold)
-        sheet.write(5, 2, data.on_date .strftime('%d-%b-%Y'), bold)
+        sheet.write(5, 2, 'Present/Absent', bold)
         sheet.write(5, 3, 'Check in', bold)
         sheet.write(5, 4, 'Check out', bold)
         sheet.write(5, 5, 'Present', bold)
@@ -49,19 +51,19 @@ class EmployeeAttendanceXlS(models.AbstractModel):
         
     
         
-        date_list = []
-        if data.printed_by == 'daily':
-            date_list.append(data.on_date)
+#         date_list = []
+#         if data.printed_by == 'daily':
+#             date_list.append(data.on_date)
             
-        elif data.printed_by == 'weekly':
-            date_list.append(data.on_date)
-            for day in range(7):
-                date_list.append(data.on_date + datetime.timedelta(days=day))
+#         elif data.printed_by == 'weekly':
+#             date_list.append(data.on_date)
+#             for day in range(7):
+#                 date_list.append(data.on_date + datetime.timedelta(days=day))
                 
-        if data.printed_by == 'monthly':
-            date_list.append(data.on_date)
-            for day in range(31):
-                date_list.append(data.on_date + datetime.timedelta(days=day))
+#         if data.printed_by == 'monthly':
+#             date_list.append(data.on_date)
+#             for day in range(31):
+#                 date_list.append(data.on_date + datetime.timedelta(days=day))
             
             
             
@@ -82,17 +84,13 @@ class EmployeeAttendanceXlS(models.AbstractModel):
         if data.employee:
             employees = self.env['hr.employee'].search([('id','=', data.employee.id)])
             
-        
         for l in employees:
-            hr_attendance = self.env['hr.attendance'].search([('attendance_date','in', date_list),('employee_id', '=', l.id)])
+            hr_attendance = self.env['hr.attendance'].search([('employee_id', '=', l.id),('attendance_date','>=', data.on_date),('attendance_date','<=', data.date_to)])
             sheet.write(row_out, 1, l.name, format1) 
             sheet.write(row, 0, sr_no, format1)
 
-        
-       
             if hr_attendance:
                 for line in hr_attendance:
-                    
                     if line.check_in and line.check_out:
                         sheet.write(row, 2, 'P', format1)
                         sheet.write(row, 5, '1', format1)
@@ -106,13 +104,13 @@ class EmployeeAttendanceXlS(models.AbstractModel):
                         sheet.write(row, 4, line.check_out.strftime('%d-%m-%Y %H:%M:%S'), format1)
                     row = row+1
             else:
-                att_dates = self.env['hr.attendance'].search([('attendance_date','in', date_list)])
+                att_dates = self.env['hr.attendance'].search([('attendance_date','>=', data.on_date),('attendance_date','<=', data.date_to)])
                 for date in att_dates:
                     sheet.write(row, 2, 'A', format1)
                     sheet.write(row, 5, '0', format1)
                     sheet.write(row, 6, '1', format1)
-                    sheet.write(row, 3, '--', format1)
-                    sheet.write(row, 4, '--', format1)
+                    sheet.write(row, 3, '', format1)
+                    sheet.write(row, 4, '', format1)
 
                     row = row+1
             sr_no += 1

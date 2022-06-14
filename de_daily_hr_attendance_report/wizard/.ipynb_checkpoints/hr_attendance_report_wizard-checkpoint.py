@@ -7,13 +7,14 @@ class HrAttendanceReportWizard(models.TransientModel):
     _name = 'hr.attendance.report.wizard'
     _description = 'Daily Attendance Report'
 
-    on_date = fields.Datetime(string='Date', required=True)
+    on_date = fields.Date(string='Date from', required=True)
+    date_to = fields.Date(string='Date to', required=True)
     
-    printed_by = fields.Selection(selection=[
-            ('daily', 'Daily'),
-            ('weekly', 'Weekly'),
-            ('monthly', 'Monthly'),
-        ], string='Print By', default='daily')
+#     printed_by = fields.Selection(selection=[
+#             ('daily', 'Daily'),
+#             ('weekly', 'Weekly'),
+#             ('monthly', 'Monthly'),
+#         ], string='Print By', default='daily')
     all_employees = fields.Boolean(string="All Employees")
     employee = fields.Many2one('hr.employee', string="Employee")
     
@@ -24,13 +25,13 @@ class HrAttendanceReportWizard(models.TransientModel):
     
     def check_report(self):
         data = {}
-        data['form'] = self.read(['on_date', 'printed_by', 'all_employees', 'employee'])[0]
+        data['form'] = self.read(['on_date', 'date_to' 'all_employees', 'employee'])[0]
         return self.print_hr_attendance_report_xls(data)
         
 
     def print_hr_attendance_report_xls(self):
         data = {}
-        data['form'] = self.read(['on_date', 'printed_by', 'employee', 'all_employees'])[0]
+        data['form'] = self.read(['on_date','date_to', 'employee', 'all_employees'])[0]
         return self.env.ref('de_daily_hr_attendance_report.hr_attendance_report_xlsx').report_action(self, data=data, config=False)
     
     
