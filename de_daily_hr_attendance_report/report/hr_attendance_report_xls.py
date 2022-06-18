@@ -81,41 +81,53 @@ class EmployeeAttendanceXlS(models.AbstractModel):
         row_out = 7
         if data.all_employees:
             employees = self.env['hr.employee'].search([])
+            
         if data.employee:
+            
             employees = self.env['hr.employee'].search([('id','=', data.employee.id)])
             
+            
+        delta_days = (data.date_to - data.on_date).days + 1
+        
+        
         for l in employees:
-            hr_attendance = self.env['hr.attendance'].search([('employee_id', '=', l.id),('attendance_date','>=', data.on_date),('attendance_date','<=', data.date_to)])
-            sheet.write(row_out, 1, l.name, format1) 
-            sheet.write(row, 0, sr_no, format1)
+            
+            start_date = data.on_date 
+            delta_days = (data.date_to - data.on_date).days + 1
+            for dayline in range(delta_days):
+            
+                hr_attendance = self.env['hr.attendance'].search([('employee_id', '=', l.id),('attendance_date','=',start_date)],limit=1)
+                sheet.write(row_out, 1, l.name, format1) 
+                sheet.write(row, 0, sr_no, format1)
 
-            if hr_attendance:
-                for line in hr_attendance:
-                    if line.check_in and line.check_out:
-                        sheet.write(row, 2, 'P', format1)
-                        sheet.write(row, 5, '1', format1)
-                        sheet.write(row, 6, '0', format1)
-                    else:
-                        sheet.write(row, 2, 'A', format1)
-                        sheet.write(row, 5, '0', format1)
-                        sheet.write(row, 6, '1', format1)
-                    sheet.write(row, 3, line.check_in.strftime('%d/%m/%Y %H:%M:%S'), format1)
-                    if line.check_out:
-                        sheet.write(row, 4, line.check_out.strftime('%d-%m-%Y %H:%M:%S'), format1)
-                    row = row+1
-            else:
-                att_dates = self.env['hr.attendance'].search([('attendance_date','>=', data.on_date),('attendance_date','<=', data.date_to)])
-                for date in att_dates:
+                if hr_attendance.check_in and hr_attendance.check_out:
+                    sheet.write(row, 2, 'P', format1)
+                    sheet.write(row, 5, '1', format1)
+                    sheet.write(row, 6, '0', format1)
+                else:
                     sheet.write(row, 2, 'A', format1)
                     sheet.write(row, 5, '0', format1)
                     sheet.write(row, 6, '1', format1)
-                    sheet.write(row, 3, '', format1)
-                    sheet.write(row, 4, '', format1)
+                    
+                if hr_attendance.check_in:
+                    sheet.write(row, 3, hr_attendance.check_in.strftime('%d/%m/%Y %H:%M:%S'), format1)
+                if hr_attendance.check_out:
+                    sheet.write(row, 4, hr_attendance.check_out.strftime('%d-%m-%Y %H:%M:%S'), format1)
+                row = row+1
+                start_date = (start_date + timedelta(1))    
+#                 else:
+#                     att_dates = self.env['hr.attendance'].search([('attendance_date','>=', data.on_date),('attendance_date','<=', data.date_to)])
+#                     for date in att_dates:
+#                         sheet.write(row, 2, 'A', format1)
+#                         sheet.write(row, 5, '0', format1)
+#                         sheet.write(row, 6, '1', format1)
+#                         sheet.write(row, 3, '', format1)
+#                         sheet.write(row, 4, '', format1)
 
-                    row = row+1
-            sr_no += 1
-                
-            row_out = row
+#                         row = row+1
+                sr_no += 1
+
+                row_out = row
             
             
             
