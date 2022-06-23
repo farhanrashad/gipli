@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_de_account_journalentry_report_de_account_journalentry_report,de_account_journalentry_report.de_account_journalentry_report,model_de_account_journalentry_report_de_account_journalentry_report,base.group_user,1,1,1,1

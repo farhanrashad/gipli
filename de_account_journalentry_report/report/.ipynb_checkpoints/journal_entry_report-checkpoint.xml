@@ -1,0 +1,11 @@
+<odoo>
+  <data>
+  <report
+            id="journal_entry_report"
+            string="Print Invoice (PDF)"
+            model="account.move"
+            report_type="qweb-pdf"
+            file="de_account_journalentry_report.report_journal_entries_template"
+            name="de_account_journalentry_report.report_journal_entries_template" />
+  </data>
+</odoo>
