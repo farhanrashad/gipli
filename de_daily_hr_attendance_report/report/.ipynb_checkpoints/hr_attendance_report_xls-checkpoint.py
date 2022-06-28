@@ -48,6 +48,8 @@ class EmployeeAttendanceXlS(models.AbstractModel):
         
         
         sr_no = 0
+        count = 0
+        count_att = 0
         
     
         
@@ -95,29 +97,43 @@ class EmployeeAttendanceXlS(models.AbstractModel):
             start_date = data.on_date 
             delta_days = (data.date_to - data.on_date).days + 1
             for dayline in range(delta_days):
-            
-                hr_attendance = self.env['hr.attendance'].search([('employee_id', '=', l.id),('attendance_date','=',start_date)],limit=1)
-                sheet.write(row_out, 1, l.name, format1) 
-                sheet.write(row, 0, sr_no, format1)
 
-                if hr_attendance.check_in and hr_attendance.check_out:
-                    sheet.write(row, 2, 'P', format1)
-                    sheet.write(row, 5, '1', format1)
-                    sheet.write(row, 6, '0', format1)
-                else:
-                    sheet.write(row, 2, 'A', format1)
-                    sheet.write(row, 5, '0', format1)
-                    sheet.write(row, 6, '1', format1)
+                hr_attendance = self.env['hr.attendance'].search([('employee_id', '=', l.id),('attendance_date','=',start_date)], order="check_in asc")
+                count = 0
+                for count_line in hr_attendance:
+                    count += 1
+                
+                count_att = 0
+                check_in = False
+                check_out = False
+                for line in hr_attendance:
+                    sheet.write(row_out, 1, l.name, format1) 
+                    sheet.write(row, 0, sr_no, format1)
+
+                    if line.check_in and line.check_out:
+                        sheet.write(row, 2, 'P', format1)
+                        sheet.write(row, 5, '1', format1)
+                        sheet.write(row, 6, '0', format1)
+                    else:
+                        sheet.write(row, 2, 'A', format1)
+                        sheet.write(row, 5, '0', format1)
+                        sheet.write(row, 6, '1', format1)
+
+
+                    count_att += 1
+                    if count_att == 1:
+                        check_in = (line.check_in)
+                    if count_att == count:
+                        check_out = (line.check_out)
                     
-                    
-                check_in_time = hr_attendance.check_in
-                check_out_time = hr_attendance.check_out    
-                if hr_attendance.check_in:
-                    check_in_time = hr_attendance.check_in + relativedelta(hours=+5)
-                    sheet.write(row, 3, check_in_time.strftime('%m/%d/%Y %H:%M:%S'), format1)
-                if hr_attendance.check_out: 
-                    check_out_time = hr_attendance.check_out + relativedelta(hours=+5)
-                    sheet.write(row, 4,check_out_time.strftime('%m/%d/%Y %H:%M:%S'), format1)
+                    check_in_time = check_in
+                    check_out_time = check_out    
+                    if check_in:
+                        check_in_time = check_in + relativedelta(hours=+5)
+                        sheet.write(row, 3, check_in_time.strftime('%m/%d/%Y %H:%M:%S'), format1)
+                    if check_out: 
+                        check_out_time = check_out + relativedelta(hours=+5)
+                        sheet.write(row, 4,check_out_time.strftime('%m/%d/%Y %H:%M:%S'), format1)
 
                     
                     
