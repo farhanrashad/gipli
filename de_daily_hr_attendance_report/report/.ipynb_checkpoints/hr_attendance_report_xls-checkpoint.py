@@ -109,10 +109,24 @@ class EmployeeAttendanceXlS(models.AbstractModel):
                     sheet.write(row, 5, '0', format1)
                     sheet.write(row, 6, '1', format1)
                     
+                    
+                check_in_time = hr_attendance.check_in
+                check_out_time = hr_attendance.check_out    
                 if hr_attendance.check_in:
-                    sheet.write(row, 3, hr_attendance.check_in.strftime('%d/%m/%Y %H:%M:%S'), format1)
-                if hr_attendance.check_out:
-                    sheet.write(row, 4, hr_attendance.check_out.strftime('%d-%m-%Y %H:%M:%S'), format1)
+                    check_in_time = hr_attendance.check_in + relativedelta(hours=+5)
+                    sheet.write(row, 3, check_in_time.strftime('%m/%d/%Y %H:%M:%S'), format1)
+                if hr_attendance.check_out: 
+                    check_out_time = hr_attendance.check_out + relativedelta(hours=+5)
+                    sheet.write(row, 4,check_out_time.strftime('%m/%d/%Y %H:%M:%S'), format1)
+
+                    
+                    
+#                 if hr_attendance.check_in:
+#                     sheet.write(row, 3, hr_attendance.check_in.strftime('%d/%m/%Y %H:%M:%S') + relativedelta(hours =+ 5), format1)
+#                 if hr_attendance.check_out:
+#                     sheet.write(row, 4, hr_attendance.check_out.strftime('%d-%m-%Y %H:%M:%S'), format1)
+                    
+                    
                 row = row+1
                 start_date = (start_date + timedelta(1))    
 #                 else:
@@ -128,46 +142,3 @@ class EmployeeAttendanceXlS(models.AbstractModel):
                 sr_no += 1
 
                 row_out = row
-            
-            
-            
-#         result = []
-#         result2 = []
-#         for emp in employees:
-#             main_dict = {'sno':sr_no,'emp_name':emp.name,'p_count':'','a_count':'','att_dict':''}
-#             emp_attendance = self.env['hr.attendance'].search([('attendance_date','in', date_list),('employee_id', '=', emp.id)])
-#             print("emp and employee attendance ++++++++++++++++ ",emp,emp_attendance)
-            
-#             for att in emp_attendance:
-#                 att_dict = {'check_in':'', 'check_out':'', 'status':'', }
-#                 if att.check_in and att.check_out:
-#                     att_dict["check_in"] = att.check_in.strftime('%d/%m/%Y %H:%M:%S')
-#                     att_dict["check_out"] = att.check_out.strftime('%d-%m-%Y %H:%M:%S')
-#                     att_dict["status"] = 'P'
-#                     att_dict["p_count"] = 1
-#                     att_dict["a_count"] = 0
-#                 else:
-#                     att_dict["check_in"] = '--'
-#                     att_dict["check_out"] = '--'
-#                     att_dict["status"] = 'A'
-                
-#                 result2.append(att_dict)
-#                 main_dict['att_dict'] = result2
-#             result.append(main_dict)
-#             sr_no += 1
-        
-#         row_out = 7
-#         row_in = 7
-#         for rec in result:
-#             sheet.write(row_out, 0, rec['sno'], format1)
-#             sheet.write(row_out, 1, rec['emp_name'], format1)            
-#             for data in rec['att_dict']:
-#                 sheet.write(row_in, 2, data['check_in'], format1)
-#                 sheet.write(row_in, 3, data['check_out'], format1)
-#                 sheet.write(row_in, 4, data['status'], format1)
-#                 row_in +=1
-#             row_out = row_in + 1
-
-            
-        
-        
