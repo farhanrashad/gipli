@@ -1,0 +1,14 @@
+<!--<?xml version="1.0" encoding="UTF-8" ?>-->
+<odoo>
+    <data>
+        <report
+            id="hr_employee_statement_report_xlsx"
+            model="employee.statement.wizard"
+            string="Employee Statement Report"
+            report_type="xlsx"
+            name="de_employee_statement.hr_employee_statement_report_xlsx"
+            file="de_employee_statement.hr_employee_statement_report_xlsx"
+
+        />
+    </data>
+</odoo>
