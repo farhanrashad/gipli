@@ -106,26 +106,27 @@ class EmployeeAttendanceXlS(models.AbstractModel):
                 count_att = 0
                 check_in = False
                 check_out = False
+                attendance = 'A'
+                absent = 1
+                prsent = 0
+                sheet.write(row_out, 1, l.name, format1) 
+                sheet.write(row, 0, sr_no, format1)
                 for line in hr_attendance:
-                    sheet.write(row_out, 1, l.name, format1) 
-                    sheet.write(row, 0, sr_no, format1)
+                    attendance = 'P'
+                    absent = 0
+                    prsent = 1
 
-                    if line.check_in and line.check_out:
-                        sheet.write(row, 2, 'P', format1)
-                        sheet.write(row, 5, '1', format1)
-                        sheet.write(row, 6, '0', format1)
-                    else:
-                        sheet.write(row, 2, 'A', format1)
-                        sheet.write(row, 5, '0', format1)
-                        sheet.write(row, 6, '1', format1)
+                sheet.write(row, 2, attendance, format1)
+                sheet.write(row, 5, prsent, format1)
+                sheet.write(row, 6, absent, format1)
 
-
+                for line in hr_attendance:
                     count_att += 1
                     if count_att == 1:
                         check_in = (line.check_in)
                     if count_att == count:
                         check_out = (line.check_out)
-                    
+
                     check_in_time = check_in
                     check_out_time = check_out    
                     if check_in:
