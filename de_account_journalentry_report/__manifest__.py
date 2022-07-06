@@ -25,6 +25,7 @@
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
+        'report/journal_entry_header.xml',
         'report/journal_entry_report.xml',
         'report/journal_entry_template.xml',
         'views/views.xml',

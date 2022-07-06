@@ -1,0 +1,27 @@
+<odoo>
+    <template id="pdf_report_layout">
+       <t t-set="company" t-value="user.company_id"/>
+        <div class="header">
+        <div class="row">
+        <div class="col-3">
+            
+            </div>
+            <div class="col-8">
+                <div style="font-weight: bold;" 
+                     t-field="company.partner_id" t-options='{"fields":["address","name"],"no_marker": true }'/>
+                
+                <p1>JOURNAL VOUCHER</p1>
+            </div>
+            <div class="col-3">
+<!--                 <i class="pull-right">
+                    <i>
+                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                    </i>
+                </i> -->
+            </div>
+            </div>
+            <div t-if="company.logo or company.report_header" class="row zero_min_height"> </div></div>
+    </template>
+</odoo>
+
+
