@@ -7,10 +7,10 @@
             
             </div>
             <div class="col-8">
-                <div style="font-weight: bold;" 
+                <div style="font-weight: bold; font-size: 25px" 
                      t-field="company.partner_id" t-options='{"fields":["address","name"],"no_marker": true }'/>
                 
-                <p1>JOURNAL VOUCHER</p1>
+                <p1 style="font-weight: bold; font-size: 20px">JOURNAL VOUCHER</p1>
             </div>
             <div class="col-3">
 <!--                 <i class="pull-right">
