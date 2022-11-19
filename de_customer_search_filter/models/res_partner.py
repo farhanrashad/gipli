@@ -16,7 +16,6 @@ class ResPartner(models.Model):
                          '|', ['vat', 'ilike', name],
                          '|', ['nic', 'ilike', name],
                          '|', ['ntn', 'ilike', name],
-                         '|', ['wc_ref', 'ilike', name],
                          '|', ['mobile', 'ilike', name],
                          '|', ['city', 'ilike', name],
                          '|', ['email', 'ilike', name],
