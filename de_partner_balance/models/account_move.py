@@ -13,3 +13,9 @@ class AccountMove(models.Model):
     #balance = fields.Monetary(string)
     debit = fields.Monetary(related='partner_id.debit', string='Total Receivable', readonly=True,store=False)
     credit = fields.Monetary(related='partner_id.credit', string='Total Payable', readonly=True, store=False)
+
+
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+    wac_reference = fields.Char(string='WAC Ref', store=True)
