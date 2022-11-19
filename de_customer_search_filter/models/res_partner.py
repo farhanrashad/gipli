@@ -7,6 +7,8 @@ from odoo import models, api
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    wc_num = fields.Char(string='WC Ref', help="The Walking Customer Reference Number.")
+
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         """ This method will find Customer names according to its mobile, phone, city, email and its job position."""
