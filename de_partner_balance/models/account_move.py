@@ -15,7 +15,7 @@ class AccountMove(models.Model):
     credit = fields.Monetary(related='partner_id.credit', string='Total Payable', readonly=True, store=False)
 
 
-class ResPartner(models.Model):
-    _inherit = 'res.partner'
-
-    wac_reference = fields.Char(string='WAC Ref', store=True)
+# class ResPartner(models.Model):
+#     _inherit = 'res.partner'
+#
+#     wac_reference = fields.Char(string='WAC Ref', store=True)
