@@ -8,6 +8,7 @@
             <xpath expr="//field[@name='vat']" position="after">
                 <field name="ntn" placeholder="e.g 1359640-3"/>
                 <field name="nic" placeholder="e.g 3460344332225" />
+                <field name="wac_ref" placeholder="e.g WC9876" />
             </xpath>
         </field>
     </record>
