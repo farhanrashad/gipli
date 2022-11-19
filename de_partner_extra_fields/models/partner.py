@@ -12,4 +12,4 @@ class ResPartner(models.Model):
     
     ntn = fields.Char(string='NTN', help="The National Tax Number.")
     nic = fields.Char(string='NIC', help="The National Identity Card Number.")
-    wac_ref = fields.Char(string='NIC', help="Walking Customer Number.")
+    wac_ref = fields.Char(string='Wac Ref', help="Walking Customer Number.")
