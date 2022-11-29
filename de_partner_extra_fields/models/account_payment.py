@@ -13,6 +13,7 @@ class AccountPayment(models.Model):
     vat = fields.Char(related='partner_id.vat', string='Tax ID', store=True, readonly=True)
     ntn = fields.Char(related='partner_id.ntn', string='NTN', store=True, readonly=True)
     nic = fields.Char(related='partner_id.nic', string='NIC', store=True, readonly=True)
+    wac_ref = fields.Char(related='partner_id.wac_ref', string='Wac Ref', store=True, readonly=True)
     
     city = fields.Char(related='partner_id.city', string='City', store=True, readonly=True)
     
