@@ -45,12 +45,13 @@ class PartnerBalanceXlS(models.AbstractModel):
         
         sheet.write(2,0,'Code', bold)
         sheet.write(2,1 , 'Name',bold)
-        sheet.write(2,2 , 'Email',bold)
-        sheet.write(2,3 , 'City',bold)
-        sheet.write(2,4 , 'CNIC',bold)
-        sheet.write(2,5 , 'NTN',bold)
-        sheet.write(2,6 , 'STRN',bold)
-        sheet.write(2,7 , 'Balance',bold)
+        sheet.write(2, 2, 'Walking Customer', bold)
+        sheet.write(2,3 , 'Email',bold)
+        sheet.write(2,4 , 'City',bold)
+        sheet.write(2,5 , 'CNIC',bold)
+        sheet.write(2,6 , 'NTN',bold)
+        sheet.write(2,7 , 'STRN',bold)
+        sheet.write(2,8 , 'Balance',bold)
 
        
 #         entery_type = ''
@@ -85,14 +86,14 @@ class PartnerBalanceXlS(models.AbstractModel):
                 """)
         if data.account_type == 'receivable':
              self._cr.execute("""
-                select p.ref, p.name, p.vat as strn, p.ntn, p.email, p.nic, p.city, sum(l.debit) - sum(l.credit) as bal
+                select p.ref, p.name,p.wac_ref,p.vat as strn, p.ntn, p.email, p.nic, p.city, sum(l.debit) - sum(l.credit) as bal
                 from account_move_line l
                 join account_account a on l.account_id = a.id
                 join account_move m on l.move_id = m.id
                 join res_partner p on l.partner_id = p.id
                 where a.internal_type = '""" + str(data.account_type) +  """' and l.date <= '""" + str(dated) +  """' and l.company_id='"""+ str(company_id)  + """'
                 and m.state in ('draft', 'posted')
-                group by p.ref, p.name, p.vat, p.email, p.ntn, p.nic, p.city
+                group by p.ref, p.name,p.wac_ref, p.vat, p.email, p.ntn, p.nic, p.city
                 """)
             
         
@@ -103,12 +104,13 @@ class PartnerBalanceXlS(models.AbstractModel):
         for move in rs_move:
             sheet.write(row,0, move['ref'], format_txt)
             sheet.write(row,1, move['name'], format_txt)
-            sheet.write(row,2, move['email'], format_txt)
-            sheet.write(row,3, move['city'], format_txt)
-            sheet.write(row,4, move['nic'], format_txt)
-            sheet.write(row,5, move['ntn'], format_txt)
-            sheet.write(row,6, move['strn'], format_txt)
-            sheet.write(row,7, move['bal'], format_num)
+            sheet.write(row,2, move['wac_ref'], format_txt)
+            sheet.write(row,3, move['email'], format_txt)
+            sheet.write(row,4, move['city'], format_txt)
+            sheet.write(row,5, move['nic'], format_txt)
+            sheet.write(row,6, move['ntn'], format_txt)
+            sheet.write(row,7, move['strn'], format_txt)
+            sheet.write(row,8, move['bal'], format_num)
             
 
              
