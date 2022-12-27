@@ -18,9 +18,10 @@ class PartnerBalanceXlS(models.AbstractModel):
         format1 = workbook.add_format({'font_size': '12', 'align': 'center', 'bold': False})
         sheet = workbook.add_worksheet('Employee Attendance Report')
         bold = workbook.add_format({'bold': True, 'align': 'center', 'border': True})
+        date_format = workbook.add_format({'bold': True, 'align': 'center', 'border': True,'num_format': 'dd/mm/yy'})
         
        
-        sheet.write('C1:C1', data.date.strftime('%d-%m-%Y'), bold)
+        sheet.write('C1:C1', data.date,date_format)
         
         
         format0 = workbook.add_format({'font_size': '12', 'align': 'vcenter', 'bold': True,})
