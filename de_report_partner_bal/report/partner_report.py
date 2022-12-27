@@ -67,7 +67,9 @@ class PartnerBalanceXlS(models.AbstractModel):
         if data['date']:
             date_param = " to_char(date) <= " + data['date'].strftime("%Y-%m-%d")
         company_id = data.company_id.id            
-        dated = data['date'].strftime("%Y-%m-%d")
+        dated = data['date']
+        if dated:
+            dated.strftime("%Y-%m-%d")
 #         current_date=str((data.date))
 #         sssssssss = datetime.strptime(current_date, "%Y-%m-%d").strftime("%d/%m/%Y")
         # -------------------------------------------------------------------------
