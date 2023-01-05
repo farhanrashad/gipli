@@ -15,5 +15,6 @@ class AccountPayment(models.Model):
     nic = fields.Char(related='partner_id.nic', string='NIC', store=True, readonly=True)
     
     city = fields.Char(related='partner_id.city', string='City', store=True, readonly=True)
+    wac_ref = fields.Char(related='partner_id.wac_ref', string='Wac Ref', store=True, readonly=True) 
     
     #city_filter = fields.Char('City',readonly=True)
