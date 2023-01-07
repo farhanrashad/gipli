@@ -42,7 +42,7 @@ class PartnerBalanceXlS(models.AbstractModel):
         sheet.write(2, 0, 'Code', bold)
         sheet.write(2, 1, 'Name', bold)
         if data.account_type == 'receivable':
-            sheet.write(2, 2, 'Sequence #', bold)
+            sheet.write(2, 2, 'Walking Customer', bold)
             sheet.write(2, 3, 'Email', bold)
             sheet.write(2, 4, 'City', bold)
             sheet.write(2, 5, 'CNIC', bold)
@@ -90,7 +90,7 @@ class PartnerBalanceXlS(models.AbstractModel):
                    """)
         if data.account_type == 'receivable':
             self._cr.execute("""
-                   select p.ref, p.name,m.seq_number as seq_number,p.vat as strn, p.ntn, p.email, p.nic, p.city, sum(l.debit) - sum(l.credit) as bal
+                   select p.ref, p.name,p.wac_ref as walking_customer,p.vat as strn, p.ntn, p.email, p.nic, p.city, sum(l.debit) - sum(l.credit) as bal
                    from account_move_line l
                    join account_account a on l.account_id = a.id
                    join account_move m on l.move_id = m.id
@@ -98,7 +98,7 @@ class PartnerBalanceXlS(models.AbstractModel):
                    where a.internal_type = '""" + str(data.account_type) + """' and l.date <= '""" + str(
                 dated) + """' and l.company_id='""" + str(company_id) + """'
                    and m.state in ('draft', 'posted')
-                   group by p.ref, p.name,m.seq_number, p.vat, p.email, p.ntn, p.nic, p.city
+                   group by p.ref, p.name,p.wac_ref, p.vat, p.email, p.ntn, p.nic, p.city
                    """)
 
         rs_move = self._cr.dictfetchall()
@@ -107,7 +107,7 @@ class PartnerBalanceXlS(models.AbstractModel):
             sheet.write(row, 0, move['ref'], format_txt)
             sheet.write(row, 1, move['name'], format_txt)
             if data.account_type == 'receivable':
-                sheet.write(row, 2, move['seq_number'], format_txt)
+                sheet.write(row, 2, move['walking_customer'], format_txt)
                 sheet.write(row, 3, move['email'], format_txt)
                 sheet.write(row, 4, move['city'], format_txt)
                 sheet.write(row, 5, move['nic'], format_txt)
