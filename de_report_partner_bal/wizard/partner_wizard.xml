@@ -8,7 +8,7 @@
 				<form string="Partner Balance">
                     <group>
                         <group>
-                            <field name="date"/>
+                            <field name="date" required="1"/>
                             <field name="company_id"/>
                            
                         </group>
