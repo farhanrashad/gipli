@@ -1,0 +1,19 @@
+<odoo>
+  <data>
+    <record id="action_hr_employees_teacher"
+			model="ir.actions.act_window">
+			<field name="name">Teacher</field>
+			<field name="res_model">hr.employee</field>
+			<field name="context">{'default_is_teacher':'True'}</field>
+			<field name="domain">[('is_teacher','=','True')]</field>
+			<field name="view_ids"
+				eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('hr.view_employee_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('hr.view_employee_form')})]" />
+		</record>
+        
+        <menuitem name="Teachers" id="menu_school_teachers_teacher"
+			parent="menu_school_teacher_main" action="action_hr_employees_teacher"
+			groups="group_school_teacher" />
+  </data>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top menu item -->
+    <menuitem name="Teacher"
+        id="menu_school_teacher"
+        groups="group_school_teacher"
+        web_icon="de_school_teacher,static/description/icon.png"
+        sequence="55" />
+    
+    <menuitem name="Teacher" id="menu_school_teacher_main"
+			parent="menu_school_teacher" 
+              sequence = "10"
+			groups="group_school_teacher" />
+</odoo>

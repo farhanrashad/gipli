@@ -1,0 +1,19 @@
+<odoo>
+  <data>
+    <record id="action_res_partner_student"
+			model="ir.actions.act_window">
+			<field name="name">Student</field>
+			<field name="res_model">res.partner</field>
+			<field name="context">{'default_is_student':'True'}</field>
+			<field name="domain">[('is_student','=','True')]</field>
+			<field name="view_ids"
+				eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('base.view_partner_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('de_school.view_partner_form_de_school')})]" />
+		</record>
+        
+        <menuitem name="Students" id="menu_school_student_main_student"
+			parent="menu_school_student_main" action="action_res_partner_student"
+			groups="group_school_student" />
+  </data>
+</odoo>

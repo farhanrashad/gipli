@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        
+        <record id="view_teacher_timetable_calendar" model="ir.ui.view">
+            <field name="name">school.timetable.calendar</field>
+            <field name="model">oe.school.timetable</field>
+            <field name="priority">25</field>
+            <field name="arch" type="xml">
+                <calendar string="Planning" date_start="start_datetime" date_stop="end_datetime" color="color" event_open_popup="true" quick_add="False" mode="month">
+                    <field name="name"/>
+                    <field name="course_id" avatar_field="avatar_128"/>
+                    <field name="subject_id" filters="1" color="color"/>
+                    <field name="allocated_hours" invisible="1"/>
+                    <field name="allocated_percentage" invisible="1"/>
+                    <field name="state" groups="de_school.group_school_manager"/>
+                </calendar>
+            </field>
+        </record>
+        
+        <record id="action_teacher_my_timetable" model="ir.actions.act_window">
+            <field name="name">My Timetable</field>
+            <field name="res_model">oe.school.timetable</field>
+            <field name="view_mode">gantt,calendar,tree,form,kanban</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'gantt', 'view_id': ref('de_school_timetable.school_timetable_view_gantt')}),
+                (0, 0, {'view_mode': 'calendar', 'view_id': ref('view_teacher_timetable_calendar')}),
+                (0, 0, {'view_mode': 'tree'}),
+                (0, 0, {'view_mode': 'form'})]"/>
+            <field name="search_view_id" ref="de_school_timetable.view_timetable_search_form"/>
+            <field name="context">{'search_default_my_timetable': 1, 'create':False}</field>
+            <field name="domain">[('user_id','=',uid)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No timetable found. 
+                </p>
+            </field>
+        </record>
+        
+        <menuitem name="My Timetable" id="menu_school_teacher_timetable"
+                    parent="menu_school_teacher" action="action_teacher_my_timetable"
+                    groups="group_school_teacher" sequence="20"/>
+        
+    </data>
+</odoo>
