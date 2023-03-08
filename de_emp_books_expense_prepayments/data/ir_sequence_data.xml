@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Sequences for hr.expense.prepayment -->
+        <record id="seq_expense_prepayment_request" model="ir.sequence">
+            <field name="name">Expense Prepayment Request</field>
+            <field name="code">hr.expense.prepayment</field>
+            <field name="prefix">EPP/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

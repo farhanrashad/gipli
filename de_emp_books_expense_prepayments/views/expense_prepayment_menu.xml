@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="0">   
+        <menuitem id="menu_emp_books_main_expense_prepayments" name="My Prepayments" parent="de_emp_books.menu_emp_books_root" sequence="10" />
+        <menuitem id="menu_emp_books_config_expense_prepayments" name="Prepayment for Expense " parent="de_emp_books.menu_emp_books_config" sequence="10" />
+	</data>
+</odoo>
+

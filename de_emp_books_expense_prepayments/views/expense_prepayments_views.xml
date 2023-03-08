@@ -1,0 +1,428 @@
+<odoo>
+    <data>
+        <record id="hr_expense_prepayment_type_search_view" model="ir.ui.view">
+            <field name="name">hr.expense.prepayment.type.search.view</field>
+            <field name="model">hr.expense.prepayment.type</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                    <field name="name" string="Type" filter_domain="['|',('name','ilike',self)]"/>
+
+                </search>
+            </field>
+        </record>
+
+
+        <record id="hr_expense_prepayment_type_form_view" model="ir.ui.view">
+            <field name="name">hr.expense.prepayment.type.form.view</field>
+            <field name="model">hr.expense.prepayment.type</field>
+            <field name="arch" type="xml">
+                <form string="prepayment">
+                    <sheet>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Type"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. prepayment for Admin Expense"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group name="account_info">
+                                <field name="account_id" options="{'no_create':True}"/>
+                            </group>
+                            <group name="accounting_info">
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="hr_expense_prepayment_type_tree_view">
+            <field name="name">hr.prepayment.type.tree.view</field>
+            <field name="model">hr.expense.prepayment.type</field>
+            <field name="arch" type="xml">
+                <tree string=" prepayment type">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="action_expense_prepayment_type" model="ir.actions.act_window">
+            <field name="name">Advacne Type</field>
+            <field name="res_model">hr.expense.prepayment.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="hr_expense_prepayment_type_tree_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new expense prepayment type
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_emp_books_config_expense_prepayment_type" action="action_expense_prepayment_type"
+                  parent="menu_emp_books_config_expense_prepayments" name="Prepayments Type" sequence="1"
+                  groups="hr.group_hr_manager"/>
+
+        <!-- prepayment Expense -->
+
+        <record id="hr_expense_prepayment_view_search" model="ir.ui.view">
+            <field name="name">hr.expense.prepayment.view.search</field>
+            <field name="model">hr.expense.prepayment</field>
+            <field name="arch" type="xml">
+                <search string="prepayment">
+                    <field string="prepayment Request" name="name"/>
+                    <field string="Reference" name="ref"/>
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                    <separator/>
+                    <field name="employee_id"/>
+                    <field string="Department" name="department_id" operator="child_of"/>
+                    <filter string="My Requests" name="my_requests" domain="[('employee_id.user_id', '=', uid)]"/>
+                    <filter string="My Team" name="my_team_requests"
+                            domain="[('employee_id.parent_id.user_id', '=', uid)]"
+                            groups="de_empfin_expense_prepayments.group_hr_expense_prepayment_approver"
+                            help="Requests of Your Team Member"/>
+                    <separator/>
+                    <filter domain="[('state', '=', 'submit')]" string="To Approve" name="submitted"
+                            help="Confirmed prepayments"/>
+                    <filter domain="[('state', '=', 'approved')]" string="To Post" name="to_post"
+                            help="Approved Requests"/>
+                    <filter domain="[('state', '=', 'done')]" string="Paid" name="paid" help="Expenses to Invoice"/>
+                    <filter domain="[('state', '=', 'cancel')]" string="Refused" name="canceled"/>
+                    <separator/>
+                    <filter domain="[('state', '=', 'reconciled')]" string="Reconciled" name="reconciled"
+                            help="Reconciled Requests"/>
+                    <filter domain="[('state', '!=', 'reconciled')]" string="Unreonciled" name="unreconciled"
+                            help="Unreconciled Requests"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                        <filter string="Department" name="department" domain="[]"
+                                context="{'group_by': 'department_id'}"/>
+                        <filter string="Company" name="company" domain="[]" context="{'group_by': 'company_id'}"
+                                groups="base.group_multi_company"/>
+                        <filter string="Date" name="expenses_month" domain="[]"
+                                context="{'group_by': 'accounting_date'}" help="Expenses by Date"/>
+                        <filter string="Status" domain="[]" context="{'group_by': 'state'}" name="state"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_hr_expense_prepayment_graph" model="ir.ui.view">
+            <field name="name">hr.expense.prepayment.graph</field>
+            <field name="model">hr.expense.prepayment</field>
+            <field name="arch" type="xml">
+                <graph string="prepayments Analysis" sample="1">
+                    <field name="employee_id" type="col"/>
+                    <field name="date" interval="month" type="row"/>
+                    <field name="accounting_date" interval="month" type="row"/>
+                    <field name="total_amount" type="measure"/>
+                    <field name="total_amount_approved" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="view_hr_expense_prepayment_pivot" model="ir.ui.view">
+            <field name="name">hr.expense.prepayment.pivot</field>
+            <field name="model">hr.expense.prepayment</field>
+            <field name="arch" type="xml">
+                <pivot string="prepayment Analysis" sample="1">
+                    <field name="employee_id" type="row"/>
+                    <field name="date" interval="month" type="col"/>
+                    <field name="accounting_date" interval="month" type="col"/>
+                    <field name="total_amount" type="measure"/>
+                    <field name="total_amount_approved" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="hr_expense_prepayment_view_activity" model="ir.ui.view">
+            <field name="name">hr.expense.prepayment.activity</field>
+            <field name="model">hr.expense.prepayment</field>
+            <field name="arch" type="xml">
+                <activity string="prepayments">
+                    <field name="employee_id"/>
+                    <field name="currency_id"/>
+                    <templates>
+                        <div t-name="activity-box">
+                            <img t-att-src="activity_image('hr.employee', 'image_128', record.employee_id.raw_value)"
+                                 t-att-title="record.employee_id.value" t-att-alt="record.employee_id.value"/>
+                            <div>
+                                <field name="name" display="full"/>
+                                <field name="total_amount" widget="monetary" muted="1" display="full"/>
+                                <field name="state" display="right"/>
+                            </div>
+                        </div>
+                    </templates>
+                </activity>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="hr_expense_prepayment_tree_view">
+            <field name="name">hr.expense.prepayment.tree.view</field>
+            <field name="model">hr.expense.prepayment</field>
+            <field name="arch" type="xml">
+                <tree string=" prepayment type">
+                    <field name="name"/>
+                    <field name="ref"/>
+                    <field name="date"/>
+                    <field name="employee_id"/>
+                    <field name="manager_id"/>
+                    <field name="department_id" optional="hide"/>
+                    <field name="total_amount" optional="show"/>
+                    <field name="total_amount_approved" optional="show"/>
+                    <field name="currency_id" optional="hide"/>
+                    <field name="company_id" optional="hide"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="hr_expense_prepayment_form_view" model="ir.ui.view">
+            <field name="name">hr.expense.prepayment.form.view</field>
+            <field name="model">hr.expense.prepayment</field>
+            <field name="arch" type="xml">
+                <form string="prepayments" class="o_prepayment_form">
+                    <field name="can_reset" invisible="1"/>
+                    <header>
+                        <button name="action_submit_prepayment" states="draft" string="Submit to Manager" type="object"
+                                class="oe_highlight o_expense_sheet_submit"/>
+                        <button name="approve_prepayment" states="submit" string="Approve" type="object"
+                                class="oe_highlight o_expense_sheet_approve"/>
+
+                        <button name="action_create_bill"
+                                string="Create Bill"
+                                type="object"
+                                class="oe_highlight o_expense_sheet_post"
+                                attrs="{'invisible': [('state', '!=', 'approved')]}"
+                                groups="account.group_account_invoice"/>
+
+                        <button name="%(de_emp_books_expense_prepayments.hr_expense_prepayment_refuse_wizard_action)d"
+                                states="submit,approve"
+                                context="{'hr_expense_prepayment_refuse_model':'hr.expense.prepayment'}" string="Refuse"
+                                type="action" groups="hr_expense.group_hr_expense_team_approver"/>
+                        <button name="reset_prepayment_request" string="Reset to Draft" type="object"
+                                attrs="{'invisible': ['|', ('can_reset', '=', False), ('state', 'not in', ['submit', 'cancel'])]}"
+                                data-hotkey="q"/>
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submit,approved,post,done"/>
+                    </header>
+                    <sheet>
+
+                        <widget name="web_ribbon" title="Paid" bg_color="bg-warning"
+                                attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                        <widget name="web_ribbon" title="Reconciled" bg_color="bg-success"
+                                attrs="{'invisible': [('state', '!=', 'reconciled')]}"/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. prepayment Request Summary"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" required="1" options="{'no_create':True}"/>
+                                <field name="manager_id" readonly="1" options="{'no_create':True}"/>
+                                <field name="job_id" options="{'no_create':True}"/>
+                                <field name="department_id"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="ref"/>
+                            <field name="accounting_date"
+                                   attrs="{'invisible': ['|', ('accounting_date', '=', False), ('state', 'not in', ['approved', 'done'])]}"/>
+                            <field name="currency_id" required="1" options="{'no_create':True}"/>
+
+                        </group>
+
+                        <group>
+                            <field name="description" nolabel="1" class="oe_inline" placeholder="Notes..."/>
+                        </group>
+
+                        <notebook>
+                            <page name="prepayment_line" string="prepayment Lines">
+                                <field name="expense_prepayment_line_ids" nolabel="1"
+                                       context="{'default_company_id': company_id, 'default_employee_id': employee_id, 'group_by': 'company_id', 'groups': 'base.group_multi_company'}">
+                                    <tree editable="bottom">
+                                        <field name="is_editable" invisible="1"/>
+                                        <field name="employee_id" invisible="1"/>
+                                        <field name="name"/>
+                                        <field name="prepayment_type_id" options="{'no_create':True,'no_open':True}"
+                                               attrs="{'readonly':[('parent.state','not in',['draft'])]}"/>
+                                        <field name="account_id" invisible="0"
+                                               options="{'no_create':True,'no_open':True}"/>
+                                        <field name="name" invisible="1"/>
+                                        <field name="amount" string="Requested" sum="Requested Amount"/>
+                                        <field name="amount_approved" string="Approved" sum="Approved Amount"
+                                               groups="hr_expense.group_hr_expense_manager"/>
+                                        <field name="currency_id" invisible="1"/>
+
+                                        <field name="note"/>
+                                        <field name="amount_residual" optional="hide"/>
+                                        <field name="state" optional="hide"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page name="accounting_info" string="Accounting">
+                                <group>
+                                    <group>
+                                        <field name="journal_id" options="{'no_create':True,'no_open':True}"/>
+                                        <field name="account_move_id"/>
+                                        <field name="company_id"/>
+                                    </group>
+                                    <group>
+                                        <field name="address_id" string="Partner"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="o_attachment_preview"/>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record id="action_hr_expense_prepayment" model="ir.actions.act_window">
+            <field name="name">My prepayments to Approve</field>
+            <field name="res_model">hr.expense.prepayment</field>
+            <field name="view_mode">tree,kanban,form,graph,pivot</field>
+            <field name="search_view_id" ref="hr_expense_prepayment_view_search"/>
+            <field name="context">{'search_default_my_requests':1,'search_default_submitted':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No prepayment request for expense found. Let's create one!
+                </p>
+                <p>
+                    Employee requests for prepayment payment for future expenses.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_emp_books_hr_expense_prepayment" action="action_hr_expense_prepayment"
+                  parent="menu_emp_books_main_expense_prepayments" name="My prepayments to approve" sequence="10"/>
+
+        <record id="action_hr_expense_prepayment_to_approve" model="ir.actions.act_window">
+            <field name="name">Prepayments to Approve</field>
+            <field name="res_model">hr.expense.prepayment</field>
+            <field name="view_mode">tree,kanban,form,graph,pivot</field>
+            <field name="search_view_id" ref="hr_expense_prepayment_view_search"/>
+            <field name="context">{}</field>
+            <field name="domain">[('state', '=', 'submit')]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No prepayment request for expense found. Let's create one!
+                </p>
+                <p>
+                    Employee requests for prepayment payment for future expenses.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_emp_books_hr_expense_prepayment_to_approve" action="action_hr_expense_prepayment_to_approve"
+                  parent="de_emp_books.menu_emp_books_reports" name="Prepayments to Approve" sequence="10"/>
+
+        <!-- prepayment Lines -->
+        <record id="hr_expense_prepayment_line_view_search" model="ir.ui.view">
+            <field name="name">hr.expense.prepayment.line.view.search</field>
+            <field name="model">hr.expense.prepayment.line</field>
+            <field name="arch" type="xml">
+                <search string="prepayment Lines">
+                    <field string="prepayment Request Line" name="name"/>
+                    <field string="Reference" name="expense_prepayment_id"/>
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                    <separator/>
+                    <field name="employee_id"/>
+                    <filter string="My Requests" name="my_requests"
+                            domain="[('expense_prepayment_id.employee_id.user_id', '=', uid)]"/>
+                    <filter string="My Team" name="my_team_requests"
+                            domain="[('expense_prepayment_id.employee_id.parent_id.user_id', '=', uid)]"
+                            groups="hr_expense.group_hr_expense_manager" help="Requests of Your Team Member"/>
+                    <separator/>
+                    <filter domain="[('state', '=', 'submit')]" string="To Approve" name="submitted"
+                            help="Confirmed prepayments"/>
+                    <filter domain="[('state', '=', 'approved')]" string="To Post" name="to_post"
+                            help="Approved Requests"/>
+                    <filter domain="[('state', '=', 'done')]" string="Paid" name="paid" help="Expenses to Invoice"/>
+                    <filter domain="[('state', '=', 'cancel')]" string="Refused" name="canceled"/>
+                    <separator/>
+                    <filter domain="[('state', '=', 'reconciled')]" string="Reconciled" name="reconciled"
+                            help="Reconciled Requests"/>
+                    <filter domain="[('state', '!=', 'reconciled')]" string="Unreonciled" name="unreconciled"
+                            help="Unreconciled Requests"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                        <filter string="Company" name="company" domain="[]" context="{'group_by': 'company_id'}"
+                                groups="base.group_multi_company"/>
+                        <filter string="Date" name="expenses_month" domain="[]" context="{'group_by': 'date'}"
+                                help="Expenses by Date"/>
+                        <filter string="Status" domain="[]" context="{'group_by': 'state'}" name="state"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="hr_expense_prepayment_line_unreconciled_tree_view">
+            <field name="name">hr.expense.prepayment.line.unreconciled.tree.view</field>
+            <field name="model">hr.expense.prepayment.line</field>
+            <field name="arch" type="xml">
+                <tree string=" prepayment type">
+                    <field name="name"/>
+                    <field name="expense_prepayment_id"/>
+                    <field name="date"/>
+                    <field name="employee_id"/>
+                    <field name="amount"/>
+                    <field name="amount_approved" optional="hide"/>
+                    <field name="currency_id" optional="hide"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="hr_expense_my_unreconciled_prepayment_lines" model="ir.actions.act_window">
+            <field name="name">My prepayments to Reconcile</field>
+            <field name="res_model">hr.expense.prepayment.line</field>
+            <field name="view_mode">tree,form,pivot</field>
+            <field name="search_view_id" ref="hr_expense_prepayment_line_view_search"/>
+            <field name="context">{'create':False, 'search_default_my_requests':1}</field>
+            <field name="domain">[('state', '=', 'done')]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_empty_folder">
+                    No prepayment requests found!
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_emp_books_hr_expense_my_unreconciled_prepayment_lines"
+                  action="hr_expense_my_unreconciled_prepayment_lines" parent="menu_emp_books_main_expense_prepayments"
+                  name="My prepayments to Reconcile" sequence="40"/>
+
+
+        <record id="hr_expense_my_all_prepayment_lines" model="ir.actions.act_window">
+            <field name="name">My All prepayment Requests</field>
+            <field name="res_model">hr.expense.prepayment.line</field>
+            <field name="view_mode">tree,form,pivot</field>
+            <field name="search_view_id" ref="hr_expense_prepayment_line_view_search"/>
+            <field name="context">{'create':False, 'search_default_my_requests':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_empty_folder">
+                    No prepayment requests found!
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_emp_books_hr_expense_my_all_prepayment_lines" action="hr_expense_my_all_prepayment_lines"
+                  parent="menu_emp_books_main_expense_prepayments" name="My All Requests" sequence="50"/>
+
+    </data>
+</odoo>

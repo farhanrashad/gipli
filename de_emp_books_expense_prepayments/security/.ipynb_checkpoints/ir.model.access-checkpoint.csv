@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_expense_prepayment_type_manager,access.hr.expense.prepayment.type.manager,model_hr_expense_prepayment_type,hr_expense.group_hr_expense_manager,1,1,1,1
+access_hr_expense_prepayment_type_user,access.hr.expense.prepayment.type.user,model_hr_expense_prepayment_type,hr_expense.group_hr_expense_user,1,0,0,0
+access_hr_expense_prepayment_type_team_approver,access.hr.expense.prepayment.type.team.approver,model_hr_expense_prepayment_type,hr_expense.group_hr_expense_team_approver,1,0,0,0
+
+access_hr_expense_prepayment_user,access.hr.expense.prepayment.user,model_hr_expense_prepayment,hr_expense.group_hr_expense_user,1,1,1,1
+access_hr_expense_prepayment_line_user,access.hr.expense.prepayment.manager,model_hr_expense_prepayment_line,hr_expense.group_hr_expense_user,1,1,1,1
+access_hr_expense_prepayment_team_approver,access.hr.expense.prepayment.team.approver,model_hr_expense_prepayment,hr_expense.group_hr_expense_team_approver,1,1,1,1
+access_hr_expense_prepayment_line_team_approver,access.hr.expense.prepayment.line.team.approver,model_hr_expense_prepayment_line,hr_expense.group_hr_expense_team_approver,1,1,1,1
+
+access_hr_expense_prepayment_refuse_wizard,access.hr.expense.prepayment.refuse.wizard,model_hr_expense_prepayment_refuse_wizard,hr_expense.group_hr_expense_team_approver,1,1,1,0
+
