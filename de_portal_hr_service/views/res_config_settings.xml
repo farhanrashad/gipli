@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="res_config_settings_view_form_inherit" model="ir.ui.view">
+        <field name="name">res_config_settings_view_form_inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="55"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Services" string="Services" data-key="de_portal_hr_service">
+                    <h2 id="notification_group_ids_container">Exclude Default Menu</h2>
+                    <div id="notification_group_ids_container" class="row mt16 o_settings_container">
+                        <div class="col-xs-12 col-md-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label for="security_group_id"/>
+                                <div class="text-muted">
+                                    Security Groups
+                                </div>
+                                <div class="content-group">
+                                    <div class="row mt16 ml4">
+                                        <field name="security_group_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'de_portal_hr_service'}</field>
+    </record>
+
+    <menuitem id="services_settings_menu" name="Settings" parent="hr_service_config_menu" action="settings_action" sequence="0"/>
+</odoo>
