@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+		<record id="hr_applicant_form_view_inherit" model="ir.ui.view">
+			<field name="name">hr.applicant.form.view</field>
+			<field name="model">hr.applicant</field>
+			<field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='description']" position="after">
+					<notebook>
+                        <page string="Skills">
+                            <field name='skill_id'>
+                                <tree  editable='bottom'>
+                                    <field name="pref_name"/>
+                                    <field name="skill_level"/>
+                                    <field name="pref_value"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Application Summary">
+                            <field name="description" placeholder="Feedback of interviews..."/>
+                        </page>
+                    </notebook>
+				</xpath>
+                <xpath expr="//field[@name='description']" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+				</xpath>
+			</field>
+		</record>
+
+	</data>
+</odoo>

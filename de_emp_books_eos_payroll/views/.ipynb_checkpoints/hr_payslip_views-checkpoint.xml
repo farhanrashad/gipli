@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_hr_payslip_form_eos" model="ir.ui.view">
+            <field name="name">view.hr.payslip.form.eos</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[1]/group[2]" position="inside">
+                    <field name="eos_contract_id" attrs="{'readonly': [('state', '=', 'done')]}"/>                                 
+                </xpath>
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" name="open_compensations" type="object" icon="fa-dollar" attrs="{'invisible': [('comp_count', '=', 0)]}">
+                        <field string="Compensations" name="comp_count" widget="statinfo"/>
+                    </button>
+                </div>
+                
+            </field>
+        </record>
+</odoo>

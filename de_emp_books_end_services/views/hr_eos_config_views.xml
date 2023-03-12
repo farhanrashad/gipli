@@ -1,0 +1,76 @@
+<odoo>
+  <data>
+    
+      <menuitem
+            id="menu_emp_books_config_eos"
+            name="End of Service"
+            parent="de_emp_books.menu_emp_books_config"
+            sequence="50"
+            groups="hr.group_hr_manager"/>
+      
+      <!-- Enf of Services Type -->
+      <record id="hr_eos_type_form_view" model="ir.ui.view">
+            <field name="name">hr.eos.type.form.view</field>
+            <field name="model">hr.eos.type</field>
+            <field name="arch" type="xml">
+                <form string="Contrat Type" class="o_eos_contract_form">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+          </field>
+      </record>
+      <record model="ir.ui.view" id="hr_eos_type_tree_view">
+            <field name="name">hr.eos.type.tree.view</field>
+            <field name="model">hr.eos.type</field>
+            <field name="arch" type="xml">
+                <tree string="End of Services" >
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+      
+      <record id="action_hr_eos_type" model="ir.actions.act_window">
+            <field name="name">End of Serivce Type</field>
+            <field name="res_model">hr.eos.type</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No type found. Let's create one!
+              </p>
+            </field>
+        </record>        
+        
+        <menuitem action="action_hr_eos_type" name="Type" id="menu_emp_books_config_hr_eos_type" parent="menu_emp_books_config_eos" sequence="1"/>
+      
+      
+      <!-- Enf of Services Checklist -->
+      <record model="ir.ui.view" id="hr_eos_checklist_tree_view">
+            <field name="name">hr.eos.checklist.tree.view</field>
+            <field name="model">hr.eos.checklist</field>
+            <field name="arch" type="xml">
+                <tree string="Checklist" editable="bottom">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+      
+      <record id="action_hr_eos_checklist" model="ir.actions.act_window">
+            <field name="name">Exit Checklist</field>
+            <field name="res_model">hr.eos.checklist</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No checklist found. Let's create one!
+              </p>
+            </field>
+        </record>        
+        
+        <menuitem action="action_hr_eos_checklist" name="Checklist" id="menu_emp_books_config_hr_eos_checklist" parent="menu_emp_books_config_eos" sequence="3"/>
+      
+  </data>
+</odoo>

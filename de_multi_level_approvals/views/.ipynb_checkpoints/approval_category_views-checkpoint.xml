@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="approval_category_view_form_inherited" model="ir.ui.view">
+        <field name="name">approval.category.view.form</field>
+        <field name="model">approval.category</field>
+        <field name="inherit_id" ref="approvals.approval_category_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_manager_approver']" position="before">
+                <field name="approval_type" />
+                <field name="approval_level" attrs="{'invisible':[('approval_type','!=','D')],'required':[('approval_type','=','D')]}"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Approvers" name="approvers" attrs="{'invisible': [('approval_type', '!=', 'S')]}">
+                    <field name="approval_category_line" widget="one2many_list">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle" />
+                            <field name="user_id" />
+                            <field name="department_id"/>
+                            <field name="job_title"/>
+                        </tree>
+                    </field>
+                </page>
+                
+            </xpath>
+            <xpath expr="//group[@name='approvers']/field[@name='user_ids']" position="attributes">
+                <attribute name="attrs">{"invisible": [["approval_type","!=","R"]]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='approvers']/field[@name='approval_minimum']" position="attributes">
+                <attribute name="attrs">{"invisible": [["approval_type","!=","R"]]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='approvers']/field[@name='is_manager_approver']" position="attributes">
+                <attribute name="attrs">{"invisible": [["approval_type","!=","R"]]}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

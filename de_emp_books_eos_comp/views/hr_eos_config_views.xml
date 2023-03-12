@@ -1,0 +1,72 @@
+<odoo>
+  <data>
+    <!-- Enf of Services Compensation Rule Categories -->
+      <record model="ir.ui.view" id="hr_eos_comp_rule_category_tree_view">
+            <field name="name">hr.eos.comp.rule.category.tree.view</field>
+            <field name="model">hr.eos.comp.rule.category</field>
+            <field name="arch" type="xml">
+                <tree string="EOS Rule Category" editable="bottom">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+      
+      <record id="action_hr_eos_comp_rule_category" model="ir.actions.act_window">
+            <field name="name">Compensation Rule Category</field>
+            <field name="res_model">hr.eos.comp.rule.category</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No compensation rule category found. Let's create one!
+              </p>
+            </field>
+        </record>        
+        
+        <menuitem action="action_hr_eos_comp_rule_category" name="Compensation Rule Category" id="menu_emp_books_config_hr_eos_comp_rule_category" parent="de_emp_books_end_services.menu_emp_books_config_eos" sequence="4"/>
+      
+      
+      <!-- Enf of Services Compensation Rules -->
+      <record id="hr_eos_comp_rule_form_view" model="ir.ui.view">
+            <field name="name">hr.eos.comp.rule.form.view</field>
+            <field name="model">hr.eos.comp.rule</field>
+            <field name="arch" type="xml">
+                <form string="Contrat Type" class="o_eos_contract_form">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="amount_select"/>
+                            </group>
+                            <group>
+                                <field name="eos_category_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <group colspan="4">
+                                <field colspan="4" name="amount_python_compute" attrs="{'invisible':[('amount_select','!=','code')], 'required':[('amount_select','=','code')]}"/>
+                        </group>
+                    </sheet>
+                </form>
+          </field>
+      </record>
+      <record model="ir.ui.view" id="hr_eos_comp_rule_tree_view">
+            <field name="name">hr.eos.comp.rule.tree.view</field>
+            <field name="model">hr.eos.comp.rule</field>
+            <field name="arch" type="xml">
+                <tree string="End of Services" >
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+      
+      <record id="action_hr_eos_comp_rule" model="ir.actions.act_window">
+            <field name="name">Compensation Rule</field>
+            <field name="res_model">hr.eos.comp.rule</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No compensation rule found. Let's create one!
+              </p>
+            </field>
+        </record>        
+        
+        <menuitem action="action_hr_eos_comp_rule" name="Compensation Rule" id="menu_emp_books_config_hr_eos_comp_rule" parent="de_emp_books_end_services.menu_emp_books_config_eos" sequence="5"/>
+  </data>
+</odoo>

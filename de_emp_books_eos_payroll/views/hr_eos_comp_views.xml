@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="hr_eos_comp_rule_form_view_input" model="ir.ui.view">
+            <field name="name">hr.eos.comp.rule.form.view.input</field>
+            <field name="model">hr.eos.comp.rule</field>
+            <field name="inherit_id" ref="de_emp_books_eos_comp.hr_eos_comp_rule_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='eos_category_ids']" position="after">
+                    <field name="input_type_id" />
+                </xpath>                
+                 
+            </field>
+        </record>
+
+       
+</odoo>

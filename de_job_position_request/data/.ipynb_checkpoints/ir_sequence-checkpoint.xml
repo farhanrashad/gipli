@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+
+      <record id="get_id" model="ir.sequence">
+          <field name="name">Job Position Request</field>
+          <field name="code">hr.job.position.request</field>
+          <field name="prefix">JPR/</field>
+          <field name="padding">5</field>
+          <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

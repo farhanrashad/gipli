@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="hr_eos_comp_rule_form_view" model="ir.ui.view">
+            <field name="name">hr.eos.contract.form.view</field>
+            <field name="model">hr.eos.contract</field>
+            <field name="inherit_id" ref="de_emp_books_eos_comp.hr_eos_contract_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header[1]" position="inside">
+                    <button name="action_sheet_move_create"
+                            string="Post Journal Entries"
+                            type="object"
+                            class="oe_highlight o_expense_sheet_post"
+                            attrs="{'invisible': [('state', '!=', 'approval2')]}"
+                            groups="account.group_account_invoice"/>
+                </xpath>                
+                 <xpath expr="//notebook[1]" position="inside">
+                     <page name="accounting_info" string="Accounting">
+                         <group>
+                             <group>
+                                 <field name="journal_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                 <field name="account_move_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                 
+                             </group>
+                         </group>
+                     </page>
+                </xpath>
+            </field>
+        </record>
+</odoo>

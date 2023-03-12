@@ -1,0 +1,21 @@
+<odoo>
+  <data>
+    <record id="approval_category_view_form_inherit" model="ir.ui.view">
+        <field name='name'>approval.category.view.form.inherit</field>
+        <field name="model">approval.category</field>
+        <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='options']" position="inside">
+                   <group>
+                       <group string="Extra">
+                           <field name="model_id" options="{'no_create_open':True}"/>
+                       </group>
+                       <group>
+                       </group>
+                   </group>
+            </xpath>
+        </field>
+    </record>
+      
+  </data>
+</odoo>

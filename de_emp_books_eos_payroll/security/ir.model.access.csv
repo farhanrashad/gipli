@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_de_emp_books_eos_payroll_de_emp_books_eos_payroll,de_emp_books_eos_payroll.de_emp_books_eos_payroll,model_de_emp_books_eos_payroll_de_emp_books_eos_payroll,base.group_user,1,1,1,1

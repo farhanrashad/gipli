@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_eos_type_manager,access.hr.eos.type.manager,model_hr_eos_type,hr.group_hr_manager,1,1,1,1
+access_hr_eos_type_user,access.hr.eos.type.user,model_hr_eos_type,hr.group_hr_user,1,1,1,0
+
+access_hr_eos_checklist_manager,access.hr.eos.checklist.manager,model_hr_eos_checklist,hr.group_hr_manager,1,1,1,1
+access_hr_eos_checklist_user,access.hr.eos.checklist.user,model_hr_eos_checklist,hr.group_hr_user,1,1,1,0
+
+access_hr_eos_contract_manager,access.hr.eos.contract.manager,model_hr_eos_contract,hr.group_hr_manager,1,1,1,1
+access_hr_eos_contract_user,access.hr.eos.contract.user,model_hr_eos_contract,hr.group_hr_user,1,1,1,0

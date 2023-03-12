@@ -1,0 +1,62 @@
+<odoo>
+  <data>
+    <record id="job_position_request_form_view_inherit" model="ir.ui.view">
+        <field name='name'>job.position.request.form.view.inherit</field>
+        <field name="model">hr.job.position.request</field>
+        <field name="inherit_id" ref="de_job_position_request.open_job_creation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='job_id']" position="after">
+                <field name="job_function" />
+                <field name="job_grade" />
+                <field name="work_location" />
+                <field name="employment_type" />
+                <field filename="file_jd" name="file_jd" />
+            </xpath>
+            <xpath expr="//group[2]/group[2]" position="replace">
+                <group>
+                    <field name="approval_ceo" />
+                    <field name="approval_chairman" />
+                </group>
+            </xpath>
+            <xpath expr="//page[1]" position="after">
+                <page string="Replacement" attrs="{'invisible':[('position_type','!=', 'old')]}">
+                    <group>
+                        <group string="Replacement of" name="employee_replacement">
+                            <field name="old_employee_name" />
+                            <field name="old_job_title" />
+                            <field name="old_position" />
+                            <field name="old_grade" />
+                        </group>
+                        <group>
+                            <field name="old_employee_exit_reason" />
+                            <field name="request_reason" />
+                        </group>
+                    </group>
+                </page>
+                <page string="Preference">
+                    <group>
+                        <group>
+                            <label for="exp_essential" />
+                            <div class="o_row" >
+                                <span class="mr-1">Essential</span>
+                                <field name="exp_essential" /><em>Year(s)</em>
+                                <span class="mr-1">     Preferable</span>
+                                <field name="exp_prefer" /><em>Year(s)</em>
+                            </div>
+                            <field name="gender" widget="radio" />
+                        </group>
+                        <group>
+                            <field name="exp_field" />
+                            <field name="min_edu" />
+                            <field name="min_tech_edu" />
+                            <field name="com_lit_level" />
+                            <field name="req_social" />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+      
+  </data>
+</odoo>

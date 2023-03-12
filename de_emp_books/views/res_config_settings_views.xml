@@ -1,0 +1,38 @@
+<odoo>
+    
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.books</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="55"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Employee Books" string="Employee Books" data-key="employee books" groups="de_emp_books.group_hr_employee_books_manager">
+                    <h2>Employee Books</h2>
+                    <div class="row mt16 o_settings_container" name="employee_books">
+                        
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    
+    <record id="action_emp_books_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="res_config_settings_view_form"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'de_emp_books', 'bin_size': False}</field>
+    </record>
+
+    <menuitem id="menu_emp_books_general_settings"
+        name="Settings"
+        parent="menu_emp_books_config"
+        sequence="0"
+        action="action_emp_books_config_settings"
+        />
+
+</odoo>

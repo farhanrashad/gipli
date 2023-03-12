@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_eos_comp_rule_manager,access.hr.eos.comp.rule.manager,model_hr_eos_comp_rule,hr.group_hr_manager,1,1,1,1
+access_hr_eos_comp_rule_user,access.hr.eos.comp.rule.user,model_hr_eos_comp_rule,hr.group_hr_user,1,1,1,0
+
+access_hr_eos_comp_rule_category_manager,access.hr.eos.comp.rule.category.manager,model_hr_eos_comp_rule_category,hr.group_hr_manager,1,1,1,1
+access_hr_eos_comp_rule_category_user,access.hr.eos.comp.rule.category.user,model_hr_eos_comp_rule_category,hr.group_hr_user,1,1,1,0
+
+access_hr_eos_comp_line_user,access.hr.eos.comp.line.user,model_hr_eos_comp_line,hr.group_hr_user,1,1,1,1
+

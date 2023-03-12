@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="open_job_creation_form" model="ir.ui.view">
+            <field name="name">Job Position Request</field>
+            <field name="model">hr.job.position.request</field>
+            <field name="arch" type="xml">
+                <form string="Job Position Request">
+                    <header>
+                        <button name="button_submit" string="Submit" type="object" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
+                        <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['pending'])]}"/>
+                        <button name="button_refuse" string="Refuse" type="object" attrs="{'invisible': [('state', 'not in', ['pending'])]}"/>
+                        <button name="button_close" type="object" string="Close" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['confirm'])]}"/>
+
+                        <button name="button_cancel" string="Cancel" type="object" attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
+                <field name="state" widget="statusbar" statusbar_visible="draft,confirm" />
+                        
+                    </header>
+                    <sheet>
+                        <field name="request_type" invisible="1" />
+                         <field name="active" invisible="1"/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="e.g HR Manager" readonly="1" />
+                            </h1>
+                        </div>
+                        <group >
+                            <group>
+                                <field name="position_request_type_id" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                                <field name="request_type" widget="selection" attrs="{'invisible':[('position_request_type_id','=', False)]}"/>
+
+                                <field name="position_type" attrs="{'invisible':[('position_request_type_id','=', False)]}"/>
+                                <field name="job_id" required="1" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                            </group>
+                            <group>
+                                <field name="date_request" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                                <field name="date_planned" string="Need On" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                                <field name="department_id" required="1" options="{'no_create': True,'no_open':True}" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                                <field name="manager_id" string="Reporting To" options="{'no_create': True,'no_open':True}" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                                <field name="user_id" />
+                                <field name="company_id" groups="base.group_multi_company" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                                
+
+                            </group>                            
+                        </group>
+                        <group>
+                            <group>
+                                <field name="no_of_recruitment" string="Required Employees" required="1" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                                <field name="no_of_employee" string="Curreny Employees"/>
+                                <field name="expected_employees" string="Total Expected Employees"/>
+                            </group>
+                            <group>
+                                
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Description">
+                                <field name="description" attrs="{'readonly':[('state','!=', 'draft')]}" />
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+        
+        
+        <record id="open_job_creation_form_tree" model="ir.ui.view">
+            <field name="name">Job Position Request</field>
+            <field name="model">hr.job.position.request</field>
+            <field name="arch" type="xml">
+                <tree string="Job Position Request Tree">
+                    <field name="name"/>
+                    <field name="date_request"/>
+                    <field name="date_planned"/>
+                    <field name="department_id" optional="hide" />
+                    <field name="manager_id" optional="hide" />
+                    <field name="no_of_recruitment"/>
+                    <field name="state"/>
+                     <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+            
+        <record id="open_job_request_creation_form" model="ir.actions.act_window">
+            <field name="name">Job Position Request</field>
+            <field name="res_model">hr.job.position.request</field>
+            <field name="binding_view_types">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="open_job_creation_form_tree"/>
+        </record>
+
+        <menuitem action="open_job_request_creation_form" id="job_position_request_menu"
+                  parent="hr_recruitment.menu_crm_case_categ0_act_job" sequence="10"/>
+            
+        
+
+       
+    </data>
+</odoo>
+            
+            
