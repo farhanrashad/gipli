@@ -299,7 +299,7 @@ class CustomerPortal(CustomerPortal):
                 template += self._get_service_records_row_cols_before(service_id,line)
             for f in service_id.hr_service_items:
                 # Start
-                template += self._get_service_records_row(f,service_id,line,counter)
+                template += self._get_service_records_row(f,service_id,line)
                 # template += self._get_service_records_row(f,service_id,line)
                 #End
             if self._get_service_records_row_cols_after(service_id,line):
@@ -331,7 +331,7 @@ class CustomerPortal(CustomerPortal):
         template = ''
         return template
     
-    def _get_service_records_row(self,f,service_id,line,counter):
+    def _get_service_records_row(self,f,service_id,line):
         template = ''
         rec_id = False
         rec_id = str(line["id"])

@@ -1,0 +1,22 @@
+<odoo>
+    <data>
+        <template id="portal_report_record_form" name="My Entries">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+                <form action="/my/report/model/record/submit" name = "input_submission_form" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="s_website_form_rows row col-12 s_col_no_bgcolor">
+                        <div class="form-group s_website_form_field col-12 " data-type="char" data-name="Field">
+                            <input type="hidden" class="form-control s_website_form_input" id="report_id" name="report_id" t-att-value="report_id" />
+                            <input type="hidden" class="form-control s_website_form_input" id="model_id" name="model_id" t-att-value="model_id" />
+                            <input type="hidden" class="form-control s_website_form_input" id="record_id" name="record_id" t-att-value="record_id" />
+                            <input type="hidden" class="form-control s_website_form_input" id="edit_mode" name="edit_mode" t-att-value="edit_mode" />
+                        </div>
+                        <t t-raw="template_primary_fields"/>
+                      
+                    </div>
+                </form>    
+            </t>
+        </template>
+    </data>
+</odoo>
