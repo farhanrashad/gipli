@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="action_shift_request_report" model="ir.actions.report">
+        <field name="name">Shift Requests</field>
+        <field name="model">all.shift.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">de_employee_shift.report_shift_request</field>
+        <field name="report_file">de_employee_shift.report_shift_request</field>
+        <field name="binding_model_id" ref="model_all_shift_request"/>
+    </record>
+</odoo>

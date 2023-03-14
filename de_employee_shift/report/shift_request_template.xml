@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="report_shift_request">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style>
+                            #tab1 > tbody > tr > td {
+                                font-size : 14px;
+                            }
+                            #tab1 > tbody > tr > th {
+                                font-size : 14px;
+                            }
+                        </style>
+                        <h4 style="text-align: center;">Shift Request</h4>
+                        <h4 class="mt-5">
+                            <t t-esc="o.number"/>
+                        </h4>
+                        <h4 class="mt-3">
+                            <t t-esc="o.employee_id.name"/>
+                        </h4>
+                        <table class="table table-bordered table-sm mt-5" id="tab1">
+                            <thead>
+
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th style="text-align: left;">Shift Type:</th>
+                                    <td class="text-left">
+                                        <t t-esc="o.shift_type_id.name"/>
+                                    </td>
+                                    <th style="text-align: left;">Shift Responsible:</th>
+                                    <td class="text-left">
+                                        <t t-esc="o.shift_responsible_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: left;">Manager:</th>
+                                    <td class="text-left">
+                                        <t t-esc="o.employee_manger_id.name"/>
+                                    </td>
+                                    <th style="text-align: left;">Department:</th>
+                                    <td class="text-left">
+                                        <t t-esc="o.department_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: left;">Start Date:</th>
+                                    <td class="text-left">
+                                        <t t-esc="o.start_date"/>
+                                    </td>
+                                    <th style="text-align: left;">End Date:</th>
+                                    <td class="text-left">
+                                        <t t-esc="o.end_date"/>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <th style="text-align: left;">Company:</th>
+                                    <td class="text-left">
+                                        <t t-esc="o.company_id.name"/>
+                                    </td>
+                                    <th style="text-align: left;">Status:</th>
+                                    <td class="text-left">
+                                        <t t-esc="o.status"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h4 class="mt-2">
+                            Description
+                        </h4>
+                        <span><t t-esc="o.description"/> </span>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,48 @@
+<odoo>
+    <data>
+        <record id="view_shipt_type_form" model="ir.ui.view">
+            <field name="name">shipt.type.form</field>
+            <field name="model">shipt.type</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group></group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="time_from" widget="float_time"/>
+                            </group>
+                            <group>
+                                <field name="time_to" widget="float_time"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_shipt_type_tree" model="ir.ui.view">
+            <field name="name">shipt.type.tree</field>
+            <field name="model">shipt.type</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="time_from" widget="float_time"/>
+                    <field name="time_to" widget="float_time"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_shift_type" model="ir.actions.act_window">
+            <field name="name">Shipt Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">shipt.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="shift_type_root" name="Configuration" parent="menu_shift_request_root" sequence="30"/>
+        <menuitem id="shift_type" name="Shift Type" parent="shift_type_root" sequence="10"
+                   action="action_shift_type"/>
+    </data>
+</odoo>

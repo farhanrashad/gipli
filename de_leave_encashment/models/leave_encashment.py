@@ -33,7 +33,7 @@ class LeaveEncashment(models.Model):
     description = fields.Text(string='Description')
     allocation_id = fields.Many2one('hr.leave.allocation', string='Leave Allocation')
     remaining_leave = fields.Integer(string='Remaining Leave', compute='_compute_remaining_leave', store=True)
-    encasenmet_leave = fields.Integer(string='Encasement Leave', compute='_compute_encasenmet_leave', store=True)
+    encasenmet_leave = fields.Integer(string='Encasement Leave', compute='_compute_encasenmet_leave')
     journal_count = fields.Integer(string='Journal Count', compute='_compute_journal_count')
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -70,7 +70,7 @@ class LeaveEncashment(models.Model):
     @api.depends('leave')
     def _compute_encasenmet_leave(self):
         for record in self:
-            record.remaining_leave = record.leave
+            record.encasenmet_leave = record.leave
 
     def action_draft(self):
         self.write({'state': 'draft'})

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_shift_request,shift.request,model_shift_request,,1,1,1,1
+access_shipt_type,shipt.type,model_shipt_type,employee_request,1,1,1,1
+access_shift_request_approve,shift.request.approve,model_shift_request_approve,employee_request,1,1,1,1
+access_all_shift_request,all.shift.request,model_all_shift_request,employee_request,1,1,1,1

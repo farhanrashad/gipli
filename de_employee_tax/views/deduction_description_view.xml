@@ -1,0 +1,41 @@
+<odoo>
+    <data>
+        <!-- Form view -->
+        <record id="deduction_description_form_view" model="ir.ui.view">
+            <field name="name">deduction.description.form</field>
+            <field name="model">deduction.description</field>
+            <field name="arch" type="xml">
+                <form string="Deduction Description">
+                    <group>
+                        <field name="deduction_description"/>
+                        <field name="amount"/>
+                        <field name="contract_id" invisible="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <!-- Tree view -->
+        <record id="deduction_description_tree_view" model="ir.ui.view">
+            <field name="name">deduction.description.tree</field>
+            <field name="model">deduction.description</field>
+            <field name="arch" type="xml">
+                <tree string="Deduction Descriptions">
+                    <field name="deduction_description"/>
+                    <field name="amount"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Actions -->
+        <record id="action_deduction_description" model="ir.actions.act_window">
+            <field name="name">Deduction Description</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">deduction.description</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="menu_deduction_description" name="Deduction Description"
+                  parent="hr.menu_human_resources_configuration"
+                  action="action_deduction_description" sequence="2"/>
+
+    </data>
+</odoo>
