@@ -7,8 +7,8 @@
     "sequence": 1,
 
     "author": "Dynexcel",
-    "website": "https://www.dynexcel.co",
-    "version": '14.0.0.7',
+    "website": "https://www.dynexcel.com",
+    "version": '15.0.0.9',
 
     "depends": ['base','approvals'],
     "data": [

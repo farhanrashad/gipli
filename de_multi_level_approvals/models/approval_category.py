@@ -10,8 +10,8 @@ class ApprovalCategory(models.Model):
     
     approval_type = fields.Selection([
         ("R", "Default Approval"),
-        ("D", "Multi-Level Dynamic"),
-        ("S", "Multi-Level Static"),
+        ("D", "Multi-Level Manager Approval"),
+        ("S", "Multi-Level Approval"),
     ], default='R', required=True, help="Technical field for UX purpose.")
     
     approval_category_line = fields.One2many('approval.category.line', 'approval_category_id')
