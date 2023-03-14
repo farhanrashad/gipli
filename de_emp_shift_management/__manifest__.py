@@ -20,15 +20,19 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','resource'],
+    'depends': ['base','hr','resource','utm','portal'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'data/shift_sequence.xml',
         'views/emp_shift_management.xml',
+        'views/employee_shift_alloc.xml',
         'views/views.xml',
         'views/templates.xml',
+        'reports/report_emp_shifts.xml',
         'wizards/emp_wizard.xml',
+        'wizards/emp_shift_report_wizard.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

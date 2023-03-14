@@ -115,7 +115,15 @@
             </field>
         </record>
         
-         <record id="employee_shifts_kanban_view" model="ir.ui.view">
+       
+
+        
+        
+        
+        
+        
+        
+    <record id="employee_shifts_kanban_view" model="ir.ui.view">
         <field name="name">employee.shifts.kanban</field>
         <field name="model">emp.shift</field>
         <field name="arch" type="xml">
