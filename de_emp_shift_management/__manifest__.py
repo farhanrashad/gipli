@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','resource','utm','portal'],
+    'depends': ['base','hr','resource','utm','portal','report_xlsx'],
 
     # always loaded
     'data': [
