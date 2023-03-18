@@ -77,12 +77,14 @@ class CustomerPortal(portal.CustomerPortal):
             primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
             primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>'
             primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>'
-
-                        
-
-                        
-            primary_template += '<div class="col-lg-12 text-left mb16" style=""><h1>' + service_id.header_model_id.name + '</h1></div>'
-            primary_template += '<hr class="w-100 mx-auto" />'
+        
+            primary_template += '<nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar  mt-3 rounded">'
+            primary_template += '<ol class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1 row">'
+            primary_template += '<li class="breadcrumb-item ml-1" data-oe-model="ir.ui.view" data-oe-id="1049" data-oe-field="arch" data-oe-xpath="/t[1]/ol[1]/li[1]"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"></i></a></li>'
+            primary_template += '<li class="breadcrumb-item active ">' + service_id.header_model_id.name + '</li>'
+            primary_template += '</ol>'
+            primary_template += '</nav>'
+            
             primary_template += '<div class="row" style="">'
             
             # primary_template += '<t t-set="test" t-value="hr_service_items" />'
@@ -97,7 +99,9 @@ class CustomerPortal(portal.CustomerPortal):
                     # primary_template += "<div class='col-6' style='padding:16px;background-color:#FFFFFF;'>"
                     primary_template += "<div class='col-6 ' >"
                     primary_template += "<div class='p-3 h-100 bg-white' style=''>"
-                    primary_template += '<div class="mb-2"><h5><strong>' + group[0].field_variant_line_id.description + '</strong></h5></div>'
+                    primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].field_variant_line_id.description + '</h5>'
+                    primary_template += '<hr class="w-100 mx-auto" />'
+                    primary_template += '</div>'
                     primary_template += '<div class="" style=" border-radius: 10px;">'
 
                 if group[0].field_variant_line_id.display_column == 'col_12':
