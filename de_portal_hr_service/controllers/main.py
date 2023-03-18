@@ -186,6 +186,8 @@ class CustomerPortal(CustomerPortal):
                 record_editable = True
             else:
                 record_editable = False
+        else:
+            record_editable = True
         try:
             partner_id = request.env.user.partner_id
             record_sudo.message_subscribe([partner_id.id])

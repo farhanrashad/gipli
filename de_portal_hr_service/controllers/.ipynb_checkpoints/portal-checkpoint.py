@@ -81,8 +81,9 @@ class CustomerPortal(portal.CustomerPortal):
                         
 
                         
-            primary_template += '<div class="col-lg-12 text-left mb16" style="padding:0px;border-bottom:1px solid #cccccc;"><h1>' + service_id.header_model_id.name + '</h1></div>'
-            primary_template += '<div class="row col-lg-12" style="">'
+            primary_template += '<div class="col-lg-12 text-left mb16" style=""><h1>' + service_id.header_model_id.name + '</h1></div>'
+            primary_template += '<hr class="w-100 mx-auto" />'
+            primary_template += '<div class="row" style="">'
             
             # primary_template += '<t t-set="test" t-value="hr_service_items" />'
 
@@ -94,14 +95,14 @@ class CustomerPortal(portal.CustomerPortal):
                 group = hr_service_grouped_items[key]
                 if group[0].field_variant_line_id.display_column == 'col_6':
                     # primary_template += "<div class='col-6' style='padding:16px;background-color:#FFFFFF;'>"
-                    primary_template += "<div class='col-6' >"
-                    primary_template += "<div class='card bg-light mx-3 my-3 p-3 bg-white rounded' style=''>"
+                    primary_template += "<div class='col-6 ' >"
+                    primary_template += "<div class='p-3 h-100 bg-white' style=''>"
                     primary_template += '<div class="mb-2"><h5><strong>' + group[0].field_variant_line_id.description + '</strong></h5></div>'
                     primary_template += '<div class="" style=" border-radius: 10px;">'
 
                 if group[0].field_variant_line_id.display_column == 'col_12':
                     primary_template += "<div class='col-12'>"
-                    primary_template += "<div class='card bg-light mx-3 my-3  p-3  bg-white' style='padding:16px;background-color:#FFFFFF; border-radius: 15px;'>"
+                    primary_template += "<div class='p-3 h-100 bg-white' style='padding:16px;background-color:#FFFFFF; border-radius: 15px;'>"
                     primary_template += '<div class="mb-2"><h5><strong>' + group[0].field_variant_line_id.description + '</strong></h5></div>'
                     primary_template += '<div class="" style="border-radius: 10px;">'
                     # primary_template += '<div class="card-header mb-2"><h3>' + group[0].field_variant_line_id.description + '</h3></div>'
@@ -176,7 +177,8 @@ class CustomerPortal(portal.CustomerPortal):
                                     result = model_related_field + '-' + response_field_name
                                 
                                     primary_template += "<input type='hidden'  id='join_fields' name='" + result + "' />"
-                                    name = field.field_name +"-" + str(service.id)
+                                    name = field.field_name +"-" + str(service.id) +"-" + field._name
+
                                     primary_template += "<select id='" + name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'" +  " onchange=check_list(this); >"
                                 else:
                                     primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'>"
@@ -243,16 +245,17 @@ class CustomerPortal(portal.CustomerPortal):
 
                     
                         primary_template += "</div>"
+                primary_template += "</div>"                
                 primary_template += "</div>"
+                
+                
+                    
                 primary_template += "</div>"
-                primary_template += "</div>"
-                        
+            primary_template += '</div>'
             # add seperator and button
-            primary_template += '<div class="form-group col-12 s_website_form_submit" data-name="Submit Button" style="text-align: right;">'
-            primary_template += '<hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid;"/>'
-           
-            primary_template += '<div class="row"/>'
-            primary_template += '<div class="d-flex flex-row col-6"/>'
+            primary_template += '<div class="form-group row p-3 s_website_form_submit" data-name="Submit Button" style="text-align: right;">'
+            primary_template += '<hr class="w-100 mx-auto" />'
+            primary_template += '<div class="d-flex flex-row col-6 text-right"/>'
             primary_template += '<button type="button" class="btn btn-link p-0 m-0 text-decoration-none" onclick="window.history.back();"  style="text-align: left;">Back</button>'
             
             # <img t-if="record_id.id" src="/de_portal_hr_service/static/icons/previous.png" alt="Previous" t-attf-onclick="action(type = 'previous', {{service.id}} , {{service.header_model_id.id}} , {{record_id.id}} )"/>
@@ -261,14 +264,13 @@ class CustomerPortal(portal.CustomerPortal):
             primary_template += '<span id="s_website_form_result_back"/>'
             primary_template += '</div>'
             primary_template += '<div class="d-flex flex-row-reverse col-6"/>'
-            primary_template += '<button type="submit" class="btn btn-primary">Submit</button>'
+            primary_template += '<button type="submit" class="btn btn-primary btn-lg">Submit</button>'
             # primary_template += '<button type="submit" class="btn btn-primary rounded-circle btn-lg">Submit</button>'
             primary_template += '<span id="s_website_form_result"/>'
             primary_template += '</div>'
-            primary_template += '</div>'
+            
 
 
-            primary_template += "</div>"
 
         
         # ------------------------------------------

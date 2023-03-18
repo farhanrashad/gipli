@@ -204,7 +204,7 @@ class HRServiceItems(models.Model):
     # hr_service_id = fields.Many2one('hr.service', string='HR Service', readonly=True,)
     name = fields.Text(string='Description', )
     
-    field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade")
+    field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True)
     field_name = fields.Char(related='field_id.name')
     field_label = fields.Char(string='Label', store=True, compute='_compute_label_from_field', readonly=False)
     

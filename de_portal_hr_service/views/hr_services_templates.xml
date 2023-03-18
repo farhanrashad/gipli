@@ -143,7 +143,7 @@
                                 <div t-if="title" class="col-10 col-md-10  text-left">
                                     <span t-if="title" t-esc="title" class="col-8 text-truncate"/>
                                     <small t-if="title" class="text-muted d-none d-md-inline"> (# <span t-field="record_id.sudo().id"/>S)</small>
-                                    <a t-if="record_editable" t-attf-href="/my/model/record/{{service.id}}/{{service.header_model_id.id}}/{{record_id.id}}/1">
+                                    <a t-if="record_editable and service.is_edit" t-attf-href="/my/model/record/{{service.id}}/{{service.header_model_id.id}}/{{record_id.id}}/1">
                                         <i class="fa fa-edit"></i>
                                     </a>
                                 </div>

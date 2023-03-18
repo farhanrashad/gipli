@@ -12,7 +12,7 @@
     'author': "dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
-    'version': '15.0.2.6',
+    'version': '15.0.2.8',
 
     'depends': ['portal','hr'],
 

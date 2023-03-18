@@ -11,7 +11,7 @@ from odoo.exceptions import AccessError, MissingError, UserError, ValidationErro
 
 from odoo.http import request
 from odoo.tools.translate import _
-# from odoo.tools import groupby as groupbyelem
+from odoo.tools import groupby as groupbyelem
 from odoo.addons.portal.controllers import portal
 from odoo.addons.portal.controllers.portal import pager as portal_pager, get_records_pager
 from odoo.osv.expression import OR, AND
@@ -19,7 +19,6 @@ import base64
 from odoo.tools import safe_eval
 from collections import OrderedDict
 from itertools import dropwhile
-from itertools import groupby
 
 #from odoo.addons.website.controllers import form
 
@@ -81,118 +80,58 @@ class CustomerPortal(portal.CustomerPortal):
                         
 
                         
-            primary_template += '<div class="col-lg-12 text-left mb16" style=""><h1>' + service_id.header_model_id.name + '</h1></div>'
-            primary_template += '<hr class="w-100 mx-auto" />'
-            primary_template += '<div class="row" style="">'
+            primary_template += '<div class="col-lg-12 text-left mb16" style="padding:0px;border-bottom:1px solid #cccccc;"><h1>' + service_id.header_model_id.name + '</h1></div>'
+            primary_template += '<section class="row s_website_form pt16 pb16 o_colored_level undefined" style="padding:16px;background-color:#EFFDEC;">'
             
             # primary_template += '<t t-set="test" t-value="hr_service_items" />'
 
-            hr_service_grouped_items = {}
-            for key, group in groupby(hr_service_items, lambda item: item.field_variant_line_id.id):
-                hr_service_grouped_items[key] = list(group)
-            keys = sorted(hr_service_grouped_items.keys())
-            for key in keys:
-                group = hr_service_grouped_items[key]
-                if group[0].field_variant_line_id.display_column == 'col_6':
-                    # primary_template += "<div class='col-6' style='padding:16px;background-color:#FFFFFF;'>"
-                    primary_template += "<div class='col-6 ' >"
-                    primary_template += "<div class='p-3 h-100 bg-white' style=''>"
-                    primary_template += '<div class="mb-2"><h5><strong>' + group[0].field_variant_line_id.description + '</strong></h5></div>'
-                    primary_template += '<div class="" style=" border-radius: 10px;">'
-
-                if group[0].field_variant_line_id.display_column == 'col_12':
-                    primary_template += "<div class='col-12'>"
-                    primary_template += "<div class='p-3 h-100 bg-white' style='padding:16px;background-color:#FFFFFF; border-radius: 15px;'>"
-                    primary_template += '<div class="mb-2"><h5><strong>' + group[0].field_variant_line_id.description + '</strong></h5></div>'
-                    primary_template += '<div class="" style="border-radius: 10px;">'
-                    # primary_template += '<div class="card-header mb-2"><h3>' + group[0].field_variant_line_id.description + '</h3></div>'
-
+            for field in hr_service_items:
+                # find the record value
+                field_domain = []
+                if field.display_type == 'line_section':
+                    primary_template += "<div class='row col12 pb0 pt0 text-o-color-1' style='width:100%;padding:10px 25px 0px 25px;'>"
+                    primary_template += "<h3>" + str(field.name) + "</h3>"
+                    primary_template += '<hr class="w-100 mx-auto" pt0 pb0 style="border-top-width: 1px; border-top-style: solid;margin-top:0px;"/>'
+                    primary_template += "</div>"
+                    
+                    # add seperator
+                    primary_template += '<div class="s_hr text-left pt32 pb32" data-snippet="s_hr" data-name="Separator">'
+                    primary_template += '<hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid;"/>'
+                    primary_template += '</div>'
+                    #primary_template += "<hr/>"
+                elif field.display_type == 'line_separator':
+                    # add seperator
+                    primary_template += "<div class='row col12 pb0 pt0' style='width:100%;padding:10px 25px 0px 25px;'>"
+                    primary_template += '<hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid;"/>'
+                    primary_template += '</div>'
                 
-
-                for field in group:
-                    # find the record value
-                    field_domain = []
-
-                    if field.operation_mode:
-                        if record_sudo:
-                            if field.sudo().field_id.ttype == 'many2one':
-                                record_val = record_sudo[eval("'" + field.field_name + "'")].id
-                            else:
-                                record_val = str(record_sudo[eval("'" + field.field_name + "'")])
-                            #primary_template += "<h1>" + str(record_sudo[eval("'" + field.field_name + "'")]) + "=value</h1>"
+                elif field.display_type == 'line_note':
+                    primary_template += "<div class='row col12 pb0 pt0 text-o-color-2' style='width:100%;padding:10px 25px 0px 25px;'>"
+                    primary_template += "<em>" + str(field.name) + "</em>"
+                    primary_template += "</div>"
                     
-                        if field.is_required:
-                            primary_template += "<div class='form-group mb-2   s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
-                            # primary_template += "<div class='form-group col-4 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
+                elif not field.display_type and field.operation_mode:
+                    if record_sudo:
+                        if field.sudo().field_id.ttype == 'many2one':
+                            record_val = record_sudo[eval("'" + field.field_name + "'")].id
                         else:
-                            primary_template += "<div class='form-group mb-2 ' data-type='char' data-name='" + field.field_name + "'>"
-                            # primary_template += "<div class='form-group col-4' data-type='char' data-name='" + field.field_name + "'>"
-                        
-                        primary_template += "<label class='s_website_form_label' style='width: 200px' for='" + field.field_name + "'>"
-                        primary_template += "<span class='s_website_form_label_content'>" + field.field_label + "</span>"
-                        primary_template += "</label>"
+                            record_val = str(record_sudo[eval("'" + field.field_name + "'")])
+                        #primary_template += "<h1>" + str(record_sudo[eval("'" + field.field_name + "'")]) + "=value</h1>"
+                
+                    if field.is_required:
+                        primary_template += "<div class='form-group col-4 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
+                    else:
+                        primary_template += "<div class='form-group col-4' data-type='char' data-name='" + field.field_name + "'>"
                     
-                        # Many2one Field
-                        if field.field_type == 'many2one':
-                            if field.field_model == 'ir.attachment':
-                                primary_template += "<input type='file' class='form-control-file mb-2 s_website_form_input' id='" + field.field_name + "' name='" + field.field_name + "' multiple='1' />"
-                            else:
-                                if field.field_domain:
-                                    try:
-                                        if 'employee' in field.field_domain:
-                                            field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
-                                        elif 'user' in field.field_domain:
-                                            field_domain = eval(field.field_domain, {"user": request.env.user.id})
-                                        elif 'partner' in field.field_domain:
-                                            field_domain = eval(field.field_domain, {"partner": request.env.user.partner_id.id})
-                                        else:
-                                            field_domain = safe_eval.safe_eval(field.field_domain)
-                                    except Exception:
-                                        field_domain = []
-                                    #e = request.env.user.employee_id.id
-                                    #raise ValidationError(eval(field.field_domain, {"employee": request.env.user.employee_id.id}))
-                                    #if isinstance(field.field_domain, str):
-                                    #    if field.field_domain == 'employee.id':
-                                    #        field_domain = [('employee_id','=',request.env.user.employee_id.id)]
-                                    #    else:
-                                    #        field_domain = safe_eval.safe_eval(field.field_domain)
-                                    #field_domain = field_domain.replace("employee.id", "request.env.user.employee_id.id")
-                                    #raise ValidationError(_(json.dumps(field.field_domain)))
-                                    #field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
-                                m2o_id = request.env[field.field_model].sudo().search(field_domain)
-                                # primary_template += "<option value='' " + " selected"  + ">" + "Search for a product </option>"
-    
-                                if field.ref_populate_field_id:
-                                    response_field_name = field.ref_populate_field_id.name
-                                    response_field  = hr_service_items.filtered(lambda x:x.field_model == field.ref_populate_field_id.relation)
-                                    responce_model = response_field.field_model
-                                    model_fields = request.env[field.field_model]._fields
-                                    model_fields_dict = dict(model_fields)
-
-                                    model_related_field = None                                
-                                    for key, value in model_fields_dict.items():
-                                        if value.comodel_name == responce_model:
-                                            model_related_field=key
-
-                                    result = model_related_field + '-' + response_field_name
-                                
-                                    primary_template += "<input type='hidden'  id='join_fields' name='" + result + "' />"
-                                    name = field.field_name +"-" + str(service.id) +"-" + field._name
-
-                                    primary_template += "<select id='" + name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'" +  " onchange=check_list(this); >"
-                                else:
-                                    primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'>"
-
-                                for m in m2o_id:
-                                    primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
-                                    #template += "<t t-esc='t" + m.name + "'/>"
-                                    primary_template += m.name
-                                    primary_template += "</option>"
-                                primary_template += "</select>"
-                                
-                            
-                        # Many2many field
-                        elif field.field_type == 'many2many':
+                    primary_template += "<label class='s_website_form_label' style='width: 200px' for='" + field.field_name + "'>"
+                    primary_template += "<span class='s_website_form_label_content'>" + field.field_label + "</span>"
+                    primary_template += "</label>"
+                
+                    # Many2one Field
+                    if field.field_type == 'many2one':
+                        if field.field_model == 'ir.attachment':
+                            primary_template += "<input type='file' class='form-control-file s_website_form_input' id='" + field.field_name + "' name='" + field.field_name + "' multiple='1' />"
+                        else:
                             if field.field_domain:
                                 try:
                                     if 'employee' in field.field_domain:
@@ -205,57 +144,108 @@ class CustomerPortal(portal.CustomerPortal):
                                         field_domain = safe_eval.safe_eval(field.field_domain)
                                 except Exception:
                                     field_domain = []
-                            m2m_id = request.env[field.field_model].sudo().search(field_domain) 
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control mb-2 selection-search' multiple='multiple'>"
-                            # primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control mb-2 selection-search' style='width: 25%' multiple='multiple'>"
-                            for m in m2m_id:
+                                #e = request.env.user.employee_id.id
+                                #raise ValidationError(eval(field.field_domain, {"employee": request.env.user.employee_id.id}))
+                                #if isinstance(field.field_domain, str):
+                                #    if field.field_domain == 'employee.id':
+                                #        field_domain = [('employee_id','=',request.env.user.employee_id.id)]
+                                #    else:
+                                #        field_domain = safe_eval.safe_eval(field.field_domain)
+                                #field_domain = field_domain.replace("employee.id", "request.env.user.employee_id.id")
+                                #raise ValidationError(_(json.dumps(field.field_domain)))
+                                #field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
+                            m2o_id = request.env[field.field_model].sudo().search(field_domain)
+                            # primary_template += "<option value='' " + " selected"  + ">" + "Search for a product </option>"
+ 
+                            if field.ref_populate_field_id:
+                                response_field_name = field.ref_populate_field_id.name
+                                response_field  = hr_service_items.filtered(lambda x:x.field_model == field.ref_populate_field_id.relation)
+                                responce_model = response_field.field_model
+                                model_fields = request.env[field.field_model]._fields
+                                model_fields_dict = dict(model_fields)
+
+                                model_related_field = None                                
+                                for key, value in model_fields_dict.items():
+                                    if value.comodel_name == responce_model:
+                                        model_related_field=key
+
+                                result = model_related_field + '-' + response_field_name
+                            
+                                primary_template += "<input type='hidden'  id='join_fields' name='" + result + "' />"
+                                name = field.field_name +"-" + str(service.id)
+                                primary_template += "<select id='" + name + "' name='" + field.field_name + "'class='form-control selection-search'" +  " onchange=check_list(this); >"
+                                # primary_template += "<select id='" + field.field_name + "' name='" + name + "'class='form-control selection-search'" +  " onchange=check_list(this); >"
+                            else:
+                                primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control selection-search'>"
+
+                            for m in m2o_id:
                                 primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
+                                #template += "<t t-esc='t" + m.name + "'/>"
                                 primary_template += m.name
                                 primary_template += "</option>"
                             primary_template += "</select>"
+                            
+                           
+                    # Many2many field
+                    elif field.field_type == 'many2many':
+                        if field.field_domain:
+                            try:
+                                if 'employee' in field.field_domain:
+                                    field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
+                                elif 'user' in field.field_domain:
+                                    field_domain = eval(field.field_domain, {"user": request.env.user.id})
+                                elif 'partner' in field.field_domain:
+                                    field_domain = eval(field.field_domain, {"partner": request.env.user.partner_id.id})
+                                else:
+                                    field_domain = safe_eval.safe_eval(field.field_domain)
+                            except Exception:
+                                field_domain = []
+                        m2m_id = request.env[field.field_model].sudo().search(field_domain)
+                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control selection-search' multiple='multiple'>"
+                        for m in m2m_id:
+                            primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
+                            primary_template += m.name
+                            primary_template += "</option>"
+                        primary_template += "</select>"
 
 
 
 
-                        # Selection field
-                        elif field.field_type == 'selection':
-                            sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control mb-2' >"
-                            for sel in sel_ids:
-                                primary_template += "<option value='" + str(sel.value) + "' " + (" selected" if str(record_val) == sel.value else " ") + ">"
-                                primary_template += sel.name
-                                primary_template += "</option>"
-                            primary_template += "</select>"
-                    
-                        # Date Field
-                        elif field.field_type == 'date':
-                            primary_template += '<input type="date" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        elif field.field_type == 'datetime':
-                            primary_template += '<input type="datetime-local" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        elif field.field_type == 'char':
-                            primary_template += '<input type="text" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        elif field.field_type == 'text':
-                            primary_template += '<textarea class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + " ></textarea>"
-                        elif field.field_type in ('integer','float','monetary'):
-                            primary_template += '<input type="number" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        #elif field.field_type == 'html':
-                        #    primary_template += "<input type='text' class='form-control s_website_form_input' name='" + field.field_name + "' id='" + field.field_name + "' value='" + record_val + ("'required=1'" if field.is_required else '') + "'/>"
-                        else:
-                            primary_template += '<input type="text" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-
-                    
-                        primary_template += "</div>"
-                primary_template += "</div>"                
-                primary_template += "</div>"
+                    # Selection field
+                    elif field.field_type == 'selection':
+                        sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
+                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control' >"
+                        for sel in sel_ids:
+                            primary_template += "<option value='" + str(sel.value) + "' " + (" selected" if str(record_val) == sel.value else " ") + ">"
+                            primary_template += sel.name
+                            primary_template += "</option>"
+                        primary_template += "</select>"
                 
+                    # Date Field
+                    elif field.field_type == 'date':
+                        primary_template += '<input type="date" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
+                    elif field.field_type == 'datetime':
+                        primary_template += '<input type="datetime-local" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
+                    elif field.field_type == 'char':
+                        primary_template += '<input type="text" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
+                    elif field.field_type == 'text':
+                        primary_template += '<textarea class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + " ></textarea>"
+                    elif field.field_type in ('integer','float','monetary'):
+                        primary_template += '<input type="number" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
+                    #elif field.field_type == 'html':
+                    #    primary_template += "<input type='text' class='form-control s_website_form_input' name='" + field.field_name + "' id='" + field.field_name + "' value='" + record_val + ("'required=1'" if field.is_required else '') + "'/>"
+                    else:
+                        primary_template += '<input type="text" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
+
                 
+                    primary_template += "</div>"
                     
-                primary_template += "</div>"
-            primary_template += '</div>'
             # add seperator and button
-            primary_template += '<div class="form-group row p-3 s_website_form_submit" data-name="Submit Button" style="text-align: right;">'
-            primary_template += '<hr class="w-100 mx-auto" />'
-            primary_template += '<div class="d-flex flex-row col-6 text-right"/>'
+            primary_template += '<div class="form-group col-12 s_website_form_submit" data-name="Submit Button" style="text-align: right;">'
+            primary_template += '<hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid;"/>'
+           
+            primary_template += '<div class="row"/>'
+            primary_template += '<div class="d-flex flex-row col-6"/>'
             primary_template += '<button type="button" class="btn btn-link p-0 m-0 text-decoration-none" onclick="window.history.back();"  style="text-align: left;">Back</button>'
             
             # <img t-if="record_id.id" src="/de_portal_hr_service/static/icons/previous.png" alt="Previous" t-attf-onclick="action(type = 'previous', {{service.id}} , {{service.header_model_id.id}} , {{record_id.id}} )"/>
@@ -264,13 +254,14 @@ class CustomerPortal(portal.CustomerPortal):
             primary_template += '<span id="s_website_form_result_back"/>'
             primary_template += '</div>'
             primary_template += '<div class="d-flex flex-row-reverse col-6"/>'
-            primary_template += '<button type="submit" class="btn btn-primary btn-lg">Submit</button>'
+            primary_template += '<button type="submit" class="btn btn-primary">Submit</button>'
             # primary_template += '<button type="submit" class="btn btn-primary rounded-circle btn-lg">Submit</button>'
             primary_template += '<span id="s_website_form_result"/>'
             primary_template += '</div>'
-            
+            primary_template += '</div>'
 
 
+            primary_template += "</section>"
 
         
         # ------------------------------------------
