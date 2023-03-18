@@ -257,21 +257,15 @@ class CustomerPortal(portal.CustomerPortal):
                 primary_template += "</div>"
             primary_template += '</div>'
             # add seperator and button
-            primary_template += '<div class="form-group row p-3 s_website_form_submit" data-name="Submit Button" style="text-align: right;">'
-            primary_template += '<hr class="w-100 mx-auto" />'
+            primary_template += '<nav class="navbar navbar-light navbar-expand-lg border p-2 py-0 mb-2 o_portal_navbar  mt-3 rounded">'
             primary_template += '<div class="d-flex flex-row col-6 text-right"/>'
             primary_template += '<button type="button" class="btn btn-link p-0 m-0 text-decoration-none" onclick="window.history.back();"  style="text-align: left;">Back</button>'
-            
-            # <img t-if="record_id.id" src="/de_portal_hr_service/static/icons/previous.png" alt="Previous" t-attf-onclick="action(type = 'previous', {{service.id}} , {{service.header_model_id.id}} , {{record_id.id}} )"/>
-
-            # primary_template += '<button type="button" class="btn btn-primary" onclick="window.history.back();"  style="text-align: left;">Back</button>'
-            primary_template += '<span id="s_website_form_result_back"/>'
             primary_template += '</div>'
             primary_template += '<div class="d-flex flex-row-reverse col-6"/>'
-            primary_template += '<button type="submit" class="btn btn-primary btn-lg">Submit</button>'
-            # primary_template += '<button type="submit" class="btn btn-primary rounded-circle btn-lg">Submit</button>'
-            primary_template += '<span id="s_website_form_result"/>'
+            primary_template += '<button type="submit" class="btn btn-primary">Submit</button>'
             primary_template += '</div>'
+            primary_template += '</nav>'
+            primary_template += '<span id="s_website_form_result"/>'
             
 
 
