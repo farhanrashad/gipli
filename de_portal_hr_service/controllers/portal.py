@@ -99,15 +99,15 @@ class CustomerPortal(portal.CustomerPortal):
                     # primary_template += "<div class='col-6' style='padding:16px;background-color:#FFFFFF;'>"
                     primary_template += "<div class='col-6 ' >"
                     primary_template += "<div class='p-3 h-100 bg-white' style=''>"
-                    primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].field_variant_line_id.description + '</h5>'
+                    primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].field_variant_line_id.description if group[0].field_variant_line_id.description else '' + '</h5>'
                     primary_template += '<hr class="w-100 mx-auto" />'
                     primary_template += '</div>'
                     primary_template += '<div class="" style=" border-radius: 10px;">'
 
                 if group[0].field_variant_line_id.display_column == 'col_12':
                     primary_template += "<div class='col-12'>"
-                    primary_template += "<div class='p-3 h-100 bg-white' style='padding:16px;background-color:#FFFFFF; border-radius: 15px;'>"
-                    primary_template += '<div class="mb-2"><h5><strong>' + group[0].field_variant_line_id.description + '</strong></h5></div>'
+                    primary_template += "<div class='p-3 h-100 bg-white' style=''>"
+                    primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].field_variant_line_id.description if group[0].field_variant_line_id.description else '' + '</h5>'
                     primary_template += '<div class="" style="border-radius: 10px;">'
                     # primary_template += '<div class="card-header mb-2"><h3>' + group[0].field_variant_line_id.description + '</h3></div>'
 
