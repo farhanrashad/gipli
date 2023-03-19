@@ -12,7 +12,11 @@
     'author': "dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
-    'version': '15.0.3.0',
+    'version': '15.0.3.2',
+    'license': 'LGPL-3',
+    'live_test_url': 'https://youtu.be/f_uSGd3qJNU',
+    'price': 149,
+    'currency': 'USD',
 
     'depends': ['portal','hr'],
 
@@ -26,4 +30,8 @@
         'views/hr_service_web_templates.xml',
         'views/field_variant_views.xml',
     ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'images': ['static/description/banner.png'],
 }

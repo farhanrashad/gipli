@@ -434,9 +434,13 @@ class CustomerPortal(portal.CustomerPortal):
                         # field.field_name: [(6,0,m2m_ids.ids)],
                         field.field_name: m2m_ids.ids,
                     })
-                elif field.field_type == 'float':
+                elif field.field_type in ('float','monetary'):
                     vals.update({
                         field.field_name: float(kw.get(field.field_name))
+                    })
+                elif field.field_type in ('integer'):
+                    vals.update({
+                        field.field_name: int(kw.get(field.field_name))
                     })
                 else:
                     vals.update({

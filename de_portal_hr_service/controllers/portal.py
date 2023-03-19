@@ -118,7 +118,7 @@ class CustomerPortal(portal.CustomerPortal):
                             #primary_template += "<h1>" + str(record_sudo[eval("'" + field.field_name + "'")]) + "=value</h1>"
                     
                         if field.is_required:
-                            primary_template += "<div class='form-group mb-2   s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
+                            primary_template += "<div class='form-group mb-2 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
                             # primary_template += "<div class='form-group col-4 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
                         else:
                             primary_template += "<div class='form-group mb-2 ' data-type='char' data-name='" + field.field_name + "'>"
@@ -434,9 +434,13 @@ class CustomerPortal(portal.CustomerPortal):
                         # field.field_name: [(6,0,m2m_ids.ids)],
                         field.field_name: m2m_ids.ids,
                     })
-                elif field.field_type == 'float':
+                elif field.field_type in ('float','monetary'):
                     vals.update({
                         field.field_name: float(kw.get(field.field_name))
+                    })
+                elif field.field_type in ('integer'):
+                    vals.update({
+                        field.field_name: int(kw.get(field.field_name))
                     })
                 else:
                     vals.update({
