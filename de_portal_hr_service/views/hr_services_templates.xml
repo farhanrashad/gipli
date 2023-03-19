@@ -13,7 +13,7 @@
                         <!-- <div class="breadcrumb-item active text-truncate col-10 col-lg-12"> -->
                         <a t-attf-href="/my/{{service.id}}">
                             <!-- <a t-if="service" t-attf-href="/my/service/{{service.id}}"> -->
-                            <span t-esc="service.name" />
+                            <span t-esc="service.name" /> 
                             <!-- <span t-esc="service.header_model_id.name" /> -->
                         </a>
                     </li>
