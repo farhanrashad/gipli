@@ -221,11 +221,6 @@ class HRServiceItems(models.Model):
     #is_create = fields.Boolean(string='Create', help='To be avaiable field on creation form')
     #is_edit = fields.Boolean(string='Edit', help='To be avaiable field on edit form')
     
-    display_type = fields.Selection([
-        ('line_section', "Section"),
-        ('line_note', "Note"),
-        ('line_separator', "Separator")], default=False, help="Technical field for UX purpose.")
-    
     operation_mode = fields.Selection([
         ('create', "Create"),
         ('edit', "Edit"),
@@ -341,20 +336,11 @@ class HRServiceItemsLine(models.Model):
     _description = 'Service Record Line Items'
     _order = 'id'
 
-
-    # def _get_varient_line_domain(self):
-    #     variant_line_records = self.env['hr.service.field.variant.line'].search([('field_variant_id','=',self.hr_service_id.field_variant_id.id)])
-    #     domain = [('id', 'in', variant_line_records.ids)]
-    #     return domain
-
     hr_service_id = fields.Many2one('hr.service', string='HR Service', readonly=True,)
     hr_service_record_line_id = fields.Many2one('hr.service.record.line', string='Service Record Line', readonly=True,)
     
     sequence = fields.Integer(string='Sequence', default=10)
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True, )
-    display_type = fields.Selection([
-        ('line_section', "Section"),
-        ('line_note', "Note")], default=False, help="Technical field for UX purpose.")
     name = fields.Text(string='Description', required=False)
 
     field_name = fields.Char(related='field_id.name')

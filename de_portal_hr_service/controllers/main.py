@@ -417,51 +417,26 @@ class CustomerPortal(CustomerPortal):
         template += "<div class='row mb-4'>"
         
         for header in service_id.hr_service_items:
-            if header.display_type == 'line_section':
-                template += "<div class='row col12 pb0 pt16 text-o-color-1' style='width:100%;padding:10px 25px 0px 25px;'>"
-                template += "<h3>" + str(header.name) + "</h3>"
-                template += '<hr class="w-100 mx-auto" pt0 pb0 style="border-top-width: 1px; border-top-style: solid;margin-top:0px;"/>'
-                template += "</div>"
-                    
-                # add seperator
-                template += '<div class="s_hr text-left pt32 pb32" data-snippet="s_hr" data-name="Separator">'
-                template += '<hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid;"/>'
-                template += '</div>'
-                #primary_template += "<hr/>"
-            elif header.display_type == 'line_separator':
-                # add seperator
-                template += "<div class='row col12 pb0 pt0' style='width:100%;padding:10px 25px 0px 25px;'>"
-                template += '<hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid;"/>'
-                template += '</div>'
-                
-            elif header.display_type == 'line_note':
-                template += "<div class='row col12 pb0 pt0 text-o-color-2' style='width:100%;padding:10px 25px 0px 25px;'>"
-                template += "<em>" + str(header.name) + "</em>"
-                template += "</div>"
-                    
-            elif not header.display_type:
-                    
-                template += "<div class='col-12 col-md-6 mb-1'>"
-                template += "<strong>" + header.field_label + ": </strong>"
             
-                if header.field_type == 'many2one':
-                    template += "<span>" + str(record[eval("'" + header.sudo().field_name + "'")].sudo().name) + "</span>"
-                elif header.field_type == 'many2many':
-                    m2m_ids = request.env[header.field_model].sudo().search([('id','in',record[eval("'" + header.field_name + "'")].ids)])
-                        #if m2m_ids.check_access_rights('read', raise_exception=False) else 0
-                    m2m_text = ''
-                    for m2m in m2m_ids:
-                        m2m_text += m2m.name + ','
-                    template += "<span>" + m2m_text[:-1] + "</span>"
-                elif header.field_type == 'selection':
-                    sel_id = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',header.field_id.id),('value','=',record[eval("'" + header.field_name + "'")])],limit=1)
-                    if sel_id:
-                        template += "<span>" + str(sel_id.name) + "</span>"
-                else:
-                    template += "<span>" + str(record[eval("'" + header.field_name + "'")]) + "</span>"
-                
-                template += "</div>"
+            template += "<div class='col-12 col-md-6 mb-1'>"
+            template += "<strong>" + header.field_label + ": </strong>"
             
+            if header.field_type == 'many2one':
+                template += "<span>" + str(record[eval("'" + header.sudo().field_name + "'")].sudo().name) + "</span>"
+            elif header.field_type == 'many2many':
+                m2m_ids = request.env[header.field_model].sudo().search([('id','in',record[eval("'" + header.field_name + "'")].ids)])
+                    #if m2m_ids.check_access_rights('read', raise_exception=False) else 0
+                m2m_text = ''
+                for m2m in m2m_ids:
+                    m2m_text += m2m.name + ','
+                template += "<span>" + m2m_text[:-1] + "</span>"
+            elif header.field_type == 'selection':
+                sel_id = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',header.field_id.id),('value','=',record[eval("'" + header.field_name + "'")])],limit=1)
+                if sel_id:
+                    template += "<span>" + str(sel_id.name) + "</span>"
+            else:
+                template += "<span>" + str(record[eval("'" + header.field_name + "'")]) + "</span>"
+            template += "</div>"
         template += "</div>"
         
         
