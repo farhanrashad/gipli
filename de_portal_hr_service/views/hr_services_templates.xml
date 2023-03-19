@@ -20,9 +20,9 @@
                 </t>
                 <t t-if="record_id">
                     <li class="breadcrumb-item active text-truncate">
-                        <a t-attf-href="/my/{{service.id}}/{{record_id}}">
+                        
                             <span t-esc="record_id.name" />
-                        </a>
+                        
                     </li>
                 </t>
             </xpath>
