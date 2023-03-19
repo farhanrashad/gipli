@@ -47,14 +47,14 @@ class CustomerPortal(portal.CustomerPortal):
         
         if service_id.header_model_id.id == int(model_id):
             #record_id = request.env[service_id.header_model_id.model].sudo().search([('id','=',int(rec_id))],limit=1).id
-            hr_service_items = service_id.hr_service_items
+            hr_service_items = service_id.hr_service_items.filtered(lambda x: x.operation_mode)
             if edit_mode == '1' or edit_mode == 1:
                 record_sudo = request.env[service_id.header_model_id.model].sudo().search([('id','=',record_id)],limit=1)
                         
         elif line_item:
             #record_id = request.env[service_id.line_model_id.model].sudo().search([('id','=',int(rec_id))],limit=1).id
             #hr_service_items = line_model_id.hr_service_record_line_items #service_id.hr_service_items_line
-            hr_service_items = line_item.hr_service_record_line_items
+            hr_service_items = line_item.hr_service_record_line_items.filtered(lambda x: x.operation_mode)
             if edit_mode == '1' or edit_mode == 1:
                 record_sudo = request.env[line_item.line_model_id.model].sudo().search([('id','=',record_id)],limit=1)            
 
@@ -367,7 +367,7 @@ class CustomerPortal(portal.CustomerPortal):
 
 
         if service_id.header_model_id.id == int(model_id):
-            service_items = service_id.hr_service_items
+            service_items = service_id.hr_service_items.filtered(lambda x: x.operation_mode)
             if edit_mode == '1' or edit_mode == 1:
                 record_sudo = request.env[service_id.header_model_id.model].sudo().search([('id','=',int(record_id))],limit=1)
                 res_name = record_sudo.name
