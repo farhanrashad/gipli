@@ -493,10 +493,10 @@ class CustomerPortal(CustomerPortal):
             
                 for line in record_lines:
                     counter += 1
-                    if counter % 2 == 0:
-                        template += "<tr class='bg-200'>"
-                    else:
-                        template += "<tr>"
+                    #if counter % 2 == 0:
+                    #    template += "<tr class='bg-200'>"
+                    #else:
+                    template += "<tr>"
                 
                     for f in rec_line.hr_service_record_line_items:    
                         fields += f.field_name + ','
