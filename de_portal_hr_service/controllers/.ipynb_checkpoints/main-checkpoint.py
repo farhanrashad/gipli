@@ -451,6 +451,7 @@ class CustomerPortal(CustomerPortal):
         record_liens = False
         if service_id.hr_service_record_line:
             for rec_line in service_id.hr_service_record_line:
+                counter = 0
                 domain = [(rec_line.parent_relational_field_id.name, '=', record_id.id)]
                 if rec_line.relational_field_id:
                     record_lines = request.env[rec_line.line_model_id.model].search(domain)
