@@ -71,7 +71,7 @@
 
 
 
-        <menuitem id="hr_service_report_menu_root_config_menu" name="Reports" parent="de_portal_hr_service.hr_service_menu_root" sequence="10" groups="de_portal_hr_service_report.group_hr_service_report_user"/>
+        <menuitem id="hr_service_report_menu_root_config_menu" name="Reports" parent="de_portal_hr_service.hr_service_menu_root" sequence="10" groups="de_portal_hr_service.group_hr_service_user"/>
 
         <menuitem action="action_services_report" name="Report Designer" id="hr_service_report_menu_root_config_menu_service" parent="hr_service_report_menu_root_config_menu" sequence="2"/>
 

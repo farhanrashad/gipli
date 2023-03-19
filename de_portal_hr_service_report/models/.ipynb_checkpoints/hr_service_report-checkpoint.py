@@ -38,19 +38,19 @@ class HRServiceReport(models.Model):
             
 
     name = fields.Char(string='Name', required=True, translate=True, states=READONLY_STATES,)
-    code = fields.Char(string='Code', required=True)
+    code = fields.Char(string='Code', required=True, states=READONLY_STATES)
 
     model_id = fields.Many2one(
             string='Model for Parameters',
             comodel_name='ir.model',
             readonly=True,
-            store=True
+            store=True, states=READONLY_STATES,
         )
 
-    sql_text = fields.Text(string='SQL Query')
+    sql_text = fields.Text(string='SQL Query', states=READONLY_STATES,)
     query_tooltip = fields.Text(compute='_compute_query_tooltip', default=_compute_query_tooltip)
 
-    group_id = fields.Many2one('res.groups', string='Security Group')
+    group_id = fields.Many2one('res.groups', string='Security Group', states=READONLY_STATES,)
     
     
     state = fields.Selection([
@@ -63,7 +63,7 @@ class HRServiceReport(models.Model):
     
     param_field_ids = fields.Many2many(
         string='Parameter Fields',
-        comodel_name='ir.model.fields',
+        comodel_name='ir.model.fields', states=READONLY_STATES,
     )
           
 
