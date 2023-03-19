@@ -50,27 +50,19 @@ class CustomerPortal(portal.CustomerPortal):
             hr_service_items = service_id.hr_service_items
             if edit_mode == '1' or edit_mode == 1:
                 record_sudo = request.env[service_id.header_model_id.model].sudo().search([('id','=',record_id)],limit=1)
-            
-            #primary_template += '<div class="col-lg-12 text-left mb16" style="border-bottom:1px solid #cccccc;"><h5>' + service_id.header_model_id.name + '</h5></div>'
-            #extra_template += "<br/>"
-            
-        #elif service_id.line_model_id.id == int(model_id):
+                        
         elif line_item:
             #record_id = request.env[service_id.line_model_id.model].sudo().search([('id','=',int(rec_id))],limit=1).id
             #hr_service_items = line_model_id.hr_service_record_line_items #service_id.hr_service_items_line
             hr_service_items = line_item.hr_service_record_line_items
             if edit_mode == '1' or edit_mode == 1:
-                record_sudo = request.env[line_item.line_model_id.model].sudo().search([('id','=',record_id)],limit=1)
-            
-            #primary_template += '<div class="col-lg-12 text-left mb16" style="border-bottom:1px solid #cccccc;"><h5>' + service_id.header_model_id.name + ' / ' + str(line_item.line_model_id.name) + '</h5></div>'
-            #extra_template += "<br/>"
-            
+                record_sudo = request.env[line_item.line_model_id.model].sudo().search([('id','=',record_id)],limit=1)            
 
                 
         
-        # ------------------------------------------
-        # ------------- Left Section ----------------
-        # ------------------------------------------
+        # ----------------------------------------------------
+        # ------------- Generate Dynamic Form ----------------
+        # ----------------------------------------------------
         for service in service_id:
 
             primary_template += '<link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />'
@@ -267,73 +259,6 @@ class CustomerPortal(portal.CustomerPortal):
             primary_template += '</nav>'
             primary_template += '<span id="s_website_form_result"/>'
             
-
-
-
-        
-        # ------------------------------------------
-        # -------------Right Section Fields ----------------
-        # ------------------------------------------
-        """
-        for service in service_id:
-            for field in hr_service_items:
-                field_domain = []
-                if record_sudo:
-                    if field.field_id.sudo().ttype == 'many2one':
-                        record_val = record_sudo[eval("'" + field.field_name + "'")].name
-                    else:
-                        record_val = str(record_sudo[eval("'" + field.field_name + "'")])
-                        
-                if field.is_required:
-                    extra_template += "<div class='form-group col-12 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
-                else:
-                    extra_template += "<div class='form-group col-12' data-type='char' data-name='" + field.field_name + "'>"
-                extra_template += "<label class='s_website_form_label' style='width: 200px' for='" + field.field_name + "'>"
-                extra_template += "<span class='s_website_form_label_content'>" + field.field_label + "</span>"
-                extra_template += "</label>"
-                
-                # Many2one Field
-                if field.field_type == 'many2one':
-                    if field.field_model == 'ir.attachment':
-                        extra_template += "<input type='file' class='form-control-file s_website_form_input' id='" + field.field_name + "' name='" + field.field_name + "' multiple='1' />"
-                    else:
-                        if field.field_domain:
-                            field_domain = safe_eval.safe_eval(field.field_domain)
-                            
-                        m2o_id = request.env[field.field_model].sudo().search(field_domain)
-                        
-                        extra_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control' >"
-                        for m in m2o_id:
-                            extra_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.name else " ") + ">"
-                            #template += "<t t-esc='t" + m.name + "'/>"
-                            extra_template += m.name
-                            extra_template += "</option>"
-                        extra_template += "</select>"
-                    
-                # Selection field
-                elif field.field_type == 'selection':
-                    sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
-                    extra_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control' >"
-                    for sel in sel_ids:
-                        extra_template += "<option value='" + str(sel.value) + "' " + (" 'selected'" if str(record_val) == sel.value else " ") + ">"
-                        extra_template += sel.name
-                        extra_template += "</option>"
-                    extra_template += "</select>"
-                
-                # Date Field
-                elif field.field_type == 'date':
-                    extra_template += '<input type="date" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                elif field.field_type == 'char':
-                    extra_template += '<input type="text" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                elif field.field_type in ('integer','float','monetary'):
-                    extra_template += '<input type="number" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                #elif field.field_type == 'html':
-                #    primary_template += "<input type='text' class='form-control s_website_form_input' name='" + field.field_name + "' id='" + field.field_name + "' value='" + record_val + ("'required=1'" if field.is_required else '') + "'/>"
-                else:
-                    extra_template += '<input type="text" class="form-control s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                
-                extra_template += "</div>"
-        """
             
         currency_ids = request.env['res.currency'].sudo().search([('active','=',True)])
         return {
@@ -407,7 +332,6 @@ class CustomerPortal(portal.CustomerPortal):
             
         
 
-
         # return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode))
         
     @http.route(['/my/model/record/prev/<int:service_id>/<int:model_id>/<int:record_id>'
@@ -471,19 +395,6 @@ class CustomerPortal(portal.CustomerPortal):
                     field.field_name: user_id.partner_id.id,
                 })
         
-        # for field in service_items.filtered(lambda r: r.auto_populate):
-        #     if field.auto_populate == 'user':
-        #         vals.update({
-        #             field.field_name: user_id.id,
-        #         })
-        #     elif field.auto_populate == 'employee':
-        #         vals.update({
-        #             field.field_name: user_id.employee_id.id,
-        #         })
-        #     elif field.auto_populate == 'partner':
-        #         vals.update({
-        #             field.field_name: user_id.partner_id.id,
-        #         })
         
         for field in service_items:
             if kw.get(field.field_name):
@@ -565,15 +476,6 @@ class CustomerPortal(portal.CustomerPortal):
             else:
                 record = record_sudo[eval("'" + line_item.parent_relational_field_id.sudo().name + "'")]
                 record_sudo.sudo().write(vals)
-        
-        #raise UserError(str(record_id))
-        #elif kw.get('mode') == '1':
-        #    if record_sudo:
-        #        record_sudo.sudo().write(vals)
-        #        if parent_record_id:
-        #            parent_record_id = record_sudo.id
-        #        else:
-        #            record_id = record_sudo.id
         
             
         return request.redirect('/my/model/record/%s/%s/%s' % (service_id.id,service_id.header_model_id.id, record.id))
