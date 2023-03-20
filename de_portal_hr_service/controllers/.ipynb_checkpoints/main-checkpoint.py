@@ -531,6 +531,36 @@ class CustomerPortal(CustomerPortal):
                 if service_id.is_create and record_editable:
                     template +=  "<a href='/my/model/record/" + str(service_id.id) + "/" + str(rec_line.line_model_id.id) + "/" + str(record.id) + "/0" + "' >Add a record" + "</a>"
                 template += "</section>"
+                
+                # if service_id.allow_import:
+                if rec_line.allow_import  and record_editable:
+                    service = str(service_id.id)
+                    model = str(rec_line.line_model_id.id)
+                    record = str(record.id)
+                    import_record = service + '-' + model + '-' + record
+                    template += "<hr class='mt-4 mb-4'>"
+
+                    template += "<input type='hidden' name='" + import_record + "' id='import_record' class='form-control' >"
+                    
+                    
+                    template += "<div class='card-header mt-5'>"
+                    template += "<div class='row no-gutters'>"
+                    
+                    template += "<div class='col-4'>"
+                    template += "<span class='col-12 text-truncate bold'><b>Import Records</b></span>"
+                    template += "<div class='col-12 text-left'>"
+                    template += "<span>You can choose one of the following options:</span>"
+                    template += "</div>"
+                    template += "<div class='col-12'>"
+                    radio_options = [{'value': 'excel', 'label': 'Excel'}, {'value': 'csv', 'label': 'CSV'}]
+                    for radio_option in radio_options:
+                        template += "<input type='radio'  name='file_format' value='" + radio_option['value'] + "' checked="+ radio_option['value'] + '==' + 'excel' + " />"
+                        template += "&nbsp;<label>" + radio_option['label'] + "</label>"
+                        template += "&nbsp;&nbsp;&nbsp;"
+                    template += "</div>"
+
+                    template += "</div>"
+                    
 
         return template
     
