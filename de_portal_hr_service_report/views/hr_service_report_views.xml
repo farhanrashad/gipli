@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- HR Service Report -->
+        <record model="ir.ui.view" id="hr_service_report_form_view">
+            <field name="name">hr.service.report.form.view</field>
+            <field name="model">hr.service.report</field>
+            <field name="arch" type="xml">
+                <form string="HR Service Report">
+                    <header>
+                        <button name="button_validate" type="object" states="draft" string="Validate" class="oe_highlight" id="validate" data-hotkey="v"/>
+                        <button name="button_publish" type="object" states="validate" string="Publish" class="oe_highlight" id="validate" data-hotkey="p"/>
+                        <button name="button_draft" states="validate,publish,cancel" string="Set to Draft" type="object" data-hotkey="o"/>
+                        <button name="button_cancel" states="draft,validate,publish" string="Cancel" type="object" data-hotkey="x" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,validate,publish" readonly="1"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g Employee Detail Report"/>
+                            </h1>
+                            <field name="code" placeholder="e.g employee"/>
+                        </div>
+                        <group>
+                            <group>
+                                <button string="Add Parameter" class="btn btn-link" type="object" name="generate_model" attrs="{'invisible': [('model_id', '!=', False)]}"/>
+                                <field name="model_id" attrs="{'invisible': [('model_id', '=', False)]}"/>
+                                
+                            </group>
+                            <group>
+                                <field name="group_id"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="sql_text" no_label="1" placeholder="e.g select id, name from res_partner" attrs="{'required': [('state', 'not in', ['draft','cancel'])]}"/>
+                            <field name="query_tooltip" string="" class="font-italic text-muted"/>
+                        </group>
+                        
+                        <notebook>
+                            <page string="Parameters" name="parameters" attrs="{'invisible': [['model_id','=',False]]}">
+                                <field name="param_field_ids" string="Parameters" domain="[('model_id', '=', model_id)]" context="{ 'default_model_id': model_id,}" />
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="hr_service_report_tree_view">
+            <field name="name">hr.service.report.tree.view</field>
+            <field name="model">hr.service.report</field>
+            <field name="arch" type="xml">
+                <tree string="HR Service Report">
+                    <field name="name"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="action_services_report" model="ir.actions.act_window">
+            <field name="name">Service Report</field>
+            <field name="res_model">hr.service.report</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                No service Report found. Let's create one!
+                </p>
+            </field>
+        </record>
+
+
+
+        <menuitem id="hr_service_report_menu_root_config_menu" name="Reports" parent="de_portal_hr_service.hr_service_menu_root" sequence="10" groups="de_portal_hr_service.group_hr_service_user"/>
+
+        <menuitem action="action_services_report" name="Report Designer" id="hr_service_report_menu_root_config_menu_service" parent="hr_service_report_menu_root_config_menu" sequence="2"/>
+
+
+
+    </data>
+</odoo>
