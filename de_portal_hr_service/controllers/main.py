@@ -460,7 +460,6 @@ class CustomerPortal(CustomerPortal):
         # line items
         m2m_text = ''
         domain = []
-        record_liens = False
         if service_id.hr_service_record_line:
             for rec_line in service_id.hr_service_record_line:
                 
@@ -530,17 +529,18 @@ class CustomerPortal(CustomerPortal):
                 template += "</table>"
                 if service_id.is_create and record_editable:
                     template +=  "<a href='/my/model/record/" + str(service_id.id) + "/" + str(rec_line.line_model_id.id) + "/" + str(record.id) + "/0" + "' >Add a record" + "</a>"
-                template += "</section>"
-                
+                    
+                    
                 # if service_id.allow_import:
-                if rec_line.allow_import  and record_editable:
+                if rec_line.allow_import and record_editable:
                     service = str(service_id.id)
                     model = str(rec_line.line_model_id.id)
-                    record = str(record.id)
-                    import_record = service + '-' + model + '-' + record
+                    #record = str(record.id)
+                    #import_record = service + '-' + model + '-' + record
+                    
                     template += "<hr class='mt-4 mb-4'>"
 
-                    template += "<input type='hidden' name='" + import_record + "' id='import_record' class='form-control' >"
+                    #template += "<input type='hidden' name='" + import_record + "' id='import_record' class='form-control' >"
                     
                     
                     template += "<div class='card-header mt-5'>"
@@ -561,6 +561,29 @@ class CustomerPortal(CustomerPortal):
 
                     template += "</div>"
                     
+                    template += "<div class='col-4 col-md-4'>"
+                    template += "<div class='col-12 col-md-12'>"
+                    template += "<input type='file'  id='attached_document' class='form-control form-control-md' name='attached_document' multiple='1' />"
+                    template += "</div>"
+                    template += "<div class='col-12 col-md-12'>"
+                    template += '<a href="/download/sample/import/record/' + str(service_id.id) + '/' + str(rec_line.id) + '"><i class="fa fa-download  btn-lg"></i>Download Example</a>'          
+                    template += "</div>"
+                    template += "</div>"
+                    
+                    template += "<div class='col-4 col-md-4'>"
+                    template += '<button type="submit" class="btn btn-primary" onclick=submit_document();>Import Records</button>'    
+                    template += "</div>"     
+                    
+                    
+                    # template += "</div>"
+                    template += "</div>"
+                    template += "</div>" 
+                    
+                    
+                    
+                template += "</section>"
+                
+                
 
         return template
     
