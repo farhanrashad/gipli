@@ -398,7 +398,24 @@ class CustomerPortal(CustomerPortal):
         m2m_ids = False
         fields = ''
         template = ''
-            
+        
+        
+        template += '<link href="/de_portal_hr_service/static/src/datatable.css" rel="stylesheet" />'
+        template += '<link href="/de_portal_hr_service/static/src/datatable_export_button.css" rel="stylesheet" />'
+                
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/datatable.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_buttons.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_jszip.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_pdfmake.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_vfs_fonts.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_btn_html5.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_print.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_select.js"></script>'
+
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/items_datatable.js"></script>'
+        template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/sweetalert.js"></script>'
+
         
         domain = [('id', '=', record_id.id)]
         record = request.env[service_id.header_model_id.model].search(domain)
@@ -441,61 +458,28 @@ class CustomerPortal(CustomerPortal):
         
         
         # line items
-        counter = 0
         m2m_text = ''
-        #template += "<h1>" + str(record_id.id) + record_id.name + "</h1>"
-        
-        #domain = [(service_id.parent_relational_field_id.name, '=', record_id.id)]
         domain = []
-        # radio_options = [    {'value': 'excel', 'label': 'Excel'},    {'value': 'csv', 'label': 'CSV'},]
-        record_liens = False
         if service_id.hr_service_record_line:
             for rec_line in service_id.hr_service_record_line:
-                counter = 0
-                domain = [(rec_line.parent_relational_field_id.name, '=', record_id.id)]
-                if rec_line.relational_field_id:
-                    record_lines = request.env[rec_line.line_model_id.model].search(domain)
-            
-                
-                # template += '<link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet" />'
-                # template += '<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>'
-                # template += '<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>'
-                # template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/items_datatable.js"></script>'
-
-                template += '<link href="/de_portal_hr_service/static/src/datatable.css" rel="stylesheet" />'
-                template += '<link href="/de_portal_hr_service/static/src/datatable_export_button.css" rel="stylesheet" />'
-                
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/datatable.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_buttons.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_jszip.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_pdfmake.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_vfs_fonts.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_btn_html5.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_print.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_select.js"></script>'
-
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/items_datatable.js"></script>'
-                template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/sweetalert.js"></script>'
-
                 
                 template += "<section id='details' style='page-break-inside: auto; overflow:scroll;' class='mt32'>"
                 template += "<table class='itemsTable table table-sm'>"
                 template += "<thead class='bg-100'>"
-        
+                
+                domain = [(rec_line.parent_relational_field_id.name, '=', record_id.id)]
+                if rec_line.relational_field_id:
+                    record_lines = request.env[rec_line.line_model_id.model].search(domain)
+                    
                 for label in rec_line.hr_service_record_line_items:
                     template += "<th>" + label.field_label + "</th>"
         
                 template += "<th></th>"
                 template += "</thead>"
-        
+                
                 template += "<tbody class='sale_tbody'>"
-            
+                # ------- display record line items -----------
                 for line in record_lines:
-                    counter += 1
-                    #if counter % 2 == 0:
-                    #    template += "<tr class='bg-200'>"
-                    #else:
                     template += "<tr>"
                 
                     for f in rec_line.hr_service_record_line_items:    
@@ -539,21 +523,24 @@ class CustomerPortal(CustomerPortal):
                     template += "</tr>"
                 
                 fields = fields[:-1]
-            
-                template += "</tbody></table>"
-                template +="</section>"
+                    
+                template += "</tbody>"
+                
+                template += "</table>"
                 if service_id.is_create and record_editable:
                     template +=  "<a href='/my/model/record/" + str(service_id.id) + "/" + str(rec_line.line_model_id.id) + "/" + str(record.id) + "/0" + "' >Add a record" + "</a>"
-               
+                    
+                    
                 # if service_id.allow_import:
-                if rec_line.allow_import  and record_editable:
+                if rec_line.allow_import and record_editable:
                     service = str(service_id.id)
                     model = str(rec_line.line_model_id.id)
-                    record = str(record.id)
-                    import_record = service + '-' + model + '-' + record
+                    #record = str(record.id)
+                    #import_record = service + '-' + model + '-' + record
+                    
                     template += "<hr class='mt-4 mb-4'>"
 
-                    template += "<input type='hidden' name='" + import_record + "' id='import_record' class='form-control' >"
+                    #template += "<input type='hidden' name='" + import_record + "' id='import_record' class='form-control' >"
                     
                     
                     template += "<div class='card-header mt-5'>"
@@ -573,10 +560,7 @@ class CustomerPortal(CustomerPortal):
                     template += "</div>"
 
                     template += "</div>"
-
-                  
                     
-
                     template += "<div class='col-4 col-md-4'>"
                     template += "<div class='col-12 col-md-12'>"
                     template += "<input type='file'  id='attached_document' class='form-control form-control-md' name='attached_document' multiple='1' />"
@@ -593,7 +577,13 @@ class CustomerPortal(CustomerPortal):
                     
                     # template += "</div>"
                     template += "</div>"
-                    template += "</div>"      
+                    template += "</div>" 
+                    
+                    
+                    
+                template += "</section>"
+                
+                
 
         return template
     
