@@ -75,7 +75,7 @@ def import_data(self_ref =None,model = None,record_sudo=None,import_type = 'exce
                         })
                 elif field.field_type == 'float':
                     vals.update({
-                        field.field_name: float(obj.get(field.field_label))
+                        field.field_name: float(obj.get(field.field_label)) if obj.get(field.field_label) else ''
                     })
                 else:
                     vals.update({

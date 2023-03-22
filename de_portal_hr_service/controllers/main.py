@@ -462,7 +462,12 @@ class CustomerPortal(CustomerPortal):
         domain = []
         if service_id.hr_service_record_line:
             for rec_line in service_id.hr_service_record_line:
+
+                model_name = rec_line.line_model_id.name
                 
+                template += "<h4  class='mx-auto mt-3'>"+ model_name +"</h4>"
+
+
                 template += "<section id='details' style='page-break-inside: auto; overflow:scroll;' class='mt32'>"
                 template += "<table class='itemsTable table table-sm'>"
                 template += "<thead class='bg-100'>"
@@ -528,6 +533,7 @@ class CustomerPortal(CustomerPortal):
                 
                 template += "</table>"
                 if service_id.is_create and record_editable:
+
                     template +=  "<a href='/my/model/record/" + str(service_id.id) + "/" + str(rec_line.line_model_id.id) + "/" + str(record.id) + "/0" + "' >Add a record" + "</a>"
                     
                     
@@ -535,12 +541,15 @@ class CustomerPortal(CustomerPortal):
                 if rec_line.allow_import and record_editable:
                     service = str(service_id.id)
                     model = str(rec_line.line_model_id.id)
-                    #record = str(record.id)
-                    #import_record = service + '-' + model + '-' + record
+                    import_record_id = str(record.id)
+                    rec_line_id = str(rec_line.id)
+
+                    import_record = service + '-' + model + '-' + import_record_id + '-' + rec_line_id
                     
                     template += "<hr class='mt-4 mb-4'>"
 
-                    #template += "<input type='hidden' name='" + import_record + "' id='import_record' class='form-control' >"
+                    template += "<input type='hidden' name='import_record' id='" + import_record + "' class='form-control' >"
+                    # template += "<input type='hidden' name='" + import_record + "' id='import_record' class='form-control' >"
                     
                     
                     template += "<div class='card-header mt-5'>"
@@ -563,7 +572,9 @@ class CustomerPortal(CustomerPortal):
                     
                     template += "<div class='col-4 col-md-4'>"
                     template += "<div class='col-12 col-md-12'>"
-                    template += "<input type='file'  id='attached_document' class='form-control form-control-md' name='attached_document' multiple='1' />"
+                    attachement_record_line_id = "attached_document_" + str(rec_line.id)
+                    template += "<input type='file'  id='" + attachement_record_line_id + "' class='form-control form-control-md' name='attached_document' multiple='1' />"
+                    template += "<input type='hidden'  id='" + str(rec_line.id) + "' class='form-control form-control-md' name='record_line_id'/>"
                     template += "</div>"
                     template += "<div class='col-12 col-md-12'>"
                     template += '<a href="/download/sample/import/record/' + str(service_id.id) + '/' + str(rec_line.id) + '"><i class="fa fa-download  btn-lg"></i>Download Example</a>'          
@@ -571,7 +582,8 @@ class CustomerPortal(CustomerPortal):
                     template += "</div>"
                     
                     template += "<div class='col-4 col-md-4'>"
-                    template += '<button type="submit" class="btn btn-primary" onclick=submit_document();>Import Records</button>'    
+                    template += '<button type="button" class="btn btn-primary"  onclick=submit_document();>Import Records</button>'    
+                    # template += '<button type="submit" class="btn btn-primary"  t-attf-onclick="submit_document( {{rec_line.id}} );">Import Records</button>'    
                     template += "</div>"     
                     
                     
