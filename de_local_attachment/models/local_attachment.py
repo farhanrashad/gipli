@@ -21,7 +21,7 @@ class Attachment(models.Model):
                 data = base64.b64decode(datass)
                 folder_path = self.env['ir.config_parameter'].sudo().get_param('de_local_attachment.attachment_folder')
                 if folder_path:
-                    with open(folder_path + str(values['res_id']), 'wb') as f:
+                    with open(folder_path + str(attachment.id), 'wb') as f:
                         f.write(data)   
         except Exception as excp:
             _logger.exception(excp)
@@ -32,7 +32,7 @@ class Attachment(models.Model):
         folder_path = self.env['ir.config_parameter'].sudo().get_param('de_local_attachment.attachment_folder')
         if folder_path:
             for attachment in self:
-                path = folder_path + str(attachment.res_id)
+                path = folder_path + str(attachment.id)
                 if os.path.exists(path):
                     os.remove(path)
         return super(Attachment, self).unlink()

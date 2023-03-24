@@ -21,7 +21,8 @@ class AttachmentControllerInherit(Binary):
         try:
             attachment  = request.env['ir.attachment'].search([('id','=',id)])
             folder_path = request.env['ir.config_parameter'].sudo().get_param('de_local_attachment.attachment_folder')
-            path = folder_path + str(attachment.res_id)
+            # path = folder_path + str(attachment.res_id)
+            path = folder_path + str(attachment.id)
             file_content = None
             with open(path, 'rb') as file:
             # read the file content
