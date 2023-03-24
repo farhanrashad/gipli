@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_tax_slabs,tax.slabs,model_tax_slabs,,1,1,1,1
-access_deduction_description,deduction.description,model_deduction_description,,1,1,1,1
-access_extra_charges,extra.charges,model_extra_charges,,1,1,1,1

@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_de_emp_shift_management_de_emp_shift_management,de_emp_shift_management.de_emp_shift_management,model_emp_weekoff,,1,1,1,1
-access_de_shift_type,de_emp_shift_management.shift_type,model_shift_type,,1,1,1,1
-access_de_emp_shift,de_emp_shift_management.emp_shift_type,model_emp_shift,,1,1,1,1
-access_de_wizard_emp_shift,de_emp_shift_management.wizard_emp_shift_type,model_wizard_shift_alloc,,1,1,1,1
-access_employee_shift_alloc,de_emp_shift_management.employee_shift_alloc,model_employee_shift_alloc,,1,1,1,1
-access_wizard_report_emp_shift,de_emp_shift_management.wizard_report_emp_shift,model_wizard_report_emp_shift,,1,1,1,1

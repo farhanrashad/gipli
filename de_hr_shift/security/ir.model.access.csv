@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_de_hr_shift_de_hr_shift,de_hr_shift.de_hr_shift,model_shift_management,,1,1,1,1
