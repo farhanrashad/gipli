@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="approval_category_view_form_inherit">
+            <field name="name">approval.category.view.form.inherit</field>
+            <field name="model">approval.category</field>
+            <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/sheet" position="before">
+                    <header>
+                        <button string="Subscribe" name="subscribe" type="object" states="draft" class="oe_highlight" />
+                        <button string="Unsubscribe" name="unsubscribe" type="object" states="subscribed" />
+                        <field name="state" widget="statusbar" />
+                    </header>
+                </xpath>
+                <xpath expr="//field[@name='has_location']" position="after">
+                    <separator string="Extra"/>
+                    <!-- <group string="Condition"> -->
+                    <field name="condition" widget="domain" options="{'model': 'related_model_name', 'in_dialog': True}"/>
+                    <!-- </group> -->
+                    <field name="related_model_name" invisible="1"/>
+
+                    <field name="model_id"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='options']" position="after">
+                    <page string="Template Body" name="body">
+                        <field name="body_html" widget="html" options="{'style-inline': true}"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="approval_request_view_form_inherit">
+            <field name="name">approval.request.view.form.inherit</field>
+            <field name="model">approval.request</field>
+            <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[@name='approvers']" position="after">
+                    <page string="Extra" name="extra">
+                        <group>
+                            <group>
+                                <field name="model_id" string="Model"/>
+                                <field name="record" string="Record"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+                <xpath expr="//field[@name='reason']" position="attributes">
+                    <attribute name="widget">html</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
