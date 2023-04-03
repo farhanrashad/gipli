@@ -47,13 +47,13 @@
                                 <table>
                                     <tbody>
                                         <tr>
-                                            <td style="font-weight: bold;">Vendor's Name :</td>
+                                            <td style="font-weight: bold;">Vendor:</td>
                                             <td>
                                                 <span t-field=" o.partner_id.name"/>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="font-weight: bold;text-align:right;">&#160;&#160;&#160;Address :</td>
+                                            <td style="font-weight: bold;text-align:right;">Address :</td>
                                             <td>
                                                 <span t-field=" o.partner_id.street"/><br/>
                                                 <span t-field=" o.partner_id.street2"/>,
@@ -76,7 +76,10 @@
                 </div>
                 <div class="col-auto mw-100 mb-2">
                             <strong>Reference:</strong><br/>
-                            <t t-set="voucher_no" t-value="(o.seq_name).split('/')[0] +'/'+(o.seq_name).split('/')[2]"/>
+                              <t t-set="voucher_no" t-value=""/>
+                              <t t-if="o.seq_number"> 
+                                 <t t-set="voucher_no" t-value="'INV/'+ str(o.seq_number)"/>
+                               </t>   
                                 <span class="m-0">
                                   <t t-esc="voucher_no"/>
                                 </span>

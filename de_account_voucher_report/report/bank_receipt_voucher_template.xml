@@ -6,21 +6,46 @@
                       
         <t t-set="o" t-value="o.with_context()"/>
         <div class="page" style="font-size:18px;">	
-            <div class= "pull-left">
+            <div ><!--class= "pull-left">-->
                <img style="height:100px;width:100px" t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" class="float-left" alt="Logo"/>
-                <span t-esc='o.company_id.name' style="margin-top:5px;"/><br/>
-                <span t-esc='o.company_id.street'/>
-                <span t-esc='o.company_id.street2'/>
-                <span t-esc='o.company_id.city'/>
-                <span t-esc='o.company_id.country_id.name'/>
+                <span aling="center" t-esc='o.company_id.name' style="font-size: 20px; margin-top:25px;padding-left:300px;"/><br/>
+                 <t t-if="o.company_id.street">
+                     <span style="padding-left:300px;" t-esc='o.company_id.street'/>
+                 </t>
+                 <t t-if="o.company_id.street2">    
+                    <span style="padding-left:300px;" t-esc='o.company_id.street2'/>
+                 </t>
+                 <t style="padding-left:300px;" t-if="o.company_id.city">   
+                    <span t-esc='o.company_id.city'/>
+                 </t>   
+                 <t style="padding-left:300px;" t-if="o.company_id.country_id">
+                    <span t-esc='o.company_id.country_id.name'/>
+                 </t>   
             </div>
             <div class="oe_structure"/>
             <div align="center"> 
                 <br/>                  
-                <h2>BANK RECEIPT VOUCHER</h2>
+                <h3>BANK RECEIPT VOUCHER</h3>
             </div>
             <br/>
-            <table class="table table-sm table-striped table-bordered">
+             <div id="payment_receipt_informations" class="row mt32 mb32">
+                <div class="col-auto mw-100 mb-2" style="white-space:nowrap;">
+                    <strong>Voucher Date:</strong>
+                    <p class="m-0" t-field="o.date"/>
+                </div>
+                <div class="col-auto mw-100 mb-2">
+                    <strong>Reference:</strong><br/>
+                    <t t-set="voucher_no" t-value="(o.seq_name).split('/')[0] +'/'+(o.seq_name).split('/')[2]"/>
+                        <span class="m-0">
+                          <t t-esc="voucher_no"/>
+                        </span>
+                    <!-- <p class="m-0" t-field="o.seq_number"/> -->
+                </div>
+            </div>
+            
+            
+            
+            <!-- <table class="table table-sm table-striped table-bordered">
 
                <tr style="height:30%">
                     <th align="center">V.NO.:</th>
@@ -29,7 +54,7 @@
                     <th> <span t-field="o.date"/></th>
                 </tr>
 
-            </table>
+            </table> -->
             <br/>
              <table class="table table-sm table-striped table-bordered">
                 <thead>
@@ -56,12 +81,18 @@
                                      </t>
                                      </td>
                             <td ><span t-field="line.name"/></td>
-                            <td ><span t-field="line.debit"/> 
+                            <td >
+                                 <t t-if="not line.debit == 0.0">
+                                     <span t-field="line.debit"/> 
+                                  </t>   
                                 <t t-set= "total_debit" t-value="total_debit+line.debit"/>
                             </td>
                               
-                            <td ><span t-field="line.credit"/>
-                                <t t-set= "total_credit" t-value="total_credit+line.credit"/></td>
+                            <td >
+                               <t t-if="not line.credit == 0.0">    
+                                <span t-field="line.credit"/>
+                               </t>  
+                            <t t-set= "total_credit" t-value="total_credit+line.credit"/></td>
                              
                            </tr> 
                          
@@ -80,10 +111,10 @@
                             
                          </td>
                           <th>
-                            <t t-esc="total_debit"/> 
+                            <t t-esc="'{:,}'.format(int(total_debit)) "/> 
                          </th>
                          <th>
-                            <t t-esc="total_credit"/> 
+                            <t t-esc="'{:,}'.format(int(total_credit))"/> 
                          </th>
                       </tr>
                    
@@ -97,19 +128,38 @@
             <br/>
 
         </div>
-              <t t-if="o.type=='entry'">
-    <table class="table table-sm ">
-       
-                <tr>
-                    <th style="max-width:100px; word-wrap:break-word;padding-left:5px;"></th>
-                    <th style="border-top: 1px solid black;padding:5px;text-align:center;"> Prepared By</th>
-                    <th style="max-width:100px; word-wrap:break-word;padding:5px;"> </th>
-                    <th style="border-top: 1px solid black;padding:5px;text-align:center;">Checked By</th>
-                    <th style="max-width:100px; word-wrap:break-word;padding-left:5px;"> </th>
-                    <th style="border-top: 1px solid black;padding:5px;text-align:center;">Approved By</th>
-                </tr>
-         </table>
-        </t>
+    <!-- <t t-if="o.type=='entry'"> -->
+                    <div style="margin-top:50px;">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th style="padding:5px;text-align:center;border-bottom: 1px solid black;">
+                                    <span t-esc="o.env.user.name"/>
+                                </th>
+                                <th style="max-width:100px; word-wrap:break-word;padding:5px;"/>
+                                <th style="padding:5px;text-align:center;">
+                                    <span>    </span>
+                                </th>
+                                <th style="max-width:100px; word-wrap:break-word;padding:5px;"/>
+                                <th style="padding:5px;text-align:center;">
+                                    <span>    </span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td style="border-top:1px solid black;text-align:center;">
+                                    <span>Prepared By</span>
+                                </td>
+                                <th style="max-width:100px; word-wrap:break-word;padding:5px;"/>
+                                <td style="border-top:1px solid black;text-align:center;">
+                                    <span>Checked By</span>
+                                </td>
+                                <th style="max-width:100px; word-wrap:break-word;padding:5px;"/>
+                                <td style="border-top:1px solid black;text-align:center;">
+                                    <span>Approved By</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                <!-- </t> -->
     </t>
     </t>
            

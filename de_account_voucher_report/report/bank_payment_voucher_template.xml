@@ -1,50 +1,54 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+    
 <odoo>
-<template id="v2_voucher_document">
-    <t t-call="web.html_container"> 
-        <t t-call="web.internal_layout">
-                      
-        <t t-set="o" t-value="o.with_context()"/>
-        <div class="page" style="">	
-            <div ><!--class= "pull-left">-->
-               <img style="height:100px;width:100px" t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" class="float-left" alt="Logo"/>
-                <span aling="center" t-esc='o.company_id.name' style="font-size: 20px; margin-top:25px;padding-left:300px;"/><br/>
-                 <t t-if="o.company_id.street">
-                     <span style="padding-left:300px;" t-esc='o.company_id.street'/>
-                 </t>
-                 <t t-if="o.company_id.street2">    
-                    <span style="padding-left:300px;" t-esc='o.company_id.street2'/>
-                 </t>
-                 <t style="padding-left:300px;" t-if="o.company_id.city">   
-                    <span t-esc='o.company_id.city'/>
-                 </t>   
-                 <t style="padding-left:300px;" t-if="o.company_id.country_id">
-                    <span t-esc='o.company_id.country_id.name'/>
-                 </t>   
-            </div>
-            <div class="oe_structure"/>
-            <div align="center"> 
-                <br/>                  
-                <h3>BANK PAYMENT VOUCHER</h3>
-            </div>
-            <br/>
-            
-            
-                    <div id="payment_informations" class="row mt32 mb32">
+    <template id="v2_voucher_document">
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <t t-set="o" t-value="o.with_context()"/>
+                <div class="page" style="">
+                    <div>
+                        <!--class= "pull-left">-->
+                        <img alt="Logo" class="float-left" style="height:100px;width:100px" t-att-src="image_data_uri(o.company_id.logo)" t-if="o.company_id.logo"/>
+                        <span aling="center" style="font-size: 20px; margin-top:25px;padding-left:300px;" t-esc="o.company_id.name"/>
+                        <br/>
+                        <t t-if="o.company_id.street">
+                            <span style="padding-left:300px;" t-esc="o.company_id.street"/>
+                        </t>
+                        <t t-if="o.company_id.street2">
+                            <span style="padding-left:300px;" t-esc="o.company_id.street2"/>
+                        </t>
+                        <t style="padding-left:300px;" t-if="o.company_id.city">
+                            <span t-esc="o.company_id.city"/>
+                        </t>
+                        <t style="padding-left:300px;" t-if="o.company_id.country_id">
+                            <span t-esc="o.company_id.country_id.name"/>
+                        </t>
+                    </div>
+                    <div class="oe_structure"/>
+                    <div align="center">
+                        <br/>
+                        <h3>BANK PAYMENT VOUCHER</h3>
+                    </div>
+                    <br/>
+                    <div class="row mt32 mb32" id="payment_informations">
                         <div class="col-auto mw-100 mb-2">
                             <strong>Voucher Date:</strong>
                             <p class="m-0" t-field="o.date"/>
                         </div>
                         <div class="col-auto mw-100 mb-2">
-                            <strong>Reference:</strong><br/>
-                            <t t-set="voucher_no" t-value="(o.seq_name).split('/')[0] +'/'+(o.seq_name).split('/')[2]"/>
-                                <span class="m-0">
-                                  <t t-esc="voucher_no"/>
-                                </span>
+                            <strong>Reference:</strong>
+                            <br/>
+                            <t t-set="voucher_no" t-value=""/>
+                            <t t-if="o.seq_number"> 
+                               <t t-set="voucher_no" t-value="'INV/'+ str(o.seq_number)"/>
+                            </t>   
+                            <span class="m-0">
+                                <t t-esc="voucher_no"/>
+                            </span>
                             <!-- <p class="m-0" t-field="o.seq_number"/> -->
                         </div>
                     </div>
-            <!-- <table class="table table-sm table-striped table-bordered">
+                    <!-- <table class="table table-sm table-striped table-bordered">
 
                <tr style="height:30%">
                     <th align="center">Voucher date :</th>
@@ -55,116 +59,117 @@
                 </tr>
 
             </table> -->
-            <br/>
-             <table class="table table-sm table-striped table-bordered">
-                <thead>
-                    <tr>
-                       <th> A/C CODE</th>
-                        <th>TITLE OF ACCOUNT</th>
-                        <th>NARRATION</th>
-                        <th>DEBIT</th>
-                        <th>CREDIT</th>
-                    </tr>
-                    </thead>
-                <tbody class="sale_tbody">
-                    <t t-set= "total_debit" t-value="0"/>
-                    <t t-set= "total_credit" t-value="0"/>
-                      <t t-foreach="o.line_ids" t-as="line">
-                        <tr>
-                            <td ><span t-field="line.account_id.code"/></td>
-                            <td >
-                                 <t t-if="not line.partner_id">
-                                <span t-field="line.account_id.name"/>
-                                     </t>
-                                <t t-if="line.partner_id!=False">
-                                <span t-field="line.partner_id.name"/>
-                                     </t>
-                                     </td>
-                            <td ><span t-field="line.name"/></td>
-                            <td >
-                                <t t-if="not line.debit == 0.0">
-                                   <span t-field="line.debit"/> 
-                                </t>   
-                                <t t-set= "total_debit" t-value="total_debit+line.debit"/>
-                            </td>
-                              
-                            <td>
-                                <t t-if="not line.credit == 0.0">
-                                    <span t-field="line.credit"/>
-                                 </t>   
-                                <t t-set= "total_credit" t-value="total_credit+line.credit"/></td>
-                             
-                           </tr> 
-                         
-                       </t>
-                          
-                    <tr>
-                        
-                        
-                    </tr>
-                     <tr>
-                         <td colspan="3" style="font-size:12px;">
-                             <p><strong>Rupees:</strong>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                            <strong> <span t-esc="o.company_id.currency_id.amount_to_text(total_debit)"/></strong>
-                             <b  style="font-size:14px;" class='pull-right'>Total: </b>
-                                </p>
-                         </td>
-                         <th>
-                            <t t-esc="'{:,}'.format(int(total_debit))"/> 
-                         </th>
-                         <th>
-                            <t t-esc="'{:,}'.format(int(total_credit))"/> 
-                         </th>
-                      </tr>
-                   
-                </tbody>
-                
-            </table>
-            <br/>
-            <br/>
-             <br/>
-            <br/>
-            
-
-        </div>
-              <t t-if="o.type=='entry'">
-            <div style="margin-top:50px;">
-            
- 
-            <table class="table table-borderless">
-       
-                <tr>
-                    
-                    
-                    <th style="padding:5px;text-align:center;border-bottom: 1px solid black;"><span t-esc="o.env.user.name"/></th>
-                    <th style="max-width:100px; word-wrap:break-word;padding:5px;"> </th>
-                    <th style="padding:5px;text-align:center;"><span>&#160;&#160;&#160;&#160;</span></th>
-                     <th style="max-width:100px; word-wrap:break-word;padding:5px;"> </th>
-                     <th style="padding:5px;text-align:center;"><span>&#160;&#160;&#160;&#160;</span></th>
-                  
-                </tr>
-                
-                <tr>
-                   <td style="border-top:1px solid black;text-align:center;"><span>Prepared By</span></td>
-                    <th style="max-width:100px; word-wrap:break-word;padding:5px;"> </th>
-                   <td style="border-top:1px solid black;text-align:center;"><span>Checked By</span></td>
-                      <th style="max-width:100px; word-wrap:break-word;padding:5px;"> </th>
-                   <td style="border-top:1px solid black;text-align:center;"><span>Approved By</span></td>
-                   
-                </tr>
-         </table>
-         </div>
+                    <br/>
+                    <table class="table table-sm table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th> A/C CODE</th>
+                                <th>TITLE OF ACCOUNT</th>
+                                <th>NARRATION</th>
+                                <th>DEBIT</th>
+                                <th>CREDIT</th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+                            <t t-set="total_debit" t-value="0"/>
+                            <t t-set="total_credit" t-value="0"/>
+                            <t t-as="line" t-foreach="o.line_ids">
+                                <tr>
+                                    <td>
+                                        <span t-field="line.account_id.code"/>
+                                    </td>
+                                    <td>
+                                        <t t-if="not line.partner_id">
+                                            <span t-field="line.account_id.name"/>
+                                        </t>
+                                        <t t-if="line.partner_id!=False">
+                                            <span t-field="line.partner_id.name"/>
+                                        </t>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-if="not line.debit == 0.0">
+                                            <span t-field="line.debit"/>
+                                        </t>
+                                        <t t-set="total_debit" t-value="total_debit+line.debit"/>
+                                    </td>
+                                    <td>
+                                        <t t-if="not line.credit == 0.0">
+                                            <span t-field="line.credit"/>
+                                        </t>
+                                        <t t-set="total_credit" t-value="total_credit+line.credit"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <tr/>
+                            <tr>
+                                <td colspan="3" style="font-size:12px;">
+                                    <p>
+                                        <strong>Rupees:</strong>
+                                                
+                            
+                                        <strong>
+                                            <span t-esc="o.company_id.currency_id.amount_to_text(total_debit)"/>
+                                        </strong>
+                                        <b class="pull-right" style="font-size:14px;">Total: </b>
+                                    </p>
+                                </td>
+                                <th>
+                                    <t t-esc="'{:,}'.format(int(total_debit))"/>
+                                </th>
+                                <th>
+                                    <t t-esc="'{:,}'.format(int(total_credit))"/>
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                </div>
+                <t t-if="o.type=='entry'">
+                    <div style="margin-top:50px;">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th style="padding:5px;text-align:center;border-bottom: 1px solid black;">
+                                    <span t-esc="o.env.user.name"/>
+                                </th>
+                                <th style="max-width:100px; word-wrap:break-word;padding:5px;"/>
+                                <th style="padding:5px;text-align:center;">
+                                    <span>    </span>
+                                </th>
+                                <th style="max-width:100px; word-wrap:break-word;padding:5px;"/>
+                                <th style="padding:5px;text-align:center;">
+                                    <span>    </span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td style="border-top:1px solid black;text-align:center;">
+                                    <span>Prepared By</span>
+                                </td>
+                                <th style="max-width:100px; word-wrap:break-word;padding:5px;"/>
+                                <td style="border-top:1px solid black;text-align:center;">
+                                    <span>Checked By</span>
+                                </td>
+                                <th style="max-width:100px; word-wrap:break-word;padding:5px;"/>
+                                <td style="border-top:1px solid black;text-align:center;">
+                                    <span>Approved By</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
         </t>
-    </t>
-    </t>
-           
-</template>
-    
-<template id="bank_payment_voucher_report">
-    <t t-call="web.html_container">
-        <t t-foreach="docs" t-as="o">
-            <t t-call="de_account_voucher_report.v2_voucher_document" t-lang="o.partner_id.lang"/>
+    </template>
+    <template id="bank_payment_voucher_report">
+        <t t-call="web.html_container">
+            <t t-as="o" t-foreach="docs">
+                <t t-call="de_account_voucher_report.v2_voucher_document" t-lang="o.partner_id.lang"/>
+            </t>
         </t>
-    </t>
-</template>
+    </template>
 </odoo>
