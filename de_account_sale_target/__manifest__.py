@@ -20,7 +20,7 @@
     'version': '0.6',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','sale','account'],
+    'depends': ['base','sale','account','sh_retail_price_tax'],
 
     # always loaded
     'data': [

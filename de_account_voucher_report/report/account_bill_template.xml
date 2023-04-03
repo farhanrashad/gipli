@@ -6,13 +6,21 @@
                       
         <t t-set="o" t-value="o.with_context()"/>
         <div class="page" style="font-size:18px;">
-             <div class= "pull-left">
+             <div><!-- class= "pull-left">-->
                <img style="height:100px;width:100px" t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" class="float-left" alt="Logo"/>
-                <span t-esc='o.company_id.name' style="margin-top:5px;"/><br/>
-                <span t-esc='o.company_id.street'/>
-                <span t-esc='o.company_id.street2'/>
-                <span t-esc='o.company_id.city'/>
-                <span t-esc='o.company_id.country_id.name'/>
+                <span aling="center" t-esc='o.company_id.name' style="font-size: 20px; margin-top:25px;padding-left:300px;"/><br/>
+                 <t t-if="o.company_id.street">
+                     <span style="padding-left:300px;" t-esc='o.company_id.street'/>
+                 </t>
+                 <t t-if="o.company_id.street2">    
+                    <span style="padding-left:300px;" t-esc='o.company_id.street2'/>
+                 </t>
+                 <t style="padding-left:300px;" t-if="o.company_id.city">   
+                    <span t-esc='o.company_id.city'/>
+                 </t>   
+                 <t style="padding-left:300px;" t-if="o.company_id.country_id">
+                    <span t-esc='o.company_id.country_id.name'/>
+                 </t>   
             </div>
             <div class="oe_structure"/>
             <div align="center"> 
@@ -20,7 +28,62 @@
               <h2><t t-if="o.type=='in_invoice'">Purchase Voucher</t><t t-if="o.type=='entry'">Journal Voucher</t></h2>
             </div>
             <br/>
-            <table class="table table-sm table-striped table-bordered">
+            
+            
+            
+            
+             <div class="row">
+                     <div class="col-6" style="font-size:15px">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: bold;">&#160;</td>
+                                            <td>&#160;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>  
+                            <div class="col-6" style="font-size:15px">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: bold;">Vendor's Name :</td>
+                                            <td>
+                                                <span t-field=" o.partner_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: bold;text-align:right;">&#160;&#160;&#160;Address :</td>
+                                            <td>
+                                                <span t-field=" o.partner_id.street"/><br/>
+                                                <span t-field=" o.partner_id.street2"/>,
+                                                <span t-field=" o.partner_id.city"/>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                           
+                        </div>
+            
+            
+            
+             <div id="bill_payment_informations" class="row mt32 mb32">
+                <div class="col-auto mw-100 mb-2" style="white-space:nowrap;">
+                            <strong>Voucher Date:</strong>
+                            <p class="m-0" t-field="o.date"/>
+                </div>
+                <div class="col-auto mw-100 mb-2">
+                            <strong>Reference:</strong><br/>
+                            <t t-set="voucher_no" t-value="(o.seq_name).split('/')[0] +'/'+(o.seq_name).split('/')[2]"/>
+                                <span class="m-0">
+                                  <t t-esc="voucher_no"/>
+                                </span>
+                            <!-- <p class="m-0" t-field="o.seq_number"/> -->
+                </div>
+            </div>
+            <!-- <table class="table table-sm table-striped table-bordered">
 
                 <tr style="height:30%">
                     <th align="center">V.NO.:</th>
@@ -28,7 +91,7 @@
                     <th align="center">DATE :</th>
                     <th> <span t-field="o.date"/></th>
                 </tr>
-            </table>
+            </table> -->
             <br/>
             <table class="table table-sm table-striped table-bordered">
                 <thead>

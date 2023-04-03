@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
  <report
-            id="report_sale_invoice"
+            id="report_sale_tax_invoice"
             string="Sale Invoice Report"
             model="account.move"
             report_type="qweb-pdf"

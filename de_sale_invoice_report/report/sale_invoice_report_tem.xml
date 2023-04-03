@@ -1,28 +1,75 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+    
 <odoo>
-
+    <template id="sale_tax_header_footer">
+        <t t-set="company" t-value="res_company"/>
+        <div style="margin-left:-10px;display:flex; justify-content:center;" t-att-style="report_header_style" t-attf-class="header o_company_#{company.id}_layout not-last-page">
+            <div class="row" style="font-family: 'Trebuchet MS', sans-serif;">
+                <!-- <img style="height:100px;width:100px" t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" class="float-left" alt="Logo"/> -->
+                <span style="font-size: 20px; margin-top:25px;padding-left:300px;" t-esc="company.name"/>
+                <br/>
+                <t t-if="company.street">
+                    <span style="font-size: 20px; margin-top:1px;padding-left:300px;" t-esc="company.street"/>
+                    <br/>
+                </t>
+                <t t-if="company.street2">
+                    <span style="font-size: 20px; margin-top:1px;padding-left:300px;" t-esc="company.street2"/>
+                    <br/>
+                </t>
+                <t t-if="company.city">
+                    <span style="font-size: 20px; margin-top:1px;padding-left:300px;" t-esc="company.city"/>
+                    <br/>
+                </t>
+                <t t-if="company.country_id">
+                    <span style="font-size: 20px; margin-top:1px;padding-left:300px;" t-esc="company.country_id.name"/>
+                    <br/>
+                </t>
+            </div>
+        </div>
+        <div class="footer" style="padding-top:0px;border-top:1px solid black;text-align:center;">
+            <span>Thank you for your business with us!</span>
+            <div style="padding-left:296px;text-align:left; font-size:12px;">
+                <strong>Head Office &#160; :</strong><span t-esc="company.street"/>,<span t-esc="company.street2"/>
+                ,<span t-esc="company.city"/>,<b><span t-esc="company.country_id.name"/></b> <br/>
+                <b>Tel :</b><span t-esc="company.phone"/>&#160;<b>Fax:</b><span>+92-41-8787706, </span>&#160;  <b>Email :</b><span t-esc="company.email"/><br/>
+                <strong>Site Address &#160;:</strong><span>87, Phase 1B,M-3 Industrial City,Sahianwala, Faisalabad,</span>&#160;<b>Pakistan</b>  
+                 
+           </div>
+        </div>
+        
+         
+    </template>
+    <!-- <template id="sti_regard_tote" inherit_id="de_sale_invoice_report.sale_tax_header_footer">
+                 <xpath expr="//div[@class='footer']" position="before">
+                <div class="center" style="padding-bottom:15px;border:1px solid black;">
+                             Thank you for your business with us!
+                   </div>
+                 </xpath>
+            </template>      -->
     <template id="report_sale_invoices">
         <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <t t-set="sr_no" t-value="0"/>
-                <t t-call="web.external_layout">
-                   <div class="page" style="font-size:20px;" >
-                       <div class= "pull-left">
+            <t t-as="o" t-foreach="docs">
+                <div class="article o_report_layout_standard" t-att-data-oe-id="doc and doc.id" t-att-data-oe-model="doc  and doc._name">
+                    <t t-call="de_sale_invoice_report.sale_tax_header_footer"/>
+                    <t t-set="sr_no" t-value="0"/>
+                    <!-- <t t-call="web.external_layout"> -->
+                    <div class="page" style="font-size:20px;">
+                        <!-- <div class= "pull-left">
                          <img style="height:100px;width:100px" t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" class="float-left" alt="Logo"/>
-                         <span t-esc='o.company_id.name' style="margin-top:5px;"/><br/>
-                         <span t-esc='o.company_id.street'/>
-                         <span t-esc='o.company_id.street2'/>
-                         <span t-esc='o.company_id.city'/>
-                         <span t-esc='o.company_id.country_id.name'/>
-                        </div>
-                        <p style="text-align: right; font-size:20px">ORIGINAL</p>
-                        <p style="text-decoration: underline; text-align: center; font-size:20px">SALES TAX INVOICE</p>
-                       <div class="row">
-                           <div class="col-6" style="font-size:15px">
+                         <span t-esc='o.company_id.name' style="font-size: 20px; margin-top:25px;padding-left:300px;"/><br/>
+                         <span t-esc='o.company_id.street'  style="font-size: 20px; margin-top:1px;padding-left:300px;"/><br/>
+                         <span t-esc='o.company_id.street2' style="font-size: 20px; margin-top:1px;padding-left:300px;"/><br/>
+                         <span t-esc='o.company_id.city' style="font-size: 20px; margin-top:1px;padding-left:300px;"/><br/>
+                         <span t-esc='o.company_id.country_id.name' style="font-size: 20px; margin-top:1px;padding-left:300px;"/><br/>
+                        </div> -->
+                        <p style="text-align: right; font-size:18px">ORIGINAL</p>
+                        <p style="text-decoration: underline; text-align: center; font-size:18px">SALES TAX INVOICE</p>
+                        <div class="row">
+                            <div class="col-6" style="font-size:15px">
                                 <table>
                                     <tbody>
-                                        <tr style="font-weight: bold;">
-                                            <td>Name :</td>
+                                        <tr>
+                                            <td style="font-weight: bold;">Buyer's Name :</td>
                                             <td>
                                                 <span t-field=" o.partner_id.name"/>
                                             </td>
@@ -33,67 +80,75 @@
                             <div class="col-6" style="font-size:15px">
                                 <table>
                                     <tbody>
-                                        <tr style="font-weight: bold;">
-                                            <td>Invoice# :</td>
+                                        <tr>
+                                            <td style="font-weight: bold;">Invoice# :</td>
                                             <td>
+                                                <t t-set="voucher_no" t-value="(o.seq_name).split('/')[0] +'/'+(o.seq_name).split('/')[2]"/>
+                                                <span>
+                                                    <t t-esc="voucher_no"/>
+                                                </span>
                                                 <t t-set="sr_no" t-value="sr_no + 1"/>
-                                                <span><t t-esc="sr_no"/></span>
+                                                <!-- <span><t t-esc="sr_no"/></span> -->
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                       <div class="row">
-                           <div class="col-6" style="font-size:15px">
-                               <table>
-                                   <tbody>
-                                       <tr style="font-weight: bold;">
-                                           <td>Address :</td>
-                                           <td>
-                                               <span t-field=" o.partner_id.street"/>
-                                               <span t-field=" o.partner_id.street2"/>
-                                               <span t-field=" o.partner_id.city"/>
-                                               <span t-field=" o.partner_id.country_id"/>
-                                           </td>
-                                       </tr>
-                                   </tbody>
-                               </table>
-                           </div>
-                           <div class="col-6" style="font-size:15px">
-                               <table>
-                                   <tbody>
-                                       <tr style="font-weight: bold;">
-                                           <td>Date :</td>
-                                           <td>
-                                               <span t-field=" o.invoice_date"/>
-                                           </td>
-                                       </tr>
-                                   </tbody>
-                               </table>
-                           </div>
-                       </div>
-                       <div class="row">
-                           <div class="col-6" style="font-size:15px">
-                               <table>
-                                   <tbody>
-                                       <tr style="font-weight: bold;">
-                                           <td>ST.REG.NO. :</td>
+                        <div class="row">
+                            <div class="col-6" style="font-size:15px">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: bold; white-space:nowrap;">Address :</td>
+                                            <td>
+                                                <span t-field=" o.partner_id.street"/>
+                                                <span t-field=" o.partner_id.street2"/>
+                                                <span t-field=" o.partner_id.city"/>
+                                                <span t-field=" o.partner_id.country_id"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-6" style="font-size:15px">
+                                <table>
+                                    <tbody>
+                                        <tr style="font-weight: bold;">
+                                            <td>Date :</td>
+                                            <td>
+                                                <span t-field=" o.invoice_date"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6" style="font-size:15px">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: bold;">CNIC :</td>
+                                            <td>
+                                                <span t-field=" o.partner_id.nic"/>
+                                            </td>
+                                            <!-- <td>ST.REG.NO. :</td>
                                            <td>
                                              <span t-field=" o.partner_id.strg"/>
-                                           </td>
-                                       </tr>
-                                       <br/>
-                                       <tr style="font-weight: bold;">
-                                           <td>N.T.N :</td>
-                                           <td>
-                                              <span t-field=" o.partner_id.ntn"/>
-                                           </td>
-                                       </tr>
-                                   </tbody>
-                               </table>
-                           </div>
-                           <div class="col-6" style="font-size:15px">
+                                           </td> -->
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <td style="font-weight: bold;">N.T.N:</td>
+                                            <td>
+                                                <span t-field=" o.partner_id.ntn"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- <div class="col-6" style="font-size:15px">
                                <table>
                                    <tbody>
                                        <tr style="font-weight: bold;">
@@ -103,17 +158,19 @@
                                        </tr>
                                    </tbody>
                                </table>
-                           </div>
-                       </div>
-                        <table style="font-size:15px" class="table">
+                           </div> -->
+                        </div>
+                        <table class="table" style="font-size:15px">
                             <thead class="thead-light">
                                 <tr>
-                                    <th style="border: 2px solid black;" scope="col" width="100">QUANTITY</th>
-                                    <th style="border: 2px solid black;" scope="col" width="200">DESCRIPTION OF GOODS</th>
-                                    <th style="border: 2px solid black;" scope="col" width="90">VALUE EXCLUDING TAX</th>
-                                    <th style="border: 2px solid black;" scope="col" width="90">RATE OF SALES TAX(%)</th>
-                                    <th style="border: 2px solid black;" scope="col" width="90">TOTAL SALES TAX PAYABLE</th>
-                                    <th style="border: 2px solid black;" scope="col" width="90">VALUE INCLUDING SALES TAX</th>
+                                    <th scope="col" style="border: 2px solid black;" width="100">Quantity</th>
+                                    <th scope="col" style="border: 2px solid black;" width="200">Description of Goods</th>
+                                    <th scope="col" style="border: 2px solid black;" width="90">Unit Price</th>
+                                    <th scope="col" style="border: 2px solid black;" width="90">Value Excluding Tax</th>
+                                    <th scope="col" style="border: 2px solid black;" width="90">RATE OF SALES TAX(%)</th>
+                                    
+                                    <th scope="col" style="border: 2px solid black;" width="90">Total Sales Tax Payable @18%</th>
+                                    <th scope="col" style="border: 2px solid black;" width="90">Value Including Sales Tax</th>
                                 </tr>
                             </thead>
                             <tbody style="color:black">
@@ -125,101 +182,111 @@
                                 <t t-set="total_val_inc_tax" t-value="0"/>
                                 <t t-set="further_tax" t-value="0"/>
                                 <t t-set="net_invoice_tax" t-value="0"/>
-
-                                <t t-foreach="o.invoice_line_ids" t-as="line">
-                                    <t t-foreach="line.tax_ids" t-as="tax_linea">
+                                <t t-as="line" t-foreach="o.invoice_line_ids">
+                                    <t t-as="tax_linea" t-foreach="line.tax_ids">
                                         <t t-if="tax_linea.amount == 17">
-                                        <t t-set="tax_total_a" t-value="tax_total_a + ((line.price_unit*line.quantity) * tax_linea.amount/100) "/>
+                                            <t t-set="tax_total_a" t-value="tax_total_a + ((line.price_unit*line.quantity) * tax_linea.amount/100) "/>
                                         </t>
                                     </t>
-                                    <t t-foreach="line.tax_ids" t-as="tax_lineb">
+                                    <t t-as="tax_lineb" t-foreach="line.tax_ids">
                                         <t t-if="tax_lineb.amount == 3">
-                                        <t t-set="tax_total_b" t-value="tax_total_b + ((line.price_unit*line.quantity) * tax_lineb.amount/100) "/>
+                                            <t t-set="tax_total_b" t-value="tax_total_b + ((line.price_unit*line.quantity) * tax_lineb.amount/100) "/>
                                         </t>
                                     </t>
                                 </t>
-
-                                <t t-foreach="o.invoice_line_ids" t-as="line">
-
-                                    <tr style="border: 1px solid black;" >
+                                <t t-as="line" t-foreach="o.invoice_line_ids">
+                                    <tr style="border: 1px solid black;">
                                         <td style="border-right: 2px solid black; border-left: 2px solid black;">
                                             <t t-esc="line.quantity"/>
-                                           <t t-esc="line.product_uom_id.name"/>
-                                        </td>
-                                         <td style="border-right: 2px solid black;">
-                                            <t t-esc="line.name"/>
-                                        </td>
-                                          <td style="border-right: 2px solid black;">
-                                            <t t-esc="line.price_unit*line.quantity" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
-                                              <t t-set="total_val_ex_tax" t-value="total_val_ex_tax + (line.price_unit*line.quantity)"/>
+                                            <t t-esc="line.product_uom_id.name"/>
                                         </td>
                                         <td style="border-right: 2px solid black;">
-                                            <t t-foreach="line.tax_ids" t-as="tax_line">
+                                            <t t-esc="line.name"/>
+                                        </td>
+                                        
+                                        
+                                        <td style="border-right: 2px solid black;">
+                                            <t t-esc="line.price_unit"/>
+                                        </td>
+                                        <td style="border-right: 2px solid black;">
+                                            <t t-esc="line.price_unit*line.quantity" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
+                                            <t t-set="total_val_ex_tax" t-value="total_val_ex_tax + (line.price_unit*line.quantity)"/>
+                                        </td>
+                                        <td style="border-right: 2px solid black;">
+                                            <t t-as="tax_line" t-foreach="line.tax_ids">
                                                 <t t-esc="tax_line.name"/>
                                             </t>
-                                        </td >
+                                            
+                                        </td>
                                         <t t-set="sum_tax_amount" t-value="0"/>
                                         <t t-set="tax_amount" t-value="0"/>
-
                                         <td style="border-right:2px solid black;">
-
-                                            <t t-foreach="line.tax_ids" t-as="tax_line">
+                                            <t t-as="tax_line" t-foreach="line.tax_ids">
                                                 <t t-esc="(line.price_unit*line.quantity) * tax_line.amount/100" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
                                                 <t t-set="tax_amount" t-value="(line.price_unit*line.quantity) * tax_line.amount/100"/>
                                                 <t t-set="sum_tax_amount" t-value="sum_tax_amount + tax_amount"/>
-                                                <t t-set="total_sale_tax"
-                                                   t-value="total_sale_tax + ((line.price_unit*line.quantity) * tax_line.amount/100)"/>
-                                                </t>
+                                                <t t-set="total_sale_tax" t-value="total_sale_tax + ((line.price_unit*line.quantity) * tax_line.amount/100)"/>
+                                            </t>
                                         </td>
                                         <td style="border-right: 2px solid black;">
                                             <t t-set="sum_tax_inc_sale" t-value="sum_tax_amount + (line.price_unit*line.quantity)"/>
-                                            <t t-esc="sum_tax_inc_sale"/>
-                                                                    <t t-set="total_val_inc_tax"
-                                                   t-value="total_val_inc_tax + sum_tax_inc_sale"/>
+                                            <t t-esc="'{:,}'.format(int(sum_tax_inc_sale))"/>
+                                            <t t-set="total_val_inc_tax" t-value="total_val_inc_tax + sum_tax_inc_sale"/>
                                         </td>
-
                                     </tr>
                                 </t>
-                                   <tr style="border: 2px solid black;">
-                                        <td style="border: 2px solid black;"></td>
-                                        <td style="border: 2px solid black;"></td>
-                                        <td style="border: 1px solid black;">
-                                            <span t-esc="total_val_ex_tax"/>
-                                        </td>
-                                       <td style="border: 2px solid black;"></td>
-                                        <td style="border: 2px solid black;">
-                                            <span t-esc="total_sale_tax"/>
-                                        </td>
-                                        <td style="border: 2px solid black;">
-                                            <span t-esc="total_val_inc_tax"/>
-                                            <t t-set="further_tax" t-value="total_val_inc_tax * 3/100"/>
-                                            <t t-set="net_invoice_tax" t-value="total_val_inc_tax + further_tax"/>
-                                        </td>
+                                <tr style="border: 2px solid black;">
+                                    <td style="border: 2px solid black;"/>
+                                    <td style="border: 2px solid black;"/>
+                                    <td style="border: 2px solid black;"/>
+                                    <td style="border: 1px solid black;">
+                                        <span t-esc="'{:,.2f}'.format(total_val_ex_tax)"/>
+                                    </td>
+                                    <td style="border: 2px solid black;"/>
+                                    <td style="border: 2px solid black;">
+                                        <span t-esc="'{:,.2f}'.format(total_sale_tax)"/>
+                                    </td>
+                                    <td style="border: 2px solid black;">
+                                        <span t-esc="'{:,}'.format(int(total_val_inc_tax))"/>
+                                        <t t-set="further_tax" t-value="total_val_inc_tax * 3/100"/>
+                                        <t t-set="net_invoice_tax" t-value="total_val_inc_tax + further_tax"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                     <td/>
+                                    <td colspan="2">
+                                          TAX @ 17.00 % 
+                                        <br/>
+                                           FURTHER TAX @ 3.00 % 
+                                        <br/>
+                                           NET INVOICE VALUE
 
-                                    </tr>
-                                     <tr>
-                                         <td></td>
-                                         <td></td>
-                                         <td></td>
-                                         <td colspan="2">
-                                             TAX @ 17.00 % <br/>
-                                             FURTHER TAX @ 3.00 % <br/>
-                                             NET INVOICE VALUE
-
-                                         </td>
-                                         <td style="border: 2px solid black;" scope="col" width="90">
-                                             <span t-esc="tax_total_a" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/><br/>
-                                             <span t-esc="tax_total_b" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/><br/>
-                                             <span t-esc="total_val_inc_tax" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
-                                         </td>
-                                     </tr>
-
+                                         
+                                    </td>
+                                    <td scope="col" style="border: 2px solid black;" width="90">
+                                        <span t-esc="tax_total_a" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
+                                        <br/>
+                                        <span t-esc="tax_total_b" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
+                                        <br/>
+                                        <span t-esc="total_val_inc_tax" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
-                   </div>
-                </t>
+                        <div class="row" style="border-bottom:1px solid black; width:50%;margin-top:100px;font-size:14px; white-space:nowrap;">
+                            <strong>For&#160;<span t-esc="o.env.user.company_id.name"/></strong>
+                            <!-- <div class="col-xs-6"  style="margin-top:330px;"> -->
+                            <!-- <span style="border-top:1px solid black;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span> -->
+                            <!-- </div> -->
+                        </div>
+                    </div>
+                    <!-- <div  style="border-top:1px solid black;">outside page</div> -->
+                    <!-- </t> -->
+                </div>
             </t>
         </t>
     </template>
-
 </odoo>
