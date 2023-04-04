@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+       <!--
+        Resource: res.partner
+        -->
+        <record id="res_partner_clickup" model="res.partner">
+            <field name="name">Clickup</field>
+            <field name="email">clickup@example.com</field>
+            <field name="image_1920" type="base64" file="de_clickup_connector/static/src/img/clickup.png"/>
+        </record>
+        
+    </data>
+</odoo>

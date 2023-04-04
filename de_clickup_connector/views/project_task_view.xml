@@ -1,0 +1,31 @@
+<odoo>
+	<data>
+
+	<record id="project_task_form_view_inherit" model="ir.ui.view">
+		<field name="name">project.task.form</field>
+		<field name="model">project.task</field>
+		<field name="inherit_id" ref="project.view_task_form2" />
+		<field name="arch" type="xml">
+
+			<xpath expr="//notebook" position="inside">
+				<page string="Clickup">
+					<group>
+						<group>
+							<field name="clickup_list_id" required="True"/>
+							<field name="clickup_folder_id"  readonly="True"/>
+							<field name="clickup_task_url" widget="url" readonly="True"/>
+						</group>
+						<group>
+							<field name="clickup_id" readonly="True"/>
+							<field name="clickup_space_id" readonly="True"/>
+							<field name="clickup_team_id" readonly="True"/>
+						</group>
+					</group>
+				</page>
+			</xpath>
+
+		</field>
+	</record>
+
+	</data>
+</odoo>

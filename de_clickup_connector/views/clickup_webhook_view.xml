@@ -1,0 +1,66 @@
+<odoo>
+
+	<record id="view_clickup_webhook_form" model="ir.ui.view">
+		<field name="name">clickup.webhook.form</field>
+		<field name="model">clickup.webhook</field>
+		<field name="arch" type="xml">
+			<form>
+				<sheet>
+					
+                    <div class="oe_title">
+                        <h3>
+                            <group>
+                                <field name="clickup_id" readonly="True"/>
+                                <field name="team_id" readonly="True"/>
+                                <field name="end_point" readonly="True"/>
+                                <field name="status" readonly="True"/>
+                            </group>
+                        </h3>
+                    </div>
+					
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+	<record id="view_clickup_webhook_tree" model="ir.ui.view">
+		<field name="name">clickup.webhook.tree</field>
+		<field name="model">clickup.webhook</field>
+		<field name="arch" type="xml">
+			<tree>
+                <field name="team_id" />
+                <field name="end_point" />
+                <field name="status" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="view_clickup_webhook_search" model="ir.ui.view">
+		<field name="name">clickup.webhook.search</field>
+		<field name="model">clickup.webhook</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="end_point" />
+				<field name="status" />
+			</search>
+		</field>
+	</record>
+
+
+	<record id="action_clickup_webhook_view" model="ir.actions.act_window">
+		<field name="name">Clickup Webhooks</field>
+		<field name="res_model">clickup.webhook</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="view_mode">tree,form</field>
+		<field name="domain">[]</field>
+		<field name="context">{}</field>
+		<field name="search_view_id" ref="view_clickup_webhook_search" />
+		<field name="view_id" ref="view_clickup_webhook_tree" />
+		<field name="help" type="html">
+			<p class="o_view_nocontent_smiling_face">
+				Create Clickup webhooks Here...
+			</p>
+		</field>
+	</record>
+
+</odoo>

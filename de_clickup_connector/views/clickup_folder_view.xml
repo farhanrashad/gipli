@@ -1,0 +1,66 @@
+<odoo>
+
+	<record id="view_clickup_folder_form" model="ir.ui.view">
+		<field name="name">clickup.folder.form</field>
+		<field name="model">clickup.folder</field>
+		<field name="arch" type="xml">
+			<form>
+				<sheet>
+					
+                    <div class="oe_title">
+                        <h3>
+                            <group>
+                                <field name="name" placeholder="Folder One"/>
+                                <field name="clickup_id" readonly="True"/>
+                                <field name="project_id" readonly="True"/>
+                            </group>
+                        </h3>
+                    </div>
+					
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+	<record id="view_clickup_folder_tree" model="ir.ui.view">
+		<field name="name">clickup.folder.tree</field>
+		<field name="model">clickup.folder</field>
+		<field name="arch" type="xml">
+			<tree>
+				<field name="name"/>
+				<field name="clickup_id" />
+				<field name="project_id" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="view_clickup_folder_search" model="ir.ui.view">
+		<field name="name">clickup.folder.search</field>
+		<field name="model">clickup.folder</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="name"/>
+				<field name="clickup_id" />
+				<field name="project_id" />
+			</search>
+		</field>
+	</record>
+
+
+	<record id="action_clickup_folder_view" model="ir.actions.act_window">
+		<field name="name">Clickup Folders</field>
+		<field name="res_model">clickup.folder</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="view_mode">tree,form</field>
+		<field name="domain">[]</field>
+		<field name="context">{}</field>
+		<field name="search_view_id" ref="view_clickup_folder_search" />
+		<field name="view_id" ref="view_clickup_folder_tree" />
+		<field name="help" type="html">
+			<p class="o_view_nocontent_smiling_face">
+				Create Clickup Folders Here...
+			</p>
+		</field>
+	</record>
+
+</odoo>

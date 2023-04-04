@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+1,clickup.config,model_clickup_config,base.group_user,1,1,1,1
+2,clickup.workspace,model_clickup_workspace,base.group_user,1,1,1,1
+3,clickup.list,model_clickup_list,base.group_user,1,1,1,1
+4,clickup.folder,model_clickup_folder,base.group_user,1,1,1,1
+5,clickup.webhook,model_clickup_webhook,base.group_user,1,1,1,1
+

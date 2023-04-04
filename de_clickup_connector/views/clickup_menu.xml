@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="0">
+
+		<menuitem id="clickup_config_menu_root" name="Clickup"
+			parent="project.menu_project_config"
+			sequence="10" />
+			
+		<menuitem id="clickup_config_menu" name="Config"
+			parent="clickup_config_menu_root" action="de_clickup_connector.action_clickup_config_view"
+			sequence="3" />
+			
+		<menuitem id="clickup_folder_menu" name="Folders"
+			parent="clickup_config_menu_root" action="de_clickup_connector.action_clickup_folder_view"
+			sequence="5" />
+			
+		<menuitem id="clickup_list_menu" name="Lists"
+			parent="clickup_config_menu_root" action="de_clickup_connector.action_clickup_list_view"
+			sequence="7" />
+		
+		<menuitem id="clickup_webhook_menu" name="Webhook"
+			parent="clickup_config_menu_root" action="de_clickup_connector.action_clickup_webhook_view"
+			sequence="8" />	
+		
+			
+	</data>
+</odoo>
+

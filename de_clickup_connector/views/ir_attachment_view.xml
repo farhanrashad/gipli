@@ -1,0 +1,19 @@
+<odoo>
+	<data>
+
+	<record id="ir_attachment_form_view_inherit" model="ir.ui.view">
+		<field name="name">ir.attachment.form</field>
+		<field name="model">ir.attachment</field>
+		<field name="inherit_id" ref="base.view_attachment_form" />
+		<field name="arch" type="xml">
+
+			<xpath expr="//field[@name='mimetype']" position="after">
+				<field name="clickup_id" readonly="True"/>
+				<field name="clickup_attachment_url" widget="url" readonly="True"/>
+			</xpath>
+
+		</field>
+	</record>
+
+	</data>
+</odoo>

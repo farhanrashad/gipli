@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="view_clickup_config_form" model="ir.ui.view">
+		<field name="name">clickup.config.form</field>
+		<field name="model">clickup.config</field>
+		<field name="arch" type="xml">
+			<form>
+				<header>
+					<button name='action_validate' string="Validate" type="object" states='draft'
+							class='oe_highlight' />
+					<field name="state" widget="statusbar" statusbar_visible="draft,confirm" />
+				</header>
+
+				<sheet>
+					 <field name="image_1920" widget="image" class="oe_avatar"/>
+					<div class="oe_title">
+                        <h2><field name="name" placeholder="e.g. Clickup Workspace 1" attrs="{'readonly':[('state','=','confirm')]}"/></h2>
+                    </div>
+                        
+					<group string="Configuration">
+						<group>
+							<field name="client_id" required="True" attrs="{'readonly':[('state','=','confirm')]}"/>
+							<field name="client_secret" required="True" attrs="{'readonly':[('state','=','confirm')]}"/>
+							<field name="redirect_url" required="True"/>
+							<field name="code" readonly="True" />
+							<field name="token" readonly="True" />
+							<field name="workspace_id" />
+							<!-- <field name="webhook_end_point" />
+							<field name="webhook_status" />
+							<field name="webhook_clickup_id" /> -->
+							<field name="active" invisible="True"/>
+						</group>
+					</group>
+					
+					<group>
+						<button name='refresh_clickup_code_token' string="Connect" type="object"
+							class='oe_highlight' id="button-pad"/>
+						<button name='get_clickup_workspaces' string="Import Workspaces" type="object"
+							class='oe_highlight' id="button-pad" />
+						<button name='get_clickup_space_projects' string="Import Projects" type="object"
+							class='oe_highlight' id="button-pad" />	
+						<button name='get_clickup_folders' string="Import Folders" type="object"
+							class='oe_highlight' id="button-pad" />
+						<button name='get_clickup_lists' string="Import Lists" type="object"
+							class='oe_highlight' id="button-pad" />
+						<button name='synch_project_tags' string="Synch Tags" type="object"
+							class='oe_highlight' id="button-pad" />
+						<button name='get_clickup_team_tasks' string="Import Tasks" type="object"
+							class='oe_highlight' id="button-pad" />		
+						<button name='get_task_comments' string="Import Task Comments" type="object"
+							class='oe_highlight' id="button-pad" />	
+						<button name='push_task_comments' string="Export Task Comments" type="object"
+							class='oe_highlight' id="button-pad" />
+						<button name='import_webhooks' string="Import Webhook" type="object"
+							class='oe_highlight' id="button-pad" />	
+						<button name='create_webhook' string="Create Webhook" type="object"
+							class='oe_highlight' id="button-pad" />	
+						
+						
+						
+					</group>
+				
+				</sheet>
+				
+				<style>
+				    #button-pad {
+				        margin-right:5px;
+				        margin-bottom:5px;
+				        margin-top:5px;
+				        width: 250px;
+				    }
+				</style>
+			
+			</form>
+		</field>
+	</record>
+
+
+	<record id="view_clickup_config_tree" model="ir.ui.view">
+		<field name="name">clickup.config.tree</field>
+		<field name="model">clickup.config</field>
+		<field name="arch" type="xml">
+			<tree>
+				<field name="name" />
+				<field name="workspace_id" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="view_clickup_config_search" model="ir.ui.view">
+		<field name="name">clickup.config.search</field>
+		<field name="model">clickup.config</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="client_id" />
+				<field name="client_secret" />
+				<field name="code"  />
+				<field name="token"  />
+			</search>
+		</field>
+	</record>
+
+
+	<record id="action_clickup_config_view"
+		model="ir.actions.act_window">
+		<field name="name">Clickup Configuration</field>
+		<field name="res_model">clickup.config</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="view_mode">tree,form</field>
+		<field name="domain">[]</field>
+		<field name="context">{}</field>
+		<field name="search_view_id" ref="view_clickup_config_search" />
+		<field name="view_id" ref="view_clickup_config_tree" />
+		<field name="help" type="html">
+			<p class="o_view_nocontent_smiling_face">
+				No Clickup Configuration Found, Let's Create one.....
+			</p>
+		</field>
+	</record>
+
+
+</odoo>
+
+

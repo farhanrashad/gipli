@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="res_config_settings_view_formclickup" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.project.clickup</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="50"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form" />
+            <field name="arch" type="xml">
+            
+            <xpath expr="//div[@name='project_time']" position="after">
+                        <h2>Clickup</h2>
+                        <div class="row mt16 o_settings_container" name="project_clickup">
+                            <div class="col-12 col-lg-6 o_setting_box" name="project_time_management">
+                                <div class="o_setting_left_pane">
+                                    <field name="module_project_forecast" widget="upgrade_boolean"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="module_project_forecast"/>
+                                    <div class="text-muted" name="project_forecast_msg">
+                                        Connect with Clickup
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                </xpath>
+            </field>
+        </record>
+
+</odoo>
