@@ -1,0 +1,44 @@
+<odoo>
+
+    <template id="sucess_message" name="Connection Success">
+        <div class="sucess class"
+             style="font-size:3em; text-align:center; background:#48bb3e; width: 300px; height: 300px; display: flex;
+                    align-items: center; justify-content: center; border-radius: 50%; flex-direction: column;
+                    color: white; margin: auto; margin-top: calc(50vh - 150px);">
+              <span class="tick" style="font-size: 90px;
+                            line-height: 1;
+                            margin-bottom: -30px;" >
+                  &#10004;
+              </span>
+              <span>Congrats Success!</span>
+
+        </div>
+        <script>
+            setTimeout(function(){
+                window.location.href = '/';
+            }, 1100)
+        </script>
+    </template>
+
+    <template id="failed_message" name="Connection Failed">
+         <div class="failed class"
+             style="font-size:3em; text-align:center; background:#FF4645; width: 300px; height: 300px; display: flex;
+                    align-items: center; justify-content: center; border-radius: 50%; flex-direction: column;
+                    color: white; margin: auto; margin-top: calc(50vh - 150px);">
+              <span class="tick" style="font-size: 90px;
+                            line-height: 1;
+                            margin-bottom: -11px" >
+                  &#10005;
+              </span>
+              <span>Failed!</span>
+        </div>
+        <script>
+            setTimeout(function(){
+                window.location.href = '/';
+            }, 1100)
+        </script>
+    </template>
+
+</odoo>
+
+
