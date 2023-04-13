@@ -1,0 +1,303 @@
+<odoo>
+  <data>
+      <record id="emp_week_off_tree_view" model="ir.ui.view">
+            <field name="name">emp_week_off tree</field>
+            <field name="model">emp.weekoff</field>
+            <field name="arch" type="xml">
+                <tree string="Employee weekoff" editable="top">
+                    <field name="name"/> 
+                    <field name="day_no"/>
+                </tree>
+            </field>
+        </record>
+         <record id="action_emp_week_off" model="ir.actions.act_window">
+            <field name="name">Employee Week off</field>
+            <field name="res_model">emp.weekoff</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="emp_week_off_tree_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a new record
+                </p>
+            </field>
+        </record>
+        <menuitem id="emp_shift_mangement_menu_root"
+            name="Shift Scheduling"
+            parent="hr.menu_hr_root"
+            sequence="8"/>
+               
+        <menuitem id="menu_emp_shift_scheduling" name="Employee Weekoffs" action="action_emp_week_off" parent="emp_shift_mangement_menu_root"/>
+         
+       <record id="shift_type_tree_view" model="ir.ui.view">
+            <field name="name">shift type tree</field>
+            <field name="model">shift.type</field>
+            <field name="arch" type="xml">
+                <tree string="Shift type" editable="top">
+                    <field name="name"/> 
+                    <field name="work_hours"/>
+                </tree>
+            </field>
+        </record>
+         <record id="action_shift_type" model="ir.actions.act_window">
+            <field name="name">Shift Type</field>
+            <field name="res_model">shift.type</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="shift_type_tree_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a new record
+                </p>
+            </field>
+        </record>  
+        
+        <menuitem id="menu_shift_type" name="Shift Type" action="action_shift_type" parent="emp_shift_mangement_menu_root"/>
+        
+        
+         <record id="employee_shift_form_view" model="ir.ui.view">
+            <field name="name">employee.shift.form_view</field>
+            <field name="model">emp.shift</field>
+            <field name="arch" type="xml">
+                <form string="Employee Shift">
+                   <sheet>
+                        <div name="button_box" position="inside">
+                            <field name="related_weekoff_count" invisible="1"/>
+                            <button name="action_related_weekoff"
+                                class="oe_stat_button"
+                                icon="fa-pencil-square-o"
+                                type="object"
+                                attrs="{'invisible': [('related_weekoff_count', '=', 0)]}">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value"><field name="related_weekoff_count"/></span>
+                                    <span class="o_stat_text">Weekoff</span>
+                                </div>
+                            </button>
+                        </div>
+                
+                   
+                   
+                        <h1>
+                           <field name="name" />
+                        </h1>
+                        <group>
+                            <group>
+                                <field name="shift_id"/>
+                                <field name="time_from"/>
+                                <field name="time_to"/>
+                                <!-- <field name="time_from"  widget="float_time"/>
+                                <field name="time_to"  widget="float_time"/> -->
+                                <field name="user_id"/>
+                            </group>
+                            
+                            <group>
+                                <field name="resource_calendar_id"/>
+                                <field name="over_time_threshold"/>
+                                <field name="late_threshold"/>
+                                <field name="company_id"/>
+                            </group>
+                        </group>     
+                   </sheet>
+                </form>
+            </field>
+        </record>
+        
+        
+        <record id="employee_shift_tree_view" model="ir.ui.view">
+            <field name="name">emp shift tree view</field>
+            <field name="model">emp.shift</field>
+            <field name="arch" type="xml">
+                <tree string="Employee Shifts">
+                    <field name="name"/> 
+                    <field name="shift_id"/>
+                    <field name="time_from"/>
+                    <field name="time_to"/>
+                    <field name="user_id"/>
+                </tree>
+            </field>
+        </record>
+        
+       
+
+        
+        
+        
+        
+        
+        
+    <record id="employee_shifts_kanban_view" model="ir.ui.view">
+        <field name="name">employee.shifts.kanban</field>
+        <field name="model">emp.shift</field>
+        <field name="arch" type="xml">
+            <kanban sample="1" class="o_kanban_product_template">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="resource_calendar_id"/>
+                <field name="time_from"/>
+                <field name="time_to"/>
+                <field name="user_id"/>
+                 <field name="company_id"/>
+                <!-- <progressbar field="activity_state" colors='{"planned": "success", "today": "warning", "overdue": "danger"}'/> -->
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top mb-0">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="priority" widget="priority"/><field name="name"/>
+                                        </strong>
+                                    </div>
+                                    
+                                </div>
+                                <t t-if="record.resource_calendar_id">
+                                     Working Hours : <field name="resource_calendar_id"/>
+                                </t>
+                                <div>
+                                    Time:<span t-esc="record.time_from.raw_value"/> to <span t-esc="record.time_to.raw_value"/> 
+                                 </div>
+                                <div>
+                                    Responsible: <field name="user_id"/>
+                                </div>
+                                
+                                <div>
+                                    Company: <field name="company_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+        <record id="action_emp_shift" model="ir.actions.act_window">
+            <field name="name">Employee shifts</field>
+            <field name="res_model">emp.shift</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_id" ref="employee_shift_tree_view"/>
+            <!-- <field name="view_id" ref="employee_shifts_kanban_view"/> -->
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a new record
+                </p>
+            </field>
+        </record>  
+        
+        
+         <menuitem id="menu_emp_shift" name="Shifts" action="action_emp_shift" parent="emp_shift_mangement_menu_root" groups="hr.group_hr_user,hr.group_hr_manager"/>
+         
+         
+         
+         <record id="emp_shift_days_tree_view" model="ir.ui.view">
+            <field name="name">emp_shift_days tree</field>
+            <field name="model">shift.days</field>
+            <field name="arch" type="xml">
+                <tree string="Employee shift days" editable="top">
+                    <field name="employee_id"/> 
+                    <field name="date_of_week"/>
+                    <field name="shift_id"/>
+                    <field name="department_id"/>
+                    <field name="user_id"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="emp_shift_days_calendar_view" model="ir.ui.view">
+            <field name="name">emp.shift.days.calendar.view</field>
+            <field name="model">shift.days</field>
+            <field name="arch" type="xml">
+                <calendar
+                    string="Employee Shifts days"
+                    date_start="date_of_week"
+                  
+                    mode="month"
+                    quick_add="False"
+                    color="employee_id"
+                   >
+                  
+                    <field name="department_id" filters="1" />
+                    <field name="employee_id" filters="1" />
+                    <field name="shift_id" filters="1" />
+                </calendar>
+            </field>
+       </record>
+        
+        
+        
+         <record id="action_emp_shift_days" model="ir.actions.act_window">
+            <field name="name">Employee shift days</field>
+            <field name="res_model">shift.days</field>
+            <field name="view_mode">tree,calendar</field>
+            <field name="view_id" ref="emp_shift_days_tree_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a new record
+                </p>
+            </field>
+        </record>
+         
+            <menuitem id="menu_emp_shift_days" name="Employee Shift Days" action="action_emp_shift_days" parent="emp_shift_mangement_menu_root"/>
+        
+        
+        
+         <record id="emp_shift_offdays_tree_view" model="ir.ui.view">
+            <field name="name">emp_shift_offdays tree</field>
+            <field name="model">shift.offdays</field>
+            <field name="arch" type="xml">
+                <tree string="Employee shift days" editable="top">
+                    <field name="employee_id"/> 
+                    <field name="date_of_week"/>
+                    <field name="day_of_week"/>
+                     <field name="user_id"/>
+                    <field name="shift_id"/>
+                </tree>
+            </field>
+        </record>
+        
+        
+         <record id="emp_shift_offdays_calendar_view" model="ir.ui.view">
+            <field name="name">emp.shift.offdays.calendar.view</field>
+            <field name="model">shift.offdays</field>
+            <field name="arch" type="xml">
+                <calendar
+                    string="Employee Shifts offdays"
+                    date_start="date_of_week"
+                  
+                    mode="month"
+                    quick_add="False"
+                    color="employee_id"
+                   >
+                  
+                    <field name="day_of_week" filters="1" />
+                    <field name="employee_id" filters="1" />
+                    <field name="shift_id" filters="1" />
+                </calendar>
+            </field>
+       </record>
+        
+        
+        
+        
+         <record id="action_emp_shift_offdays" model="ir.actions.act_window">
+            <field name="name">Employee shift offdays</field>
+            <field name="res_model">shift.offdays</field>
+            <field name="view_mode">tree,calendar</field>
+            <field name="view_id" ref="emp_shift_offdays_tree_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a new record
+                </p>
+            </field>
+        </record>
+         
+            <menuitem id="menu_emp_shift_offdays" name="Employee Shift OffDays" action="action_emp_shift_offdays" parent="emp_shift_mangement_menu_root"/>
+   
+        
+        
+        
+        
+        
+        
+         
+  </data>
+</odoo>  

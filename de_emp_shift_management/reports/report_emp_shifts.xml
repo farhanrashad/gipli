@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><odoo>
+    <data>
+        <record id="action_report_emp_shift_xlsx" model="ir.actions.report">
+            <field name="name">Employee shifts xlsx report</field>
+            <field name="model">employee.shift.alloc</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">de_emp_shift_management.employee_shift_report_xlsx</field>
+            <field name="report_file">de_emp_shift_management.employee_shift_report_xlsx</field>
+        </record>
+        <record id="action_report_emp_shift_pdf" model="ir.actions.report">
+            <field name="name">Employee shifts pdf report</field>
+            <field name="model">employee.shift.alloc</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_emp_shift_management.employee_shift_report_pdf</field>
+            <field name="report_file">de_emp_shift_management.employee_shift_report_pdf</field>
+        </record>
+        <template id="employee_shift_report_pdf">
+           <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row" style="text-align:center; font-size:28px;">
+                            <div class="col-xs-12">
+                                <strong style="width:100%;">Shift Allocation</strong>
+                            </div>
+                        </div>
+                        <br/>
+                        <t t-foreach="emp_recs"  t-as="emp_rec">
+                            <div class="row">
+                               <div class="col-xs-6" style="width:50%;">
+                                  <strong style="font-size:30px;">Employee:</strong>
+                                  <span  style="font-size:30px;" t-esc="emp_rec.employee_id.name"/>
+                                  <br/>
+                                   <strong  style="font-size:30px;">Shift:</strong>
+                                  <span  style="font-size:30px;" t-esc="emp_rec.shift_id.name"/>
+                               </div>
+                               
+                               <div class="col-xs-6">
+                                  <strong  style="font-size:30px;">From:</strong>
+                                  <span  style="font-size:25px;" t-esc="emp_rec.date_from"/>
+                                  <br/>
+                                   <strong  style="font-size:30px;">To:</strong>
+                                  <span  style="font-size:25px;" t-esc="emp_rec.date_to"/>
+                               </div>
+                            </div>
+                            
+                            <br/>
+                            <br/>
+                             <div style="text-align:center;">
+                                <strong style="font-size:25px;">Weekends</strong>
+                            </div>
+                            <div class="row">
+                                <table class="table table-condensed" style="border-collapse: collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left" style="border:1px solid black;width:50%;font-size:22px;">
+                                                <span>Date</span>
+                                            </th> 
+                                            <th class="text-center" style="border:1px solid black;font-size:22px;">
+                                                <span>Day</span>
+                                            </th>
+                                          
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="emp_rec.shift_offdays_line" t-as="offday_line">
+                                          
+                                            <tr>
+                                                <td class="text-left" style="border:1px solid black;font-size:22px;">
+                                                    <span t-esc="offday_line.date_of_week"/>
+                                                </td>
+                                                <td class="text-center" style="border:1px solid black;font-size:22px;">
+                                                    <span t-esc="offday_line.day_of_week.name"/>
+                                                </td>
+                                               
+                                            </tr>
+                                       </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br/>
+                            <div style="text-align:center;">
+                                <strong style="font-size:25px;">Working days</strong>
+                            </div>
+                            <br/>
+                           
+                             <div class="row">
+                                <table class="table table-condensed" style="border-collapse: collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left" style="border:1px solid black;width:50%;font-size:22px;">
+                                                <span>Date</span>
+                                            </th> 
+                                            <th class="text-center" style="border:1px solid black;font-size:22px;">
+                                                <span>Shift</span>
+                                            </th>
+                                          
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="emp_rec.shift_days_line" t-as="workday_line">
+                                          
+                                            <tr>
+                                                <td class="text-left" style="border:1px solid black;font-size:22px;">
+                                                    <span t-esc="workday_line.date_of_week"/>
+                                                </td>
+                                                <td class="text-center" style="border:1px solid black;font-size:22px;">
+                                                    <span t-esc="workday_line.shift_id.name"/>
+                                                </td>
+                                               
+                                            </tr>
+                                       </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div style="page-break-after:always;"></div>
+                            
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

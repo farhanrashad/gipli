@@ -1,0 +1,53 @@
+<odoo>
+  <data> 
+      <record id="create_bulk_shifts_wizard_form" model="ir.ui.view">
+            <field name="name">bulk shifts wizard Form View</field>
+            <field name="model">wizard.shift.alloc</field>
+            <field name="arch" type="xml">
+                <form string="Create Bulk Shift Allocations">
+                
+                   <group>
+                        <field name="shift_id"/>
+                        <field name="shift_type_id"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                       
+                       <field name= "description"/>
+                       
+                        <notebook>
+                            <page string="Employess" name="employess_rec">
+                              
+                              
+                                    <field name = "employee_ids" widget="many2many_tags" />
+                                     <!-- widget="many2many_tags"/> -->
+                                  
+                            </page>
+                        </notebook>       
+                    </group>
+                    <footer>
+                        <button name="create_shifts" type="object" string="Create" class="btn-primary"/>
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+             </field> 
+        </record>   
+        
+        
+        
+        
+          <record id="bulk_shift_wizard_action" model="ir.actions.act_window">
+            <field name="name">Create bulk Shift Allocation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.shift.alloc</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="create_bulk_shifts_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+        
+        <menuitem id="menu_bulk_shift_wizard" 
+                  action="bulk_shift_wizard_action"
+                  parent="emp_shift_mangement_menu_root"
+                  groups="hr.group_hr_user,hr.group_hr_manager" />
+        
+  </data>
+</odoo>  

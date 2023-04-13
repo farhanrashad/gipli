@@ -1,0 +1,40 @@
+<odoo>
+  <data> 
+      <record id="wizard_report_emp_shift_form_view" model="ir.ui.view">
+            <field name="name">wizard report empshift Form View</field>
+            <field name="model">wizard.report.emp.shift</field>
+            <field name="arch" type="xml">
+                <form string="print pdf and xlsx report">
+                
+                   <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <footer>
+                        <button name="get_emp_pdf_report" type="object" string="print pdf" class="btn-primary"/>
+                        <button name="get_emp_xlsx_report" type="object" string="print xlsx" class="btn-primary"/>
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+             </field> 
+        </record>   
+        
+        
+        
+        
+          <record id="wizard_report_emp_shift_action" model="ir.actions.act_window">
+            <field name="name">Employee Allocation Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.report.emp.shift</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_report_emp_shift_form_view"/>
+            <field name="target">new</field>
+        </record>
+        
+        <menuitem id="menu_wizard_report_emp_shift_" 
+                  action="wizard_report_emp_shift_action"
+                  parent="emp_shift_mangement_menu_root"
+                  groups="hr.group_hr_user,hr.group_hr_manager" />
+        
+  </data>
+</odoo>  
