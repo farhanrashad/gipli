@@ -188,8 +188,7 @@ class CustomerPortal(portal.CustomerPortal):
                                     primary_template += "<select id='" + name + "' name='" + field.field_name + "' required='" + required + "'class='mb-2 selection-search form-control'" +  " onchange=check_list(this); >"
                                 else:
                                     primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='mb-2 selection-search form-control'>"
-                                    if field.is_required:
-                                        primary_template += "<option value='' >Select </option>"
+                                    primary_template += "<option value='' >Select </option>"
 
                                 for m in m2o_id:
                                     primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
