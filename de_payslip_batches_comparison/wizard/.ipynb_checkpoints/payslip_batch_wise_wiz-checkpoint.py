@@ -6,8 +6,8 @@ class PayslipBatchWise(models.TransientModel):
     _name = 'pay.slip.report.wizard'
     _description = 'Employee Batch Wise Salary'
 
-    from_batch_id = fields.Many2one('hr.payslip.run', string='From Batch')
-    to_batch_id = fields.Many2one('hr.payslip.run', string='To Batch')
+    from_batch_id = fields.Many2one('hr.payslip.run', string='Previous Batch')
+    to_batch_id = fields.Many2one('hr.payslip.run', string='Current Batch')
     
     company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env.company, required=True)
 
