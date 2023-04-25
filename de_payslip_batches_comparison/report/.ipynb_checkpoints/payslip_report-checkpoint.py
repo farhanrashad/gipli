@@ -75,7 +75,8 @@ class PayslipReport(models.AbstractModel):
         
         # Employees Data
         query = '''
-        select a.emp_id, a.emp_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
+        select ROW_NUMBER() OVER( ORDER BY 1) as sr_no, 
+            a.emp_id, a.emp_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
             sum(batch1_total - batch2_total) as batch_diff
             from (
                 select e.id as emp_id, e.name as emp_name, l.total as batch1_total, 0 as batch2_total 

@@ -181,7 +181,7 @@
                         </thead>
                         <tbody class="reconcilation_tbody">
                             <tr t-foreach="rs_employees" t-as="emp">
-                                <td><span t-esc="emp['emp_name']"/></td>
+                                <td><span t-esc="emp['sr_no']"/></td>
                                 <td><span t-esc="emp['emp_name']"/></td>
                                 <td><span t-esc="emp['emp_name']"/></td>
                                 <td><span t-esc="emp['emp_name']"/></td>
