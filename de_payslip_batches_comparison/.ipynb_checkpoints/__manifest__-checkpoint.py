@@ -25,6 +25,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+
         'wizard/payslip_batch_wise_report.xml',
         'report/reports.xml',
         'report/payslip_report_template.xml',
