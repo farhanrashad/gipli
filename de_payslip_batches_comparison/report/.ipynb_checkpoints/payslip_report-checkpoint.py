@@ -16,31 +16,93 @@ class PayslipReport(models.AbstractModel):
         
         #Comparison
         query = '''
-        select a.rule_id, a.rule_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total from 
-        (
+        select a.rule_id, a.rule_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
+            sum(batch1_total-batch2_total) as batch_diff
+        FROM (
             select r.id as rule_id, r.name as rule_name, l.total as batch1_total, 0 as batch2_total 
             from hr_payslip_run b
             join hr_payslip p on p.payslip_run_id = b.id
             join hr_payslip_line l on l.slip_id = p.id 
             join hr_salary_rule r on l.salary_rule_id = r.id 
-            where b.company_id= %(company_id)s and b.id = %(from_batch_id)s
+            where b.company_id = %(company_id)s and b.id = %(from_batch_id)s
             union all 
             select r.id as rule_id, r.name as rule_name, 0 as batch1_total, l.total as batch2_total
             from hr_payslip_run b
             join hr_payslip p on p.payslip_run_id = b.id
             join hr_payslip_line l on l.slip_id = p.id 
             join hr_salary_rule r on l.salary_rule_id = r.id 
-            where b.company_id= %(company_id)s and b.id = %(to_batch_id)s
+            where b.company_id = %(company_id)s and b.id = %(to_batch_id)s
         ) a 
         group by a.rule_id, a.rule_name
         '''
         args = {
-            'company_id': data['company_id'],
-            'from_batch_id': data['from_batch_id'],
-            'to_batch_id': data['to_batch_id'],
+            'company_id': data['form']['company_id'],
+            'from_batch_id': data['form']['from_batch_id'],
+            'to_batch_id': data['form']['to_batch_id'],
         }
-        self.env.cr.execute(query)
+        self.env.cr.execute(query, args)
         rs_rules = self._cr.dictfetchall()
+        
+        # Deductions
+        query = '''
+        select a.rule_id, a.rule_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
+            sum(batch1_total-batch2_total) as batch_diff
+        FROM (
+            select r.id as rule_id, r.name as rule_name, l.total as batch1_total, 0 as batch2_total 
+            from hr_payslip_run b
+            join hr_payslip p on p.payslip_run_id = b.id
+            join hr_payslip_line l on l.slip_id = p.id 
+            join hr_salary_rule r on l.salary_rule_id = r.id 
+            where b.company_id = %(company_id)s and b.id = %(from_batch_id)s
+            union all 
+            select r.id as rule_id, r.name as rule_name, 0 as batch1_total, l.total as batch2_total
+            from hr_payslip_run b
+            join hr_payslip p on p.payslip_run_id = b.id
+            join hr_payslip_line l on l.slip_id = p.id 
+            join hr_salary_rule r on l.salary_rule_id = r.id 
+            where b.company_id = %(company_id)s and b.id = %(to_batch_id)s
+        ) a 
+        group by a.rule_id, a.rule_name
+        '''
+        args = {
+            'company_id': data['form']['company_id'],
+            'from_batch_id': data['form']['from_batch_id'],
+            'to_batch_id': data['form']['to_batch_id'],
+        }
+        self.env.cr.execute(query, args)
+        rs_ded_rules = self._cr.dictfetchall()
+        
+        
+        # Employees Data
+        query = '''
+        select a.emp_id, a.emp_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
+            sum(batch1_total - batch2_total) as batch_diff
+            from (
+                select e.id as emp_id, e.name as emp_name, l.total as batch1_total, 0 as batch2_total 
+                from hr_payslip_run b
+                join hr_payslip p on p.payslip_run_id = b.id
+                join hr_payslip_line l on l.slip_id = p.id 
+                join hr_employee e on p.employee_id = e.id
+                where b.company_id = %(company_id)s and b.id = %(from_batch_id)s
+                union all 
+                select e.id as emp_id, e.name as emp_name, l.total as batch1_total, 0 as batch2_total 
+                from hr_payslip_run b
+                join hr_payslip p on p.payslip_run_id = b.id
+                join hr_payslip_line l on l.slip_id = p.id 
+                join hr_employee e on p.employee_id = e.id
+                where b.company_id = %(company_id)s and b.id = %(to_batch_id)s
+            ) a
+            group by a.emp_id, a.emp_name
+            having sum(batch1_total - batch2_total) != 0
+        '''
+        args = {
+            'company_id': data['form']['company_id'],
+            'from_batch_id': data['form']['from_batch_id'],
+            'to_batch_id': data['form']['to_batch_id'],
+        }
+        self.env.cr.execute(query, args)
+        rs_employees = self._cr.dictfetchall()
+        
         
         
         batch_1 = self.env['hr.payslip.run'].browse(data['form']['from_batch_id'])
@@ -150,27 +212,7 @@ class PayslipReport(models.AbstractModel):
             'from_batch_id': from_batch_id,
             'to_batch_id': to_batch_id,
             'rs_rules': rs_rules,
-            'batch_name': batch_1.name,
-            'batch_name_2': batch_2.name,
-            'employee_count': len(employees_batch_1),
-            'employee_count_2': len(employees_batch_2),
-            'total_net_salary': sum(batch_1.slip_ids.mapped('net_wage')),
-            'total_net_salary_2': sum(batch_2.slip_ids.mapped('net_wage')),
-            'net_salary_diff': net_salary_diff,
-            'total_basic_salary': total_basic_salary,
-            'total_basic_salary_1': total_basic_salary_1,
-            'basic_salary_diff': basic_salary_diff,
-            'allowance_dict': allowance_dict,
-            'batch_dict': batch_dict,
-            'batch_ded_dict': batch_ded_dict,
-            'deduction_dict': deduction_dict,
-            'diff_dict': diff_dict,
-            'diff_deduction_total': diff_deduction_total,
-            'deduction_1': deduction_1,
-            'allow_dedud': allow_dedud,
-            'data': data,
-            'data1': data1,
-            'data2': data2,
-            'employees': employees_batch_1,
+            'rs_employees': rs_employees,
+            'currency': self.env.company.currency_id.name,
         }
         return report_data

@@ -12,18 +12,17 @@
                     <div class="oe_structure"/>
                     <div class='pull-left' style='color:blue;'>
                         <h5>Payroll Reconciliation Report</h5>
-                        Period <t t-esc="from_batch_id.name"/>
+                        Period <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
                         and
-                        <t t-esc="to_batch_id.name"/>
+                        <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
                     </div>
                     <div class='pull-right' style="max-width: 250px;height: 20px; color:blue;">
                         <strong>Printed On:</strong>
                         <span t-esc="datetime.datetime.strptime(str(datetime.datetime.now()+ relativedelta(hours =+ 5)), '%Y-%m-%d %H:%M:%S.%f').strftime('%d-%b-%y %H:%M %p')"/>
                         <br/>
-                        <strong>Printed By:</strong>
-                        <span t-esc="user.name"/>
+                        <strong>Printed By:</strong><span t-esc="user.name"/>
                         <br/>
-                        <strong>Currency:</strong>
+                        <strong>Currency:</strong><span t-esc="currency"/>
                         <!--                        <span t-esc="docs.company_id.currency_id.name"/>-->
                     </div>
 
@@ -39,19 +38,20 @@
 
                             <tr>
                                 <td>
-                                    Net salary of <span t-esc="len(from_batch_id.slip_ids)"/> employees for <span t-esc="from_batch_id.name"/>
+                                    Net salary of <span t-esc="len(from_batch_id.slip_ids)"/> employees for  <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
                                 </td>
                                 <td>
-                                    <span t-esc="sum(from_batch_id.slip_ids.mapped('net_wage'))"/>
+                                    <span t-esc="'{0:,}'.format(int(round(sum(from_batch_id.slip_ids.mapped('net_wage')))))"/>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    Net salary of <span t-esc="len(to_batch_id.slip_ids)"/> employees for <span t-esc="to_batch_id.name"/>
+                                    Net salary of <span t-esc="len(to_batch_id.slip_ids)"/> employees for <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
 
                                 </td>
                                 <td>
-                                    <span t-esc="sum(to_batch_id.slip_ids.mapped('net_wage'))"/>
+                                    <span t-esc="'{0:,}'.format(int(round(sum(to_batch_id.slip_ids.mapped('net_wage')))))"/>
+                                    
                                 </td>
                             </tr>
                             <tr>
@@ -59,352 +59,66 @@
                                     Net Change: Increase / (Decrease)
                                 </td>
                                 <td>
-                                    <t t-esc="sum(from_batch_id.slip_ids.mapped('net_wage'))-sum(to_batch_id.slip_ids.mapped('net_wage'))"/>
+                                    <span t-esc="'{0:,}'.format(int(round(sum(from_batch_id.slip_ids.mapped('net_wage'))-sum(to_batch_id.slip_ids.mapped('net_wage')))))"/>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                     <br/>
                     <p style='color:blue;'>Reasons of change in Net Salary Payable</p>
-                    <div class="row no-gutters">
-                        <div class="col-5">
                             <table class="table table-sm table-striped table-bordered">
                                 <thead>
                                     <th style='color:blue;'>Compensation</th>
-                                    <th style='color:blue;'>Batch 1</th>
-                                    <th style='color:blue;'>Batch 2</th>
+                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/></th>
+                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/></th>
                                     <th style='color:blue;'>Curr-Prv</th>
                                 </thead>
                                 <tbody class="reconcilation_tbody">
+                                    <t t-set="sum_batch1" t-value="0"/>
+                                    <t t-set="sum_batch2" t-value="0"/>
                                     <tr t-foreach="rs_rules" t-as="rule">
-                                        <td><span t-esc="rule['name']"/></td>
-                                        <td><span t-esc="rule['name']"/></td>
-                                        <td><span t-esc="rule['name']"/></td>
-                                        <td><span t-esc="rule['name']"/></td>
+                                        <td><span t-esc="rule['rule_name']"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch1_total'])))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch2_total'])))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch_diff'])))"/></td>
+                                        <t t-set="sum_batch1" t-value="sum_batch1 + rule['batch1_total']"/>
+                                        <t t-set="sum_batch2" t-value="sum_batch2 + rule['batch2_total']"/>
+                                    </tr>
+                                    <tr>
+                                        <td/>
+                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch1)))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch2)))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch1-sum_batch2)))"/></td>
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                    <div class="row no-gutters">
-                        <div class="col-5">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            <t t-esc="batch_name"/>
-                                            (Compensation)
-                                        </th>
-                                        <th style='color:blue;'>
-                                            <t t-esc="batch_name"/>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="reconcilation_tbody">
-                                    <tr>
-                                        <td>
-                                            Base Salary
-                                        </td>
-                                        <td>
-                                            <t t-esc="total_basic_salary"/>
-                                        </td>
-                                    </tr>
-                                    <t t-set="total_allowances" t-value="0"/>
-                                    
-                                    <t t-foreach="batch_dict.items()" t-as="item">
-                                        <tr>
-                                            <td>
-                                                <span t-esc="item[0]"/>
-                                            </td>
-                                            <td>
-                                                <span t-esc="item[1]"/>
-                                                <t t-set="total_allowances"
-                                                   t-value="total_allowances + item[1]"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                            <strong>
-                                                <t t-esc="total_allowances + total_basic_salary"/>
-                                            </strong>
-                                        </td>
-                                    </tr>
-                                </tbody>
-
-                            </table>
-                        </div>
-                        <div class="col-5">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            <span t-esc="batch_name_2"/>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="reconcilation_tbody">
-                                    <tr>
-                                        <td>
-                                            <t t-esc="total_basic_salary_1"/>
-                                        </td>
-                                    </tr>
-                                    <t t-set="total_allowances" t-value="0"/>
-                                    <t t-foreach="allowance_dict.items()" t-as="item">
-                                        <tr>
-                                            <td>
-                                                <span t-esc="item[1]"/>
-                                                <t t-set="total_allowances"
-                                                   t-value="total_allowances + item[1]"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <tr>
-                                        <td>
-                                            <strong>
-                                                <t t-esc="total_allowances + total_basic_salary_1"/>
-                                            </strong>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-2">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style='color:blue;'>Curr-Prev</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="reconcilation_tbody">
-                                    <tr>
-                                        <td>
-                                            <t t-esc="basic_salary_diff"/>
-                                        </td>
-                                    </tr>
-                                    <t t-set="diff_allowance" t-value="0"/>
-                                    <t t-foreach="diff_dict.items()" t-as="item">
-                                        <tr>
-                                            <td>
-                                                <span t-esc="item[1]"/>
-                                                <t t-set="diff_allowance"
-                                                   t-value="diff_allowance + item[1]"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            Total A:
-                                            <t t-esc="diff_allowance"/>
-                                        </th>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                    </div>
                     <br/>
-                    <div class="row no-gutters">
-                        <div class="col-5">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
+                            <table class="table table-sm table-striped table-bordered">
                                 <thead>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            <t t-esc="batch_name"/>
-                                            (Deductions)
-                                        </th>
-                                        <th style='color:blue;'>
-                                            <t t-esc="batch_name"/>
-                                        </th>
-                                    </tr>
+                                    <th style='color:blue;'>Deductions</th>
+                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/></th>
+                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/></th>
+                                    <th style='color:blue;'>Curr-Prv</th>
                                 </thead>
                                 <tbody class="reconcilation_tbody">
-                                    <t t-set="deduction_total" t-value="0"/>
-                                    <t t-foreach="batch_ded_dict.items()" t-as="item">
-                                        <tr>
-                                            <td>
-                                                <span t-esc="item[0]"/>
-                                            </td>
-                                            <td>
-                                                <span t-esc="item[1]"/>
-                                                <t t-set="deduction_total"
-                                                   t-value="deduction_total + item[1]"/>
-                                            </td>
-                                        </tr>
-                                    </t>
+                                    <t t-set="sum_batch1" t-value="0"/>
+                                    <t t-set="sum_batch2" t-value="0"/>
+                                    <tr t-foreach="rs_ded_rules" t-as="rule">
+                                        <td><span t-esc="rule['rule_name']"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch1_total'])))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch2_total'])))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch_diff'])))"/></td>
+                                        <t t-set="sum_batch1" t-value="sum_batch1 + rule['batch1_total']"/>
+                                        <t t-set="sum_batch2" t-value="sum_batch2 + rule['batch2_total']"/>
+                                    </tr>
                                     <tr>
-                                        <td></td>
-                                        <td>
-                                            <strong>
-                                                <t t-esc="deduction_total"/>
-                                            </strong>
-                                        </td>
+                                        <td/>
+                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch1)))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch2)))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch1-sum_batch2)))"/></td>
                                     </tr>
                                 </tbody>
-
                             </table>
-                        </div>
-                        <div class="col-5">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            <span t-esc="batch_name_2"/>
-                                        </th>
-                                        <!--                                        <th style='color:blue;'>Curr-Prev</th>-->
-                                    </tr>
-                                </thead>
-                                <tbody class="reconcilation_tbody">
-                                    <t t-set="deduction_total" t-value="0"/>
-                                    <t t-foreach="deduction_dict.items()" t-as="item">
-                                        <tr>
-                                            <td>
-                                                <span t-esc="item[1]"/>
-                                                <t t-set="deduction_total"
-                                                   t-value="deduction_total + item[1]"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <tr>
-                                        <td>
-                                            <strong>
-                                                <t t-esc="deduction_total"/>
-                                            </strong>
-                                        </td>
-                                    </tr>
-                                </tbody>
-
-                            </table>
-                        </div>
-                        <div class="col-2">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style='color:blue;'>Curr-Prev</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="reconcilation_tbody">
-                                    <t t-set="deduction_total" t-value="0"/>
-                                    <t t-foreach="diff_deduction_total.items()" t-as="item">
-                                        <tr>
-                                            <td>
-                                                <span t-esc="item[1]"/>
-                                                <t t-set="deduction_total"
-                                                   t-value="deduction_total + item[1]"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            Total B:
-                                            <t t-esc="deduction_total"/>
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            Total A - Total B:
-                                            <t t-esc="allow_dedud"/>
-                                        </th>
-                                    </tr>
-                                </tbody>
-
-                            </table>
-                        </div>
-
-                    </div>
-                    <br/>
-                    <p style='color:blue;'>Payroll Reconciliation detail</p>
-                    <div class="row no-gutters">
-                        <div class="col-5">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style='color:blue;'>Sr #</th>
-                                        <th style='color:blue;'>Emp.Code</th>
-                                        <th style='color:blue;'>Date Of Joining</th>
-                                        <th style='color:blue;'>Name</th>
-                                        <th style='color:blue;'>
-                                            <t t-esc="batch_name"/>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="reconcilation_tbody">
-                                    <t t-foreach="data" t-as="data">
-                                        <tr>
-                                            <td>
-                                                <span t-esc="data_index"/>
-                                            </td>
-                                            <td>
-                                                <!--                                                <span t-esc="data.employee_id.code"/>-->
-                                            </td>
-                                            <td>
-                                                <span t-esc="data.employee_id.first_contract_date"/>
-                                            </td>
-                                            <td>
-                                                <span t-esc="data.employee_id.name"/>
-                                            </td>
-                                            <td>
-                                                <span t-esc="data.net_wage"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-5">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            <t t-esc="batch_name_2"/>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="reconcilation_tbody">
-                                    <t t-foreach="data1" t-as="data1">
-                                        <tr>
-                                            <td>
-                                                <t t-esc="data1.net_wage"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-2">
-                            <table class="table table-sm table-striped table-bordered"
-                                   style="border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style='color:blue;'>
-                                            Difference
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="reconcilation_tbody">
-                                    <t t-foreach="data2.items()" t-as="data2">
-                                        <tr>
-                                            <td>
-                                                <t t-esc="data2[0]"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
-                        </div>
-
-                    </div>
-                    <br/>
-                    <br/>
                     <br/>
                     <table class="table table-sm table-striped table-bordered">
                         <tr>
@@ -419,6 +133,55 @@
                             <th style="border-top: 1px solid black;padding:5px;text-align:center;">Approved By</th>
                         </tr>
                     </table>
+                    
+                </div>
+                
+                <!-- Reconciliation Detail Report -->
+                
+                <div class="page" style="font-size:12px">
+                    <br/><br/>
+                    <div class="oe_structure"/>
+                    <div class='pull-left' style='color:blue;'>
+                        <h5>Payroll Reconciliation detail</h5>
+                        Period <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
+                        and
+                        <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
+                    </div>
+                    <div class='pull-right' style="max-width: 250px;height: 20px; color:blue;">
+                        <strong>Printed On:</strong>
+                        <span t-esc="datetime.datetime.strptime(str(datetime.datetime.now()+ relativedelta(hours =+ 5)), '%Y-%m-%d %H:%M:%S.%f').strftime('%d-%b-%y %H:%M %p')"/>
+                        <br/>
+                        <strong>Printed By:</strong><span t-esc="user.name"/>
+                        <br/>
+                        <strong>Currency:</strong><span t-esc="currency"/>
+                    </div>
+                    
+                    <br/><br/>
+                    
+                    <table class="table table-sm table-striped table-bordered" style="border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style='color:blue;'>Sr #</th>
+                                <th style='color:blue;'>Emp.Code</th>
+                                <th style='color:blue;'>Date Of Joining</th>
+                                <th style='color:blue;'>Name</th>
+                                <th style='color:blue;'>Previous</th>
+                                <th style='color:blue;'>Current</th>
+                                <th style='color:blue;'>Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody class="reconcilation_tbody">
+                            <tr t-foreach="rs_employees" t-as="emp">
+                                <td><span t-esc="emp['emp_name']"/></td>
+                                <td><span t-esc="emp['emp_name']"/></td>
+                                <td><span t-esc="emp['emp_name']"/></td>
+                                <td><span t-esc="emp['emp_name']"/></td>
+                                <td><span t-esc="'{0:,}'.format(int(round(emp['batch1_total'])))"/></td>
+                                <td><span t-esc="'{0:,}'.format(int(round(emp['batch2_total'])))"/></td>
+                                <td><span t-esc="'{0:,}'.format(int(round(emp['batch_diff'])))"/></td>
+                            </tr>
+                        </tbody>
+                    </table>                    
                 </div>
             </t>
         </t>
