@@ -90,7 +90,7 @@ class PayslipReport(models.AbstractModel):
                 join hr_salary_rule r on l.salary_rule_id = r.id
                 join hr_employee e on p.employee_id = e.id
                 where b.company_id = %(company_id)s and b.id = %(from_batch_id)s
-                and e.code = 'NET'
+                and l.code = 'NET'
                 union all 
                 select e.id as emp_id, e.emp_number, e.date as doj, e.name as emp_name, 0 as batch1_total, l.total as batch2_total 
                 from hr_payslip_run b
@@ -99,7 +99,7 @@ class PayslipReport(models.AbstractModel):
                 join hr_salary_rule r on l.salary_rule_id = r.id
                 join hr_employee e on p.employee_id = e.id
                 where b.company_id = %(company_id)s and b.id = %(to_batch_id)s
-                and e.code = 'NET'
+                and l.code = 'NET'
             ) a
             group by a.emp_id, a.emp_number, a.emp_name
             having sum(batch1_total - batch2_total) != 0
