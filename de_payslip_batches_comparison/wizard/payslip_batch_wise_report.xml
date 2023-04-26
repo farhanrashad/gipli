@@ -42,7 +42,7 @@
 
         <menuitem
                 id="menu_hr_batch_wise_report"
-                name="Batch Reconciliation"
+                name="Batch Reconciliation Report"
                 action="pay_slip_report_wizard_action"
                 sequence="50"
                 parent="hr_payroll.menu_hr_payroll_report"/>

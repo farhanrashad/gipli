@@ -103,13 +103,13 @@
                                 <tbody class="reconcilation_tbody">
                                     <t t-set="sum_batch1" t-value="0"/>
                                     <t t-set="sum_batch2" t-value="0"/>
-                                    <tr t-foreach="rs_ded_rules" t-as="rule">
-                                        <td><span t-esc="rule['rule_name']"/></td>
-                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch1_total'])))"/></td>
-                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch2_total'])))"/></td>
-                                        <td><span t-esc="'{0:,}'.format(int(round(rule['batch_diff'])))"/></td>
-                                        <t t-set="sum_batch1" t-value="sum_batch1 + rule['batch1_total']"/>
-                                        <t t-set="sum_batch2" t-value="sum_batch2 + rule['batch2_total']"/>
+                                    <tr t-foreach="rs_ded_rules" t-as="ded">
+                                        <td><span t-esc="ded['rule_name']"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(ded['batch1_total'])))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(ded['batch2_total'])))"/></td>
+                                        <td><span t-esc="'{0:,}'.format(int(round(ded['batch_diff'])))"/></td>
+                                        <t t-set="sum_batch1" t-value="sum_batch1 + ded['batch1_total']"/>
+                                        <t t-set="sum_batch2" t-value="sum_batch2 + ded['batch2_total']"/>
                                     </tr>
                                     <tr>
                                         <td/>

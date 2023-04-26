@@ -213,6 +213,7 @@ class PayslipReport(models.AbstractModel):
             'from_batch_id': from_batch_id,
             'to_batch_id': to_batch_id,
             'rs_rules': rs_rules,
+            'rs_ded_rules': rs_ded_rules,
             'rs_employees': rs_employees,
             'currency': self.env.company.currency_id.name,
         }
