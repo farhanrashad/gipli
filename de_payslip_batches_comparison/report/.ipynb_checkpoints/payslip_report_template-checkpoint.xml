@@ -88,7 +88,7 @@
                                         <td/>
                                         <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch1)))"/></strong></td>
                                         <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch2)))"/></strong></td>
-                                        <td style='color:blue;'><strong>Total A:<span t-esc="'{0:,}'.format(int(round(sum_batch1-sum_batch2)))"/></strong></td>
+                                        <td style='color:blue;'><strong>Total A: <span t-esc="'{0:,}'.format(int(round(sum_batch1-sum_batch2)))"/></strong></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -115,13 +115,13 @@
                                         <td/>
                                         <td><strong><span t-esc="'{0:,}'.format(int(round(sum_ded_batch1)))"/></strong></td>
                                         <td><strong><span t-esc="'{0:,}'.format(int(round(sum_ded_batch2)))"/></strong></td>
-                                        <td style='color:blue;'><strong>Total B:<span t-esc="'{0:,}'.format(int(round(sum_ded_batch1-sum_ded_batch2)))"/></strong></td>
+                                        <td style='color:blue;'><strong>Total B: <span t-esc="'{0:,}'.format(int(round(sum_ded_batch1-sum_ded_batch2)))"/></strong></td>
                                     </tr>
                                     <tr>
                                         <td/>
                                         <td/>
                                         <td/>
-                                        <td style='color:blue;'><strong>Total A - Total B:<span t-esc="'{0:,}'.format(int(abs(sum_batch1-sum_batch2)-abs(sum_ded_batch1-sum_ded_batch2)))"/></strong></td>
+                                        <td style='color:blue;'><strong>Total A - Total B: <span t-esc="'{0:,}'.format(int(abs(sum_batch1-sum_batch2)-abs(sum_ded_batch1-sum_ded_batch2)))"/></strong></td>
 
                                     </tr>
                                 </tbody>
@@ -189,8 +189,8 @@
                         <tbody class="reconcilation_tbody">
                             <tr t-foreach="rs_employees" t-as="emp">
                                 <td><span t-esc="emp['sr_no']"/></td>
-                                <td><span t-esc="emp['emp_name']"/></td>
-                                <td><span t-esc="emp['emp_name']"/></td>
+                                <td><span t-esc="emp['emp_number']"/></td>
+                                <td><span t-esc="emp['doj']"/></td>
                                 <td><span t-esc="emp['emp_name']"/></td>
                                 <td><span t-esc="'{0:,}'.format(int(round(emp['batch1_total'])))"/></td>
                                 <td><span t-esc="'{0:,}'.format(int(round(emp['batch2_total'])))"/></td>

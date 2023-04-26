@@ -80,24 +80,24 @@ class PayslipReport(models.AbstractModel):
         # Employees Data
         query = '''
         select ROW_NUMBER() OVER( ORDER BY 1) as sr_no, 
-            a.emp_id, a.emp_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
+            a.emp_id, a.emp_number, a.emp_name, max(a.doj) as doj, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
             sum(batch1_total - batch2_total) as batch_diff
             from (
-                select e.id as emp_id, e.name as emp_name, l.total as batch1_total, 0 as batch2_total 
+                select e.id as emp_id, e.emp_number, e.date as doj, e.name as emp_name, l.total as batch1_total, 0 as batch2_total 
                 from hr_payslip_run b
                 join hr_payslip p on p.payslip_run_id = b.id
                 join hr_payslip_line l on l.slip_id = p.id 
                 join hr_employee e on p.employee_id = e.id
                 where b.company_id = %(company_id)s and b.id = %(from_batch_id)s
                 union all 
-                select e.id as emp_id, e.name as emp_name, l.total as batch1_total, 0 as batch2_total 
+                select e.id as emp_id, e.emp_number, e.date as doj, e.name as emp_name, 0 as batch1_total, l.total as batch2_total 
                 from hr_payslip_run b
                 join hr_payslip p on p.payslip_run_id = b.id
                 join hr_payslip_line l on l.slip_id = p.id 
                 join hr_employee e on p.employee_id = e.id
                 where b.company_id = %(company_id)s and b.id = %(to_batch_id)s
             ) a
-            group by a.emp_id, a.emp_name
+            group by a.emp_id, a.emp_number, a.emp_name
             having sum(batch1_total - batch2_total) != 0
         '''
         args = {
