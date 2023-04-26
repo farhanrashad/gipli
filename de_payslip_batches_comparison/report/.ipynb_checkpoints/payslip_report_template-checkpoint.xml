@@ -4,12 +4,6 @@
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <div class="page" style="font-size:12px">
-                    <style>
-                        .table {
-                        margin-bottom: 0;
-                        }
-                    </style>
-                    <div class="oe_structure"/>
                     <div class='pull-left' style='color:blue;'>
                         <h5>Payroll Reconciliation Report</h5>
                         Period <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
@@ -23,11 +17,10 @@
                         <strong>Printed By:</strong><span t-esc="user.name"/>
                         <br/>
                         <strong>Currency:</strong><span t-esc="currency"/>
-                        <!--                        <span t-esc="docs.company_id.currency_id.name"/>-->
+                        <br/>
                     </div>
 
-                    <br/>
-                    <table class="table table-sm table-striped table-bordered">
+                    <table class="table table-sm table-striped table-bordered mt8">
                         <thead>
                             <tr>
                                 <th style='color:blue;'>Description</th>
@@ -155,8 +148,6 @@
                 <!-- Reconciliation Detail Report -->
                 
                 <div class="page" style="font-size:12px">
-                    <br/><br/>
-                    <div class="oe_structure"/>
                     <div class='pull-left' style='color:blue;'>
                         <h5>Payroll Reconciliation detail</h5>
                         Period <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
@@ -170,11 +161,11 @@
                         <strong>Printed By:</strong><span t-esc="user.name"/>
                         <br/>
                         <strong>Currency:</strong><span t-esc="currency"/>
+                        <br/>
                     </div>
                     
-                    <br/><br/>
                     
-                    <table class="table table-sm table-striped table-bordered" style="border-collapse: collapse;">
+                    <table class="table table-sm table-striped table-bordered mt8" style="border-collapse: collapse;">
                         <thead>
                             <tr>
                                 <th style='color:blue;'>Sr #</th>
