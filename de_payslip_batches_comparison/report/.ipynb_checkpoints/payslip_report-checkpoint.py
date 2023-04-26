@@ -14,24 +14,26 @@ class PayslipReport(models.AbstractModel):
         to_batch_id = self.env['hr.payslip.run'].browse(data['form']['to_batch_id'])
         
         
-        #Comparison
+        # Compensation Query
         query = '''
         select a.rule_id, a.rule_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
             sum(batch1_total-batch2_total) as batch_diff
         FROM (
-            select r.id as rule_id, r.name as rule_name, l.total as batch1_total, 0 as batch2_total 
+            select r.id as rule_id, r.compansation_summary_label as rule_name, l.total as batch1_total, 0 as batch2_total
             from hr_payslip_run b
             join hr_payslip p on p.payslip_run_id = b.id
             join hr_payslip_line l on l.slip_id = p.id 
             join hr_salary_rule r on l.salary_rule_id = r.id 
             where b.company_id = %(company_id)s and b.id = %(from_batch_id)s
+            and reconcile_compansation = True
             union all 
-            select r.id as rule_id, r.name as rule_name, 0 as batch1_total, l.total as batch2_total
+            select r.id as rule_id, r.compansation_summary_label as rule_name, 0 as batch1_total, l.total as batch2_total
             from hr_payslip_run b
             join hr_payslip p on p.payslip_run_id = b.id
             join hr_payslip_line l on l.slip_id = p.id 
             join hr_salary_rule r on l.salary_rule_id = r.id 
             where b.company_id = %(company_id)s and b.id = %(to_batch_id)s
+            and reconcile_compansation = True
         ) a 
         group by a.rule_id, a.rule_name
         '''
@@ -43,24 +45,26 @@ class PayslipReport(models.AbstractModel):
         self.env.cr.execute(query, args)
         rs_rules = self._cr.dictfetchall()
         
-        # Deductions
+        # Deductions Query
         query = '''
         select a.rule_id, a.rule_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
             sum(batch1_total-batch2_total) as batch_diff
         FROM (
-            select r.id as rule_id, r.name as rule_name, l.total as batch1_total, 0 as batch2_total 
+            select r.id as rule_id, r.deduction_summary_label as rule_name, l.total as batch1_total, 0 as batch2_total 
             from hr_payslip_run b
             join hr_payslip p on p.payslip_run_id = b.id
             join hr_payslip_line l on l.slip_id = p.id 
             join hr_salary_rule r on l.salary_rule_id = r.id 
             where b.company_id = %(company_id)s and b.id = %(from_batch_id)s
+            and r.reconcile_deduction = True
             union all 
-            select r.id as rule_id, r.name as rule_name, 0 as batch1_total, l.total as batch2_total
+            select r.id as rule_id, r.deduction_summary_label as rule_name, 0 as batch1_total, l.total as batch2_total
             from hr_payslip_run b
             join hr_payslip p on p.payslip_run_id = b.id
             join hr_payslip_line l on l.slip_id = p.id 
             join hr_salary_rule r on l.salary_rule_id = r.id 
             where b.company_id = %(company_id)s and b.id = %(to_batch_id)s
+            and r.reconcile_deduction = True
         ) a 
         group by a.rule_id, a.rule_name
         '''

@@ -86,9 +86,9 @@
                                     </tr>
                                     <tr>
                                         <td/>
-                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch1)))"/></td>
-                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch2)))"/></td>
-                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch1-sum_batch2)))"/></td>
+                                        <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch1)))"/></strong></td>
+                                        <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch2)))"/></strong></td>
+                                        <td style='color:blue;'><strong>Total A:<span t-esc="'{0:,}'.format(int(round(sum_batch1-sum_batch2)))"/></strong></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -101,21 +101,28 @@
                                     <th style='color:blue;'>Curr-Prv</th>
                                 </thead>
                                 <tbody class="reconcilation_tbody">
-                                    <t t-set="sum_batch1" t-value="0"/>
-                                    <t t-set="sum_batch2" t-value="0"/>
+                                    <t t-set="sum_ded_batch1" t-value="0"/>
+                                    <t t-set="sum_ded_batch2" t-value="0"/>
                                     <tr t-foreach="rs_ded_rules" t-as="ded">
                                         <td><span t-esc="ded['rule_name']"/></td>
                                         <td><span t-esc="'{0:,}'.format(int(round(ded['batch1_total'])))"/></td>
                                         <td><span t-esc="'{0:,}'.format(int(round(ded['batch2_total'])))"/></td>
                                         <td><span t-esc="'{0:,}'.format(int(round(ded['batch_diff'])))"/></td>
-                                        <t t-set="sum_batch1" t-value="sum_batch1 + ded['batch1_total']"/>
-                                        <t t-set="sum_batch2" t-value="sum_batch2 + ded['batch2_total']"/>
+                                        <t t-set="sum_ded_batch1" t-value="sum_ded_batch1 + ded['batch1_total']"/>
+                                        <t t-set="sum_ded_batch2" t-value="sum_ded_batch2 + ded['batch2_total']"/>
                                     </tr>
                                     <tr>
                                         <td/>
-                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch1)))"/></td>
-                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch2)))"/></td>
-                                        <td><span t-esc="'{0:,}'.format(int(round(sum_batch1-sum_batch2)))"/></td>
+                                        <td><strong><span t-esc="'{0:,}'.format(int(round(sum_ded_batch1)))"/></strong></td>
+                                        <td><strong><span t-esc="'{0:,}'.format(int(round(sum_ded_batch2)))"/></strong></td>
+                                        <td style='color:blue;'><strong>Total B:<span t-esc="'{0:,}'.format(int(round(sum_ded_batch1-sum_ded_batch2)))"/></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                        <td style='color:blue;'><strong>Total A - Total B:<span t-esc="'{0:,}'.format(int(abs(sum_batch1-sum_batch2)-abs(sum_ded_batch1-sum_ded_batch2)))"/></strong></td>
+
                                     </tr>
                                 </tbody>
                             </table>

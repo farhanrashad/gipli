@@ -20,7 +20,7 @@
     'version': '15.0.0.3',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr_payroll'],
+    'depends': ['base', 'hr_payroll','de_payroll_taxes'],
 
     # always loaded
     'data': [
