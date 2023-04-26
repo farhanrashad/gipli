@@ -54,7 +54,7 @@ class HRService(models.Model):
                     'active_model': model_id.model,
                     'active_id': record_id.id,
                 }
-                action_server.sudo().with_context(**ctx).run()
+                action_server.sudo().with_context(**ctx).sudo().run()
 
     # ---------------------------------------------------
     # Mail gateway
