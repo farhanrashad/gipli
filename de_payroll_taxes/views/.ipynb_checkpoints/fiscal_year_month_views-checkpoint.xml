@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        
+        <record id="view_fiscal_year_month_form" model="ir.ui.view">
+            <field name="name">fiscal.year.month.form</field>
+            <field name="model">fiscal.year.month</field>
+            <field name="arch" type="xml">
+                <form string="Fiscal Year" create='0' edit='0' delete='0'>
+                    <sheet>
+                       <group>
+                         <group>
+                              <field name="name"  />
+                         </group>
+                           <group>
+                              <field name="days"  />
+                         </group>
+                       </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+       
+
+        <record model="ir.ui.view" id="view_fiscal_year_tree">
+            <field name="name">fiscal.year.month.tree</field>
+            <field name="model">fiscal.year.month</field>
+            <field name="arch" type="xml">
+                <tree string="Fiscal Month" create='0' delete='0' edit='0'>
+                    <field name="name"/>
+                    <field name="days"  />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_fiscal_year_month" model="ir.actions.act_window">
+            <field name="name">Fiscal Month</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">fiscal.year.month</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" ref="view_fiscal_year_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Records Here.......
+                </p>
+            </field>
+        </record>
+        
+     
+        <menuitem id="fiscal_year_month_menuitem"
+                  name="Fiscal Month"
+                  parent="hr_work_entry_contract.menu_hr_payroll_configuration"
+                  action="action_fiscal_year_month"
+                  sequence="90"/>
+        
+    </data>
+</odoo>

@@ -1,0 +1,35 @@
+<odoo>
+    <data>
+
+    <record id="resume_slides_line_view_form_inh" model="ir.ui.view">
+        <field name="name">hr.resume.line.form</field>
+        <field name="model">hr.resume.line</field>
+        <field name="inherit_id" ref="hr_skills.resume_line_view_form"/>
+        <field eval="20" name="priority"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_end']" position="after">
+<!--                attrs="{'invisible': [('display_type', '!=', 'course')]}"-->
+                <field name="institute" attrs="{'invisible': [('is_experience', '=', True)]}"/>
+                <field name="cgpa" attrs="{'invisible': [('is_experience', '=', True)]}"/>
+                <field name="reason_to_leave" attrs="{'invisible': [('is_education', '=', True)]}"/>
+                <field name="salary" attrs="{'invisible': [('is_education', '=', True)]}"/>
+                <field name="is_experience" invisible="1"/>
+                <field name="is_education" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+        <record id="hr_employee_view_form_new" model="ir.ui.view">
+            <field name="name">hr.employee.view.form.inherit.resume</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[@name='public']//div/div/field[@name='resume_line_ids']//tree/field[@name='name']" position="after">
+                    <field name="institute"/>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

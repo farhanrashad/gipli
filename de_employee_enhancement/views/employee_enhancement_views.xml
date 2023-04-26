@@ -1,0 +1,284 @@
+<odoo>
+  <data>
+
+      <record model="ir.ui.view" id="view_hr_employee_tree_inh">
+        <field name="name">hr.employee.tree.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="emp_number" invisible="0"/>
+                    <field name="grade_type" invisible="1"/>
+                    <field name="emp_type" invisible="1"/>
+                    <field name="grade_designation" invisible="1"/>
+                    <field name="section" invisible="1"/>
+                    <field name="emp_status" invisible="1"/>
+                    <field name="date" invisible="1"/>
+                    <field name="probation_period" invisible="1"/>
+                    <field name="confirm_date" invisible="1"/>
+                    <field name="contract_expiry" invisible="1"/>
+                    <field name="is_consultant" invisible="1"/>
+                    <field name="tax_rate" invisible="1"/>
+                    <field name="stop_salary" invisible="1"/>
+                    <field name="resigned_date" invisible="1"/>
+                    <field name="resign_type" invisible="1"/>
+                    <field name="resigned_remarks" invisible="1"/>
+                    <field name="resign_reason" invisible="1"/>
+                    <field name="fac_deduction" invisible="1"/>
+                    <field name="fac_deduction_percentage" invisible="1"/>
+                    <field name="pf_member" invisible="1"/>
+                    <field name="pf_trust" invisible="1"/>
+                    <field name="pf_effec_date" invisible="1"/>
+                    <field name="ss_entitled" invisible="1"/>
+                    <field name="ss_number" invisible="1"/>
+                    <field name="union_fund" invisible="1"/>
+                    <field name="union_fund_amount" invisible="1"/>
+                    <field name="eobi_number" invisible="1"/>
+                    <field name="eobi_registration_date" invisible="1"/>
+                    <field name="wps" invisible="1"/>
+                    <field name="ipl_variable" invisible="1"/>
+                    <field name="cnic" invisible="1"/>
+                    <field name="blood_group" invisible="1"/>
+                    <field name="religion" invisible="1"/>
+                    <field name="ntn" invisible="1"/>
+                </xpath>
+            </field>
+      </record>
+
+      <record model="ir.ui.view" id="view_hr_employee_search_inh">
+        <field name="name">hr.employee.search.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='job_id']" position="after">
+                    <field name="emp_number"/>
+                    <field name="grade_type"/>
+                    <field name="emp_type"/>
+                    <field name="grade_designation"/>
+                    <field name="section"/>
+                    <field name="emp_status"/>
+                    <field name="date"/>
+                    <field name="probation_period"/>
+                    <field name="confirm_date"/>
+                    <field name="contract_expiry"/>
+                    <field name="is_consultant"/>
+                    <field name="tax_rate"/>
+                    <field name="stop_salary"/>
+                    <field name="resigned_date"/>
+                    <field name="resign_type"/>
+                    <field name="resigned_remarks"/>
+                    <field name="resign_reason"/>
+                    <field name="fac_deduction"/>
+                    <field name="fac_deduction_percentage"/>
+                    <field name="pf_member"/>
+                    <field name="pf_trust"/>
+                    <field name="pf_effec_date"/>
+                    <field name="ss_entitled"/>
+                    <field name="ss_number"/>
+                    <field name="union_fund"/>
+                    <field name="union_fund_amount"/>
+                    <field name="eobi_member"/>
+                    <field name="eobi_number"/>
+                    <field name="eobi_registration_date"/>
+                    <field name="wps"/>
+                    <field name="ipl_variable"/>
+                    <field name="cnic"/>
+                    <field name="blood_group"/>
+                    <field name="religion"/>
+                    <field name="ntn"/>
+                </xpath>
+            </field>
+      </record>
+
+    <record model="ir.ui.view" id="view_hr_employee_inh">
+        <field name="name">hr.employee.form.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='mobile_phone']" position="before">
+                    <field name="employee_number" invisible='1'/>
+                </xpath>    
+<!--                Header -->
+                <xpath expr="//form/sheet/notebook" position="before">
+                    <group col="4">
+                        <field name="emp_number"/>
+                        <field name="grade_type"/>
+                        <field name="emp_type"/>
+                        <field name="grade_designation"/>
+                        <field name="section"/>
+                    </group>
+                </xpath>
+<!--                Status   -->
+                <xpath expr="//field[@name='job_id']" position="after">
+                    <field name="emp_status"/>
+                    <field name="date"/>
+                    <field name="probation_period"/>
+                    <field name="confirm_date"/>
+                    <field name="contract_expiry"/>
+                    <field name="is_consultant"/>
+                    <field name="tax_rate"/>
+                    <field name="stop_salary"/>
+                </xpath>
+<!--            New Departure-->
+                <xpath expr="//notebook/page[@name='hr_settings']//group/group[@name='identification_group']" position="after">
+                    <group string="Departure">
+                        <field name="resigned_date"/>
+                        <field name="resign_type"/>
+                        <field name="resigned_remarks"/>
+                        <field name="resign_reason"/>
+                    </group>
+                </xpath>
+<!--                Citizen-->
+                <xpath expr="//field[@name='country_of_birth']" position="after">
+                    <field name="cnic"/>
+                    <field name="blood_group"/>
+                    <field name="religion"/>
+                    <field name="ntn"/>
+                </xpath>
+
+                <xpath expr="//field[@name='emergency_contact']" position="before">
+                    <field name="father_name"/>
+                </xpath>
+
+                <xpath expr="//field[@name='bank_account_id']" position="after">
+                    <field name="temporary_address"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='hr_settings']" position="after">
+                    <page name="Funds" string="Funds and Deduction">
+                        <group>
+                        <group string="FAC">
+                            <field name="fac_deduction"/>
+                            <field name="fac_deduction_percentage"/>
+                        </group>
+                        <group string="PFUND">
+                                <field name="pf_member"/>
+                                <field name="pf_trust"/>
+                                <field name="pf_effec_date"/>
+                        </group>
+                        <group string="SS FUND">
+                                <field name="ss_entitled"/>
+                                <field name="ss_number"/>
+                        </group>
+                        <group string="UNION FUND">
+                                <field name="union_fund"/>
+                                <field name="union_fund_amount"/>
+                        </group>
+                        <group string="EOBI">
+                                <field name="eobi_member"/>
+                                <field name="eobi_number"/>
+                                <field name="eobi_registration_date"/>
+                                <field name="wps"/>
+                                <field name="ipl_variable"/>
+                        </group>
+
+                        <group string="Gratuity">
+                                <field name="gratuity"/>
+                        </group>
+                        </group>
+                    </page>
+                </xpath>
+
+                <xpath expr="//field[@name='tz']" position="after">
+                    <field name="ot_allowed"/>
+                </xpath>
+
+                <xpath expr="//notebook/page[@name='hr_settings']" position="after">
+                    <page name="project" string="Project Information">
+                        <field name="project_lines">
+                            <tree editable="bottom">
+                                <field name="name" string="Project" required="1"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="location"/>
+                                <field name="period"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+                
+                <xpath expr="//page[5]" position="after">
+                    <page name="benefit" string="Benefits">
+                        <field name="benefit_lines">
+                            <tree editable="bottom">
+                                <field name="benefit_description"/>
+								<field name="name" string="Description" required="0"/>
+                                <field name="start_date"/>                                
+                                <field name="benefit_remarks"/>
+                                <field name="benefit_amount"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+
+                <xpath expr="//notebook/page[@name='hr_settings']" position="after">
+                    <page name="assets" string="Assets">
+
+                        <field name="asset_lines">
+                            <tree editable="bottom">
+                                <field name="asset_id" string="Asset" required="1"/>
+                                <field name="issue_date"/>
+                                <field name="estimated_life_span"/>
+                                <field name="recovery_date"/>
+                                <field name="description"/>
+                            </tree>
+                        </field>
+
+                    </page>
+                </xpath>
+
+        </field>
+    </record>
+      
+
+    <record id="hr_contract_move_form_view_inherit" model="ir.ui.view">
+        <field name="name">hr.contract.form.view</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='structure_type_id']" position="after">
+                <field name="expense_account" required="1"/>
+            </xpath>
+            <xpath expr="//page[@name='information']" position="after">
+                <page name="cost_center_info" string="Cost Centre Information">
+                    <field name="cost_center_information_line">
+                        <tree editable="bottom">
+                            <field name="cost_center" required="1"/>
+                            <field name="percentage_charged"/>
+                        </tree>
+                    </field>
+                    <div style="text-align:right;">
+                        <field name="total_percentage"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!--  <record id="action_hr_expense_account_emp_rights" model="ir.actions.act_window">
+            <field name="name">Employee Expenses</field>
+            <field name="res_model">hr.expense.sheet</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+             <field name="search_view_id" ref="hr_expense_sheet_view_search"/>
+            <field name="view_id" ref="view_hr_expense_sheet_tree"/> 
+            <field name="domain">[]</field>
+            <field name="context">{
+                'search_default_approved': 1,
+                'search_default_to_post': 1,
+            }
+            </field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new expense report
+              </p><p>
+                Once you have created your expense, submit it to your manager who will validate it.
+              </p>
+            </field>
+        </record>
+    
+    <menuitem id="menu_hr_expense_account_employee_expenses_claim" name="Employee Expenses Claim" sequence="22" parent="hr.menu_hr_employee_payroll"  action="action_hr_expense_account_emp_rights" groups='de_employee_enhancement.group_employee_enhancement_expense'/>
+
+    -->
+
+
+  </data>
+</odoo>

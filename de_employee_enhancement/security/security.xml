@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        
+            <record id="group_employee_enhancement_expense" model="res.groups">
+	        <field name="name">Allow Expense Reset to Draft</field>
+	    </record>
+
+	</data>
+</odoo>

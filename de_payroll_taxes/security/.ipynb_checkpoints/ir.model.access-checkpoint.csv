@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_tax_credit,access.hr.tax.credit,model_hr_tax_credit,,1,1,1,1
+access_hr_tax_credit_wizard,access.hr.tax.credit.wizard,model_hr_tax_credit_wizard,,1,1,1,1
+access_tax_credit_type,access.tax.credit.type,model_tax_credit_type,,1,1,1,1
+access_fiscal_year_month,access.fiscal.year.month,model_fiscal_year_month,,1,1,1,1
+access_salary_adjustment_allowance,access.salary.adjustment.allowance,model_salary_adjustment_allowance,,1,1,1,1
+access_salary_adjustment_line,access.salary.adjustment.line,model_salary_adjustment_line,,1,1,1,1
+access_hr_tax_range,access.hr.tax.range,model_hr_tax_range,,1,1,1,1
+access_hr_tax_range_line,access.hr.tax.range.line,model_hr_tax_range_line,,1,1,1,1
+access_basic_salary_devision,access.basic.salary.devision,model_basic_salary_devision,,1,1,1,1
+access_account_payment_request,access.account.payment.request,model_account_payment_request,,1,1,1,1
+access_payment_request_wizard,access.payment.request.wizard,model_payment_request_wizard,,1,1,1,1
+access_hr_tax_ded,access.hr.tax.ded,model_hr_tax_ded,,1,1,1,1
+access_taxable_ded_entry,access.taxable.ded.entry,model_taxable_ded_entry,,1,1,1,1
+
+

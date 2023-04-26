@@ -1,0 +1,47 @@
+<odoo>
+    <data>
+        <record id="view_grade_type_form" model="ir.ui.view">
+		<field name="name">grade.type.form</field>
+		<field name="model">grade.type</field>
+		<field name="arch" type="xml">
+			<form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+			</form>
+		</field>
+	    </record>
+
+        <record id="view_grade_type_tree" model="ir.ui.view">
+		<field name="name">grade.type.tree</field>
+		<field name="model">grade.type</field>
+		<field name="arch" type="xml">
+			<tree>
+                <field name="name"/>
+			</tree>
+		</field>
+	    </record>
+
+        <record id="action_grade_type_tree_view" model="ir.actions.act_window">
+            <field name="name">Grade Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">grade.type</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="view_id" ref="view_grade_type_tree"/> -->
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No Lines Found. Let's Create One!
+              </p>
+            </field>
+    </record>
+
+        <menuitem
+                id="menu_grade_type"
+                name="Grade Type"
+                parent="hr.menu_human_resources_configuration_employee"
+                action="action_grade_type_tree_view"
+                sequence="100"/>
+    </data>
+</odoo>

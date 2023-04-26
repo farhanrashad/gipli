@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<odoo>
+   <data>
+
+         <record id="hr_salary_rule_views_adjustment_allowance" model="ir.ui.view">
+			<field name="name">hr.salary.rule.form.adjustment.allowance</field>
+			<field name="model">hr.salary.rule</field>
+			<field name="inherit_id" ref="hr_payroll.hr_salary_rule_form"/>
+			<field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string='Configuration'>
+                        <group>
+                          <group> 
+                              <h4>Tax Computation Report</h4>  
+                              <field name="computation_report" /> 
+                              <field name="report_label" attrs="{'required': [('computation_report', '=',True)]}"/> 
+                              <field name="computation_sequence" attrs="{'required': [('computation_report', '=',True)]}"/>
+                              <field name="pfund_amount" attrs="{'required': [('computation_report', '=',True)]}"/> 
+                              <field name="include_total" attrs="{'required': [('computation_report', '=',True)]}"/> 
+                               <br/>
+                               <h4>Salary Detail Report</h4>  
+                              <field name="detail_report" /> 
+                              <field name="detail_label" attrs="{'required': [('detail_report', '=',True)],'invisible': [('detail_report', '=',False)]}"/> 
+                              <field name="detail_sequence" attrs="{'required': [('detail_report', '=',True)],'invisible': [('detail_report', '=',False)]}"/>
+                              <field name="detail_deduction" attrs="{'required': [('detail_report', '=',True)],'invisible': [('detail_report', '=',False)]}"/> 
+                              <field name="detail_compansation" attrs="{'required': [('detail_report', '=',True)],'invisible': [('detail_report', '=',False)]}"/> 
+                          </group>    
+                          <group>    
+                            <field name="salary_adjustment" />
+                            <h4>Reconciliation Summary Report</h4>  
+                              <field name="reconcile_deduction" /> 
+                              <field name="reconcile_compansation" /> 
+                             <h4>Reconciliation Detail Report</h4>  
+                              <field name="reconcilation_details" /> 
+                          </group>    
+                            
+                       </group>     
+                    </page>    
+				</xpath>
+            </field>
+		</record>
+        
+    </data>
+</odoo>

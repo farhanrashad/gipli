@@ -1,0 +1,9 @@
+<odoo>
+     <report id="open_payment_request_action"
+            model="report.de_payroll_taxes.payment_request_report"
+            string="Payment Request Report"
+            report_type="qweb-pdf"
+            name="de_payroll_taxes.payment_request_report"
+            file="de_payroll_taxes.payment_request_report"
+    />
+</odoo>

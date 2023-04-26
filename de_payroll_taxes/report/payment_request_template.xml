@@ -1,0 +1,56 @@
+<odoo>
+  <data>
+  <template id="payment_request_report">
+    <t t-call="web.html_container">
+    <t t-call="web.external_layout">
+        <div class="page" style='font-size:10px;'>
+            <h3>Payment Request Report</h3>
+            <div class="oe_structure"/>
+            <div  style="margin-left: 600px; max-width: 250px;height: 20px;">
+               <strong>Printed On:</strong>
+               <span  t-esc="datetime.datetime.strptime(str(datetime.datetime.now()+ relativedelta(hours =+ 5)), '%Y-%m-%d %H:%M:%S.%f').strftime('%d-%b-%y %H:%M %p')"/>
+            </div> 
+                <table class="table table-sm table-striped table-bordered">
+                    <tr>
+                        <th>Period</th>
+                        <td><t t-esc='docs.date.strftime("%b-%y")'/></td>                        
+                    </tr>
+                </table>    
+                                  
+               <table class="table table-sm table-striped table-bordered"  style='table-layout:fixed;'>
+                   <thead>
+                    <tr>
+                        <th style='color:blue;'>In Favor</th>
+                        <th style='color:blue;'>Payment Type</th>
+                        <th style='color:blue;'>Credit Account Code</th>
+                        <th style='color:blue;'>Amount</th>
+                        <th style='color:blue;'>Status</th>
+                    </tr>
+                   </thead>  
+                   <tbody class="payment_tbody">  
+                      <t t-foreach="docs.company_ids" t-as="company"> 
+                          <tr>
+                            <th style='font-size:14px;' colspan='4'> <span t-esc="company.name"/> </th>
+                          </tr> 
+                       <t t-foreach="request.env['account.payment.request'].search([('fiscal_month','=',docs.date.month),('year','=',docs.date.year),('company_id','=',company.id)])" t-as="payment_req">  
+                           <tr>
+                               <td><span t-esc="payment_req.name"/></td>
+                               <td><span t-esc="payment_req.payment_type"/></td>
+                               <td><span t-esc="payment_req.rule_id.ora_account_gl_code"/></td>
+                               <td><span t-esc="'{0:,}'.format(int(round(payment_req.amount)))"/> </td>
+                               <td>Approved</td>
+                           </tr>
+                        </t>
+                      </t> 
+                      
+                   </tbody>
+               </table>                  
+          </div>
+    </t>
+    </t>
+</template>
+    
+    
+
+  </data>
+</odoo>

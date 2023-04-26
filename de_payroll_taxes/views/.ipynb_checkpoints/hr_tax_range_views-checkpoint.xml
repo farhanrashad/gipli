@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        
+        <record id="view_hr_tax_range_form" model="ir.ui.view">
+            <field name="name">hr.tax.range.form</field>
+            <field name="model">hr.tax.range</field>
+            <field name="arch" type="xml">
+                <form string="Tax Range" >
+                    <sheet>
+                        <h2>
+                           <field name="name"  />
+                        </h2>
+                       <group>
+                         <group>
+                              <field name="date"  />
+                              <field name="month"  />
+                              <field name="year"  />
+                         </group>
+                         <group>                              
+                         </group>  
+                       </group>
+                        <notebook>
+                            <page string='Range Lines'>
+                               <field name='tax_range_line_ids' >
+                                   <tree editable='bottom'>
+                                      <field name='start_amount' />
+                                      <field name='end_amount' />
+                                      <field name='addition_amount' />
+                                      <field name='percentage' />
+                                      <field name='deduction_amount' />
+                                      <field name='range_id' invisible='1' />
+                                      <field name='month' invisible='1' />
+                                      <field name='year' invisible='1' />
+                                   </tree>
+                               </field> 
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+       
+
+        <record model="ir.ui.view" id="view_hr_tax_range_tree">
+            <field name="name">hr.tax.range.tree</field>
+            <field name="model">hr.tax.range</field>
+            <field name="arch" type="xml">
+                <tree string="Tax Range" create='1' delete='1' edit='1'>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_hr_tax_range" model="ir.actions.act_window">
+            <field name="name">Tax Range</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.tax.range</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" ref="view_hr_tax_range_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Records Here.......
+                </p>
+            </field>
+        </record>
+        
+     
+        <menuitem id="hr_tax_range_tree_menuitem"
+                  name="Tax Range"
+                  parent="hr_work_entry_contract.menu_hr_payroll_configuration"
+                  action="action_hr_tax_range"
+                  sequence="70"/>
+        
+    </data>
+</odoo>

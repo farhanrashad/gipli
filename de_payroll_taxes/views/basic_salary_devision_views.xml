@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        
+        <record id="view_basic_salary_devision_form" model="ir.ui.view">
+            <field name="name">basic.salary.devision.form</field>
+            <field name="model">basic.salary.devision</field>
+            <field name="arch" type="xml">
+                <form string="Basic Salary" create='1' edit='1' delete='1'>
+                    <sheet>
+                       <group>
+                         <group>
+                              <field name="name"  />
+                              <field name="percentage"  />
+                         </group>
+                           <group>
+                              <field name="has_category"  />
+                         </group>
+                       </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+       
+
+        <record model="ir.ui.view" id="view_basic_salary_devision_tree">
+            <field name="name">basic.salary.devision.tree</field>
+            <field name="model">basic.salary.devision</field>
+            <field name="arch" type="xml">
+                <tree string="Basic Salary" create='1' delete='1' edit='0'>
+                     <field name="name"  />
+                     <field name="percentage"  />
+                     <field name="has_category"  />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_basic_salary_devision" model="ir.actions.act_window">
+            <field name="name">Salary Devision</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">basic.salary.devision</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" ref="view_basic_salary_devision_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Records Here.......
+                </p>
+            </field>
+        </record>
+        
+     
+        <menuitem id="basic_salary_devision_month_menuitem"
+                  name="Salary Devision"
+                  parent="hr_work_entry_contract.menu_hr_payroll_configuration"
+                  action="action_basic_salary_devision"
+                  sequence="95"/>
+        
+    </data>
+</odoo>

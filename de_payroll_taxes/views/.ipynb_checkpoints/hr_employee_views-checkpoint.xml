@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<odoo>
+   <data>
+
+         <record id="hr_employee_views_leave_ded_exception" model="ir.ui.view">
+			<field name="name">hr.employee.form.leave.ded</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr.view_employee_form"/>
+			<field name="arch" type="xml">
+                        <xpath expr="//field[@name='job_id']" position="after">
+                           <field name="leave_ded" />
+                        </xpath>       
+            </field>
+ 	 </record>
+        
+    </data>
+</odoo>

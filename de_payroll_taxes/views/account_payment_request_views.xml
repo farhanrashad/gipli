@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        <record id="view_account_payment_request_form" model="ir.ui.view">
+            <field name="name">account.payment.request.form</field>
+            <field name="model">account.payment.request</field>
+            <field name="arch" type="xml">
+                <form string="Account Payment"  create='0' delete='0' edit='0'>
+                    <sheet>
+                       <group>
+                        <group>
+                              <field name="name" />   
+                              <field name="rule_id" />
+                              <field name="payment_type" /> 
+                              <field name="company_id" /> 
+                        </group>
+                        <group>
+                            <field name="account_id" />
+                            <field name="fiscal_month" />
+                            <field name="year" />   
+                            <field name="amount" />    
+                        </group>
+                       </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_account_payment_request_tree">
+            <field name="name">account.payment.request.tree</field>
+            <field name="model">account.payment.request</field>
+            <field name="arch" type="xml">
+                <tree string="Payment Request"  create='0' delete='0' edit='0'>
+                    <field name="name"/>
+                    <field name="payment_type" />
+                    <field name="account_id"/>
+                    <field name="fiscal_month"/>
+                    <field name="year"/> 
+                    <field name="amount"/>
+                    <field name="company_id" readonly='1'/>  
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_view_account_payment_request" model="ir.actions.act_window">
+            <field name="name">Account Payment Request</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.payment.request</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" ref="view_account_payment_request_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Records Here.......
+                </p>
+            </field>
+        </record>
+        
+     
+        <menuitem id="hr_payment_request_menuitem"
+                  name="Payment Request"
+                  parent="hr_payroll.menu_hr_payroll_employees_root"
+                  action="action_view_account_payment_request"
+                  sequence="11"
+                  />
+        
+    </data>
+</odoo>

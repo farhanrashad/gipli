@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        <record id="view_hr_tax_ded_form" model="ir.ui.view">
+            <field name="name">hr.tax.ded.form</field>
+            <field name="model">hr.tax.ded</field>
+            <field name="arch" type="xml">
+                <form string="Tax Ded" create='0' edit='0' delete='0'>
+                    <sheet>
+                       <group>
+                        <group>
+                              <field name="date" />   
+                              <field name="employee_id" />
+                              <field name="tax_year" /> 
+                              <field name="company_id" /> 
+                              <field name="period_num" /> 
+                        </group>
+                        <group>
+                            <field name="fiscal_month" />
+                            <field name="taxable_amount" />
+                            <field name="pf_amount" />   
+                            <field name="tax_ded_amount" />    
+                        </group>
+                       </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_hr_tax_ded_tree">
+            <field name="name">hr.tax.ded.tree</field>
+            <field name="model">hr.tax.ded</field>
+            <field name="arch" type="xml">
+                <tree string="Tax Ded"  create='1' edit='0' delete='0'>
+                    <field name="employee_id"/>
+                    <field name="date" optional='hide'/>
+                    <field name="period_num" optional='hide'/>
+                    <field name="tax_year"/>
+                    <field name="fiscal_month"/>
+                    <field name="taxable_amount"/> 
+                    <field name="pf_amount"/>
+                    <field name="tax_ded_amount"/>
+                    <field name="company_id" readonly='1'/>  
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_view_hr_tax_ded" model="ir.actions.act_window">
+            <field name="name">HR Tax Deduction</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.tax.ded</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" ref="view_hr_tax_ded_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Records Here.......
+                </p>
+            </field>
+        </record>
+        
+     
+        <menuitem id="hr_tax_deduction_menuitem"
+                  name="Tax Deduction"
+                  parent="hr_payroll.menu_hr_payroll_report"
+                  action="action_view_hr_tax_ded"
+                  sequence="16"
+                  />
+        
+    </data>
+</odoo>

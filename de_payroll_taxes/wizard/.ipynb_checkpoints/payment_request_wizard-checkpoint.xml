@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        <record id="view_payment_request_wizard_form" model="ir.ui.view">
+            <field name="name">payment.request.wizard.form</field>
+            <field name="model">payment.request.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Payment Request" create='0' delete='0' edit='0'>
+                    <sheet>
+                       <group>
+                       
+                        <group>
+                             <field name="date"  />                             
+                        </group>
+                         <group>
+                              
+                        </group>
+                       </group>
+                       <notebook>
+                        <page string="Companies">
+                            <field name="company_ids">
+                                <tree editable="bottom">
+                                    <field name="id" invisible="1"/>
+                                    <field name="name" />
+                                                                       
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                      
+                      <footer>
+                            <button string="Print" name="check_report" type="object"
+                                class="oe_highlight"/>
+                            <button string="Cancel" special="cancel"
+                                class="oe_link"/>
+                        </footer>    
+                    </sheet>
+                    
+                </form>
+            </field>
+        </record>
+
+      
+
+    <record model="ir.actions.act_window" id="action_payment_request_wizard">
+        <field name="name">Payment Request</field>
+        <field name="res_model">payment.request.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+        
+     
+        <menuitem id="payment_request_wizard_menuitem"
+                  name="Payment Request Report"
+                  parent="hr_payroll.menu_hr_payroll_report"
+                  action="action_payment_request_wizard"
+                  sequence="18"/>
+        
+    </data>
+</odoo>

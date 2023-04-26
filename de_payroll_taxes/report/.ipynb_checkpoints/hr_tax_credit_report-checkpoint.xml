@@ -1,0 +1,9 @@
+<odoo>
+     <report id="hr_tax_credit_report_xlx"
+            model="hr.tax.credit"
+            string="Tax Credit Report"
+            report_type="xlsx"
+            name="de_payroll_taxes.hr_tax_credit_report_xlx"
+            file="de_payroll_taxes.hr_tax_credit_report_xlx"
+    />
+</odoo>

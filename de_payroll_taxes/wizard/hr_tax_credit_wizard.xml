@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        <record id="view_hr_tax_credit_wizard_form" model="ir.ui.view">
+            <field name="name">hr.tax.credit.wizard.form</field>
+            <field name="model">hr.tax.credit.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Tax Credit" create='0' delete='0' edit='0'>
+                    <sheet>
+                       <group>
+                        <group>
+                              <field name="employee_id" />
+                              <field name="date" />
+                              <field name="remarks" />
+                        </group>
+                        <group>
+                             <field name="credit_type_id"  require='1'/>
+                             <field name="credit_amount" />
+                            <field name="number_of_month" />
+                        </group>
+                       </group>
+                      <footer>
+                            <button string="Validate" name="action_create_tax_credit" type="object"
+                                class="oe_highlight"/>
+                            <button string="Cancel" special="cancel"
+                                class="oe_link"/>
+                        </footer>    
+                    </sheet>
+                    
+                </form>
+            </field>
+        </record>
+
+      
+
+         <record model="ir.actions.act_window" id="action_hr_tax_credit_wizard">
+        <field name="name">Allocate Tax Credit</field>
+        <field name="res_model">hr.tax.credit.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+        
+     
+        <menuitem id="hr_tax_credit_wizard_menuitem"
+                  name="Allocate Tax Credit"
+                  parent="hr_payroll.menu_hr_payroll_employees_root"
+                  action="action_hr_tax_credit_wizard"
+                  sequence="18"/>
+        
+    </data>
+</odoo>
