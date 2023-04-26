@@ -6,9 +6,9 @@
                 <div class="page" style="font-size:12px">
                     <div class='pull-left' style='color:blue;'>
                         <h5>Payroll Reconciliation Report</h5>
-                        Period <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
+                        Period <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/>
                         and
-                        <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
+                        <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/>
                     </div>
                     <div class='pull-right' style="max-width: 250px;height: 20px; color:blue;">
                         <strong>Printed On:</strong>
@@ -31,7 +31,7 @@
 
                             <tr>
                                 <td>
-                                    Net salary of <span t-esc="len(from_batch_id.slip_ids)"/> employees for  <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
+                                    Net salary of <span t-esc="len(from_batch_id.slip_ids)"/> employees for  <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/>
                                 </td>
                                 <td>
                                     <span t-esc="'{0:,}'.format(int(round(sum(from_batch_id.slip_ids.mapped('net_wage')))))"/>
@@ -39,7 +39,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    Net salary of <span t-esc="len(to_batch_id.slip_ids)"/> employees for <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
+                                    Net salary of <span t-esc="len(to_batch_id.slip_ids)"/> employees for <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/>
 
                                 </td>
                                 <td>
@@ -62,8 +62,8 @@
                             <table class="table table-sm table-striped table-bordered">
                                 <thead>
                                     <th style='color:blue;'>Compensation</th>
-                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/></th>
-                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/></th>
+                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(from_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/></th>
+                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(to_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/></th>
                                     <th style='color:blue;'>Curr-Prv</th>
                                 </thead>
                                 <tbody class="reconcilation_tbody">
@@ -89,8 +89,8 @@
                             <table class="table table-sm table-striped table-bordered">
                                 <thead>
                                     <th style='color:blue;'>Deductions</th>
-                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/></th>
-                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/></th>
+                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(from_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/></th>
+                                    <th style='color:blue;'><span t-esc="datetime.datetime.strptime(str(to_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/></th>
                                     <th style='color:blue;'>Curr-Prv</th>
                                 </thead>
                                 <tbody class="reconcilation_tbody">
@@ -123,7 +123,7 @@
                     <table class="table table-sm table-striped table-bordered">
                         <tbody class="reconcilation_tbody">
                             <tr>
-                                <td style='color:blue;'><strong>Total Bank Transferable for <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>:</strong></td>
+                                <td style='color:blue;'><strong>Total Bank Transferable for <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/>:</strong></td>
                                 <td><strong><span t-esc="'{0:,}'.format(int(round(sum(to_batch_id.slip_ids.mapped('net_wage')))))"/></strong></td>
                             </tr>
                         </tbody>
@@ -150,9 +150,9 @@
                 <div class="page" style="font-size:12px">
                     <div class='pull-left' style='color:blue;'>
                         <h5>Payroll Reconciliation detail</h5>
-                        Period <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
+                        Period <span t-esc="datetime.datetime.strptime(str(from_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/>
                         and
-                        <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_start),'%Y-%m-%d').strftime('%b-%y')"/>
+                        <span t-esc="datetime.datetime.strptime(str(to_batch_id.date_end),'%Y-%m-%d').strftime('%b-%y')"/>
                     </div>
                     <div class='pull-right' style="max-width: 250px;height: 20px; color:blue;">
                         <strong>Printed On:</strong>
