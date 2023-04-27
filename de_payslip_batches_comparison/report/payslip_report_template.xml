@@ -52,12 +52,11 @@
                                     Net Change: Increase / (Decrease)
                                 </td>
                                 <td>
-                                    <span t-esc="'{0:,}'.format(int(round(sum(from_batch_id.slip_ids.mapped('net_wage'))-sum(to_batch_id.slip_ids.mapped('net_wage')))))"/>
+                                    <span t-esc="'{0:,}'.format(int(round(sum(to_batch_id.slip_ids.mapped('net_wage'))-sum(from_batch_id.slip_ids.mapped('net_wage')))))"/>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <br/>
                     <p style='color:blue;'>Reasons of change in Net Salary Payable</p>
                             <table class="table table-sm table-striped table-bordered">
                                 <thead>
@@ -81,11 +80,11 @@
                                         <td/>
                                         <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch1)))"/></strong></td>
                                         <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch2)))"/></strong></td>
-                                        <td style='color:blue;'><strong>Total A: <span t-esc="'{0:,}'.format(int(round(sum_batch1-sum_batch2)))"/></strong></td>
+                                        <td style='color:blue;'><strong>Total A: <span t-esc="'{0:,}'.format(int(round(sum_batch2-sum_batch1)))"/></strong></td>
                                     </tr>
                                 </tbody>
                             </table>
-                    <br/><br/>
+                    <br/>
                             <table class="table table-sm table-striped table-bordered">
                                 <thead>
                                     <th style='color:blue;'>Deductions</th>
@@ -108,7 +107,7 @@
                                         <td/>
                                         <td><strong><span t-esc="'{0:,}'.format(int(round(sum_ded_batch1)))"/></strong></td>
                                         <td><strong><span t-esc="'{0:,}'.format(int(round(sum_ded_batch2)))"/></strong></td>
-                                        <td style='color:blue;'><strong>Total B: <span t-esc="'{0:,}'.format(int(round(sum_ded_batch1-sum_ded_batch2)))"/></strong></td>
+                                        <td style='color:blue;'><strong>Total B: <span t-esc="'{0:,}'.format(int(round(sum_ded_batch2-sum_ded_batch1)))"/></strong></td>
                                     </tr>
                                     <tr>
                                         <td/>
@@ -119,7 +118,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-                    <br/><br/>
+                    <br/>
                     <table class="table table-sm table-striped table-bordered">
                         <tbody class="reconcilation_tbody">
                             <tr>
@@ -128,7 +127,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <br/><br/><br/><br/><br/>
+                    <br/><br/><br/>
                     <table class="table table-sm table-striped table-bordered">
                         <tr>
                             <th style="max-width:100px; word-wrap:break-word;padding-left:5px;"></th>
@@ -195,9 +194,9 @@
                                             <td><span t-esc="'{0:,}'.format(int(round(emp['batch2_total'])))"/></td>
                                             <td><span t-esc="'{0:,}'.format(int(round(emp['batch_diff'])))"/></td>
                                         </tr>
-                                        <t t-set="sum_rule_batch1" t-value="sum_rule_batch1 + rule['batch1_total']"/>
-                                        <t t-set="sum_rule_batch2" t-value="sum_rule_batch2 + rule['batch2_total']"/>
-                                        <t t-set="sum_batch_diff" t-value="sum_batch_diff + rule['batch_diff']"/>
+                                        <t t-set="sum_rule_batch1" t-value="sum_rule_batch1 + emp['batch1_total']"/>
+                                        <t t-set="sum_rule_batch2" t-value="sum_rule_batch2 + emp['batch2_total']"/>
+                                        <t t-set="sum_batch_diff" t-value="sum_batch_diff + emp['batch_diff']"/>
                                     </t>
                                 </t>
                                 <tr>
@@ -206,6 +205,9 @@
                                     <td><strong><span t-esc="'{0:,}'.format(int(round(sum_rule_batch2)))"/></strong></td>
                                     <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch_diff)))"/></strong></td>
                                 </tr>
+                                <t t-set="sum_rule_batch1" t-value="0"/>
+                                <t t-set="sum_rule_batch2" t-value="0"/>
+                                <t t-set="sum_batch_diff" t-value="0"/>
                             </tbody>
                         </table>
                         
@@ -241,9 +243,9 @@
                                             <td><span t-esc="'{0:,}'.format(int(round(emp['batch2_total'])))"/></td>
                                             <td><span t-esc="'{0:,}'.format(int(round(emp['batch_diff'])))"/></td>
                                         </tr>
-                                        <t t-set="sum_rule_batch1" t-value="sum_rule_batch1 + rule['batch1_total']"/>
-                                        <t t-set="sum_rule_batch2" t-value="sum_rule_batch2 + rule['batch2_total']"/>
-                                        <t t-set="sum_batch_diff" t-value="sum_batch_diff + rule['batch_diff']"/>
+                                        <t t-set="sum_rule_batch1" t-value="sum_rule_batch1 + emp['batch1_total']"/>
+                                        <t t-set="sum_rule_batch2" t-value="sum_rule_batch2 + emp['batch2_total']"/>
+                                        <t t-set="sum_batch_diff" t-value="sum_batch_diff + emp['batch_diff']"/>
                                     </t>
                                 </t>
                                 <tr>

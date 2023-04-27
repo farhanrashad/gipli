@@ -17,7 +17,7 @@ class PayslipReport(models.AbstractModel):
         # Compensation Query
         query = '''
         select a.rule_id, a.rule_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
-            sum(batch1_total-batch2_total) as batch_diff
+            sum(abs(batch2_total)-abs(batch1_total)) as batch_diff
         FROM (
             select r.id as rule_id, r.compansation_summary_label as rule_name, l.total as batch1_total, 0 as batch2_total
             from hr_payslip_run b
@@ -36,6 +36,7 @@ class PayslipReport(models.AbstractModel):
             and reconcile_compansation = True
         ) a 
         group by a.rule_id, a.rule_name
+        having sum(batch1_total - batch2_total) != 0
         '''
         args = {
             'company_id': data['form']['company_id'],
@@ -48,7 +49,7 @@ class PayslipReport(models.AbstractModel):
         # Deductions Query
         query = '''
         select a.rule_id, a.rule_name, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
-            sum(batch1_total-batch2_total) as batch_diff
+            sum(abs(batch2_total)-abs(batch1_total)) as batch_diff
         FROM (
             select r.id as rule_id, r.deduction_summary_label as rule_name, l.total as batch1_total, 0 as batch2_total 
             from hr_payslip_run b
@@ -67,6 +68,7 @@ class PayslipReport(models.AbstractModel):
             and r.reconcile_deduction = True
         ) a 
         group by a.rule_id, a.rule_name
+        having sum(batch1_total - batch2_total) != 0
         '''
         args = {
             'company_id': data['form']['company_id'],
@@ -79,9 +81,9 @@ class PayslipReport(models.AbstractModel):
         
         # Employees Data
         query = '''
-        select ROW_NUMBER() OVER( ORDER BY 1) as sr_no, 
+        select ROW_NUMBER() OVER( ORDER BY a.rule_id) as sr_no, 
             a.emp_id, a.emp_number, a.emp_name, a.rule_id, max(a.doj) as doj, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
-            sum(batch1_total - batch2_total) as batch_diff
+            sum(abs(batch2_total) - abs(batch1_total)) as batch_diff
             from (
                 select e.id as emp_id, e.emp_number, e.date as doj, e.name as emp_name, r.id as rule_id, 
                 l.total as batch1_total, 0 as batch2_total 
