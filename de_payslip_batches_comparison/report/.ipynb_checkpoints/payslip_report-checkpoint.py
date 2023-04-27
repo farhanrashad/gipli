@@ -36,6 +36,7 @@ class PayslipReport(models.AbstractModel):
             and reconcile_compansation = True
         ) a 
         group by a.rule_id, a.rule_name
+        having sum(batch1_total) != 0 or sum(batch2_total) != 0
         '''
         args = {
             'company_id': data['form']['company_id'],
@@ -67,6 +68,7 @@ class PayslipReport(models.AbstractModel):
             and r.reconcile_deduction = True
         ) a 
         group by a.rule_id, a.rule_name
+        having sum(batch1_total) != 0 or sum(batch2_total) != 0
         '''
         args = {
             'company_id': data['form']['company_id'],
