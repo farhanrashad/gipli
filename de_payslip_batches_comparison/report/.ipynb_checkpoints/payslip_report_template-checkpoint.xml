@@ -164,31 +164,98 @@
                         <br/>
                     </div>
                     
-                    
-                    <table class="table table-sm table-striped table-bordered mt8" style="border-collapse: collapse;">
-                        <thead>
-                            <tr>
-                                <th style='color:blue;'>Sr #</th>
-                                <th style='color:blue;'>Emp.Code</th>
-                                <th style='color:blue;'>Date Of Joining</th>
-                                <th style='color:blue;'>Name</th>
-                                <th style='color:blue;'>Previous</th>
-                                <th style='color:blue;'>Current</th>
-                                <th style='color:blue;'>Difference</th>
-                            </tr>
-                        </thead>
-                        <tbody class="reconcilation_tbody">
-                            <tr t-foreach="rs_employees" t-as="emp">
-                                <td><span t-esc="emp['sr_no']"/></td>
-                                <td><span t-esc="emp['emp_number']"/></td>
-                                <td><span t-esc="emp['doj']"/></td>
-                                <td><span t-esc="emp['emp_name']"/></td>
-                                <td><span t-esc="'{0:,}'.format(int(round(emp['batch1_total'])))"/></td>
-                                <td><span t-esc="'{0:,}'.format(int(round(emp['batch2_total'])))"/></td>
-                                <td><span t-esc="'{0:,}'.format(int(round(emp['batch_diff'])))"/></td>
-                            </tr>
-                        </tbody>
-                    </table>                    
+                    <t t-foreach="rs_rules" t-as="rule">
+                        <t t-set="sum_rule_batch1" t-value="0"/>
+                        <t t-set="sum_rule_batch2" t-value="0"/>
+                        <t t-set="sum_batch_diff" t-value="0"/>
+                        <table class="table table-sm table-striped table-bordered mt8" style="border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th colspan="2" style='color:blue;'><strong><span t-esc="rule['rule_name']"/></strong></th>
+                                </tr>
+                                <tr>
+                                    <th style='color:blue;'>Sr #</th>
+                                    <th style='color:blue;'>Emp.Code</th>
+                                    <th style='color:blue;'>Date Of Joining</th>
+                                    <th style='color:blue;'>Name</th>
+                                    <th style='color:blue;'>Previous</th>
+                                    <th style='color:blue;'>Current</th>
+                                    <th style='color:blue;'>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody class="reconcilation_tbody">
+                                <t t-foreach="rs_employees" t-as="emp">
+                                    <t t-if="rule['rule_id'] == emp['rule_id']">
+                                        <tr>
+                                            <td><span t-esc="emp['sr_no']"/></td>
+                                            <td><span t-esc="emp['emp_number']"/></td>
+                                            <td><span t-esc="emp['doj']"/></td>
+                                            <td><span t-esc="emp['emp_name']"/></td>
+                                            <td><span t-esc="'{0:,}'.format(int(round(emp['batch1_total'])))"/></td>
+                                            <td><span t-esc="'{0:,}'.format(int(round(emp['batch2_total'])))"/></td>
+                                            <td><span t-esc="'{0:,}'.format(int(round(emp['batch_diff'])))"/></td>
+                                        </tr>
+                                        <t t-set="sum_rule_batch1" t-value="sum_rule_batch1 + rule['batch1_total']"/>
+                                        <t t-set="sum_rule_batch2" t-value="sum_rule_batch2 + rule['batch2_total']"/>
+                                        <t t-set="sum_batch_diff" t-value="sum_batch_diff + rule['batch_diff']"/>
+                                    </t>
+                                </t>
+                                <tr>
+                                    <td/><td/><td/><td/>
+                                    <td><strong><span t-esc="'{0:,}'.format(int(round(sum_rule_batch1)))"/></strong></td>
+                                    <td><strong><span t-esc="'{0:,}'.format(int(round(sum_rule_batch2)))"/></strong></td>
+                                    <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch_diff)))"/></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                    </t>
+                    <t t-foreach="rs_ded_rules" t-as="rule">
+                        <t t-set="sum_rule_batch1" t-value="0"/>
+                        <t t-set="sum_rule_batch2" t-value="0"/>
+                        <t t-set="sum_batch_diff" t-value="0"/>
+                        <table class="table table-sm table-striped table-bordered mt8" style="border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th colspan="2" style='color:blue;'><strong><span t-esc="rule['rule_name']"/></strong></th>
+                                </tr>
+                                <tr>
+                                    <th style='color:blue;'>Sr #</th>
+                                    <th style='color:blue;'>Emp.Code</th>
+                                    <th style='color:blue;'>Date Of Joining</th>
+                                    <th style='color:blue;'>Name</th>
+                                    <th style='color:blue;'>Previous</th>
+                                    <th style='color:blue;'>Current</th>
+                                    <th style='color:blue;'>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody class="reconcilation_tbody">
+                                <t t-foreach="rs_employees" t-as="emp">
+                                    <t t-if="rule['rule_id'] == emp['rule_id']">
+                                        <tr>
+                                            <td><span t-esc="emp['sr_no']"/></td>
+                                            <td><span t-esc="emp['emp_number']"/></td>
+                                            <td><span t-esc="emp['doj']"/></td>
+                                            <td><span t-esc="emp['emp_name']"/></td>
+                                            <td><span t-esc="'{0:,}'.format(int(round(emp['batch1_total'])))"/></td>
+                                            <td><span t-esc="'{0:,}'.format(int(round(emp['batch2_total'])))"/></td>
+                                            <td><span t-esc="'{0:,}'.format(int(round(emp['batch_diff'])))"/></td>
+                                        </tr>
+                                        <t t-set="sum_rule_batch1" t-value="sum_rule_batch1 + rule['batch1_total']"/>
+                                        <t t-set="sum_rule_batch2" t-value="sum_rule_batch2 + rule['batch2_total']"/>
+                                        <t t-set="sum_batch_diff" t-value="sum_batch_diff + rule['batch_diff']"/>
+                                    </t>
+                                </t>
+                                <tr>
+                                    <td/><td/><td/><td/>
+                                    <td><strong><span t-esc="'{0:,}'.format(int(round(sum_rule_batch1)))"/></strong></td>
+                                    <td><strong><span t-esc="'{0:,}'.format(int(round(sum_rule_batch2)))"/></strong></td>
+                                    <td><strong><span t-esc="'{0:,}'.format(int(round(sum_batch_diff)))"/></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                    </t>
                 </div>
             </t>
         </t>
