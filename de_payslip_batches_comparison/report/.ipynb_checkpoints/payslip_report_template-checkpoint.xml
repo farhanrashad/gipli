@@ -127,7 +127,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <br/><br/><br/>
+                    <br/><br/><br/><br/><br/><br/><br/>
                     <table class="table table-sm table-striped table-bordered">
                         <tr>
                             <th style="max-width:100px; word-wrap:break-word;padding-left:5px;"></th>
@@ -145,7 +145,7 @@
                 </div>
                 
                 <!-- Reconciliation Detail Report -->
-                
+                <p style="page-break-before:always;"> </p>
                 <div class="page" style="font-size:12px">
                     <div class='pull-left' style='color:blue;'>
                         <h5>Payroll Reconciliation detail</h5>

@@ -81,7 +81,7 @@ class PayslipReport(models.AbstractModel):
         
         # Employees Data
         query = '''
-        select ROW_NUMBER() OVER( ORDER BY a.rule_id) as sr_no, 
+        select ROW_NUMBER() OVER( PARTITION BY a.rule_id ORDER BY a.rule_id) as sr_no, 
             a.emp_id, a.emp_number, a.emp_name, a.rule_id, max(a.doj) as doj, sum(batch1_total) as batch1_total, sum(batch2_total) as batch2_total,
             sum(abs(batch2_total) - abs(batch1_total)) as batch_diff
             from (
