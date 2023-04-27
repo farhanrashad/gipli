@@ -13,6 +13,8 @@ class PayslipReport(models.AbstractModel):
         from_batch_id = self.env['hr.payslip.run'].browse(data['form']['from_batch_id'])
         to_batch_id = self.env['hr.payslip.run'].browse(data['form']['to_batch_id'])
         
+        company_id = self.env['res.company'].browse(data['form']['company_id'])
+        
         
         # Compensation Query
         query = '''
@@ -227,5 +229,6 @@ class PayslipReport(models.AbstractModel):
             'rs_ded_rules': rs_ded_rules,
             'rs_employees': rs_employees,
             'currency': self.env.company.currency_id.name,
+            'company_id':company_id,
         }
         return report_data
