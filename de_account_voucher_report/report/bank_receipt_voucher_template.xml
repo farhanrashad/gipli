@@ -35,11 +35,14 @@
                 </div>
                 <div class="col-auto mw-100 mb-2">
                     <strong>Reference:</strong><br/>
-                    <t t-set="voucher_no" t-value="(o.seq_name).split('/')[0] +'/'+(o.seq_name).split('/')[2]"/>
-                        <span class="m-0">
-                          <t t-esc="voucher_no"/>
-                        </span>
-                    <!-- <p class="m-0" t-field="o.seq_number"/> -->
+                    <t t-set="voucher_no" t-value=""/>
+                    <t t-if="o.seq_number"> 
+                        <t t-set="voucher_no" t-value="'INV/'+ str(o.seq_number)"/>
+                    </t>
+                                              
+                    <span>
+                         <t t-esc="voucher_no"/>
+                    </span>
                 </div>
             </div>
             

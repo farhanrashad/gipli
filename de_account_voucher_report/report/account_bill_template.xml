@@ -33,7 +33,7 @@
             
             
              <div class="row">
-                     <div class="col-6" style="font-size:15px">
+                     <div class="col-5" style="font-size:15px">
                                 <table>
                                     <tbody>
                                         <tr>
@@ -43,7 +43,7 @@
                                     </tbody>
                                 </table>
                             </div>  
-                            <div class="col-6" style="font-size:15px">
+                            <div class="col-7" style="font-size:15px">
                                 <table>
                                     <tbody>
                                         <tr>
@@ -53,7 +53,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="font-weight: bold;text-align:right;">Address :</td>
+                                            <td style="font-weight: bold;">Address :</td>
                                             <td>
                                                 <span t-field=" o.partner_id.street"/><br/>
                                                 <span t-field=" o.partner_id.street2"/>,
@@ -114,11 +114,17 @@
                             <td ><span t-field="line.account_id.code"/></td>
                             <td ><span t-field="line.account_id.name"/></td>
                             <td ><span t-field="line.name"/></td>
-                            <td ><span t-field="line.debit"/> 
+                            <td>
+                                <t t-if="not line.debit == 0.0">    
+                                    <span t-field="line.debit"/> 
+                                </t>    
                                 <t t-set= "total_debit" t-value="total_debit+line.debit"/>
                             </td>
                               
-                            <td ><span t-field="line.credit"/>
+                            <td>
+                                 <t t-if="not line.credit == 0.0">    
+                                     <span t-field="line.credit"/>
+                                </t>     
                                 <t t-set= "total_credit" t-value="total_credit+line.credit"/></td>
                              
                            </tr> 
@@ -136,11 +142,11 @@
                                 </p>
                          </td>
                          <th>
-                            <t t-esc="total_debit"/> 
+                            <t t-esc="'{:,}'.format(int(total_debit)) "/> 
                          </th>
                          <th>
-                            <t t-esc="total_credit"/> 
-                         </th>
+                            <t t-esc="'{:,}'.format(int(total_credit)) "/> 
+                          </th>
                       </tr>
                    
                 </tbody>
