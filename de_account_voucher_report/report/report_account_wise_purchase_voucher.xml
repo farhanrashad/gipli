@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><odoo>
+    <data>
+        <report file="de_account_voucher_report.account_wise_bill_report"
+         id="open_account_wise_purchase_voucher"
+          model="account.je.wizard"
+           name="de_account_voucher_report.account_wise_bill_report" 
+           report_type="qweb-pdf"
+            string="Purchase/journal Voucher report"/>
+    </data>
+    <template id="account_wise_bill_report">
+        <t t-call="web.html_container">
+ <!--            <t t-call="web.internal_layout"> -->
+                
+                 
+                    <div class="page" style="font-size:18px;">
+                        <t t-foreach="je_objs" t-as="o"> 
+                       
+                        <div>
+                            <!-- class= "pull-left">-->
+                            <img alt="Logo" class="float-left" style="height:100px;width:100px" t-att-src="image_data_uri(o.company_id.logo)" t-if="o.company_id.logo"/>
+                            <span aling="center" style="font-size: 20px; margin-top:25px;padding-left:300px;" t-esc="o.company_id.name"/>
+                            <br/>
+                            <t t-if="o.company_id.street">
+                                <span style="padding-left:300px;" t-esc="o.company_id.street"/>
+                            </t>
+                            <t t-if="o.company_id.street2">
+                                <span style="padding-left:300px;" t-esc="o.company_id.street2"/>
+                            </t>
+                            <t style="padding-left:300px;" t-if="o.company_id.city">
+                                <span t-esc="o.company_id.city"/>
+                            </t>
+                            <t style="padding-left:300px;" t-if="o.company_id.country_id">
+                                <span t-esc="o.company_id.country_id.name"/>
+                            </t>
+                        </div>
+                        <div class="oe_structure"/>
+                        <div align="center"> 
+                <br/>                  
+              <h2><t t-if="o.type=='in_invoice'">Purchase Voucher</t><t t-if="o.type=='entry'">Journal Voucher</t></h2>
+            </div>
+            <br/>
+            
+            <div class="row">
+                <strong>Account:</strong>
+                <span t-esc="account.name"/>
+            </div>
+            
+            
+             <div class="row">
+                 <div class="col-5" style="font-size:15px">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight: bold;">&#160;</td>
+                                <td>&#160;</td>
+                            </tr>
+                            
+                            <tr>
+                                <td style="font-weight: bold;">&#160;</td>
+                                <td>&#160;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </div>  
+                    <div class="col-7" style="font-size:15px;margin-left:500px;">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: bold;">Vendor:</td>
+                                    <td>
+                                        <span t-field=" o.partner_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:bold; white-space:nowrap">Address :</td>
+                                    <td>
+                                        <t t-if="o.partner_id.street"><span t-field=" o.partner_id.street"/><br/></t>
+                                         <t t-if="o.partner_id.street2"><span t-field=" o.partner_id.street2"/>,</t>
+                                         <t t-if="o.partner_id.city"><span t-field=" o.partner_id.city"/></t>
+                                    </td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+             </div>
+            
+            
+            
+            <div id="bill_payment_informations" class="row mt32 mb32">
+                <div class="col-auto mw-100 mb-2" style="white-space:nowrap;float:left;">
+                            <strong>Voucher Date:</strong>
+                            <p class="m-0" t-field="o.date"/>
+                </div>
+                <div class="col-auto mw-100 mb-2" style="margin-left:200px;">
+                    <strong>Reference:</strong><br/>
+                      <t t-set="voucher_no" t-value=""/>
+                      <t t-if="o.seq_number"> 
+                         <t t-set="voucher_no" t-value="'INV/'+ str(o.seq_number)"/>
+                       </t>   
+                        <span class="m-0">
+                          <t t-esc="voucher_no"/>
+                        </span>
+                      
+                </div>
+            </div>
+         
+            <br/>
+            
+            <br/>
+           
+            <table class="table table-sm table-striped" style="float:right;border-collapse:collapse;">
+                <thead>
+                    <tr>
+                       <th style="border:1px solid black;"> A/C CODE</th>
+                        <th  style="border:1px solid black;">TITLE OF ACCOUNT</th>
+                        <th  style="border:1px solid black;">NARRATION</th>
+                        <th  style="border:1px solid black;">DEBIT</th>
+                        <th  style="border:1px solid black;">CREDIT</th>
+                    </tr>
+                    </thead>
+                <tbody class="sale_tbody">
+                    <t t-set= "total_debit" t-value="0"/>
+                    <t t-set= "total_credit" t-value="0"/>
+                    <t t-foreach="o.line_ids" t-as="line">
+                        <tr>
+                            <td  style="border:1px solid black;" ><span t-field="line.account_id.code"/></td>
+                            <td  style="border:1px solid black;"><span t-field="line.account_id.name"/></td>
+                            <td  style="border:1px solid black;"><span t-field="line.name"/></td>
+                            <td style="border:1px solid black;">
+                                <t t-if="not line.debit == 0.0">    
+                                    <span t-field="line.debit"/> 
+                                </t>    
+                                <t t-set= "total_debit" t-value="total_debit+line.debit"/>
+                            </td>
+                              
+                            <td  style="border:1px solid black;">
+                                <t t-if="not line.credit == 0.0">    
+                                     <span t-field="line.credit"/>
+                                </t>     
+                                <t t-set= "total_credit" t-value="total_credit+line.credit"/>
+                             </td>
+                        </tr> 
+                     </t>
+                    <tr>
+                         <td>&#160;</td>
+                         <td>&#160;</td>
+                          <td>&#160;</td>
+                         <td>&#160;</td>
+                          <td>&#160;</td>
+                         
+                        
+                    </tr>
+                     <tr>
+                         <td colspan="3" style="font-size:12px;border:1px solid black;">
+                             <p><strong>Rupees:</strong>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                            <strong> <span t-esc="o.company_id.currency_id.amount_to_text(total_debit)"/></strong>
+                           <b  style="padding-left:30px;font-size:14px;" class='pull-right'>Total: </b>
+                                </p>
+                         </td>
+                         <th style="border:1px solid black;">
+                            <t t-esc="'{:,}'.format(int(total_debit)) "/> 
+                         </th>
+                         <th style="border:1px solid black;">
+                            <t t-esc="'{:,}'.format(int(total_credit)) "/> 
+                          </th>
+                      </tr>
+                   
+                </tbody>
+                
+            </table>
+   
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            
+
+        <!-- </div> -->
+              <t t-if="o.type=='entry'">
+                 <table class="table" style="padding-top:100px;margin-top:100px; margin-bottom:100px;">
+       
+                    <tr>
+                        <th style="max-width:100px; word-wrap:break-word;padding-left:5px;"></th>
+                        <th style="border-top: 1px solid black;padding:5px;text-align:center;"> Prepared By</th>
+                        <th style="max-width:100px; word-wrap:break-word;padding:15px;"> </th>
+                        <th style="border-top: 1px solid black;padding:5px;text-align:center;">Checked By</th>
+                        <th style="max-width:100px; word-wrap:break-word;padding-left:15px;"> </th>
+                        <th style="border-top: 1px solid black;padding:5px;text-align:center;">Approved By</th>
+                    </tr>
+            </table> 
+          </t>
+       
+          
+            </t>
+          
+                    </div>
+                  
+          
+        </t>
+    </template>
+</odoo>
