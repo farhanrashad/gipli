@@ -109,7 +109,7 @@
             
             <br/>
            
-            <table class="table table-sm table-striped" style="float:right;border-collapse:collapse;">
+            <table class="table table-sm table-striped" style="float:right;border-collapse:collapse;margin-bottom:10px;">
                 <thead>
                     <tr>
                        <th style="border:1px solid black;"> A/C CODE</th>

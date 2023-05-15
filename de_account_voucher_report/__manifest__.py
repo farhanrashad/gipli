@@ -30,7 +30,7 @@
     # Check https://github.com/odoo/odoo/blob/13.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Accounting',
-    'version': '13.0.0.1',
+    'version': '13.0.1.2',
 
     # any module necessary for this one to work correctly
     'depends': ['base','account','account_accountant', 'sh_retail_price_tax'],
@@ -51,6 +51,8 @@
         'report/bank_payment_voucher_report.xml',
         'report/bank_payment_voucher_template.xml',
         'wizard/gatepass_voucher_wizard.xml',
+        'wizard/wizard_account_je.xml',
+        'report/report_account_wise_purchase_voucher.xml',
         'views/account_move_view.xml',
         'views/templates.xml',
     ],
