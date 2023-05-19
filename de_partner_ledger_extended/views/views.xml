@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+    <template id="template_followup_report_inh" inherit_id="account_reports.line_template" >
+        <xpath expr="//t/t/tr/t[2]/td" position="replace">
+              <!-- t-att-class="'o_account_report_line ' + (column.get('class', lines.get('columns_header')[-1][column_index+line.get('colspan', 1)].get('class', '')) + (line.get('unfoldable') and ' o_foldable_total' or '')) + ('' if hierarchies_enabled else ' o_account_report_line_indent')" t-att-style="column.get('style', lines.get('columns_header')[-1][column_index+line.get('colspan', 1)].get('style', ''))"> -->
+              <td>
+                    <span class="o_account_report_column_value" t-att-title="column.get('title')">
+                    <t t-esc="column.get('name')"/>
+                    </span>
+                </td>
+           
+        </xpath>
+    </template>
+    </data>
+</odoo>
+

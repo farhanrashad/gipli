@@ -1,0 +1,90 @@
+<odoo>
+  <data>
+         <record id="de_stock_gatepass_form_view" model="ir.ui.view">
+            <field name="name">de.stock.gatepass.form_view</field>
+            <field name="model">stock.gatepass</field>
+            <field name="arch" type="xml">
+                <form string="Stock gatepass">
+                   <header>
+                        <button name="button_validate" type="object" string="validate" states="draft" class="oe_highlight"/>
+                        <button name="button_cancel" type="object" string="Cancel" states="done"/>
+                       <field name="state" widget="statusbar" statusbar_visible="draft,done,cancel"/>
+                   </header>
+                   <sheet>
+                       <h1>
+                           <field name="name" />
+                        </h1>
+                      <group>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="gp_date"/>
+                                <field name="picking_ids" widget="many2many_tags"/>
+                                
+                            </group>
+                            
+                            <group>
+                                <field name="description" />
+                                <field name="prd_ids_cs" invisible="1" widget="many2many_tags"/>
+                                
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Lines" name="gatepass_lines_items">
+                                <field name="gatepass_line"
+                                    widget=""
+                                    mode="tree,kanban"
+                                    
+                                    attrs="{'readonly': [('state', 'in', ('done', 'cancel'))]}">
+                                    <tree string="gatepass_line" editable="bottom">
+                                       <field name="product_id"  options="{'no_create': True}" domain = "[('id','in', parent.prd_ids_cs)]"/>
+                                       <field name="uom_id" />
+                                        <field name="quantity" />
+                                        <field name="product_uom_category_id" invisible="1" />
+                                    </tree>
+                                </field>
+                             </page> 
+                         </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>                     
+        
+        
+         
+         <record id="de_stock_gatepass_tree_view" model="ir.ui.view">
+            <field name="name">de_stock_gatepass tree</field>
+            <field name="model">stock.gatepass</field>
+            <field name="arch" type="xml">
+                <tree string="Stock gatepass">
+                    <field name="name"/> 
+                    <field name="partner_id"/>
+                    <field name="gp_date"/>
+                    <field name="picking_ids" widget="many2many_tags"/>
+                </tree>
+            </field>
+        </record>
+        
+        
+        <record id="action_stock_gatepass" model="ir.actions.act_window">
+            <field name="name">Gatepass</field>
+            <field name="res_model">stock.gatepass</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="de_stock_gatepass_tree_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a new record
+                </p>
+            </field>
+        </record>  
+        
+        
+         <menuitem  id="menu_stock_gatepass" 
+                    name="Gatepass" 
+                    action="action_stock_gatepass" 
+                    parent="stock.menu_stock_warehouse_mgmt"
+                    sequence="3" 
+                   />
+        
+        
+  </data>
+</odoo>  
