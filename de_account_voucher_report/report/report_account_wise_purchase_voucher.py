@@ -11,7 +11,7 @@ class ReportAccountWisePurchase(models.AbstractModel):
         print(data)
         model = self.env.context.get('active_model')
         rec = self.env[model].browse(self.env.context.get('active_id'))
-        journal_item_obj=self.env['account.move.line'].search([('account_id','=',rec.account_id.id),('parent_state','=','posted')])
+        journal_item_obj=self.env['account.move.line'].search([('account_id','=',rec.account_id.id),('parent_state','=','posted'),('date','>=',rec.date_from),('date','<=',rec.date_to)])
         je_objs= journal_item_obj.mapped('move_id')
         
         

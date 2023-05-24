@@ -4,8 +4,8 @@ class AccountJEWizard(models.TransientModel):
     _name = "account.je.wizard"
     _description = "account journal entry report wizard"
 
-    # start_date = fields.Date(string='From Date', required='1', help='select start date')
-    # end_date = fields.Date(string='To Date', required='1', help='select end date')
+    date_from = fields.Date(string='From Date', required='1', help='select start date')
+    date_to = fields.Date(string='To Date', required='1', help='select end date')
     account_id= fields.Many2one("account.account", string="Account")
     
     
