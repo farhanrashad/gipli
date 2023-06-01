@@ -32,6 +32,11 @@ class HrExpense(models.Model):
             'expense_line_ids': [(6, 0, todo.ids)]
         })
         return sheet
+
+    @api.onchange('amount_advanced')
+    def advnce_onchange(self):
+        for expense in self:
+            expense.unit_amount = expense.amount_advanced
     
     def _get_account_move_line_values(self):
         move_line_values_by_expense = {}

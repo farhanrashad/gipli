@@ -11,7 +11,7 @@
     'author': "Dynexcel",
     'website': "http://www.dynexcel.com",
     'category': 'Human Resources/Expenses',
-    'version': '16.0.0.3',
+    'version': '16.0.0.4',
     'depends': ['base', 'hr_expense', 'account', 'de_emp_books'],
     'data': [
         'security/ir.model.access.csv',
