@@ -65,16 +65,14 @@ class Partner(models.Model):
             'state': 'draft',
         })
         
-    
-
+            
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
         args = args or []
-        if name:
-            # Be sure name_search is symetric to name_get
-            name = name.split(' / ')[-1]
-            args = [('name', operator, name),('state', '=', 'approved')] + args
-            
+        # Be sure name_search is symetric to name_get
+        name = name.split(' / ')[-1]
+        args = [('name', operator, name),('state', '=', 'approved')] + args
+
         return super(Partner, self)._search(args, limit=limit, access_rights_uid=name_get_uid)
 
     @api.model

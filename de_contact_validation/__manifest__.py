@@ -17,7 +17,7 @@
 
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-    'category': 'Marketing',
+    'category': 'Sales/Accounting/Purchase',
     'version': '16.0.0.3',
     'depends': ['base'],
     'data': [
