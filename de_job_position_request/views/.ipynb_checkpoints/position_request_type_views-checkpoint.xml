@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="job_position_request_type_filter" model="ir.ui.view">
+            <field name="name">hr.job.position.request.type.search</field>
+            <field name="model">hr.job.position.request.type</field>
+            <field name="arch" type="xml">
+                <search string="Position Request">
+                   <field name="name" string="Type"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="hr_job_position_request_type_form_view" model="ir.ui.view">
+            <field name="name">hr.job.position.request.type.form.view</field>
+            <field name="model">hr.job.position.request.type</field>
+            <field name="arch" type="xml">
+                <form string="Request Type">
+                    <sheet>
+                        <group string="Request Type">
+                            <group >
+                                <field name="name" placeholder="e.g Upcoming Project Opening"/>
+                                <field name="request_type" string="Type" widget="radio"/>
+                            </group>
+                            <group>
+                                <field name="position_type" widget="radio"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="job_position_request_type_tree_view" model="ir.ui.view">
+            <field name="name">job.position.request.type.tree.view</field>
+            <field name="model">hr.job.position.request.type</field>
+            <field name="arch" type="xml">
+                <tree string="Task Stage">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_job_position_request_type" model="ir.actions.act_window">
+            <field name="name">Position Request Type</field>
+            <field name="res_model">hr.job.position.request.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="job_position_request_type_tree_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new position request type
+                </p>
+               
+            </field>
+        </record>
+
+        <menuitem id="re_partner_menu" name="Job Request Type"
+                  parent="hr_recruitment.menu_hr_recruitment_configuration"
+                  action="action_job_position_request_type" sequence="20"/>
+            
+    </data>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="hr_eos_contract_form_view" model="ir.ui.view">
+            <field name="name">hr.eos.contract.form.view</field>
+            <field name="model">hr.eos.contract</field>
+            <field name="inherit_id" ref="de_emp_books_end_services.hr_eos_contract_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[1]/group[2]" position="inside">
+                    <field name="currency_id" groups="base.group_multi_currency"/>
+                    <field name="comp_category_id" options="{'no_create_open': True}"/>
+                </xpath>
+                <xpath expr="//notebook[1]" position="inside">
+                    <page string="Compensations">
+                        <field name="eos_comp_line" nolabel="1" >
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="comp_rule_id" options="{'no_create_open': True}" domain="[('eos_category_ids','in',parent.comp_category_id)]"/>
+                                <field name="currency_id" optional="hide" />
+                                <field name="quantity" />
+                                <field name="rate" />
+                                <field name="total_amount" sum="Total"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+                 
+            </field>
+        </record>
+
+       
+</odoo>

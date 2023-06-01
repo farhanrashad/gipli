@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Sequences for Job Position Request -->
+        <record id="seq_job_position_request" model="ir.sequence">
+            <field name="name">Position Request</field>
+            <field name="code">job.position.request</field>
+            <field name="prefix">JBR</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,176 @@
+<odoo>
+    <data>
+        
+        <menuitem
+            id="menu_emp_books_eos_main"
+            name="End of Service"
+            parent="de_emp_books.menu_emp_books_root"
+            sequence="5"
+            groups="hr.group_hr_manager"/>
+        
+        <!-- Enf of Services Contract -->
+        <record id="hr_eos_contract_form_view" model="ir.ui.view">
+            <field name="name">hr.eos.contract.form.view</field>
+            <field name="model">hr.eos.contract</field>
+            <field name="arch" type="xml">
+                <form string="Contract" class="o_eos_contract_form">
+                    <header>
+                        <button name="action_submit_contract" string="Submit to Manager" type="object" class="oe_highlight o_contract_submit" states="draft" />
+                        <button name="action_contract_manager_approval" states="submit" string="Approve by Manager" type="object" groups="de_emp_books_end_services.group_hr_eos_team_approver" class="oe_highlight o_contract_manager_approval"/>
+
+                        <button name="action_hr_approval" states="approval1" string="Approve by HR" type="object" groups="hr.group_hr_user" class="oe_highlight o_contract_hr_approval"/>
+                        
+                        <button name="action_done" states="approval2" string="Validate" type="object" groups="hr.group_hr_manager" class="oe_highlight o_contract_done"/>
+
+
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submit,approval1,approval2,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="Reference No." attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" context="{'default_company_id': company_id}"/>
+                                <field name="department_id" />
+                                <field name="job_title" />
+                                <field name="first_contract_date" />
+                            </group>
+                            <group>
+                                <field name="contract_type_id" options="{'no_create_open':True}"/>
+                                <field name="date" />
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group string="Notice Period">
+                                <field name="date_notice_start" />
+                                <field name="date_notice_end" />
+                                <field name="notice_duration" />
+                                <field name="job_duration" />
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Description" name="contract_info">
+                                <field name="description" nolabel="1" placeholder="Describe end of service details..." type="html"/>
+                                <div class="d-none oe_clear"/>
+                            </page>
+                            <page string="Exit Checklist" name="exit_checklist">
+                                <group>
+                                    <group string="Checklist">
+                                        <field name="contract_checklist_ids" nolabel="1" widget="many2many_checkboxes"/>
+                                    </group>
+                                    <group>
+                                        <field name="checklist_progress" widget="percentpie"/>
+                                    </group>
+                                </group>
+                            </page>
+                            
+                        </notebook>
+                    </sheet>
+                    <div class="o_attachment_preview"/>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+      <record model="ir.ui.view" id="hr_eos_contract_tree_view">
+            <field name="name">hr.eos.contract.tree.view</field>
+            <field name="model">hr.eos.contract</field>
+            <field name="arch" type="xml">
+                <tree string="Contract" >
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="employee_id"/>
+                    <field name="department_id" optional="hide"/>
+                    <field name="job_title" optional="hide"/>
+                    <field name="contract_type_id"/>
+                    <field name="state" decoration-info="state == 'draft'" decoration-danger="state == 'submit'" decoration-success="state in ['approval1', 'approval2', 'approval3']" decoration-muted="state in ['done','cancel']" widget="badge"/>
+                    <field name="checklist_progress" widget="progressbar" optional="hide"/>
+                    
+                </tree>
+            </field>
+        </record>
+      
+        <record id="hr_eos_contract_view_search" model="ir.ui.view">
+            <field name="name">hr.eos.contract.view.search</field>
+            <field name="model">hr.eos.contract</field>
+            <field name="arch" type="xml">
+                <search string="End of Service Contract">
+                    <field string="Contract" name="name"/>
+                    <field name="date"/>
+                    <separator />
+                    <field name="employee_id"/>
+                    <field string="Department" name="department_id" operator="child_of"/>
+                    <separator />
+                    <filter domain="[('state', '=', 'submit')]" string="To Approve" name="submitted" help="Confirmed Contracts"/>
+                    <filter domain="[('state', 'in', ['approval1','approval2','approval3'])]" string="Approval Pending" name="pending" help="Approval Pending"/>
+                    <filter domain="[('state', '=', 'done')]" string="Settled" name="settled" help="Close Contracts"/>
+                    <filter domain="[('state', '=', 'cancel')]" string="Refused" name="canceled"/>
+                    <separator/>
+                    <filter string="Date" name="filter_date" date="date"/>
+                    <separator/>
+                    <filter domain="[('employee_id.active', '=', False)]" string="Former Employees" name="inactive" />
+                    <filter invisible="1" string="Late Activities" name="activities_overdue"
+                        domain="[('my_activity_date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all records which has next action date is before today"/>
+                    <filter invisible="1" string="Today Activities" name="activities_today"
+                        domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+                            domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))
+                            ]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Employee" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                        <filter string="Department" name="department" domain="[]" context="{'group_by': 'department_id'}"/>
+                        <filter string="Contract Type" domain="[]" context="{'group_by': 'contract_type_id'}" name="contract_type"/>
+                        <filter string="Company" name="company" domain="[]" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                        <filter string="Date" name="contract_month" domain="[]" context="{'group_by': 'date'}" help="Contract by Date"/>
+                        <filter string="Status" domain="[]" context="{'group_by': 'state'}" name="state"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <record id="hr_eos_contract_view_activity" model="ir.ui.view">
+            <field name="name">hr.eos.contract.activity</field>
+            <field name="model">hr.eos.contract</field>
+            <field name="arch" type="xml">
+                <activity string="End of Service Contract">
+                    <field name="employee_id"/>
+                    <templates>
+                        <div t-name="activity-box">
+                            <img t-att-src="activity_image('hr.employee', 'image_128', record.employee_id.raw_value)" t-att-title="record.employee_id.value" t-att-alt="record.employee_id.value"/>
+                            <div>
+                                <field name="name" display="full"/>
+                                <field name="state" display="right"/>
+                            </div>
+                        </div>
+                    </templates>
+                </activity>
+            </field>
+        </record>
+        
+      <record id="action_hr_eos_contract" model="ir.actions.act_window">
+            <field name="name">Contract</field>
+            <field name="res_model">hr.eos.contract</field>
+          <field name="view_mode">tree,form,activity</field>
+            <field name="search_view_id" ref="hr_eos_contract_view_search"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No end of service contract found. Let's create one!
+              </p><p>
+                Once you have created your contract, submit it to your manager who will validate it.
+              </p>
+            </field>
+        </record>        
+        
+        <menuitem action="action_hr_eos_contract" name="Contract" id="menu_emp_books_eos_contract" parent="menu_emp_books_eos_main" sequence="2"/>
+
+    </data>
+</odoo>

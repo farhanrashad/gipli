@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <data>
+        <!--Email template -->
+        <record id="job_request_email_template" model="mail.template">
+            <field name="name">Job Request: Send by email</field>
+            <field name="model_id" ref="openhcm_job_request.model_hr_job_position_request"/>
+            <field name="email_from">${(object.requested_by.email_formatted) |safe}</field>
+            <field name="partner_to">${object.manager_id}</field>
+            <field name="subject">Job Request (Ref ${object.requested_by.name})</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Hello,
+                        There is a need to hire into ${object.department.name},
+                        details listed below
+                    </p>
+                    <table class="table table-sm o_main_table">
+                        <thead>
+                            <tr class="border-black" style="border-bottom: 2px solid black; border-top: 1px solid black;">
+                                <center>
+                                    <strong>${object.name}</strong>
+                                </center>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td>
+                                <strong>Requested On</strong>
+                            </td>
+                            <td>
+                                ${object.date}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Requested By</strong>
+                            </td>
+                            <td>
+                                ${object.requested_by.name}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Employees Requires</strong>
+                            </td>
+                            <td>
+                                ${object.no_of_person_request}
+                            </td>
+                        </tr>
+                    </table>
+                    <button type="button" action="/redirect/request">View Request</button>
+                </div>
+            </field>
+<!--            <field name="lang">${object.partner_id.lang}</field>-->
+            <field name="user_signature" eval="False"/>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+        <record id="job_job_position_creation" model="mail.template">
+            <field name="name">Job Position</field>
+            <field name="model_id" ref="openhcm_job_request.model_hr_job_position_request"/>
+            <field name="email_from">${(object.manager_id.email_formatted) |safe}</field>
+            <field name="partner_to">${object.requested_by.id}</field>
+            <field name="subject">Job Request (Ref ${object.requested_by.name})</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Hello,
+                        As per your request, new job position ${object.name} has been created from
+                        ${object.get_id}. Now you can start recruitment process.
+                        Use below button to access your job position request.
+                    </p>
+                    <button type="button" onclick="location.href='https://www.w3schools.com/'">Job Position</button>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

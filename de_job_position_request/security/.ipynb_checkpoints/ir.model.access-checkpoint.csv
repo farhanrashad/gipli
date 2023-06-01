@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_hr_job_position_request_type_user,access.hr.job.position.request.type.user,model_hr_job_position_request_type,hr_recruitment.group_hr_recruitment_user,1,0,0,0
+access_hr_job_position_request_type_manager,access.job.position.request.type.manager,model_hr_job_position_request_type,hr_recruitment.group_hr_recruitment_manager,1,1,1,1
+
+access_hr_job_position_request_user,access.hr.job.position.request.user,model_hr_job_position_request,hr_recruitment.group_hr_recruitment_user,1,0,0,0
+access_hr_job_position_request_manager,access.job.position.request.manager,model_hr_job_position_request,hr_recruitment.group_hr_recruitment_manager,1,1,1,1

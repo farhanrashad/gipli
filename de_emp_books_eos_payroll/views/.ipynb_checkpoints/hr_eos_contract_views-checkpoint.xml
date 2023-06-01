@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record model="ir.actions.act_window" id="action_eos_contract_to_payslip">
+        <field name="name">Payslip</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.payslip</field>
+        <field name="view_mode">form,tree</field>
+        <field name="domain">[('eos_contract_id','=',active_id)]</field>
+        <field name="context">{
+            "default_eos_contract_id":active_id,
+            }
+        </field>
+    </record>
+    
+
+        <record id="hr_eos_comp_rule_form_view" model="ir.ui.view">
+            <field name="name">hr.eos.contract.form.view</field>
+            <field name="model">hr.eos.contract</field>
+            <field name="inherit_id" ref="de_emp_books_eos_comp.hr_eos_contract_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header[1]" position="inside">
+                    <button name="%(action_eos_contract_to_payslip)d" type="action"
+                    string="Generate Payslip"
+                    attrs="{'invisible': [('state', '!=', 'approval2')]}" groups="hr.group_hr_user"/>
+                </xpath>                
+                 <xpath expr="//notebook[1]" position="inside">
+                     <page name="payslip" string="Payslip">
+                         <group>
+                             <group>
+                                 <field name="struct_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                 <field name="payslip_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                             </group>
+                             <group name="last_payslip" string="Last Payslip">
+                                 <field name="last_payslip_id" />
+                             </group>
+                         </group>
+                     </page>
+                </xpath>
+            </field>
+        </record>
+</odoo>

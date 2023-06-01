@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="approval_request_view_form_inherited" model="ir.ui.view">
+        <field name="name">approval.request.view.form</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='approver_ids']/tree[1]/field[@name='user_id']" position="before">
+                <field name="sequence" widget="handle" />
+            </xpath>
+            <xpath expr="//field[@name='status']" position="before">
+                <field name="department_id"/>
+                <field name="job_title"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
