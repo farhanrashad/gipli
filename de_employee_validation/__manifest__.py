@@ -17,8 +17,8 @@
 
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-    'category': 'Marketing',
-    'version': '14.0.0.1',
+    'category': 'Human Resource',
+    'version': '16.0.0.2',
     'depends': ['base','hr'],
     'data': [
         # 'security/ir.model.access.csv',
