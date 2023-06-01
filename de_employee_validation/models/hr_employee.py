@@ -23,7 +23,7 @@ class HrEmployee(models.Model):
         ('approved', 'Approved'),
         ('expired','Expired'),
     ], string='Status', index=True, readonly=True, tracking=True, copy=False, default='draft', required=True, help='Employee State')
-    no_edit_mode = fields.Boolean(string='Allow Edit')
+    no_edit_mode = fields.Boolean(string='Allow Edit', default=False)
         
     @api.model
     def get_view(self, view_id=None, view_type='form', **options):

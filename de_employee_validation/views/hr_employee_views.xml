@@ -37,4 +37,25 @@
             </xpath>
         </field>
     </record>
+
+    <record id='view_employee_kanban_inherit_validation' model='ir.ui.view'>
+        <field name="name">view.employee.kanban.inherit.validation</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.hr_kanban_view_employees"/>
+        <field name="arch" type="xml">
+            <field name="user_partner_id" position="after">
+                <field name="state" />
+            </field>
+            <xpath expr="//div[hasclass('oe_kanban_content')]" position="inside">
+                <div class="o_kanban_record_bottom">
+                    <div class="oe_kanban_bottom_left"/>
+                    <div class="oe_kanban_bottom_right float-end pe-auto">
+                        <div class="hr_state_container mb-1 me-n1">
+                            <field name="state" widget="label_selection" options="{'classes': {'draft': 'default', 'approved': 'success', 'pending': 'warning'}}"/>
+                        </div>
+                    </div>
+                </div>                
+            </xpath>
+        </field>
+    </record>
 </odoo>
