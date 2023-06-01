@@ -31,14 +31,17 @@ class HrEmployee(models.Model):
         doc = etree.XML(res['arch'])
         if view_type == 'form':
             for node in doc.xpath("//field"):
-                modifiers = simplejson.loads(node.get("modifiers"))
+                #modifiers = simplejson.loads(node.get("modifiers"))
+                modifiers = json.loads(node.attrib.pop('modifiers', '{}'))
                 if 'readonly' not in modifiers:
                     modifiers['readonly'] = [['no_edit_mode','!=',False]]
                 else:
                     if type(modifiers['readonly']) != bool:
                         modifiers['readonly'].insert(0, '|')
                         modifiers['readonly'] += [['no_edit_mode','!=',False]]
-                node.set('modifiers', simplejson.dumps(modifiers)) 
+                #node.set('modifiers', simplejson.dumps(modifiers))
+                if modifiers:
+                    node.set('modifiers', json.dumps(modifiers))
                 res['arch'] = etree.tostring(doc)
         return res
     

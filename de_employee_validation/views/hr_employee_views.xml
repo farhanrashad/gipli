@@ -12,6 +12,10 @@
                 <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]"/>
                 <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
             </xpath>
+            <xpath expr="//filter[@name='group_manager']" position="before">
+                <filter name="group_state" string="Status" domain="[]" context="{'group_by': 'state'}"/>
+                <separator/>
+            </xpath>
         </field>
     </record>
     <record id="view_employee_form_validation" model="ir.ui.view">
@@ -24,10 +28,7 @@
                     <button name="button_confirm"  string="Approve" type="object" class="oe_highlight" groups="de_employee_validation.group_employee_manager" attrs="{'invisible':[('state','!=','pending')]}"/>
                     <button name="button_refuse"  string="Refuse" type="object" class="" groups="de_employee_validation.group_employee_manager" attrs="{'invisible':[('state','!=','pending')]}"/>
 
-                    <button name="button_draft"  groups="de_employee_validation.group_employee_user" string="Reset to Draft" type="object" attrs="{'invisible':[('state','not in',['pending','approved','expired'])]}"/>
-                    
-                    <button name="button_expire"  string="Set to Expire" type="object" class="" groups="de_employee_validation.group_employee_user" attrs="{'invisible':[('state','not in',['pending','approved'])]}"/>
-                    
+                    <button name="button_draft"  groups="de_employee_validation.group_employee_user" string="Reset to Draft" type="object" attrs="{'invisible':[('state','not in',['approved'])]}"/>                    
                     <field name="state" widget="statusbar" statusbar_visible="draft,pending,approved"/>
                     
             </xpath>
