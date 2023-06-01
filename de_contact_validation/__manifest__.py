@@ -18,7 +18,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Marketing',
-    'version': '16.0.0.2',
+    'version': '16.0.0.3',
     'depends': ['base'],
     'data': [
         # 'security/ir.model.access.csv',
