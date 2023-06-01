@@ -27,6 +27,7 @@
                         <field name="state" widget="statusbar" statusbar_visible="draft,submit,approval1,approval2,done"/>
                     </header>
                     <sheet>
+                        <field name="company_id" invisible="1"/>
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
                             <h1>
