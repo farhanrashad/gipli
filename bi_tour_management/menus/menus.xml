@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_tour_root" name="Tour"/>
+        <menuitem id="menu_tour_configuration" name="Configuration" parent="menu_tour_root" sequence="60"/>
+        <menuitem id="menu_tour_configuration_sub" name="Tour Configuration" parent="menu_tour_configuration"
+                  sequence="10"/>
+        <menuitem id="menu_tour_deduction_policy" name="Tour Deduction Policy" parent="menu_tour_configuration_sub"
+                  action="action_tour_deduction_policy_list" sequence="20"/>
+        <!-- Tour Destination -->
+        <menuitem id="tour_menu_destination" name="Tour Destination" parent="menu_tour_configuration_sub" sequence="30"
+                  action="tour_destination_act_window"/>
+        <!-- Tour Facility -->
+        <menuitem id="tour_facility_menu" name="Tour Facility" parent="menu_tour_configuration_sub"
+                  action="tour_facility_action" sequence="40"/>
+        <!-- Menu Package Type -->
+        <menuitem id="menu_tour_package_type" name="Package Type" parent="menu_tour_configuration_sub"
+                  action="action_tour_package_type" sequence="50"/>
+        <!-- Menu Tour Policy -->
+        <menuitem id="menu_tour_payment_policy" name="Tour Payment Policy"
+                  parent="menu_tour_configuration_sub"
+                  sequence="60"
+                  action="tour_payment_policy_action"/>
+        <!-- Menu Season -->
+        <menuitem id="tour_season_menu" name="Tour Season" action="tour_season_action"
+                  parent="menu_tour_configuration_sub" sequence="70"/>
+        <!-- Tour Program -->
+        <menuitem id="tour_program_menu" name="Tour Programs" parent="menu_tour_configuration_sub"
+                  action="tour_program_action" sequence="71"/>
+        <!-- Vis Cost -->
+        <menuitem id="visa_cost_menu" name="Vis Cost" parent="menu_tour_configuration_sub"
+                  action="visa_costing_line_action" sequence="72"/>
+        <!-- Hotel Planner -->
+        <menuitem id="hotel_planner_menu" name="Hotel Planner" parent="menu_tour_configuration_sub"
+                  action="hotel_planner_action" sequence="73"/>
+        <!-- Trave Details -->
+        <menuitem id="travel_details_menu" name="Travel Details" parent="menu_tour_configuration_sub"
+                  action="travel_planner_details_action" sequence="74"/>
+        <!-- Tour Service Details -->
+        <menuitem id="tour_service_details_menu" name="Other Services" parent="menu_tour_configuration_sub"
+                  action="tour_service_details_action" sequence="75"/>
+        <!-- Agent Commission Invoice -->
+        <menuitem id="menu_agent_commission_invoice_line" name="Agent Commission Invoice Lines"
+                  parent="menu_tour_configuration_sub" action="agent_commission_invoice_line_action" sequence="76"/>
+        <!-- Custom Tour Destination -->
+        <menuitem id="menu_custom_tour_destination" name="Custom Tour Destination"
+                  parent="menu_tour_configuration_sub" action="action_custom_tour_destination" sequence="77"/>
+        <!-- Tour Travel Information -->
+        <menuitem id="menu_tour_road_travel_main" name="Tour Travel Information" parent="menu_tour_configuration_sub"
+                  sequence="78" action="tour_road_travel_action"/>
+        <!-- Hotel Configuration -->
+        <menuitem id="menu_hotel_configuration" name="Hotel Configuration"
+                  parent="menu_tour_configuration" sequence="80"/>
+        <!-- Menu Hotel Type -->
+        <menuitem id="menu_hotel_type" name="Hotel Type" action="hotel_type_act_open"
+                  parent="menu_hotel_configuration" sequence="100"/>
+        <!-- Menu Room Type -->
+        <menuitem name="Room Type" id="menu_room_type" parent="menu_hotel_configuration"
+                  action="action_room_type" sequence="110"/>
+        <!-- Service Type -->
+        <menuitem id="menu_service_type" name="Service Type" parent="menu_hotel_configuration"
+                  sequence="120" action="action_service_type_view"/>
+        <!-- Hotel Information -->
+        <menuitem id="menu_hotel_information" name="Hotel Information" parent="menu_hotel_configuration"
+                  sequence="90" action="hotel_information_action"/>
+        <!-- Transport Configuration -->
+        <menuitem id="menu_transport_configuration" name="Transport Configuration"
+                  parent="menu_tour_configuration" sequence="130"/>
+        <!-- Transport Carrier -->
+        <menuitem id="menu_transport_carrier" name="Transport Carrier" parent="menu_transport_configuration"
+                  sequence="140" action="transport_carrier_action"/>
+        <!-- Transport Class -->
+        <menuitem id="menu_travel_class" name="Travel Class" parent="menu_transport_configuration"
+                  sequence="150" action="action_travel_class"/>
+        <!-- Transport Main -->
+        <menuitem id="menu_transport_root" name="Transport"
+                  parent="menu_tour_configuration" sequence="160"/>
+        <!-- Transport Booking -->
+        <menuitem id="menu_transport_booking" name="Transport Booking" parent="menu_transport_root"
+                  sequence="170" action="transport_booking_action"/>
+        <!-- Transport Information -->
+        <menuitem id="menu_transport_info" name="Transport Information" parent="menu_transport_root"
+                  sequence="180" action="transport_information_action"/>
+        <!-- Insurance Main Menu -->
+        <menuitem id="menu_insurance_root" name="Insurance" parent="menu_tour_root" sequence="50"/>
+        <!-- Insurance Type -->
+        <menuitem id="menu_insurance_type" name="Insurance Type" parent="menu_insurance_root"
+                  sequence="20" action="insurance_type_action_form"/>
+        <!-- Insurance Policy -->
+        <menuitem id="menu_insurance_policy" name="Insurance Policy" parent="menu_insurance_root"
+                  action="insurance_policy_action" sequence="10"/>
+        <!-- Hotel Main Menu -->
+        <menuitem id="menu_hotel_reservation_root" name="Hotel" parent="menu_tour_root" sequence="40"/>
+        <!-- Hotel Reservation -->
+        <menuitem id="menu_hotel_reservation" name="Hotel Reservation" parent="menu_hotel_reservation_root"
+                  action="hotel_reservation_action" sequence="10"/>
+        <!-- Custom Tour Main Menu -->
+        <menuitem id="menu_custom_tour_root" name="Custom Tour" parent="menu_tour_root" sequence="30"/>
+        <!-- Hotel Reservation -->
+        <menuitem id="menu_customer_tour" name="Custom Tour Booking" parent="menu_custom_tour_root"
+                  action="tour_booking_action" sequence="10"/>
+        <!-- Agent Commission Main Menu -->
+        <menuitem id="menu_agent_commission_root" name="Agent Commission" parent="menu_tour_root" sequence="20"/>
+        <!-- Agent Commission -->
+        <menuitem id="menu_agent_commission_invoice" name="Agent Commission Invoice" parent="menu_agent_commission_root"
+                  action="action_agent_commission_invoice" sequence="10"/>
+        <!-- Tour Main -->
+        <menuitem id="tour_menu_root" name="Tour" parent="menu_tour_root" sequence="10"/>
+        <!-- Tour Inquiry -->
+        <menuitem id="tour_preference_menu" name="Tour Inquiry" parent="tour_menu_root"
+                  action="tour_preference_action" sequence="10"/>
+        <!-- Tour Itinerary -->
+        <menuitem id="menu_custom_tour_itinerary" name="Tour Itinerary" action="action_custom_tour_itinerary"
+                  parent="tour_menu_root" sequence="20"/>
+        <!-- Tour Creator -->
+        <menuitem id="tour_package_menu_form" name="Tour Creator" parent="tour_menu_root"
+                  action="action_tour_package_form" sequence="30"/>
+        <!-- Tour Booking -->
+        <menuitem id="menu_customer_tour_sec" name="Tour Booking" parent="tour_menu_root"
+                  action="tour_booking_action" sequence="40"/>
+        <!-- Tour Cancellation -->
+        <menuitem id="menu_tour_cancellation" name="Tour Cancellation" parent="tour_menu_root"
+                  action="action_tour_cancellation" sequence="50"/>
+    </data>
+</odoo>

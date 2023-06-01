@@ -1,0 +1,115 @@
+<odoo>
+    <data>
+        <!-- Leave Encashment Form View -->
+        <record id="view_leave_encashment_form" model="ir.ui.view">
+            <field name="name">leave.encashment.form</field>
+            <field name="model">leave.encashment</field>
+            <field name="arch" type="xml">
+                <form string="Leave Encashment">
+                    <header>
+                        <button name="action_draft" string="Draft" type="object" class="btn-primary"
+                                attrs="{'invisible': [('state', '!=', 'approve')]}"/>
+                        <button name="action_approve" string="Approve" type="object" class="btn-primary"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <button name="action_paid" string="Paid" type="object" class="btn-primary"
+                                attrs="{'invisible': [('state', '!=', 'approve')]}"/>
+                        <button name="action_cancel" string="Cancel" type="object" class="btn-secondary"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,approve,paid,cancel"/>
+                    </header>
+                    <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_journal_entry" type="object"
+                                    class="oe_stat_button" icon="fa-calendar">
+                                <div class="o_stat_info">
+                                    <field name="journal_count" class="o_stat_value"/>
+                                    <span class="o_stat_text">Journal Entry
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group></group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="employee_id"/>
+                                <field name="department_id"/>
+                                <field name="job_id"/>
+                                <field name="contract_id"/>
+                                <field name="date"/>
+                                <field name="enchase_type"/>
+                                <field name="description"/>
+                            </group>
+                            <group>
+                                <field name="journal"/>
+                                <field name="bank_number"/>
+                                <field name="leave"/>
+                                <field name="amount"/>
+                                <field name="working_days"/>
+                                <field name="currency_id"/>
+                                <field name="total"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Allocated Leave">
+                                <group>
+                                    <field name="allocation_id"/>
+                                </group>
+                                <group>
+                                    <group>
+                                        <field name="remaining_leave"/>
+                                    </group>
+                                    <group>
+                                        <field name="encasenmet_leave"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"
+                               options="{'post_refresh': 'recipients'}"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_leave_encashment_list">
+            <field name="name">Leave Enchasement List</field>
+            <field name="model">leave.encashment</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="employee_id"/>
+                    <field name="department_id"/>
+                    <field name="job_id"/>
+                    <field name="contract_id"/>
+                    <field name="date"/>
+                    <field name="enchase_type"/>
+                    <field name="leave"/>
+                    <field name="amount"/>
+                    <field name="total"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Leave Encashment Action -->
+        <record id="action_leave_encashment" model="ir.actions.act_window">
+            <field name="name">Leave Enchasement</field>
+            <field name="res_model">leave.encashment</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Employee Menu -->
+        <menuitem
+                id="menu_leave_encashment"
+                name="Leave Encashment"
+                action="action_leave_encashment"
+                parent="hr.menu_hr_employee_payroll"
+                sequence="20"/>
+    </data>
+</odoo>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="transport_information_form_view">
+        <field name="name">transport.information.form</field>
+        <field name="model">transport.information</field>
+        <field name="arch" type="xml">
+            <form string="Transport Information">
+                <header>
+                    <button name="confirm_transport_info" type="object" string="Confirm"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="partner_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Transport Type Information">
+                            <field name="transport_type_info_ids" mode="tree">
+                                <tree string="Transport Type Information" editable="bottom">
+                                    <field name="transport_carrier_id"/>
+                                    <field name="transport_type_id"/>
+                                    <field name="transport_class_id"/>
+                                    <field name="name"/>
+                                    <field name="from_dest_id"/>
+                                    <field name="to_dest_id"/>
+                                    <field name="from_date"/>
+                                    <field name="to_date"/>
+                                    <field name="cost_price_adult"/>
+                                    <field name="cost_price_child"/>
+                                    <field name="sale_price_adult"/>
+                                    <field name="sale_price_child"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Accounting Information">
+                            <group>
+                                <group>
+                                    <field name="rcv_account_id"/>
+                                </group>
+                                <group>
+                                    <field name="pay_account_id"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record model="ir.ui.view" id="transport_information_list_view">
+        <field name="name">transport.information.list</field>
+        <field name="model">transport.information</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
+
+    <record id="transport_information_action" model="ir.actions.act_window">
+        <field name="name">Transport Information</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">transport.information</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="view_hostel_warden_form">
+        <field name="name">oe.school.hostel.warden.form</field>
+        <field name="model">oe.school.hostel.warden</field>
+        <field name="arch" type="xml">
+            <form string="Hostel Warden">
+                <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="action_room_entry" type="object"
+                                class="oe_stat_button" icon="fa-bed">
+                            <div class="o_stat_info">
+                                <field name="room_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Rooms
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="hostel_id"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                        </group>
+                        <group>
+                            <field name="department_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_hostel_warden_list">
+        <field name="name">oe.school.hostel.warden.list</field>
+        <field name="model">oe.school.hostel.warden</field>
+        <field name="arch" type="xml">
+            <tree string="Hostel Wardens">
+                <field name="hostel_id"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+            </tree>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="action_hostel_warden">
+        <field name="name">Hostel Warden Form</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">oe.school.hostel.warden</field>
+        <field name="view_mode">form,tree</field>
+    </record>
+</odoo>

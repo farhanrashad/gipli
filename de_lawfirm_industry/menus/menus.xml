@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_law_root" name="Law"/>
+        <menuitem id="menu_law_configuration" name="Configuration" parent="menu_law_root" sequence="60"/>
+        <menuitem id="menu_court" name="Court" parent="menu_law_configuration" action="action_court" sequence="10"/>
+        <menuitem id="menu_court_judge" name="Judge"
+                  parent="menu_law_configuration" action="court_judge_action" sequence="20"/>
+        <menuitem id="crime_type_menu" name="Crime Type" parent="menu_law_configuration" action="action_crime_type_form"
+                  sequence="30"/>
+        <menuitem id="menu_law_tasks_list" name="Default Task" parent="menu_law_configuration"
+                  action="action_law_task_list" sequence="40"/>
+        <menuitem id="law_task_list_menu" name="Task List" parent="menu_law_configuration" action="law_task_list_action"
+                  sequence="50"/>
+        # Lawyer Menu
+        <menuitem id="menu_hr_employee_inherit"
+                  name="Lawyers"
+                  action="hr.open_view_employee_list_my"
+                  parent="menu_law_root"
+                  sequence="50"/>
+        # Clients Menu
+        <menuitem id="menu_partner_custom" name="Clients" parent="menu_law_root" sequence="40"
+                  action="base.action_partner_form"/>
+
+        # Trust Account
+        <menuitem name="Trust Funds" id="menu_trust_accounts_action" parent="menu_law_root" sequence="30"
+                  action="trust_account_action"/>
+
+        # Case ana Matter
+        <menuitem id="menu_case_and_matter_root" parent="menu_law_root"
+                  name="Case/Matter" sequence="20"/>
+
+        <menuitem id="menu_project_matter" name="Matter" parent="menu_case_and_matter_root" sequence="10"
+                  action="project.open_view_project_all_config"/>
+        <menuitem id="menu_project_case" name="Case" parent="menu_case_and_matter_root" sequence="20"
+                  action="project.open_view_project_all_config"/>
+        <!--        <menuitem id="menu_judge" name="Judges" parent="menu_court_root" action="action_judge"/>-->
+    </data>
+</odoo>

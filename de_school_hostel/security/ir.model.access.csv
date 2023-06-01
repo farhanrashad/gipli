@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_oe_school_hostel,oe.school.hostel,model_oe_school_hostel,,1,1,1,1
+access_oe_school_hostel_category,oe.school.hostel.category,model_oe_school_hostel_category,,1,1,1,1
+access_oe_school_hostel_room,oe.school.hostel.room,model_oe_school_hostel_room,,1,1,1,1
+access_oe_school_hostel_warden,oe.school.hostel.warden,model_oe_school_hostel_warden,,1,1,1,1
+access_hostel_type,hostel.type,model_hostel_type,,1,1,1,1

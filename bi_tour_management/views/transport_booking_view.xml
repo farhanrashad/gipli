@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record model="ir.ui.view" id="transport_booking_form_view">
+            <field name="name">transport.booking.form</field>
+            <field name="model">transport.booking</field>
+            <field name="arch" type="xml">
+                <form string="Transport Booking">
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm,approved,invoiced,issue,done"/>
+                        <button name="confirm_record" type="object" string="Confirm"
+                                attrs="{'invisible': [('state', 'not in', 'draft')]}"/>
+                        <button name="make_approval" type="object" string="APPROVAL FROM TRANSPORTER"
+                                attrs="{'invisible': [('state', 'not in', 'confirm')]}"/>
+                        <button name="booking_done" type="object" string="DONE"
+                                attrs="{'invisible': [('state', 'not in', 'issue')]}"/>
+                        <button name="create_invoice" type="object" string="CONFIRM BOOKING"
+                                attrs="{'invisible': [('state', 'not in', 'approved')]}"/>
+                    </header>
+                    <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_invoice" type="object"
+                                    class="oe_stat_button" icon="fa-pencil-square-o"
+                                    attrs="{'invisible': [('state', 'not in', ('issue', 'done'))]}">
+                                <div class="o_stat_info">
+                                    <field name="invoice_count" class="o_stat_value"/>
+                                    <span class="o_stat_text">Invoice
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <group>
+                                    <field name="name" required="1"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="customer_id" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="child" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="mobile" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="email" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="currency_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="current_date" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="adult" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+
+                                </group>
+                            </div>
+                        </div>
+                        <p style="font-size:18px;">Transport Information</p>
+                        <div class="row mt-4">
+                            <div class="col-4">
+                                <group>
+                                    <field name="transport_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="transport_type_id"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="to_destination_id"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="checkin_date" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="travel_class_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="transport_carrier_id"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="from_destination_id"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                        </div>
+                        <p style="font-size:18px;">Tour Information</p>
+                        <div class="row mt-4">
+                            <div class="col-4">
+                                <group>
+                                    <!--                                    <field name="tour_id"/>-->
+                                    <field name="pnr_no"
+                                           attrs="{'readonly': [('state', 'in', ('issue','done','invoiced'))]}"/>
+                                    <field name="departure_date"
+                                           attrs="{'readonly': [('state', 'in', ('issue','done','invoiced'))]}"/>
+
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <!--                                    <field name="tour_book_id"/>-->
+                                    <field name="carrier_no"
+                                           attrs="{'readonly': [('state', 'in', ('issue','done','invoiced'))]}"/>
+
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <!--                                    <field name="tour_date_id"/>-->
+                                    <field name="arrival_date"
+                                           attrs="{'readonly': [('state', 'in', ('issue','done','invoiced'))]}"/>
+
+                                </group>
+                            </div>
+                        </div>
+                        <p style="font-size:18px;">Transport Pricing</p>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <group>
+                                    <field name="cost_price_adult"/>
+                                    <field name="sale_price_adult"/>
+                                </group>
+                            </div>
+                            <div class="col-6">
+                                <group>
+                                    <field name="cost_price_child"/>
+                                    <field name="sale_price_child"/>
+                                </group>
+                            </div>
+                        </div>
+                        <notebook>
+                            <page string="Customer Information">
+                                <field name="customer_line_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="partner_id"/>
+                                        <field name="name"/>
+                                        <field name="gender"/>
+                                        <field name="adult_child"/>
+                                        <field name="room_no"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Tax Information">
+                                <field name="tax_id" nolabel="1">
+                                    <tree>
+                                        <field name="display_name"/>
+                                        <field name="description"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="untaxed_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="tax_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <div class="oe_subtotal_footer_separator oe_inline">
+                                <label for="amount_total"/>
+                            </div>
+                            <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"
+                                   widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_amount_transport" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- List view -->
+        <record model="ir.ui.view" id="transport_booking_list_view">
+            <field name="name">transport.booking.list</field>
+            <field name="model">transport.booking</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <!--                    <field name="tour_book_id"/>-->
+                    <!--                    <field name="tour_date_id"/>-->
+                    <field name="current_date"/>
+                    <field name="customer_id"/>
+                    <field name="mobile"/>
+                    <field name="mobile"/>
+                    <field name="transport_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Action -->
+        <record id="transport_booking_action" model="ir.actions.act_window">
+            <field name="name">Transport Booking</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">transport.booking</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

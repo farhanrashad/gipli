@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_hostel_type_tree" model="ir.ui.view">
+        <field name="name">hostel.type.tree</field>
+        <field name="model">hostel.type</field>
+        <field name="arch" type="xml">
+            <tree string="Hostel Types">
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_hostel_type_form" model="ir.actions.act_window">
+        <field name="name">Hostel Types</field>
+        <field name="res_model">hostel.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create a new hostel type
+            </p>
+        </field>
+    </record>
+</odoo>

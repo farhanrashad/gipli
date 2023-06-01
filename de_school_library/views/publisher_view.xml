@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+<!--    <record id="view_book_publisher_form" model="ir.ui.view">-->
+<!--        <field name="name">book.publisher.form</field>-->
+<!--        <field name="model">book.publisher</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <form string="Book Publisher">-->
+<!--                <sheet>-->
+<!--                    <group>-->
+<!--                        <group>-->
+<!--                            <field name="name"/>-->
+<!--                            <field name="phone"/>-->
+<!--                        </group>-->
+<!--                        <group>-->
+<!--                            <field name="address"/>-->
+<!--                            <field name="email"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+<!--                    <notebook>-->
+<!--                        <page string="Books">-->
+<!--                            <field name="book_ids" widget="many2many_tags"/>-->
+<!--                        </page>-->
+<!--                    </notebook>-->
+<!--                </sheet>-->
+<!--            </form>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--    <record model="ir.ui.view" id="library_book_publisher">-->
+<!--        <field name="name">library.book.publisher</field>-->
+<!--        <field name="model">book.publisher</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <tree string="Book Publisher">-->
+<!--                <field name="name"/>-->
+<!--                <field name="phone"/>-->
+<!--                <field name="address"/>-->
+<!--                <field name="email"/>-->
+<!--            </tree>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--    <record id="action_book_publisher_list" model="ir.actions.act_window">-->
+<!--        <field name="name">Book Publishers</field>-->
+<!--        <field name="res_model">book.publisher</field>-->
+<!--        <field name="view_mode">tree,form</field>-->
+<!--    </record>-->
+</odoo>

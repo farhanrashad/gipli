@@ -1,0 +1,89 @@
+<odoo>
+    <data>
+        <record id="view_agent_commission_invoice_form" model="ir.ui.view">
+            <field name="name">agent.commission.invoice.form</field>
+            <field name="model">agent.commission.invoice</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm,invoiced,done,cancel"/>
+                        <button name="confirm_record" type="object" string="Confirm"
+                                attrs="{'invisible': [('state', 'not in', 'draft')]}"/>
+                        <button name="commission_done" type="object" string="DONE"
+                                attrs="{'invisible': [('state', 'not in', 'invoiced')]}"/>
+                        <button name="create_commission_invoice" type="object" string="CREATE INVOICE"
+                                attrs="{'invisible': [('state', 'not in', 'confirm')]}"/>
+                        <button name="cancel_commission" type="object" string="CANCEL"
+                                attrs="{'invisible': [('state', 'not in', ('draft','confirm'))]}"/>
+                    </header>
+
+                    <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_commission_invoice" type="object"
+                                    class="oe_stat_button" icon="fa-pencil-square-o">
+                                <div class="o_stat_info">
+                                    <field name="commission_count" class="o_stat_value"/>
+                                    <span class="o_stat_text">Invoice
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="agent_partner_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                            </group>
+                            <group>
+                                <field name="date" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                <field name="currency_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Commission Line">
+                                <field name="commission_line_ids" nolabel="1"
+                                       attrs="{'readonly': [('state', 'not in', 'draft')]}">
+                                    <tree>
+                                        <!--                    <field name="tour_package_id"/>-->
+                                        <field name="customer_partner_id"/>
+                                        <field name="tour_booking_id"/>
+                                        <field name="commission_percentage"/>
+                                        <field name="commission_amount"/>
+                                        <field name="total_tour_cost"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="total_amount_commission" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_agent_commission_invoice_tree" model="ir.ui.view">
+            <field name="name">agent.commission.invoice.tree</field>
+            <field name="model">agent.commission.invoice</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <!-- Define the columns for the list view -->
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="agent_partner_id"/>
+                    <field name="currency_id"/>
+                </tree>
+            </field>
+        </record>
+        <odoo>
+            <data>
+                <record id="action_agent_commission_invoice" model="ir.actions.act_window">
+                    <field name="name">Agent Commission Invoices</field>
+                    <field name="res_model">agent.commission.invoice</field>
+                    <field name="view_mode">tree,form</field>
+                </record>
+            </data>
+        </odoo>
+    </data>
+</odoo>
+

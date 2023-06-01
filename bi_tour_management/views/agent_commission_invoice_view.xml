@@ -1,0 +1,56 @@
+<odoo>
+    <data>
+
+        <!-- Form view -->
+        <record model="ir.ui.view" id="agent_commission_invoice_line_form_view">
+            <field name="name">agent.commission.invoice.line.form</field>
+            <field name="model">agent.commission.invoice.line</field>
+            <field name="arch" type="xml">
+                <form string="Agent Commission Invoice Line">
+                    <sheet>
+                        <group>
+                            <group>
+                                <!--                            <field name="tour_package_id"/>-->
+                                <field name="name"/>
+                                <field name="customer_partner_id"/>
+                                <field name="commission_percentage" attrs="{'invisible': [('commission_type', '!=', 'type1')]}"/>
+                            </group>
+                            <group>
+                                <field name="tour_booking_id"/>
+                                <field name="tour_cost"/>
+                                <field name="commission_type"/>
+                            </group>
+                        </group>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="commission_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_tour_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- List view -->
+        <record model="ir.ui.view" id="agent_commission_invoice_line_list_view">
+            <field name="name">agent.commission.invoice.line.list</field>
+            <field name="model">agent.commission.invoice.line</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <!--                    <field name="tour_package_id"/>-->
+                    <field name="tour_booking_id"/>
+                    <field name="name"/>
+                    <field name="tour_cost"/>
+                    <field name="customer_partner_id"/>
+                    <field name="commission_type"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record model="ir.actions.act_window" id="agent_commission_invoice_line_action">
+            <field name="name">Agent Commission Invoice Lines</field>
+            <field name="res_model">agent.commission.invoice.line</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

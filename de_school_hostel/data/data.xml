@@ -1,0 +1,17 @@
+<odoo>
+    <data>
+        <record id="warden_hostel_smart_button" model="ir.ui.view">
+            <field name="name">warden.hostel.view.buttons</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" type="object" name="get_vehicles"
+                            icon="fa-car">
+                        <field string="Vehicle" name="vehicle_count" widget="statinfo"/>
+                    </button>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

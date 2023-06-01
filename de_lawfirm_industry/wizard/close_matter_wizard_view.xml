@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_close_matter_wizard_form" model="ir.ui.view">
+            <field name="name">close.matter.wizard.form</field>
+            <field name="model">close.matter.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="close_reason"/>
+                    </group>
+                    <footer>
+                        <button name="close_matter" string="Submit" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="close_matter_wizard_action">
+            <field name="name">Close Reason</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">close.matter.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

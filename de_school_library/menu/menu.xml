@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem name="Library" id="menu_library_root" sequence="10"/>
+    <!--    <menuitem name="Schedule" id="menu_hostel" parent="menu_hostel_root" action="action_hostel"/>-->
+    <!--    <menuitem name="Report" id="menu_hostel" parent="menu_hostel_root" action="action_hostel"/>-->
+    <!-- Menus -->
+    <menuitem id="library_menu_order_root" name="Order" parent="menu_library_root" sequence="20"/>
+    <menuitem id="library_order_menu" name="Orders" parent="library_menu_order_root" sequence="10"
+              action="library_order_action"/>
+    <menuitem name="Products" id="products_menu_root" parent="menu_library_root" sequence="20"/>
+    <menuitem name="Products" id="products_menu_custom" parent="products_menu_root" action="stock.stock_product_normal_action" sequence="10"/>
+
+    <menuitem name="Configuration" id="menu_configuration" parent="menu_library_root" sequence="50"/>
+    <menuitem name="Settings" id="menu_setting" parent="menu_configuration" sequence="10"/>
+    <menuitem id="menu_book_types_list" name="Book Types" parent="menu_configuration" action="book_type_action"
+              sequence="20"/>
+    <menuitem id="menu_book_category_list" name="Book Category" parent="menu_configuration"
+              action="action_book_category" sequence="30"/>
+<!--    <menuitem id="menu_book_author" name="Author" parent="menu_configuration"-->
+<!--              action="action_book_author" sequence="40"/>-->
+<!--    <menuitem id="book_publisher_menu" name="Book Publishers" parent="menu_configuration"-->
+<!--              action="action_book_publisher_list" sequence="50"/>-->
+
+
+</odoo>

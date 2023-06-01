@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record model="ir.ui.view" id="hotel_reseravation_form_view">
+            <field name="name">hotel.reservation.form</field>
+            <field name="model">tour.hotel.reservation</field>
+            <field name="arch" type="xml">
+                <form string="Hotel Reservation">
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm,approved,booked,issue,done"/>
+                        <button name="confirm_record" type="object" string="Confirm"
+                                attrs="{'invisible': [('state', 'not in', 'draft')]}"/>
+                        <button name="make_approval" type="object" string="APPROVAL FROM HOTEL"
+                                attrs="{'invisible': [('state', 'not in', 'confirm')]}"/>
+                        <button name="make_booking" type="object" string="CONFIRM BOOKING"
+                                attrs="{'invisible': [('state', 'not in', 'approved')]}"/>
+                        <button name="cancel" type="object" string="CANCEL"
+                                attrs="{'invisible': [('state', 'not in', 'approved')]}"/>
+                        <button name="issue_ticket" type="object" string="ISSUE TICKET"
+                                attrs="{'invisible': [('state', 'not in', 'booked')]}"/>
+                        <button name="done_hotel" type="object" string="DONE"
+                                attrs="{'invisible': [('state', 'not in', 'issue')]}"/>
+                        <!--                        <button name="booking_done" type="object" string="DONE"-->
+                        <!--                                attrs="{'invisible': [('state', 'not in', 'issue')]}"/>-->
+                    </header>
+                    <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_hotel_reservation" type="object"
+                                    class="oe_stat_button" icon="fa-pencil-square-o"
+                                    attrs="{'invisible': [('state', 'not in', ('issue', 'booked', 'done'))]}">
+                                <div class="o_stat_info">
+                                    <field name="invoice_count_total" class="o_stat_value"/>
+                                    <span class="o_stat_text">Invoice
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <group>
+                                    <field name="name" required="1"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="customer_id" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="child" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="mobile" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="email" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="currency_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="current_date" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="adult" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+
+                                </group>
+                            </div>
+                        </div>
+                        <p style="font-size:18px;">Hotel Information</p>
+                        <div class="row mt-4">
+                            <div class="col-4">
+                                <group>
+                                    <field name="hotel_type_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="room_rent"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="check_out_date"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="hotel_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="hotel_rent" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="rooms_required" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="room_type_id"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="check_in_date"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="no_of_days"
+                                           attrs="{'readonly': [('state', 'in', 'draft')]}"/>
+                                </group>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <button string="COMPUTE" class="oe_highlight" type="object" name="compute_amounts"/>
+                            </div>
+                        </div>
+                        <p style="font-size:18px;">Tour Information</p>
+                        <div class="row mt-4">
+                            <div class="col-3">
+                                <group>
+                                    <!--                                    <field name="tour_id"/>-->
+                                </group>
+                            </div>
+                            <div class="col-3">
+                                <group>
+                                    <!--                                    <field name="tour_book_id"/>-->
+                                </group>
+                            </div>
+                            <div class="col-3">
+                                <group>
+                                    <!--                                    <field name="tour_date_id"/>-->
+                                </group>
+                            </div>
+                            <div class="col-3">
+                                <group>
+                                    <field name="destination_id"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                        </div>
+                        <notebook>
+                            <page string="Customer Information">
+                                <field name="customer_line_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="partner_id"/>
+                                        <field name="name"/>
+                                        <field name="gender"/>
+                                        <field name="adult_child"/>
+                                        <field name="room_no"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Tax Information">
+                                <field name="tax_id" nolabel="1">
+                                    <tree>
+                                        <field name="display_name"/>
+                                        <field name="description"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="untaxed_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="tax_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <div class="oe_subtotal_footer_separator oe_inline">
+                                <label for="amount_total"/>
+                            </div>
+                            <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"
+                                   widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="hotel_invoice_amount" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- List view -->
+        <record model="ir.ui.view" id="tour_reservation_list_view">
+            <field name="name">tour.reservation.list</field>
+            <field name="model">tour.hotel.reservation</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="check_in_date"/>
+                    <field name="check_out_date"/>
+                    <field name="email"/>
+                    <field name="mobile"/>
+                    <!--                    <field name="tour_book_id"/>-->
+                    <!--                    <field name="tour_date_id"/>-->
+                    <field name="hotel_id"/>
+                    <field name="adult"/>
+                    <field name="child"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Action -->
+        <record id="hotel_reservation_action" model="ir.actions.act_window">
+            <field name="name">Hotel Reservation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tour.hotel.reservation</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

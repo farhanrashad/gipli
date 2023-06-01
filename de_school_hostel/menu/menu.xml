@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem name="Hostels" id="menu_hostel_root" sequence="10"/>
+    <!--    <menuitem name="Schedule" id="menu_hostel" parent="menu_hostel_root" action="action_hostel"/>-->
+    <!--    <menuitem name="Report" id="menu_hostel" parent="menu_hostel_root" action="action_hostel"/>-->
+    <menuitem name="Configuration" id="menu_configuration" parent="menu_hostel_root" sequence="50"/>
+    <menuitem name="Settings" id="menu_setting" parent="menu_configuration" sequence="10"/>
+    <menuitem name="Hostels" id="menu_hostel" parent="menu_configuration" action="action_hostel" sequence="20"/>
+    <menuitem id="oe_school_hostel_category_tag_menu" name="Tag"
+              parent="menu_configuration" action="oe_school_hostel_category_action" sequence="30"/>
+    <menuitem id="oe_school_hostel_category_tag_menu" name="Tag"
+              parent="menu_configuration" action="oe_school_hostel_category_action" sequence="40"/>
+    <menuitem name="Hostel Wardens" id="menu_hostel_wardens_list" parent="menu_configuration"
+              action="action_hostel_warden"/>
+    <menuitem id="menu_hostel_type_list" name="Hostel Types"
+              parent="menu_configuration"
+              action="action_hostel_type_form" sequence="50"/>
+
+    <menuitem id="menu_school_hostel_room_root" name="Rooms" parent="menu_hostel_root" sequence="10"/>
+    <menuitem id="menu_contract_root" name="Contracts" parent="menu_hostel_root" sequence="20"/>
+    <menuitem id="menu_custom_model_sale_order"
+              name="Contracts"
+              action="sale.action_quotations_with_onboarding"
+              parent="menu_contract_root"
+              sequence="10"/>
+    <menuitem id="menu_reports_root" name="Reports" parent="menu_hostel_root" sequence="30"/>
+    <menuitem id="menu_school_hostel_room" name="Rooms"
+              parent="menu_school_hostel_room_root"
+              action="action_school_hostel_room"
+              sequence="10"/>
+</odoo>

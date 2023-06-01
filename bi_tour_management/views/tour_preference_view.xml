@@ -1,0 +1,150 @@
+<odoo>
+    <data>
+        <!-- Form view -->
+        <record model="ir.ui.view" id="tour_preference_form_view">
+            <field name="name">tour.preference.form</field>
+            <field name="model">tour.preference</field>
+            <field name="arch" type="xml">
+                <form string="Tour Preference">
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm,approved,invoiced,issue,done"/>
+                        <button name="confirm_tour_record" type="object" string="Confirm"
+                                attrs="{'invisible': [('state', 'not in', 'draft')]}"/>
+                    </header>
+
+                    <sheet>
+                        <!-- Add fields to the form view -->
+                        <div class="row">
+                            <div class="col-4">
+                                <group>
+                                    <field name="current_date" required="1"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="lead_id" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="address" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="email" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="mobile" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="contact_name" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="adult" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="child" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="via" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                        </div>
+                        <p style="font-size:18px;">Tour Information</p>
+                        <div class="row">
+                            <div class="col-3">
+                                <group>
+                                    <field name="check_in_date" required="1"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-3">
+                                <group>
+                                    <field name="check_out_date" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-3">
+                                <group>
+                                    <field name="tour_low_price" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-3">
+                                <group>
+                                    <field name="tour_high_price" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                        </div>
+                        <notebook>
+                            <page name="destination_preferences" string="Destination Preferences">
+                                <field name="destination_line_ids">
+                                    <tree>
+                                        <field name="destination_id"/>
+                                        <field name="country_id"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page name="hotel_preferences" string="Hotel Preferences">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <group>
+                                            <field name="hotel_type_id" required="1"
+                                                   attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                            <field name="low_price" required="1"
+                                                   attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                        </group>
+                                    </div>
+                                    <div class="col-4">
+                                        <group>
+                                            <field name="room_type_id" widget="horizontal"
+                                                   attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                            <field name="high_price" required="1"
+                                                   attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                        </group>
+                                    </div>
+                                    <div class="col-4">
+                                        <group>
+                                            <field name="room_req" widget="horizontal"
+                                                   attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                        </group>
+                                    </div>
+                                </div>
+
+                            </page>
+                            <page name="transport_preferences" string="Transport Preferences">
+                                <field name="transport_ids">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                        <field name="product_id"/>
+                                        <field name="travel_class_id"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- List view -->
+        <record model="ir.ui.view" id="tour_preference_list_view">
+            <field name="name">tour.preference.list</field>
+            <field name="model">tour.preference</field>
+            <field name="arch" type="xml">
+                <tree string="Tour Preferences">
+                    <field name="current_date"/>
+                    <field name="email"/>
+                    <field name="adult"/>
+                    <field name="child"/>
+                    <field name="lead_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="tour_preference_action">
+            <field name="name">Tour Inqiry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tour.preference</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

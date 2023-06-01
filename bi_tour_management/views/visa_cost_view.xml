@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Form view -->
+        <record model="ir.ui.view" id="visa_costing_line_form_view">
+            <field name="name">visa.costing.line.form</field>
+            <field name="model">visa.costing.line</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="total_person"/>
+
+                            </group>
+                            <group>
+                                <field name="country_id"/>
+                                <field name="visa_type"/>
+                                <field name="sale_price"/>
+                                <field name="total_price" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="sale_tax_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="sale_tax_amount_visa" widget="monetary"
+                               options="{'currency_field': 'currency_id'}"/>
+                        <field name="visa_pin_sale" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- List view -->
+        <record model="ir.ui.view" id="visa_costing_line_tree_view">
+            <field name="name">visa.costing.line.tree</field>
+            <field name="model">visa.costing.line</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="country_id"/>
+                    <field name="visa_type"/>
+                    <field name="sale_price"/>
+                    <field name="total_person"/>
+                    <field name="total_price"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record model="ir.actions.act_window" id="visa_costing_line_action">
+            <field name="name">Visa Costing Lines</field>
+            <field name="res_model">visa.costing.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+        </record>
+    </data>
+</odoo>

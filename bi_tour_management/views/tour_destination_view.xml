@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="tour_destination_form_view" model="ir.ui.view">
+        <field name="name">tour.destination.form</field>
+        <field name="model">tour.destination</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="code"/>
+                            <field name="country_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="tour_destination_list_view" model="ir.ui.view">
+        <field name="name">tour.destination.list</field>
+        <field name="model">tour.destination</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="country_id"/>
+            </tree>
+        </field>
+    </record>
+    <record id="tour_destination_act_window" model="ir.actions.act_window">
+        <field name="name">Tour Destinations</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">tour.destination</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

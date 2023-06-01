@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="tour_payment_policy_form_view">
+            <field name="name">tour.payment.policy.form</field>
+            <field name="model">tour.payment.policy</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="before_book_date_per"/>
+
+                            </group>
+                            <group>
+                                <field name="before_pay_date_per"/>
+
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- List View -->
+        <record id="view_tour_payment_policy_tree" model="ir.ui.view">
+            <field name="name">tour.payment.policy.tree</field>
+            <field name="model">tour.payment.policy</field>
+            <field name="arch" type="xml">
+                <tree string="Tour Payment Policy">
+                    <field name="name"/>
+                    <field name="before_book_date_per"/>
+                    <field name="before_pay_date_per"/>
+                </tree>
+            </field>
+        </record>
+        <!-- List Action -->
+        <record id="tour_payment_policy_action" model="ir.actions.act_window">
+            <field name="name">Tour Payment Policies</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tour.payment.policy</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>

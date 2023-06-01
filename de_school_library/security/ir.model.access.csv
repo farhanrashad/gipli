@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_library_order,library.order,model_library_order,,1,1,1,1
+access_library_order_line,library.order.line,model_library_order_line,,1,1,1,1
+access_oe_school_library_book_type,oe.school.library.book.type,model_oe_school_library_book_type,,1,1,1,1
+access_os_school_library_book_category,os.school.library.book.category,model_os_school_library_book_category,,1,1,1,1
+access_library_book_author,library.book.author,model_library_book_author,,1,1,1,1
+access_book_publisher,book.publisher,model_book_publisher,,1,1,1,1

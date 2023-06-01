@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="oe_school_hostel_category_form_view">
+            <field name="name">oe.school.hostel.category.form</field>
+            <field name="model">oe.school.hostel.category</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="code"/>
+                            </group>
+                        </group>
+                    </sheet>
+                     <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"
+                               options="{'post_refresh': 'recipients'}"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="oe_school_hostel_category_tree_view">
+            <field name="name">oe.school.hostel.category.tree</field>
+            <field name="model">oe.school.hostel.category</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="oe_school_hostel_category_action">
+            <field name="name">Tag</field>
+            <field name="res_model">oe.school.hostel.category</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

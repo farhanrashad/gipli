@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Form view -->
+        <record model="ir.ui.view" id="library_order_form_view">
+            <field name="name">library.order.form</field>
+            <field name="model">library.order</field>
+            <field name="arch" type="xml">
+                <form string="Library Order">
+                    <header>
+                        <!--                        <button name="action_draft" string="Draft" type="object" class="btn-primary"-->
+                        <!--                                attrs="{'invisible': [('state', '!=', 'approve')]}"/>-->
+                        <!--                        <button name="action_approve" string="Approve" type="object" class="btn-primary"-->
+                        <!--                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>-->
+                        <!--                        <button name="action_paid" string="Paid" type="object" class="btn-primary"-->
+                        <!--                                attrs="{'invisible': [('state', '!=', 'approve')]}"/>-->
+                        <!--                        <button name="action_cancel" string="Cancel" type="object" class="btn-secondary"-->
+                        <!--                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>-->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done,cancel"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="date_order"/>
+                            </group>
+                            <group>
+                                <field name="customer_id"/>
+                                <field name="amount_total"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Order Lines">
+                                <field name="order_lines">
+                                    <tree editable="bottom">
+                                        <field name="book_id"/>
+                                        <field name="book_category_id"/>
+<!--                                        <field name="author"/>-->
+<!--                                        <field name="author"/>-->
+<!--                                        <field name="publisher"/>-->
+                                        <field name="quantity"/>
+                                        <field name="subtotal"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- List view -->
+        <record model="ir.ui.view" id="library_order_list_view">
+            <field name="name">library.order.list</field>
+            <field name="model">library.order</field>
+            <field name="arch" type="xml">
+                <tree string="Library Orders">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="date_order"/>
+                    <field name="state"/>
+                    <field name="amount_total"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="library_order_action">
+            <field name="name">Library Orders</field>
+            <field name="res_model">library.order</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>
