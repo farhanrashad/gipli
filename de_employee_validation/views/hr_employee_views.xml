@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="view_employee_filter_inherit_validation" model="ir.ui.view">
+        <field name="name">view.employee.filter.inherit.validation</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_employee_form_validation" model="ir.ui.view">
+        <field name="name">view.employee.form.validation</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                    <button name="button_submit"  string="Submit for Approval" type="object" class="oe_highlight" groups="de_employee_validation.group_employee_user" attrs="{'invisible':[('state','!=','draft')]}"/>
+                    <button name="button_confirm"  string="Approve" type="object" class="oe_highlight" groups="de_employee_validation.group_employee_manager" attrs="{'invisible':[('state','!=','pending')]}"/>
+                    <button name="button_refuse"  string="Refuse" type="object" class="" groups="de_employee_validation.group_employee_manager" attrs="{'invisible':[('state','!=','pending')]}"/>
+
+                    <button name="button_draft"  groups="de_employee_validation.group_employee_user" string="Reset to Draft" type="object" attrs="{'invisible':[('state','not in',['pending','approved','expired'])]}"/>
+                    
+                    <button name="button_expire"  string="Set to Expire" type="object" class="" groups="de_employee_validation.group_employee_user" attrs="{'invisible':[('state','not in',['pending','approved'])]}"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,pending,approved"/>
+                    
+            </xpath>
+            <xpath expr="//group[1]/group[1]" position="inside">
+                <field name="no_edit_mode" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

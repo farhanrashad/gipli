@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Contact Validation",
+    'name': "Employee Validation",
 
     'summary': """
-        Contact Validation
+        Employee Validation
         """,
 
     'description': """
-        Contact Validation:-
+        Employee Validation:-
         Add Contact Stages
         1. Draft
         2. To Approve
@@ -19,11 +19,11 @@
     'website': "https://www.dynexcel.com",
     'category': 'Marketing',
     'version': '14.0.0.1',
-    'depends': ['base'],
+    'depends': ['base','hr'],
     'data': [
         # 'security/ir.model.access.csv',
-        'security/contact_security.xml',
-        'views/res_partner_views.xml',
+        'security/employee_security.xml',
+        'views/hr_employee_views.xml',
         
     ],
     "price": 25,
