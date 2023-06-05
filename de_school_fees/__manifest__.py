@@ -14,7 +14,7 @@
     'website': "https://www.dynexcel.com",
 
     'category': 'Dynexcel',
-    'version': '16.0.0.1',
+    'version': '16.0.0.2',
     'installable': True,
     'application': True,
     # any module necessary for this one to work correctly

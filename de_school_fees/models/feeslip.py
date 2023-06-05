@@ -29,14 +29,14 @@ class FeeSlip(models.Model):
         'oe.fee.struct', string='Fee Structure',
         compute='_compute_struct_id', store=True, readonly=False,
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]},
-        help='Defines the rules that have to be applied to this payslip, according '
+        help='Defines the rules that have to be applied to this feeslip, according '
              'to the contract chosen. If the contract is empty, this field isn\'t '
              'mandatory anymore and all the valid rules of the structures '
              'of the employee\'s contracts will be applied.')
     #struct_type_id = fields.Many2one('hr.payroll.structure.type', related='struct_id.type_id')
     #wage_type = fields.Selection(related='struct_type_id.wage_type')
     name = fields.Char(
-        string='Payslip Name', required=True,
+        string='Feeslip Name', required=True,
         compute='_compute_name', store=True, readonly=False,
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
     number = fields.Char(
@@ -45,7 +45,7 @@ class FeeSlip(models.Model):
     student_id = fields.Many2one(
         'res.partner', string='Student', required=True, readonly=True,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]},
-        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id), '|', ('active', '=', True), ('active', '=', False)]")
+        domain="[('is_student', '=', True), ('active', '=', True)]")
     #department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id', readonly=True, store=True)
     #job_id = fields.Many2one('hr.job', string='Job Position', related='employee_id.job_id', readonly=True, store=True)
     date_from = fields.Date(
@@ -63,16 +63,16 @@ class FeeSlip(models.Model):
         ('cancel', 'Rejected')],
         string='Status', index=True, readonly=True, copy=False,
         default='draft', tracking=True,
-        help="""* When the payslip is created the status is \'Draft\'
-                \n* If the payslip is under verification, the status is \'Waiting\'.
-                \n* If the payslip is confirmed then status is set to \'Done\'.
-                \n* When user cancel payslip the status is \'Rejected\'.""")
+        help="""* When the feeslip is created the status is \'Draft\'
+                \n* If the feeslip is under verification, the status is \'Waiting\'.
+                \n* If the feeslip is confirmed then status is set to \'Done\'.
+                \n* When user cancel feeslip the status is \'Rejected\'.""")
     line_ids = fields.One2many(
-        'oe.feeslip.line', 'feeslip_id', string='Payslip Lines',
+        'oe.feeslip.line', 'feeslip_id', string='Feeslip Lines',
         compute='_compute_line_ids', store=True, readonly=True, copy=True,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     company_id = fields.Many2one(
-        'res.company', string='Company', copy=False, required=True,
+        'res.company', string='Company', copy=False, required=False,
         compute='_compute_company_id', store=True, readonly=False,
         default=lambda self: self.env.company,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
@@ -82,11 +82,11 @@ class FeeSlip(models.Model):
     )
     country_code = fields.Char(related='country_id.code', readonly=True)
     #worked_days_line_ids = fields.One2many(
-    #    'hr.payslip.worked_days', 'feeslip_id', string='Payslip Worked Days', copy=True,
+    #    'hr.feeslip.worked_days', 'feeslip_id', string='feeslip Worked Days', copy=True,
     #    compute='_compute_worked_days_line_ids', store=True, readonly=False,
     #    states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
     input_line_ids = fields.One2many(
-        'oe.feeslip.input.line', 'feeslip_id', string='Payslip Inputs', store=True,
+        'oe.feeslip.input.line', 'feeslip_id', string='Feeslip Inputs', store=True,
         #compute='_compute_input_line_ids', 
         readonly=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
     paid = fields.Boolean(
@@ -99,7 +99,7 @@ class FeeSlip(models.Model):
     credit_note = fields.Boolean(
         string='Credit Note', readonly=True,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]},
-        help="Indicates this payslip has a refund of another")
+        help="Indicates this feeslip has a refund of another")
     has_refund_slip = fields.Boolean(compute='_compute_has_refund_slip')
     feeslip_run_id = fields.Many2one('oe.feeslip.run', string='Batch Name', readonly=True,
     copy=False, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]}, ondelete='cascade',
@@ -123,7 +123,7 @@ class FeeSlip(models.Model):
 
     #salary_attachment_ids = fields.Many2many(
     #    'hr.salary.attachment',
-    #    relation='hr_payslip_hr_salary_attachment_rel',
+    #    relation='hr_feeslip_hr_salary_attachment_rel',
     #    string='Salary Attachments',
     #    compute='_compute_salary_attachment_ids',
     #    store=True,
@@ -192,30 +192,30 @@ class FeeSlip(models.Model):
 
     @api.depends('student_id', 'state')
     def _compute_negative_net_to_report_display(self):
-        activity_type = False #self.env.ref('hr_payroll.mail_activity_data_hr_payslip_negative_net')
-        for payslip in self:
-            if payslip.state in ['draft', 'verify']:
-                payslips_to_report = self.env['oe.feeslip'].search([
+        activity_type = False #self.env.ref('hr_payroll.mail_activity_data_hr_feeslip_negative_net')
+        for feeslip in self:
+            if feeslip.state in ['draft', 'verify']:
+                feeslips_to_report = self.env['oe.feeslip'].search([
                     ('has_negative_net_to_report', '=', True),
-                    ('student_id', '=', payslip.student_id.id),
+                    ('student_id', '=', feeslip.student_id.id),
                     ('credit_note', '=', False),
                 ])
-                payslip.negative_net_to_report_display = payslips_to_report
-                payslip.negative_net_to_report_amount = payslips_to_report._get_line_values(['NET'], compute_sum=True)['NET']['sum']['total']
-                payslip.negative_net_to_report_message = _(
-                    'Note: There are previous payslips with a negative amount for a total of %s to report.',
-                    round(payslip.negative_net_to_report_amount, 2))
-                #if payslips_to_report and payslip.state == 'verify' and not payslip.activity_ids.filtered(lambda a: a.activity_type_id == activity_type):
-                    #payslip.activity_schedule(
-                    #    'hr_payroll.mail_activity_data_hr_payslip_negative_net',
-                    #    summary=_('Previous Negative Payslip to Report'),
-                    #    note=_('At least one previous negative net could be reported on this payslip for <a href="#" data-oe-model="%s" data-oe-id="%s">%s</a>') % (
-                    #        payslip.student_id._name, payslip.student_id.id, payslip.student_id.display_name),
-                        #user_id=payslip.contract_id.hr_responsible_id.id or self.env.ref('base.user_admin').id)
+                feeslip.negative_net_to_report_display = feeslips_to_report
+                feeslip.negative_net_to_report_amount = feeslips_to_report._get_line_values(['NET'], compute_sum=True)['NET']['sum']['total']
+                feeslip.negative_net_to_report_message = _(
+                    'Note: There are previous feeslips with a negative amount for a total of %s to report.',
+                    round(feeslip.negative_net_to_report_amount, 2))
+                #if feeslips_to_report and feeslip.state == 'verify' and not feeslip.activity_ids.filtered(lambda a: a.activity_type_id == activity_type):
+                    #feeslip.activity_schedule(
+                    #    'hr_payroll.mail_activity_data_hr_feeslip_negative_net',
+                    #    summary=_('Previous Negative feeslip to Report'),
+                    #    note=_('At least one previous negative net could be reported on this feeslip for <a href="#" data-oe-model="%s" data-oe-id="%s">%s</a>') % (
+                    #        feeslip.student_id._name, feeslip.student_id.id, feeslip.student_id.display_name),
+                        #user_id=feeslip.contract_id.hr_responsible_id.id or self.env.ref('base.user_admin').id)
             else:
-                payslip.negative_net_to_report_display = False
-                payslip.negative_net_to_report_amount = False
-                payslip.negative_net_to_report_message = False
+                feeslip.negative_net_to_report_display = False
+                feeslip.negative_net_to_report_amount = False
+                feeslip.negative_net_to_report_message = False
 
     def _get_negative_net_input_type(self):
         self.ensure_one()
@@ -238,7 +238,7 @@ class FeeSlip(models.Model):
             ('student_id', '=', self.student_id.id),
             ('credit_note', '=', False),
         ]).write({'has_negative_net_to_report': False})
-        self.activity_feedback(['hr_payroll.mail_activity_data_hr_payslip_negative_net'])
+        self.activity_feedback(['hr_payroll.mail_activity_data_hr_feeslip_negative_net'])
 
     def _compute_is_regular(self):
         for slip in self:
@@ -247,33 +247,33 @@ class FeeSlip(models.Model):
     def _is_invalid(self):
         self.ensure_one()
         if self.state not in ['done', 'paid']:
-            return _("This payslip is not validated. This is not a legal document.")
+            return _("This feeslip is not validated. This is not a legal document.")
         return False
 
     #@api.depends('worked_days_line_ids', 'input_line_ids')
     def _compute_line_ids(self):
-        if not self.env.context.get("payslip_no_recompute"):
+        if not self.env.context.get("feeslip_no_recompute"):
             return
-        for payslip in self.filtered(lambda p: p.line_ids and p.state in ['draft', 'verify']):
-            payslip.line_ids = [(5, 0, 0)] + [(0, 0, line_vals) for line_vals in payslip._get_payslip_lines()]
+        for feeslip in self.filtered(lambda p: p.line_ids and p.state in ['draft', 'verify']):
+            feeslip.line_ids = [(5, 0, 0)] + [(0, 0, line_vals) for line_vals in feeslip._get_feeslip_lines()]
 
     def _compute_basic_net(self):
         line_values = (self._origin)._get_line_values(['BASIC', 'NET'])
-        for payslip in self:
-            payslip.basic_wage = line_values['BASIC'][payslip._origin.id]['total']
-            payslip.net_wage = line_values['NET'][payslip._origin.id]['total']
+        for feeslip in self:
+            feeslip.basic_wage = line_values['BASIC'][feeslip._origin.id]['total']
+            feeslip.net_wage = line_values['NET'][feeslip._origin.id]['total']
 
     #@api.depends('worked_days_line_ids.number_of_hours', 'worked_days_line_ids.is_paid')
     def _compute_worked_hours(self):
-        for payslip in self:
-            payslip.sum_worked_hours = sum([line.number_of_hours for line in payslip.worked_days_line_ids])
+        for feeslip in self:
+            feeslip.sum_worked_hours = sum([line.number_of_hours for line in feeslip.worked_days_line_ids])
 
     #@api.depends('contract_id')
     def _compute_normal_wage(self):
         with_contract = self.filtered('contract_id')
         (self - with_contract).normal_wage = 0
-        for payslip in with_contract:
-            payslip.normal_wage = payslip._get_contract_wage()
+        for feeslip in with_contract:
+            feeslip.normal_wage = feeslip._get_contract_wage()
 
     def _compute_is_superuser(self):
         self.update({'is_superuser': self.env.user._is_superuser() and self.user_has_groups("base.group_no_one")})
@@ -281,24 +281,24 @@ class FeeSlip(models.Model):
     def _compute_has_refund_slip(self):
         #This field is only used to know whether we need a confirm on refund or not
         #It doesn't have to work in batch and we try not to search if not necessary
-        for payslip in self:
-            if not payslip.credit_note and payslip.state in ('done', 'paid') and self.search_count([
-                ('student_id', '=', payslip.student_id.id),
-                ('date_from', '=', payslip.date_from),
-                ('date_to', '=', payslip.date_to),
-                #('contract_id', '=', payslip.contract_id.id),
-                ('fee_struct_id', '=', payslip.struct_id.id),
+        for feeslip in self:
+            if not feeslip.credit_note and feeslip.state in ('done', 'paid') and self.search_count([
+                ('student_id', '=', feeslip.student_id.id),
+                ('date_from', '=', feeslip.date_from),
+                ('date_to', '=', feeslip.date_to),
+                #('contract_id', '=', feeslip.contract_id.id),
+                ('fee_struct_id', '=', feeslip.struct_id.id),
                 ('credit_note', '=', True),
                 ('state', '!=', 'cancel'),
                 ]):
-                payslip.has_refund_slip = True
+                feeslip.has_refund_slip = True
             else:
-                payslip.has_refund_slip = False
+                feeslip.has_refund_slip = False
 
     @api.constrains('date_from', 'date_to')
     def _check_dates(self):
-        if any(payslip.date_from > payslip.date_to for payslip in self):
-            raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
+        if any(feeslip.date_from > feeslip.date_to for feeslip in self):
+            raise ValidationError(_("Feeslip 'Date From' must be earlier 'Date To'."))
 
     def write(self, vals):
         res = super().write(vals)
@@ -312,94 +312,94 @@ class FeeSlip(models.Model):
                 for deduction_type, input_type_id in attachment_types.items():
                     attachments = slip.salary_attachment_ids.filtered(lambda r: r.deduction_type == deduction_type)
                     input_lines = slip.input_line_ids.filtered(lambda r: r.input_type_id.id == input_type_id.id)
-                    # Use the amount from the computed value in the payslip lines not the input
+                    # Use the amount from the computed value in the feeslip lines not the input
                     salary_lines = slip.line_ids.filtered(lambda r: r.code in input_lines.mapped('code'))
                     if not attachments or not salary_lines:
                         continue
                     attachments.record_payment(abs(salary_lines.total))
         return res
 
-    def action_payslip_draft(self):
+    def action_feeslip_draft(self):
         return self.write({'state': 'draft'})
 
     def _get_pdf_reports(self):
-        classic_report = self.env.ref('hr_payroll.action_report_payslip')
+        classic_report = self.env.ref('hr_payroll.action_report_feeslip')
         result = defaultdict(lambda: self.env['oe.feeslip'])
-        for payslip in self:
-            if not payslip.fee_struct_id or not payslip.fee_struct_id.report_id:
-                result[classic_report] |= payslip
+        for feeslip in self:
+            if not feeslip.fee_struct_id or not feeslip.fee_struct_id.report_id:
+                result[classic_report] |= feeslip
             else:
-                result[payslip.fee_struct_id.report_id] |= payslip
+                result[feeslip.fee_struct_id.report_id] |= feeslip
         return result
 
     def _generate_pdf(self):
         mapped_reports = self._get_pdf_reports()
         attachments_vals_list = []
-        generic_name = _("Payslip")
-        template = self.env.ref('hr_payroll.mail_template_new_payslip', raise_if_not_found=False)
-        for report, payslips in mapped_reports.items():
-            for payslip in payslips:
-                pdf_content, dummy = report.sudo()._render_qweb_pdf(payslip.id)
+        generic_name = _("feeslip")
+        template = self.env.ref('hr_payroll.mail_template_new_feeslip', raise_if_not_found=False)
+        for report, feeslips in mapped_reports.items():
+            for feeslip in feeslips:
+                pdf_content, dummy = report.sudo()._render_qweb_pdf(feeslip.id)
                 if report.print_report_name:
-                    pdf_name = safe_eval(report.print_report_name, {'object': payslip})
+                    pdf_name = safe_eval(report.print_report_name, {'object': feeslip})
                 else:
                     pdf_name = generic_name
                 attachments_vals_list.append({
                     'name': pdf_name,
                     'type': 'binary',
                     'raw': pdf_content,
-                    'res_model': payslip._name,
-                    'res_id': payslip.id
+                    'res_model': feeslip._name,
+                    'res_id': feeslip.id
                 })
                 # Send email to employees
                 if template:
-                    template.send_mail(payslip.id, notif_layout='mail.mail_notification_light')
+                    template.send_mail(feeslip.id, notif_layout='mail.mail_notification_light')
         self.env['ir.attachment'].sudo().create(attachments_vals_list)
 
-    def action_payslip_done(self):
-        invalid_payslips = self.filtered(lambda p: p.contract_id and (p.contract_id.date_start > p.date_to or (p.contract_id.date_end and p.contract_id.date_end < p.date_from)))
-        if invalid_payslips:
-            raise ValidationError(_('The following employees have a contract outside of the payslip period:\n%s', '\n'.join(invalid_payslips.mapped('student_id.name'))))
+    def action_feeslip_done(self):
+        invalid_feeslips = self.filtered(lambda p: p.contract_id and (p.contract_id.date_start > p.date_to or (p.contract_id.date_end and p.contract_id.date_end < p.date_from)))
+        if invalid_feeslips:
+            raise ValidationError(_('The following employees have a contract outside of the feeslip period:\n%s', '\n'.join(invalid_feeslips.mapped('student_id.name'))))
         if any(slip.contract_id.state == 'cancel' for slip in self):
-            raise ValidationError(_('You cannot valide a payslip on which the contract is cancelled'))
+            raise ValidationError(_('You cannot valide a feeslip on which the contract is cancelled'))
         if any(slip.state == 'cancel' for slip in self):
-            raise ValidationError(_("You can't validate a cancelled payslip."))
+            raise ValidationError(_("You can't validate a cancelled feeslip."))
         self.write({'state' : 'done'})
 
         line_values = self._get_line_values(['NET'])
 
         self.filtered(lambda p: not p.credit_note and line_values['NET'][p.id]['total'] < 0).write({'has_negative_net_to_report': True})
-        self.mapped('payslip_run_id').action_close()
-        # Validate work entries for regular payslips (exclude end of year bonus, ...)
-        regular_payslips = self.filtered(lambda p: p.fee_struct_id.type_id.default_struct_id == p.fee_struct_id)
+        self.mapped('feeslip_run_id').action_close()
+        # Validate work entries for regular feeslips (exclude end of year bonus, ...)
+        regular_feeslips = self.filtered(lambda p: p.fee_struct_id.type_id.default_struct_id == p.fee_struct_id)
         work_entries = self.env['hr.work.entry']
-        for regular_payslip in regular_payslips:
+        for regular_feeslip in regular_feeslips:
             work_entries |= self.env['hr.work.entry'].search([
-                ('date_start', '<=', regular_payslip.date_to),
-                ('date_stop', '>=', regular_payslip.date_from),
-                ('student_id', '=', regular_payslip.student_id.id),
+                ('date_start', '<=', regular_feeslip.date_to),
+                ('date_stop', '>=', regular_feeslip.date_from),
+                ('student_id', '=', regular_feeslip.student_id.id),
             ])
         if work_entries:
             work_entries.action_validate()
 
-        if self.env.context.get('payslip_generate_pdf'):
-            if self.env.context.get('payslip_generate_pdf_direct'):
+        if self.env.context.get('feeslip_generate_pdf'):
+            if self.env.context.get('feeslip_generate_pdf_direct'):
                 self._generate_pdf()
             else:
                 self.write({'queued_for_pdf': True})
-                payslip_cron = self.env.ref('hr_payroll.ir_cron_generate_payslip_pdfs', raise_if_not_found=False)
-                if payslip_cron:
-                    payslip_cron._trigger()
+                feeslip_cron = self.env.ref('hr_payroll.ir_cron_generate_feeslip_pdfs', raise_if_not_found=False)
+                if feeslip_cron:
+                    feeslip_cron._trigger()
 
-    def action_payslip_cancel(self):
+    def action_feeslip_cancel(self):
         if not self.env.user._is_system() and self.filtered(lambda slip: slip.state == 'done'):
-            raise UserError(_("Cannot cancel a payslip that is done."))
+            raise UserError(_("Cannot cancel a feeslip that is done."))
         self.write({'state': 'cancel'})
-        self.mapped('payslip_run_id').action_close()
+        self.mapped('feeslip_run_id').action_close()
 
-    def action_payslip_paid(self):
+    def action_feeslip_paid(self):
         if any(slip.state != 'done' for slip in self):
-            raise UserError(_('Cannot mark payslip as paid if not confirmed.'))
+            raise UserError(_('Cannot mark feeslip as paid if not confirmed.'))
         self.write({'state': 'paid'})
 
     def action_open_work_entries(self):
@@ -417,55 +417,55 @@ class FeeSlip(models.Model):
         }
 
     def refund_sheet(self):
-        copied_payslips = self.env['oe.feeslip']
-        for payslip in self:
-            copied_payslip = payslip.copy({
+        copied_feeslips = self.env['oe.feeslip']
+        for feeslip in self:
+            copied_feeslip = feeslip.copy({
                 'credit_note': True,
-                'name': _('Refund: %(payslip)s', payslip=payslip.name),
+                'name': _('Refund: %(feeslip)s', feeslip=feeslip.name),
                 'edited': True,
                 'state': 'verify',
             })
-            for wd in copied_payslip.worked_days_line_ids:
+            for wd in copied_feeslip.worked_days_line_ids:
                 wd.number_of_hours = -wd.number_of_hours
                 wd.number_of_days = -wd.number_of_days
                 wd.amount = -wd.amount
-            for line in copied_payslip.line_ids:
+            for line in copied_feeslip.line_ids:
                 line.amount = -line.amount
-            copied_payslips |= copied_payslip
-        formview_ref = self.env.ref('hr_payroll.view_hr_payslip_form', False)
-        treeview_ref = self.env.ref('hr_payroll.view_hr_payslip_tree', False)
+            copied_feeslips |= copied_feeslip
+        formview_ref = self.env.ref('hr_payroll.view_hr_feeslip_form', False)
+        treeview_ref = self.env.ref('hr_payroll.view_hr_feeslip_tree', False)
         return {
-            'name': ("Refund Payslip"),
+            'name': ("Refund feeslip"),
             'view_mode': 'tree, form',
             'view_id': False,
             'res_model': 'oe.feeslip',
             'type': 'ir.actions.act_window',
             'target': 'current',
-            'domain': [('id', 'in', copied_payslips.ids)],
+            'domain': [('id', 'in', copied_feeslips.ids)],
             'views': [(treeview_ref and treeview_ref.id or False, 'tree'), (formview_ref and formview_ref.id or False, 'form')],
             'context': {}
         }
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_draft_or_cancel(self):
-        if any(payslip.state not in ('draft', 'cancel') for payslip in self):
-            raise UserError(_('You cannot delete a payslip which is not draft or cancelled!'))
+        if any(feeslip.state not in ('draft', 'cancel') for feeslip in self):
+            raise UserError(_('You cannot delete a feeslip which is not draft or cancelled!'))
 
     def compute_sheet(self):
         feeslips = self.filtered(lambda slip: slip.state in ['draft', 'verify'])
-        # delete old payslip lines
+        # delete old feeslip lines
         feeslips.line_ids.unlink()
         for feeslip in feeslips:
             number = feeslip.number or self.env['ir.sequence'].next_by_code('fee.slip')
-            lines = [(0, 0, line) for line in feeslip._get_payslip_lines()]
+            lines = [(0, 0, line) for line in feeslip._get_feeslip_lines()]
             feeslip.write({'line_ids': lines, 'number': number, 'state': 'verify', 'compute_date': fields.Date.today()})
         return True
 
     def action_refresh_from_work_entries(self):
-        # Refresh the whole payslip in case the HR has modified some work entries
-        # after the payslip generation
+        # Refresh the whole feeslip in case the HR has modified some work entries
+        # after the feeslip generation
         if any(p.state not in ['draft', 'verify'] for p in self):
-            raise UserError(_('The payslips should be in Draft or Waiting state.'))
+            raise UserError(_('The feeslips should be in Draft or Waiting state.'))
         self.mapped('worked_days_line_ids').unlink()
         self.mapped('line_ids').unlink()
         self._compute_worked_days_line_ids()
@@ -520,7 +520,7 @@ class FeeSlip(models.Model):
 
     def _get_worked_day_lines(self, domain=None, check_out_of_contract=True):
         """
-        :returns: a list of dict containing the worked days values that should be applied for the given payslip
+        :returns: a list of dict containing the worked days values that should be applied for the given feeslip
         """
         res = []
         # fill only if the contract as a working schedule linked
@@ -588,17 +588,17 @@ class FeeSlip(models.Model):
         }
         return localdict
 
-    def _get_payslip_lines(self):
+    def _get_feeslip_lines(self):
         self.ensure_one()
 
-        localdict = self.env.context.get('force_payslip_localdict', None)
+        localdict = self.env.context.get('force_feeslip_localdict', None)
         if localdict is None:
             localdict = self._get_localdict()
 
         rules_dict = localdict['rules'].dict
         result_rules_dict = localdict['result_rules'].dict
 
-        blacklisted_rule_ids = self.env.context.get('prevent_payslip_computation_line_ids', [])
+        blacklisted_rule_ids = self.env.context.get('prevent_feeslip_computation_line_ids', [])
 
         result = {}
 
@@ -689,11 +689,11 @@ class FeeSlip(models.Model):
         for slip in self.filtered(lambda p: p.student_id and p.date_from):
             lang = slip.student_id.sudo().lang or self.env.user.lang
             context = {'lang': lang}
-            payslip_name = slip.fee_struct_id.payslip_name or _('Salary Slip')
+            feeslip_name = slip.fee_struct_id.feeslip_name or _('Salary Slip')
             del context
 
-            slip.name = '%(payslip_name)s - %(employee_name)s - %(dates)s' % {
-                'payslip_name': payslip_name,
+            slip.name = '%(feeslip_name)s - %(employee_name)s - %(dates)s' % {
+                'feeslip_name': feeslip_name,
                 'employee_name': slip.student_id.name,
                 'dates': format_date(self.env, slip.date_from, date_format="MMMM y", lang_code=lang)
             }
@@ -703,7 +703,7 @@ class FeeSlip(models.Model):
         for slip in self.filtered(lambda p: p.date_to):
             if slip.date_to > date_utils.end_of(fields.Date.today(), 'month'):
                 slip.warning_message = _(
-                    "This payslip can be erroneous! Work entries may not be generated for the period from %(start)s to %(end)s.",
+                    "This feeslip can be erroneous! Work entries may not be generated for the period from %(start)s to %(end)s.",
                     start=date_utils.add(date_utils.end_of(fields.Date.today(), 'month'), days=1),
                     end=slip.date_to,
                 )
@@ -715,7 +715,7 @@ class FeeSlip(models.Model):
         if self.env.context.get('salary_simulation'):
             return
         valid_slips = self.filtered(lambda p: p.student_id and p.date_from and p.date_to and p.contract_id and p.fee_struct_id)
-        # Make sure to reset invalid payslip's worked days line
+        # Make sure to reset invalid feeslip's worked days line
         invalid_slips = self - valid_slips
         invalid_slips.worked_days_line_ids = [(5, False, False)]
         # Ensure work entries are generated for all contracts
@@ -765,7 +765,7 @@ class FeeSlip(models.Model):
             AND pl.code IN %s
             GROUP BY p.id, pl.code
         """ % (selected_fields, '%s', '%s'), (tuple(self.ids), tuple(code_list)))
-        # self = hr.payslip(1, 2)
+        # self = hr.feeslip(1, 2)
         # request_rows = [
         #     {'id': 1, 'code': 'IP', 'total': 100, 'quantity': 1},
         #     {'id': 1, 'code': 'IP.DED', 'total': 200, 'quantity': 1},
@@ -817,19 +817,19 @@ class FeeSlip(models.Model):
             res['toolbar'].pop('print')
         return res
 
-    def action_print_payslip(self):
+    def action_print_feeslip(self):
         return {
-            'name': 'Payslip',
+            'name': 'Feeslip',
             'type': 'ir.actions.act_url',
-            'url': '/print/payslips?list_ids=%(list_ids)s' % {'list_ids': ','.join(str(x) for x in self.ids)},
+            'url': '/print/feeslips?list_ids=%(list_ids)s' % {'list_ids': ','.join(str(x) for x in self.ids)},
         }
 
-    def action_export_payslip(self):
+    def action_export_feeslip(self):
         self.ensure_one()
         return {
-            "name": "Debug Payslip",
+            "name": "Debug Feeslip",
             "type": "ir.actions.act_url",
-            "url": "/debug/payslip/%s" % self.id,
+            "url": "/debug/feeslip/%s" % self.id,
         }
 
     def _get_contract_wage(self):
@@ -851,9 +851,9 @@ class FeeSlip(models.Model):
 
     def _is_outside_contract_dates(self):
         self.ensure_one()
-        payslip = self
+        feeslip = self
         #contract = self.contract_id
-        return contract.date_start > payslip.date_to or (contract.date_end and contract.date_end < payslip.date_from)
+        return contract.date_start > feeslip.date_to or (contract.date_end and contract.date_end < feeslip.date_from)
 
     def _get_data_files_to_update(self):
         # Note: Use lists as modules/files order should be maintained
@@ -867,13 +867,13 @@ class FeeSlip(models.Model):
             for file_to_update in files_to_update:
                 convert_file(self.env.cr, module_name, file_to_update, idref)
 
-    def action_edit_payslip_lines(self):
+    def action_edit_feeslip_lines(self):
         self.ensure_one()
         if not self.user_has_groups('hr_payroll.group_hr_payroll_manager'):
             raise UserError(_('This action is restricted to payroll managers only.'))
         if self.state == 'done':
-            raise UserError(_('This action is forbidden on validated payslips.'))
-        wizard = self.env['hr.payroll.edit.payslip.lines.wizard'].create({
+            raise UserError(_('This action is forbidden on validated feeslips.'))
+        wizard = self.env['hr.payroll.edit.feeslip.lines.wizard'].create({
             'feeslip_id': self.id,
             'line_ids': [(0, 0, {
                 'sequence': line.sequence,
@@ -900,28 +900,28 @@ class FeeSlip(models.Model):
 
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Edit Payslip Lines'),
-            'res_model': 'hr.payroll.edit.payslip.lines.wizard',
+            'name': _('Edit Feeslip Lines'),
+            'res_model': 'hr.payroll.edit.feeslip.lines.wizard',
             'view_mode': 'form',
             'target': 'new',
-            'binding_model_id': self.env['ir.model.data']._xmlid_to_res_id('hr_payroll.model_hr_payslip'),
+            'binding_model_id': self.env['ir.model.data']._xmlid_to_res_id('hr_payroll.model_hr_feeslip'),
             'binding_view_types': 'form',
             'res_id': wizard.id
         }
 
     @api.model
     def _cron_generate_pdf(self):
-        payslips = self.search([
+        feeslips = self.search([
             ('state', 'in', ['done', 'paid']),
             ('queued_for_pdf', '=', True),
         ])
-        if not payslips:
+        if not feeslips:
             return
         BATCH_SIZE = 50
-        payslips_batch = payslips[:BATCH_SIZE]
-        payslips_batch._generate_pdf()
-        payslips_batch.write({'queued_for_pdf': False})
+        feeslips_batch = feeslips[:BATCH_SIZE]
+        feeslips_batch._generate_pdf()
+        feeslips_batch.write({'queued_for_pdf': False})
         # if necessary, retrigger the cron to generate more pdfs
-        if len(payslips) > BATCH_SIZE:
-            self.env.ref('hr_payroll.ir_cron_generate_payslip_pdfs')._trigger()
+        if len(feeslips) > BATCH_SIZE:
+            self.env.ref('hr_payroll.ir_cron_generate_feeslip_pdfs')._trigger()
 
