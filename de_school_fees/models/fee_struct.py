@@ -10,7 +10,7 @@ class FeeStructure(models.Model):
 
     @api.model
     def _get_default_report_id(self):
-        return self.env.ref('hr_payroll.action_report_payslip', False)
+        return self.env.ref('hr_payroll.action_report_feeslip', False)
 
     
     @api.model
@@ -26,9 +26,9 @@ class FeeStructure(models.Model):
     rule_ids = fields.One2many(
         'oe.fee.rule', 'fee_struct_id',
         string='Fee Rules', default=_get_default_rule_ids)
-    #report_id = fields.Many2one('ir.actions.report', string="Report", domain="[('model','=','hr.payslip'),('report_type','=','qweb-pdf')]", default=_get_default_report_id)
-    payslip_name = fields.Char(string="Payslip Name", translate=True,
-        help="Name to be set on a payslip. Example: 'End of the year bonus'. If not set, the default value is 'Fee Slip'")
+    #report_id = fields.Many2one('ir.actions.report', string="Report", domain="[('model','=','hr.feeslip'),('report_type','=','qweb-pdf')]", default=_get_default_report_id)
+    feeslip_name = fields.Char(string="Feeslip Name", translate=True,
+        help="Name to be set on a feeslip. Example: 'End of the year bonus'. If not set, the default value is 'Fee Slip'")
     use_enrollment_contract_lines = fields.Boolean(default=True, help="contract lines won't be computed/displayed in fee slips.")
     schedule_pay = fields.Selection([
         ('monthly', 'Monthly'),

@@ -654,7 +654,7 @@ class FeeSlip(models.Model):
                     'note': html2plaintext(rule.note),
                     'fee_rule_id': rule.id,
                     #'contract_id': localdict['contract'].id,
-                    'student_id': localdict['employee'].id,
+                    'student_id': localdict['student'].id,
                     'amount': amount,
                     'quantity': qty,
                     'rate': rate,
@@ -689,7 +689,7 @@ class FeeSlip(models.Model):
         for slip in self.filtered(lambda p: p.student_id and p.date_from):
             lang = slip.student_id.sudo().lang or self.env.user.lang
             context = {'lang': lang}
-            feeslip_name = slip.fee_struct_id.feeslip_name or _('Salary Slip')
+            feeslip_name = slip.fee_struct_id.feeslip_name or _('Fee Slip')
             del context
 
             slip.name = '%(feeslip_name)s - %(employee_name)s - %(dates)s' % {
