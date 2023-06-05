@@ -103,9 +103,9 @@ result = rules.NET > categories.NET * 0.10''',
 - fee rule: %s (%s)
 - Error: %s""") % (
             error_type,
-            localdict['employee'].name,
-            localdict['contract'].name,
-            localdict['payslip'].dict.name,
+            localdict['student'].name,
+            localdict['student'].name,
+            localdict['feeslip'].dict.name,
             self.name,
             self.code,
             e))
