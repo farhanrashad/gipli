@@ -1,0 +1,61 @@
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_custom_tour_destination_form" model="ir.ui.view">
+            <field name="name">custom.tour.destination.form</field>
+            <field name="model">custom.tour.destination</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <!-- Add fields to the form view -->
+                        <div class="row">
+                            <div class="col-4">
+                                <group>
+                                    <field name="destination_id"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="country_id"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="name"/>
+                                </group>
+                            </div>
+                        </div>
+                        <notebook>
+                            <page string="Site Line">
+                                <field name="site_lines_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- List View -->
+        <record id="view_custom_tour_destination_list" model="ir.ui.view">
+            <field name="name">custom.tour.destination.list</field>
+            <field name="model">custom.tour.destination</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="destination_id"/>
+                    <field name="country_id"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Action for opening the list view -->
+        <record id="action_custom_tour_destination" model="ir.actions.act_window">
+            <field name="name">Custom Tour Destinations</field>
+            <field name="res_model">custom.tour.destination</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

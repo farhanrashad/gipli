@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="tour_season_form_view">
+            <field name="name">tour.season.form</field>
+            <field name="model">tour.season</field>
+            <field name="arch" type="xml">
+                <form string="Tour Season">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="code"/>
+
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="tour_season_list_view">
+            <field name="name">tour.season.list</field>
+            <field name="model">tour.season</field>
+            <field name="arch" type="xml">
+                <tree string="Tour Seasons">
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="tour_season_action">
+            <field name="name">Tour Seasons</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tour.season</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

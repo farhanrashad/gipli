@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Form view -->
+        <record id="tour_program_form_view" model="ir.ui.view">
+            <field name="name">tour.program.form</field>
+            <field name="model">tour.program</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="tour_code"/>
+                                <field name="days"/>
+                            </group>
+                            <group>
+                                <field name="description"/>
+                            </group>
+                            <!--                            <field name="product_ids" widget="many2many_tags"/>-->
+                        </group>
+                        <div class="row">
+                            <div class="col-4">
+                                <group>
+                                    <field name="break_fast"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="lunch"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="dinner"/>
+                                </group>
+                            </div>
+                        </div>
+                        <notebook>
+                            <page string="Program Expense">
+                                <group>
+                                    <group>
+                                        <field name="sale_price"/>
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </page>
+                        </notebook>
+                         <group class="oe_subtotal_footer oe_right">
+                            <field name="total_sale_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- List view -->
+        <record id="tour_program_list_view" model="ir.ui.view">
+            <field name="name">tour.program.list</field>
+            <field name="model">tour.program</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="tour_code"/>
+                    <field name="days"/>
+                    <field name="description"/>
+                    <field name="sale_price"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="tour_program_action" model="ir.actions.act_window">
+            <field name="name">Tour Programs</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tour.program</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+        </record>
+
+    </data>
+</odoo>

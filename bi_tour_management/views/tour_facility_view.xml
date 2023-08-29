@@ -1,0 +1,41 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="tour_facility_form_view">
+            <field name="name">tour.facility.form</field>
+            <field name="model">tour.facility</field>
+            <field name="arch" type="xml">
+                <form string="Tour Facility">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="code"/>
+                                <field name="description"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="tour_facility_tree_view">
+            <field name="name">tour.facility.tree</field>
+            <field name="model">tour.facility</field>
+            <field name="arch" type="xml">
+                <tree string="Tour Facilities">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="tour_facility_action">
+            <field name="name">Tour Facilities</field>
+            <field name="res_model">tour.facility</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

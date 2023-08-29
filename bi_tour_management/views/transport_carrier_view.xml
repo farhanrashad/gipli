@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="transport_carrier_form_view">
+            <field name="name">transport.carrier.form</field>
+            <field name="model">transport.carrier</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Transport Carrier">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="transport_carrier_list_view">
+            <field name="name">transport.carrier.list</field>
+            <field name="model">transport.carrier</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="transport_carrier_action">
+            <field name="name">Transport Carriers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">transport.carrier</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>

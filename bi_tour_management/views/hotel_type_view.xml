@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Form view -->
+        <record id="view_hotel_type_form" model="ir.ui.view">
+            <field name="name">hotel.type.form</field>
+            <field name="model">hotel.type</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <notebook>
+                            <page name="description" string="Description">
+                                <field name="description"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- List view -->
+        <record id="view_hotel_type_list" model="ir.ui.view">
+            <field name="name">hotel.type.list</field>
+            <field name="model">hotel.type</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hotel_type_act_open" model="ir.actions.act_window">
+            <field name="name">Hotel Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hotel.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

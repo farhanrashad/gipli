@@ -1,0 +1,92 @@
+<odoo>
+    <data>
+        <record id="view_tour_cancellation_form" model="ir.ui.view">
+            <field name="name">tour.cancellation.form</field>
+            <field name="model">tour.cancellation</field>
+            <field name="arch" type="xml">
+                <form string="Tour Cancellation">
+                    <header>
+                        <field name="status" widget="statusbar"
+                               statusbar_visible="draft,in_process,done"/>
+                        <button name="process_record" type="object" string="REQUEST TO PROCESS"
+                                attrs="{'invisible': [('status', 'not in', 'draft')]}"/>
+                        <button name="done_cancel" type="object" string="DONE"
+                                attrs="{'invisible': [('status', 'not in', 'in_process')]}"/>
+                    </header>
+                    <sheet>
+                        <div class="row">
+                            <div class="col-4">
+                                <group>
+                                    <field name="tour_booking_id"/>
+                                    <field name="current_date"/>
+                                    <field name="mobile"/>
+                                    <field name="via"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="cancel_date"/>
+                                    <field name="name"/>
+                                    <field name="customer_id"/>
+                                    <field name="adult"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="name"/>
+                                    <field name="email"/>
+                                    <field name="child"/>
+                                </group>
+                            </div>
+                        </div>
+                        <h3 style="margin-top: 30px;">Tour Information</h3>
+                        <div class="row mt-5">
+                            <div class="col-4">
+                                <group>
+                                    <field name="tour_type"/>
+                                    <field name="tour_dates_id"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="season_id"/>
+                                    <field name="payment_policy_id"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="tour_id"/>
+                                </group>
+                            </div>
+                        </div>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tour_cancellation_list" model="ir.ui.view">
+            <field name="name">tour.cancellation.list</field>
+            <field name="model">tour.cancellation</field>
+            <field name="arch" type="xml">
+                <tree string="Tour Cancellations">
+                    <field name="name"/>
+                    <field name="cancel_date"/>
+                    <field name="customer_id"/>
+                    <field name="status"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_tour_cancellation" model="ir.actions.act_window">
+            <field name="name">Tour Cancellations</field>
+            <field name="res_model">tour.cancellation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new tour cancellation.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record model="ir.ui.view" id="tour_booking_form_view">
+            <field name="name">tour.booking.form</field>
+            <field name="model">tour.booking</field>
+            <field name="arch" type="xml">
+                <form string="Tour Booking">
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm,in_progress,booked,done,cancel"/>
+                        <button name="confirm_record" type="object" string="Confirm"
+                                attrs="{'invisible': [('state', 'not in', 'draft')]}"/>
+                        <button name="make_approval_tour" type="object" string="APPROVE"
+                                attrs="{'invisible': [('state', 'not in', 'confirm')]}"/>
+                        <button name="make_booking" type="object" string="CONFIRM BOOKING"
+                                attrs="{'invisible': [('state', 'not in', 'in_progress')]}"/>
+                        <button name="cancel" type="object" string="CANCEL"
+                                attrs="{'invisible': [('state', 'not in', ('draft', 'confirm', 'in_progress'))]}"/>
+                        <button name="done_tour" type="object" string="DONE"
+                                attrs="{'invisible': [('state', 'not in', 'booked')]}"/>
+                    </header>
+                    <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_tour_booking" type="object"
+                                    class="oe_stat_button" icon="fa-credit-card"
+                                    attrs="{'invisible': [('state', 'not in', ('booked', 'done'))]}">
+                                <div class="o_stat_info">
+                                    <field name="quotation_count" class="o_stat_value"/>
+                                    <span class="o_stat_text">Quotation
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" required="1" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                            </h1>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <group>
+                                    <field name="customer_id" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="mobile" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="via" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="current_date" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="adult" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="email" widget="horizontal"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="child" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="currency_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+
+                                </group>
+                            </div>
+                        </div>
+                        <p style="font-size:18px;">Tour Information</p>
+                        <div class="row mt-4">
+                            <div class="col-4">
+                                <group>
+                                    <field name="tour_type" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="season_id"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="tour_dates_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="payment_policy_id"
+                                           attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="tour_book_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
+                                    <field name="tour_id" attrs="{'readonly': [('state', 'not in', 'draft')]}" invisible="1"/>
+                                </group>
+                            </div>
+                        </div>
+                        <notebook>
+                            <page string="Tour Persons">
+                                <field name="tour_customer_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="partner_id"/>
+                                        <field name="name"/>
+                                        <field name="gender"/>
+                                        <field name="adult_child"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Tour Program">
+                                <field name="tour_program_book_ids" nolabel="1">
+                                    <tree>
+                                        <field name="tour_code"/>
+                                        <field name="days"/>
+                                        <field name="description"/>
+                                        <field name="break_fast"/>
+                                        <field name="lunch"/>
+                                        <field name="dinner"/>
+                                        <field name="sale_price"/>
+                                        <field name="total_sale_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Destinations">
+                                <field name="tour_book_destination_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="destination_id"/>
+                                        <field name="country_id"/>
+                                        <field name="night"/>
+                                        <field name="is_visa"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Cost Include">
+                                <field name="tour_cost_include_facility_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="tour_facility_id"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Cost Exclude">
+                                <field name="tour_cost_exclude_facility_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="tour_facility_id"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Site Cost">
+                                <field name="sites_cost_book_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="new_sale_price"/>
+                                        <field name="total_sale_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Visa Cost">
+                                <field name="visa_cost_ids" nolabel="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="country_id"/>
+                                        <field name="visa_type"/>
+                                        <field name="sale_price"/>
+                                        <field name="total_person"/>
+                                        <field name="total_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Hotel Details">
+                                <field name="hotel_planner_book_ids" nolabel="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="destination_id"/>
+                                        <field name="hotel_id"/>
+                                        <field name="hotel_type_id"/>
+                                        <field name="room_type_id"/>
+                                        <field name="room_required"/>
+                                        <field name="days"/>
+                                        <field name="customer_price"/>
+                                        <field name="total_customer_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Travel Planner">
+                                <field name="travel_planner_book_ids" nolabel="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="transport_id"/>
+                                        <field name="date"/>
+                                        <field name="transport_carrier_id"/>
+                                        <field name="transport_type_id"/>
+                                        <field name="travel_class_id"/>
+                                        <field name="from_dest_id"/>
+                                        <field name="to_dest_id"/>
+                                        <field name="sale_price_adult"/>
+                                        <field name="sale_price_child"/>
+                                        <field name="total_sale_price_adult" readonly="1"/>
+                                        <field name="total_sale_price_child" readonly="1"/>
+                                        <field name="tour_booking_id" context="{'default_tour_booking_id': name}"
+                                               invisible="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Other Services">
+                                <field name="tour_services_book_ids" nolabel="1">
+                                    <tree>
+                                        <field name="product_id"/>
+                                        <field name="sale_price"/>
+                                        <field name="product_uom_qty"/>
+                                        <field name="product_uom_id"/>
+                                        <field name="discount"/>
+                                        <field name="price_subtotal"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Services">
+                                <field name="insurance_policy_ids" nolabel="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="insurance_type_id"/>
+                                        <field name="insurance_adult_cost"/>
+                                        <field name="insurance_child_cost"/>
+                                        <field name="total_cost"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="sub_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="tax_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <div class="oe_subtotal_footer_separator oe_inline">
+                                <label for="total_insurance_amount"/>
+                            </div>
+                            <field name="total_insurance_amount" nolabel="1" class="oe_subtotal_footer_separator"
+                                   widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_amount" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </sheet>
+
+                </form>
+            </field>
+        </record>
+        <!-- List view -->
+        <record model="ir.ui.view" id="tour_booking_list_view">
+            <field name="name">tour.booking.list</field>
+            <field name="model">tour.booking</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="current_date"/>
+                    <field name="adult"/>
+                    <field name="child"/>
+                    <field name="email"/>
+                    <field name="mobile"/>
+                    <field name="tour_type"/>
+                    <!--                    <field name="tour_book_id"/>-->
+                    <!--                    <field name="tour_date_id"/>-->
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Action -->
+        <record id="tour_booking_action" model="ir.actions.act_window">
+            <field name="name">Tour Booking</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tour.booking</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

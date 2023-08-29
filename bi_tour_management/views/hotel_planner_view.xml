@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="view_hotel_planner_detail_form">
+        <field name="name">hotel.planner.detail.form</field>
+        <field name="model">hotel.planner.detail</field>
+        <field name="arch" type="xml">
+            <form string="Hotel Planner Detail">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="hotel_id"/>
+                            <field name="room_type_id"/>
+                            <field name="days"/>
+                            <field name="total_customer_price"/>
+                        </group>
+                        <group>
+                            <field name="destination_id"/>
+                            <field name="hotel_type_id"/>
+                            <field name="room_required"/>
+                            <field name="customer_price"/>
+                            <field name="pur_bol"/>
+                        </group>
+                        <group>
+                            <field name="sale_tax_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+                <group class="oe_subtotal_footer oe_right">
+                    <field name="sale_tax_amount_htl" widget="monetary"
+                           options="{'currency_field': 'currency_id'}"/>
+                    <field name="hotel_pln_sale" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_hotel_planner_detail_tree">
+        <field name="name">hotel.planner.detail.tree</field>
+        <field name="model">hotel.planner.detail</field>
+        <field name="arch" type="xml">
+            <tree string="Hotel Planner Detail">
+                <field name="name"/>
+                <field name="destination_id"/>
+                <field name="hotel_id"/>
+                <field name="hotel_type_id"/>
+                <field name="room_type_id"/>
+                <field name="room_required"/>
+                <field name="days"/>
+                <field name="customer_price"/>
+                <field name="total_customer_price"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Action -->
+    <record model="ir.actions.act_window" id="hotel_planner_action">
+        <field name="name">Hotel Planner</field>
+        <field name="res_model">hotel.planner.detail</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+</odoo>

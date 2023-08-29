@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Tour Travel Information -->
+    <record model="ir.ui.view" id="tour_road_travel_form_view">
+        <field name="name">tour.road.travel.form</field>
+        <field name="model">tour.road.travel</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="from_destination_id"/>
+                            <field name="transport_type_id"/>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="to_destination_id"/>
+                            <field name="travel_class_id"/>
+                            <field name="approx_time"/>
+                        </group>
+                    </group>
+                    <p style="font-size:18px;">Provider Information</p>
+                    <notebook>
+                        <page name="provider_information" string="Provider Information">
+                            <field name="provider_ids">
+                                <tree editable="bottom">
+                                    <field name="provider_id"/>
+                                    <field name="transport_carrier_id"/>
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record model="ir.ui.view" id="tour_road_travel_list_view">
+        <field name="name">tour.road.travel.list</field>
+        <field name="model">tour.road.travel</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="from_destination_id"/>
+                <field name="to_destination_id"/>
+                <field name="travel_class_id"/>
+                <field name="approx_time"/>
+                <field name="transport_type_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record model="ir.actions.act_window" id="tour_road_travel_action">
+        <field name="name">Tour Road Travel</field>
+        <field name="res_model">tour.road.travel</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,57 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="tour_service_line_details_form_view">
+            <field name="name">Tour Service Line Details Form</field>
+            <field name="model">tour.service.line.details</field>
+            <field name="arch" type="xml">
+                <form string="Tour Service Line Details">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="product_id"/>
+                                <field name="product_uom_qty"/>
+                                <field name="price_subtotal" readonly="1"/>
+                                <field name="pur_bol"/>
+                            </group>
+                            <group>
+                                <field name="sale_price"/>
+                                <field name="product_uom_id"/>
+                                <field name="discount"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="sale_tax_ids" widget="many2many_tags"/>
+                        </group>
+                    </sheet>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="sale_tax_amount_tour" widget="monetary"
+                               options="{'currency_field': 'currency_id'}"/>
+                        <field name="sale_tour_services" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <!-- List view -->
+        <record id="view_tour_service_line_details_list" model="ir.ui.view">
+            <field name="name">tour.service.line.details.list</field>
+            <field name="model">tour.service.line.details</field>
+            <field name="arch" type="xml">
+                <tree string="Tour Service Line Details">
+                    <field name="product_id"/>
+                    <field name="sale_price"/>
+                    <field name="product_uom_qty"/>
+                    <field name="product_uom_id"/>
+                    <field name="discount"/>
+                    <field name="price_subtotal"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Action -->
+        <record model="ir.actions.act_window" id="tour_service_details_action">
+            <field name="name">Create Other Services</field>
+            <field name="res_model">tour.service.line.details</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+        </record>
+    </data>
+</odoo>

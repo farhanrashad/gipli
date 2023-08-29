@@ -1,0 +1,201 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="view_tour_package_form">
+            <field name="name">tour.package.form</field>
+            <field name="model">tour.package</field>
+            <field name="arch" type="xml">
+                <form>
+                       <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm"/>
+                        <button name="confirm_record" type="object" string="Confirm"
+                                attrs="{'invisible': [('state', 'not in', 'draft')]}"/>
+                    </header>
+                    <sheet>
+                        <div class="row">
+                            <div class="col-4">
+                                <group>
+                                    <field name="name"/>
+                                    <field name="tour_type"/>
+                                    <!--                            <field name="tour_road_travel_lines_id"/>-->
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="code"/>
+                                    <field name="current_date"/>
+                                    <!--                            <field name="tour_road_travel_lines_id"/>-->
+                                </group>
+                            </div>
+                            <div class="col-4">
+                                <group>
+                                    <field name="product_id"/>
+                                    <field name="days"/>
+                                    <!--                            <field name="tour_road_travel_lines_id"/>-->
+                                </group>
+                            </div>
+                        </div>
+                        <p style="font-size:18px;">Introduction</p>
+                        <notebook>
+                            <page name="travel_information" string="Travel Information">
+                                <field name="tour_road_travel_lines_id">
+                                    <tree>
+                                        <field name="from_destination_id"/>
+                                        <field name="to_destination_id"/>
+                                        <field name="transport_type_id"/>
+                                        <field name="travel_class_id"/>
+                                        <field name="name"/>
+                                        <field name="approx_time"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <p style="font-size:18px;">Other Information</p>
+                        <notebook>
+                            <page name="tour_dates" string="Tour Dates">
+                                <field name="tour_date_lines">
+                                    <tree editable="bottom">
+                                        <field name="season_id"/>
+                                        <field name="start_date"/>
+                                        <field name="book_date"/>
+                                        <field name="due_date"/>
+                                        <field name="total_seats"/>
+                                        <field name="available_seats"/>
+                                        <field name="status"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Tour Program">
+                                <field name="tour_program_book_ids" nolabel="1">
+                                    <tree>
+                                        <field name="tour_code"/>
+                                        <field name="days"/>
+                                        <field name="description"/>
+                                        <field name="break_fast"/>
+                                        <field name="lunch"/>
+                                        <field name="dinner"/>
+                                        <field name="sale_price"/>
+                                        <field name="total_sale_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Destinations">
+                                <field name="tour_book_destination_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="destination_id"/>
+                                        <field name="country_id"/>
+                                        <field name="night"/>
+                                        <field name="is_visa"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Cost Include">
+                                <field name="tour_cost_include_facility_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="tour_facility_id"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Cost Exclude">
+                                <field name="tour_cost_exclude_facility_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="tour_facility_id"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Site Cost">
+                                <field name="sites_cost_book_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="new_sale_price"/>
+                                        <field name="total_sale_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Visa Cost">
+                                <field name="visa_cost_ids" nolabel="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="country_id"/>
+                                        <field name="visa_type"/>
+                                        <field name="sale_price"/>
+                                        <field name="total_person"/>
+                                        <field name="total_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Hotel Details">
+                                <field name="hotel_planner_book_ids" nolabel="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="destination_id"/>
+                                        <field name="hotel_id"/>
+                                        <field name="hotel_type_id"/>
+                                        <field name="room_type_id"/>
+                                        <field name="room_required"/>
+                                        <field name="days"/>
+                                        <field name="customer_price"/>
+                                        <field name="total_customer_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Travel Planner">
+                                <field name="travel_planner_book_ids" nolabel="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="transport_id"/>
+                                        <field name="date"/>
+                                        <field name="transport_carrier_id"/>
+                                        <field name="transport_type_id"/>
+                                        <field name="travel_class_id"/>
+                                        <field name="from_dest_id"/>
+                                        <field name="to_dest_id"/>
+                                        <field name="sale_price_adult"/>
+                                        <field name="sale_price_child"/>
+                                        <field name="total_sale_price_adult" readonly="1"/>
+                                        <field name="total_sale_price_child" readonly="1"/>
+                                        <field name="tour_booking_id" context="{'default_tour_booking_id': name}"
+                                               invisible="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Other Services">
+                                <field name="tour_services_book_ids" nolabel="1">
+                                    <tree>
+                                        <field name="product_id"/>
+                                        <field name="sale_price"/>
+                                        <field name="product_uom_qty"/>
+                                        <field name="product_uom_id"/>
+                                        <field name="discount"/>
+                                        <field name="price_subtotal"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_tour_package_tree">
+            <field name="name">tour.package.tree</field>
+            <field name="model">tour.package</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="tour_type"/>
+                    <field name="current_date"/>
+                    <field name="days"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_tour_package_form">
+            <field name="name">Tour Creator</field>
+            <field name="res_model">tour.package</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>
