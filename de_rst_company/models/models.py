@@ -61,5 +61,13 @@ class AccMoveLineCompDomain(models.Model):
             recs= self.env['product.product'].sudo().search([('company_id','=',comp_id.id)])
             if recs:  
                 return {'domain' : {'product_id' : [('id', 'in', recs.ids)]}}     
-    
+            
+            
+    @api.onchange('company_id')
+    def getCompDompartner(self):
+        if self.env.company.name == 'GMSA ENERGY (PVT) LTD':
+            comp_id= self.env['res.company'].search([('name','=','GMSA ENERGY (PVT) LTD')])
+            recs= self.env['res.partner'].sudo().search([('company_id','=',comp_id.id)])
+            if recs:  
+                return {'domain' : {'partner_id' : [('id', 'in', recs.ids)]}} 
     

@@ -2,11 +2,39 @@
 
 from odoo import models, fields, api
 
+class MovelineCompDomain(models.Model):
+    _inherit="account.move.line"
+#
+
+    # company_id_dom = fields.Many2one('res.company',string="Company",default=lambda self:self.env.company)
+   
+    # @api.onchange('company_id_dom')
+    # def getCompDom(self):
+    #     if self.env.company.name == 'GMSA ENERGY (PVT) LTD':
+    #         comp_id= self.env['res.company'].search([('name','=','GMSA ENERGY (PVT) LTD')])
+    #         recs= self.env['res.partner'].sudo().search([('company_id','=',comp_id.id)])
+    #         if recs:  
+    #             return {'domain' : {'partner_id' : [('id', 'in', recs.ids)]}} 
+    #
+
+
+
 class MultipleInvoiceProducts(models.TransientModel):
     _name = "account.multiple.products"
 
     product_ids = fields.Many2many('product.product',string="Products")
-
+    
+    company_id = fields.Many2one('res.company',string="Company",default=lambda self:self.env.company)
+    
+    @api.onchange('company_id')
+    def getCompDom(self):
+        if self.env.company.name == 'GMSA ENERGY (PVT) LTD':
+            comp_id= self.env['res.company'].search([('name','=','GMSA ENERGY (PVT) LTD')])
+            recs= self.env['product.product'].sudo().search([('company_id','=',comp_id.id)])
+            if recs:  
+                return {'domain' : {'product_ids' : [('id', 'in', recs.ids)]}}     
+    
+    
     def add_multiple_products(self):
         move_line_obj = self.env['account.move.line']  
         if self.env.context.get('active_model')=='account.move': 

@@ -10,8 +10,16 @@
             <xpath expr ="//notebook" position="before">
                 <button string="Add Multiple Products" name="%(action_account_multiple_products_form)d" type="action" class="oe_highlight" attrs="{'invisible': [('state', 'in', ['done', 'cancel'])]}" />  
             </xpath>
+            
+            
+            <!-- <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='account_id']" position="after">
+                        <field name=" company_id_dom"/>
+            </xpath> -->
         </field>     
     </record>
+    
+    
+  
 
 </odoo>
 
