@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="court_judge_form_view">
+            <field name="name">court.judge.form</field>
+            <field name="model">court.judge</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="contact"/>
+                            </group>
+                            <group>
+                                <field name="court_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="court_judge_list_view">
+            <field name="name">court.judge.list</field>
+            <field name="model">court.judge</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="contact"/>
+                    <field name="court_id"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="court_judge_action">
+            <field name="name">Court Judges</field>
+            <field name="res_model">court.judge</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

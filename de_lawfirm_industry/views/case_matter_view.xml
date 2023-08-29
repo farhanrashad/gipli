@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="project_project_form_inherit_custom">
+            <field name="name">project.project.form.inherit</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <header>
+                    <button name="%(close_matter_wizard_action)d" string="CLOSE MATTER" type="action"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,won,loss,settled,dropped"/>
+                </header>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="court_id"/>
+                    <field name="judge_id"/>
+                    <field name="task_template_id"/>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="crime_type_id"/>
+                </xpath>
+                <field name="label_tasks" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="tag_ids" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="user_id" position="attributes">
+                    <attribute name="string">Lawyer</attribute>
+                </field>
+                <field name="date_start" position="attributes">
+                    <attribute name="string">Dates</attribute>
+                </field>
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" type="object" name="action_shift_request"
+                            icon="fa-star">
+                        <field string="Trust Account" name="trust_account" widget="statinfo"/>
+                    </button>
+                </div>
+            </field>
+        </record>
+        <record id="my_partner_form_view" model="ir.ui.view">
+            <field name="name">my.partner.form.view</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" type="object" name="action_shift_request"
+                            icon="fa-star">
+                        <field string="Trust Account" name="trust_account" widget="statinfo"/>
+                    </button>
+                </div>
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" type="object" name="action_cases_count"
+                            icon="fa-gavel">
+                        <field string="Cases" name="cases_count" widget="statinfo"/>
+                    </button>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

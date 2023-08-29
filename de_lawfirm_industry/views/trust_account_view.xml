@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Form view -->
+        <record id="view_trust_account_form" model="ir.ui.view">
+            <field name="name">trust.account.form</field>
+            <field name="model">trust.account</field>
+            <field name="arch" type="xml">
+                <form string="Trust Account">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="case_id"/>
+                                <field name="amount_due"/>
+                            </group>
+                            <group>
+                                <field name="matter_id"/>
+                                <field name="amount"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Attachment">
+                                <field name="attachment"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- List view -->
+        <record id="view_trust_account_list" model="ir.ui.view">
+            <field name="name">trust.account.list</field>
+            <field name="model">trust.account</field>
+            <field name="arch" type="xml">
+                <tree string="Trust Accounts">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="case_id"/>
+                    <field name="matter_id"/>
+                    <field name="amount"/>
+                    <field name="amount_due"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Actions -->
+        <record model="ir.actions.act_window" id="trust_account_action">
+            <field name="name">Trust Accounts</field>
+            <field name="res_model">trust.account</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

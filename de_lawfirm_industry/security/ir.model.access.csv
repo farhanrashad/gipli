@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_court_court,court.court,model_court_court,,1,1,1,1
+access_court_judge,court.judge,model_court_judge,,1,1,1,1
+access_crime_type,crime.type,model_crime_type,,1,1,1,1
+access_law_task,law.task,model_law_task,,1,1,1,1
+access_law_task_list,law.task.list,model_law_task_list,,1,1,1,1
+access_trust_account,trust.account,model_trust_account,,1,1,1,1
+access_close_matter_wizard,close.matter.wizard,model_close_matter_wizard,,1,1,1,1
