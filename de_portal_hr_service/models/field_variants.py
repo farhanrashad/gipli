@@ -27,7 +27,7 @@ class FieldVariantLine(models.Model):
     # display_column = fields.Char(string='Display Columns')
     
     display_column = fields.Selection(
-        string='Display Columns',
+        string='Display Columns', required=True,
         selection=[('col_6', '6 Col'), ('col_12', '12 Col')]
     )
     
