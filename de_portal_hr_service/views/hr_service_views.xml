@@ -22,6 +22,8 @@
                     <field name="field_readonly" invisible="1"/>
                     <field name="field_domain" optional="hide" attrs="{'readonly':[('field_type','!=','many2one')]}"/>
                     <field name="ref_field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" optional="hide" />
+                    <field name="val_expr" optional="hide" />
+
                     <field name="ref_populate_field_ids" invisible="1" />
                     <field name="ref_populate_field_id" />
                     <!-- <field name="link_field_id" domain="[('model', '=', field_model)]" attrs="{'required':[('field_type','=','many2one')], 'readonly':[('field_type','!=','many2one')]}"/> -->
@@ -173,6 +175,7 @@
                                         <field name="ref_field_id" domain="[('model_id', '=', parent.header_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                                         <!-- <field name="link_field_id" domain="[('model', '=', field_model)]" attrs="{'required':[('field_type','=','many2one')], 'readonly':[('field_type','!=','many2one')]}"/> -->
                                         <field name="link_field_id" domain="[('model', '=', field_model)]" attrs="{'required':[('field_type','=','many2one')], 'readonly':[('field_type','not in',['many2one','many2many'])]}"/>
+                                        <field name="val_expr" optional="hide" />
                                         <field name="field_label" />
                                         <field name="is_required" attrs="{'readonly':[('field_store','=',False)]}"/>
                                         <field name="operation_mode" attrs="{'readonly':[('field_store','=',False)]}"/>

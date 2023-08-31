@@ -21,5 +21,8 @@
                 </form>    
             </t>
         </template>
+        <!-- add template to add javascript fileds -->
+        
+
     </data>
 </odoo>

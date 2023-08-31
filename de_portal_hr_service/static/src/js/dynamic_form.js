@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
   $('.selection-search').select2({  
     // width: 'resolve'
