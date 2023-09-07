@@ -8,7 +8,7 @@
             <search string="Stage Search">
                 <field name="name"/>
                 <field name="sequence"/>
-                <field name="is_won"/>
+                <field name="is_close"/>
                 <field name="team_id"/>
             </search>
         </field>
@@ -22,7 +22,7 @@
             <tree string="Stages" multi_edit="1">
                 <field name="sequence" widget="handle"/>
                 <field name="name" readonly="1"/>
-                <field name="is_won"/>
+                <field name="is_close"/>
                 <field name="team_id"/>
             </tree>
         </field>
@@ -43,7 +43,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="is_won"/>
+                            <field name="is_close"/>
                             <field name="fold"/>
                             
                         </group>
