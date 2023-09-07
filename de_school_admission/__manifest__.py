@@ -20,7 +20,7 @@
     'version': '16.0.0.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['de_school'],
+    'depends': ['de_school','de_school_team'],
 
     # always loaded
     'data': [

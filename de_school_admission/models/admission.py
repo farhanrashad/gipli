@@ -73,7 +73,7 @@ class Admission(models.Model):
         ('green', 'Next activity is planned')], string='Kanban State',
         compute='_compute_kanban_state')
     tag_ids = fields.Many2many(
-        'crm.tag', 'crm_admission_tag_rel', 'lead_id', 'tag_id', string='Tags',
+        'oe.admission.tag', 'admission_admission_tag_rel', 'lead_id', 'tag_id', string='Tags',
         help="Classify and analyze your lead/opportunity categories like: Training, Service")
     color = fields.Integer('Color Index', default=0)
     
@@ -139,7 +139,8 @@ class Admission(models.Model):
     
     # Academic Fields
     is_admission = fields.Boolean('Is Admission')
-    course_id = fields.Many2one('oe.school.course', string='Course')
+    admission_register_id = fields.Many2one('oe.admission.register',string="Admission Register", required=True)
+    course_id = fields.Many2one('oe.school.course', string='Course', required=True)
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
     
     # ------------------------------------------------------

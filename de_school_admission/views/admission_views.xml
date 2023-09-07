@@ -107,6 +107,7 @@
                                 <field name="type" invisible="1"/>
                             </group>
                             <group string="Academic" name="academic">
+                                <field name="admission_register_id" options="{'no_create_edit': True}" required="1"/>
                                 <field name="course_id" options="{'no_create_edit': True}" required="1"/>
                                 <field name="batch_id" options="{'no_create_edit': True}" domain="[('course_id','=',course_id)]"/>
                                 <field name="company_id" groups="base.group_multi_company"/>

@@ -16,7 +16,7 @@ class AdmissionRegister(models.Model):
     date_end = fields.Date(string='End Date')
     max_students = fields.Integer(string='Maximum Admissions', store=True,
                                         help='Expected number of students for this course after new admission.')
-    min_students = fields.Integer(string="Current Number of Employees", store=True, 
+    min_students = fields.Integer(string="Minimum Admission", store=True, 
                                   help='Number of minimum students expected for this course.')
     no_of_applicants = fields.Integer(string='Total Applicants', copy=False,
         help='Number of new applications you expect to enroll.', default=1)
@@ -28,3 +28,28 @@ class AdmissionRegister(models.Model):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     
     course_id = fields.Many2one('oe.school.course', string='Course', required=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('progress', 'Open'),
+        ('close', 'Closed'),
+        ('cancel', 'Cancelled')
+    ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
+
+    def button_draft(self):
+        self.write({'state': 'draft'})
+        return {}
+
+    def button_open(self):
+        self.write({'state': 'progress'})
+        return {}
+
+    def button_close(self):
+        self.write({'state': 'close'})
+        return {}
+        
+    def button_cancel(self):
+        self.write({'state': 'draft'})
+        return {}
+
+    
+            
