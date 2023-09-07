@@ -320,7 +320,42 @@ class Admission(models.Model):
                         email_state = 'correct'
                         break
             lead.email_state = email_state
-    
+
+    def _get_partner_email_update(self):
+        """Calculate if we should write the email on the related partner. When
+        the email of the lead / partner is an empty string, we force it to False
+        to not propagate a False on an empty string.
+
+        Done in a separate method so it can be used in both ribbon and inverse
+        and compute of email update methods.
+        """
+        self.ensure_one()
+        if self.partner_id and self.email_from != self.partner_id.email:
+            lead_email_normalized = tools.email_normalize(self.email_from) or self.email_from or False
+            partner_email_normalized = tools.email_normalize(self.partner_id.email) or self.partner_id.email or False
+            return lead_email_normalized != partner_email_normalized
+        return False
+
+    def _get_partner_phone_update(self):
+        """Calculate if we should write the phone on the related partner. When
+        the phone of the lead / partner is an empty string, we force it to False
+        to not propagate a False on an empty string.
+
+        Done in a separate method so it can be used in both ribbon and inverse
+        and compute of phone update methods.
+        """
+        self.ensure_one()
+        if self.partner_id and self.phone != self.partner_id.phone:
+            lead_phone_formatted = self.phone_get_sanitized_number(number_fname='phone') or self.phone or False
+            partner_phone_formatted = self.partner_id.phone_get_sanitized_number(number_fname='phone') or self.partner_id.phone or False
+            return lead_phone_formatted != partner_phone_formatted
+        return False
+
+    @api.depends('email_from', 'partner_id')
+    def _compute_partner_email_update(self):
+        for lead in self:
+            lead.partner_email_update = lead._get_partner_email_update()
+            
     @api.depends('phone', 'partner_id')
     def _compute_partner_phone_update(self):
         for lead in self:
