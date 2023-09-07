@@ -494,11 +494,12 @@ class CustomerPortal(CustomerPortal):
                         
                         if line[eval("'" + f.field_name + "'")]:
                             if f.field_type == 'many2one':
+                                
                                 if f.field_model == 'ir.attachment':
                                     template += "<a href='/web/content/" + str(line[eval("'" + f.field_name + "'")].id) + "?download=true' title='Dowload'><i class='fa fa-download'></i></a>"
                                 else:
                                     template += str(line[eval("'" + f.field_name + "'")].name) \
-                                        if line[eval("'" + f.field_name + "'")].check_access_rights('read', raise_exception=False) else 0
+                                        if line[eval("'" + f.field_name + "'")].check_access_rights('read', raise_exception=False) else ''
 
                             elif f.field_type == 'many2many':
                                 m2m_ids = request.env[f.field_model].sudo().search([('id','in',line[eval("'" + f.field_name + "'")].ids)])

@@ -20,6 +20,7 @@ from odoo.tools import safe_eval
 from collections import OrderedDict
 from itertools import dropwhile
 from itertools import groupby
+import datetime
 
 #from odoo.addons.website.controllers import form
 
@@ -42,6 +43,11 @@ class CustomerPortal(portal.CustomerPortal):
         
         field_val = ''
         field_domain = []
+        
+        required = '0'
+        required_label = ''
+        
+        data_pre = stDate = dat_time = ''
         
         line_item = request.env['hr.service.record.line'].search([('hr_service_id','=',service_id.id),('line_model_id','=',int(model_id))],limit=1)
         
@@ -108,6 +114,13 @@ class CustomerPortal(portal.CustomerPortal):
                 for field in group:
                     # find the record value
                     field_domain = []
+                    
+                    if field.is_required:
+                        required = '1'
+                        required_label = '*'
+                    else:
+                        required = ''
+                        required_label = ''
 
                     if field.operation_mode:
                         if record_sudo:
@@ -118,14 +131,14 @@ class CustomerPortal(portal.CustomerPortal):
                             #primary_template += "<h1>" + str(record_sudo[eval("'" + field.field_name + "'")]) + "=value</h1>"
                     
                         if field.is_required:
-                            primary_template += "<div class='form-group mb-2   s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
+                            primary_template += "<div class='form-group mb-2 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
                             # primary_template += "<div class='form-group col-4 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
                         else:
                             primary_template += "<div class='form-group mb-2 ' data-type='char' data-name='" + field.field_name + "'>"
                             # primary_template += "<div class='form-group col-4' data-type='char' data-name='" + field.field_name + "'>"
                         
                         primary_template += "<label class='s_website_form_label' style='width: 200px' for='" + field.field_name + "'>"
-                        primary_template += "<span class='s_website_form_label_content'>" + field.field_label + "</span>"
+                        primary_template += "<span class='s_website_form_label_content'>" + field.field_label + required_label + "</span>"
                         primary_template += "</label>"
                     
                         # Many2one Field
@@ -175,9 +188,17 @@ class CustomerPortal(portal.CustomerPortal):
                                     primary_template += "<input type='hidden'  id='join_fields' name='" + result + "' />"
                                     name = field.field_name +"-" + str(service.id) +"-" + field._name
 
-                                    primary_template += "<select id='" + name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'" +  " onchange=check_list(this); >"
+                                    if field.is_required:
+                                        primary_template += "<select id='" + name + "' name='" + field.field_name + "' required='" + required + "'class='mb-2 selection-search form-control'" +  " onchange=check_list(this); >"
+                                    else:
+                                        primary_template += "<select id='" + name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'" +  " onchange=check_list(this); >"
+
                                 else:
-                                    primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'>"
+                                    if field.is_required:
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='mb-2 selection-search form-control'>"
+                                    else:
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'>"
+                                primary_template += "<option value='' >Select </option>"
 
                                 for m in m2o_id:
                                     primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
@@ -202,9 +223,10 @@ class CustomerPortal(portal.CustomerPortal):
                                 except Exception:
                                     field_domain = []
                             m2m_id = request.env[field.field_model].sudo().search(field_domain) 
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control mb-2 selection-search' multiple='multiple'>"
+                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='form-control mb-2 selection-search' multiple='multiple'>"
                             # primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control mb-2 selection-search' style='width: 25%' multiple='multiple'>"
                             for m in m2m_id:
+                                primary_template += "<option value='' >Select </option>"
                                 primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
                                 primary_template += m.name
                                 primary_template += "</option>"
@@ -216,7 +238,7 @@ class CustomerPortal(portal.CustomerPortal):
                         # Selection field
                         elif field.field_type == 'selection':
                             sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control mb-2' >"
+                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='form-control mb-2' >"
                             for sel in sel_ids:
                                 primary_template += "<option value='" + str(sel.value) + "' " + (" selected" if str(record_val) == sel.value else " ") + ">"
                                 primary_template += sel.name
@@ -227,7 +249,17 @@ class CustomerPortal(portal.CustomerPortal):
                         elif field.field_type == 'date':
                             primary_template += '<input type="date" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
                         elif field.field_type == 'datetime':
-                            primary_template += '<input type="datetime-local" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
+                            if record_val:
+                                data_pre = record_val.strip().split(',')
+                                stDate = data_pre[0].replace("\"", "")
+                                dat_time = datetime.datetime.strptime(stDate,'%Y-%m-%d %H:%M:%S.%f')
+                            try:
+                                primary_template += '<input type="datetime-local" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + dat_time + '"' +  ('required="1"' if field.is_required else '') + ">"
+                            except:
+                                stDate = stDate + ".4"
+                                dat_time = datetime.datetime.strptime(stDate,'%Y-%m-%d %H:%M:%S.%f')
+                                primary_template += '<input type="datetime-local" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + dat_time + '"' +  ('required="1"' if field.is_required else '') + ">"
+
                         elif field.field_type == 'char':
                             primary_template += '<input type="text" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
                         elif field.field_type == 'text':

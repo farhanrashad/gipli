@@ -216,7 +216,8 @@ class HRServiceItems(models.Model):
     field_domain = fields.Char(string='Domain', help="If present, this condition must be satisfied before executing the action rule.")
     ref_field_id = fields.Many2one('ir.model.fields', string='Reference Field', ondelete="cascade", help='Get value from Reference field' )
     link_field_id = fields.Many2one('ir.model.fields', string='Link Field', help="Reference field ID for many2many ")
-    
+    val_expr = fields.Char(string='Expression', help="If present, this field value must be copied from expression.")
+
     is_required = fields.Boolean(string='Required', help='Required field at web form')
     #is_create = fields.Boolean(string='Create', help='To be avaiable field on creation form')
     #is_edit = fields.Boolean(string='Edit', help='To be avaiable field on edit form')
@@ -350,6 +351,8 @@ class HRServiceItemsLine(models.Model):
     field_readonly = fields.Boolean(related='field_id.readonly')
     field_domain = fields.Char(string='Domain', help="If present, this condition must be satisfied before executing the action rule.")    
     ref_field_id = fields.Many2one('ir.model.fields', string='Reference Field', ondelete="cascade", help='Get value from Reference field' )
+    val_expr = fields.Char(string='Expression', help="If present, this field value must be copied from expression.")
+
     # code_type = fields.Selection(string='Code Type',selection=[('selection', 'Selection'),('field_referance', 'Field Referance')])
     
     field_variant_id = fields.Many2one('hr.service.field.variant',related='hr_service_id.field_variant_id')
