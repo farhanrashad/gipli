@@ -102,7 +102,7 @@
                                     <field name="mobile" widget="phone" string="Mobile"/>
                                 </div>
                                 <field name="user_id"
-                                    context="{'default_sales_team_id': team_id}" widget="many2one_avatar_user"/>
+                                    context="{'default_team_id': team_id}" widget="many2one_avatar_user"/>
                                 <field name="team_id" options="{'no_open': True, 'no_create': True}"/>
                                 <field name="type" invisible="1"/>
                             </group>
@@ -150,7 +150,6 @@
                     <field name="team_id" optional="hide"/>
                     <field name="activity_ids" widget="list_activity"/>
                     <field name="activity_user_id" optional="hide" string="Activity by" widget="many2one_avatar_user"/>
-                    <field name="activity_calendar_event_id" invisible="1"/>
                     <field name="campaign_id" optional="hide"/>
                     <field name="medium_id" optional="hide"/>
                     <field name="source_id" optional="hide"/>

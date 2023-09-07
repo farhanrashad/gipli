@@ -47,13 +47,12 @@ class Admission(models.Model):
         help='UX: Limit to lead company or all if no company')
     user_email = fields.Char('User Email', related='user_id.email', readonly=True)
     user_login = fields.Char('User Login', related='user_id.login', readonly=True)
+    company_id = fields.Many2one('res.company', string='Company', index=True, compute='_compute_company_id', readonly=False, store=True)
     team_id = fields.Many2one(
         'oe.admission.team', string='Admission Team', check_company=True, index=True, tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         compute='_compute_team_id', ondelete="set null", readonly=False, store=True)
-    company_id = fields.Many2one(
-        'res.company', string='Company', index=True,
-        compute='_compute_company_id', readonly=False, store=True)
+
     referred = fields.Char('Referred By')
     description = fields.Html('Notes')
     active = fields.Boolean('Active', default=True, tracking=True)
