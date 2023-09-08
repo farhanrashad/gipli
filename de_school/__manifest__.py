@@ -1,28 +1,24 @@
 # -*- coding: utf-8 -*-
+###############################################################################
+# This module has been developed by Dynexcel to enhance the functionality and user experience of the system. Dynexcel, with its commitment to excellence, ensures that this module adheres to the highest standards of quality and performance. We appreciate feedback and suggestions to continually improve our offerings. For any queries or support, please reach out to the Dynexcel team.
+###############################################################################
 {
     'name': "School Management System",
-
     'summary': """
-    Core Module
-        """,
-
-    'description': """
-        School Management System
+        Core Module of School Management System
     """,
-
+    'description': """
+        Transform educational administration with the Odoo School Management Core Module. This comprehensive solution centralizes all essential school operations, from student enrollment to staff management, ensuring a seamless and efficient educational environment.
+    """,
     'author': "Dynexcel",
     'website': "https://dynexcel.com/",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/13.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
     'category': 'CRM/School',
     'version': '16.0.0.1',
-
-    # any module necessary for this one to work correctly
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'license': 'OPL-1',
     'depends': ['base','hr'],
-
-    # always loaded
     'data': [
         'security/school_security.xml',
         'security/ir.model.access.csv',
@@ -40,13 +36,9 @@
         'views/batch_views.xml',
         'views/subject_views.xml',
     ],
-    # only loaded in demonstration mode
     'demo': [
         'demo/student_demo.xml',
     ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
     'assets': {
         'web.assets_backend': [
             'de_school/static/src/js/planning_calendar.js',
