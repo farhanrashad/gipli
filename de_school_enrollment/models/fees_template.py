@@ -103,7 +103,7 @@ class SaleOrderFeesTemplateLine(models.Model):
     name = fields.Text('Description', required=True, translate=True)
     product_id = fields.Many2one(
         'product.product', 'Product', check_company=True,
-        domain=[('sale_ok', '=', True)])
+        domain=[('sale_ok', '=', True),('fee_product', '=', True),('detailed_type', '=', 'service')])
     product_uom_qty = fields.Float('Quantity', required=True, digits='Product Unit of Measure', default=1)
     product_uom_id = fields.Many2one('uom.uom', 'Unit of Measure', domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True)

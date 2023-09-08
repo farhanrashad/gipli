@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
+###############################################################################
+# This module has been developed by Dynexcel to enhance the functionality and user experience of the system. Dynexcel, with its commitment to excellence, ensures that this module adheres to the highest standards of quality and performance. We appreciate feedback and suggestions to continually improve our offerings. For any queries or support, please reach out to the Dynexcel team.
+###############################################################################
 {
     'name': "Enrollment",
 
     'summary': """
     Student Enrollment
         """,
-
     'description': """
         Enrollment
     """,
-
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-
     'category': 'School',
-    'version': '14.0.0.1',
-
-    # any module necessary for this one to work correctly
+    'version': '16.0.0.1',
+    'installable': True,
+    'auto_install': False,
+    'application': True,
+    'license': 'OPL-1',
     'depends': ['de_school','sale'],
-
-    # always loaded
     'data': [
-        'security/ir.model.access.csv',
         'security/enrollment_security.xml',
+        'security/ir.model.access.csv',
         'views/enrollment_menu.xml',
         'views/sale_order_fees_template_views.xml',
+        'views/product_views.xml',
         'views/sale_views.xml',
         'views/enrollment_views.xml',
     ],
-    # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
