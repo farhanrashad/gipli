@@ -265,7 +265,7 @@ class CustomerPortal(portal.CustomerPortal):
                         elif field.field_type == 'text':
                             primary_template += '<textarea class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + " ></textarea>"
                         elif field.field_type in ('integer','float','monetary'):
-                            primary_template += '<input type="number" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
+                            primary_template += '<input type="number" step="any" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
                         #elif field.field_type == 'html':
                         #    primary_template += "<input type='text' class='form-control s_website_form_input' name='" + field.field_name + "' id='" + field.field_name + "' value='" + record_val + ("'required=1'" if field.is_required else '') + "'/>"
                         else:
@@ -397,35 +397,54 @@ class CustomerPortal(portal.CustomerPortal):
         
         line_item = request.env['hr.service.record.line'].search([('hr_service_id','=',service_id.id),('line_model_id','=',int(model_id))],limit=1)
 
-
+        user_id = request.env['res.users'].sudo().search([('id','=',http.request.env.context.get('uid'))],limit=1)
+        vals = {}
+        
         if service_id.header_model_id.id == int(model_id):
             service_items = service_id.hr_service_items.filtered(lambda x: x.operation_mode)
             if edit_mode == '1' or edit_mode == 1:
                 record_sudo = request.env[service_id.header_model_id.model].sudo().search([('id','=',int(record_id))],limit=1)
                 res_name = record_sudo.name
+
+            # default values for header model
+            for field in service_id.header_model_id.field_id.filtered(lambda r: r.relation and r.ttype == 'many2one' and r.store):
+                try:
+                    if field.relation == 'res.users':
+                        vals.update({
+                            field.name: user_id.id,
+                        })
+                    elif field.relation == 'hr.employee':
+                        vals.update({
+                            field.name: user_id.employee_id.id,
+                        })
+                    elif field.relation == 'res.partner':
+                        vals.update({
+                            field.name: user_id.partner_id.id,
+                        })
+                except:
+                    pass
         elif line_item.line_model_id: #service_id.line_model_id.id == int(model_id):
             service_items = line_item.hr_service_record_line_items #line_model_id.hr_service_record_line_items #.hr_service_items_line
             if edit_mode == '1' or edit_mode == 1:
                 record_sudo = request.env[line_item.line_model_id.model].sudo().search([('id','=',int(record_id))],limit=1)
                 res_name = record_sudo.name
-        
-        user_id = request.env['res.users'].sudo().search([('id','=',http.request.env.context.get('uid'))],limit=1)
-        
-        vals = {}
-        
-        for field in service_items.filtered(lambda r: r.field_model):
-            if field.field_model == 'res.users':
-                vals.update({
-                    field.field_name: user_id.id,
-                })
-            elif field.field_model == 'hr.employee':
-                vals.update({
-                    field.field_name: user_id.employee_id.id,
-                })
-            elif field.field_model == 'res.partner':
-                vals.update({
-                    field.field_name: user_id.partner_id.id,
-                })
+                # default values for header model
+            for field in line_item.line_model_id.field_id.filtered(lambda r: r.relation and r.ttype == 'many2one' and r.store):
+                try:
+                    if field.relation == 'res.users':
+                        vals.update({
+                            field.name: user_id.id,
+                        })
+                    elif field.relation == 'hr.employee':
+                        vals.update({
+                            field.name: user_id.employee_id.id,
+                        })
+                    elif field.relation == 'res.partner':
+                        vals.update({
+                            field.name: user_id.partner_id.id,
+                        })
+                except:
+                    pass
         
         
         for field in service_items:
