@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_de_school_sale_de_school_sale,de_school_sale.de_school_sale,model_de_school_sale_de_school_sale,base.group_user,1,1,1,1
