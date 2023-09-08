@@ -1,35 +1,30 @@
 # -*- coding: utf-8 -*-
+###############################################################################
+# This module has been developed by Dynexcel to enhance the functionality and user experience of the system. Dynexcel, with its commitment to excellence, ensures that this module adheres to the highest standards of quality and performance. We appreciate feedback and suggestions to continually improve our offerings. For any queries or support, please reach out to the Dynexcel team.
+###############################################################################
 {
     'name': "Student",
-
     'summary': """
-    School Student
+    Student
         """,
-
     'description': """
-        School Student
+        This module introduces the Student Portal, a centralized hub for all student-related records. Seamlessly access, manage, and track every student's academic journey, from enrollment to graduation, all in one place.
     """,
-
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
     'category': 'CRM/School',
-    'version': '15.0.0.1',
-
-    # any module necessary for this one to work correctly
+    'version': '16.0.0.2',
+    'installable': True,
+    'auto_install': False,
+    'application': True,
+    'license': 'OPL-1',
     'depends': ['de_school'],
-
-    # always loaded
     'data': [
         'security/student_security.xml',
         # 'security/ir.model.access.csv',
         'views/school_student_menu.xml',
         'views/student_views.xml',
     ],
-    # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
