@@ -91,7 +91,7 @@ class HRService(models.Model):
     def button_publish(self):
         field_model_ids = self.env['ir.model']
         #model_ids = self.env['ir.model']
-        model_ids = self.header_model_id
+        model_ids = self.header_model_id + self.hr_service_record_line.mapped('line_model_id')
         
         field_model_ids += self.env['ir.model'].search([('model', 'in', self.hr_service_items.filtered(lambda x: x.field_model != False).mapped('field_model'))])
         field_model_ids += self.env['ir.model'].search([('model', 'in', self.hr_service_record_line.hr_service_record_line_items.filtered(lambda x: x.field_model != False).mapped('field_model'))])
@@ -125,7 +125,11 @@ class HRService(models.Model):
                 self.env['ir.model.access'].sudo().create(vals)
             else:
                 ima_id.sudo().write(vals)
-        for model in field_model_ids:
+
+        # Give Permission to base models Product Template, Product, Partner
+        base_model_ids = self.env['ir.model'].search([('model','in',['product.template','product.product','res.partner'])])
+        
+        for model in (field_model_ids + base_model_ids):
             field_ima_id = self.env['ir.model.access'].search([('model_id','=',model.id),('group_id','=',group_id.id)],limit=1)
             vals = ({
                 'name': group_id.name + ' :- ' + model.name,
