@@ -30,19 +30,7 @@
         'views/hr_service_web_templates.xml',
         'views/field_variant_views.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'de_portal_hr_service/static/src/js/auto_fill_script.js',
-            'de_portal_hr_service/static/src/js/datatable.js',
-            'de_portal_hr_service/static/src/js/dynamic_form.js',
-            'de_portal_hr_service/static/src/js/items_datatable.js',
-            'de_portal_hr_service/static/src/js/jquery.js',
-            'de_portal_hr_service/static/src/js/main_datatable.js',
-            'de_portal_hr_service/static/src/js/select_two.js',
-            'de_portal_hr_service/static/src/js/sweetalert.js',
-            'de_portal_hr_service/static/src/js/js_export/*',
-        ],
-    },
+    
     'installable': True,
     'application': True,
     'auto_install': False,
