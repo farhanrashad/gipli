@@ -30,7 +30,12 @@
         'views/hr_service_web_templates.xml',
         'views/field_variant_views.xml',
     ],
-    
+    'assets': {
+        'web.assets_backend': [
+            'de_portal_hr_service/static/src/js/*',
+            'de_portal_hr_service/static/src/js/js_export/*',
+        ],
+    },
     'installable': True,
     'application': True,
     'auto_install': False,
