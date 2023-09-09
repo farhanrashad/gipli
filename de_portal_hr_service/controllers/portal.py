@@ -399,6 +399,7 @@ class CustomerPortal(portal.CustomerPortal):
 
         user_id = request.env['res.users'].sudo().search([('id','=',http.request.env.context.get('uid'))],limit=1)
         vals = {}
+        employee_id = request.env['hr.employee']
         
         if service_id.header_model_id.id == int(model_id):
             service_items = service_id.hr_service_items.filtered(lambda x: x.operation_mode)
@@ -408,21 +409,23 @@ class CustomerPortal(portal.CustomerPortal):
 
             # default values for header model
             for field in service_id.header_model_id.field_id.filtered(lambda r: r.relation and r.ttype == 'many2one' and r.store):
-                try:
+                if not kw.get(field.name):
                     if field.relation == 'res.users':
                         vals.update({
                             field.name: user_id.id,
                         })
-                    elif field.relation == 'hr.employee':
-                        vals.update({
-                            field.name: user_id.employee_id.id,
-                        })
-                    elif field.relation == 'res.partner':
+                    if field.relation == 'hr.employee':
+                        employee_id = request.env['hr.employee'].sudo().search([('user_id','=',http.request.env.context.get('uid'))],limit=1)
+                        if employee_id:
+                            vals.update({
+                                field.name: user_id.employee_id.id,
+                            })
+                        else:
+                            raise UserError('Employees are allowed only to process this transactions')
+                    if field.relation == 'res.partner':
                         vals.update({
                             field.name: user_id.partner_id.id,
                         })
-                except:
-                    pass
         elif line_item.line_model_id: #service_id.line_model_id.id == int(model_id):
             service_items = line_item.hr_service_record_line_items #line_model_id.hr_service_record_line_items #.hr_service_items_line
             if edit_mode == '1' or edit_mode == 1:
@@ -430,21 +433,19 @@ class CustomerPortal(portal.CustomerPortal):
                 res_name = record_sudo.name
                 # default values for header model
             for field in line_item.line_model_id.field_id.filtered(lambda r: r.relation and r.ttype == 'many2one' and r.store):
-                try:
+                if not kw.get(field.name):
                     if field.relation == 'res.users':
                         vals.update({
                             field.name: user_id.id,
                         })
-                    elif field.relation == 'hr.employee':
+                    if field.relation == 'hr.employee':
                         vals.update({
                             field.name: user_id.employee_id.id,
                         })
-                    elif field.relation == 'res.partner':
+                    if field.relation == 'res.partner':
                         vals.update({
                             field.name: user_id.partner_id.id,
                         })
-                except:
-                    pass
         
         
         for field in service_items:
