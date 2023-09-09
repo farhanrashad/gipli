@@ -54,13 +54,14 @@ function check_list(obj) {
         //debugger;
         responce_field = data[0].responce_field;
         responce_field = document.getElementById(responce_field);
-        try:
+        try {
             responce_field.remove();
             responce_field.innerHTML = "";
-          document.write(responce_field)
-        catch(e):
+            //document.write(responce_field)
+        }
+        catch(err) {
             responce_field.write('')
-        responce_field.className = "form-control";
+            responce_field.className = "form-control";
       }
       data.forEach(function (option) {
         debugger;
