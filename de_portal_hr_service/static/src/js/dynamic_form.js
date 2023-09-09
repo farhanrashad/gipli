@@ -48,13 +48,18 @@ function check_list(obj) {
     contentType: false,
     processData: false,
     success: function (data) {
-      debugger;
+      //debugger;
       let responce_field;
       if (data !== undefined && data !== null) {
-        debugger;
+        //debugger;
         responce_field = data[0].responce_field;
         responce_field = document.getElementById(responce_field);
-        responce_field.innerHTML = "";
+        try:
+            responce_field.remove();
+            responce_field.innerHTML = "";
+          document.write(responce_field)
+        catch(e):
+            responce_field.write('')
         responce_field.className = "form-control";
       }
       data.forEach(function (option) {
