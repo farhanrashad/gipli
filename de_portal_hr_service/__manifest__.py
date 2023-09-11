@@ -12,7 +12,7 @@
     'author': "dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
-    'version': '16.0.4.2',
+    'version': '16.0.4.3',
     'license': 'LGPL-3',
     'live_test_url': 'https://youtu.be/f_uSGd3qJNU',
     'price': 149,
@@ -29,6 +29,7 @@
         'views/hr_services_templates.xml',
         'views/hr_service_web_templates.xml',
         'views/field_variant_views.xml',
+        'views/hr_employee_views.xml',
     ],
     
     'installable': True,

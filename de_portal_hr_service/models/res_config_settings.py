@@ -7,6 +7,7 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     security_group_id = fields.Many2one('res.groups', string='Security Group')
+    allow_portal_user = fields.Boolean('Allow Portal User', config_parameter='de_portal_hr_service.allow_portal_user')
 
     @api.model
     def get_values(self):
