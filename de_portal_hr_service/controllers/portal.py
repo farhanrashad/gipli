@@ -9,7 +9,9 @@ from markupsafe import Markup
 from odoo import fields, http, SUPERUSER_ID, _
 from odoo.exceptions import AccessError, MissingError, UserError, ValidationError
 
-from odoo.http import request
+from odoo import http
+from odoo.http import request, Response
+
 from odoo.tools.translate import _
 # from odoo.tools import groupby as groupbyelem
 from odoo.addons.portal.controllers import portal
@@ -29,8 +31,33 @@ import datetime
 import json
 
 class CustomerPortal(portal.CustomerPortal):
+    @http.route('/custom/get_field_vals', type='http', auth='public', website=True)
+    def get_field_vals(self, **kwargs):
+
+        field_name = kwargs.get('field_name')
+        field_value = kwargs.get('field_value')
+        target_field_name = kwargs.get('target_field_name', 'uom_id')  # default to 'uom_id' if not provided
+
+        # Fetch the record based on the field_id from kwargs
+        #record = request.env['product.product'].sudo().browse(int(kwargs.get('field_id', 0)))
+        raise UserError('hello')
+        record = request.env['product.product'].sudo().browse(52)
+        # Check if the record exists
+        if not record.exists():
+            return Response("Record not found", status=400)
+
+        # Dynamically get the field value based on the target field name passed
+        target_field_name = kwargs.get('target_field_name', 'uom_id')  # default to 'uom_id' if not provided
+        if hasattr(record, target_field_name):
+            field_value = getattr(record, target_field_name)
+            return Response(f"{field_value.id}: {field_value.name}")
+        else:
+            return Response("Invalid field or record not found", status=400)
+
+
+
     
-    def _prepare_service_record_page(self,service_id, model_id, record_id, edit_mode):
+    def _prepare_service_record_page(self,service_id, model_id, record_id, edit_mode, js_code):
         m2o_id = False
         extra_template = ''
         primary_template = ''
@@ -72,9 +99,9 @@ class CustomerPortal(portal.CustomerPortal):
         for service in service_id:
 
             primary_template += '<link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />'
-            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
-            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>'
-            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>'
+            #primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
+            #primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>'
+            #primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script><br/><br/>'
         
             primary_template += '<nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar  mt-3 rounded">'
             primary_template += '<ol class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1 row">'
@@ -189,9 +216,9 @@ class CustomerPortal(portal.CustomerPortal):
                                     name = field.field_name +"-" + str(service.id) +"-" + field._name
 
                                     if field.is_required:
-                                        primary_template += "<select id='" + name + "' name='" + field.field_name + "' required='" + required + "'class='mb-2 selection-search form-control'" +  " onchange=check_list(this); >"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='mb-2 selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
                                     else:
-                                        primary_template += "<select id='" + name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'" +  " onchange=check_list(this); >"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
 
                                 else:
                                     if field.is_required:
@@ -293,6 +320,43 @@ class CustomerPortal(portal.CustomerPortal):
             
             
         currency_ids = request.env['res.currency'].sudo().search([('active','=',True)])
+        # JavaScript code as a string
+        js_code = """
+<script>
+    let isRequestExecuted = false;
+    function filter_field_vals(element, targetFieldId) {
+        if (isRequestExecuted) return;  // If already executed, return early
+        console.log("Function filter_field_vals started");
+
+        let fieldName = element.name;  // Get the element's name
+        let fieldValue = element.value;  // Get the element's value
+
+        let data = {
+            'field_name': fieldName,   // Send the field name
+            'field_value': fieldValue, // Send the field value
+            'target_field_name': targetFieldId  // Send the target field name
+        };
+
+        $.ajax({
+            url: '/custom/get_field_vals',
+            type: 'GET',
+            data: data,
+            success: function (response) {
+                let targetSelect = $('#' + targetFieldId);
+                targetSelect.empty();
+                let values = response.split(':');
+                targetSelect.append($('<option>', {
+                    value: values[0],
+                    text: values[1]
+                }));
+            }
+        });
+        isRequestExecuted = true;  // Set the flag to true after execution
+    }
+</script>
+
+        """
+
         return {
             'currency_ids': currency_ids,
             'template_primary_fields': primary_template,
@@ -301,12 +365,13 @@ class CustomerPortal(portal.CustomerPortal):
             'record_id': record_id,
             'model_id': model_id,
             'edit_mode': edit_mode or 0,
+            'js_code': js_code,
         }
     
     @http.route(['/my/model/record/<int:service_id>/<int:model_id>/<int:record_id>/<int:edit_mode>'
                 ], type='http', auth="user", website=True)        
-    def portal_hr_service_record(self, service_id=False, model_id=False, record_id=False, edit_mode=False, **kw):
-        return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode))
+    def portal_hr_service_record(self, service_id=False, model_id=False, record_id=False, edit_mode=False, js_code=False,**kw):
+        return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode, js_code))
         
     # @http.route(['/my/model/record/next/<int:service_id>/<int:model_id>/<int:record_id>'
     @http.route(['/my/model/record/next/prev'], type='http', method=['POST'], auth="user", website=True,
@@ -362,14 +427,11 @@ class CustomerPortal(portal.CustomerPortal):
         data = json.dumps(data)
         return data   
             
-        
-
-        # return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode))
-        
+                
     @http.route(['/my/model/record/prev/<int:service_id>/<int:model_id>/<int:record_id>'
                 ], type='http', auth="user", website=True)        
     def portal_hr_service_record_previous(self, service_id=False, model_id=False, record_id=False, edit_mode=False, **kw):
-        return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode))
+        return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode, js_code))
         
     
     @http.route('/my/model/record/submit', website=True, page=True, auth='public', csrf=False)
