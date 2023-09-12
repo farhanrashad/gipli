@@ -6,7 +6,7 @@
             name="Self Service"
             web_icon="de_portal_hr_service,static/description/icon.png"
             active="True"
-            sequence="7"/>
+            sequence="22"/>
         
            <menuitem id="hr_service_menu_root_config_menu"
             name="Services"

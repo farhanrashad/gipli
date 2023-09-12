@@ -91,7 +91,8 @@ class HRService(models.Model):
     def button_publish(self):
         field_model_ids = self.env['ir.model']
         #model_ids = self.env['ir.model']
-        model_ids = self.header_model_id + self.hr_service_record_line.mapped('line_model_id')
+        variant_model_ids = self.env['ir.model'].search([('model','in',['hr.service.field.variant','hr.service.field.variant.line'])])
+        model_ids = self.header_model_id + self.hr_service_record_line.mapped('line_model_id') + variant_model_ids
         
         field_model_ids += self.env['ir.model'].search([('model', 'in', self.hr_service_items.filtered(lambda x: x.field_model != False).mapped('field_model'))])
         field_model_ids += self.env['ir.model'].search([('model', 'in', self.hr_service_record_line.hr_service_record_line_items.filtered(lambda x: x.field_model != False).mapped('field_model'))])
@@ -240,7 +241,7 @@ class HRServiceItems(models.Model):
         ('both', 'Both'),
         ], string='Display View')
     
-    ref_populate_field_id = fields.Many2one('ir.model.fields',string='Populate Field')
+    ref_populate_field_id = fields.Many2one('ir.model.fields',string='Filter Reference')
 
 
 

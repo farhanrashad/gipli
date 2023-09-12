@@ -53,29 +53,18 @@ class CustomerPortal(portal.CustomerPortal):
 
         target_record = request.env[target_field_id.relation].sudo().search([('id','=',record_id)],limit=1)
         
-        #raise UserError(str(field_name)+str(field_value)+str(target_field_name))
-        # Fetch the record based on the field_id from kwargs
-        #record = request.env['product.product'].sudo().browse(int(kwargs.get('field_id', 0)))
-        #raise UserError('hello')
-        record = request.env['product.product'].sudo().browse(52)
         # Check if the record exists
         if not src_record.exists():
             return Response("Record not found", status=400)
 
-        # Dynamically get the field value based on the target field name passed
-        #target_field_name = kwargs.get('target_field_name', 'uom_id')  # default to 'uom_id' if not provided
-        if hasattr(target_record, target_field_name):
-            field_value = getattr(target_record, target_field_name)
-            return Response(f"{field_value.id}: {field_value.name}")
-        else:
-            #return Response("Invalid field or record not found" + str(target_record.id) + target_record.name, status=400)
-            options = {record_id: record_val}
+        if target_record:
+            options = {target_record.id: target_record.name}
             return json.dumps(options)
+        else:
+            return Response("Invalid field or record not found", status=400)
+            #options = {record_id: record_val}
+            #return json.dumps(options)
             #return Response(f"{record_id}: {record_val}")
-
-
-
-
 
     
     def _prepare_service_record_page(self,service_id, model_id, record_id, edit_mode, js_code):
@@ -120,8 +109,8 @@ class CustomerPortal(portal.CustomerPortal):
         for service in service_id:
 
             primary_template += '<link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />'
-            #primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
-            #primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>'
+            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
+            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>'
             #primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script><br/><br/>'
         
             primary_template += '<nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar  mt-3 rounded">'
@@ -135,31 +124,41 @@ class CustomerPortal(portal.CustomerPortal):
             
             # primary_template += '<t t-set="test" t-value="hr_service_items" />'
 
+            
+            
             hr_service_grouped_items = {}
-            for key, group in groupby(hr_service_items, lambda item: item.field_variant_line_id.id):
+            for key, group in groupby(service_id.field_variant_id.field_variant_line_ids):
                 hr_service_grouped_items[key] = list(group)
             keys = sorted(hr_service_grouped_items.keys())
+            
             for key in keys:
                 group = hr_service_grouped_items[key]
-                if group[0].field_variant_line_id.display_column == 'col_6':
+                if group[0].display_column == 'col_6':
                     # primary_template += "<div class='col-6' style='padding:16px;background-color:#FFFFFF;'>"
                     primary_template += "<div class='col-6 ' >"
                     primary_template += "<div class='p-3 h-100 bg-white' style=''>"
-                    primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].field_variant_line_id.description if group[0].field_variant_line_id.description else '' + '</h5>'
-                    primary_template += '<hr class="w-100 mx-auto" />'
-                    primary_template += '</div>'
+                    if group[0].description:
+                        primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].description + '</h5>'
+                        primary_template += '<hr class="w-100 mx-auto" />'
+                        primary_template += '</div>'
+                    else:
+                        primary_template += '<div class="mb-2"></div>'
+                        
                     primary_template += '<div class="" style=" border-radius: 10px;">'
 
-                if group[0].field_variant_line_id.display_column == 'col_12':
+                if group[0].display_column == 'col_12':
                     primary_template += "<div class='col-12'>"
                     primary_template += "<div class='p-3 h-100 bg-white' style=''>"
-                    primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].field_variant_line_id.description if group[0].field_variant_line_id.description else '' + '</h5>'
+                    if group[0].description:
+                        primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].description + '</h5>'
+                    else:
+                        primary_template += '<div class="mb-2"></div>'
+                        
                     primary_template += '<div class="" style="border-radius: 10px;">'
                     # primary_template += '<div class="card-header mb-2"><h3>' + group[0].field_variant_line_id.description + '</h3></div>'
 
                 
-
-                for field in group:
+                for field in hr_service_items.filtered(lambda x:x.field_variant_line_id.id == key.id):
                     # find the record value
                     field_domain = []
                     
@@ -417,6 +416,17 @@ class CustomerPortal(portal.CustomerPortal):
     @http.route(['/my/model/record/<int:service_id>/<int:model_id>/<int:record_id>/<int:edit_mode>'
                 ], type='http', auth="user", website=True)        
     def portal_hr_service_record(self, service_id=False, model_id=False, record_id=False, edit_mode=False, js_code=False,**kw):
+        
+        service_sudo = request.env['hr.service'].sudo().search([('id','=',service_id)],limit=1)
+        # Assuming you have the group ID
+        group_id = service_sudo.group_id.id  # Replace with your group ID
+        # Check if the user belongs to the group using the group ID
+        user = request.env.user
+        user_groups = user.groups_id.ids  # This will give you a list of group IDs the user belongs to
+        if group_id not in user_groups:
+            # If the user doesn't belong to the group, redirect them to another page (e.g., the home page)
+            return request.redirect('/my')
+
         return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode, js_code))
         
     # @http.route(['/my/model/record/next/<int:service_id>/<int:model_id>/<int:record_id>'
@@ -477,6 +487,7 @@ class CustomerPortal(portal.CustomerPortal):
     @http.route(['/my/model/record/prev/<int:service_id>/<int:model_id>/<int:record_id>'
                 ], type='http', auth="user", website=True)        
     def portal_hr_service_record_previous(self, service_id=False, model_id=False, record_id=False, edit_mode=False, **kw):
+        
         return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode, js_code))
         
     
@@ -646,6 +657,14 @@ class CustomerPortal(portal.CustomerPortal):
                 record = record_sudo[eval("'" + line_item.parent_relational_field_id.sudo().name + "'")]
                 record_sudo.sudo().write(vals)
         
+        # Assuming you have the group ID
+        group_id = service_id.group_id.id  # Replace with your group ID
+        # Check if the user belongs to the group using the group ID
+        user = request.env.user
+        user_groups = user.groups_id.ids  # This will give you a list of group IDs the user belongs to
+        if group_id not in user_groups:
+            # If the user doesn't belong to the group, redirect them to another page (e.g., the home page)
+            return request.redirect('/my')
             
         return request.redirect('/my/model/record/%s/%s/%s' % (service_id.id,service_id.header_model_id.id, record.id))
     
@@ -665,7 +684,16 @@ class CustomerPortal(portal.CustomerPortal):
         elif line_item.line_model_id.id == int(model_id):
             record_sudo = request.env[line_item.line_model_id.model].sudo().search([('id','=',int(record_id))],limit=1)
             record = record_sudo[eval("'" + line_item.parent_relational_field_id.sudo().name + "'")]
-                
+
+        # Assuming you have the group ID
+        group_id = service_id.group_id.id  # Replace with your group ID
+        # Check if the user belongs to the group using the group ID
+        user = request.env.user
+        user_groups = user.groups_id.ids  # This will give you a list of group IDs the user belongs to
+        if group_id not in user_groups:
+            # If the user doesn't belong to the group, redirect them to another page (e.g., the home page)
+            return request.redirect('/my')
+            
         record_sudo.sudo().unlink()
         return request.redirect('/my/model/record/%s/%s/%s' % (service_id.id,model_id, record.id))
 

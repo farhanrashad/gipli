@@ -18,10 +18,11 @@
                         </div>
                     </div>
                 </form> 
+                <!-- add template to add javascript fileds -->
                 <t t-raw="js_code"/>
             </t>
         </template>
-        <!-- add template to add javascript fileds -->
+        
         
 
     </data>

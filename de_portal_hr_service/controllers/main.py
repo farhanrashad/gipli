@@ -106,6 +106,17 @@ class CustomerPortal(CustomerPortal):
         values.update({
             'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service_sudo),
         })
+
+        service_id = request.env['hr.service'].sudo().search([('id','=',service_id)],limit=1)
+        # Assuming you have the group ID
+        group_id = service_id.group_id.id  # Replace with your group ID
+        # Check if the user belongs to the group using the group ID
+        user = request.env.user
+        user_groups = user.groups_id.ids  # This will give you a list of group IDs the user belongs to
+        if group_id not in user_groups:
+            # If the user doesn't belong to the group, redirect them to another page (e.g., the home page)
+            return request.redirect('/my')
+            
         return request.render("de_portal_hr_service.portal_my_hr_service", values)
     
     
@@ -176,7 +187,16 @@ class CustomerPortal(CustomerPortal):
 
             else:
                 record_state = str(record_sudo[eval("'" + service_sudo.sudo().state_field_id.name + "'")])
-        
+
+        # Assuming you have the group ID
+        group_id = service_sudo.group_id.id  # Replace with your group ID
+        # Check if the user belongs to the group using the group ID
+        user = request.env.user
+        user_groups = user.groups_id.ids  # This will give you a list of group IDs the user belongs to
+        if group_id not in user_groups:
+            # If the user doesn't belong to the group, redirect them to another page (e.g., the home page)
+            return request.redirect('/my')
+            
         # find editable record option
         record_editable = False
         if service_sudo.condition:

@@ -53,7 +53,7 @@
             </field>
         </record>
 
-        <menuitem action="action_service_field_variant" name="Field Variant" id="hr_service_field_variant" parent="hr_service_menu_root_config_menu" sequence="2"/>
+        <menuitem action="action_service_field_variant" name="Field Variant" id="hr_service_field_variant" parent="hr_service_config_menu" sequence="2"/>
 
     </data>
 </odoo>

@@ -179,7 +179,7 @@
                                         <field name="field_label" />
                                         <field name="is_required" attrs="{'readonly':[('field_store','=',False)]}"/>
                                         <field name="operation_mode" attrs="{'readonly':[('field_store','=',False)]}"/>
-                                        <field name="field_variant_line_id" domain="[('field_variant_id','=',parent.field_variant_id)]"/>
+                                        <field name="field_variant_line_id" domain="[('field_variant_id','=',parent.field_variant_id)]" attrs="{'readonly':[('field_store','=',False)]}"/>
                                         <!-- <field name="operation_mode" attrs="{'readonly': [('field_store', '=', False)]}"/> -->
                                         <field name="link_record" />
                                         <field name="display_option" />
