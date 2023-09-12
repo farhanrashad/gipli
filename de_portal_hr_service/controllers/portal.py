@@ -34,25 +34,46 @@ class CustomerPortal(portal.CustomerPortal):
     @http.route('/custom/get_field_vals', type='http', auth='public', website=True)
     def get_field_vals(self, **kwargs):
 
-        field_name = kwargs.get('field_name')
-        field_value = kwargs.get('field_value')
+        field_name = kwargs.get('src_field_name')
+        field_value = kwargs.get('src_field_value')
         target_field_name = kwargs.get('target_field_name', 'uom_id')  # default to 'uom_id' if not provided
+        #model = kwargs.get('model_id')
+        
+        model = request.env['ir.model'].search([('id','=',kwargs.get('model_id'))],limit=1)
+        
+        src_field_id = request.env['ir.model.fields'].search([('model_id','=',model.id),('name','=',field_name)],limit=1)
+        src_record = request.env[src_field_id.relation].sudo().search([('id','=',field_value)],limit=1)
+        
+        target_field_id = request.env['ir.model.fields'].search([('model_id','=',model.id),('name','=',target_field_name)],limit=1)
 
+        src_target_field_id = request.env['ir.model.fields'].sudo().search([('model_id.model','=',src_field_id.relation),('relation','=',target_field_id.relation)],limit=1)
+
+        record_val = src_record[eval("'" + src_target_field_id.name + "'")].name
+        record_id = src_record[eval("'" + src_target_field_id.name + "'")].id
+
+        target_record = request.env[target_field_id.relation].sudo().search([('id','=',record_id)],limit=1)
+        
+        #raise UserError(str(field_name)+str(field_value)+str(target_field_name))
         # Fetch the record based on the field_id from kwargs
         #record = request.env['product.product'].sudo().browse(int(kwargs.get('field_id', 0)))
-        raise UserError('hello')
+        #raise UserError('hello')
         record = request.env['product.product'].sudo().browse(52)
         # Check if the record exists
-        if not record.exists():
+        if not src_record.exists():
             return Response("Record not found", status=400)
 
         # Dynamically get the field value based on the target field name passed
-        target_field_name = kwargs.get('target_field_name', 'uom_id')  # default to 'uom_id' if not provided
-        if hasattr(record, target_field_name):
-            field_value = getattr(record, target_field_name)
+        #target_field_name = kwargs.get('target_field_name', 'uom_id')  # default to 'uom_id' if not provided
+        if hasattr(target_record, target_field_name):
+            field_value = getattr(target_record, target_field_name)
             return Response(f"{field_value.id}: {field_value.name}")
         else:
-            return Response("Invalid field or record not found", status=400)
+            #return Response("Invalid field or record not found" + str(target_record.id) + target_record.name, status=400)
+            options = {record_id: record_val}
+            return json.dumps(options)
+            #return Response(f"{record_id}: {record_val}")
+
+
 
 
 
@@ -323,35 +344,60 @@ class CustomerPortal(portal.CustomerPortal):
         # JavaScript code as a string
         js_code = """
 <script>
-    let isRequestExecuted = false;
-    function filter_field_vals(element, targetFieldId) {
-        if (isRequestExecuted) return;  // If already executed, return early
+    function filter_field_vals(element_src, element_target) {
         console.log("Function filter_field_vals started");
 
-        let fieldName = element.name;  // Get the element's name
-        let fieldValue = element.value;  // Get the element's value
+        let fieldNameSrc = element_src.name;  // Get the target element's name
+        let fieldValueSrc = element_src.value;  // Get the element's value
+        let FieldNameTarget = element_target.name // get the target element's name
+        var modelId = document.getElementById("model_id").value;
 
         let data = {
-            'field_name': fieldName,   // Send the field name
-            'field_value': fieldValue, // Send the field value
-            'target_field_name': targetFieldId  // Send the target field name
+            'src_field_name': fieldNameSrc,   // Send the field name
+            'src_field_value': fieldValueSrc, // Send the field value
+            'target_field_name': FieldNameTarget,  // Send the target field name
+            'model_id': modelId // Send Model id
         };
+
+        //alert(typeof target_field_name);
+        //alert("Name: " + fieldNameSrc + ", Value: " + fieldValueSrc + ", Target Name: " + FieldNameTarget + ",Model: " + modelId );
 
         $.ajax({
             url: '/custom/get_field_vals',
             type: 'GET',
             data: data,
-            success: function (response) {
-                let targetSelect = $('#' + targetFieldId);
+            dataType: 'json',  // Explicitly expect JSON
+            success: function (data) {
+                console.log(data);
+                //let targetSelect = $('#' + element_target);
+                let targetSelect;
+                if (typeof element_target === "string") {
+                    targetSelect = $('#' + element_target);
+                } else if (element_target instanceof HTMLElement) {
+                    targetSelect = $(element_target);
+                } else {
+                    console.error("Invalid target provided");
+                    return;
+                }
+    
                 targetSelect.empty();
-                let values = response.split(':');
-                targetSelect.append($('<option>', {
-                    value: values[0],
-                    text: values[1]
-                }));
-            }
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        targetSelect.append($('<option>', {
+                            value: key,
+                            text: data[key]
+                        }));
+                    }
+                }
+
+                //$.each(data, function (key, value) {
+                //    targetSelect.append($('<option>', {
+                //        value: key,
+                //        text: value
+                //    }));
+                //});
+            },
         });
-        isRequestExecuted = true;  // Set the flag to true after execution
     }
 </script>
 
