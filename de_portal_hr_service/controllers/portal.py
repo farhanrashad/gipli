@@ -94,19 +94,20 @@ class CustomerPortal(portal.CustomerPortal):
         _logger.info("Received domain: %s", domain)
 
         # Check if domain is not empty
-        if not domain:
-            return Response(json.dumps({'error': 'Empty domain received'}), content_type='application/json;charset=utf-8', status=400)
-
-        # Explicitly parse the domain string
-        try:
-            evaluated_domain = ast.literal_eval(domain)
-            if not isinstance(evaluated_domain, list):
-                raise ValueError("Domain is not a list")
-        except Exception as e:
-            _logger.error("Error parsing domain: %s", str(e))
-            return Response(json.dumps({'error': 'Invalid domain format'}), content_type='application/json;charset=utf-8', status=400)
+        if not domain or domain == "":
+            evaluated_domain = []
+        else:
+            # Explicitly parse the domain string
+            try:
+                evaluated_domain = ast.literal_eval(domain)
+                if not isinstance(evaluated_domain, list):
+                    raise ValueError("Domain is not a list")
+            except Exception as e:
+                _logger.error("Error parsing domain: %s", str(e))
+                return Response(json.dumps({'error': 'Invalid domain format'}), content_type='application/json;charset=utf-8', status=400)
 
         combined_domain = evaluated_domain + search_domain
+
     
 
         records = request.env[model].sudo().search(combined_domain, limit=limit, offset=offset)
@@ -269,18 +270,21 @@ class CustomerPortal(portal.CustomerPortal):
                     field_domain = []
 
                     #Search and label fields 
-                    related_model_name = field.field_id.relation
-                    Model = request.env[related_model_name]
-                    default_field = 'name' if 'name' in Model._fields else 'id'
-                    # Assuming you've already fetched the field record in some manner
-                    search_fields = [f.name for f in field.search_fields_ids] or [default_field]
-                    label_fields = [f.name for f in field.label_fields_ids] or [default_field]
-
+                    if field.field_id.relation:
+                        related_model_name = field.field_id.relation
+                        Model = request.env[related_model_name]
+                        default_field = 'name' if 'name' in Model._fields else 'id'
+                        # Assuming you've already fetched the field record in some manner
+                        search_fields = [f.name for f in field.search_fields_ids] or [default_field]
+                        label_fields = [f.name for f in field.label_fields_ids] or [default_field]
+                    else:
+                        search_fields = ''
+                        label_fields = ''
                     #search_fields = ','.join([f.name for f in field.search_fields_ids])
                     #label_fields = ','.join([f.name for f in field.label_fields_ids])
 
                     # check the domain
-                    domain_filter = str(field.field_domain).replace("'", "&#39;")
+                    domain_filter = str(field.field_domain).replace("'", "&#39;") if field.field_domain else ""
                     
                     if field.is_required:
                         required = '1'
