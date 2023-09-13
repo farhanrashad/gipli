@@ -12,7 +12,7 @@
     'author': "dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
-    'version': '16.0.4.4',
+    'version': '16.0.4.5',
     'license': 'LGPL-3',
     'live_test_url': 'https://youtu.be/f_uSGd3qJNU',
     'price': 149,

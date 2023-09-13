@@ -40,28 +40,39 @@ class CustomerPortal(portal.CustomerPortal):
         #model = kwargs.get('model_id')
         
         model = request.env['ir.model'].search([('id','=',kwargs.get('model_id'))],limit=1)
-        
+
+        # 1. Get the source field id object. e.g product_id
+        # 2. Get the source record. e.g product = 'Communication'
         src_field_id = request.env['ir.model.fields'].search([('model_id','=',model.id),('name','=',field_name)],limit=1)
         src_record = request.env[src_field_id.relation].sudo().search([('id','=',field_value)],limit=1)
         
         target_field_id = request.env['ir.model.fields'].search([('model_id','=',model.id),('name','=',target_field_name)],limit=1)
-
         src_target_field_id = request.env['ir.model.fields'].sudo().search([('model_id.model','=',src_field_id.relation),('relation','=',target_field_id.relation)],limit=1)
 
-        record_val = src_record[eval("'" + src_target_field_id.name + "'")].name
-        record_id = src_record[eval("'" + src_target_field_id.name + "'")].id
-
-        target_record = request.env[target_field_id.relation].sudo().search([('id','=',record_id)],limit=1)
+        if src_target_field_id.ttype == 'many2one':
+            # This code will execute if source-target_field data type is many2one
+            # 1. Get the target field value from the source record. e.g km
+            # 2. Get the record from the target model on target field value. e.g id=7, name=km
+            src_target_field_record = src_record[eval("'" + src_target_field_id.name + "'")]
+            target_record = request.env[target_field_id.relation].sudo().search([('id','=',src_target_field_record.id)],limit=1)
+            options = {target_record.id: target_record.name}
+        elif src_target_field_id.ttype == 'one2many':
+            # This code will execute if source-target_field data type is one2many
+            target_record = src_record[eval("'" + src_target_field_id.name + "'")]
+            options = {t.id: t.name for t in target_record}
         
         # Check if the record exists
         if not src_record.exists():
             return Response("Record not found", status=400)
 
-        if target_record:
-            options = {target_record.id: target_record.name}
+        if target_record or len(target_record):
             return json.dumps(options)
+            #return Response(target_record.name, status=400)
+            #return json.dumps(options)
         else:
-            return Response("Invalid field or record not found", status=400)
+            options = {}
+            return json.dumps(options)
+            #return Response("Invalid field or record not found", status=400)
             #options = {record_id: record_val}
             #return json.dumps(options)
             #return Response(f"{record_id}: {record_val}")
