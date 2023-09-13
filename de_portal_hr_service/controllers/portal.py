@@ -25,13 +25,37 @@ from itertools import groupby
 import datetime
 
 #from odoo.addons.website.controllers import form
+import ast
 
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 import json
 
 class CustomerPortal(portal.CustomerPortal):
+    """
+    @http.route('/dynamic_filter', type='http', auth="user", methods=['GET'])
+    def dynamic_filter(self, model, field, search_fields, domain, label_fields, q):
+        Model = request.env[model]
+        domain = ast.literal_eval(domain) if domain else []
+        search_domain = [('name', 'ilike', q)]
+        for search_field in search_fields.split(','):
+            search_domain.append((search_field, 'ilike', q))
+        domain = ['|' * (len(search_domain) - 1)] + search_domain + domain
+        records = Model.search(domain, limit=10)
+        
+        label_fields_list = label_fields.split(',')
+        results = []
+        for record in records:
+            label = ' - '.join([str(getattr(record, f)) for f in label_fields_list])
+            results.append({'id': record.id, 'text': label})
 
+        return json.dumps(results)
+    """
+
+    """
     @http.route('/dynamic_search', type='http', auth="user", methods=['GET'])
     def dynamic_search(self, **kwargs):
         q = kwargs.get('q', '')
@@ -47,10 +71,52 @@ class CustomerPortal(portal.CustomerPortal):
         items = [{'id': record.id, 'text': getattr(record, field)} for record in records]
         
         return Response(json.dumps({'items': items}), content_type='application/json;charset=utf-8', status=200)
+    """
+    @http.route('/dynamic_search', type='http', auth="user", methods=['GET'])
+    def dynamic_search(self, **kwargs):
+        q = kwargs.get('q', '')
+        model = kwargs.get('model', '')
+        field = kwargs.get('field', '')
+        search_fields = kwargs.get('search_fields', '').split(',')
+        domain = kwargs.get('domain', '[]')
+        label_fields = kwargs.get('label_fields', '').split(',')
+        page = int(kwargs.get('page', 1))
+        
+        limit = 20
+        offset = (page - 1) * limit
 
+        # Extend the domain to search across multiple fields
+        search_domain = ['|'] * (len(search_fields) - 1)
+        for search_field in search_fields:
+            search_domain.append((search_field, 'ilike', q))
+        
+        # Log the received domain
+        _logger.info("Received domain: %s", domain)
 
+        # Check if domain is not empty
+        if not domain:
+            return Response(json.dumps({'error': 'Empty domain received'}), content_type='application/json;charset=utf-8', status=400)
 
+        # Explicitly parse the domain string
+        try:
+            evaluated_domain = ast.literal_eval(domain)
+            if not isinstance(evaluated_domain, list):
+                raise ValueError("Domain is not a list")
+        except Exception as e:
+            _logger.error("Error parsing domain: %s", str(e))
+            return Response(json.dumps({'error': 'Invalid domain format'}), content_type='application/json;charset=utf-8', status=400)
+
+        combined_domain = evaluated_domain + search_domain
     
+
+        records = request.env[model].sudo().search(combined_domain, limit=limit, offset=offset)
+        
+        # Concatenate fields for display
+        items = [{'id': record.id, 'text': ' '.join([str(getattr(record, lbl_field)) for lbl_field in label_fields])} for record in records]
+
+        
+        return Response(json.dumps({'items': items}), content_type='application/json;charset=utf-8', status=200)
+
     @http.route('/custom/get_field_vals', type='http', auth='public', website=True)
     def get_field_vals(self, **kwargs):
 
@@ -99,6 +165,14 @@ class CustomerPortal(portal.CustomerPortal):
             #return json.dumps(options)
             #return Response(f"{record_id}: {record_val}")
 
+        print("Starting dynamic_search...")
+        print("Query:", q)
+        print("Model:", model)
+        print("Field:", field)
+        print("Search Fields:", search_fields)
+        print("Domain:", combined_domain)
+
+
     
     def _prepare_service_record_page(self,service_id, model_id, record_id, edit_mode, js_code):
         m2o_id = False
@@ -140,13 +214,15 @@ class CustomerPortal(portal.CustomerPortal):
         # ------------- Generate Dynamic Form ----------------
         # ----------------------------------------------------
         for service in service_id:
-
-            primary_template += '<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />'
-            primary_template += '<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>'
             primary_template += '<link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />'
             primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
             primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>'
-            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script><br/><br/>'
+            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>'
+
+            # libraries used for dynamic search 
+            primary_template += '<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />'
+            primary_template += '<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>'
+            
         
             primary_template += '<nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar  mt-3 rounded">'
             primary_template += '<ol class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1 row">'
@@ -156,9 +232,6 @@ class CustomerPortal(portal.CustomerPortal):
             primary_template += '</nav>'
             
             primary_template += '<div class="row" style="">'
-            
-            # primary_template += '<t t-set="test" t-value="hr_service_items" />'
-
             
             
             hr_service_grouped_items = {}
@@ -190,12 +263,14 @@ class CustomerPortal(portal.CustomerPortal):
                         primary_template += '<div class="mb-2"></div>'
                         
                     primary_template += '<div class="" style="border-radius: 10px;">'
-                    # primary_template += '<div class="card-header mb-2"><h3>' + group[0].field_variant_line_id.description + '</h3></div>'
-
                 
                 for field in hr_service_items.filtered(lambda x:x.field_variant_line_id.id == key.id):
                     # find the record value
                     field_domain = []
+
+                    search_fields = ','.join([f.name for f in field.search_fields_ids])
+                    label_fields = ','.join([f.name for f in field.label_fields_ids])
+                    domain_filter = str(field.field_domain).replace("'", "&#39;")
                     
                     if field.is_required:
                         required = '1'
@@ -214,11 +289,8 @@ class CustomerPortal(portal.CustomerPortal):
                     
                         if field.is_required:
                             primary_template += "<div class='form-group mb-2 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
-                            # primary_template += "<div class='form-group col-4 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
                         else:
-                            primary_template += "<div class='form-group mb-2 ' data-type='char' data-name='" + field.field_name + "'>"
-                            # primary_template += "<div class='form-group col-4' data-type='char' data-name='" + field.field_name + "'>"
-                        
+                            primary_template += "<div class='form-group mb-2 ' data-type='char' data-name='" + field.field_name + "'>"                        
                         primary_template += "<label class='s_website_form_label' style='width: 200px' for='" + field.field_name + "'>"
                         primary_template += "<span class='s_website_form_label_content'>" + field.field_label + required_label + "</span>"
                         primary_template += "</label>"
@@ -240,18 +312,8 @@ class CustomerPortal(portal.CustomerPortal):
                                             field_domain = safe_eval.safe_eval(field.field_domain)
                                     except Exception:
                                         field_domain = []
-                                    #e = request.env.user.employee_id.id
-                                    #raise ValidationError(eval(field.field_domain, {"employee": request.env.user.employee_id.id}))
-                                    #if isinstance(field.field_domain, str):
-                                    #    if field.field_domain == 'employee.id':
-                                    #        field_domain = [('employee_id','=',request.env.user.employee_id.id)]
-                                    #    else:
-                                    #        field_domain = safe_eval.safe_eval(field.field_domain)
-                                    #field_domain = field_domain.replace("employee.id", "request.env.user.employee_id.id")
-                                    #raise ValidationError(_(json.dumps(field.field_domain)))
-                                    #field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
+                                    
                                 m2o_id = request.env[field.field_model].sudo().search(field_domain)
-                                # primary_template += "<option value='' " + " selected"  + ">" + "Search for a product </option>"
     
                                 if field.ref_populate_field_id:
                                     response_field_name = field.ref_populate_field_id.name
@@ -267,19 +329,18 @@ class CustomerPortal(portal.CustomerPortal):
 
                                     result = model_related_field + '-' + response_field_name
                                 
-                                    primary_template += "<input type='hidden'  id='join_fields' name='" + result + "' />"
+                                    #primary_template += "<input type='hidden'  id='join_fields' name='" + result + "' />"
                                     name = field.field_name +"-" + str(service.id) +"-" + field._name
 
                                     if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
                                     else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
-
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
                                 else:
                                     if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='mb-2 select2-dynamic selection-search form-control'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
                                     else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='mb-2 select2-dynamic selection-search form-control'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
                                 primary_template += "<option value='' >Select </option>"
 
                                 for m in m2o_id:
@@ -288,8 +349,6 @@ class CustomerPortal(portal.CustomerPortal):
                                     primary_template += m.name
                                     primary_template += "</option>"
                                 primary_template += "</select>"
-                                
-                            
                         # Many2many field
                         elif field.field_type == 'many2many':
                             if field.field_domain:
@@ -305,8 +364,7 @@ class CustomerPortal(portal.CustomerPortal):
                                 except Exception:
                                     field_domain = []
                             m2m_id = request.env[field.field_model].sudo().search(field_domain) 
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='form-control mb-2 select2-dynamic selection-search' multiple='multiple'>"
-                            # primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control mb-2 selection-search' style='width: 25%' multiple='multiple'>"
+                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic selection-search' multiple='multiple'>"
                             for m in m2m_id:
                                 primary_template += "<option value='' >Select </option>"
                                 primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
@@ -314,13 +372,10 @@ class CustomerPortal(portal.CustomerPortal):
                                 primary_template += "</option>"
                             primary_template += "</select>"
 
-
-
-
                         # Selection field
                         elif field.field_type == 'selection':
                             sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='form-control mb-2 select2-dynamic ' >"
+                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic ' >"
                             for sel in sel_ids:
                                 primary_template += "<option value='" + str(sel.value) + "' " + (" selected" if str(record_val) == sel.value else " ") + ">"
                                 primary_template += sel.name
@@ -348,12 +403,8 @@ class CustomerPortal(portal.CustomerPortal):
                             primary_template += '<textarea class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + " ></textarea>"
                         elif field.field_type in ('integer','float','monetary'):
                             primary_template += '<input type="number" step="any" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        #elif field.field_type == 'html':
-                        #    primary_template += "<input type='text' class='form-control s_website_form_input' name='" + field.field_name + "' id='" + field.field_name + "' value='" + record_val + ("'required=1'" if field.is_required else '') + "'/>"
                         else:
                             primary_template += '<input type="text" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-
-                    
                         primary_template += "</div>"
                 primary_template += "</div>"                
                 primary_template += "</div>"
@@ -435,6 +486,7 @@ class CustomerPortal(portal.CustomerPortal):
     }
 
 // Dynamic Search JS Code
+/*
 $(document).ready(function() {
     $('.select2-dynamic').each(function() {
         var model = $(this).data('model');
@@ -465,12 +517,51 @@ $(document).ready(function() {
         });
     });
 });
+*/
+$(document).ready(function() {
+    console.log("Initializing Select2...");
+    $('.select2-dynamic').each(function() {
+        var model = $(this).data('model');
+        var field = $(this).data('field');
+        var searchFields = $(this).data('search-fields');
+        var domain = $(this).data('domain');
+        var labelFields = $(this).data('label-fields');
+        
+        $(this).select2({
+            ajax: {
+                url: '/dynamic_search',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term,
+                        model: model,
+                        field: field,
+                        search_fields: searchFields,
+                        domain: domain,
+                        label_fields: labelFields,
+                        page: params.page
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search...',
+            minimumInputLength: 1
+        });
+    });
+});
 
 
 
 </script>
 
         """
+        #js_code = ''
 
         return {
             'currency_ids': currency_ids,

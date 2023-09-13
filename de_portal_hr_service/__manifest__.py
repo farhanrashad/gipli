@@ -12,13 +12,13 @@
     'author': "dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
-    'version': '16.0.4.5',
+    'version': '16.0.4.6',
     'license': 'LGPL-3',
     'live_test_url': 'https://youtu.be/f_uSGd3qJNU',
     'price': 149,
     'currency': 'USD',
 
-    'depends': ['portal','hr'],
+    'depends': ['base','portal','hr','web'],
 
     'data': [
         'security/service_security.xml',
@@ -31,7 +31,11 @@
         'views/field_variant_views.xml',
         'views/hr_employee_views.xml',
     ],
-    
+    #'assets': {
+    #    'web.assets_frontend': [
+    #        '/de_portal_hr_service/static/src/js/dynamic_filter.js',
+    #    ]
+    #},
     'installable': True,
     'application': True,
     'auto_install': False,

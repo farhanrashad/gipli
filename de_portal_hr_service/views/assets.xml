@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_portal_frontend" inherit_id="portal.assets_frontend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_filter.js"></script>
+        </xpath>
+    </template>
+</odoo>

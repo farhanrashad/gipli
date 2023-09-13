@@ -4,10 +4,6 @@
 
         <template id="portal_layout" name="Portal layout: project menu entry" inherit_id="portal.portal_breadcrumbs" priority="40">
             <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-                <!-- <li t-if="page_name == 'service' or service" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not service else ''}">
-                    <a t-if="service" t-attf-href="/my?{{ keep_query() }}">Services</a>
-                    <t t-else="">Services</t>
-                </li> -->
                 <t t-if="service">
                     <li class="breadcrumb-item active text-truncate">
                         <!-- <div class="breadcrumb-item active text-truncate col-10 col-lg-12"> -->
@@ -39,34 +35,22 @@
                     <t t-if="group  &amp;  request.env.user.groups_id">
                         <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between" t-attf-href="/my/{{service.id}}" title="Invoices &amp; Bills">
                             <span t-esc="service.name" />
-                            <span class="badge text-bg-secondary rounded-pill" data-oe-model="ir.ui.view" data-oe-id="1233" data-oe-field="arch" data-oe-xpath="/t[1]/a[1]/t[3]/span[1]" data-placeholder_count="invoice_count">
+                            <t t-esc="0" /> 
+                            <span class="badge text-bg-secondary rounded-pill" data-oe-model="ir.ui.view" data-oe-id="1233" data-oe-field="arch" data-oe-xpath="/t[1]/a[1]/t[3]/span[1]" data-placeholder_count="service_count">
                                 <t t-if='service_count'>
-                                    <span t-esc="service_count" /> 
+                                    <span t-esc="service_count" />
                                 </t>
                                 <t t-else=''>
-                                    <t esc="0" />
+                                    <span t-esc="0" /> 
                                 </t>
                             </span>
                         </a>
-                        <!--
-                        <t t-call="portal.portal_docs_entry">
-                            <t t-set="title" t-value="service.name"/>
-                            <t t-set="url" t-value="'/my/'+str(service.id)"/>
-                            <t t-if='service_count'>
-                                <t t-set="placeholder_count" t-value="'service_count'"/>
-                                <t t-set="count" t-value="service_count"/>
-                            </t>
-                            <t t-else=''>
-                                <t t-set="placeholder_count" t-value="'empty_count'"/>
-                                <t t-set="count" t-value="0"/>
-                            </t>
-                        </t>
-                        -->
                     </t>
                     <t t-if="not group">
                         <t t-call="portal.portal_docs_entry">
                             <t t-set="title" t-value="service.name"/>
                             <t t-set="url" t-value="'/my/'+str(service.id)"/>
+                            <t t-set="count" t-value="0"/>
                             <t t-if='service_count'>
                                 <t t-set="placeholder_count" t-value="'service_count'"/>
                                 <t t-set="count" t-value="service_count"/>

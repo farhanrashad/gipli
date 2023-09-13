@@ -12,6 +12,7 @@ from odoo import models, fields, exceptions, api, _
 from odoo.tools import safe_eval
 from odoo.exceptions import ValidationError
 
+from lxml import etree
     
 
 class HRService(models.Model):
@@ -217,12 +218,12 @@ class HRServiceItems(models.Model):
     field_domain = fields.Char(string='Domain Filter', help="Domain to filter records for the frontend. Use Odoo domain format.")
     search_fields_ids = fields.Many2many(
         'ir.model.fields', string='Search Fields',
-        domain="[('model', '=', 'product.product')]",
+        relation='service_item_search_field_rel',  # Name of the relation table
         help="Fields to be used for searching in the frontend."
     )
     label_fields_ids = fields.Many2many(
         'ir.model.fields', string='Label Fields',
-        domain="[('model', '=', 'product.product')]",
+        relation='service_item_label_field_rel',  # Name of the relation table
         help="Fields to be concatenated for display in the frontend."
     )
     
@@ -230,7 +231,7 @@ class HRServiceItems(models.Model):
     # Reference fields
     ref_field_id = fields.Many2one('ir.model.fields', string='Reference Field', ondelete="cascade", help='Get value from Reference field' )
     link_field_id = fields.Many2one('ir.model.fields', string='Link Field', help="Reference field ID for many2many ")
-    val_expr = fields.Char(string='Expression', help="If present, this field value must be copied from expression.")
+    link_record = fields.Boolean(string='Link Record')
     is_required = fields.Boolean(string='Required', help='Required field at web form')
     
     operation_mode = fields.Selection([
@@ -248,9 +249,6 @@ class HRServiceItems(models.Model):
         ], string='Display View')
     
     ref_populate_field_id = fields.Many2one('ir.model.fields',string='Filter Reference')
-
-
-
     ref_populate_field_id = fields.Many2one('ir.model.fields',string='Populate Field',domain="[('id', 'in', ref_populate_field_ids)]")
                 
     ref_populate_field_ids = fields.Many2many('ir.model.fields',
@@ -258,23 +256,11 @@ class HRServiceItems(models.Model):
         compute='_compute_related_model_ids',
     )
 
-    
-
     @api.depends()
     def _compute_related_model_ids(self):
         for record in self:
             field_ids = record.env[record._name].search([]).filtered(lambda x:x.field_type == 'many2one').field_id
             record.ref_populate_field_ids = field_ids
-
-    
-   
-    link_record = fields.Boolean(string='Link Record')
-    
-    # auto_populate = fields.Selection([
-    #     ('user', 'From User'),
-    #     ('employee', 'From Users Employee'),
-    #     ('partner', 'From Users Partner'),
-    #     ], string='Auto Populate', )
 
     @api.depends('field_id')
     def _compute_label_from_field(self):
@@ -288,7 +274,25 @@ class HRServiceItems(models.Model):
             #line.is_create = False
             #line.is_edit = False
             line.link_record = False
-            
+
+    
+    @api.onchange('field_model')
+    def _onchange_field_model(self):
+        domain = {}
+        if self.field_model:
+            domain['search_fields_ids'] = [('model', '=', self.field_model),('store', '=', True),('ttype', 'in', ['char','integer','text','selection'])]
+            domain['label_fields_ids'] = [('model', '=', self.field_model),('store', '=', True),('ttype', 'in', ['char','integer','text','selection'])]
+            # Clear the current values of the fields
+            self.search_fields_ids = False
+            self.label_fields_ids = False
+        else:
+            domain['search_fields_ids'] = []
+            domain['label_fields_ids'] = []
+            # Clear the current values of the fields
+            self.search_fields_ids = False
+            self.label_fields_ids = False
+        return {'domain': domain}
+
                 
 class HRServiceItemsLine(models.Model):
     _name = 'hr.service.record.line'
@@ -365,20 +369,23 @@ class HRServiceItemsLine(models.Model):
     field_domain = fields.Char(string='Domain Filter', help="Domain to filter records for the frontend. Use Odoo domain format.")
     search_fields_ids = fields.Many2many(
         'ir.model.fields', string='Search Fields',
+        relation='service_line_item_search_field_rel',  # Name of the relation table
         domain="[('model', '=', 'product.product')]",
         help="Fields to be used for searching in the frontend."
     )
     label_fields_ids = fields.Many2many(
         'ir.model.fields', string='Label Fields',
+        relation='service_line_item_label_field_rel',  # Name of the relation table
         domain="[('model', '=', 'product.product')]",
         help="Fields to be concatenated for display in the frontend."
     )
 
+    link_field_id = fields.Many2one('ir.model.fields', string='Link Field', help="Reference model field to display value ")
+    field_label = fields.Char(string='Label', required=True, store=True, compute='_compute_label_from_field', readonly=False)
+    is_required = fields.Boolean(string='Required', help='Required field at web form')
+    
     # Reference fields
     ref_field_id = fields.Many2one('ir.model.fields', string='Reference Field', ondelete="cascade", help='Get value from Reference field' )
-    val_expr = fields.Char(string='Expression', help="If present, this field value must be copied from expression.")
-
-    # code_type = fields.Selection(string='Code Type',selection=[('selection', 'Selection'),('field_referance', 'Field Referance')])
     
     field_variant_id = fields.Many2one('hr.service.field.variant',related='hr_service_id.field_variant_id')
     field_variant_line_id = fields.Many2one('hr.service.field.variant.line')
@@ -388,20 +395,6 @@ class HRServiceItemsLine(models.Model):
         string='ref_populate_field_ids',
         compute='_compute_related_model_ids',
     )
-
-    @api.depends()
-    def _compute_related_model_ids(self):
-        for record in self:
-            field_ids = record.env[record._name].search([]).filtered(lambda x:x.field_type == 'many2one').field_id
-            record.ref_populate_field_ids = field_ids
-
-    
-    link_field_id = fields.Many2one('ir.model.fields', string='Link Field', help="Reference model field to display value ")
-    field_label = fields.Char(string='Label', required=True, store=True, compute='_compute_label_from_field', readonly=False)
-    is_required = fields.Boolean(string='Required', help='Required field at web form')
-    #is_create = fields.Boolean(string='Create', help='To be avaiable field on creation form')
-    #is_edit = fields.Boolean(string='Edit', help='To be avaiable field on edit form')
-
     operation_mode = fields.Selection([
         ('create', "Create"),
         ('edit', "Edit"),
@@ -412,3 +405,26 @@ class HRServiceItemsLine(models.Model):
     def _compute_label_from_field(self):
         for line in self:
             line.field_label = line.field_id.field_description
+
+    @api.depends()
+    def _compute_related_model_ids(self):
+        for record in self:
+            field_ids = record.env[record._name].search([]).filtered(lambda x:x.field_type == 'many2one').field_id
+            record.ref_populate_field_ids = field_ids
+            
+    @api.onchange('field_model')
+    def _onchange_field_model(self):
+        domain = {}
+        if self.field_model:
+            domain['search_fields_ids'] = [('model', '=', self.field_model),('store', '=', True),('ttype', 'in', ['char','integer','text','selection'])]
+            domain['label_fields_ids'] = [('model', '=', self.field_model),('store', '=', True),('ttype', 'in', ['char','integer','text','selection'])]
+            # Clear the current values of the fields
+            self.search_fields_ids = False
+            self.label_fields_ids = False
+        else:
+            domain['search_fields_ids'] = []
+            domain['label_fields_ids'] = []
+            # Clear the current values of the fields
+            self.search_fields_ids = False
+            self.label_fields_ids = False
+        return {'domain': domain}
