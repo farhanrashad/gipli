@@ -31,6 +31,26 @@ import datetime
 import json
 
 class CustomerPortal(portal.CustomerPortal):
+
+    @http.route('/dynamic_search', type='http', auth="user", methods=['GET'])
+    def dynamic_search(self, **kwargs):
+        q = kwargs.get('q', '')
+        model = kwargs.get('model', '')
+        field = kwargs.get('field', '')
+        page = int(kwargs.get('page', 1))
+        
+        limit = 20
+        offset = (page - 1) * limit
+        domain = [(field, 'ilike', q)]
+        
+        records = request.env[model].sudo().search(domain, limit=limit, offset=offset)
+        items = [{'id': record.id, 'text': getattr(record, field)} for record in records]
+        
+        return Response(json.dumps({'items': items}), content_type='application/json;charset=utf-8', status=200)
+
+
+
+    
     @http.route('/custom/get_field_vals', type='http', auth='public', website=True)
     def get_field_vals(self, **kwargs):
 
@@ -60,6 +80,8 @@ class CustomerPortal(portal.CustomerPortal):
             # This code will execute if source-target_field data type is one2many
             target_record = src_record[eval("'" + src_target_field_id.name + "'")]
             options = {t.id: t.name for t in target_record}
+        else:
+            options = {}
         
         # Check if the record exists
         if not src_record.exists():
@@ -119,10 +141,12 @@ class CustomerPortal(portal.CustomerPortal):
         # ----------------------------------------------------
         for service in service_id:
 
+            primary_template += '<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />'
+            primary_template += '<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>'
             primary_template += '<link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />'
             primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
             primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>'
-            #primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script><br/><br/>'
+            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script><br/><br/>'
         
             primary_template += '<nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar  mt-3 rounded">'
             primary_template += '<ol class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1 row">'
@@ -247,15 +271,15 @@ class CustomerPortal(portal.CustomerPortal):
                                     name = field.field_name +"-" + str(service.id) +"-" + field._name
 
                                     if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='mb-2 selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
                                     else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
 
                                 else:
                                     if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='mb-2 selection-search form-control'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='mb-2 select2-dynamic selection-search form-control'>"
                                     else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='mb-2 selection-search form-control'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='mb-2 select2-dynamic selection-search form-control'>"
                                 primary_template += "<option value='' >Select </option>"
 
                                 for m in m2o_id:
@@ -281,7 +305,7 @@ class CustomerPortal(portal.CustomerPortal):
                                 except Exception:
                                     field_domain = []
                             m2m_id = request.env[field.field_model].sudo().search(field_domain) 
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='form-control mb-2 selection-search' multiple='multiple'>"
+                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='form-control mb-2 select2-dynamic selection-search' multiple='multiple'>"
                             # primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "'class='form-control mb-2 selection-search' style='width: 25%' multiple='multiple'>"
                             for m in m2m_id:
                                 primary_template += "<option value='' >Select </option>"
@@ -296,7 +320,7 @@ class CustomerPortal(portal.CustomerPortal):
                         # Selection field
                         elif field.field_type == 'selection':
                             sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "'class='form-control mb-2' >"
+                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "'class='form-control mb-2 select2-dynamic ' >"
                             for sel in sel_ids:
                                 primary_template += "<option value='" + str(sel.value) + "' " + (" selected" if str(record_val) == sel.value else " ") + ">"
                                 primary_template += sel.name
@@ -409,6 +433,41 @@ class CustomerPortal(portal.CustomerPortal):
             },
         });
     }
+
+// Dynamic Search JS Code
+$(document).ready(function() {
+    $('.select2-dynamic').each(function() {
+        var model = $(this).data('model');
+        var field = $(this).data('field');
+        
+        $(this).select2({
+            ajax: {
+                url: '/dynamic_search',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        model: model,
+                        field: field,
+                        page: params.page
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search...',
+            minimumInputLength: 1
+        });
+    });
+});
+
+
+
 </script>
 
         """

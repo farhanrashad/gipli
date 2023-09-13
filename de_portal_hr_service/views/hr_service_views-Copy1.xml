@@ -21,8 +21,6 @@
                     <field name="field_store" invisible="1"/>
                     <field name="field_readonly" invisible="1"/>
                     <field name="field_domain" optional="hide" attrs="{'readonly':[('field_type','!=','many2one')]}"/>
-                    <field name="search_fields_ids" optional="hide" widget="many2many_tags" />
-                    <field name="label_fields_ids" optional="hide" widget="many2many_tags" />
                     <field name="ref_field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                     <field name="val_expr" optional="hide" />
 
@@ -174,8 +172,6 @@
                                         <field name="field_store" invisible="1"/>
                                         <field name="field_readonly" invisible="1"/>
                                         <field name="field_domain" optional="hide" attrs="{'readonly':[('field_type','!=','many2one')]}"/>
-                                        <field name="search_fields_ids" optional="hide" widget="many2many_tags" />
-                                        <field name="label_fields_ids" optional="hide" widget="many2many_tags" />
                                         <field name="ref_field_id" domain="[('model_id', '=', parent.header_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                                         <!-- <field name="link_field_id" domain="[('model', '=', field_model)]" attrs="{'required':[('field_type','=','many2one')], 'readonly':[('field_type','!=','many2one')]}"/> -->
                                         <field name="link_field_id" domain="[('model', '=', field_model)]" attrs="{'required':[('field_type','=','many2one')], 'readonly':[('field_type','not in',['many2one','many2many'])]}"/>
@@ -205,6 +201,33 @@
                             </tree>
                         </field>
                     </page>
+                    <!--
+                    <page string="Line Item Fields" name="import_fields">
+                        <field name="hr_service_items_line" >
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle" />
+                                <field name="hr_service_id" invisible="1" />
+                                <field name="field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" />
+                                <field name="field_name" />
+                                <field name="field_type" />
+                                <field name="field_model" />
+                                <field name="field_store" invisible="1"/>
+                                <field name="field_readonly" invisible="1"/>
+                                <field name="field_domain" optional="hide" attrs="{'readonly':[('field_type','!=','many2one')]}"/>
+
+                                
+                                <field name="link_field_id" domain="[('model', '=', field_model)]" attrs="{'required':[('field_type','=','many2one')], 'readonly':[('field_type','!=','many2one')]}"/>
+                                <field name="field_label" />
+                                <field name="is_required" attrs="{'readonly':[('field_store','=',False)]}"/>
+                                <field name="is_create" attrs="{'readonly':[('field_store','=',False)]}"/>
+                                <field name="is_edit" attrs="{'readonly':[('field_store','=',False)]}"/>
+                                <field name="add_fields" attrs="{'readonly':[('field_store','=',False)]}"/>
+                                <field name="auto_populate" />
+                            </tree>
+                        </field>
+
+                    </page>
+                            -->
                         </notebook>
                     </sheet>
                 </form>

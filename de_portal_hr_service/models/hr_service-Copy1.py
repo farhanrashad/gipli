@@ -57,6 +57,8 @@ class HRService(models.Model):
     
     hr_service_items = fields.One2many('hr.service.items', 'hr_service_id', string='Service Items', copy=True, auto_join=True, states=READONLY_STATES,)
     
+    #hr_service_items_line = fields.One2many('hr.service.items.line', 'hr_service_id', string='Item Lines', copy=True, auto_join=True, states=READONLY_STATES,)
+
     hr_service_record_line = fields.One2many('hr.service.record.line', 'hr_service_id', string='Record Lines', copy=True, auto_join=True, states=READONLY_STATES,)
 
     
@@ -210,28 +212,20 @@ class HRServiceItems(models.Model):
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True)
     field_name = fields.Char(related='field_id.name')
     field_label = fields.Char(string='Label', store=True, compute='_compute_label_from_field', readonly=False)
+    
+
     field_type = fields.Selection(related='field_id.ttype')
     field_model = fields.Char(related='field_id.relation')
     field_store = fields.Boolean(related='field_id.store')
     field_readonly = fields.Boolean(related='field_id.readonly')
-    field_domain = fields.Char(string='Domain Filter', help="Domain to filter records for the frontend. Use Odoo domain format.")
-    search_fields_ids = fields.Many2many(
-        'ir.model.fields', string='Search Fields',
-        domain="[('model', '=', 'product.product')]",
-        help="Fields to be used for searching in the frontend."
-    )
-    label_fields_ids = fields.Many2many(
-        'ir.model.fields', string='Label Fields',
-        domain="[('model', '=', 'product.product')]",
-        help="Fields to be concatenated for display in the frontend."
-    )
-    
-
-    # Reference fields
+    field_domain = fields.Char(string='Domain', help="If present, this condition must be satisfied before executing the action rule.")
     ref_field_id = fields.Many2one('ir.model.fields', string='Reference Field', ondelete="cascade", help='Get value from Reference field' )
     link_field_id = fields.Many2one('ir.model.fields', string='Link Field', help="Reference field ID for many2many ")
     val_expr = fields.Char(string='Expression', help="If present, this field value must be copied from expression.")
+
     is_required = fields.Boolean(string='Required', help='Required field at web form')
+    #is_create = fields.Boolean(string='Create', help='To be avaiable field on creation form')
+    #is_edit = fields.Boolean(string='Edit', help='To be avaiable field on edit form')
     
     operation_mode = fields.Selection([
         ('create', "Create"),
@@ -257,8 +251,6 @@ class HRServiceItems(models.Model):
         string='ref_populate_field_ids',
         compute='_compute_related_model_ids',
     )
-
-    
 
     @api.depends()
     def _compute_related_model_ids(self):
@@ -362,19 +354,7 @@ class HRServiceItemsLine(models.Model):
     field_model = fields.Char(related='field_id.relation')
     field_store = fields.Boolean(related='field_id.store')
     field_readonly = fields.Boolean(related='field_id.readonly')
-    field_domain = fields.Char(string='Domain Filter', help="Domain to filter records for the frontend. Use Odoo domain format.")
-    search_fields_ids = fields.Many2many(
-        'ir.model.fields', string='Search Fields',
-        domain="[('model', '=', 'product.product')]",
-        help="Fields to be used for searching in the frontend."
-    )
-    label_fields_ids = fields.Many2many(
-        'ir.model.fields', string='Label Fields',
-        domain="[('model', '=', 'product.product')]",
-        help="Fields to be concatenated for display in the frontend."
-    )
-
-    # Reference fields
+    field_domain = fields.Char(string='Domain', help="If present, this condition must be satisfied before executing the action rule.")    
     ref_field_id = fields.Many2one('ir.model.fields', string='Reference Field', ondelete="cascade", help='Get value from Reference field' )
     val_expr = fields.Char(string='Expression', help="If present, this field value must be copied from expression.")
 
@@ -412,3 +392,48 @@ class HRServiceItemsLine(models.Model):
     def _compute_label_from_field(self):
         for line in self:
             line.field_label = line.field_id.field_description
+            
+    
+    
+    
+class HRServiceItemsLine(models.Model):
+    _name = 'hr.service.items.line'
+    _description = 'Service Items Line'
+    _order = 'sequence, id'
+
+    
+    hr_service_id = fields.Many2one('hr.service', string='HR Service', readonly=True,)
+    sequence = fields.Integer(string='Sequence', default=10)
+    field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True, domain="[('model','=','account.custom.entry.line')]")
+    field_name = fields.Char(related='field_id.name')
+    field_type = fields.Selection(related='field_id.ttype')
+    field_model = fields.Char(related='field_id.relation')
+    field_store = fields.Boolean(related='field_id.store')
+    field_readonly = fields.Boolean(related='field_id.readonly')
+    field_domain = fields.Char(string='Domain', help="If present, this condition must be satisfied before executing the action rule.")
+    val_expr = fields.Char(string='Expression', help="If present, this field value must be copied from expression.")
+
+    
+    link_field_id = fields.Many2one('ir.model.fields', string='Link Field', help="Reference field ID for many2many ")
+    field_label = fields.Char(string='Label', required=True, store=True, compute='_compute_label_from_field', readonly=False)
+    is_required = fields.Boolean(string='Required', help='Required field at web form')
+    #is_create = fields.Boolean(string='Create', help='To be avaiable field on creation form')
+    #is_edit = fields.Boolean(string='Edit', help='To be avaiable field on edit form')
+
+    operation_mode = fields.Selection([
+        ('create', "Create"),
+        ('edit', "Edit"),
+        ('all', "All"),
+        ], default=False, help="Technical field for operations purpose.")
+    
+    # auto_populate = fields.Selection([
+    #     ('user', 'From User'),
+    #     ('employee', 'From Users Employee'),
+    #     ('partner', 'From Users Partner'),
+    #     ], string='Auto Populate', )
+    
+    @api.depends('field_id')
+    def _compute_label_from_field(self):
+        for line in self:
+            line.field_label = line.field_id.field_description
+
