@@ -268,8 +268,18 @@ class CustomerPortal(portal.CustomerPortal):
                     # find the record value
                     field_domain = []
 
-                    search_fields = ','.join([f.name for f in field.search_fields_ids])
-                    label_fields = ','.join([f.name for f in field.label_fields_ids])
+                    #Search and label fields 
+                    related_model_name = field.field_id.relation
+                    Model = request.env[related_model_name]
+                    default_field = 'name' if 'name' in Model._fields else 'id'
+                    # Assuming you've already fetched the field record in some manner
+                    search_fields = [f.name for f in field.search_fields_ids] or [default_field]
+                    label_fields = [f.name for f in field.label_fields_ids] or [default_field]
+
+                    #search_fields = ','.join([f.name for f in field.search_fields_ids])
+                    #label_fields = ','.join([f.name for f in field.label_fields_ids])
+
+                    # check the domain
                     domain_filter = str(field.field_domain).replace("'", "&#39;")
                     
                     if field.is_required:
@@ -333,14 +343,14 @@ class CustomerPortal(portal.CustomerPortal):
                                     name = field.field_name +"-" + str(service.id) +"-" + field._name
 
                                     if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
                                     else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
                                 else:
                                     if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
                                     else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
                                 primary_template += "<option value='' >Select </option>"
 
                                 for m in m2o_id:
@@ -364,7 +374,7 @@ class CustomerPortal(portal.CustomerPortal):
                                 except Exception:
                                     field_domain = []
                             m2m_id = request.env[field.field_model].sudo().search(field_domain) 
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic selection-search' multiple='multiple'>"
+                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic selection-search' multiple='multiple'>"
                             for m in m2m_id:
                                 primary_template += "<option value='' >Select </option>"
                                 primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
@@ -375,7 +385,7 @@ class CustomerPortal(portal.CustomerPortal):
                         # Selection field
                         elif field.field_type == 'selection':
                             sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + search_fields + "' data-label-fields='" + label_fields + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic ' >"
+                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic ' >"
                             for sel in sel_ids:
                                 primary_template += "<option value='" + str(sel.value) + "' " + (" selected" if str(record_val) == sel.value else " ") + ">"
                                 primary_template += sel.name

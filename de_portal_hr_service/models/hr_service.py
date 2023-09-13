@@ -256,6 +256,14 @@ class HRServiceItems(models.Model):
         compute='_compute_related_model_ids',
     )
 
+    is_model_selected = fields.Boolean(compute='_compute_is_model_selected')
+
+    @api.depends('field_model')
+    def _compute_is_model_selected(self):
+        for record in self:
+            record.is_model_selected = bool(record.field_model)
+
+
     @api.depends()
     def _compute_related_model_ids(self):
         for record in self:
@@ -400,6 +408,14 @@ class HRServiceItemsLine(models.Model):
         ('edit', "Edit"),
         ('all', "All"),
         ], default=False, help="Technical field for operations purpose.")
+
+    is_model_selected = fields.Boolean(compute='_compute_is_model_selected')
+
+    @api.depends('field_model')
+    def _compute_is_model_selected(self):
+        for record in self:
+            record.is_model_selected = bool(record.field_model)
+
     
     @api.depends('field_id')
     def _compute_label_from_field(self):
