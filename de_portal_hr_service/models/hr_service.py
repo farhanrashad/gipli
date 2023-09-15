@@ -253,7 +253,7 @@ class HRServiceItems(models.Model):
                 
     ref_populate_field_ids = fields.Many2many('ir.model.fields',
         string='ref_populate_field_ids',
-        compute='_compute_related_model_ids',
+        compute='_compute_related_model_for_populate_field',
     )
 
     is_model_selected = fields.Boolean(compute='_compute_is_model_selected')
@@ -264,11 +264,12 @@ class HRServiceItems(models.Model):
             record.is_model_selected = bool(record.field_model)
 
 
-    @api.depends()
-    def _compute_related_model_ids(self):
+    @api.depends('field_id')
+    def _compute_related_model_for_populate_field(self):
         for record in self:
-            field_ids = record.env[record._name].search([]).filtered(lambda x:x.field_type == 'many2one').field_id
-            record.ref_populate_field_ids = field_ids
+            related_model = record.field_id.relation
+            related_fields = self.env['ir.model.fields'].search([('model', '=', related_model), ('ttype', '=', 'many2one')])
+            record.ref_populate_field_ids = related_fields        
 
     @api.depends('field_id')
     def _compute_label_from_field(self):
@@ -401,7 +402,7 @@ class HRServiceItemsLine(models.Model):
                 
     ref_populate_field_ids = fields.Many2many('ir.model.fields',
         string='ref_populate_field_ids',
-        compute='_compute_related_model_ids',
+        compute='_compute_related_model_for_populate_field',
     )
     operation_mode = fields.Selection([
         ('create', "Create"),
@@ -422,11 +423,23 @@ class HRServiceItemsLine(models.Model):
         for line in self:
             line.field_label = line.field_id.field_description
 
-    @api.depends()
-    def _compute_related_model_ids(self):
+    @api.depends('field_id')
+    def _compute_related_model_for_populate_field(self):
         for record in self:
-            field_ids = record.env[record._name].search([]).filtered(lambda x:x.field_type == 'many2one').field_id
-            record.ref_populate_field_ids = field_ids
+            # Get the related model of the selected field_id
+            related_model = record.field_id.model
+        
+            # Get all many2one relations of the related_model
+            many2one_relations = self.env['ir.model.fields'].search([('model', '=', related_model), ('ttype', '=', 'many2one')]).mapped('relation')
+        
+            # Get all fields in hr.service.items that match any of the many2one relations
+            related_fields = self.env['ir.model.fields'].search([('model', 'in', many2one_relations)])
+        
+            record.ref_populate_field_ids = related_fields
+
+        
+
+        
             
     @api.onchange('field_model')
     def _onchange_field_model(self):

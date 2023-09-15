@@ -45,7 +45,8 @@
                     
                     <field name="ref_field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                     
-                    <field name="ref_populate_field_id" />
+                    <field name="ref_populate_field_id" domain="[('id', 'in', ref_populate_field_ids)]"/>
+
                     
                 </tree>
             </field>

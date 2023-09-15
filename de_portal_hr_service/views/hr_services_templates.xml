@@ -36,9 +36,9 @@
                         <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between" t-attf-href="/my/{{service.id}}" title="Invoices &amp; Bills">
                             <span t-esc="service.name" />
                             <t t-esc="0" /> 
-                            <span class="badge text-bg-secondary rounded-pill" data-oe-model="ir.ui.view" data-oe-id="1233" data-oe-field="arch" data-oe-xpath="/t[1]/a[1]/t[3]/span[1]" data-placeholder_count="service_count">
+                            <span class="badge text-bg-secondary rounded-pill" data-oe-model="ir.ui.view" data-oe-id="1233" data-oe-field="arch" data-oe-xpath="/t[1]/a[1]/t[3]/span[1]" data-placeholder_count="service_count+0">
                                 <t t-if='service_count'>
-                                    <span t-esc="service_count" />
+                                    <span t-esc="service_count+0" />
                                 </t>
                                 <t t-else=''>
                                     <span t-esc="0" /> 
@@ -143,9 +143,6 @@
                                         <i class="fa fa-edit"></i>
                                     </a>
                                 </div>
-
-
-
                                 <div class="col-1 col-md-1 flex-grow-0 text-center">
                                     <div class="record_pager btn-group" role="group">
                                         <a role="button" class="btn btn-link" style = "color:#3aadaa" t-attf-onclick="action(type = 'previous', {{service.id}} , {{service.header_model_id.id}} , {{record_id.id}} )">
@@ -156,9 +153,16 @@
                                         </a>
                                     </div>
                                 </div>
+                                <div class="col-1 col-md-1 d-flex align-items-center justify-content-end">
+                                   <t t-if="record_id.sudo().state">
+                                        <div class="ribbon ribbon-primary">
+                                            <span t-field="record_id.sudo().state"/>
+                                        </div>
+                                   </t>
+                                </div>
 
-                                <div t-if="state" class="col-1 col-md-1 d-flex align-items-center  text-center">
-                                    <span t-esc="state" class=" badge badge-pill badge-info" title="Current stage of this entry"/>
+                                <div t-if="record_id.sudo().state" class="col-1 col-md-1 d-flex align-items-center  text-center">
+                                    <span t-esc="record_id.sudo().state" class=" badge badge-pill badge-info" title="Current stage of this entry"/>
                                 </div>
                             </div>
                         </div>
