@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_employee_read,access.employee.read,hr.model_hr_employee,group_employee_workspace,1,0,0,0
+access_contract_read,access.contract.read,hr_contract.model_hr_contract,group_employee_workspace,1,0,0,0
