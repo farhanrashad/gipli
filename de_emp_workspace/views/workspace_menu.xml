@@ -4,21 +4,8 @@
         <menuitem id="menu_workspace" name="Workspace" sequence="10" web_icon="fa-user"/>
 
         <menuitem id="menu_employee" name="Employee" parent="menu_workspace" sequence="10" />
-        <!--
-        <menuitem id="menu_my_contract" name="My Contract" parent="menu_employee" action="action_my_contract" sequence="20"/>
-
-        <menuitem id="menu_project" name="Project" parent="menu_workspace" sequence="20" web_icon="fa-tasks"/>
-        <menuitem id="menu_my_projects" name="My Projects" parent="menu_project" action="action_my_projects" sequence="10"/>
-        <menuitem id="menu_my_tasks" name="My Tasks" parent="menu_project" action="action_my_tasks" sequence="20"/>
-
-        <menuitem id="menu_expense" name="Expense" parent="menu_workspace" sequence="30" web_icon="fa-money"/>
-        <menuitem id="menu_my_report" name="My Report" parent="menu_expense" action="action_my_report" sequence="10"/>
-        <menuitem id="menu_my_expenses" name="My Expenses" parent="menu_expense" action="action_my_expenses" sequence="20"/>
-
-        <menuitem id="menu_attendance" name="Attendance" parent="menu_workspace" sequence="40" web_icon="fa-clock"/>
-        <menuitem id="menu_my_attendance" name="My Attendance" parent="menu_attendance" action="action_my_attendance" sequence="10"/>
-        <menuitem id="menu_kiosk" name="Kiosk" parent="menu_attendance" action="action_kiosk" sequence="20"/>
-        <menuitem id="menu_time_off_request" name="Time Off Request" parent="menu_attendance" action="action_time_off_request" sequence="30"/>
-    -->
+        <menuitem id="menu_my_projects" name="My Projects" parent="menu_workspace" sequence="20"/>
+        <menuitem id="menu_my_attendance" name="My Attendance" parent="menu_workspace" sequence="30"/>
+        <menuitem id="menu_my_expenses" name="My Expenses" parent="menu_workspace" sequence="40"/>
     </data>
 </odoo>

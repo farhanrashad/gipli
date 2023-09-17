@@ -71,6 +71,8 @@
         <field name="search_view_id" ref="hr.view_employee_filter"/>
         -->
         <field name="context">{'create': False,'edit':False}</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+
     </record>
 
 
