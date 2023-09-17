@@ -46,6 +46,7 @@
     'license': 'OPL-1',
     "price": 25,
     "currency": "USD",
+    'images': ['static/description/banner.png'],  # Specify the path to your banner image
     'installable': True,
     'application': True,
     'auto_install': False,
