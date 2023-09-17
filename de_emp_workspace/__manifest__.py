@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Employee Workspace',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Human Resources',
     'summary': 'Employee Self-Service Portal',
     'description': """

@@ -88,13 +88,11 @@
                                         <field name="certificate"/>
                                         <field name="study_field"/>
                                         <field name="study_school"/>
-                                        <separator name="has_work_permit" string="Work Permit"/>
                                         <field name="visa_no"/>
                                         <field name="permit_no"/>
                                         <field name="visa_expire"/>
                                         <field name="work_permit_expiration_date"/>
                                         <field name="work_permit_name" invisible="1"/>
-                                        <field name="has_work_permit" widget="work_permit_upload" filename="work_permit_name"/>
                                     </group>
                                     <group string="Citizenship">
                                         <field name="country_id" options='{"no_open": True, "no_create": True}'/>
