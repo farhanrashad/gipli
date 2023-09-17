@@ -17,23 +17,6 @@
             <field name="groups_id" eval="[(6, 0, [ref('group_employee_workspace')])]"/>
         </record>
 
-        <!-- Define the record rules for employee profiles -->
-        <record id="access_employee_profile_own" model="ir.rule">
-            <field name="name">Employee Profile Own</field>
-            <field name="model_id" ref="hr.model_hr_employee"/>
-            <field name="domain_force">[('user_id', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_employee_workspace'))]"/>
-            <field name="perm_read" eval="1"/>
-        </record>
-
-        <!-- Define the record rules for contracts -->
-        <record id="access_contract_own" model="ir.rule">
-            <field name="name">Contract Own</field>
-            <field name="model_id" ref="hr_contract.model_hr_contract"/>
-            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_employee_workspace'))]"/>
-            <field name="perm_read" eval="1"/>
-        </record>
         
     </data>
 </odoo>

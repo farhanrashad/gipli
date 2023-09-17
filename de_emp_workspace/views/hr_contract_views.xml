@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+      <record id="hr_my_contract_form_view" model="ir.ui.view">
+            <field name="name">hr.my.contract.form.view</field>
+            <field name="model">hr.contract</field>
+            <field name="arch" type="xml">
+                <form string="Current Contract">
+                    <header>
+                        <field name="state" readonly="1" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                        <div class="oe_title pe-0 w-100 mw-100" name="title">
+                            <h1 class="d-flex flex-row justify-content-between">
+                                <field name="name" class="text-truncate" placeholder="Contract Reference"/>
+                            </h1>
+                            <h2>
+                                <field name="company_id" groups="base.group_multi_company" invisible="1"/>
+                            </h2>
+                        </div>
+                        <group name="top_info">
+                            <group name="top_info_left">
+                                <field name="active" invisible="1"/>
+                            </group>
+                            <group name="top_info_right">
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+    <record id="hr_my_contract_tree_view" model="ir.ui.view">
+            <field name="name">hr.my.contracts.tree.view</field>
+            <field name="model">hr.contract</field>
+            <field name="arch" type="xml">
+                <tree string="Contracts" multi_edit="1" sample="1" default_order='date_start ASC'>
+                    <field name="company_id" invisible="1"/>
+                    <field name="name" readonly="1"/>
+                    <field name="employee_id" readonly="1" widget="many2one_avatar_employee"/>
+                    <field name="job_id"/>
+                    <field name="date_start" readonly="1"/>
+                    <field name="date_end" readonly="1"/>
+                    <field name="resource_calendar_id" optional="show"/>
+                    <field name="structure_type_id" optional="show"/>
+                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'close'" decoration-success="state == 'open'"/>
+                    <field name="wage" invisible="1"/>
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" readonly="1" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+    
+    <!-- Define the action to open the form view -->
+    <record id="action_my_contracts" model="ir.actions.act_window">
+        <field name="name">My Contracts</field>
+        <field name="res_model">hr.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids"
+				eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('hr_my_contract_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('hr_my_contract_form_view')})]" />
+        <!--
+        <field name="search_view_id" ref="hr.view_employee_filter"/>
+        -->
+        <field name="context">{'create': False,'edit':False}</field>
+    </record>
+
+
+
+    <record id="hr_employee_action_from_user" model="ir.actions.act_window">
+            <field name="name">Employees</field>
+            <field name="res_model">hr.contract</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    
+    <menuitem id="menu_my_contracts" name="My Contracts" parent="menu_employee" action="action_my_contracts" sequence="10"/>
+   
+</odoo>

@@ -37,6 +37,7 @@
         'security/ir.model.access.csv',
         'views/workspace_menu.xml',
         'views/hr_employee_views.xml',
+        'views/hr_contract_views.xml',
     ],
     'license': 'LGPL-3',
     'installable': True,
