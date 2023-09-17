@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Employee Workspace',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Human Resources',
     'summary': 'Employee Self-Service Portal',
     'description': """
@@ -42,6 +42,7 @@
         'views/hr_attendance_views.xml',
         'views/hr_expense_views.xml',
         'views/hr_holidays_views.xml',
+        'views/hr_timesheet_views.xml',
     ],
     'license': 'OPL-1',
     "price": 25,
