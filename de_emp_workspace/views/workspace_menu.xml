@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <menuitem id="menu_workspace" name="Workspace" sequence="10" web_icon="fa-user"/>
+        <menuitem id="menu_workspace" 
+            name="Workspace" 
+            sequence="10" 
+            web_icon="de_emp_workspace,static/description/icon.png"
+        />
 
         <menuitem id="menu_employee" name="Employee" parent="menu_workspace" sequence="10" />
         <menuitem id="menu_my_projects" name="My Projects" parent="menu_workspace" sequence="20"/>
         <menuitem id="menu_my_attendance" name="My Attendance" parent="menu_workspace" sequence="30"/>
-        <menuitem id="menu_my_expenses" name="My Expenses" parent="menu_workspace" sequence="40"/>
+        <menuitem id="menu_my_timeoff" name="My Timeoff" parent="menu_workspace" sequence="40"/>
+        <menuitem id="menu_my_expenses" name="My Expenses" parent="menu_workspace" sequence="50"/>
     </data>
 </odoo>

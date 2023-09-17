@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Employee Workspace',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Human Resources',
     'summary': 'Employee Self-Service Portal',
     'description': """
@@ -43,7 +43,9 @@
         'views/hr_expense_views.xml',
         'views/hr_holidays_views.xml',
     ],
-    'license': 'LGPL-3',
+    'license': 'OPL-1',
+    "price": 25,
+    "currency": "USD",
     'installable': True,
     'application': True,
     'auto_install': False,
