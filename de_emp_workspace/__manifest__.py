@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Employee Workspace',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Human Resources',
     'summary': 'Employee Self-Service Portal',
     'description': """
@@ -47,7 +47,7 @@
     'license': 'OPL-1',
     "price": 25,
     "currency": "USD",
-    'images': ['static/description/banner.png'],  # Specify the path to your banner image
+    'images': ['static/description/banner.jpg'],  # Specify the path to your banner image
     'installable': True,
     'application': True,
     'auto_install': False,
