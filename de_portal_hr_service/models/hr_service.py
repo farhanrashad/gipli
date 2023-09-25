@@ -267,9 +267,8 @@ class HRServiceItems(models.Model):
     @api.depends('field_id')
     def _compute_related_model_for_populate_field(self):
         for record in self:
-            related_model = record.field_id.relation
-            related_fields = self.env['ir.model.fields'].search([('model', '=', related_model), ('ttype', '=', 'many2one')])
-            record.ref_populate_field_ids = related_fields        
+            related_fields = self.env['ir.model.fields'].search([('model', '=', record.hr_service_record_line_id.line_model_id.model), ('ttype', '=', 'many2one')])
+            record.ref_populate_field_ids = related_fields         
 
     @api.depends('field_id')
     def _compute_label_from_field(self):
@@ -426,20 +425,8 @@ class HRServiceItemsLine(models.Model):
     @api.depends('field_id')
     def _compute_related_model_for_populate_field(self):
         for record in self:
-            # Get the related model of the selected field_id
-            related_model = record.field_id.model
-        
-            # Get all many2one relations of the related_model
-            many2one_relations = self.env['ir.model.fields'].search([('model', '=', related_model), ('ttype', '=', 'many2one')]).mapped('relation')
-        
-            # Get all fields in hr.service.items that match any of the many2one relations
-            related_fields = self.env['ir.model.fields'].search([('model', 'in', many2one_relations)])
-        
-            record.ref_populate_field_ids = related_fields
-
-        
-
-        
+            related_fields = self.env['ir.model.fields'].search([('model', '=', record.hr_service_record_line_id.line_model_id.model), ('ttype', '=', 'many2one')])
+            record.ref_populate_field_ids = related_fields 
             
     @api.onchange('field_model')
     def _onchange_field_model(self):
