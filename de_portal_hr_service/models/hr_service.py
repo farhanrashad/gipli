@@ -267,7 +267,7 @@ class HRServiceItems(models.Model):
     @api.depends('field_id')
     def _compute_related_model_for_populate_field(self):
         for record in self:
-            related_fields = self.env['ir.model.fields'].search([('model', '=', record.hr_service_record_line_id.line_model_id.model), ('ttype', '=', 'many2one')])
+            related_fields = self.env['ir.model.fields'].search([('model', '=', record.hr_service_id.header_model_id.model), ('ttype', '=', 'many2one')])
             record.ref_populate_field_ids = related_fields         
 
     @api.depends('field_id')
