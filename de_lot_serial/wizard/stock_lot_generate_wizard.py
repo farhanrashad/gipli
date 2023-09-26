@@ -44,7 +44,7 @@ class GenerateLotWizard(models.TransientModel):
     def generate_serial(self):
         for x in range(self.quantity):
             if self.sequence_id.id:
-                self.env['stock.production.lot'].sudo().create({
+                self.env['stock.lot'].sudo().create({
                     'product_id': self.product_id.id,
                     'name': self.sequence_id.next_by_id(),
                     'company_id': self.env.user.company_id.id,
