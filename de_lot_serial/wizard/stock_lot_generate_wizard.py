@@ -2,9 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
-from odoo.tools.float_utils import float_round
-
 
 class GenerateLotWizard(models.TransientModel):
     _name = "stock.lot.generate.wizard"
