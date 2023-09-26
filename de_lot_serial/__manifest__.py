@@ -15,8 +15,8 @@
     'data': [
         'security/ir.model.access.csv',
         'wizard/stock_lot_generate_wizard_views.xml',
-        #'views/product_template_views.xml',
-        #'views/product_views.xml',
+        'views/product_template_views.xml',
+        'views/product_views.xml',
     ],
     'license': 'OPL-1',
     "price": 25,
