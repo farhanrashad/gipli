@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="stock_lot_generate_wizard_view" model="ir.ui.view">
+            <field name="name">Generate Lot</field>
+            <field name="model">stock.lot.generate.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generate Lot">
+                    <p class="oe_grey">
+                        Generate unique lot/serial 
+                    </p>
+                    <group>
+                        <group>
+                            <field name="product_id" class="oe_inline" readonly="1"/>
+                            <field name="quantity"  required="1"/>
+                            <field name="sequence_id" options="{'no_create':True}" required="1" domain="[('id','=',category_sequence_ids)]"  />
+                        </group>
+                        <group>
+                            <field name="category_sequence_ids" widget="many2many_tags" readonly="1" invisible="1"  />
+                            <field name="product_tmpl_id" options="{'no_create':True}" invisible="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <!--
+                        <button name="create_invoices" id="create_invoice_open" string="Create and View Bill" type="object"
+                            context="{'open_bills': True}" class="btn-primary"/>
+-->
+                        <button name="generate_serial" id="generate_serial" string="Generate" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_stock_lot_generate_wizard" model="ir.actions.act_window">
+            <field name="name">Generate Serial</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.lot.generate.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <!-- TODO: check if we need this -->
+            <field name="binding_model_id" ref="product.model_product_product" />
+            <field name="binding_view_types">list</field>
+        </record>
+
+</odoo>
