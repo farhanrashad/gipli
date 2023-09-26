@@ -12,7 +12,6 @@
     'version': '0.1',
     'category': 'Human Resources',
 
-    # any module necessary for this one to work correctly
     'depends': ['de_hr_workspace','hr_attendance'],
 
     # always loaded
@@ -25,9 +24,10 @@
     'demo': [
         'demo/demo.xml',
     ],
+    'license': 'OPL-1',
     'license': 'LGPL-3',
     'images': ['static/description/banner.jpg'],
     'installable': True,
-    'application': True,
+    'application': False,
     'auto_install': False,
 }
