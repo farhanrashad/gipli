@@ -11,11 +11,7 @@
     'website': 'https://www.dynexcel.com',
     'version': '0.1',
     'category': 'Human Resources',
-
-    # any module necessary for this one to work correctly
     'depends': ['de_hr_workspace','hr_expense'],
-
-    # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/hr_expense_views.xml',
@@ -27,6 +23,6 @@
     'license': 'LGPL-3',
     'images': ['static/description/banner.jpg'],
     'installable': True,
-    'application': True,
+    'application': False,
     'auto_install': False,
 }
