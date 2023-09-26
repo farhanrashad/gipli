@@ -9,7 +9,7 @@
     """,
     'author': 'Dynexcel',
     'website': 'https://www.dynexcel.com',
-    'version': '0.1',
+    'version': '0.2',
     'category': 'Inventory',
     'depends': ['base','product','stock'],
     'data': [
