@@ -11,12 +11,13 @@
     """,
     'author': 'Dynexcel',
     'website': 'https://www.dynexcel.com',
-    'depends': ['base','hr'],
+    'depends': ['base','hr','hr_contract'],
     'data': [
         'security/security.xml',
         # 'security/ir.model.access.csv',
         'views/workspace_menu.xml',
-        'views/hr_employee.xml',
+        'views/hr_employee_views.xml',
+        'views/hr_contract_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
