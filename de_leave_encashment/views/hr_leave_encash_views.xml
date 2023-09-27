@@ -1,0 +1,134 @@
+<odoo>
+    <data>
+        <!-- Leave Encashment Form View -->
+        <record id="view_leave_encashment_form" model="ir.ui.view">
+            <field name="name">hr.leave.encash</field>
+            <field name="model">hr.leave.encash</field>
+            <field name="arch" type="xml">
+                <form string="Leave Encashment">
+                    <header>
+                        <button string="Confirm" name="action_confirm" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('active', '=', False)]}"/>
+                        <button string="Approve" name="action_approve" type="object" class="oe_highlight" attrs="{'invisible': ['|', '|', ('active', '=', False), ('can_approve', '=', False), ('state', '!=', 'confirm')]}"/>
+                        <button string="Validate" name="action_validate" states="validate1" type="object" groups="hr_holidays.group_hr_holidays_user" class="oe_highlight"/>
+                        <button string="Refuse" name="action_refuse" type="object" attrs="{'invisible': ['|', '|', ('active', '=', False), ('can_approve', '=', False), ('state', 'not in', ('confirm','validate1','validate'))]}"/>
+                        <button string="Cancel" name="action_cancel" type="object" attrs="{'invisible': ['|', ('active', '=', False), ('can_cancel', '=', False)]}"/>
+                        <button string="Mark as Draft" name="action_draft" type="object" attrs="{'invisible': ['|', ('can_reset', '=', False), ('state', 'not in', ['confirm', 'refuse'])]}"/>
+
+                        <button name="action_request_move_create"
+                            string="Post Journal Entries"
+                            type="object"
+                            data-hotkey="y"
+                            class="oe_highlight o_leave_encashment_post"
+                            attrs="{'invisible': [('state', '!=', 'validate')]}"
+                            groups="account.group_account_invoice"/>
+
+                        
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,validate,post,done"/>
+                    </header>
+                    <sheet>
+                        <field name="company_id" invisible="1"/>
+                        <field name="active" invisible="1"/>
+                        <field name="leave_type_request_unit" invisible="1"/>
+                        <field name="validation_type" invisible="1"/>
+                        <field name="can_reset" invisible="1"/>
+                        <field name="can_approve" invisible="1"/>
+                        <field name="can_cancel" invisible="1"/>
+                        
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_open_account_move"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                type="object"
+                                attrs="{'invisible': ['|', ('state', 'not in', ['post', 'done']), ('account_move_id', '=', False)]}" groups="account.group_account_invoice">
+                                Journal Entry
+                            </button>
+                            <field name="account_move_id" invisible="1"/>
+                            
+                        </div>
+                        <div class="oe_title">
+                            <span class="o_form_label" >Request for Leave Encashment </span>
+                            <h1 class="d-flex">
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" context="{'default_company_id': company_id}" widget="many2one_avatar_employee"/>
+                                <field name="holiday_status_id" force_save="1" domain="['|', ('requires_allocation', '=', 'no'), '&amp;', ('has_valid_allocation', '=', True), '&amp;', ('virtual_remaining_leaves', '&gt;', 0), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}" options="{'no_create': True, 'no_open': True, 'request_type':'leave'}"/>
+
+                                <field name="date"/>
+                                <field name="leave_avail" />
+                                <div class="o_td_label">
+                                    <label for="number_of_days" string="Duration" />
+                                </div>
+                                <div name="duration_display">
+                                    <field name="number_of_days" widget="float_time" nolabel="1" style="width: 5rem;" />
+                                    <span class="ml8" >Days/Hours</span>
+                                </div>
+                                <field name="leave_remain" />
+                                <div class="o_td_label">
+                                    <label for="amount_total" string="Total" />
+                                </div>
+                                <div name="amount_total">
+                                    <field name="amount_total" nolabel="1" style="width: 8rem;" />
+                                    <span class="ml8" ><field name="currency_id" nolabel="1" style="width: 8rem;" /></span>
+                                </div>
+                                
+                                <field name="department_id" context="{'default_company_id': company_id}"/>
+                                <field name="job_id" context="{'default_company_id': company_id}"/>
+                                <field name="contract_id" context="{'default_company_id': company_id}"/>
+                                
+                                
+                            </group>
+                            <group>
+                                <field name="accounting_date" groups="account.group_account_invoice,account.group_account_readonly" />
+                                <field name="journal_id" groups="account.group_account_invoice,account.group_account_readonly" options="{'no_open': True, 'no_create': True}" context="{'default_company_id': company_id}"/>
+                                <field name="address_id" invisible="1" context="{'default_company_id': company_id}"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="user_id" widget="many2one_avatar_user"/>
+                                
+                            </group>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" />
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_leave_encashment_list">
+            <field name="name">Leave Enchasement List</field>
+            <field name="model">hr.leave.encash</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="employee_id"/>
+                    <field name="department_id"/>
+                    <field name="job_id"/>
+                    <field name="contract_id"/>
+                    <field name="date"/>
+                    <field name="amount_total"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Leave Encashment Action -->
+        <record id="action_leave_encashment" model="ir.actions.act_window">
+            <field name="name">Leave Enchasement</field>
+            <field name="res_model">hr.leave.encash</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                id="menu_hr_leave_encashment"
+                name="My Leave Encash Request"
+                action="action_leave_encashment"
+                parent="hr_holidays.menu_hr_holidays_my_leaves"
+                sequence="20"/>
+
+    </data>
+</odoo>
