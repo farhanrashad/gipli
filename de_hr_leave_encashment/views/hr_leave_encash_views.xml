@@ -1,5 +1,53 @@
 <odoo>
     <data>
+        <record id="view_hr_leave_encash_filter" model="ir.ui.view">
+        <field name="name">hr.leave.encash.filter</field>
+        <field name="model">hr.leave.encash</field>
+        <field name="arch" type="xml">
+            <search string="Search Time Off">
+                <field name="employee_id"/>
+                <field name="holiday_status_id"/>
+                <field name="name"/>
+                <filter domain="[('state','in',('confirm','validate1'))]" string="To Approve" name="approve"/>
+                <filter domain="[('state', '=', 'validate1')]" string="Need Second Approval" name="second_approval"/>
+                <filter string="Approved Request" domain="[('state', '=', 'validate')]" name="validated"/>
+                <filter string="To Approve or Need Second Approval or Approved Request" domain="[('state', 'in', ('validate', 'validate1', 'confirm'))]" name="need_approval_approved"/>
+                <separator/>
+                <filter string="My Request" name="my_leaves" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter string="My Team" name="my_team" domain="['|', ('employee_id.parent_id', '=', uid), ('employee_id.user_id', '=', uid)]" help="Request of people you are manager of"/>
+                <filter string="My Department" name="department"
+                        domain="[('employee_id.member_of_department', '=', True)]"
+                        help="My Department"/>
+                <separator/>
+                <filter string="Active Employee" name="active_employee" domain="[('active_employee','=',True)]"/>
+                <separator/>
+                <filter name="active_time_off" string="Active Time Off"
+                    domain="[('holiday_status_id.active', '=', True)]" help="Active Time Off"/>
+                <filter name="archive" string="Archived Time Off"
+                    domain="[('holiday_status_id.active', '=', False)]" help="Archived Time Off"/>
+                <separator/>
+                <filter name="archived_leaves" string="Cancelled Time Off" domain="[('active', '=', False)]" />
+                <filter invisible="1" string="Late Activities" name="activities_overdue"
+                    domain="[('my_activity_date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                    help="Show all records which has next action date is before today"/>
+                <filter invisible="1" string="Today Activities" name="activities_today"
+                    domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+                        domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))
+                        ]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_employee" string="Employee" context="{'group_by':'employee_id'}"/>
+                    <filter name="group_type" string="Type" context="{'group_by':'holiday_status_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                </group>
+                <searchpanel>
+                    <field name="state" string="Status"/>
+                    <field name="department_id" string="Department" icon="fa-users"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
         <!-- Leave Encashment Form View -->
         <record id="view_leave_encashment_form" model="ir.ui.view">
             <field name="name">hr.leave.encash</field>
@@ -11,7 +59,6 @@
                         <button string="Approve" name="action_approve" type="object" class="oe_highlight" attrs="{'invisible': ['|', '|', ('active', '=', False), ('can_approve', '=', False), ('state', '!=', 'confirm')]}"/>
                         <button string="Validate" name="action_validate" states="validate1" type="object" groups="hr_holidays.group_hr_holidays_user" class="oe_highlight"/>
                         <button string="Refuse" name="action_refuse" type="object" attrs="{'invisible': ['|', '|', ('active', '=', False), ('can_approve', '=', False), ('state', 'not in', ('confirm','validate1','validate'))]}"/>
-                        <button string="Cancel" name="action_cancel" type="object" attrs="{'invisible': ['|', ('active', '=', False), ('can_cancel', '=', False)]}"/>
                         <button string="Mark as Draft" name="action_draft" type="object" attrs="{'invisible': ['|', ('can_reset', '=', False), ('state', 'not in', ['confirm', 'refuse'])]}"/>
 
                         <button name="action_request_move_create"
@@ -28,8 +75,10 @@
                     <sheet>
                         <field name="company_id" invisible="1"/>
                         <field name="active" invisible="1"/>
+                        <field name="active_employee" invisible="1"/>
                         <field name="leave_type_request_unit" invisible="1"/>
                         <field name="validation_type" invisible="1"/>
+                        <field name="account_move_id" invisible="1"/>
                         <field name="can_reset" invisible="1"/>
                         <field name="can_approve" invisible="1"/>
                         <field name="can_cancel" invisible="1"/>
@@ -54,18 +103,27 @@
                         <group>
                             <group>
                                 <field name="employee_id" context="{'default_company_id': company_id}" widget="many2one_avatar_employee"/>
-                                <field name="holiday_status_id" force_save="1" domain="['|', ('requires_allocation', '=', 'no'), '&amp;', ('has_valid_allocation', '=', True), '&amp;', ('virtual_remaining_leaves', '&gt;', 0), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}" options="{'no_create': True, 'no_open': True, 'request_type':'leave'}"/>
+                                <field name="holiday_status_id" force_save="1" context="{'employee_id':employee_id}" options="{'no_create': True, 'no_open': True, 'request_type':'leave'}"/>
 
                                 <field name="date"/>
-                                <field name="leave_avail" />
-                                <div class="o_td_label">
+                                <field name="virtual_remaining_leaves" />
+                                <div class="o_td_label" attrs="{'invisible': [('leave_type_request_unit', '!=', 'day')]}">
                                     <label for="number_of_days" string="Duration" />
                                 </div>
-                                <div name="duration_display">
-                                    <field name="number_of_days" widget="float_time" nolabel="1" style="width: 5rem;" />
-                                    <span class="ml8" >Days/Hours</span>
+                                <div name="duration_display" attrs="{'invisible': [('leave_type_request_unit', '!=', 'day')]}">
+                                    <field name="number_of_days" nolabel="1" style="width: 5rem;" />
+                                    <span class="ml8" >Days</span>
                                 </div>
-                                <field name="leave_remain" />
+
+                                <div class="o_td_label" attrs="{'invisible': [('leave_type_request_unit', '!=', 'hour')]}">
+                                    <label for="number_of_hours" string="Duration" />
+                                </div>
+                                <div name="duration_display" attrs="{'invisible': [('leave_type_request_unit', '!=', 'hour')]}">
+                                    <field name="number_of_hours" widget="float_time" nolabel="1" style="width: 5rem;" />
+                                    <span class="ml8" >Hours</span>
+                                </div>
+                                
+                                <field name="virtual_bal_leaves" />
                                 <div class="o_td_label">
                                     <label for="amount_total" string="Total" />
                                 </div>
@@ -73,9 +131,6 @@
                                     <field name="amount_total" nolabel="1" style="width: 8rem;" />
                                     <span class="ml8" ><field name="currency_id" nolabel="1" style="width: 8rem;" /></span>
                                 </div>
-                                
-                                <field name="department_id" context="{'default_company_id': company_id}"/>
-                                <field name="job_id" context="{'default_company_id': company_id}"/>
                                 <field name="contract_id" context="{'default_company_id': company_id}"/>
                                 
                                 
@@ -84,9 +139,9 @@
                                 <field name="accounting_date" groups="account.group_account_invoice,account.group_account_readonly" />
                                 <field name="journal_id" groups="account.group_account_invoice,account.group_account_readonly" options="{'no_open': True, 'no_create': True}" context="{'default_company_id': company_id}"/>
                                 <field name="address_id" invisible="1" context="{'default_company_id': company_id}"/>
-                                <field name="company_id" groups="base.group_multi_company"/>
                                 <field name="user_id" widget="many2one_avatar_user"/>
-                                
+                                      <field name="department_id" context="{'default_company_id': company_id}"/>
+                                <field name="job_id" context="{'default_company_id': company_id}"/>
                             </group>
                         </group>
                         <group>
@@ -120,7 +175,12 @@
         <record id="action_leave_encashment" model="ir.actions.act_window">
             <field name="name">Leave Enchasement</field>
             <field name="res_model">hr.leave.encash</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,activity</field>
+            <field name="help" type="html">
+                <p>
+                    Manage your leave encashment requests and view their status in one place.
+                </p>
+            </field>
         </record>
 
         <menuitem
