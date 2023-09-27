@@ -28,8 +28,9 @@ class MultipleInvoiceProducts(models.TransientModel):
     
     @api.onchange('company_id')
     def getCompDom(self):
-        if self.env.company.name == 'GMSA ENERGY (PVT) LTD':
-            comp_id= self.env['res.company'].search([('name','=','GMSA ENERGY (PVT) LTD')])
+        comp_name = self.env.company.name
+        if comp_name == 'GMSA ENERGY (PVT) LTD'  or comp_name == 'SALEEMI INTERNATIONAL (PVT) LTD' :
+            comp_id= self.env['res.company'].search([('name','=', comp_name)])
             recs= self.env['product.product'].sudo().search([('company_id','=',comp_id.id)])
             if recs:  
                 return {'domain' : {'product_ids' : [('id', 'in', recs.ids)]}}     
