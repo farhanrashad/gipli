@@ -1,0 +1,16 @@
+<odoo>
+    <data>
+        <record id="view_hr_leave_type_form_inherit" model="ir.ui.view">
+            <field name="name">hr.leave.type.form.inherit</field>
+            <field name="model">hr.leave.type</field>
+            <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='allocation_validation']" position="inside">
+                    <separator string="Leave Encashment"/>
+                    <field name="allow_leave_encashment"/>
+                    <field name="product_id" required="1" attrs="{'required': [('allow_leave_encashment','=',True)],'invisible': [('allow_leave_encashment','!=',True)]}"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
