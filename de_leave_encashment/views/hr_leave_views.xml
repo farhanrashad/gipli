@@ -1,0 +1,19 @@
+<odoo>
+    <data>
+        <!-- Extend the hr.leave.form view using XPath -->
+        <record id="view_hr_leave_form_extend" model="ir.ui.view">
+            <field name="name">hr.leave.form.extend</field>
+            <field name="model">hr.leave</field>
+            <field name="inherit_id" ref="hr_holidays.hr_leave_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//sheet[1]" position="inside">
+                    <field name="leave_encash_id" invisible="1" />
+                </xpath>
+                <!-- Add the attrs attribute using XPath to the requested_date_from field -->
+                <xpath expr="//field[@name='request_date_from']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('leave_encash_id', '!=', False)]}</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
