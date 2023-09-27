@@ -10,7 +10,7 @@ from odoo.addons.base.models.res_partner import _tz_get
 class LeaveEncashment(models.Model):
     _name = 'hr.leave.encash'
     _description = 'Leave Encashment'
-    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     @api.model
     def _default_employee_id(self):
@@ -275,6 +275,11 @@ class LeaveEncashment(models.Model):
         res = super(LeaveEncashment, self).create(vals_list)
         return res
 
+    def unlink(self):
+        for record in self:
+            if record.state != 'draft':
+                raise exceptions.UserError("You can only delete records in 'Draft' status.")
+        return super(LeaveEncashment, self).unlink()
 
     # ------------------------------------------------
     # ----------- Action Buttons ---------------------
