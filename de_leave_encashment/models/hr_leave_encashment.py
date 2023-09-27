@@ -53,10 +53,20 @@ class LeaveEncashment(models.Model):
     employee_id = fields.Many2one('hr.employee', string="Employee", required=True, readonly=False, tracking=True, states=READONLY_STATES, default=_default_employee_id, check_company=True, domain= lambda self: self.env['hr.leave.encash']._get_employee_id_domain())
     holiday_status_id = fields.Many2one(
         "hr.leave.type", compute='_compute_holiday_status_from_employee_id', store=True, string="Time Off Type", required=True, readonly=False, states=READONLY_STATES,
-        domain="[('company_id', '=?', employee_company_id), '|', ('requires_allocation', '=', 'no'), ('has_valid_allocation', '=', True)]", tracking=True)
+        domain="[('allow_leave_encashment','=',True),('virtual_remaining_leaves', '>', 0)]", tracking=True)
     leave_type_request_unit = fields.Selection(related='holiday_status_id.request_unit', readonly=True)
     validation_type = fields.Selection(string='Validation Type', related='holiday_status_id.leave_validation_type', readonly=False)
-
+    virtual_remaining_leaves = fields.Float(related='holiday_status_id.virtual_remaining_leaves', string="Available Leaves")
+     # duration
+    number_of_days = fields.Float(
+        'Number of Days', store=True, readonly=False, tracking=True, default=1, required=True,
+        help='Duration in days. Reference field to use when necessary.')
+    number_of_hours = fields.Float(
+        'Number of Hours', store=True, readonly=False, tracking=True, default=1, required=True,
+        help='Duration in hours. Reference field to use when necessary.')
+    virtual_bal_leaves = fields.Float(string='Balance Leaves', compute='_compute_all_leave_balance', help='Leave balance after encashment')
+    amount_total = fields.Float(string='Total Amount', compute='_compute_total', store=True)
+    active_employee = fields.Boolean(related='employee_id.active', string='Employee Active', readonly=True)
     active = fields.Boolean(default=True, readonly=True)
     first_approver_id = fields.Many2one(
         'hr.employee', string='First Approval', readonly=True, copy=False,
@@ -73,8 +83,6 @@ class LeaveEncashment(models.Model):
     contract_id = fields.Many2one('hr.contract', string='Contract', compute='_compute_from_employee_id')
     user_id = fields.Many2one('res.users', 'Manager', compute='_compute_from_employee_id', store=True, readonly=True, copy=False, states={'draft': [('readonly', False)]}, tracking=True)
     address_id = fields.Many2one('res.partner', compute='_compute_from_employee_id', store=True, readonly=False, copy=True, string="Employee Home Address", check_company=True)
-
-
     date = fields.Date(string='Date', default=fields.Date.today(), required=True, states=READONLY_STATES,)
     account_move_id = fields.Many2one('account.move', string='Journal Entry', ondelete='restrict', copy=False, readonly=True)
     accounting_date = fields.Date(
@@ -86,19 +94,9 @@ class LeaveEncashment(models.Model):
     journal_id = fields.Many2one('account.journal', string='Accounting Journal', check_company=True, domain="[('type', '=', 'purchase'), ('company_id', '=', company_id)]",
         states={'validate': [('readonly', False)], 'post': [('readonly', False)]},
         default=_default_journal_id, help="The journal used when the request is done.")
-    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states={'draft': [('readonly', False)]}, default=lambda self: self.env.company)
+    company_id = fields.Many2one(related='employee_id.company_id', readonly=True, store=True)
     currency_id = fields.Many2one('res.currency', string='Currency',                                 compute='_compute_currency_id', store=True, readonly=True)
-
-    # duration
-    number_of_days = fields.Float(
-        'Number of Days', store=True, readonly=False, tracking=True, default=1, required=True,
-        help='Duration in days. Reference field to use when necessary.')
-    leave_avail = fields.Float(string='Available Leaves', compute='_compute_all_balance')
-    leave_remain = fields.Float(string='Remaining Leaves', compute='_compute_all_balance')
-    amount_total = fields.Float(string='Total Amount', compute='_compute_total', store=True)
     description = fields.Text(string='Description', states=READONLY_STATES, readonly=False)
-    
-    journal_count = fields.Integer(string='Journal Count', compute='_compute_journal_count')
     state = fields.Selection([
         ('draft', 'To Submit'),
         ('confirm', 'To Approve'),
@@ -115,19 +113,18 @@ class LeaveEncashment(models.Model):
 
     @api.depends('company_id.currency_id')
     def _compute_currency_id(self):
-        for sheet in self:
-            # Deal with a display bug when there is a company currency change after creation of the expense sheet
-            if not sheet.currency_id or sheet.state not in {'post', 'done', 'cancel'}:
-                sheet.currency_id = sheet.company_id.currency_id
+        for record in self:
+            if not record.currency_id or record.state not in {'post', 'done', 'refuse'}:
+                record.currency_id = record.company_id.currency_id
 
     @api.depends('employee_id')
     def _compute_from_employee_id(self):
         for record in self:
-            record.address_id = record.employee_id.sudo().address_home_id
-            record.department_id = record.employee_id.department_id
-            record.job_id = record.employee_id.job_id
-            record.contract_id = record.employee_id.contract_id
-            record.user_id = record.employee_id.parent_id.user_id
+            record.address_id = record.employee_id.sudo().address_home_id.id
+            record.department_id = record.employee_id.sudo().department_id
+            record.job_id = record.employee_id.sudo().job_id
+            record.contract_id = record.employee_id.sudo().contract_id
+            record.user_id = record.employee_id.sudo().parent_id.user_id
 
     @api.depends('employee_id')
     def _compute_holiday_status_from_employee_id(self):
@@ -154,12 +151,16 @@ class LeaveEncashment(models.Model):
             elif not leave.state:
                 leave.state = 'draft'
 
-    def _compute_all_balance(self):
+    @api.depends('holiday_status_id','virtual_remaining_leaves','leave_type_request_unit',
+                 'number_of_days','number_of_hours')
+    def _compute_all_leave_balance(self):
+        bal = 0
         for record in self:
-            allocation_ids = self.env['hr.leave.allocation'].search([('employee_id','=',record.employee_id.id),('holiday_status_id','=',record.holiday_status_id.id),('state','=','validate')])
-            leave_ids = self.env['hr.leave'].search([('employee_id','=',record.employee_id.id),('holiday_status_id','=',record.holiday_status_id.id),('state','=','validate')])
-            record.leave_avail = sum(allocation_ids.mapped('number_of_days_display')) - sum(leave_ids.mapped('number_of_days_display'))
-            record.leave_remain = (sum(allocation_ids.mapped('number_of_days_display')) - sum(leave_ids.mapped('number_of_days_display'))) - record.number_of_days 
+            if record.leave_type_request_unit == 'day':
+                bal = record.virtual_remaining_leaves - record.number_of_days
+            else:
+                bal = record.virtual_remaining_leaves - record.number_of_hours
+            record.virtual_bal_leaves = bal
 
 
 
@@ -264,7 +265,7 @@ class LeaveEncashment(models.Model):
     # ------------------------------------------------
     # ----------- Operations -------------------------
     # ------------------------------------------------
-    @api.model_create_multi
+    @api.model
     def create(self, vals):
         if vals.get('name', _('New')) == _('New'):
             vals['name'] = self.env['ir.sequence'].next_by_code(
@@ -281,44 +282,64 @@ class LeaveEncashment(models.Model):
 
     def action_confirm(self):
         if self.filtered(lambda holiday: holiday.state != 'draft'):
-            raise UserError(_('Time off request must be in Draft state ("To Submit") in order to confirm it.'))
+            raise UserError(_('Request must be in Draft state ("To Submit") in order to confirm it.'))
+
+        if self.virtual_bal_leaves < 0:
+            raise UserError(_('The remaining leave balance cannot be negative.'))
+            
         self.write({'state': 'confirm'})
         self.activity_update()
         return True
 
+    
     def action_approve(self):
         #if any(holiday.state != 'confirm' for holiday in self):
         #    raise UserError(_('Encashment request must be confirmed ("To Approve") in order to approve it.'))
         current_employee = self.env.user.employee_id
+        number_of_leaves = 0
+        if self.leave_type_request_unit == 'day':
+            number_of_leaves = self.number_of_days
+        else:
+            number_of_leaves = self.number_of_hours
+        leave_id = self.env['hr.leave'].create({
+            'name': self.employee_id.name + ' on' + self.holiday_status_id.name + ': ' + str(number_of_leaves) + ' (Leave enchased)',
+            'employee_id':self.employee_id.id,
+            'holiday_type': 'employee',
+            'holiday_status_id': self.holiday_status_id.id,
+            'number_of_days': self.number_of_days,
+            'leave_type_request_unit': self.leave_type_request_unit,
+            'leave_encash_id': self.id,
+        })
+        leave_id.sudo().action_validate()
+        self.write({'state': 'validate'})
+        self.activity_update()
+        return True
+
+    def action_validate(self):
+        number_of_leaves = 0
+        if self.leave_type_request_unit == 'day':
+            number_of_leaves = self.number_of_days
+        else:
+            number_of_leaves = self.number_of_hours
+        leave_id = self.env['hr.leave'].create({
+            'name': self.employee_id.name + ' on' + self.holiday_status_id.name + ': ' + str(number_of_leaves) + ' (Leave enchased)',
+            'employee_id':self.employee_id.id,
+            'holiday_type': 'employee',
+            'holiday_status_id': self.holiday_status_id.id,
+            'number_of_days': self.number_of_days,
+            'leave_type_request_unit': self.leave_type_request_unit,
+            'leave_encash_id': self.id,
+        })
+        leave_id.sudo().action_validate()
         self.write({'state': 'validate'})
         self.activity_update()
         return True
         
-    def action_validate(self):
-        self.write({'state': 'draft'})
-        
-    
-        
-
-    def action_paid(self):
-        self.write({'state': 'paid'})
-        for rec in self:
-            journal_rec = self.env['account.move'].search([])
-            values = {
-                'number': rec.bank_number,
-                'employee_id': rec.employee_id.id,
-                'due_date': rec.date,
-                'state': rec.state,
-                'total': rec.total,
-            }
-            journal_rec.create(values)
-
     def action_refuse(self):
-        self.write({'state': 'cancel'})
+        self.write({'state': 'refuse'})
+        self.activity_update()
+        return True
         
-    def action_cancel(self):
-        self.write({'state': 'cancel'})
-
     # --------------------------------------------
     # Actions
     # --------------------------------------------
@@ -351,6 +372,7 @@ class LeaveEncashment(models.Model):
                 })
             ],
         })
+        
         self.write({
             'state': 'post',
             'account_move_id': account_move_id.id
