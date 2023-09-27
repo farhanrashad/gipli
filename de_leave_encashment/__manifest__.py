@@ -20,13 +20,13 @@
     'version': '16.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'hr', 'hr_contract', 'mail', 'resource', 'hr_holidays'],
+    'depends': ['base','hr_contract', 'hr_holidays','account'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
 
-        'views/leave_encashment_view.xml',
+        'views/hr_leave_encash_views.xml',
         'views/hr_leave_allocation_view.xml',
         'views/journal_entry_view.xml',
 
