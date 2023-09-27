@@ -230,13 +230,6 @@ class LeaveEncashment(models.Model):
                     if not is_officer and (state == 'validate' and val_type == 'hr') and holiday.holiday_type == 'employee':
                         raise UserError(_('You must either be a Time off Officer or Time off Manager to approve this leave'))     
             
-    @api.model
-    def create(self, vals):
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code(
-                'leave.enchasement') or _('New')
-        res = super(LeaveEncashment, self).create(vals)
-        return res
 
     def _compute_journal_count(self):
         for record in self:
@@ -263,12 +256,30 @@ class LeaveEncashment(models.Model):
                 
 
 
+    # ------------------------------------------------
+    # ----------- Operations -------------------------
+    # ------------------------------------------------
+    @api.model_create_multi
+    def create(self, vals):
+        if vals.get('name', _('New')) == _('New'):
+            vals['name'] = self.env['ir.sequence'].next_by_code(
+                'leave.enchasement') or _('New')
+        res = super(LeaveEncashment, self).create(vals)
+        return res
+
+    # ------------------------------------------------
+    # ----------- Action Buttons ---------------------
+    # ------------------------------------------------
 
     def action_draft(self):
         self.write({'state': 'draft'})
 
     def action_confirm(self):
-        self.write({'state': 'draft'})
+        if self.filtered(lambda holiday: holiday.state != 'draft'):
+            raise UserError(_('Time off request must be in Draft state ("To Submit") in order to confirm it.'))
+        self.write({'state': 'confirm'})
+        self.activity_update()
+        return True
 
     def action_validate(self):
         self.write({'state': 'draft'})
@@ -308,3 +319,38 @@ class LeaveEncashment(models.Model):
             'domain': [('id', '=', self.account_move_id.id)],
             'context': "{'create': False}"
         }
+
+    def _get_responsible_for_approval(self):
+        self.ensure_one()
+        responsible = self.env.user
+        return responsible
+        
+    def activity_update(self):
+        to_clean, to_do = self.env['hr.leave.encash'], self.env['hr.leave.encash']
+        for holiday in self:
+            note = _(
+                'New %(leave_type)s Encashment Request created by %(user)s',
+                leave_type=holiday.holiday_status_id.name,
+                user=holiday.create_uid.name,
+            )
+            if holiday.state == 'draft':
+                to_clean |= holiday
+            elif holiday.state == 'confirm':
+                holiday.activity_schedule(
+                    'de_leave_encashment.mail_act_leave_encash_approval',
+                    note=note,
+                    user_id=holiday.sudo()._get_responsible_for_approval().id or self.env.user.id)
+            elif holiday.state == 'validate1':
+                holiday.activity_feedback(['de_leave_encashment.mail_act_leave_encash_approval'])
+                holiday.activity_schedule(
+                    'de_leave_encashment.mail_act_leave_encash_second_approval',
+                    note=note,
+                    user_id=holiday.sudo()._get_responsible_for_approval().id or self.env.user.id)
+            elif holiday.state == 'validate':
+                to_do |= holiday
+            elif holiday.state == 'refuse':
+                to_clean |= holiday
+        if to_clean:
+            to_clean.activity_unlink(['de_leave_encashment.mail_act_leave_encash_approval', 'de_leave_encashment.mail_act_leave_encash_second_approval'])
+        if to_do:
+            to_do.activity_feedback(['de_leave_encashment.mail_act_leave_encash_approval', 'de_leave_encashment.mail_act_leave_encash_second_approval'])
