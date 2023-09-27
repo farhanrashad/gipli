@@ -78,7 +78,7 @@
                                 <field name="job_id" context="{'default_company_id': company_id}"/>
                                 <field name="contract_id" context="{'default_company_id': company_id}"/>
                                 
-                                <field name="description"/>
+                                
                             </group>
                             <group>
                                 <field name="accounting_date" groups="account.group_account_invoice,account.group_account_readonly" />
@@ -88,6 +88,9 @@
                                 <field name="user_id" widget="many2one_avatar_user"/>
                                 
                             </group>
+                        </group>
+                        <group>
+                            <field name="description"/>
                         </group>
                     </sheet>
                     <div class="oe_chatter">

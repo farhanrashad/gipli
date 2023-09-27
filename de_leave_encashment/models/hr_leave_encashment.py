@@ -96,7 +96,7 @@ class LeaveEncashment(models.Model):
     leave_avail = fields.Float(string='Available Leaves', compute='_compute_all_balance')
     leave_remain = fields.Float(string='Remaining Leaves', compute='_compute_all_balance')
     amount_total = fields.Float(string='Total Amount', compute='_compute_total', store=True)
-    description = fields.Text(string='Description')
+    description = fields.Text(string='Description', states=READONLY_STATES, readonly=False)
     
     journal_count = fields.Integer(string='Journal Count', compute='_compute_journal_count')
     state = fields.Selection([
@@ -347,6 +347,7 @@ class LeaveEncashment(models.Model):
                     'product_id': self.holiday_status_id.product_id.id,
                     'quantity': 1,
                     'price_unit': self.amount_total,
+                    'name': self.description or self.holiday_status_id.product_id.display_name,
                 })
             ],
         })
@@ -366,18 +367,6 @@ class LeaveEncashment(models.Model):
             'views': [[False, "form"]],
             'res_model': 'account.move',
             'res_id': self.account_move_id.id,
-        }
-        
-    def action_journal_entry(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Journal Entry',
-            'view_mode': 'tree,form',
-            'target': 'current',
-            'res_model': 'account.move',
-            'domain': [('id', '=', self.account_move_id.id)],
-            'context': "{'create': False}"
         }
 
     def _get_responsible_for_approval(self):

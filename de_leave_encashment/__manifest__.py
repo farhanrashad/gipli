@@ -28,10 +28,7 @@
         'data/sequence.xml',
         'data/mail_activity_type_data.xml',
         'views/hr_leave_type_views.xml',
-        'views/hr_leave_encash_views.xml',
-        'views/hr_leave_allocation_view.xml',
-        'views/journal_entry_view.xml',
-        
+        'views/hr_leave_encash_views.xml',        
     ],
     # only loaded in demonstration mode
     'demo': [
