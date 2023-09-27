@@ -14,6 +14,14 @@
                         <button string="Cancel" name="action_cancel" type="object" attrs="{'invisible': ['|', ('active', '=', False), ('can_cancel', '=', False)]}"/>
                         <button string="Mark as Draft" name="action_draft" type="object" attrs="{'invisible': ['|', ('can_reset', '=', False), ('state', 'not in', ['confirm', 'refuse'])]}"/>
 
+                        <button name="action_request_move_create"
+                            string="Post Journal Entries"
+                            type="object"
+                            data-hotkey="y"
+                            class="oe_highlight o_leave_encashment_post"
+                            attrs="{'invisible': [('state', '!=', 'validate')]}"
+                            groups="account.group_account_invoice"/>
+
                         
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirm,validate,post,done"/>
                     </header>
@@ -27,14 +35,15 @@
                         <field name="can_cancel" invisible="1"/>
                         
                         <div name="button_box" class="oe_button_box">
-                            <button name="action_journal_entry" type="object"
-                                    class="oe_stat_button" icon="fa-calendar">
-                                <div class="o_stat_info">
-                                    <field name="journal_count" class="o_stat_value"/>
-                                    <span class="o_stat_text">Journal Entry
-                                    </span>
-                                </div>
+                            <button name="action_open_account_move"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                type="object"
+                                attrs="{'invisible': ['|', ('state', 'not in', ['post', 'done']), ('account_move_id', '=', False)]}" groups="account.group_account_invoice">
+                                Journal Entry
                             </button>
+                            <field name="account_move_id" invisible="1"/>
+                            
                         </div>
                         <div class="oe_title">
                             <span class="o_form_label" >Request for Leave Encashment </span>

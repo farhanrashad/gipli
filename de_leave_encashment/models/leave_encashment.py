@@ -80,9 +80,11 @@ class LeaveEncashment(models.Model):
     accounting_date = fields.Date(
         string='Accounting Date',
         compute='_compute_accounting_date',
+        states={'validate': [('readonly', False)], 'post': [('readonly', False)]},
         store=True
     )
-    journal_id = fields.Many2one('account.journal', string='Accounting Journal', readonly=True, check_company=True, domain="[('type', '=', 'purchase'), ('company_id', '=', company_id)]",
+    journal_id = fields.Many2one('account.journal', string='Accounting Journal', check_company=True, domain="[('type', '=', 'purchase'), ('company_id', '=', company_id)]",
+        states={'validate': [('readonly', False)], 'post': [('readonly', False)]},
         default=_default_journal_id, help="The journal used when the request is done.")
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states={'draft': [('readonly', False)]}, default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', string='Currency',                                 compute='_compute_currency_id', store=True, readonly=True)
@@ -144,10 +146,13 @@ class LeaveEncashment(models.Model):
         for record in self:
             record.accounting_date = record.account_move_id.date
 
-    @api.depends('holiday_status_id')
+    @api.depends('holiday_status_id','account_move_id','account_move_id.payment_state')
     def _compute_state(self):
         for leave in self:
-            leave.state = 'draft' #'confirm' if leave.validation_type != 'no_validation' else 'draft'
+            if leave.account_move_id.payment_state in ('paid','in_payment'):
+                leave.state = 'done'
+            elif not leave.state:
+                leave.state = 'draft'
 
     def _compute_all_balance(self):
         for record in self:
@@ -184,7 +189,7 @@ class LeaveEncashment(models.Model):
     def _compute_can_cancel(self):
         now = fields.Datetime.now()
         for leave in self:
-            leave.can_cancel = leave.id and leave.employee_id.user_id == self.env.user and leave.state == 'validate' and leave.date_from and leave.date_from > now
+            leave.can_cancel = leave.id and leave.employee_id.user_id == self.env.user and leave.state == 'validate'
 
     def _check_approval_update(self, state):
         """ Check if target state is achievable. """
@@ -281,12 +286,18 @@ class LeaveEncashment(models.Model):
         self.activity_update()
         return True
 
+    def action_approve(self):
+        #if any(holiday.state != 'confirm' for holiday in self):
+        #    raise UserError(_('Encashment request must be confirmed ("To Approve") in order to approve it.'))
+        current_employee = self.env.user.employee_id
+        self.write({'state': 'validate'})
+        self.activity_update()
+        return True
+        
     def action_validate(self):
         self.write({'state': 'draft'})
         
-    def action_approve(self):
-        self.write({'state': 'confirm'})
-        return True
+    
         
 
     def action_paid(self):
@@ -308,6 +319,55 @@ class LeaveEncashment(models.Model):
     def action_cancel(self):
         self.write({'state': 'cancel'})
 
+    # --------------------------------------------
+    # Actions
+    # --------------------------------------------
+    
+    def action_request_move_create(self):
+        if any(request.state != 'validate' for request in self):
+            raise UserError(_("You can only generate accounting entry for approved request(s)."))
+
+        if any(not request.journal_id for request in self):
+            raise UserError(_("Specify journal to generate accounting entries."))
+
+        if not self.employee_id.sudo().address_home_id:
+            raise UserError(_("The private address of the employee is required to post the accounting document. Please add it on the employee form."))
+
+        # Create a vendor bill
+        account_move_id = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.employee_id.sudo().address_home_id.id,
+            'journal_id': self.journal_id.id,
+            'invoice_date': fields.Date.today(),
+            'date': self.accounting_date or fields.Date.context_today(self),
+            'ref': self.name,
+            'currency_id': self.currency_id.id,
+            'invoice_line_ids': [
+                (0, 0, {
+                    'product_id': self.holiday_status_id.product_id.id,
+                    'quantity': 1,
+                    'price_unit': self.amount_total,
+                })
+            ],
+        })
+        self.write({
+            'state': 'post',
+            'account_move_id': account_move_id.id
+        })
+
+        self.activity_update()
+
+    def action_open_account_move(self):
+        self.ensure_one()
+        return {
+            'name': self.account_move_id.name,
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'views': [[False, "form"]],
+            'res_model': 'account.move',
+            'res_id': self.account_move_id.id,
+        }
+        
     def action_journal_entry(self):
         self.ensure_one()
         return {
