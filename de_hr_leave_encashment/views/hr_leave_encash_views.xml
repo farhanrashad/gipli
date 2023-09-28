@@ -161,12 +161,16 @@
             <field name="model">hr.leave.encash</field>
             <field name="arch" type="xml">
                 <tree>
+                    <field name="name"/>
+                    <field name="date"/>
                     <field name="employee_id"/>
                     <field name="department_id"/>
-                    <field name="job_id"/>
-                    <field name="contract_id"/>
-                    <field name="date"/>
+                    <field name="job_id" optional="hide"/>
+                    <field name="contract_id" optional="hide"/>
                     <field name="amount_total"/>
+                    <field name="state" optional="show" widget="badge" decoration-danger="state == 'validate' or state == 'validate1'" decoration-warning="state == 'confirm'" decoration-success="state == 'post'" decoration-info="state == 'draft' or state == 'refuse' or state == 'done'"/>
+
+                    <field name="state"/>
                 </tree>
             </field>
         </record>

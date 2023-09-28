@@ -24,7 +24,7 @@
         'reports/leave_encash_report_template.xml',
     ],
     'license': 'OPL-1',
-    'price': 45,
+    'price': 55,
     'currency': 'USD',
     'images': ['static/description/banner.jpg'],
     'installable': True,
