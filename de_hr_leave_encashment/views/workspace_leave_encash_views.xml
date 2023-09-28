@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     
+    <record id="action_my_leave_encash_request" model="ir.actions.act_window">
+        <field name="name">My Leave Encashment Request</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.leave.encash</field>
+        <field name="view_mode">tree,form,activity</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="de_hr_leave_encashment.view_hr_leave_encash_filter"/>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Keep track of your Encashment Requests.
+            </p><p>
+                Manage your leave encashment requests and view their status in one place.
+            </p>
+        </field>
+    </record>
+        
+    <menuitem id="menu_my_leave_encash_request" name="My Leave Encash Request" parent="de_hr_workspace_timeoff.menu_my_timeoff" action="action_my_leave_encash_request" sequence="30" />
+
+   
+</odoo>

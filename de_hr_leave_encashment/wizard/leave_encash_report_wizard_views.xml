@@ -1,0 +1,34 @@
+<odoo>
+    <data>
+        <record id="view_leave_encash_wizard_form" model="ir.ui.view">
+            <field name="name">leave.encash.wizard.view.form</field>
+            <field name="model">hr.leave.encash.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generate PDF Report">
+                    <!-- Add fields and buttons as needed -->
+                    <group>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                    </group>
+                    <footer>
+                        <button string="Generate Report" name="generate_report" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_leave_encash_wizard" model="ir.actions.act_window">
+            <field name="name">Generate PDF Report</field>
+            <field name="res_model">hr.leave.encash.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="de_hr_leave_encashment.view_leave_encash_wizard_form"/>
+            <field name="target">new</field>
+            <!-- You can specify a menu item for this action if needed -->
+        </record>
+
+        <menuitem id="menu_action_leave_encash_wizard" name="Leave Encash" parent="hr_holidays.menu_hr_holidays_report" action="action_leave_encash_wizard" sequence="30" />
+
+        
+    </data>
+</odoo>

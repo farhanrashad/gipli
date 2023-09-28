@@ -278,7 +278,7 @@ class LeaveEncashment(models.Model):
     def unlink(self):
         for record in self:
             if record.state != 'draft':
-                raise exceptions.UserError("You can only delete records in 'Draft' status.")
+                raise UserError("You can only delete records in 'Draft' status.")
         return super(LeaveEncashment, self).unlink()
 
     # ------------------------------------------------
@@ -320,6 +320,13 @@ class LeaveEncashment(models.Model):
         })
         leave_id.sudo().action_validate()
         self.write({'state': 'validate'})
+        self.message_post(
+                body=_(
+                    'Your Encashment Request for %(leave_type)s on %(date)s has been accepted',
+                    leave_type=self.holiday_status_id.display_name,
+                    date=self.date
+                ),
+                partner_ids=self.employee_id.user_id.partner_id.ids)
         self.activity_update()
         return True
 

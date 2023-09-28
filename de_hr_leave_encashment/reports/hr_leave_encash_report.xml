@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Define your QWeb report template here -->
+        <template id="report_hr_leave_encashment">
+            <t t-set="company" t-value="env.company"/>
+            <t t-call="web.html_container">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <div class="text-center">
+                            <h3>Leave Encashment</h3>
+                        </div>
+                        <table  class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>From Date</th>
+                                    <th>To Date</th>
+                                    <th>Total Encashment Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <t t-if="start_date">
+                                            <strong><t t-esc="start_date" t-options="{'widget': 'datetime'}"/></strong>
+                                        </t>
+                                    </td>
+                                    <td>
+                                        <t t-if="end_date">
+                                            <strong><t t-esc="end_date" t-options="{'widget': 'datetime'}"/></strong>
+                                        </t>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <t t-foreach="docs" t-as="o">
+                            <span t-field="o.name"/>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <record id="leave_encash_details_report" model="ir.actions.report">
+            <field name="name">Leave Encashment Details</field>
+            <field name="model">hr.leave.encash</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_hr_leave_encashment.report_hr_leave_encashment</field>
+        </record>
+        
+    </data>
+</odoo>
