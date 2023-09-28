@@ -66,7 +66,7 @@ class LeaveEncashment(models.Model):
         'Number of Hours', store=True, readonly=False, tracking=True, default=1, required=True,
         help='Duration in hours. Reference field to use when necessary.')
     virtual_bal_leaves = fields.Float(string='Balance Leaves', compute='_compute_all_leave_balance', help='Leave balance after encashment')
-    amount_total = fields.Float(string='Total Amount', compute='_compute_total', store=True)
+    amount_total = fields.Monetary(string='Total Amount', compute='_compute_total', store=True, currency_field='currency_id')
     active_employee = fields.Boolean(related='employee_id.active', string='Employee Active', readonly=True)
     active = fields.Boolean(default=True, readonly=True)
     first_approver_id = fields.Many2one(

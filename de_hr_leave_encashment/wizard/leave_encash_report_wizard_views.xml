@@ -7,8 +7,13 @@
                 <form string="Generate PDF Report">
                     <!-- Add fields and buttons as needed -->
                     <group>
-                        <field name="start_date"/>
-                        <field name="end_date"/>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="report_filter" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="date_end"/>
+                        </group>
                     </group>
                     <footer>
                         <button string="Generate Report" name="generate_report" type="object" class="btn-primary"/>
@@ -21,11 +26,12 @@
         <record id="action_leave_encash_wizard" model="ir.actions.act_window">
             <field name="name">Generate PDF Report</field>
             <field name="res_model">hr.leave.encash.wizard</field>
+            <field name="type">ir.actions.act_window</field>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="de_hr_leave_encashment.view_leave_encash_wizard_form"/>
+            <field name="view_id" ref="view_leave_encash_wizard_form"/>
             <field name="target">new</field>
-            <!-- You can specify a menu item for this action if needed -->
-        </record>
+            <field name="context">{'report_name': 'de_hr_leave_encashment.report_hr_leave_encashment'}</field>
+        </record>        
 
         <menuitem id="menu_action_leave_encash_wizard" name="Leave Encash" parent="hr_holidays.menu_hr_holidays_report" action="action_leave_encash_wizard" sequence="30" />
 

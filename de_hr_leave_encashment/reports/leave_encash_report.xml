@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_leave_encash" model="ir.actions.report">
+            <field name="name">Leave Encashment Details</field>
+            <field name="model">hr.leave.encash.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_hr_leave_encashment.report_leave_encash</field>
+             <field name="report_file">de_hr_leave_encashment.report_leave_encash</field>
+            <field name="binding_model_id" ref="model_hr_leave_encash_wizard"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>
