@@ -23,16 +23,16 @@
                                 <tr>
                                     <td>
                                         <t t-if="form_data['date_start']">
-                                            <strong><t t-esc="form_data['date_start']" t-options="{'widget': 'datetime'}"/></strong>
+                                            <strong><t t-esc="form_data['date_start']" t-options="{'widget': 'date'}"/></strong>
                                         </t>
                                     </td>
                                     <td>
                                         <t t-if="date_end">
-                                            <strong><t t-esc="date_end" t-options="{'widget': 'datetime'}"/></strong>
+                                            <strong><t t-esc="date_end" t-options="{'widget': 'date'}"/></strong>
                                         </t>
                                     </td>
-                                    <td><strong><t t-esc="total_employees" /></strong></td>
-                                    <td><strong><t t-esc="amount_total" /></strong></td>
+                                    <td class="text-center"><strong><t t-esc="total_employees" /></strong></td>
+                                    <td class="text-right"><strong><t t-esc="'{0:,.2f}'.format(int(amount_total))" /></strong></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -59,7 +59,7 @@
                                                 <td><span t-esc="le['name']"/></td>
                                                 <td><span t-esc="le['holiday_status_name']"/></td>
                                                 <td class="text-center"><span t-esc="le['number_of_leaves']"/>/<span t-esc="le['leave_type_request_unit']"/></td>
-                                                <td class="text-right"><span t-esc="le['amount_total']" /></td>
+                                                <td class="text-right"><t t-esc="'{0:,.2f}'.format(int(le['amount_total']))" /></td>
                                                 <td class="text-center"><span t-esc="le['state']" /></td>
                                             </t>
                                         </tr>
@@ -95,7 +95,7 @@
                                                 <td><span t-esc="le['name']"/></td>
                                                 <td><span t-esc="le['holiday_status_name']"/></td>
                                                 <td class="text-center"><span t-esc="le['number_of_leaves']"/>/<span t-esc="le['leave_type_request_unit']"/></td>
-                                                <td class="text-right"><span t-esc="le['amount_total']" /></td>
+                                                <td class="text-right"><t t-esc="'{0:,.2f}'.format(int(le['amount_total']))" /></td>
                                                 <td class="text-center"><span t-esc="le['state']" /></td>
                                             </t>
                                         </tr>
