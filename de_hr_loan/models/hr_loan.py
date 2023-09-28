@@ -111,7 +111,7 @@ class HrLoan(models.Model):
                                   help="Balance amount")
     total_paid_amount = fields.Float(string="Total Paid Amount", store=True, compute='_compute_loan_amount',
                                      help="Total paid amount")
-
+    description = fields.Text(string='Description', states=READONLY_STATES, readonly=False)
     state = fields.Selection([
         ('draft', 'To Submit'),
         ('verify', 'Verified'),
@@ -139,6 +139,12 @@ class HrLoan(models.Model):
         res = super(HrLoan, self).create(vals_list)
         return res
         
+    def unlink(self):
+        for loan in self:
+            if loan.state not in ('draft', 'cancel'):
+                raise UserError(
+                    'You cannot delete a loan which is not in draft or cancelled state')
+        return super(HrLoan, self).unlink()
 
     # ------------------------------------------------
     # -------------- Methods -------------------------
@@ -198,10 +204,12 @@ class HrLoan(models.Model):
                 'state':'draft'
             })
     def action_confirm(self):
-        for record in self:
-            record.write({
-                'state':'confirm'
-            })
+        #if self.filtered(lambda loan: loan.state != 'draft' or loan.state != 'verify'):
+        #    raise UserError(_('Request must be in Draft state ("To Submit") in order to confirm it.'))            
+        self.write({'state': 'confirm'})
+        self.activity_update()
+        return True
+        
     def action_refuse(self):
         template = self.env.ref('de_hr_loan.loan_reject_email_temp')
         template.send_mail(self.id, force_send=True)
@@ -214,22 +222,103 @@ class HrLoan(models.Model):
         self.write({'state': 'cancel'})
 
     def action_approve(self):
-        for data in self:
-            if not data.loan_lines:
-                raise ValidationError(_("Please Compute installment"))
-            else:
-                template = self.env.ref('de_hr_loan.loan_approve_email_temp')
-                template.send_mail(self.id, force_send=True)
-                self.write({'state': 'approve'})
-
-    def unlink(self):
         for loan in self:
-            if loan.state not in ('draft', 'cancel'):
-                raise UserError(
-                    'You cannot delete a loan which is not in draft or cancelled state')
-        return super(HrLoan, self).unlink()
+            if not loan.loan_lines:
+                raise ValidationError(_("Please Compute installment"))
+            
+            template = self.env.ref('de_hr_loan.loan_approval_mail')
+            template.send_mail(self.id, force_send=True)
+            self.write({'state': 'validate'})
+            self.message_post(
+                body=_(
+                    'Your Encashment Request for %(leave_type)s on %(date)s has been accepted',
+                    leave_type=self.loan_type_id.name,
+                    date=self.date
+                ),
+                partner_ids=self.employee_id.user_id.partner_id.ids)
+            self.activity_update()
 
+    def action_request_move_create(self):
+        if any(request.state != 'validate' for request in self):
+            raise UserError(_("You can only generate accounting entry for approved request(s)."))
 
+        if any(not request.journal_id for request in self):
+            raise UserError(_("Specify journal to generate accounting entries."))
+
+        if not self.employee_id.sudo().address_home_id:
+            raise UserError(_("The private address of the employee is required to post the accounting document. Please add it on the employee form."))
+
+        # Create a vendor bill
+        account_move_id = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.employee_id.sudo().address_home_id.id,
+            'journal_id': self.journal_id.id,
+            'invoice_date': fields.Date.today(),
+            'date': self.accounting_date or fields.Date.context_today(self),
+            'ref': self.name,
+            'currency_id': self.currency_id.id,
+            'invoice_line_ids': [
+                (0, 0, {
+                    'product_id': self.loan_type_id.product_id.id,
+                    'quantity': 1,
+                    'price_unit': self.loan_amount,
+                    'name': self.description or self.loan_type_id.product_id.display_name,
+                })
+            ],
+        })
+        
+        self.write({
+            'state': 'post',
+            'account_move_id': account_move_id.id
+        })
+
+        self.activity_update()
+        
+    def _get_responsible_for_approval(self):
+        self.ensure_one()
+        responsible = self.env.user
+        return responsible
+        
+    def activity_update(self):
+        to_clean, to_do = self.env['hr.loan'], self.env['hr.loan']
+        for loan in self:
+            note = _(
+                'New %(loan_type)s Encashment Request created by %(user)s',
+                loan_type=loan.loan_type_id.name,
+                user=loan.create_uid.name,
+            )
+            if loan.state == 'draft':
+                to_clean |= loan
+            elif loan.state == 'confirm':
+                loan.activity_schedule(
+                    'de_hr_loan.mail_act_loan_approval',
+                    note=note,
+                    user_id=loan.sudo()._get_responsible_for_approval().id or self.env.user.id)
+            elif loan.state == 'validate1':
+                loan.activity_feedback(['de_hr_loan.mail_act_loan_approval'])
+                loan.activity_schedule(
+                    'de_hr_loan.mail_act_loan_second_approval',
+                    note=note,
+                    user_id=loan.sudo()._get_responsible_for_approval().id or self.env.user.id)
+            elif loan.state == 'validate':
+                to_do |= loan
+            elif loan.state == 'refuse':
+                to_clean |= loan
+        if to_clean:
+            to_clean.activity_unlink(['de_hr_loan.mail_act_loan_approval', 'de_hr_loan.mail_act_loan_second_approval'])
+        if to_do:
+            to_do.activity_feedback(['de_hr_loan.mail_act_loan_approval', 'de_hr_loan.mail_act_loan_second_approval'])
+
+    def action_open_account_move(self):
+        self.ensure_one()
+        return {
+            'name': self.account_move_id.name,
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'views': [[False, "form"]],
+            'res_model': 'account.move',
+            'res_id': self.account_move_id.id,
+        }
 class InstallmentLine(models.Model):
     _name = "hr.loan.line"
     _description = "Installment Line"

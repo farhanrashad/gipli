@@ -10,5 +10,18 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <!-- Leave specific activities -->
+        <record id="mail_act_loan_approval" model="mail.activity.type">
+            <field name="name">Request Approval</field>
+            <field name="icon">fa-sun-o</field>
+            <field name="res_model">hr.loan</field>
+        </record>
+        <record id="mail_act_loan_second_approval" model="mail.activity.type">
+            <field name="name">Request Second Approve</field>
+            <field name="icon">fa-sun-o</field>
+            <field name="res_model">hr.loan</field>
+        </record>
+        
 	</data>
 </odoo>

@@ -32,6 +32,8 @@ class LoanType(models.Model):
     sequence_code = fields.Char(string="Code")
     sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
         copy=False, check_company=True)
+    product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
+
 
 
     @api.model_create_multi

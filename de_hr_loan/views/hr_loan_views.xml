@@ -30,14 +30,35 @@
                     <button name="action_confirm" type="object" string="Confirm" attrs="{'invisible':[('state','!=','draft')]}"/>
                     <button name="action_confirm" type="object" string="Confirm" class="oe_highlight"  attrs="{'invisible':[('state','!=','verify')]}"/>
 
+                    <button string="Approve" name="action_approve" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'confirm')]}"/>
+
+                    <button name="action_request_move_create"
+                            string="Post Journal Entries"
+                            type="object"
+                            data-hotkey="y"
+                            class="oe_highlight o_loan_post"
+                            attrs="{'invisible': [('state', '!=', 'validate')]}"
+                            groups="account.group_account_invoice"/>
+
+
+
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,verified,confirm,validate,post,done"/>
                 </header>
 
                 <sheet>
                     <field name="company_id" invisible="1" />
-                    <div class="oe_button_box" name="button_box">
-                    </div>
+                    <div name="button_box" class="oe_button_box">
+                            <button name="action_open_account_move"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                type="object"
+                                attrs="{'invisible': ['|', ('state', 'not in', ['post', 'done']), ('account_move_id', '=', False)]}" groups="account.group_account_invoice">
+                                Journal Entry
+                            </button>
+                            <field name="account_move_id" invisible="1"/>
+                            
+                        </div>
                     <div class="oe_title">
                         <span class="o_form_label" >Request for Loan </span>
                         <h1 class="d-flex">
@@ -70,6 +91,9 @@
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
                     </group>
+                    <group>
+                            <field name="description"/>
+                        </group>
                     <notebook>
                         <page string="Installments">
                             <field name="loan_lines">

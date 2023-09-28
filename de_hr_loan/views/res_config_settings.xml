@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="res_config_settings_view_form_inherit" model="ir.ui.view">
+        <field name="name">res_config_settings_view_form_inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="55"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Loan" string="Loan" data-key="de_hr_loan">
+                    <h2 id="notification_group_ids_container">Loan Management</h2>
+                    <div class="row mt16 o_settings_container" name="invoicing_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box" id="quantities_billed_vendor" title="This default value is applied to any new product created. This can be changed in the product detail form.">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label for="repayment_mode"/>
+                                <a href="https://www.odoo.com/documentation/16.0/applications/inventory_and_mrp/purchase/manage_deals/control_bills.html" title="Documentation" class="o_doc_link" target="_blank"/>
+                                <div class="text-muted">
+                                    Enable one of the repayment mode for employee loan disbursement
+                                </div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="repayment_mode" class="o_light_label" widget="radio"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>    
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'de_hr_loan'}</field>
+    </record>
+
+    <menuitem id="services_settings_menu" name="Settings" parent="menu_loan_config" action="settings_action" sequence="0"/>
+</odoo>
