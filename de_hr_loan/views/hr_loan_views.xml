@@ -23,12 +23,15 @@
         <field name="arch" type="xml">
             <form string="Loan Request">
                 <header>
-                    <button name="compute_installment" type="object" string="Compute Installment" class="oe_highlight"  attrs="{'invisible':[('state','in',('approve', 'refuse'))]}"/>
-                    <button name="action_submit" type="object" string="Submit" states="draft" class="oe_highlight"/>
-                    <button name="action_cancel" type="object" string="Cancel" states="draft" />
-                    <button name="action_approve" type="object" string="Approve" states="waiting_approval_1" class="oe_highlight" groups="hr.group_hr_manager"/>
-                    <button name="action_refuse" type="object" string="Refuse" states="draft,waiting_approval_1" class="oe_highlight" groups="hr.group_hr_manager"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,validate,post,done"/>
+                    <button name="compute_installment" type="object" string="Compute Installment" class="oe_highlight"  attrs="{'invisible':[('state','!=','draft')]}"/>
+                    <button name="compute_installment" type="object" string="Compute Installment" attrs="{'invisible':[('state','!=','verify')]}"/>
+
+                    <button string="Mark as Draft" name="action_draft" type="object" attrs="{'invisible': [('state', 'not in', ['draft', 'verify'])]}"/>
+                    <button name="action_confirm" type="object" string="Confirm" attrs="{'invisible':[('state','!=','draft')]}"/>
+                    <button name="action_confirm" type="object" string="Confirm" class="oe_highlight"  attrs="{'invisible':[('state','!=','verify')]}"/>
+
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,verified,confirm,validate,post,done"/>
                 </header>
 
                 <sheet>
@@ -44,6 +47,8 @@
                     <group >
                         <group>
                             <field name="employee_id" context="{'default_company_id': company_id}" widget="many2one_avatar_employee"/>
+                            <field name="loan_type_id" force_save="1" options="{'no_create': True, 'no_open': True}"/>
+
                             <field name="date"/>
                             <div class="o_td_label">
                                 <label for="loan_amount" string="Amount" />
@@ -53,17 +58,17 @@
                                 <span class="ml8" ><field name="currency_id" nolabel="1" style="width: 8rem;" /></span>
                             </div>
                             <field name="installment"/>
+                            <field name="date_start" />
                         </group>
                         <group>
+                            <field name="accounting_date" groups="account.group_account_invoice,account.group_account_readonly" />
+                            <field name="journal_id" groups="account.group_account_invoice,account.group_account_readonly" options="{'no_open': True, 'no_create': True}" context="{'default_company_id': company_id}"/>
+                             <field name="address_id" invisible="1" context="{'default_company_id': company_id}"/>
+                            <field name="account_move_id" invisible="1" />
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
-                        
-                        <field name="department_id"/>
-                        <field name="job_position"/>
-                        <field name="loan_amount" attrs="{'readonly':[('state','=','approve')]}"/>
-                        <field name="installment" attrs="{'readonly':[('state','=','approve')]}"/>
-                        <field name="payment_date" attrs="{'readonly':[('state','=','approve')]}"/>
-                        <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
-                        <field name="currency_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                     </group>
                     <notebook>
                         <page string="Installments">
