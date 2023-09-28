@@ -11,15 +11,16 @@
     'company': 'www.dynexcel.co',
     'maintainer': 'Yasir Ali',
     'website': "https://www.odynexcel.com",
-    'depends': [
-        'base', 'hr', 'account'
-    ],
+    'depends': ['base', 'hr', 'account'],
     'data': [
-        'security/ir.model.access.csv',
         'security/security.xml',
-        'views/hr_loan_seq.xml',
-        'data/loan_approve_email_temp.xml',
+        'security/ir.model.access.csv',
+        'data/loan_data.xml',
+        #'views/hr_loan_seq.xml',
+        #'data/loan_approve_email_temp.xml',
+        'views/hr_loan_type_views.xml',
         'views/hr_loan.xml',
+        'views/hr_loan_views.xml',
     ],
     'images': ['static/description/banner.png'],
     'license': 'OPL-1',

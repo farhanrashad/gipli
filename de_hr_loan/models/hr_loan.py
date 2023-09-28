@@ -1,14 +1,41 @@
-from odoo import models, fields, api, _
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from odoo.exceptions import ValidationError, UserError
+# -*- coding: utf-8 -*-
+from odoo import fields, models, api, _
+from odoo.exceptions import AccessError, UserError, ValidationError
+from datetime import datetime, timedelta, time
+from pytz import timezone, UTC
+from odoo.tools import date_utils
+from odoo.addons.base.models.res_partner import _tz_get
 
 
 class HrLoan(models.Model):
     _name = 'hr.loan'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
     _description = "Loan Request"
+    _order = 'id desc'
 
+    @api.model
+    def _default_employee_id(self):
+        return self.env.user.employee_id
+
+    def _get_employee_id_domain(self):
+        res = [('id', '=', 0)] # Nothing accepted by domain, by default
+        if self.user_has_groups('de_hr_loan.group_loan_user') or self.user_has_groups('account.group_account_user'):
+            res = "['|', ('company_id', '=', False), ('company_id', '=', company_id)]"  # Then, domain accepts everything
+        elif self.user_has_groups('de_hr_loan.group_loan_manager') and self.env.user.employee_ids:
+            user = self.env.user
+            employee = self.env.user.employee_id
+            res = [
+                '|', '|', '|',
+                ('department_id.manager_id', '=', employee.id),
+                ('parent_id', '=', employee.id),
+                ('id', '=', employee.id),
+                '|', ('company_id', '=', False), ('company_id', '=', employee.company_id.id),
+            ]
+        elif self.env.user.employee_id:
+            employee = self.env.user.employee_id
+            res = [('id', '=', employee.id), '|', ('company_id', '=', False), ('company_id', '=', employee.company_id.id)]
+        return res
+        
     @api.model
     def default_get(self, field_list):
         result = super(HrLoan, self).default_get(field_list)
@@ -30,21 +57,31 @@ class HrLoan(models.Model):
             loan.balance_amount = balance_amount
             loan.total_paid_amount = total_paid
 
-    name = fields.Char(string="Loan Name", default="/", readonly=True, help="Name of the loan")
+    READONLY_STATES = {
+        'confirm': [('readonly', True)],
+        'refuse': [('readonly', True)],
+        'validate': [('readonly', True)],
+        'validate1': [('readonly', True)],
+        'post': [('readonly', True)],
+        'done': [('readonly', True)],
+    }
+    
+    name = fields.Char('Loan Reference', required=True, index='trigram', copy=False, default='New')
     date = fields.Date(string="Date", default=fields.Date.today(), readonly=True, help="Date")
-    employee_id = fields.Many2one('hr.employee', string="Employee", required=True, help="Employee")
+    employee_id = fields.Many2one('hr.employee', string="Employee", required=True, readonly=False, tracking=True,
+                                  states=READONLY_STATES, default=_default_employee_id, check_company=True, 
+                                  domain=lambda self: self.env['hr.loan']._get_employee_id_domain())
     department_id = fields.Many2one('hr.department', related="employee_id.department_id", readonly=True,
                                     string="Department", help="Employee")
+    company_id = fields.Many2one(related='employee_id.company_id', readonly=True, store=True)
+    currency_id = fields.Many2one('res.currency', string='Currency',                               
+                                  compute='_compute_currency_id', store=True, readonly=True)
+
     installment = fields.Integer(string="No Of Installments", default=1, help="Number of installments")
     payment_date = fields.Date(string="Payment Start Date", required=True, default=fields.Date.today(), help="Date of "
                                                                                                              "the "
                                                                                                              "paymemt")
     loan_lines = fields.One2many('hr.loan.line', 'loan_id', string="Loan Line", index=True)
-    company_id = fields.Many2one('res.company', 'Company', readonly=True, help="Company",
-                                 default=lambda self: self.env.user.company_id,
-                                 states={'draft': [('readonly', False)]})
-    currency_id = fields.Many2one('res.currency', string='Currency', required=True, help="Currency",
-                                  default=lambda self: self.env.user.company_id.currency_id)
     job_position = fields.Many2one('hr.job', related="employee_id.job_id", readonly=True, string="Job Position",
                                    help="Job position")
     loan_amount = fields.Float(string="Loan Amount", required=True, help="Loan amount")
@@ -56,25 +93,48 @@ class HrLoan(models.Model):
                                      help="Total paid amount")
 
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('waiting_approval_1', 'Submitted'),
-        ('approve', 'Approved'),
+        ('draft', 'To Submit'),
+        ('confirm', 'To Approve'),
         ('refuse', 'Refused'),
-        ('cancel', 'Canceled'),
-    ], string="State", default='draft', tracking=True, copy=False, )
+        ('validate1', 'Second Approval'),
+        ('validate', 'Approved'),
+        ('post', 'Posted'),
+        ('done', 'Done'),
+        ], string='Status', default='draft',compute='_compute_state', store=True, tracking=True, copy=False, readonly=False,
+        help="The status is set to 'To Submit', when a time off request is created." +
+        "\nThe status is 'To Approve', when request is confirmed by user." +
+        "\nThe status is 'Refused', when request is refused by manager." +
+        "\nThe status is 'Approved', when request is approved by manager.")
 
-    @api.model
-    def create(self, values):
-        loan_count = self.env['hr.loan'].search_count(
-            [('employee_id', '=', values['employee_id']), ('state', '=', 'approve'),
-             ('balance_amount', '!=', 0)])
-        if loan_count:
-            raise ValidationError(_("The employee has already a pending installment"))
-        else:
-            values['name'] = self.env['ir.sequence'].get('hr.loan.seq') or ' '
-            res = super(HrLoan, self).create(values)
-            return res
 
+    # ------------------------------------------------
+    # ----------- Operations -------------------------
+    # ------------------------------------------------
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.loan') or _('New')
+        res = super(HrLoan, self).create(vals_list)
+        return res
+        
+
+    # ------------------------------------------------
+    # -------------- Methods -------------------------
+    # ------------------------------------------------
+    def _compute_state(self):
+        for leave in self:
+            if leave.account_move_id.payment_state in ('paid','in_payment'):
+                leave.state = 'done'
+            elif not leave.state:
+                leave.state = 'draft'
+
+    @api.depends('company_id.currency_id')
+    def _compute_currency_id(self):
+        for record in self:
+            if not record.currency_id or record.state not in {'post', 'done', 'refuse'}:
+                record.currency_id = record.company_id.currency_id
+                
     def compute_installment(self):
         """This automatically create the installment the employee need to pay to
         company based on payment start date and the no of installments.
