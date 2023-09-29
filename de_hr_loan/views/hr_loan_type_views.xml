@@ -39,18 +39,23 @@
                             <group>
                                 <group string="Based On">
                                     <field name="calculation_type" class="o_light_label" widget="radio"/>
-                                    <field name="fixed_amount" attrs="{'invisible': [('calculation_type', '!=', 'fix')]}"/>
-                                    <field name="amount_per" attrs="{'invisible': [('calculation_type', '!=', 'percent')]}"/>
+                                    <field name="fixed_amount" attrs="{'invisible': [('calculation_type', '!=', 'fix')],'required': [('calculation_type', '=', 'fix')]}"/>
+                                    <field name="calculation_field_id" attrs="{'invisible': [('calculation_type', '!=', 'percent')]}"/>
+                                    <field name="amount_per" attrs="{'invisible': [('calculation_type', '!=', 'percent')],'required': [('calculation_type', '=', 'percent')]}"/>
                                 </group>
                                 <group>
                                     <field name="submission_condition" widget="radio"/>
                                     <field name="frequency" />
+                                    <field name="fixed_installment"/>
+                                    <field name="no_of_installment" attrs="{'invisible': [('fixed_installment', '=', False)], 'required': [('fixed_installment', '=', True)]}"/>
+
 
                                 </group>
                             </group>
                             <group>
                                 <group string="Disbursement">
-                                    <field name="repayment_mode" class="o_light_label" widget="radio"/>
+                                    <field name="repayment_mode" class="o_light_label" />
+                                    <field name="prepayment_credit_memo"  attrs="{'invisible': [('repayment_mode', '!=', 'credit_memo')]}"/>
                                 </group>
                             </group>
                             

@@ -34,23 +34,34 @@ class LoanType(models.Model):
         copy=False, check_company=True)
 
     repayment_mode = fields.Selection([
-        ('credit_memo', 'By Credit Memo'),
-        ('payslip', 'By Payslip'),
+        ('credit_memo', 'Credit Memo'),
+        ('payslip', 'Payslip'),
         ('none', 'None'),
     ], string='Re-Payment Mode', required=True, default='credit_memo')
+    prepayment_credit_memo = fields.Boolean(string='Is Prepayment')
+    
     product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
 
     request_to_validate_count = fields.Integer("Number of requests to validate", compute="_compute_request_to_validate_count")
 
     # Loan Rules
     calculation_type = fields.Selection([
-        ('fix', 'Fixed Amount'),
-        ('percent', 'Wage Percentage'),
+        ('fix', 'Fixed'),
+        ('percent', 'Percentage'),
     ], string='Calculation Type', required=True, default='fix')
 
     fixed_amount = fields.Float(string="Fixed Amount")
+    calculation_field_id = fields.Many2one(
+        'ir.model.fields',
+        string='Calculation Field',
+        domain=[
+            ('model', '=', 'hr.contract'),
+            ('ttype', 'in', ['float', 'monetary']),
+        ],
+        required=True,
+        ondelete='cascade',
+    )
     amount_per = fields.Float(string="Percentage (%)")
-
     submission_condition = fields.Selection(
         [
             ('active_same_type', 'Allow in same type'),
@@ -71,14 +82,10 @@ class LoanType(models.Model):
         ],
         string="Frequency", required=True, default='no_limit',
         help="Select the frequency to allow submissions."
-    )
+    )    
 
-    # Settlment Rule
-    method_disburse = fields.Selection(
-        string="Disburse Method",
-        selection=[],
-    )
-    
+    fixed_installment = fields.Boolean(string='Fixed Installment')
+    no_of_installment = fields.Integer(string='No. of Installments', required=False)
 
     loan_type_document_ids = fields.One2many('hr.loan.type.document', 'loan_type_id', string='Documents')
 

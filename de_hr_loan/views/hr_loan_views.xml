@@ -78,7 +78,8 @@
                                 <field name="loan_amount" nolabel="1" style="width: 8rem;" />
                                 <span class="ml8" ><field name="currency_id" nolabel="1" style="width: 8rem;" /></span>
                             </div>
-                            <field name="installment"/>
+                            <field name="fixed_installment" invisible="1" />
+                            <field name="installment" attrs="{'readonly': [('fixed_installment', '!=', False)]}"/>
                             <field name="date_start" />
                         </group>
                         <group>
@@ -100,7 +101,10 @@
                                 <tree string="Installments" editable="bottom">
                                     <field name="date"/>
                                     <field name="amount"/>
-                                    <field name="paid" readonly="1" invisible="1"/>
+                                    <field name="state" readonly="1" />
+                                    <field name="res_id" invisible="1"/>
+                                    <field name="model" invisible="1" />
+                                    <field name="res_name" optional="hide"/>
                                 </tree>
                             </field>
                             <group class="oe_subtotal_footer oe_right" colspan="2" >
@@ -113,7 +117,8 @@
                         <page string="Documents" name="loan_documents">
                             <field name="loan_document_ids" >
                                 <tree string="loan Documents" editable="bottom" create="false" edit="false" delete="false">
-                                    <field name="name" readonly="1"/>
+                                    <field name="name" readonly="1" invisible="1"/>
+                                    <field name="doc_desc" readonly="1" required="1" />
                                     <field name="attachment" attrs="{'required': [('is_mandatory', '=', True)]}" widget="binary" filename="name"/>
                                     <field name="loan_id" invisible="1"/>
                                     <field name="is_mandatory" invisible="1"/>

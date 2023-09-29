@@ -56,8 +56,7 @@ class HrLoan(models.Model):
         total_paid = 0.0
         for loan in self:
             for line in loan.loan_lines:
-                if line.paid:
-                    total_paid += line.amount
+                total_paid += line.amount
             balance_amount = loan.loan_amount - total_paid
             loan.total_amount = loan.loan_amount
             loan.balance_amount = balance_amount
@@ -83,9 +82,14 @@ class HrLoan(models.Model):
     company_id = fields.Many2one(related='employee_id.company_id', readonly=True, store=True)
     currency_id = fields.Many2one('res.currency', string='Currency',                               
                                   compute='_compute_currency_id', store=True, readonly=True)
+
+    fixed_installment = fields.Boolean(string='Fixed Installment', compute='_compute_installment_from_loan_type')
     loan_amount = fields.Float(string="Loan Amount", required=True, help="Loan amount",states=READONLY_STATES,)
-    installment = fields.Integer(string="No Of Installments", default=1, help="Number of installments", states=READONLY_STATES,)
-    date_start = fields.Date(string="Loan Start Date", required=True, default=fields.Date.today(), 
+    installment = fields.Integer(string="No Of Installments", default=1, states=READONLY_STATES,
+                                 store=True, compute='_compute_installment_from_loan_type',
+                                 help="Number of installments", )
+    date_start = fields.Date(string="Loan Start Date", required=True, store=True, readonly=False,
+                             compute='_compute_date_start',
                                help="Date of Start", states=READONLY_STATES,)
     department_id = fields.Many2one('hr.department', string='Department', compute='_compute_from_employee_id', store=True)
     job_id = fields.Many2one('hr.job', string='Job', compute='_compute_from_employee_id')
@@ -163,12 +167,30 @@ class HrLoan(models.Model):
         for record in self:
             if not record.currency_id or record.state not in {'post', 'done', 'refuse'}:
                 record.currency_id = record.company_id.currency_id
+
+    @api.depends('loan_type_id','date')
+    def _compute_date_start(self):
+        for loan in self:
+            loan.date_start = datetime.strptime(str(loan.date), '%Y-%m-%d') + relativedelta(months=1)
+        
+    @api.depends('loan_type_id')
+    def _compute_installment_from_loan_type(self):
+        for loan in self:
+            loan.fixed_installment = loan.loan_type_id.fixed_installment
+            if loan.loan_type_id.fixed_installment:
+                if loan.loan_type_id.no_of_installment > 0:
+                    loan.installment = loan.loan_type_id.no_of_installment
+                else:
+                    loan.installment = 1
                 
     def compute_installment(self):
         """This automatically create the installment the employee need to pay to
         company based on payment start date and the no of installments.
             """
         for loan in self:
+            if loan.loan_amount <= 0:
+                raise UserError(_('Loan amount must be greater than 0 in order to process it.'))
+
             loan.loan_lines.unlink()
             date_start = datetime.strptime(str(loan.date_start), '%Y-%m-%d')
             amount = loan.loan_amount / loan.installment
@@ -204,6 +226,7 @@ class HrLoan(models.Model):
             for doc in document_ids:
                 vals = {
                     'name': doc.name,
+                    'doc_desc': doc.name,
                     'is_mandatory': doc.is_mandatory,
                     'loan_id': self.id,
                 }
@@ -280,13 +303,43 @@ class HrLoan(models.Model):
                 })
             ],
         })
-        
+        self._create_credit_memo()
         self.write({
             'state': 'post',
             'account_move_id': account_move_id.id
         })
 
         self.activity_update()
+        
+    def _create_credit_memo(self):
+        if self.loan_type_id.repayment_mode == 'credit_memo' and self.loan_type_id.prepayment_credit_memo:
+            for line in self.loan_lines:
+                # Create credit memo
+                account_move_id = self.env['account.move'].create({
+                    'move_type': 'in_refund',
+                    'partner_id': self.employee_id.sudo().address_home_id.id,
+                    'journal_id': self.journal_id.id,
+                    'invoice_date': fields.Date.today(),
+                    'invoice_date_due': line.date,
+                    'date': line.date,
+                    'ref': line.loan_id.name + '/' + line.date.strftime("%b") + '/' + line.date.strftime("%Y"),
+                    'currency_id': self.currency_id.id,
+                    'invoice_line_ids': [
+                        (0, 0, {
+                            'product_id': self.loan_type_id.product_id.id,
+                            'quantity': 1,
+                            'price_unit': line.amount,
+                            'name': self.loan_type_id.product_id.display_name,
+                        })
+                    ],
+                })
+                account_move_id.action_post()
+                line.write({
+                    'state': 'pending',
+                    'res_id': account_move_id.id,
+                    'model': 'account.move',
+                    'res_name': account_move_id.name,
+                })
         
     def _get_responsible_for_approval(self):
         self.ensure_one()
@@ -337,12 +390,21 @@ class InstallmentLine(models.Model):
     _name = "hr.loan.line"
     _description = "Installment Line"
 
-    date = fields.Date(string="Payment Date", required=True, help="Date of the payment")
+    date = fields.Date(string="Due On", required=True, help="Due Date")
     employee_id = fields.Many2one('hr.employee', string="Employee", help="Employee")
     amount = fields.Float(string="Amount", required=True, help="Amount")
-    paid = fields.Boolean(string="Paid", help="Paid")
     loan_id = fields.Many2one('hr.loan', string="Loan Ref.", help="Loan")
-    payslip_id = fields.Many2one('hr.payslip', string="Payslip Ref.", help="Payslip")
+    state = fields.Selection([
+        ('draft', 'Open'),
+        ('pending', 'Pending'),
+        ('close', 'Close'),
+        ], string='Status', default='draft',store=True, tracking=True, copy=False, readonly=False,
+        help="The status is set to 'draft', when an installment is created." +
+        "\nThe status is 'pending', when subsequent disbursement document is created." +
+        "\nThe status is 'close', when subsequent disbursment document is posted.")
+    res_id = fields.Integer(string="Related Document ID", readonly=True)
+    model = fields.Char(string="Related Document Model", readonly=True)
+    res_name = fields.Char(string="Reference", readonly=True)
 
 
 class HrLoanDocuments(models.Model):
@@ -350,6 +412,7 @@ class HrLoanDocuments(models.Model):
     _description = 'Loan Documents'
 
     name = fields.Char(string='Document Name', readonly=True)
+    doc_desc = fields.Char(string="Document")
     is_mandatory = fields.Boolean(string='Is Mandatory', default=False, readonly=True)
     attachment = fields.Binary(string='Attachment', attachment=True)
     loan_id = fields.Many2one('hr.loan', string='Loan', ondelete='cascade')
