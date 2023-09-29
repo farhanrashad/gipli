@@ -32,10 +32,23 @@ class LoanType(models.Model):
     sequence_code = fields.Char(string="Code")
     sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
         copy=False, check_company=True)
+
+    repayment_mode = fields.Selection([
+        ('credit_memo', 'By Credit Memo'),
+        ('payslip', 'By Payslip')
+    ], string='Re-Payment Mode', required=True, default='credit_memo')
     product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
 
+    request_to_validate_count = fields.Integer("Number of requests to validate", compute="_compute_request_to_validate_count")
 
+    def _compute_request_to_validate_count(self):
+        domain = [('state', '=', 'confirm')]
+        requests_data = self.env['hr.loan']._read_group(domain, ['loan_type_id'], ['loan_type_id'])
+        requests_mapped_data = dict((data['loan_type_id'][0], data['loan_type_id_count']) for data in requests_data)
+        for type in self:
+            type.request_to_validate_count = requests_mapped_data.get(type.id, 0)
 
+            
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -68,3 +81,21 @@ class LoanType(models.Model):
                 if loan_type.sequence_id:
                     loan_type.sequence_id.company_id = vals.get('company_id')
         return super().write(vals)
+
+
+    def create_request(self):
+        self.ensure_one()
+        # If category uses sequence, set next sequence as name
+        # (if not, set category name as default name).
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "hr.loan",
+            "views": [[False, "form"]],
+            "context": {
+                'form_view_initial_mode': 'edit',
+                'default_name': _('New') if self.automated_sequence else self.name,
+                'default_loan_type_id': self.id,
+                #'default_request_owner_id': self.env.user.id,
+                'default_request_status': 'draft'
+            },
+        }

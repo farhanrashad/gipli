@@ -10,22 +10,35 @@
             <xpath expr="//div[hasclass('settings')]" position="inside">
                 <div class="app_settings_block" data-string="Loan" string="Loan" data-key="de_hr_loan">
                     <h2 id="notification_group_ids_container">Loan Management</h2>
-                    <div class="row mt16 o_settings_container" name="invoicing_settings_container">
-                        <div class="col-12 col-lg-6 o_setting_box" id="quantities_billed_vendor" title="This default value is applied to any new product created. This can be changed in the product detail form.">
+                    <div class="row mt16 o_settings_container" name="loan_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box" id="repayment_mode" title="This default value is applied to any loan type created. This can be changed in the loan type form.">
                             <div class="o_setting_left_pane"/>
                             <div class="o_setting_right_pane">
-                                <label for="repayment_mode"/>
-                                <a href="https://www.odoo.com/documentation/16.0/applications/inventory_and_mrp/purchase/manage_deals/control_bills.html" title="Documentation" class="o_doc_link" target="_blank"/>
+                                <label for="default_repayment_mode"/>
+                                <a href="https://dynexcel.com/knowledge-base/documentation/odoo/loan-management/" title="Documentation" class="o_doc_link" target="_blank"/>
                                 <div class="text-muted">
                                     Enable one of the repayment mode for employee loan disbursement
                                 </div>
                                 <div class="content-group">
                                     <div class="mt16">
-                                        <field name="repayment_mode" class="o_light_label" widget="radio"/>
+                                        <field name="default_repayment_mode" class="o_light_label" widget="radio"/>
                                     </div>
                                 </div>
                             </div>
-                        </div>    
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box" id="down_payments">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Down Payments</span>
+                                <a href="https://dynexcel.com/knowledge-base/documentation/odoo/loan-management/" title="Documentation" class="o_doc_link" target="_blank"/>
+                                <div class="text-muted">
+                                    Product used for loan payments
+                                </div>
+                                <div class="text-muted">
+                                    <field name="default_repayment_product_id"  options="{'no_create': True}" context="{'default_detailed_type': 'service'}"/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </xpath>

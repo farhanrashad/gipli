@@ -16,17 +16,24 @@
                         <h1>
                             <field name="name" placeholder="e.g. Personal Loan"/>
                         </h1>
+                        <h3>
+                            <field name="description" placeholder="Describe the loan"/>
+                        </h3>
                     </div>
                     <group>
-                        <field name="description"/>
-                        <field name="automated_sequence"/>
-                        <field name="sequence_code" attrs="{
-                            'invisible': [('automated_sequence', '=', False)],
-                            'required': [('automated_sequence', '=', True)],
-                        }"/>
-                        <field name="sequence_id" invisible="1" readonly="1"/>
-                        <field name="product_id" options="{'no_create': True}" />
-                        <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/> 
+                        <group>
+                            <field name="automated_sequence"/>
+                            <field name="sequence_code" attrs="{
+                                'invisible': [('automated_sequence', '=', False)],
+                                'required': [('automated_sequence', '=', True)],
+                            }"/>
+                            <field name="sequence_id" invisible="1" readonly="1"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/> 
+                        </group>
+                        <group string="Loan Accounting">
+                            <field name="product_id" options="{'no_create': True}" />
+                            <field name="repayment_mode" class="o_light_label" widget="radio"/>
+                        </group>
                     </group>
                     
                 </sheet>
