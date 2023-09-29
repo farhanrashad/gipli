@@ -349,8 +349,40 @@ class HrLoanDocuments(models.Model):
     _name = 'hr.loan.document'
     _description = 'Loan Documents'
 
-    name = fields.Char(string='Document Name', required=True)
-    is_mandatory = fields.Boolean(string='Is Mandatory', default=False)
+    name = fields.Char(string='Document Name', readonly=True)
+    is_mandatory = fields.Boolean(string='Is Mandatory', default=False, readonly=True)
     attachment = fields.Binary(string='Attachment', attachment=True)
     loan_id = fields.Many2one('hr.loan', string='Loan', ondelete='cascade')
+
+    def _message_post_attach_document(self, document, message):
+        attachment = document.attachment
+        if attachment:
+            # Create an attachment record linked to the message
+            attachment_data = {
+                'name': document.name,
+                'res_model': 'mail.message',
+                'res_id': message.id,
+                'datas': attachment,
+            }
+            self.env['ir.attachment'].create(attachment_data)
+
+    @api.model
+    def create(self, vals):
+        document = super(HrLoanDocuments, self).create(vals)
+
+        # Create a message and attach the document to it
+        if document.attachment:
+            loan_message = document.loan_id.message_post(
+                body="Document Attached: %s" % document.name,
+                attachment_ids=[],
+                subtype_id=self.env['mail.message.subtype'].search([('name', '=', 'Note')]).id,
+            )
+            self._message_post_attach_document(document, loan_message)
+
+        return document
+
+
+
+
+
 
