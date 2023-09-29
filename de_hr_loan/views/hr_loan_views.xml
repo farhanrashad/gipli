@@ -95,7 +95,7 @@
                             <field name="description"/>
                         </group>
                     <notebook>
-                        <page string="Installments">
+                        <page string="Installments" name="loan_installment">
                             <field name="loan_lines">
                                 <tree string="Installments" editable="bottom">
                                     <field name="date"/>
@@ -109,6 +109,16 @@
                                 <field name="balance_amount" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
                             <div class="oe_clear"/>
+                        </page>
+                        <page string="Documents" name="loan_documents">
+                            <field name="loan_document_ids" >
+                                <tree string="loan Documents" editable="bottom">
+                                    <field name="name" />
+                                    <field name="attachment" attrs="{'required': [('is_mandatory', '=', True)]}" widget="binary" filename="name"/>
+                                    <field name="loan_id" invisible="1"/>
+                                    <field name="is_mandatory" invisible="1"/>
+                                </tree>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
@@ -178,22 +188,4 @@
         <field name="view_id" eval="hr_loan_tree_view"/>
     </record>
 
-
-    <!-- HR employee inherit Loans -->
-    <record id="view_employee_form_loan_inherit" model="ir.ui.view">
-        <field name="name">hr.employee.loan.form.inherit</field>
-        <field name="model">hr.employee</field>
-        <field name="inherit_id" ref="hr.view_employee_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="%(act_hr_employee_loan_request)d"
-                    type="action"
-                    class="oe_stat_button"
-                    icon="fa-calendar"
-                    groups="hr.group_hr_manager,hr.group_hr_user">
-                    <field name="loan_count" widget="statinfo" string="Loans"/>
-                </button>
-            </xpath>
-        </field>
-    </record>
 </odoo>

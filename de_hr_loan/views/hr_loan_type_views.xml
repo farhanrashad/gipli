@@ -28,14 +28,42 @@
                                 'required': [('automated_sequence', '=', True)],
                             }"/>
                             <field name="sequence_id" invisible="1" readonly="1"/>
-                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/> 
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
                         <group string="Loan Accounting">
                             <field name="product_id" options="{'no_create': True}" />
-                            <field name="repayment_mode" class="o_light_label" widget="radio"/>
                         </group>
                     </group>
-                    
+                    <notebook>
+                        <page string="Rules" name="loan_rule">
+                            <group>
+                                <group string="Based On">
+                                    <field name="calculation_type" class="o_light_label" widget="radio"/>
+                                    <field name="fixed_amount" attrs="{'invisible': [('calculation_type', '!=', 'fix')]}"/>
+                                    <field name="amount_per" attrs="{'invisible': [('calculation_type', '!=', 'percent')]}"/>
+                                </group>
+                                <group>
+                                    <field name="submission_condition" widget="radio"/>
+                                    <field name="frequency" />
+
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Disbursement">
+                                    <field name="repayment_mode" class="o_light_label" widget="radio"/>
+                                </group>
+                            </group>
+                            
+                        </page>
+                        <page string="Documents">
+                            <field name="loan_type_document_ids" >
+                                <tree string="Stock Moves" editable="bottom">
+                                    <field name="name" />
+                                    <field name="is_mandatory" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -73,7 +101,7 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem name="Type"
+    <menuitem name="Loan Type"
         parent="menu_loan_config"
         id="menu_hr_loan_type"
         sequence="20"

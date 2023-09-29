@@ -128,16 +128,18 @@ class HrLoan(models.Model):
         "\nThe status is 'Approved', when request is approved by manager.")
 
 
+    loan_document_ids = fields.One2many('hr.loan.document', 'loan_id', string='Documents')
+
     # ------------------------------------------------
     # ----------- Operations -------------------------
     # ------------------------------------------------
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('hr.loan') or _('New')
-        res = super(HrLoan, self).create(vals_list)
-        return res
+            category = 'loan_type_id' in vals and self.env['hr.loan.type'].browse(vals['loan_type_id'])
+            if category and category.automated_sequence:
+                vals['name'] = category.sequence_id.next_by_id()
+        return super().create(vals_list)
         
     def unlink(self):
         for loan in self:
@@ -195,6 +197,18 @@ class HrLoan(models.Model):
             record.department_id = record.employee_id.sudo().department_id
             record.job_id = record.employee_id.sudo().job_id
 
+    @api.onchange('loan_type_id')
+    def generate_loan_documents(self):
+        if self.loan_type_id:
+            document_ids = self.env['hr.loan.type.document'].search([('loan_type_id','=',self.loan_type_id.id)])
+            for doc in document_ids:
+                vals = {
+                    'name': doc.name,
+                    'is_mandatory': doc.is_mandatory,
+                    'loan_id': self.id,
+                }
+                self.env['hr.loan.document'].create(vals)
+            
     # ------------------------------------------------
     # -------------- Action Buttons ------------------
     # ------------------------------------------------
@@ -331,12 +345,12 @@ class InstallmentLine(models.Model):
     payslip_id = fields.Many2one('hr.payslip', string="Payslip Ref.", help="Payslip")
 
 
-class HrEmployee(models.Model):
-    _inherit = "hr.employee"
+class HrLoanDocuments(models.Model):
+    _name = 'hr.loan.document'
+    _description = 'Loan Documents'
 
-    def _compute_employee_loans(self):
-        """This compute the loan amount and total loans count of an employee.
-            """
-        self.loan_count = self.env['hr.loan'].search_count([('employee_id', '=', self.id)])
+    name = fields.Char(string='Document Name', required=True)
+    is_mandatory = fields.Boolean(string='Is Mandatory', default=False)
+    attachment = fields.Binary(string='Attachment', attachment=True)
+    loan_id = fields.Many2one('hr.loan', string='Loan', ondelete='cascade')
 
-    loan_count = fields.Integer(string="Loan Count", compute='_compute_employee_loans')

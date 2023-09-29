@@ -35,11 +35,59 @@ class LoanType(models.Model):
 
     repayment_mode = fields.Selection([
         ('credit_memo', 'By Credit Memo'),
-        ('payslip', 'By Payslip')
+        ('payslip', 'By Payslip'),
+        ('none', 'None'),
     ], string='Re-Payment Mode', required=True, default='credit_memo')
     product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
 
     request_to_validate_count = fields.Integer("Number of requests to validate", compute="_compute_request_to_validate_count")
+
+    # Loan Rules
+    calculation_type = fields.Selection([
+        ('fix', 'Fixed Amount'),
+        ('percent', 'Wage Percentage'),
+    ], string='Calculation Type', required=True, default='fix')
+
+    fixed_amount = fields.Float(string="Fixed Amount")
+    amount_per = fields.Float(string="Percentage (%)")
+
+    submission_condition = fields.Selection(
+        [
+            ('active_same_type', 'Allow in same type'),
+            ('active_any_type', 'Allow in any type'),
+            ('no_duplicate', 'No Duplicate Submission')
+        ],
+        string="Loan Submission Condition", 
+        default='no_duplicate',
+        help="Select the condition for allowing loan submissions."
+    )
+    frequency = fields.Selection(
+        [
+            ('monthly', 'Monthly'),
+            ('quarterly', 'Quarterly'),
+            ('half_yearly', 'Half Yearly'),
+            ('yearly', 'Yearly'),
+            ('no_limit', 'No Limit')
+        ],
+        string="Frequency", required=True, default='no_limit',
+        help="Select the frequency to allow submissions."
+    )
+
+    # Settlment Rule
+    method_disburse = fields.Selection(
+        string="Disburse Method",
+        selection=[],
+    )
+    
+
+    loan_type_document_ids = fields.One2many('hr.loan.type.document', 'loan_type_id', string='Documents')
+
+    @api.constrains('amount_per')
+    def _check_percentage_value(self):
+        for record in self:
+            if record.calculation_type == 'percent' and (record.amount_per < 1 or record.amount_per > 100):
+                raise ValidationError("Percentage value must be between 1 and 100.")
+
 
     def _compute_request_to_validate_count(self):
         domain = [('state', '=', 'confirm')]
@@ -99,3 +147,12 @@ class LoanType(models.Model):
                 'default_request_status': 'draft'
             },
         }
+
+class LoanTypeDocument(models.Model):
+    _name = 'hr.loan.type.document'
+    _description = 'Loan Type Document'
+
+    name = fields.Char(string='Name', required=True)
+    is_mandatory = fields.Boolean(string='Is Mandatory', default=False)
+    loan_type_id = fields.Many2one('hr.loan.type', string='Loan Type', required=True)
+    

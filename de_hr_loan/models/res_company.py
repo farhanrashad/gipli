@@ -8,6 +8,7 @@ class Company(models.Model):
 
     default_repayment_mode = fields.Selection([
         ('credit_memo', 'By Credit Memo'),
-        ('payslip', 'By Payslip')
+        ('payslip', 'By Payslip'),
+        ('none', 'None'),
     ], string='Re-Payment Mode', required=True, default='credit_memo')
     default_repayment_product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")

@@ -2,8 +2,12 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 
 access_hr_loan_type_manager,access.hr.loan.type.manager,model_hr_loan_type,de_hr_loan.group_loan_manager,1,1,1,1
 
+access_hr_loan_type_document_manager,access.hr.loan.type.document.manager,model_hr_loan_type_document,de_hr_loan.group_loan_manager,1,1,1,1
+
 access_hr_loan_user,access.hr.loan.user,model_hr_loan,de_hr_loan.group_loan_user,1,1,1,0
 access_hr_loan_line_user,access.hr.loan.line.user,model_hr_loan_line,de_hr_loan.group_loan_user,1,1,1,0
+access_hr_loan_documents_user,access.hr.loan.documents.user,model_hr_loan_document,de_hr_loan.group_loan_user,1,1,1,0
 
 access_hr_loan_manager,access.hr.loan.manager,model_hr_loan,de_hr_loan.group_loan_user,1,1,1,1
 access_hr_loan_line_manager,access.hr.loan.line.manager,model_hr_loan_line,de_hr_loan.group_loan_user,1,1,1,1
+access_hr_loan_documents_manager,access.hr.loan.documents.manager,model_hr_loan_document,de_hr_loan.group_loan_user,1,1,1,1
