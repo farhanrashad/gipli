@@ -24,6 +24,7 @@
         'views/hr_loan_type_views.xml',
         'views/hr_loan_views.xml',
         'reports/report_loan_views.xml',
+        'wizard/report_loan_xlsx_wizard_views.xml',
     ],
     'images': ['static/description/banner.png'],
     'license': 'OPL-1',
