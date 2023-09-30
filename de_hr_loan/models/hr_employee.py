@@ -1,9 +1,11 @@
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
-    def _compute_employee_loans(self):
-        """This compute the loan amount and total loans count of an employee.
-            """
-        self.loan_count = self.env['hr.loan'].search_count([('employee_id', '=', self.id)])
+    def create_loan_reconcile_entry(self, loan_id, loan_line_id, account_move_id):
+        reconcile_record = self.env['hr.loan.reconcile'].create({
+            'loan_id': loan_id,
+            'loan_line_id': loan_line_id,
+            'account_move_id': account_move_id,
+        })
+        return reconcile_record
 
-    loan_count = fields.Integer(string="Loan Count", compute='_compute_employee_loans')

@@ -39,7 +39,15 @@
                             <group>
                                 <group string="Based On">
                                     <field name="calculation_type" class="o_light_label" widget="radio"/>
-                                    <field name="fixed_amount" attrs="{'invisible': [('calculation_type', '!=', 'fix')],'required': [('calculation_type', '=', 'fix')]}"/>
+
+                                    <div class="o_td_label" attrs="{'invisible': [('calculation_type', '!=', 'fix')]}">
+                                        <label for="fixed_amount" string="Amount" />
+                                    </div>
+                                    <div name="fixed_amount" attrs="{'invisible': [('calculation_type', '!=', 'fix')]}">
+                                        <field name="fixed_amount" nolabel="1" style="width: 8rem;" attrs="{'invisible': [('calculation_type', '!=', 'fix')],'required': [('calculation_type', '=', 'fix')]}"/>
+                                        <span class="ml8" ><field name="currency_id" nolabel="1" style="width: 8rem;" /></span>
+                                    </div>
+                                    
                                     <field name="calculation_field_id" attrs="{'invisible': [('calculation_type', '!=', 'percent')]}"/>
                                     <field name="amount_per" attrs="{'invisible': [('calculation_type', '!=', 'percent')],'required': [('calculation_type', '=', 'percent')]}"/>
                                 </group>

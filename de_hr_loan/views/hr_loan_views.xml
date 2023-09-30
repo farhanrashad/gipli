@@ -9,7 +9,7 @@
             <tree string="Loan Requests">
                 <field name="name"/>
                 <field name="employee_id"/>
-                <field name="loan_amount"/>
+                <field name="amount"/>
                 <field name="date"/>
                 <field name="state"/>
             </tree>
@@ -50,24 +50,30 @@
                 </header>
 
                 <sheet>
-                    <field name="company_id" invisible="1" />
                     <div name="button_box" class="oe_button_box">
                             <button name="action_open_account_move"
                                 class="oe_stat_button"
                                 icon="fa-file-text-o"
                                 type="object"
-                                attrs="{'invisible': ['|', ('state', 'not in', ['post', 'done']), ('account_move_id', '=', False)]}" groups="account.group_account_invoice">
+                                attrs="{'invisible': [('account_move_id', '=', False)]}"
+                                groups="account.group_account_invoice">
                                 Journal Entry
                             </button>
-                            <field name="account_move_id" invisible="1"/>
+                            
                             
                     </div>
                     <!-- Payment status for invoices / receipts -->
-                    <!--
+                    
                     <widget name="web_ribbon" title="Paid" attrs="{'invisible': [('state', '!=', 'paid')]}"/>
                     <widget name="web_ribbon" title="Partially Reconciled" attrs="{'invisible': [('state', '!=', 'partial')]}"/>
                     <widget name="web_ribbon" title="Reconciled" attrs="{'invisible': [('state', '!=', 'close')]}"/>
-                        -->
+                    <!-- Invisible Fields -->
+                    <field name="company_id" invisible="1" />
+                    <field name="repayment_mode" invisible="1" />
+                    <field name="address_id" invisible="1" />
+                    <field name="account_move_id" invisible="1" />
+                    <field name="interval_loan_mode" invisible="1" />
+                    <field name="repayment_mode" invisible="1" />
                     <div class="oe_title">
                         <span class="o_form_label" >Request for Loan </span>
                         <h1 class="d-flex">
@@ -81,21 +87,20 @@
 
                             <field name="date"/>
                             <div class="o_td_label">
-                                <label for="loan_amount" string="Amount" />
+                                <label for="amount" string="Amount" />
                             </div>
-                            <div name="loan_amount">
-                                <field name="loan_amount" nolabel="1" style="width: 8rem;" />
+                            <div name="amount">
+                                <field name="amount" nolabel="1" style="width: 8rem;" />
                                 <span class="ml8" ><field name="currency_id" nolabel="1" style="width: 8rem;" /></span>
                             </div>
-                            <field name="interval_loan_mode" invisible="1" />
-                            <field name="interval_loan" attrs="{'readonly': [('interval_loan_mode', '=', 'fix')]}"/>
+                            
+                            <field name="interval_loan" attrs="{'readonly': ['|',('interval_loan_mode', '=', 'fix'),('state', 'not in', ['draft','verify'])]}"/>
                             <field name="date_start" />
                         </group>
                         <group>
                             <field name="accounting_date" groups="account.group_account_invoice,account.group_account_readonly" />
                             <field name="journal_id" groups="account.group_account_invoice,account.group_account_readonly" options="{'no_open': True, 'no_create': True}" context="{'default_company_id': company_id}"/>
-                             <field name="address_id" invisible="1" context="{'default_company_id': company_id}"/>
-                            <field name="account_move_id" invisible="1" />
+                             
                             <field name="department_id"/>
                             <field name="job_id"/>
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
@@ -111,15 +116,21 @@
                                     <field name="date"/>
                                     <field name="amount"/>
                                     <field name="state" readonly="1" />
+                                    <field name="account_move_id" optional="hide"/>
+                                    <field name="amount_paid"/>
                                     <field name="res_id" invisible="1"/>
                                     <field name="model" invisible="1" />
                                     <field name="res_name" optional="hide"/>
                                 </tree>
                             </field>
-                            <group class="oe_subtotal_footer oe_right" colspan="2" >
-                                <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                <field name="total_paid_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                <field name="balance_amount" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <group col="12" class="oe_loan_lines_tab">
+                                <group/>
+                                <group class="oe_subtotal_footer oe_right" >
+                                    <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_paid" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_disbursed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_balance" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
                             </group>
                             <div class="oe_clear"/>
                         </page>

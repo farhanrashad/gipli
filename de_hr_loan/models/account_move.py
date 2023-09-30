@@ -11,3 +11,4 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     loan_id = fields.One2many('hr.loan', 'account_move_id')
+    loan_line_id = fields.One2many('hr.loan.line', 'account_move_id')

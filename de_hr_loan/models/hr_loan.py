@@ -7,6 +7,9 @@ from odoo.tools import date_utils
 from odoo.addons.base.models.res_partner import _tz_get
 from dateutil.relativedelta import relativedelta
 
+from odoo.tools import safe_eval
+
+
 READONLY_FIELD_STATES = {
     state: [('readonly', True)]
     for state in {'confirm', 'validate1', 'validate' ,'post','paid','partial','close','refuse'}
@@ -56,16 +59,6 @@ class HrLoan(models.Model):
             ts_user_id = self.env.context.get('user_id', self.env.user.id)
         result['employee_id'] = self.env['hr.employee'].search([('user_id', '=', ts_user_id)], limit=1).id
         return result
-
-    def _compute_loan_amount(self):
-        total_paid = 0.0
-        for loan in self:
-            for line in loan.loan_lines:
-                total_paid += line.amount
-            balance_amount = loan.loan_amount - total_paid
-            loan.total_amount = loan.loan_amount
-            loan.balance_amount = balance_amount
-            loan.total_paid_amount = total_paid
     
     name = fields.Char('Loan Reference', required=True, index='trigram', copy=False, default='New')
     date = fields.Date(string="Date", default=fields.Date.today(), readonly=True, help="Loan Request Date",states=READONLY_FIELD_STATES,)
@@ -79,16 +72,28 @@ class HrLoan(models.Model):
     currency_id = fields.Many2one('res.currency', string='Currency', states=READONLY_FIELD_STATES,                      
                                   compute='_compute_currency_id', store=True, readonly=True)
 
-    interval_loan_mode = fields.Char(string='Interval Mode', compute='_compute_interval_from_loan_type')
-    interval_loan = fields.Integer(string="Loan Interval", default=1, store=True, required=True, compute='_compute_interval_from_loan_type',
+    interval_loan_mode = fields.Char(string='Interval Mode', compute='_compute_from_loan_type')
+    interval_loan = fields.Integer(string="Loan Interval", default=1, store=True, required=True, readonly=False,
+                                   compute='_compute_from_loan_type',
                                  help="Number of intervals to disburse loan", )
-    loan_amount = fields.Float(string="Loan Amount", required=True, help="Loan amount",)
+    repayment_mode = fields.Char(string='Repayment Mode', compute='_compute_from_loan_type')
     date_start = fields.Date(string="Loan Start Date", required=True, store=True, readonly=False,
                              compute='_compute_date_start',states=READONLY_FIELD_STATES,
                                help="Date of Start")
     department_id = fields.Many2one('hr.department', string='Department', compute='_compute_from_employee_id')
     job_id = fields.Many2one('hr.job', string='Job', compute='_compute_from_employee_id')
 
+    # Amount fields
+    amount = fields.Monetary(string="Loan Amount", required=True, help="Loan amount",states=READONLY_FIELD_STATES,)
+    
+    amount_paid = fields.Monetary(string="Paid Amount", store=True, readonly=True, compute='_compute_loan_amount',
+                                help="Total Paid Amount for loan")
+    amount_disbursed = fields.Monetary(string="Disbursed", store=True, compute='_compute_loan_amount',
+                                  help="Total Amount recieved from Employee")
+    amount_balance = fields.Monetary(string="Balance", store=True, compute='_compute_loan_amount',
+                                     help="Total Remaining amount")
+
+    # Accounting Fields
     account_move_id = fields.Many2one('account.move', string='Journal Entry', ondelete='restrict', copy=False, readonly=True)
     accounting_date = fields.Date(
         string='Accounting Date',
@@ -104,12 +109,7 @@ class HrLoan(models.Model):
     loan_lines = fields.One2many('hr.loan.line', 'loan_id', string="Loan Line", index=True, states=READONLY_FIELD_STATES,)
     
     
-    total_amount = fields.Float(string="Total Amount", store=True, readonly=True, compute='_compute_loan_amount',
-                                help="Total loan amount")
-    balance_amount = fields.Float(string="Balance Amount", store=True, compute='_compute_loan_amount',
-                                  help="Balance amount")
-    total_paid_amount = fields.Float(string="Total Paid Amount", store=True, compute='_compute_loan_amount',
-                                     help="Total paid amount")
+    
     description = fields.Text(string='Description', readonly=False, states=READONLY_FIELD_STATES,)
     state = fields.Selection([
         ('draft', 'To Submit'),
@@ -152,12 +152,31 @@ class HrLoan(models.Model):
     # ------------------------------------------------
     # -------------- Methods -------------------------
     # ------------------------------------------------
+    @api.depends('account_move_id','account_move_id.payment_state',
+                 'loan_lines','loan_lines.amount_paid')
+    def _compute_loan_amount(self):
+        total_paid = 0.0
+        for loan in self:
+            if loan.account_move_id.payment_state in ('paid','in_payment'):
+                loan.amount_paid = loan.account_move_id.amount_total_signed
+            else:
+                loan.amount_paid = 0 
+            loan.amount_disbursed = sum(loan.loan_lines.mapped('amount_paid'))
+            loan.amount_balance = loan.amount - sum(loan.loan_lines.mapped('amount_paid'))
+            
+    @api.depends('account_move_id','account_move_id.payment_state','loan_lines','loan_lines.state')
     def _compute_state(self):
-        for leave in self:
-            if leave.account_move_id.payment_state in ('paid','in_payment'):
-                leave.state = 'done'
-            elif not leave.state:
-                leave.state = 'draft'
+        for loan in self:
+            if all(loan_line.state == 'close' for loan_line in loan.loan_lines):
+                loan.state = 'close'
+            elif any(loan_line.state == 'close' for loan_line in loan.loan_lines):
+                loan.state = 'partial'
+            else:
+                if loan.account_move_id:
+                    if loan.account_move_id.payment_state in ('paid','in_payment'):
+                        loan.state = 'paid'
+                elif not loan.state:
+                    loan.state = 'draft'
 
     @api.depends('company_id.currency_id')
     def _compute_currency_id(self):
@@ -171,10 +190,12 @@ class HrLoan(models.Model):
             loan.date_start = datetime.strptime(str(loan.date), '%Y-%m-%d') + relativedelta(months=1)
         
     @api.depends('loan_type_id')
-    def _compute_interval_from_loan_type(self):
+    def _compute_from_loan_type(self):
         for loan in self:
             loan.interval_loan_mode = loan.loan_type_id.interval_loan_mode
-            loan.interval_loan = loan.interval_loan
+            if loan.interval_loan <= 0:
+                loan.interval_loan = loan.loan_type_id.interval_loan
+            loan.repayment_mode = loan.loan_type_id.repayment_mode
                 
     
     @api.depends('account_move_id.date')
@@ -214,7 +235,7 @@ class HrLoan(models.Model):
         #if self.filtered(lambda loan: loan.state != 'draft' or loan.state != 'verify'):
         #    raise UserError(_('Request must be in Draft state ("To Submit") in order to confirm it.')) 
         for loan in self:
-            if not len(loan.loan_lines) or loan.loan_amount <= 0:
+            if not len(loan.loan_lines) or loan.amount <= 0:
                 loan.action_compute_intervals()
         self.write({'state': 'confirm'})
         self.activity_update()
@@ -253,7 +274,7 @@ class HrLoan(models.Model):
         company based on payment start date and the no of installments.
             """
         for loan in self:
-            if loan.loan_amount <= 0:
+            if loan.amount <= 0:
                 raise UserError(_('Loan amount must be greater than 0 in order to process it.'))
             
             if loan.interval_loan <= 0:
@@ -263,10 +284,19 @@ class HrLoan(models.Model):
                 if loan.interval_loan > loan.loan_type_id.interval_loan:
                     raise UserError("Maximum allowed internal is %s" % loan.loan_type_id.interval_loan)
 
-                
+            contract_id = self.env['hr.contract'].search([('employee_id','=',loan.employee_id.id)],limit=1)
+            amount_wage = contract_id[eval("'" + loan.loan_type_id.calculation_field_id.name + "'")] * (loan.loan_type_id.amount_per / 100)
+            
+            if loan.loan_type_id.calculation_type == 'fix':
+                if loan.amount > loan.loan_type_id.fixed_amount:
+                    raise UserError("Maximum allowed amount is %s for this loan type" % loan.loan_type_id.fixed_amount)
+            elif loan.loan_type_id.calculation_type == 'percent':
+                if loan.amount > amount_wage:
+                    raise UserError("Your maximum amount limit for a %s is %s %s" % (loan.loan_type_id.name, amount_wage, loan.currency_id.name))
+            
             loan.loan_lines.unlink()
             date_start = datetime.strptime(str(loan.date_start), '%Y-%m-%d')
-            amount = loan.loan_amount / loan.interval_loan
+            amount = loan.amount / loan.interval_loan
             for i in range(1, loan.interval_loan + 1):
                 self.env['hr.loan.line'].create({
                     'date': date_start,
@@ -303,7 +333,7 @@ class HrLoan(models.Model):
                 (0, 0, {
                     'product_id': self.loan_type_id.product_id.id,
                     'quantity': 1,
-                    'price_unit': self.loan_amount,
+                    'price_unit': self.amount,
                     'name': self.description or self.loan_type_id.product_id.display_name,
                 })
             ],
@@ -338,12 +368,13 @@ class HrLoan(models.Model):
                         })
                     ],
                 })
-                account_move_id.action_post()
+                #account_move_id.action_post()
                 line.write({
                     'state': 'pending',
                     'res_id': account_move_id.id,
                     'model': 'account.move',
                     'res_name': account_move_id.name,
+                    'account_move_id': account_move_id.id,
                 })
         
     def _get_responsible_for_approval(self):
@@ -404,14 +435,44 @@ class HRLoanLine(models.Model):
         ('pending', 'Pending'),
         ('close', 'Close'),
         ], string='Status', default='draft',store=True, tracking=True, copy=False, readonly=False,
+            compute='_compute_state',
         help="The status is set to 'draft', when an installment is created." +
         "\nThe status is 'pending', when subsequent disbursement document is created." +
         "\nThe status is 'close', when subsequent disbursment document is posted.")
+    account_move_id = fields.Many2one('account.move', string='Journal Entry', ondelete='restrict', copy=False, readonly=True)
+    payment_state = fields.Selection(related='account_move_id.payment_state')
+    
+    amount_paid = fields.Float('Amount Paid', compute='_compute_from_account_move')
+    
+
     res_id = fields.Integer(string="Related Document ID", readonly=True)
     model = fields.Char(string="Related Document Model", readonly=True)
     res_name = fields.Char(string="Reference", readonly=True)
 
+    # --------------------------------------------------------
+    # ----------------------- Methods ------------------------
+    # --------------------------------------------------------
+    @api.depends('account_move_id','account_move_id.payment_state')
+    #@api.onchange('account_move_id.payment_state')
+    def _compute_state(self):
+        #raise UserError('hello')
+        for line in self:
+            if line.account_move_id:
+                if line.account_move_id.payment_state in ('paid','in_payment'):
+                    line.state = 'close'
+                else:
+                    line.state = 'pending'
+            elif not loan.state:
+                loan.state = 'draft'
 
+    @api.depends('account_move_id','account_move_id.payment_state')
+    def _compute_from_account_move(self):
+        for line in self:
+            if line.account_move_id.payment_state in ('paid','in_payment'):
+                line.amount_paid = line.account_move_id.amount_total_signed - line.account_move_id.amount_residual_signed
+            else:
+                line.amount_paid = 0
+            
 class HrLoanDocuments(models.Model):
     _name = 'hr.loan.document'
     _description = 'Loan Documents'

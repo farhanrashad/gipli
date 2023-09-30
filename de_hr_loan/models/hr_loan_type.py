@@ -23,6 +23,7 @@ class LoanType(models.Model):
     company_id = fields.Many2one(
         'res.company', 'Company', copy=False,
         required=True, index=True, default=lambda s: s.env.company)
+    currency_id = fields.Many2one(related='company_id.currency_id')
     active = fields.Boolean(default=True)
     sequence = fields.Integer(string="Sequence")
     description = fields.Char(string="Description", translate=True)
@@ -55,7 +56,7 @@ class LoanType(models.Model):
         'ir.model.fields',
         string='Calculation Field',
         domain=[
-            ('model', 'in', ['hr.contract','hr']),
+            ('model', 'in', ['hr.contract']),
             ('ttype', 'in', ['float', 'monetary']),
         ],
         ondelete='cascade',
