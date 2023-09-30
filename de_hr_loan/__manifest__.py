@@ -7,10 +7,10 @@
         Helps you to manage Loan Requests of your company's staff.
         """,
     'category': 'Generic Modules/Human Resources',
-    'author': "Yasir Ali",
-    'company': 'www.dynexcel.co',
-    'maintainer': 'Yasir Ali',
-    'website': "https://www.odynexcel.com",
+    'author': "Dynexcel",
+    'company': 'www.dynexcel.com',
+    'maintainer': 'Dynexcel',
+    'website': "https://www.dynexcel.com",
     'depends': ['base', 'hr', 'account'],
     'data': [
         'security/security.xml',
@@ -23,6 +23,7 @@
         'views/hr_loan_dashboard_views.xml',
         'views/hr_loan_type_views.xml',
         'views/hr_loan_views.xml',
+        'reports/report_loan_views.xml',
     ],
     'images': ['static/description/banner.png'],
     'license': 'OPL-1',

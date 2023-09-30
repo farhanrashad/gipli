@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="report_loan_pivot_view" model="ir.ui.view">
+         <field name="name">report.loan.pivot.view</field>
+         <field name="model">report.hr.loan</field>
+         <field name="arch" type="xml">
+             <pivot string="Loan Analysis" sample="1">
+                 <field name="loan_type_id" type="col"/>
+                 <field name="employee_id" type="row"/>
+                 <field name="amount_loan" type="measure"/>
+             </pivot>
+         </field>
+    </record>
+
+    <record id="report_loan_graph_view" model="ir.ui.view">
+         <field name="name">report.loan.graph.view</field>
+         <field name="model">report.hr.loan</field>
+         <field name="arch" type="xml">
+             <graph string="Loan Analysis" type="line" sample="1">
+                 <field name="date" interval="day"/>
+                 <field name="amount_loan" type="measure"/>
+             </graph>
+         </field>
+    </record>
+
+    <record id="report_loan_tree_view" model="ir.ui.view">
+        <field name="name">report.loan.tree.view</field>
+        <field name="model">report.hr.loan</field>
+        <field name="arch" type="xml">
+            <tree string="Loan Analysis">
+                <field name="date" widget="date"/>
+                <field name="loan_type_id" optional="show"/>
+                <field name="employee_id" optional="hide"/>
+                <field name="company_id" optional="show" groups="base.group_multi_company"/>
+                <field name="amount_loan" optional="hide" sum="Sum of Loan"/>
+                <field name="amount_paid" optional="show" sum="Sum of Paid Amount"/>
+                <field name="amount_disbursed" optional="show" sum="Sum of Disbursed Amount"/>
+                <field name="amount_balance" optional="show" sum="Sum of Balance Amount"/>
+                <field name="state" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="report_loan_search_view" model="ir.ui.view">
+        <field name="name">report.loan.search.view</field>
+        <field name="model">report.hr.loan</field>
+        <field name="arch" type="xml">
+            <search string="Loan Analysis">
+                <field name="date"/>
+                <filter string="Date" name="year" invisible="1" date="date" default_period="this_year"/>
+                <filter string="New" name="new" domain="[('state','in', ('draft'))]"/>
+                <filter string="In Approval" name="in_approval" domain="[('state','in',('confirm', 'validate', 'validate1'))]"/>
+                <filter string="Paid" name="paid" domain="[('state','in', ('paid'))]"/>
+                <filter string="Open" name="open" domain="[('state','in', ('partial'))]"/>
+                <filter string="Close" name="close" domain="[('state','in', ('close'))]"/>
+                <separator/>
+                <filter name="filter_date" date="date" default_period="this_month"/>
+                <filter name="filter_date_due" date="date_due" default_period="this_month"/>
+                <separator/>
+                <field name="loan_type_id"/>
+                <field name="employee_id"/>
+                <field name="product_id"/>
+                <group expand="0" string="Extended Filters">
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </group>
+                <group expand="1" string="Group By">
+                    <filter string="Loan Type" name="group_loan_type" context="{'group_by':'loan_type_id'}"/>
+                    <filter string="Employee" name="group_employee" context="{'group_by':'employee_id'}"/>
+                    <filter string="Product" name="Product" context="{'group_by':'product_id'}"/>
+                    <filter string="Status" name="status" context="{'group_by':'state'}"/>
+                    <filter string="Company" name="company" groups="base.group_multi_company" context="{'group_by':'company_id'}"/>
+                    <separator/>
+                    <filter string="Loan Date" name="group_date" context="{'group_by':'date'}"/>
+                    <separator/>
+                    <filter string="Due Date" name="group_date_due" context="{'group_by':'date_due'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_report_loan_all" model="ir.actions.act_window">
+        <field name="name">Loan Analysis</field>
+        <field name="res_model">report.hr.loan</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_id"></field>  <!-- force empty -->
+        <field name="search_view_id" ref="report_loan_search_view"/>
+        <field name="help">This report performs analysis on your quotations and sales orders. Analysis check your sales revenues and sort it by different group criteria (salesman, partner, product, etc.) Use this report to perform analysis on sales not having invoiced yet. If you want to analyse your turnover, you should use the Invoice Analysis report in the Accounting application.</field>
+    </record>
+
+    <menuitem name="Loan Analysis"
+        parent="menu_loan_reports"
+        id="menu_report_loan_analysis"
+        action="action_report_loan_all"/>
+
+    
+</odoo>

@@ -441,8 +441,7 @@ class HRLoanLine(models.Model):
         "\nThe status is 'close', when subsequent disbursment document is posted.")
     account_move_id = fields.Many2one('account.move', string='Journal Entry', ondelete='restrict', copy=False, readonly=True)
     payment_state = fields.Selection(related='account_move_id.payment_state')
-    
-    amount_paid = fields.Float('Amount Paid', compute='_compute_from_account_move')
+    amount_paid = fields.Float('Amount Paid', compute='_compute_from_account_move', store=True)
     
 
     res_id = fields.Integer(string="Related Document ID", readonly=True)
