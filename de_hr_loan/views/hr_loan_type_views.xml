@@ -46,10 +46,14 @@
                                 <group>
                                     <field name="submission_condition" widget="radio"/>
                                     <field name="frequency" />
-                                    <field name="fixed_installment"/>
-                                    <field name="no_of_installment" attrs="{'invisible': [('fixed_installment', '=', False)], 'required': [('fixed_installment', '=', True)]}"/>
 
-
+                                    <div class="o_td_label">
+                                        <label for="interval_loan_mode" string="Loan Interval" />
+                                    </div>
+                                    <div name="interval_loan_mode">
+                                        <field name="interval_loan_mode" nolabel="1" style="width: 8rem;" />
+                                        <span class="ml8" ><field name="interval_loan" nolabel="1" style="width: 8rem;" /> Month(s)</span>
+                                    </div>
                                 </group>
                             </group>
                             <group>

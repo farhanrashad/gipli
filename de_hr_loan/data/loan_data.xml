@@ -12,7 +12,7 @@
         </record>
 
         <!-- Leave specific activities -->
-        <record id="mail_act_loan_approval" model="mail.activity.type">
+        <record id="mail_act_loan_confirm" model="mail.activity.type">
             <field name="name">Request Approval</field>
             <field name="icon">fa-sun-o</field>
             <field name="res_model">hr.loan</field>

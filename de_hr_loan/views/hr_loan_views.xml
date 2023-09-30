@@ -23,10 +23,10 @@
         <field name="arch" type="xml">
             <form string="Loan Request">
                 <header>
-                    <button name="action_compute_installment" type="object" string="Compute Installment" class="oe_highlight"  attrs="{'invisible':[('state','!=','draft')]}"/>
-                    <button name="action_compute_installment" type="object" string="Compute Installment" attrs="{'invisible':[('state','!=','verify')]}"/>
+                    <button name="action_compute_intervals" type="object" string="Compute" class="oe_highlight"  attrs="{'invisible':[('state','!=','draft')]}"/>
+                    <button name="action_compute_intervals" type="object" string="Compute" attrs="{'invisible':[('state','!=','verify')]}"/>
 
-                    <button string="Mark as Draft" name="action_draft" type="object" attrs="{'invisible': [('state', 'not in', ['draft', 'verify'])]}"/>
+                    <button string="Mark as Draft" name="action_draft" type="object" attrs="{'invisible': [('state', 'not in', ['verify', 'confirm'])]}"/>
                     
                     <button name="%(action_loan_reject_wizard)d" type="action" string="Rject" attrs="{'invisible': [('state', 'not in', ['confirm','validate','validate1'])]}"/>
 
@@ -46,7 +46,7 @@
 
 
 
-                    <field name="state" widget="statusbar" statusbar_visible="draft,verified,confirm,validate,post,done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,verified,confirm,validate,post,paid"/>
                 </header>
 
                 <sheet>
@@ -87,8 +87,8 @@
                                 <field name="loan_amount" nolabel="1" style="width: 8rem;" />
                                 <span class="ml8" ><field name="currency_id" nolabel="1" style="width: 8rem;" /></span>
                             </div>
-                            <field name="fixed_installment" invisible="1" />
-                            <field name="installment" attrs="{'readonly': [('fixed_installment', '!=', False)]}"/>
+                            <field name="interval_loan_mode" invisible="1" />
+                            <field name="interval_loan" attrs="{'readonly': [('interval_loan_mode', '=', 'fix')]}"/>
                             <field name="date_start" />
                         </group>
                         <group>
@@ -105,9 +105,9 @@
                             <field name="description"/>
                         </group>
                     <notebook>
-                        <page string="Installments" name="loan_installment">
+                        <page string="Intervals" name="loan_intervals">
                             <field name="loan_lines">
-                                <tree string="Installments" editable="bottom">
+                                <tree string="Intervals" editable="bottom">
                                     <field name="date"/>
                                     <field name="amount"/>
                                     <field name="state" readonly="1" />

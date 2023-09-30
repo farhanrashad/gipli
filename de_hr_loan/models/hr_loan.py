@@ -7,6 +7,11 @@ from odoo.tools import date_utils
 from odoo.addons.base.models.res_partner import _tz_get
 from dateutil.relativedelta import relativedelta
 
+READONLY_FIELD_STATES = {
+    state: [('readonly', True)]
+    for state in {'confirm', 'validate1', 'validate' ,'post','paid','partial','close','refuse'}
+}
+
 class HrLoan(models.Model):
     _name = 'hr.loan'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
@@ -61,39 +66,27 @@ class HrLoan(models.Model):
             loan.total_amount = loan.loan_amount
             loan.balance_amount = balance_amount
             loan.total_paid_amount = total_paid
-
-    READONLY_STATES = {
-        ('confirm', 'To Approve'),
-        ('validate1', 'Second Approval'),
-        ('validate', 'Approved'),
-        ('post', 'Posted'),
-        ('paid', 'Paid'),
-        ('partial', 'Partially Reconciled'),
-        ('close', 'Reconciled'),
-        ('refuse', 'Refused'),
-    }
     
     name = fields.Char('Loan Reference', required=True, index='trigram', copy=False, default='New')
-    date = fields.Date(string="Date", default=fields.Date.today(), readonly=True, help="Date")
+    date = fields.Date(string="Date", default=fields.Date.today(), readonly=True, help="Loan Request Date",states=READONLY_FIELD_STATES,)
     employee_id = fields.Many2one('hr.employee', string="Employee", required=True, readonly=False, tracking=True,
-                                  states=READONLY_STATES, default=_default_employee_id, check_company=True, 
+                                  default=_default_employee_id, check_company=True, states=READONLY_FIELD_STATES,
                                   domain=lambda self: self.env['hr.loan']._get_employee_id_domain())
     
-    loan_type_id = fields.Many2one("hr.loan.type", store=True, string="Loan Type", 
-                                   required=True, readonly=False, states=READONLY_STATES,tracking=True)
+    loan_type_id = fields.Many2one("hr.loan.type", store=True, string="Loan Type", states=READONLY_FIELD_STATES,
+                                   required=True, readonly=False, tracking=True)
     company_id = fields.Many2one(related='employee_id.company_id', readonly=True, store=True)
-    currency_id = fields.Many2one('res.currency', string='Currency',                               
+    currency_id = fields.Many2one('res.currency', string='Currency', states=READONLY_FIELD_STATES,                      
                                   compute='_compute_currency_id', store=True, readonly=True)
 
-    fixed_installment = fields.Boolean(string='Fixed Installment', compute='_compute_installment_from_loan_type')
-    loan_amount = fields.Float(string="Loan Amount", required=True, help="Loan amount",states=READONLY_STATES,)
-    installment = fields.Integer(string="No Of Installments", default=1, states=READONLY_STATES,
-                                 store=True, compute='_compute_installment_from_loan_type',
-                                 help="Number of installments", )
+    interval_loan_mode = fields.Char(string='Interval Mode', compute='_compute_interval_from_loan_type')
+    interval_loan = fields.Integer(string="Loan Interval", default=1, store=True, required=True, compute='_compute_interval_from_loan_type',
+                                 help="Number of intervals to disburse loan", )
+    loan_amount = fields.Float(string="Loan Amount", required=True, help="Loan amount",)
     date_start = fields.Date(string="Loan Start Date", required=True, store=True, readonly=False,
-                             compute='_compute_date_start',
-                               help="Date of Start", states=READONLY_STATES,)
-    department_id = fields.Many2one('hr.department', string='Department', compute='_compute_from_employee_id', store=True)
+                             compute='_compute_date_start',states=READONLY_FIELD_STATES,
+                               help="Date of Start")
+    department_id = fields.Many2one('hr.department', string='Department', compute='_compute_from_employee_id')
     job_id = fields.Many2one('hr.job', string='Job', compute='_compute_from_employee_id')
 
     account_move_id = fields.Many2one('account.move', string='Journal Entry', ondelete='restrict', copy=False, readonly=True)
@@ -108,7 +101,7 @@ class HrLoan(models.Model):
         default=_default_journal_id, help="The journal used when the request is done.")
     address_id = fields.Many2one('res.partner', compute='_compute_from_employee_id', store=True, readonly=False, copy=True, string="Employee Home Address", check_company=True)
 
-    loan_lines = fields.One2many('hr.loan.line', 'loan_id', string="Loan Line", index=True, states=READONLY_STATES,)
+    loan_lines = fields.One2many('hr.loan.line', 'loan_id', string="Loan Line", index=True, states=READONLY_FIELD_STATES,)
     
     
     total_amount = fields.Float(string="Total Amount", store=True, readonly=True, compute='_compute_loan_amount',
@@ -117,7 +110,7 @@ class HrLoan(models.Model):
                                   help="Balance amount")
     total_paid_amount = fields.Float(string="Total Paid Amount", store=True, compute='_compute_loan_amount',
                                      help="Total paid amount")
-    description = fields.Text(string='Description', states=READONLY_STATES, readonly=False)
+    description = fields.Text(string='Description', readonly=False, states=READONLY_FIELD_STATES,)
     state = fields.Selection([
         ('draft', 'To Submit'),
         ('verify', 'Verified'),
@@ -136,7 +129,7 @@ class HrLoan(models.Model):
         "\nThe status is 'Approved', when request is approved by manager.")
 
 
-    loan_document_ids = fields.One2many('hr.loan.document', 'loan_id', string='Documents')
+    loan_document_ids = fields.One2many('hr.loan.document', 'loan_id', string='Documents', states=READONLY_FIELD_STATES,)
 
     # ------------------------------------------------
     # ----------- Operations -------------------------
@@ -178,14 +171,10 @@ class HrLoan(models.Model):
             loan.date_start = datetime.strptime(str(loan.date), '%Y-%m-%d') + relativedelta(months=1)
         
     @api.depends('loan_type_id')
-    def _compute_installment_from_loan_type(self):
+    def _compute_interval_from_loan_type(self):
         for loan in self:
-            loan.fixed_installment = loan.loan_type_id.fixed_installment
-            if loan.loan_type_id.fixed_installment:
-                if loan.loan_type_id.no_of_installment > 0:
-                    loan.installment = loan.loan_type_id.no_of_installment
-                else:
-                    loan.installment = 1
+            loan.interval_loan_mode = loan.loan_type_id.interval_loan_mode
+            loan.interval_loan = loan.interval_loan
                 
     
     @api.depends('account_move_id.date')
@@ -223,7 +212,10 @@ class HrLoan(models.Model):
             })
     def action_confirm(self):
         #if self.filtered(lambda loan: loan.state != 'draft' or loan.state != 'verify'):
-        #    raise UserError(_('Request must be in Draft state ("To Submit") in order to confirm it.'))            
+        #    raise UserError(_('Request must be in Draft state ("To Submit") in order to confirm it.')) 
+        for loan in self:
+            if not len(loan.loan_lines) or loan.loan_amount <= 0:
+                loan.action_compute_intervals()
         self.write({'state': 'confirm'})
         self.activity_update()
         return True
@@ -256,18 +248,26 @@ class HrLoan(models.Model):
                 partner_ids=self.employee_id.user_id.partner_id.ids)
             self.activity_update()
 
-    def action_compute_installment(self):
+    def action_compute_intervals(self):
         """This automatically create the installment the employee need to pay to
         company based on payment start date and the no of installments.
             """
         for loan in self:
             if loan.loan_amount <= 0:
                 raise UserError(_('Loan amount must be greater than 0 in order to process it.'))
+            
+            if loan.interval_loan <= 0:
+                raise UserError(_('Interval must be greater than 0 in order to process it.'))
 
+            if loan.loan_type_id.interval_loan_mode == 'max':
+                if loan.interval_loan > loan.loan_type_id.interval_loan:
+                    raise UserError("Maximum allowed internal is %s" % loan.loan_type_id.interval_loan)
+
+                
             loan.loan_lines.unlink()
             date_start = datetime.strptime(str(loan.date_start), '%Y-%m-%d')
-            amount = loan.loan_amount / loan.installment
-            for i in range(1, loan.installment + 1):
+            amount = loan.loan_amount / loan.interval_loan
+            for i in range(1, loan.interval_loan + 1):
                 self.env['hr.loan.line'].create({
                     'date': date_start,
                     'amount': amount,
@@ -355,7 +355,7 @@ class HrLoan(models.Model):
         to_clean, to_do = self.env['hr.loan'], self.env['hr.loan']
         for loan in self:
             note = _(
-                'New %(loan_type)s Encashment Request created by %(user)s',
+                'New %(loan_type)s Request created by %(user)s',
                 loan_type=loan.loan_type_id.name,
                 user=loan.create_uid.name,
             )
@@ -363,11 +363,11 @@ class HrLoan(models.Model):
                 to_clean |= loan
             elif loan.state == 'confirm':
                 loan.activity_schedule(
-                    'de_hr_loan.mail_act_loan_approval',
+                    'de_hr_loan.mail_act_loan_confirm',
                     note=note,
                     user_id=loan.sudo()._get_responsible_for_approval().id or self.env.user.id)
             elif loan.state == 'validate1':
-                loan.activity_feedback(['de_hr_loan.mail_act_loan_approval'])
+                loan.activity_feedback(['de_hr_loan.mail_act_loan_confirm'])
                 loan.activity_schedule(
                     'de_hr_loan.mail_act_loan_second_approval',
                     note=note,
@@ -377,7 +377,7 @@ class HrLoan(models.Model):
             elif loan.state == 'refuse':
                 to_clean |= loan
         if to_clean:
-            to_clean.activity_unlink(['de_hr_loan.mail_act_loan_approval', 'de_hr_loan.mail_act_loan_second_approval'])
+            to_clean.activity_unlink(['de_hr_loan.mail_act_loan_confirm', 'de_hr_loan.mail_act_loan_second_approval'])
         if to_do:
             to_do.activity_feedback(['de_hr_loan.mail_act_loan_approval', 'de_hr_loan.mail_act_loan_second_approval'])
 

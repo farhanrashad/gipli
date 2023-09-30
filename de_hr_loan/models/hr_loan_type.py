@@ -55,10 +55,9 @@ class LoanType(models.Model):
         'ir.model.fields',
         string='Calculation Field',
         domain=[
-            ('model', '=', 'hr.contract'),
+            ('model', 'in', ['hr.contract','hr']),
             ('ttype', 'in', ['float', 'monetary']),
         ],
-        required=True,
         ondelete='cascade',
     )
     amount_per = fields.Float(string="Percentage (%)")
@@ -84,8 +83,12 @@ class LoanType(models.Model):
         help="Select the frequency to allow submissions."
     )    
 
-    fixed_installment = fields.Boolean(string='Fixed Installment')
-    no_of_installment = fields.Integer(string='No. of Installments', required=False)
+    interval_loan_mode = fields.Selection([
+        ('fix', 'Fixed'),
+        ('max', 'Maximum'),
+    ], string='Interval Mode', required=True, default='fix')
+    
+    interval_loan = fields.Integer(string='Interval', required=True)
 
     loan_type_document_ids = fields.One2many('hr.loan.type.document', 'loan_type_id', string='Documents')
 
