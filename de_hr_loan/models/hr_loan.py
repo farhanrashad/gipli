@@ -63,12 +63,14 @@ class HrLoan(models.Model):
             loan.total_paid_amount = total_paid
 
     READONLY_STATES = {
-        'confirm': [('readonly', True)],
-        'refuse': [('readonly', True)],
-        'validate': [('readonly', True)],
-        'validate1': [('readonly', True)],
-        'post': [('readonly', True)],
-        'done': [('readonly', True)],
+        ('confirm', 'To Approve'),
+        ('validate1', 'Second Approval'),
+        ('validate', 'Approved'),
+        ('post', 'Posted'),
+        ('paid', 'Paid'),
+        ('partial', 'Partially Reconciled'),
+        ('close', 'Reconciled'),
+        ('refuse', 'Refused'),
     }
     
     name = fields.Char('Loan Reference', required=True, index='trigram', copy=False, default='New')
@@ -120,11 +122,13 @@ class HrLoan(models.Model):
         ('draft', 'To Submit'),
         ('verify', 'Verified'),
         ('confirm', 'To Approve'),
-        ('refuse', 'Refused'),
         ('validate1', 'Second Approval'),
         ('validate', 'Approved'),
         ('post', 'Posted'),
-        ('done', 'Done'),
+        ('paid', 'Paid'),
+        ('partial', 'Partially Reconciled'),
+        ('close', 'Reconciled'),
+        ('refuse', 'Refused'),
         ], string='Status', default='draft',compute='_compute_state', store=True, tracking=True, copy=False, readonly=False,
         help="The status is set to 'To Submit', when a time off request is created." +
         "\nThe status is 'To Approve', when request is confirmed by user." +
@@ -183,30 +187,7 @@ class HrLoan(models.Model):
                 else:
                     loan.installment = 1
                 
-    def compute_installment(self):
-        """This automatically create the installment the employee need to pay to
-        company based on payment start date and the no of installments.
-            """
-        for loan in self:
-            if loan.loan_amount <= 0:
-                raise UserError(_('Loan amount must be greater than 0 in order to process it.'))
-
-            loan.loan_lines.unlink()
-            date_start = datetime.strptime(str(loan.date_start), '%Y-%m-%d')
-            amount = loan.loan_amount / loan.installment
-            for i in range(1, loan.installment + 1):
-                self.env['hr.loan.line'].create({
-                    'date': date_start,
-                    'amount': amount,
-                    'employee_id': loan.employee_id.id,
-                    'loan_id': loan.id})
-                date_start = date_start + relativedelta(months=1)
-            loan._compute_loan_amount()
-            loan.write({
-                'state': 'verify',
-            })
-        return True
-
+    
     @api.depends('account_move_id.date')
     def _compute_accounting_date(self):
         for record in self:
@@ -274,6 +255,30 @@ class HrLoan(models.Model):
                 ),
                 partner_ids=self.employee_id.user_id.partner_id.ids)
             self.activity_update()
+
+    def action_compute_installment(self):
+        """This automatically create the installment the employee need to pay to
+        company based on payment start date and the no of installments.
+            """
+        for loan in self:
+            if loan.loan_amount <= 0:
+                raise UserError(_('Loan amount must be greater than 0 in order to process it.'))
+
+            loan.loan_lines.unlink()
+            date_start = datetime.strptime(str(loan.date_start), '%Y-%m-%d')
+            amount = loan.loan_amount / loan.installment
+            for i in range(1, loan.installment + 1):
+                self.env['hr.loan.line'].create({
+                    'date': date_start,
+                    'amount': amount,
+                    'employee_id': loan.employee_id.id,
+                    'loan_id': loan.id})
+                date_start = date_start + relativedelta(months=1)
+            loan._compute_loan_amount()
+            loan.write({
+                'state': 'verify',
+            })
+        return True
 
     def action_request_move_create(self):
         if any(request.state != 'validate' for request in self):
@@ -386,7 +391,7 @@ class HrLoan(models.Model):
             'res_model': 'account.move',
             'res_id': self.account_move_id.id,
         }
-class InstallmentLine(models.Model):
+class HRLoanLine(models.Model):
     _name = "hr.loan.line"
     _description = "Installment Line"
 

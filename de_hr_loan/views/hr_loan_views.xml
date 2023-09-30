@@ -23,10 +23,13 @@
         <field name="arch" type="xml">
             <form string="Loan Request">
                 <header>
-                    <button name="compute_installment" type="object" string="Compute Installment" class="oe_highlight"  attrs="{'invisible':[('state','!=','draft')]}"/>
-                    <button name="compute_installment" type="object" string="Compute Installment" attrs="{'invisible':[('state','!=','verify')]}"/>
+                    <button name="action_compute_installment" type="object" string="Compute Installment" class="oe_highlight"  attrs="{'invisible':[('state','!=','draft')]}"/>
+                    <button name="action_compute_installment" type="object" string="Compute Installment" attrs="{'invisible':[('state','!=','verify')]}"/>
 
                     <button string="Mark as Draft" name="action_draft" type="object" attrs="{'invisible': [('state', 'not in', ['draft', 'verify'])]}"/>
+                    
+                    <button name="%(action_loan_reject_wizard)d" type="action" string="Rject" attrs="{'invisible': [('state', 'not in', ['confirm','validate','validate1'])]}"/>
+
                     <button name="action_confirm" type="object" string="Confirm" attrs="{'invisible':[('state','!=','draft')]}"/>
                     <button name="action_confirm" type="object" string="Confirm" class="oe_highlight"  attrs="{'invisible':[('state','!=','verify')]}"/>
 
@@ -58,7 +61,13 @@
                             </button>
                             <field name="account_move_id" invisible="1"/>
                             
-                        </div>
+                    </div>
+                    <!-- Payment status for invoices / receipts -->
+                    <!--
+                    <widget name="web_ribbon" title="Paid" attrs="{'invisible': [('state', '!=', 'paid')]}"/>
+                    <widget name="web_ribbon" title="Partially Reconciled" attrs="{'invisible': [('state', '!=', 'partial')]}"/>
+                    <widget name="web_ribbon" title="Reconciled" attrs="{'invisible': [('state', '!=', 'close')]}"/>
+                        -->
                     <div class="oe_title">
                         <span class="o_form_label" >Request for Loan </span>
                         <h1 class="d-flex">

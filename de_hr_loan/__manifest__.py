@@ -17,6 +17,7 @@
         'security/ir.model.access.csv',
         'data/loan_data.xml',
         'data/mail_data.xml',
+        'wizard/loan_reject_wizard_views.xml',
         'views/hr_loan.xml',
         'views/res_config_settings.xml',
         'views/hr_loan_dashboard_views.xml',
