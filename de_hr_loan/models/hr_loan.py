@@ -80,6 +80,8 @@ class HrLoan(models.Model):
     date_start = fields.Date(string="Loan Start Date", required=True, store=True, readonly=False,
                              compute='_compute_date_start',states=READONLY_FIELD_STATES,
                                help="Date of Start")
+    date_end = fields.Date(string="Loan End Date", required=True, store=True, readonly=True,
+                             compute='_compute_date_end', help="Date of End")
     department_id = fields.Many2one('hr.department', string='Department', compute='_compute_from_employee_id')
     job_id = fields.Many2one('hr.job', string='Job', compute='_compute_from_employee_id')
 
@@ -188,6 +190,12 @@ class HrLoan(models.Model):
     def _compute_date_start(self):
         for loan in self:
             loan.date_start = datetime.strptime(str(loan.date), '%Y-%m-%d') + relativedelta(months=1)
+
+    @api.depends('loan_lines','loan_lines.date')
+    def _compute_date_end(self):
+        for loan in self:
+            last_line_item = self.loan_lines.search([], order="id desc", limit=1)
+            loan.date_end = last_line_item.date
         
     @api.depends('loan_type_id')
     def _compute_from_loan_type(self):

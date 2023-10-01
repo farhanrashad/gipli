@@ -96,6 +96,7 @@
                             
                             <field name="interval_loan" attrs="{'readonly': ['|',('interval_loan_mode', '=', 'fix'),('state', 'not in', ['draft','verify'])]}"/>
                             <field name="date_start" />
+                            <field name="date_end" />
                         </group>
                         <group>
                             <field name="accounting_date" groups="account.group_account_invoice,account.group_account_readonly" />

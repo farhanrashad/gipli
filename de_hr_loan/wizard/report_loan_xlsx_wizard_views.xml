@@ -7,16 +7,16 @@
             <form string="Attendance Report">
                 <group>
                     <group>
-                        <field name="start_date"/>
-                        <field name="end_date"/>
+                        <field name="start_date" required="1"/>
+                        <field name="loan_type_ids" widget="many2many_tags"/>
                     </group>
                     <group>
-                        <field name="employee_ids" widget="many2many_tags"/>
+                        <field name="end_date"/>
+                        
                     </group>
                 </group>
                 <footer>
-                    <button name="generate_pdf_report" string="Generate PDF" type="object" class="btn-primary"/>
-                    <button name="generate_excel_report" string="Generate Excel" type="object" class="btn-primary"/>
+                    <button name="generate_excel_report" string="Generate Report" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
