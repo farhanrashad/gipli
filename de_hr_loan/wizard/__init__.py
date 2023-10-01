@@ -3,3 +3,4 @@
 
 from . import loan_reject_wizard
 from . import report_loan_xlsx_wizard
+from . import save_xlsx
