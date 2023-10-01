@@ -454,7 +454,7 @@ class HrLoan(models.Model):
         return action
 
     def action_new_reschedule_request(self):
-        action = self.env["ir.actions.actions"]._for_xml_id("de_hr_loan.action_loan_reschedule")
+        action = self.env["ir.actions.actions"]._for_xml_id("de_hr_loan.action_loan_reschedule_request_new")
         return action
     
 class HRLoanLine(models.Model):
