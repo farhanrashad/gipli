@@ -12,9 +12,9 @@ from odoo.exceptions import ValidationError
 import psycopg2
 
 
-class HrAttendanceReport(models.TransientModel):
+class HRLoanXLSXReprot(models.TransientModel):
     """ Wizard for Employee Attendance Report """
-    _name = 'employee.attendance.report'
+    _name = 'hr.loan.report.wizard'
     _description = 'Employee Attendance Report Wizard'
 
     start_date = fields.Date(string="Start date",required=True)

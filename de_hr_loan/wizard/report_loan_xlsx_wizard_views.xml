@@ -1,8 +1,8 @@
 <odoo>
     <!-- Form View For Wizard -->
-    <record id="employee_attendance_report_view_form" model="ir.ui.view">
-        <field name="name">employee.attendance.report.view.form</field>
-        <field name="model">employee.attendance.report</field>
+    <record id="loan_report_wizard_view" model="ir.ui.view">
+        <field name="name">loan.report.wizard.view</field>
+        <field name="model">hr.loan.report.wizard</field>
         <field name="arch" type="xml">
             <form string="Attendance Report">
                 <group>
@@ -25,11 +25,11 @@
     
     <!--  Action  -->
     <record id="action_hr_loan_xlsx" model="ir.actions.act_window">
-        <field name="name">Attendance Report</field>
+        <field name="name">Loan Details Report</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">employee.attendance.report</field>
+        <field name="res_model">hr.loan.report.wizard</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="employee_attendance_report_view_form"/>
+        <field name="view_id" ref="loan_report_wizard_view"/>
         <field name="target">new</field>
     </record>
     <!--  Menu  -->

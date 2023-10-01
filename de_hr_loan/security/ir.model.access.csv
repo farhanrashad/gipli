@@ -7,13 +7,15 @@ access_hr_loan_type_document_manager,access.hr.loan.type.document.manager,model_
 access_hr_loan_user,access.hr.loan.user,model_hr_loan,group_loan_user,1,1,1,0
 access_hr_loan_line_user,access.hr.loan.line.user,model_hr_loan_line,group_loan_user,1,1,1,0
 access_hr_loan_documents_user,access.hr.loan.documents.user,model_hr_loan_document,group_loan_user,1,1,1,0
+access_hr_loan_reschedule_user,access.hr.loan.reschedule.user,model_hr_loan_reschedule,group_loan_user,1,1,1,0
 
 access_hr_loan_manager,access.hr.loan.manager,model_hr_loan,group_loan_manager,1,1,1,1
 access_hr_loan_line_manager,access.hr.loan.line.manager,model_hr_loan_line,group_loan_manager,1,1,1,1
 access_hr_loan_documents_manager,access.hr.loan.documents.manager,model_hr_loan_document,group_loan_manager,1,1,1,1
+access_hr_loan_reschedule_manager,access.hr.loan.reschedule.manager,model_hr_loan_reschedule,group_loan_manager,1,1,1,1
 
 access_hr_loan_reject_wizard_user,access.hr.loan.reject.wizard.user,model_hr_loan_reject_wizard,group_loan_user,1,1,1,1
 access_report_hr_loan_user,access.report.hr.loan.user,model_report_hr_loan,group_loan_user,1,1,1,1
 
-access_report_hr_loan_xlsx_user,access.report.hr.loan.xlsx.user,model_employee_attendance_report,group_loan_user,1,1,1,1
+access_report_hr_loan_xlsx_user,access.report.hr.loan.xlsx.user,model_hr_loan_report_wizard,group_loan_user,1,1,1,1
 access_report_save_xlsx_user,access.report.save.xlsx.user,model_hr_loan_save_xlsx_wizard,group_loan_user,1,1,1,1

@@ -42,8 +42,9 @@
                             class="oe_highlight o_loan_post"
                             attrs="{'invisible': [('state', '!=', 'validate')]}"
                             groups="account.group_account_invoice"/>
-
-
+                    <button string="Reschedule Loan Request" name="action_new_reschedule_request" type="object" class="oe_highlight" data-hotkey="q"
+                        title="Create new Reschedule Request"
+                        attrs="{'invisible': [('state', 'not in', ['validate','partial'])]}"/>
 
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,verified,confirm,validate,post,paid"/>
@@ -51,16 +52,20 @@
 
                 <sheet>
                     <div name="button_box" class="oe_button_box">
-                            <button name="action_open_account_move"
+                        <button name="action_open_account_move"
                                 class="oe_stat_button"
                                 icon="fa-file-text-o"
                                 type="object"
                                 attrs="{'invisible': [('account_move_id', '=', False)]}"
                                 groups="account.group_account_invoice">
                                 Journal Entry
-                            </button>
-                            
-                            
+                        </button>
+                        <button class="oe_stat_button" type="object"  name="action_view_loan_reschedule_request" icon="fa-calendar-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text"> Reschedule Requests</span>
+                                <field name="loan_reschedule_count" invisible="1"/>
+                            </div>
+                        </button>
                     </div>
                     <!-- Payment status for invoices / receipts -->
                     
@@ -113,7 +118,7 @@
                     <notebook>
                         <page string="Intervals" name="loan_intervals">
                             <field name="loan_lines">
-                                <tree string="Intervals" editable="bottom">
+                                <tree string="Intervals" editable="bottom" decoration-danger="state == 'pending'" decoration-muted="state == 'close' or state == 'cancel'" >
                                     <field name="date"/>
                                     <field name="amount"/>
                                     <field name="state" readonly="1" />

@@ -22,6 +22,7 @@
         'wizard/report_loan_xlsx_wizard_views.xml',
         'views/hr_loan.xml',
         'views/res_config_settings.xml',
+        'views/hr_loan_reschedule_views.xml',
         'views/hr_loan_dashboard_views.xml',
         'views/hr_loan_type_views.xml',
         'views/hr_loan_views.xml',

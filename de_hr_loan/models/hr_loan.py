@@ -110,7 +110,8 @@ class HrLoan(models.Model):
 
     loan_lines = fields.One2many('hr.loan.line', 'loan_id', string="Loan Line", index=True, states=READONLY_FIELD_STATES,)
     
-    
+    loan_reschedule_ids = fields.One2many('hr.loan.reschedule', 'loan_id', string="Loan Reschedule Request", index=True)
+    loan_reschedule_count = fields.Integer(compute='_compute_reschedule_request', string="Number of Reschedule Requests")
     
     description = fields.Text(string='Description', readonly=False, states=READONLY_FIELD_STATES,)
     state = fields.Selection([
@@ -186,6 +187,13 @@ class HrLoan(models.Model):
             if not record.currency_id or record.state not in {'post', 'done', 'refuse'}:
                 record.currency_id = record.company_id.currency_id
 
+    def _get_lead_sale_order_domain(self):
+        return [('state', 'not in', ('draft', 'sent', 'cancel'))]
+        
+    def _compute_reschedule_request(self):
+        for loan in self:
+            loan.loan_reschedule_count = len(loan.loan_reschedule_ids)
+            
     @api.depends('loan_type_id','date')
     def _compute_date_start(self):
         for loan in self:
@@ -430,6 +438,25 @@ class HrLoan(models.Model):
             'res_model': 'account.move',
             'res_id': self.account_move_id.id,
         }
+
+    def action_view_loan_reschedule_request(self):
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id("de_hr_loan.action_loan_reschedule")
+        action['context'] = {
+            'default_loan_id': self.id,
+        }
+        #action['domain'] = expression.AND([[('loan', '=', self.id)], self._get_lead_sale_order_domain()])
+        #orders = self.order_ids.filtered_domain(self._get_lead_sale_order_domain())
+        requests = self.loan_reschedule_ids
+        if len(requests) == 1:
+            action['views'] = [(self.env.ref('de_hr_loan.hr_loan_reschedule_form_view').id, 'form')]
+            action['res_id'] = requests.id
+        return action
+
+    def action_new_reschedule_request(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("de_hr_loan.action_loan_reschedule")
+        return action
+    
 class HRLoanLine(models.Model):
     _name = "hr.loan.line"
     _description = "Installment Line"
@@ -442,6 +469,7 @@ class HRLoanLine(models.Model):
         ('draft', 'Open'),
         ('pending', 'Pending'),
         ('close', 'Close'),
+        ('cancel', 'Cancel'),
         ], string='Status', default='draft',store=True, tracking=True, copy=False, readonly=False,
             compute='_compute_state',
         help="The status is set to 'draft', when an installment is created." +
