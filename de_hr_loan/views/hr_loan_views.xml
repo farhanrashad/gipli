@@ -30,6 +30,9 @@
                     
                     <button name="%(action_loan_reject_wizard)d" type="action" string="Rject" attrs="{'invisible': [('state', 'not in', ['confirm','validate','validate1'])]}"/>
 
+                    <button name="%(action_loan_reschedule_wizard)d" type="action" string="Reschedule" attrs="{'invisible': [('state', 'in', ['confirm','validate','validate1'])]}"/>
+
+
                     <button name="action_confirm" type="object" string="Submit Request" attrs="{'invisible':[('state','!=','draft')]}"/>
                     <button name="action_confirm" type="object" string="Submit Request" class="oe_highlight"  attrs="{'invisible':[('state','!=','verify')]}"/>
 

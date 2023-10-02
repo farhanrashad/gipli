@@ -18,6 +18,7 @@
         'data/loan_data.xml',
         'data/mail_data.xml',
         'wizard/loan_reject_wizard_views.xml',
+        'wizard/loan_reschedule_wizard_views.xml',
         'wizard/save_xlsx_views.xml',
         'wizard/report_loan_xlsx_wizard_views.xml',
         'views/hr_loan.xml',

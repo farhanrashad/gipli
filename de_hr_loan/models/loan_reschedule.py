@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from collections import defaultdict
+from odoo import fields, models, api, _
+from odoo.exceptions import AccessError, UserError, ValidationError
+from dateutil.relativedelta import relativedelta
 
-from odoo import models, fields, api, _
-from odoo.tools.misc import frozendict
 
 READONLY_FIELD_STATES = {
     state: [('readonly', True)]
@@ -21,8 +20,8 @@ class LoanReschedule(models.Model):
     employee_id = fields.Many2one(related='loan_id.employee_id')
     loan_type_id = fields.Many2one(related='loan_id.loan_type_id')
     date = fields.Date(string="Date", default=fields.Date.today(), readonly=True, help="Loan Request Date",states=READONLY_FIELD_STATES,)
-    interval_loan = fields.Integer(string='Interval', required=True)
-
+    interval_loan = fields.Integer(string='Interval', required=True, readonly=True, states=READONLY_FIELD_STATES,)
+    note = fields.Char(string='Reason', required=True, readonly=True, states=READONLY_FIELD_STATES,)
     state = fields.Selection([
         ('draft', 'To Submit'),
         ('verify', 'Verified'),
@@ -80,13 +79,46 @@ class LoanReschedule(models.Model):
         self.write({'state': 'cancel'})
 
     def action_approve(self):
-        for loan in self:            
-            template = self.env.ref('de_hr_loan.loan_approval_mail')
-            template.send_mail(self.id, force_send=True)
+        for request in self:            
+            #template = self.env.ref('de_hr_loan.loan_approval_mail')
+            #template.send_mail(request.id, force_send=True)
+
+            previous_records = self.env['hr.loan.line'].search([('loan_id', '=', request.loan_id.id),('state', 'in', ['draft','pending'])], limit=request.interval_loan)
+            #raise UserError(previous_records)
+
+            last_line_item = request.loan_id.loan_lines.search([], order="date desc", limit=1)
+            date_end = last_line_item.date
+            date_start = date_end + relativedelta(months=1)
+        
+            new_records = []
+            for i in range(request.interval_loan):
+                new_records.append({
+                    'amount': previous_records[i].amount,  # Copy other fields as needed
+                    'date': date_start,
+                    'employee_id': request.loan_id.employee_id.id,
+                    'loan_id': request.loan_id.id,
+                    'state': 'pending', #previous_records[i].state,
+                    'account_move_id': previous_records[i].account_move_id.id,
+                })
+                previous_records[i].account_move_id.sudo().button_draft()
+                previous_records[i].account_move_id.write({
+                    'name': False,
+                    'date': date_start,
+                })
+                previous_records[i].account_move_id.sudo().action_post()
+                date_start = date_start + relativedelta(months=1)
+
+            self.env['hr.loan.line'].create(new_records)
+            for previous_record in previous_records:
+                previous_record.write({
+                    'state': 'cancel',
+                    'account_move_id': False,
+                })
+            
             self.write({'state': 'validate'})
             self.message_post(
                 body=_(
-                    'Your Encashment Request for %(leave_type)s on %(date)s has been accepted',
+                    'Your Loan Request for %(leave_type)s on %(date)s has been accepted',
                     leave_type=self.loan_type_id.name,
                     date=self.date
                 ),

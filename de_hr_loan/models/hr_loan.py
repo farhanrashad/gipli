@@ -275,7 +275,7 @@ class HrLoan(models.Model):
             self.write({'state': 'validate'})
             self.message_post(
                 body=_(
-                    'Your Encashment Request for %(leave_type)s on %(date)s has been accepted',
+                    'Your Loan Reschedule Request for %(leave_type)s on %(date)s has been accepted',
                     leave_type=self.loan_type_id.name,
                     date=self.date
                 ),
