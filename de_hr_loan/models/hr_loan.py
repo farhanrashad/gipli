@@ -262,9 +262,6 @@ class HrLoan(models.Model):
         template.send_mail(self.id, force_send=True)
         return self.write({'state': 'refuse'})
 
-    def action_submit(self):
-        self.write({'state': 'waiting_approval_1'})
-
     def action_cancel(self):
         self.write({'state': 'cancel'})
 
