@@ -16,6 +16,7 @@ access_hr_loan_reschedule_manager,access.hr.loan.reschedule.manager,model_hr_loa
 
 access_hr_loan_reject_wizard_user,access.hr.loan.reject.wizard.user,model_hr_loan_reject_wizard,group_loan_user,1,1,1,1
 access_hr_loan_reschedule_wizard_user,access.hr.loan.reschedule.wizard.user,model_hr_loan_reschedule_wizard,group_loan_user,1,1,1,1
+access_loan_scheduler_compute_user,access.loan.scheduler.compute.user,model_hr_loan_scheduler_compute,group_loan_user,1,1,1,1
 
 access_report_hr_loan_user,access.report.hr.loan.user,model_report_hr_loan,group_loan_user,1,1,1,1
 

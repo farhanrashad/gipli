@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="loan_scheduler_compute_wizard" model="ir.ui.view">
+        <field name="name">Run Loan Schedulers Manually</field>
+        <field name="model">hr.loan.scheduler.compute</field>
+        <field name="arch" type="xml">
+            <form string="Parameters">
+                <p>
+The scheduled action will reconcile the received payments with pending loan schedule lines and post the accounting documents for prepayments if applicable.                </p>
+                <footer>
+                    <button name="reconcile_loans" string="Reconcile Loans" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_loan_scheduler_compute" model="ir.actions.act_window">
+        <field name="name">Reconcile Loans</field>
+        <field name="res_model">hr.loan.scheduler.compute</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem action="action_loan_scheduler_compute" id="menu_loan_scheduler_compute" parent="menu_loan_management" sequence="135" groups="base.group_no_one"/>
+
+
+</odoo>
