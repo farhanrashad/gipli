@@ -28,6 +28,7 @@
         'views/hr_loan_type_views.xml',
         'views/hr_loan_views.xml',
         'reports/report_loan_views.xml',
+        'reports/report_loan.xml',
         
     ],
     'images': ['static/description/banner.png'],

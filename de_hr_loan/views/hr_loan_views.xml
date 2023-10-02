@@ -138,7 +138,7 @@
                                     <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                     <field name="amount_paid" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                     <field name="amount_disbursed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                    <field name="amount_balance" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_residual" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                 </group>
                             </group>
                             <div class="oe_clear"/>

@@ -1,0 +1,108 @@
+<odoo>
+    <data>
+        <template id="loan_detail_template_report_view">
+            <t t-call="web.external_layout">
+                <t t-set="o" t-value="o.with_context({'lang':o.employee_id.lang})"/>
+                <div class="page">
+                    <br/>
+                    <div class="oe_structure"/>
+                    <div class="mt-4">
+                        <h2>Loan Reference #<span t-field="o.name"/></h2>
+                    </div>
+
+                    <div id="employee_info" class="row mt-4 mb32">
+                        <div t-if="o.employee_id" class="col-3 bm-2">
+                            <strong>Employee</strong>
+                            <p t-field="o.employee_id" class="m-0"/>
+                        </div>
+                        <div t-if="o.employee_id.department_id" class="col-3 bm-2">
+                            <strong>Department</strong>
+                            <p t-field="o.employee_id.department_id" class="m-0"/>
+                        </div>
+                        <div t-if="o.employee_id.job_title" class="col-3 bm-2">
+                            <strong>Job Position</strong>
+                            <p t-field="o.employee_id.job_title" class="m-0"/>
+                        </div>
+                        <div t-elif="o.employee_id.parent_id" class="col-3 bm-2">
+                            <strong>Manager</strong>
+                            <p t-field="o.employee_id.parent_id" class="m-0"/>
+                        </div>
+                    </div>
+                    <div id="loan_detail" class="row mt-4 mb32">
+                        <div t-if="o.loan_type_id" class="col-3 bm-2">
+                            <strong>Loan Type</strong>
+                            <p t-field="o.loan_type_id" class="m-0"/>
+                        </div>
+                        <div t-if="o.date" class="col-3 bm-2">
+                            <strong>Date</strong>
+                            <p t-field="o.date" class="m-0"/>
+                        </div>
+                        <div t-if="o.date_start" class="col-3 bm-2">
+                            <strong>Start Date</strong>
+                            <p t-field="o.date_start" class="m-0"/>
+                        </div>
+                        <div t-if="o.date_end" class="col-3 bm-2">
+                            <strong>End Date</strong>
+                            <p t-field="o.date_end" class="m-0"/>
+                        </div>
+                    </div>
+                    <div id="loan_amount" class="row mt-4 mb32">
+                        <div t-if="o.amount" class="col-3 bm-2">
+                            <strong>Loan Amount</strong>
+                            <p t-field="o.amount" class="m-0" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                        </div>
+                        <div t-if="o.amount_residual" class="col-3 bm-2">
+                            <strong>Residual</strong>
+                            <p t-field="o.amount_residual" class="m-0" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                        </div>
+                    </div>
+                    <br/>
+                    <h4>Loan Schedule</h4>
+                    <table class="table table-sm o_main_table mt-4">
+                        <thead style="display: table-row-group">
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="consumed_tbody">
+                            <t t-set="total" t-value="0.0"/>
+                            <t t-foreach="o.loan_lines" t-as="line">
+                                <tr>
+                                    <td><span t-field="line.date"/></td>
+                                    <td><span t-field="line.amount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}" /></td>
+                                    <td><span t-field="line.state" /></td>
+                                </tr>
+                                <t t-set="total" t-value="total + line.amount"/>
+                            </t>
+                            <tr>
+                                <td/>
+                                <td><strong>Total:</strong></td>
+                                <td width="10%"><strong><span><t t-esc="total"/></span></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </template>
+        <template id="loan_detail_report_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="de_hr_loan.loan_detail_template_report_view" t-lang="o.employee_id.lang"/>
+                </t>
+            </t>
+        </template>
+        <!--  Loan Report  -->
+        <record id="loal_detail_report" model="ir.actions.report">
+            <field name="name">Print Loan</field>
+            <field name="model">hr.loan</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_hr_loan.loan_detail_report_template</field>
+            <field name="report_file">de_hr_loan.loan_detail_report_template</field>
+            <field name="print_report_name">'Loan Detail'</field>
+            <field name="binding_model_id" ref="de_hr_loan.model_hr_loan"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

@@ -92,7 +92,7 @@ class HrLoan(models.Model):
                                 help="Total Paid Amount for loan")
     amount_disbursed = fields.Monetary(string="Disbursed", store=True, compute='_compute_loan_amount',
                                   help="Total Amount recieved from Employee")
-    amount_balance = fields.Monetary(string="Balance", store=True, compute='_compute_loan_amount',
+    amount_residual = fields.Monetary(string="Residual", store=True, compute='_compute_loan_amount',
                                      help="Total Remaining amount")
 
     # Accounting Fields
@@ -165,7 +165,7 @@ class HrLoan(models.Model):
             else:
                 loan.amount_paid = 0 
             loan.amount_disbursed = sum(loan.loan_lines.mapped('amount_paid'))
-            loan.amount_balance = loan.amount - sum(loan.loan_lines.mapped('amount_paid'))
+            loan.amount_residual = loan.amount - sum(loan.loan_lines.mapped('amount_paid'))
             
     @api.depends('account_move_id','account_move_id.payment_state','loan_lines','loan_lines.state')
     def _compute_state(self):
