@@ -41,6 +41,9 @@
                             <field name="loan_type_id" options="{'no_create': True, 'no_open': True}"/>
                         </group>
                     </group>
+                    <group>
+                        <field name="note"/>
+                    </group>
                     
                 </sheet>
                 <div class="oe_chatter">

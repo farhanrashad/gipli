@@ -449,10 +449,6 @@ class HrLoan(models.Model):
             action['views'] = [(self.env.ref('de_hr_loan.hr_loan_reschedule_form_view').id, 'form')]
             action['res_id'] = requests.id
         return action
-
-    def action_new_reschedule_request(self):
-        action = self.env["ir.actions.actions"]._for_xml_id("de_hr_loan.action_loan_reschedule_request_new")
-        return action
     
 class HRLoanLine(models.Model):
     _name = "hr.loan.line"
