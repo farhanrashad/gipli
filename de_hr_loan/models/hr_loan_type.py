@@ -6,6 +6,7 @@ import base64
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import ValidationError
 from odoo.modules.module import get_module_resource
+from ast import literal_eval
 
 
 class LoanType(models.Model):
@@ -20,6 +21,7 @@ class LoanType(models.Model):
         return base64.b64encode(open(default_image_path, 'rb').read())
 
     name = fields.Char(string="Name", translate=True, required=True)
+    color = fields.Integer('Color')
     company_id = fields.Many2one(
         'res.company', 'Company', copy=False,
         required=True, index=True, default=lambda s: s.env.company)
@@ -88,6 +90,11 @@ class LoanType(models.Model):
         ('fix', 'Fixed'),
         ('max', 'Maximum'),
     ], string='Interval Mode', required=True, default='fix')
+
+    # Compute all counts
+    count_loan_pending = fields.Integer(compute='_compute_loan_count')
+    count_loan_confirm = fields.Integer(compute='_compute_loan_count')
+    count_loan_to_pay = fields.Integer(compute='_compute_loan_count')
     
     interval_loan = fields.Integer(string='Interval', required=True)
 
@@ -107,7 +114,31 @@ class LoanType(models.Model):
         for type in self:
             type.request_to_validate_count = requests_mapped_data.get(type.id, 0)
 
-            
+    def _compute_loan_count(self):
+        domains = {
+            'count_loan_pending': [('state', 'in', ['partial','validate'])],
+            'count_loan_confirm': [('state', 'in', ['confirm'])],
+        }
+        for type in self:
+            loan_ids = self.env['hr.loan'].search([('state', 'not in', ('done', 'cancel')), ('loan_type_id', '=', type.id)])
+            type.count_loan_pending = len(loan_ids.filtered(lambda x:x.state in ('validate','partial')))
+            type.count_loan_confirm = len(loan_ids.filtered(lambda x:x.state in ('confirm')))
+            type.count_loan_to_pay = len(loan_ids.filtered(lambda x:x.state in ('post')))
+        #for field in domains:
+        #    data = self.env['hr.loan']._read_group(domains[field] +
+        #        [('state', 'not in', ('done', 'cancel')), ('loan_type_id', 'in', self.ids)],
+        #        ['loan_type_id'], ['loan_type_id'])
+        #    count = {
+        #        x['loan_type_id'][0]: x['loan_type_id_count']
+        #        for x in data if x['loan_type_id']
+        #    }
+        #    for record in self:
+        #        record[field] = count.get(record.id, 0)
+
+                
+    # --------------------------------------------
+    # -------------- Operations ------------------
+    # --------------------------------------------
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -141,7 +172,9 @@ class LoanType(models.Model):
                     loan_type.sequence_id.company_id = vals.get('company_id')
         return super().write(vals)
 
-
+    # ===============================================
+    # ================== Actions ====================
+    # ===============================================
     def create_request(self):
         self.ensure_one()
         # If category uses sequence, set next sequence as name
@@ -157,6 +190,58 @@ class LoanType(models.Model):
                 #'default_request_owner_id': self.env.user.id,
                 'default_request_status': 'draft'
             },
+        }
+
+    def _get_action(self, action_xmlid, domain=[]):
+        action = self.env["ir.actions.actions"]._for_xml_id(action_xmlid)
+        if self:
+            action['display_name'] = self.display_name
+            
+        context = {
+            'search_default_loan_type_id': [self.id],
+            'default_loan_type_id': self.id,
+            'default_company_id': self.company_id.id,
+        }
+
+        action_context = literal_eval(action['context'])
+        context = {**action_context, **context}
+        action['context'] = context
+        if domain:
+            action['domain'] = domain  # Add the domain parameter here if it's provided
+        return action
+        
+    def get_action_loan_tree_pending(self):
+        domain = [('loan_type_id', '=', self.id),('state', 'in', ['validate','partial'])]
+        return self._get_action('de_hr_loan.action_loan_tree',domain=domain)
+    def get_action_loan_tree_confirm(self):
+        domain = [('loan_type_id', '=', self.id),('state', 'in', ['confirm'])]
+        return self._get_action('de_hr_loan.action_loan_tree',domain=domain)
+    def get_action_loan_tree_to_pay(self):
+        domain = [('loan_type_id', '=', self.id),('state', 'in', ['post'])]
+        return self._get_action('de_hr_loan.action_loan_tree',domain=domain)
+
+    def get_action_all_loan_type(self):
+        domain = [('loan_type_id', '=', self.id)]
+        return self._get_action('de_hr_loan.action_loan_tree',domain=domain)
+    def get_action_all_loan_type_paid(self):
+        domain = [('loan_type_id', '=', self.id),('state', 'in', ['paid'])]
+        return self._get_action('de_hr_loan.action_loan_tree',domain=domain)
+    def get_action_all_loan_type_refused(self):
+        domain = [('loan_type_id', '=', self.id),('state', 'in', ['refuse'])]
+        return self._get_action('de_hr_loan.action_loan_tree',domain=domain)
+    def get_action_all_loan_type_closed(self):
+        domain = [('loan_type_id', '=', self.id),('state', 'in', ['close'])]
+        return self._get_action('de_hr_loan.action_loan_tree',domain=domain)
+
+    def action_open_loan_type(self):
+        self.ensure_one()
+        return {
+            'name': self.name,
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'views': [[False, "form"]],
+            'res_model': 'hr.loan.type',
+            'res_id': self.id,
         }
 
 class LoanTypeDocument(models.Model):
