@@ -249,15 +249,25 @@ class HrLoan(models.Model):
         '''
         loan_schedule_ids = self.loan_lines.search([
             ('state', 'in', ['draft','pending']),
-            ('date', '<=', fields.Date.context_today(self)),
+            ('date', '<=', fields.Date.today()),
             ('loan_id.repayment_mode', '=', 'credit_memo'),
         ])
         for line in loan_schedule_ids:
             try:
                 with self.env.cr.savepoint():
-                    if not line.loan_id.prepayment_credit_memo:
+                    if not line.loan_id.loan_type_id.prepayment_credit_memo:
                         if not line.account_move_id:
-                            loan_schedule_ids._prepare_account_move()
+                            for line in loan_schedule_ids:
+                                #account_move_id = line._prepare_credit_memo()
+                                account_move_id = self.env['account.move'].create(line._prepare_credit_memo())
+                                line.write({
+                                    'state': 'pending',
+                                    'res_id': account_move_id.id,
+                                    'model': 'account.move',
+                                    'res_name': account_move_id.name,
+                                    'account_move_id': account_move_id.id,
+                                })
+                                account_move_id.action_post()
                         else:
                             if line.account_move_id.payment_state in ('paid','in_payment'):
                                 line.state = 'close'
@@ -536,7 +546,30 @@ class HRLoanLine(models.Model):
                 line.amount_paid = line.account_move_id.amount_total_signed - line.account_move_id.amount_residual_signed
             else:
                 line.amount_paid = 0
-            
+
+    def _prepare_credit_memo(self):
+        # Create a dictionary with the values for the vendor bill
+        values = {
+            'move_type': 'in_refund',
+            'partner_id': self.loan_id.employee_id.sudo().address_home_id.id,
+            'journal_id': self.loan_id.journal_id.id,
+            'invoice_date': fields.Date.today(),
+            'invoice_date_due': self.date,
+            'date': self.date,
+            'ref': self.loan_id.name + '/' + self.date.strftime("%b") + '/' + self.date.strftime("%Y"),
+            'currency_id': self.loan_id.currency_id.id,
+            'invoice_line_ids': [
+                (0, 0, {
+                    'product_id': self.loan_id.loan_type_id.product_id.id,
+                    'quantity': 1,
+                    'price_unit': self.amount,
+                    'name': self.loan_id.loan_type_id.product_id.display_name,
+                })
+            ],
+        }
+        
+        return values
+
 class HrLoanDocuments(models.Model):
     _name = 'hr.loan.document'
     _description = 'Loan Documents'
@@ -573,9 +606,3 @@ class HrLoanDocuments(models.Model):
             self._message_post_attach_document(document, loan_message)
 
         return document
-
-
-
-
-
-
