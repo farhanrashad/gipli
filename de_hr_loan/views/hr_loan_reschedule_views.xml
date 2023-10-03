@@ -16,10 +16,11 @@
                 </header>
                 <sheet>
                     <div class="oe_title">
-                        <span class="o_form_label" >Request for Reschedule Loan </span>
+                        <span class="o_form_label" >Request for Reschedule</span>
                         <h1 class="d-flex">
                             <field name="name" readonly="1"/>
                         </h1>
+                        <span class="o_form_label" >Loan Reference</span>
                         <h3>
                             <field name="loan_id" />
                         </h3>
@@ -57,7 +58,6 @@
     <record id="hr_loan_reschedule_tree_view" model="ir.ui.view">
         <field name="name">hr.loan.reschedule.tree.view</field>
         <field name="model">hr.loan.reschedule</field>
-        <field name="priority">10</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
@@ -65,7 +65,7 @@
                 <field name="employee_id" />
                 <field name="date"/>
                 <field name="loan_type_id" />
-                <field name="state" />
+                <field name="state" widget="badge" decoration-success="state == 'confirm'" decoration-info="state == 'draft'" decoration-muted="state == 'validate' or state=='refuse'" optional="show"/>
             </tree>
         </field>
     </record>
@@ -77,6 +77,14 @@
         <field name="arch" type="xml">
             <search>
                 <field name="loan_id"/>
+                <filter string="My Requests" name="myrequest" domain="[('loan_id.employee_id.user_id.id', '=', uid)]" />
+                <separator/>
+                <filter string="To Confirm" name="to_confirm" domain="[('state', 'in', ['draft'])]" />
+                <filter string="To Approve" name="to_approve" domain="[('state', 'in', ['confirm','validate1'])]" />
+
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="status" context="{'group_by':'state'}"/>
+                </group>
             </search>
         </field>
     </record>
@@ -85,14 +93,21 @@
         <field name="name">Loan Reschedule</field>
         <field name="res_model">hr.loan.reschedule</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{'create': False}</field>
     </record>
+
+    <menuitem name="Reschedule Requests"
+        parent="menu_loan_management"
+        id="menu_hr_loan_reschedule_request"
+        sequence="2"
+        action="action_loan_reschedule"/>
 
     <record id="action_loan_reschedule_request_new" model="ir.actions.act_window">
         <field name="name">Loan Reschedule Request</field>
         <field name="res_model">hr.loan.reschedule</field>
         <field name="view_mode">form,tree</field>
         <field name="domain">[('loan_id', '=', active_id)]</field>
-        <field name="context">{'search_default_loan_id': active_id, 'default_loan_id': active_id}</field>
+        <field name="context">{'create': False, 'search_default_loan_id': active_id, 'default_loan_id': active_id}</field>
     </record>
     
 </odoo>

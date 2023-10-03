@@ -80,7 +80,7 @@ class HrLoan(models.Model):
     date_start = fields.Date(string="Loan Start Date", required=True, store=True, readonly=False,
                              compute='_compute_date_start',states=READONLY_FIELD_STATES,
                                help="Date of Start")
-    date_end = fields.Date(string="Loan End Date", required=True, store=True, readonly=True,
+    date_end = fields.Date(string="Loan End Date", store=True, readonly=True,
                              compute='_compute_date_end', help="Date of End")
     department_id = fields.Many2one('hr.department', string='Department', compute='_compute_from_employee_id')
     job_id = fields.Many2one('hr.job', string='Job', compute='_compute_from_employee_id')
@@ -141,7 +141,7 @@ class HrLoan(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             category = 'loan_type_id' in vals and self.env['hr.loan.type'].browse(vals['loan_type_id'])
-            if category and category.automated_sequence:
+            if category and category.sequence_code:
                 vals['name'] = category.sequence_id.next_by_id()
         return super().create(vals_list)
         
@@ -209,8 +209,8 @@ class HrLoan(models.Model):
     def _compute_from_loan_type(self):
         for loan in self:
             loan.interval_loan_mode = loan.loan_type_id.interval_loan_mode
-            if loan.interval_loan <= 0:
-                loan.interval_loan = loan.loan_type_id.interval_loan
+            if loan.interval_loan_mode == 'fix' or loan.interval_loan == 0:
+                loan.interval_loan = loan.loan_type_id.interval_loan                
             loan.repayment_mode = loan.loan_type_id.repayment_mode
                 
     
@@ -328,12 +328,12 @@ class HrLoan(models.Model):
                     raise UserError("Maximum allowed internal is %s" % loan.loan_type_id.interval_loan)
 
             contract_id = self.env['hr.contract'].search([('employee_id','=',loan.employee_id.id)],limit=1)
-            amount_wage = contract_id[eval("'" + loan.loan_type_id.calculation_field_id.name + "'")] * (loan.loan_type_id.amount_per / 100)
-            
+            amount_wage = 0
             if loan.loan_type_id.calculation_type == 'fix':
                 if loan.amount > loan.loan_type_id.fixed_amount:
                     raise UserError("Maximum allowed amount is %s for this loan type" % loan.loan_type_id.fixed_amount)
             elif loan.loan_type_id.calculation_type == 'percent':
+                amount_wage = contract_id[eval("'" + loan.loan_type_id.calculation_field_id.name + "'")] * (loan.loan_type_id.amount_per / 100)
                 if loan.amount > amount_wage:
                     raise UserError("Your maximum amount limit for a %s is %s %s" % (loan.loan_type_id.name, amount_wage, loan.currency_id.name))
             

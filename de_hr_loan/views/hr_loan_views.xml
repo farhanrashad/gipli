@@ -11,7 +11,8 @@
                 <field name="employee_id"/>
                 <field name="amount"/>
                 <field name="date"/>
-                <field name="state"/>
+                <field name="state" widget="badge" decoration-success="state == 'paid'" decoration-warning="state == 'confirm' or state == 'validate1'" decoration-danger="state == 'validate' or state == 'partial'" decoration-info="state == 'draft'" decoration-muted="state == 'done' or state=='refuse'" optional="show"/>
+
             </tree>
         </field>
     </record>
@@ -165,13 +166,22 @@
         <field name="name">hr.loan.search.form</field>
         <field name="model">hr.loan</field>
         <field name="arch" type="xml">
-           <search string="Loan">
-               <filter string="My Requests" name="myrequest" domain="[('employee_id.user_id.id', '=', uid)]" />
+            <search string="Loan">
+                <field name="name" string="Reference"/>
+                <field name="loan_type_id" string="Loan Type"/>
                 <field name="employee_id" string="Employee"/>
-                <field name="department_id" string="Department"/>
-                    <filter string="Employee" name="employee_id" context="{'group_by':'employee_id'}"/>
-                    <filter string="Department" name="department_id" context="{'group_by':'department_id'}"/>
+               
+                <filter string="My Requests" name="myrequest" domain="[('employee_id.user_id.id', '=', uid)]" />
+                <separator/>
+                
+                <filter string="To Approve" name="to_approve" domain="[('state', 'in', ['confirm','validate1'])]" />
+                <filter string="Pending" name="pending" domain="[('state', 'in', ['validate','partial'])]" />
+                <filter string="To Pay" name="to_pay" domain="[('state', 'in', ['paid'])]" />
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee_id" context="{'group_by':'employee_id'}"/>
+                    <filter string="Loan Type" name="group_loan_type" context="{'group_by':'loan_type_id'}"/>
                     <filter string="Status" name="status" context="{'group_by':'state'}"/>
+                </group>
             </search>
         </field>
     </record>
@@ -200,6 +210,7 @@
     <menuitem name="All Requests"
         parent="menu_loan_management"
         id="menu_hr_loan_request"
+        sequence="1"
         action="action_hr_loan_request"/>
 
     <!-- Actions for Dashbaord -->

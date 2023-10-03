@@ -28,11 +28,9 @@ class LoanType(models.Model):
     currency_id = fields.Many2one(related='company_id.currency_id')
     active = fields.Boolean(default=True)
     sequence = fields.Integer(string="Sequence")
-    description = fields.Char(string="Description", translate=True)
+    description = fields.Char(string="Description", translate=True, required=True)
     image = fields.Binary(string='Image', default=_get_default_image)
-    automated_sequence = fields.Boolean('Automated Sequence?',
-        help="If checked, the Approval Requests will have an automated generated name based on the given code.")
-    sequence_code = fields.Char(string="Code")
+    sequence_code = fields.Char(string="Code", required=True )
     sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
         copy=False, check_company=True)
 
@@ -96,7 +94,7 @@ class LoanType(models.Model):
     count_loan_confirm = fields.Integer(compute='_compute_loan_count')
     count_loan_to_pay = fields.Integer(compute='_compute_loan_count')
     
-    interval_loan = fields.Integer(string='Interval', required=True)
+    interval_loan = fields.Integer(string='Interval', required=True, default=1)
 
     loan_type_document_ids = fields.One2many('hr.loan.type.document', 'loan_type_id', string='Documents')
 
@@ -142,7 +140,7 @@ class LoanType(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('automated_sequence'):
+            if vals.get('sequence_code'):
                 sequence = self.env['ir.sequence'].create({
                     'name': _('Sequence') + ' ' + vals['sequence_code'],
                     'padding': 5,
@@ -185,7 +183,7 @@ class LoanType(models.Model):
             "views": [[False, "form"]],
             "context": {
                 'form_view_initial_mode': 'edit',
-                'default_name': _('New') if self.automated_sequence else self.name,
+                'default_name': _('New') if self.sequence_code else self.name,
                 'default_loan_type_id': self.id,
                 #'default_request_owner_id': self.env.user.id,
                 'default_request_status': 'draft'
