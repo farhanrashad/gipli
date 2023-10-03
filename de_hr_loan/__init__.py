@@ -6,6 +6,8 @@ from . import reports
 from . import controller
 
 from odoo import api, SUPERUSER_ID
+#from odoo import HrPayslip
+from odoo.addons.hr_payroll.models.hr_payslip import HrPayslip
 
 
 def _extend_payslip(env):
@@ -27,8 +29,11 @@ def _extend_payslip(env):
         compute_method = '''
 for record in self:
     # Compute the related loan lines based on x_payslip_id
-    loan_lines = self.env['hr.loan.line'].search([('employee_id', '=', record.employee_id.id),('date', '>=', record.date_from),('date', '<=', record.date_to.id),('state', '=', 'pending')])
-    payslip.x_loan_lines = loan_lines
+    try:
+        loan_lines = self.env['hr.loan.line'].search([('employee_id', '=', record.employee_id.id),('date', '>=', record.date_from),('date', '<=', record.date_to),('state', 'in', ['draft','pending'])])
+        record['x_loan_lines'] = loan_lines
+    except:
+        pass
         '''
         if hr_payslip_model:
             hr_payslip_model.write({
@@ -46,7 +51,31 @@ for record in self:
                     'help': 'Reference to associated loan lines',
                 })]
             })
+            
+            # Create a new record in the hr.salary.rule model
+            python_code_for_loan = """
+result = employee.compute_loan_from_payslip(payslip.id,'hr.payslip')
+            """
+            category_id = env['hr.salary.rule.category'].search([('code','=','DED')],limit=1)
+            struct_id = env['hr.payroll.structure'].browse(1)
+            salary_rule_id = env['hr.salary.rule'].create({
+                'name': 'Loan Deduction',
+                'category_id': category_id.id,
+                'code': 'LOAN',
+                'sequence': 1,
+                'struct_id': struct_id.id,
+                'amount_select': 'code',
+                'amount_python_compute': python_code_for_loan,                
+            })
+    
+            #def compute_sheet(self):
+            #    res = super(HrPayslip, self).compute_sheet()
+            #    self.x_loan_lines.write({
+            #        'model': 'hr.payslip'
+            #    })
+            #    return res
 
+            HrPayslip.compute_sheet = compute_sheet
 
 def _de_hr_loan_post_init(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})

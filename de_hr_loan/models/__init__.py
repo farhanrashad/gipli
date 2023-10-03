@@ -7,5 +7,4 @@ from . import hr_loan_type
 from . import account_move
 from . import loan_reschedule
 #from . import hr_loan_reconcile
-#from . import hr_employee
-#from . import payslip_extention
+from . import hr_employee

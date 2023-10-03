@@ -255,22 +255,25 @@ class HrLoan(models.Model):
         for line in loan_schedule_ids:
             try:
                 with self.env.cr.savepoint():
-                    if not line.loan_id.loan_type_id.prepayment_credit_memo:
-                        if not line.account_move_id:
-                            for line in loan_schedule_ids:
-                                #account_move_id = line._prepare_credit_memo()
-                                account_move_id = self.env['account.move'].create(line._prepare_credit_memo())
-                                line.write({
-                                    'state': 'pending',
-                                    'res_id': account_move_id.id,
-                                    'model': 'account.move',
-                                    'res_name': account_move_id.name,
-                                    'account_move_id': account_move_id.id,
-                                })
-                                account_move_id.action_post()
-                        else:
-                            if line.account_move_id.payment_state in ('paid','in_payment'):
-                                line.state = 'close'
+                    if line.loan_id.loan_type_id.repayment_mode == 'credit_memo':
+                        if not line.loan_id.loan_type_id.prepayment_credit_memo:
+                            if not line.account_move_id:
+                                    account_move_id = self.env['account.move'].create(line._prepare_credit_memo())
+                                    line.write({
+                                        'state': 'pending',
+                                        'res_id': account_move_id.id,
+                                        'model': 'account.move',
+                                        'res_name': account_move_id.name,
+                                        'account_move_id': account_move_id.id,
+                                    })
+                                    account_move_id.action_post()
+                            else:
+                                if line.account_move_id.payment_state in ('paid','in_payment'):
+                                    line.state = 'close'
+                    elif line.loan_id.loan_type_id.repayment_mode == 'payslip':
+                        if line.x_payslip_id.state in ('done','paid'):
+                            line.state = 'close'
+                        
             except UserError as e:
                 msg = _('The loan journal entries could not be posted for the following reason: %(error_message)s', error_message=e)
                 move.message_post(body=msg, message_type='comment')
@@ -395,10 +398,10 @@ class HrLoan(models.Model):
             'currency_id': self.currency_id.id,
             'invoice_line_ids': [
                 (0, 0, {
-                    'product_id': self.loan_type_id.product_id.id,
+                    'product_id': self.loan_type_id.payment_product_id.id,
                     'quantity': 1,
                     'price_unit': self.amount,
-                    'name': self.description or self.loan_type_id.product_id.display_name,
+                    'name': self.description or self.loan_type_id.payment_product_id.display_name,
                 })
             ],
         }
