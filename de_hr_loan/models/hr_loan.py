@@ -271,8 +271,11 @@ class HrLoan(models.Model):
                                 if line.account_move_id.payment_state in ('paid','in_payment'):
                                     line.state = 'close'
                     elif line.loan_id.loan_type_id.repayment_mode == 'payslip':
-                        if line.x_payslip_id.state in ('done','paid'):
-                            line.state = 'close'
+                        try:
+                            if line.x_payslip_id.state in ('done','paid'):
+                                line.state = 'close'
+                        except:
+                            pass
                         
             except UserError as e:
                 msg = _('The loan journal entries could not be posted for the following reason: %(error_message)s', error_message=e)
