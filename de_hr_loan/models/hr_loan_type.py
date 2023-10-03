@@ -41,7 +41,7 @@ class LoanType(models.Model):
     ], string='Re-Payment Mode', required=True, default='credit_memo')
     prepayment_credit_memo = fields.Boolean(string='Is Prepayment')
     
-    product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
+    payment_product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
 
     request_to_validate_count = fields.Integer("Number of requests to validate", compute="_compute_request_to_validate_count")
 

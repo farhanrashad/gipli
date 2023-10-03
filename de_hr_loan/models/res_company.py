@@ -11,4 +11,4 @@ class Company(models.Model):
         ('payslip', 'By Payslip'),
         ('none', 'None'),
     ], string='Re-Payment Mode', required=True, default='credit_memo')
-    default_repayment_product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
+    default_payment_product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")

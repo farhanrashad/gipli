@@ -27,7 +27,7 @@
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
                         <group string="Loan Accounting">
-                            <field name="product_id" options="{'no_create': True}" />
+                            <field name="payment_product_id" options="{'no_create': True}" />
                         </group>
                     </group>
                     <notebook>
