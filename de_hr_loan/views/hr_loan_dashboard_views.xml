@@ -33,7 +33,7 @@
                                         </div>
                                         <div class="col-9 o_kanban_primary_right">
                                             <h3>
-                                                <a type="object" name="get_stock_picking_action_picking_type">
+                                                <a type="object" name="get_action_all_loan_type">
                                                     <field name="name"/>
                                                 </a>
                                             </h3>

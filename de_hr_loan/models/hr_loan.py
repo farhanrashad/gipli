@@ -238,7 +238,37 @@ class HrLoan(models.Model):
                     'loan_id': self.id,
                 }
                 self.env['hr.loan.document'].create(vals)
-            
+
+    # -------------------------------------------------------------------------
+    # CRON
+    # -------------------------------------------------------------------------
+    def _reconcile_post_loan(self):
+        ''' This method is called from a cron job.
+        It is used to post entries such as those created by the module
+        account_asset and recurring entries created in _post().
+        '''
+        loan_schedule_ids = self.loan_lines.search([
+            ('state', 'in', ['draft','pending']),
+            ('date', '<=', fields.Date.context_today(self)),
+            ('loan_id.repayment_mode', '=', 'credit_memo'),
+        ])
+        for line in loan_schedule_ids:
+            try:
+                with self.env.cr.savepoint():
+                    if not line.loan_id.prepayment_credit_memo:
+                        if not line.account_move_id:
+                            loan_schedule_ids._prepare_account_move()
+                        else:
+                            if line.account_move_id.payment_state in ('paid','in_payment'):
+                                line.state = 'close'
+            except UserError as e:
+                msg = _('The loan journal entries could not be posted for the following reason: %(error_message)s', error_message=e)
+                move.message_post(body=msg, message_type='comment')
+
+        #if len(moves) == 100:  # assumes there are more whenever search hits limit
+        #    self.env.ref('account.ir_cron_auto_post_draft_entry')._trigger()
+
+        
     # ------------------------------------------------
     # -------------- Action Buttons ------------------
     # ------------------------------------------------
@@ -334,7 +364,18 @@ class HrLoan(models.Model):
             raise UserError(_("The private address of the employee is required to post the accounting document. Please add it on the employee form."))
 
         # Create a vendor bill
-        account_move_id = self.env['account.move'].create({
+        account_move_id = self.env['account.move'].create(self._prepare_account_move())
+        self._create_credit_memo()
+        self.write({
+            'state': 'post',
+            'account_move_id': account_move_id.id
+        })
+
+        self.activity_update()
+
+    def _prepare_account_move(self):
+        # Create a dictionary with the values for the vendor bill
+        values = {
             'move_type': 'in_invoice',
             'partner_id': self.employee_id.sudo().address_home_id.id,
             'journal_id': self.journal_id.id,
@@ -350,14 +391,9 @@ class HrLoan(models.Model):
                     'name': self.description or self.loan_type_id.product_id.display_name,
                 })
             ],
-        })
-        self._create_credit_memo()
-        self.write({
-            'state': 'post',
-            'account_move_id': account_move_id.id
-        })
-
-        self.activity_update()
+        }
+        
+        return values
         
     def _create_credit_memo(self):
         if self.loan_type_id.repayment_mode == 'credit_memo' and self.loan_type_id.prepayment_credit_memo:

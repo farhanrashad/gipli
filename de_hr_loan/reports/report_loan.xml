@@ -61,9 +61,9 @@
                     <table class="table table-sm o_main_table mt-4">
                         <thead style="display: table-row-group">
                             <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
+                                <th class="text-center">Date</th>
+                                <th class="text-center">Amount</th>
+                                <th class="text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody class="consumed_tbody">
@@ -71,8 +71,8 @@
                             <t t-foreach="o.loan_lines" t-as="line">
                                 <tr>
                                     <td><span t-field="line.date"/></td>
-                                    <td><span t-field="line.amount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}" /></td>
-                                    <td><span t-field="line.state" /></td>
+                                    <td class="text-end"><span t-field="line.amount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}" /></td>
+                                    <td class="text-center"><span t-field="line.state" /></td>
                                 </tr>
                                 <t t-set="total" t-value="total + line.amount"/>
                             </t>
