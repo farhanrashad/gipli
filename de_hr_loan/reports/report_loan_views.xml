@@ -36,7 +36,7 @@
                 <field name="amount_loan" optional="hide" sum="Sum of Loan"/>
                 <field name="amount_paid" optional="show" sum="Sum of Paid Amount"/>
                 <field name="amount_disbursed" optional="show" sum="Sum of Disbursed Amount"/>
-                <field name="amount_balance" optional="show" sum="Sum of Balance Amount"/>
+                <field name="amount_residual" optional="show" sum="Sum of Residual Amount"/>
                 <field name="state" optional="hide"/>
             </tree>
         </field>

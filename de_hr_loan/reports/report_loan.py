@@ -24,7 +24,7 @@ class ReportLoan(models.Model):
     amount_loan = fields.Float('Amount', readonly=True)
     amount_paid = fields.Float('Paid', readonly=True)
     amount_disbursed = fields.Float('Disbursed', readonly=True)
-    amount_balance = fields.Float('Balance', readonly=True)
+    amount_residual = fields.Float('Residual', readonly=True)
     state = fields.Selection([
         ('draft', 'To Submit'),
         ('verify', 'Verified'),
@@ -52,13 +52,13 @@ class ReportLoan(models.Model):
                     min(ln.id) as id, 
                     ln.name, ln.date, 
                     ln.loan_type_id, 
-                    tp.product_id, 
+                    tp.payment_product_id as product_id, 
                     ln.employee_id, 
                     ln.company_id,
                     sum(ln.amount) as amount_loan, 
                     sum(ln.amount_paid) as amount_paid, 
                     sum(ln.amount_disbursed) as amount_disbursed, 
-                    sum(ln.amount_balance) as amount_balance,
+                    sum(ln.amount_residual) as amount_residual,
                     ln.state,
                     l.date as date_due,
                     sum(l.amount) as amount_inst
@@ -86,13 +86,13 @@ class ReportLoan(models.Model):
                 ln.name, 
             ln.date, 
             ln.loan_type_id, 
-            tp.product_id, 
+            tp.payment_product_id, 
             ln.employee_id, 
             ln.company_id,
             ln.amount, 
             ln.amount_paid, 
             ln.amount_disbursed, 
-            ln.amount_balance,
+            ln.amount_residual,
             ln.state,
             l.date,
             l.amount

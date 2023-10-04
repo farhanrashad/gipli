@@ -65,7 +65,7 @@ class HRLoanXLSXReprot(models.TransientModel):
             SELECT
                 ln.name, to_char(ln.date,'MM-DD-YYYY') as date, 
                 e.name as employee_name, tp.name -> 'en_US' as loan_type,
-                ln.amount as loan_amount, ln.amount_paid, ln.amount_disbursed, ln.amount_balance, ln.state,
+                ln.amount as loan_amount, ln.amount_paid, ln.amount_disbursed, ln.amount_residual, ln.state,
                 to_char(l.date,'MM-DD-YYYY') as due_date, l.amount as due_amount, l.state as due_status
             FROM hr_loan ln
             JOIN hr_loan_line l on l.loan_id = ln.id
@@ -129,7 +129,7 @@ class HRLoanXLSXReprot(models.TransientModel):
                 ln.name, to_char(ln.date,'MM-DD-YYYY') as date, 
                 e.name as employee_name, tp.name -> 'en_US' as loan_type,
                 to_char(ln.date_start,'MM-DD-YYYY') as date_start, to_char(ln.date_end,'MM-DD-YYYY') as date_end,
-                ln.amount as loan_amount, ln.amount_paid, ln.amount_disbursed, ln.amount_balance, ln.state
+                ln.amount as loan_amount, ln.amount_paid, ln.amount_disbursed, ln.amount_residual, ln.state
             FROM hr_loan ln
             JOIN hr_employee e on ln.employee_id = e.id
             JOIN hr_loan_type tp on ln.loan_type_id = tp.id        
@@ -179,7 +179,7 @@ class HRLoanXLSXReprot(models.TransientModel):
                 sheet.write(row, 6, loan['loan_amount'],number)
                 sheet.write(row, 7, loan['amount_paid'],number)
                 sheet.write(row, 8, loan['amount_disbursed'],number)
-                sheet.write(row, 9, loan['amount_balance'],number)
+                sheet.write(row, 9, loan['amount_residual'],number)
                 sheet.write(row, 10, loan['state'],text)
 
                 row += 1
