@@ -474,7 +474,7 @@ class HrLoan(models.Model):
         
     def _get_responsible_for_approval(self):
         self.ensure_one()
-        responsible = self.env.user
+        responsible = self.employee_id.parent_id
         return responsible
         
     def activity_update(self):
