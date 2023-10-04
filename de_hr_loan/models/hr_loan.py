@@ -227,17 +227,22 @@ class HrLoan(models.Model):
             record.job_id = record.employee_id.sudo().job_id
 
     @api.onchange('loan_type_id')
-    def generate_loan_documents(self):
+    def onchange_loan_type_id(self):
         if self.loan_type_id:
-            document_ids = self.env['hr.loan.type.document'].search([('loan_type_id','=',self.loan_type_id.id)])
-            for doc in document_ids:
-                vals = {
-                    'name': doc.name,
-                    'doc_desc': doc.name,
-                    'is_mandatory': doc.is_mandatory,
-                    'loan_id': self.id,
-                }
-                self.env['hr.loan.document'].create(vals)
+            self.loan_document_ids.unlink()
+            loan_type_documents = self.loan_type_id.document_ids
+            self._create_loan_documents(loan_type_documents)
+
+    @api.model
+    def _create_loan_documents(self, missing_documents):
+        for doc in missing_documents:
+            vals = {
+                'name': doc.name,
+                'doc_desc': doc.name,
+                'is_mandatory': doc.is_mandatory,
+                'loan_id': self.id,
+            }
+            self.env['hr.loan.document'].create(vals)
 
     # -------------------------------------------------------------------------
     # CRON
@@ -299,6 +304,14 @@ class HrLoan(models.Model):
         for loan in self:
             if not len(loan.loan_lines) or loan.amount <= 0:
                 loan.action_compute_intervals()
+
+                # check constraint of documents
+                missing_attachments = self.loan_document_ids.filtered(lambda doc: doc.is_mandatory and not doc.attachment)
+                if missing_attachments:
+                    attachment_names = ', '.join(missing_attachments.mapped('name'))
+                    raise ValidationError(_('Mandatory attachments are missing: %s') % attachment_names)
+
+        
         self.write({'state': 'confirm'})
         self.activity_update()
         return True
@@ -367,6 +380,20 @@ class HrLoan(models.Model):
             loan.write({
                 'state': 'verify',
             })
+
+            # compute documents 
+            if self.loan_type_id:
+                existing_documents = self.loan_document_ids
+                # Get the document_ids associated with the selected loan_type
+                loan_type_documents = self.loan_type_id.document_ids
+
+                # Find the missing documents
+                missing_documents = loan_type_documents - existing_documents
+
+                # Create missing documents in the hr.loan model
+                self.loan_document_ids.unlink()                
+                self._create_loan_documents(missing_documents)
+            
         return True
 
     def action_request_move_create(self):
