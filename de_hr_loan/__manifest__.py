@@ -8,7 +8,8 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
-    'version': '0.3',
+    'version': '0.4',
+    'live_test_url': 'https://youtu.be/BwokAjL_KZU',
     'depends': ['base', 'hr', 'account','hr_contract'],
     'data': [
         'security/security.xml',
