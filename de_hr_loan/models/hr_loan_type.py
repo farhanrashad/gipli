@@ -193,7 +193,8 @@ for record in self:
     # Compute the related loan lines based on x_payslip_id
     try:
         loan_lines = self.env['hr.loan.line'].search([('employee_id', '=', record.employee_id.id),('date', '>=', record.date_from),('date', '<=', record.date_to),('state', 'in', ['draft','pending']),('loan_id.repayment_model', '=', 'hr.payslip')])
-        record['x_loan_lines'] = loan_lines
+        record['x_loan_lines'] = loan_lines.filtered(lambda x:x.loan_id.loan_type_id.repayment_model == 'hr.payslip')
+
     except:
         pass
         '''
