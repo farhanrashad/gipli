@@ -305,13 +305,12 @@ class HrLoan(models.Model):
             if not len(loan.loan_lines) or loan.amount <= 0:
                 loan.action_compute_intervals()
 
-                # check constraint of documents
-                missing_attachments = self.loan_document_ids.filtered(lambda doc: doc.is_mandatory and not doc.attachment)
-                if missing_attachments:
-                    attachment_names = ', '.join(missing_attachments.mapped('name'))
-                    raise ValidationError(_('Mandatory attachments are missing: %s') % attachment_names)
+            # check constraint of documents
+            missing_attachments = self.loan_document_ids.filtered(lambda doc: doc.is_mandatory and not doc.attachment)
+            if missing_attachments:
+                attachment_names = ', '.join(missing_attachments.mapped('name'))
+                raise ValidationError(_('Mandatory attachments are missing: %s') % attachment_names)
 
-        
         self.write({'state': 'confirm'})
         self.activity_update()
         return True
@@ -381,18 +380,21 @@ class HrLoan(models.Model):
                 'state': 'verify',
             })
 
-            # compute documents 
+            # Check if any new document added in loan 
             if self.loan_type_id:
-                existing_documents = self.loan_document_ids
-                # Get the document_ids associated with the selected loan_type
-                loan_type_documents = self.loan_type_id.document_ids
-
-                # Find the missing documents
-                missing_documents = loan_type_documents - existing_documents
-
-                # Create missing documents in the hr.loan model
-                self.loan_document_ids.unlink()                
-                self._create_loan_documents(missing_documents)
+                for loan_type_document in self.loan_type_id.loan_type_document_ids:
+                    existing_document = self.env['hr.loan.document'].search([
+                                            ('loan_id', '=', self.id),
+                                            ('name', '=', loan_type_document.name)
+                                        ])
+                    if not existing_document:
+                        vals = {
+                            'name': loan_type_document.name,
+                            'doc_desc': loan_type_document.name,
+                            'is_mandatory': loan_type_document.is_mandatory,
+                            'loan_id': self.id,
+                        }
+                        self.env['hr.loan.document'].create(vals)       
             
         return True
 
