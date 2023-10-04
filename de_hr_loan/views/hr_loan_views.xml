@@ -25,7 +25,7 @@
             <form string="Loan Request">
                 <header>
                     <button name="action_compute_intervals" type="object" string="Compute" class="oe_highlight"  attrs="{'invisible':[('state','!=','draft')]}"/>
-                    <button name="action_compute_intervals" type="object" string="Compute" attrs="{'invisible':[('state','!=','verify')]}"/>
+                    <button name="action_compute_intervals" type="object" string="Recompute" attrs="{'invisible':[('state','!=','verify')]}"/>
 
                     <button string="Mark as Draft" name="action_draft" type="object" attrs="{'invisible': [('state', 'not in', ['verify', 'confirm'])]}"/>
                     
@@ -123,9 +123,6 @@
                                     <field name="state" readonly="1" />
                                     <field name="account_move_id" optional="hide"/>
                                     <field name="amount_paid"/>
-                                    <field name="res_id" invisible="1"/>
-                                    <field name="model" invisible="1" />
-                                    <field name="res_name" optional="hide"/>
                                 </tree>
                             </field>
                             <group col="12" class="oe_loan_lines_tab">
@@ -232,7 +229,7 @@
             <field name="name">To Do</field>
             <field name="res_model">hr.loan</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="view_mode">tree,kanban,form,calendar</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph,activity</field>
             <field name="domain"></field>
             <field name="search_view_id" ref="view_loan_request_search_form"/>
             <field name="help" type="html">

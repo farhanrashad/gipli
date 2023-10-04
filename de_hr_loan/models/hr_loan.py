@@ -231,7 +231,7 @@ class HrLoan(models.Model):
     def onchange_loan_type_id(self):
         if self.loan_type_id:
             self.loan_document_ids.unlink()
-            loan_type_documents = self.loan_type_id.document_ids
+            loan_type_documents = self.loan_type_id.loan_type_document_ids
             self._create_loan_documents(loan_type_documents)
 
     @api.model
@@ -555,14 +555,11 @@ class HRLoanLine(models.Model):
     amount_paid = fields.Float('Amount Paid', compute='_compute_from_account_move', store=True)
     
 
-    res_id = fields.Integer(string="Related Document ID", readonly=True)
-    model = fields.Char(string="Related Document Model", readonly=True)
-    res_name = fields.Char(string="Reference", readonly=True)
-
     # --------------------------------------------------------
     # ----------------------- Methods ------------------------
     # --------------------------------------------------------
-    @api.depends('account_move_id','account_move_id.payment_state')
+    @api.depends('account_move_id','account_move_id.payment_state',
+                 'loan_id','loan_id.account_move_id','loan_id.account_move_id.payment_state')
     #@api.onchange('account_move_id.payment_state')
     def _compute_state(self):
         #raise UserError('hello')
@@ -572,8 +569,11 @@ class HRLoanLine(models.Model):
                     line.state = 'close'
                 else:
                     line.state = 'pending'
-            elif not loan.state:
-                loan.state = 'draft'
+            else:
+                if line.loan_id.account_move_id.payment_state in ('paid','in_payment'):
+                    line.state = 'pending'
+            #elif not loan.state:
+            #    loan.state = 'draft'
 
     @api.depends('account_move_id','account_move_id.payment_state')
     def _compute_from_account_move(self):
@@ -630,29 +630,13 @@ class HrLoanDocuments(models.Model):
             self.env['ir.attachment'].create(attachment_data)
 
     @api.model
-    def create(self, vals):
-        document = super(HrLoanDocuments, self).create(vals)
-
-        # Create a message and attach the document to it
-        if document.attachment:
-            loan_message = document.loan_id.message_post(
-                body="Document Attached: %s" % document.name,
-                attachment_ids=[],
-                subtype_id=self.env['mail.message.subtype'].search([('name', '=', 'Note')]).id,
-            )
-            self._message_post_attach_document(document, loan_message)
-            
-
-        return document
-
-    @api.model
     def write(self, vals):
         res = super(HrLoanDocuments, self).write(vals)
 
         # Create a message and attach the document to it
         if res:
             #attachment_id = self.attachment.id if isinstance(self.attachment, self.env['ir.attachment']) else False
-            if self.attachment:
+            try:
                 attachment_id = self.env['ir.attachment'].create({
                     'name': self.name,
                     'type': 'binary',
@@ -675,5 +659,7 @@ class HrLoanDocuments(models.Model):
                 #    attachment_ids=[(4, attachment_id.id)],
                 #    subtype_id=self.env['mail.message.subtype'].search([('name', '=', 'Note')]).id,
                 #)
+            except:
+                pass
 
         return res
