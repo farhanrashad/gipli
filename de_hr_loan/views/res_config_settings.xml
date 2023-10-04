@@ -9,19 +9,19 @@
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('settings')]" position="inside">
                 <div class="app_settings_block" data-string="Loan" string="Loan" data-key="de_hr_loan">
-                    <h2 id="notification_group_ids_container">Loan Management</h2>
+                    <h2 id="loan_payments_container">Loan Payments</h2>
                     <div class="row mt16 o_settings_container" name="loan_settings_container">
                         <div class="col-12 col-lg-6 o_setting_box" id="repayment_mode" title="This default value is applied to any loan type created. This can be changed in the loan type form.">
                             <div class="o_setting_left_pane"/>
                             <div class="o_setting_right_pane">
-                                <label for="default_repayment_mode"/>
+                                <label for="default_repayment_model_id"/>
                                 <a href="https://dynexcel.com/knowledge-base/documentation/odoo/loan-management/" title="Documentation" class="o_doc_link" target="_blank"/>
                                 <div class="text-muted">
-                                    Enable one of the repayment mode for employee loan disbursement
+                                    Repayment mode defines the default method employees will use to repay their loans.
                                 </div>
                                 <div class="content-group">
                                     <div class="mt16">
-                                        <field name="default_repayment_mode" class="o_light_label" widget="radio"/>
+                                        <field name="default_repayment_model_id" options="{'no_create': True}" />
                                     </div>
                                 </div>
                             </div>
@@ -29,13 +29,50 @@
                         <div class="col-12 col-lg-6 o_setting_box" id="down_payments">
                             <div class="o_setting_left_pane"/>
                             <div class="o_setting_right_pane">
-                                <span class="o_form_label">Down Payments</span>
+                                <span class="o_form_label">Payments</span>
                                 <a href="https://dynexcel.com/knowledge-base/documentation/odoo/loan-management/" title="Documentation" class="o_doc_link" target="_blank"/>
                                 <div class="text-muted">
                                     Product used for loan payments
                                 </div>
                                 <div class="text-muted">
                                     <field name="default_payment_product_id"  options="{'no_create': True}" context="{'default_detailed_type': 'service'}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 id="loan_payments_container">Loan Policy</h2>
+                    <div class="row mt16 o_settings_container" name="loan_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box" id="interval_mode" title="This default value is applied to any loan type created. This can be changed in the loan type form.">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label for="default_loan_frequency"/>
+                                <a href="https://dynexcel.com/knowledge-base/documentation/odoo/loan-management/" title="Documentation" class="o_doc_link" target="_blank"/>
+                                <div class="text-muted">
+                                    Loan frequency determines how often an employee can apply for the next loan.
+                                </div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="default_loan_frequency"  />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box" id="down_payments">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Payments</span>
+                                <a href="https://dynexcel.com/knowledge-base/documentation/odoo/loan-management/" title="Documentation" class="o_doc_link" target="_blank"/>
+                                <div class="text-muted">
+                                   Loan interval specifies the number of months within which an employee must repay the loan, with options for a maximum limit or a fixed number of intervals.
+                                </div>
+                                <div class="text-muted">
+                                    <div class="o_td_label">
+                                        <label for="default_interval_loan_mode" />
+                                    </div>
+                                    <div name="default_interval_loan_mode">
+                                        <field name="default_interval_loan_mode" nolabel="1" style="width: 8rem;" />
+                                        <span class="ml8" ><field name="default_interval_loan" nolabel="1" style="width: 8rem;" /> Month(s)</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

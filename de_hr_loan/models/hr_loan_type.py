@@ -34,6 +34,10 @@ class LoanType(models.Model):
     sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
         copy=False, check_company=True)
 
+    repayment_model_id = fields.Many2one('ir.model', readonly=False, string="Repayment Mode",  
+                        ondelete='cascade', required=True, domain=lambda self: self._compute_model_domain(),
+                help="Repayment mode defines the default method employees will use to repay their loans."
+    )
     repayment_mode = fields.Selection([
         ('credit_memo', 'Credit Memo'),
         ('payslip', 'Payslip'),
@@ -62,17 +66,8 @@ class LoanType(models.Model):
         ondelete='cascade',
     )
     amount_per = fields.Float(string="Percentage (%)")
-    submission_condition = fields.Selection(
-        [
-            ('active_same_type', 'Allow in same type'),
-            ('active_any_type', 'Allow in any type'),
-            ('no_duplicate', 'No Duplicate Submission')
-        ],
-        string="Loan Submission Condition", 
-        default='no_duplicate',
-        help="Select the condition for allowing loan submissions."
-    )
-    frequency = fields.Selection(
+    
+    loan_frequency = fields.Selection(
         [
             ('monthly', 'Monthly'),
             ('quarterly', 'Quarterly'),
@@ -81,13 +76,15 @@ class LoanType(models.Model):
             ('no_limit', 'No Limit')
         ],
         string="Frequency", required=True, default='no_limit',
-        help="Select the frequency to allow submissions."
+        help="Loan frequency determines how often an employee can apply for the next loan."
     )    
 
     interval_loan_mode = fields.Selection([
         ('fix', 'Fixed'),
         ('max', 'Maximum'),
-    ], string='Interval Mode', required=True, default='fix')
+    ], string='Interval Mode', required=True, default='fix',
+        help="Loan interval specifies the number of months within which an employee must repay the loan, with options for a maximum limit or a fixed number of intervals."
+                                         )
 
     # Compute all counts
     count_loan_pending = fields.Integer(compute='_compute_loan_count')
@@ -103,6 +100,11 @@ class LoanType(models.Model):
         for record in self:
             if record.calculation_type == 'percent' and (record.amount_per < 1 or record.amount_per > 100):
                 raise ValidationError("Percentage value must be between 1 and 100.")
+
+    @api.model
+    def _compute_model_domain(self):
+        allowed_model_ids = self.env['ir.model'].search([('model', 'in', ['hr.payslip', 'account.move'])]).ids
+        return [('id', 'in', allowed_model_ids)]
 
 
     def _compute_request_to_validate_count(self):
@@ -148,7 +150,9 @@ class LoanType(models.Model):
                     'company_id': vals.get('company_id'),
                 })
                 vals['sequence_id'] = sequence.id
-        return super().create(vals_list)
+        res = super().create(vals_list)
+        res._check_payroll()
+        return res
 
     def write(self, vals):
         if 'sequence_code' in vals:
@@ -170,6 +174,78 @@ class LoanType(models.Model):
                     loan_type.sequence_id.company_id = vals.get('company_id')
         return super().write(vals)
 
+    def _check_payroll(self):
+        # Check if the field 'x_payslip_id' already exists in hr.loan.type model
+        payslip_field_exits_in_loan_line = self.env['ir.model.fields'].search([
+            ('model_id.model', '=', 'hr.loan.line'),
+            ('name', '=', 'x_payslip_id')
+        ], limit=1)
+
+        loanline_field_exits_in_payslip = self.env['ir.model.fields'].search([
+            ('model_id.model', '=', 'hr.payslip'),
+            ('name', '=', 'x_loan_lines')
+        ], limit=1)
+
+        hr_loan_line_model = env['ir.model'].search([('model', '=', 'hr.loan.line')])
+        hr_payslip_model = env['ir.model'].search([('model', '=', 'hr.payslip')])
+
+        # compute 
+        compute_method = '''
+for record in self:
+    # Compute the related loan lines based on x_payslip_id
+    try:
+        loan_lines = self.env['hr.loan.line'].search([('employee_id', '=', record.employee_id.id),('date', '>=', record.date_from),('date', '<=', record.date_to),('state', 'in', ['draft','pending'])])
+        record['x_loan_lines'] = loan_lines
+    except:
+        pass
+        '''
+        # Create a new record in the hr.salary.rule model
+        python_code_for_loan = """
+result = employee.compute_loan_from_payslip(payslip.id,'hr.payslip')
+        """
+        category_id = env['hr.salary.rule.category'].search([('code','=','DED')],limit=1)
+        struct_id = env['hr.payroll.structure'].browse(1)
+        rule_exists = env['hr.salary.rule'].search([('code', '=', 'LOAN')],limit_id)
+        if hr_loan_line_model:
+            if not payslip_field_exits_in_loan_line:
+                # Create the field 'x_payslip_id' if it doesn't exist
+                self.env['ir.model.fields'].create({
+                    'name': 'x_payslip_id',
+                    'field_description': 'Payslip Reference',
+                    'model_id': hr_loan_line_model.id,
+                    'ttype': 'many2one',
+                    'relation': 'hr.payslip',
+                    'store': True,
+                    'copied': False,
+                    'help': 'Reference to the associated payslip',
+                })
+            if hr_payslip_model:
+                if not loanline_field_exits_in_payslip:
+                    hr_payslip_model.write({
+                        'field_id': [(0, 0, {
+                            'name': 'x_loan_lines',
+                            'field_description': 'Loan Lines',
+                            'model_id': hr_payslip_model.id,
+                            'ttype': 'one2many',
+                            'relation': 'hr.loan.line',
+                            'relation_field': 'x_payslip_id',
+                            'store': True,
+                            'copied': False,
+                            'depends': 'employee_id,date_from,date_to',
+                            'compute': compute_method,
+                            'help': 'Reference to associated loan lines',
+                        })]
+                    })
+                if not rule_exists:
+                    salary_rule_id = env['hr.salary.rule'].create({
+                        'name': 'Loan Deduction',
+                        'category_id': category_id.id,
+                        'code': 'LOAN',
+                        'sequence': 1,
+                        'struct_id': struct_id.id,
+                        'amount_select': 'code',
+                        'amount_python_compute': python_code_for_loan,                
+                    })
     # ===============================================
     # ================== Actions ====================
     # ===============================================

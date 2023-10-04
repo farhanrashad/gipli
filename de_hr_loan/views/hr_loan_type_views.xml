@@ -48,8 +48,7 @@
                                     <field name="amount_per" attrs="{'invisible': [('calculation_type', '!=', 'percent')],'required': [('calculation_type', '=', 'percent')]}"/>
                                 </group>
                                 <group>
-                                    <field name="submission_condition" widget="radio"/>
-                                    <field name="frequency" />
+                                    <field name="loan_frequency" />
 
                                     <div class="o_td_label">
                                         <label for="interval_loan_mode" string="Loan Interval" />
@@ -62,6 +61,7 @@
                             </group>
                             <group>
                                 <group string="Disbursement">
+                                    <field name="repayment_model_id" options="{'no_create': True}" />
                                     <field name="repayment_mode" class="o_light_label" />
                                     <field name="prepayment_credit_memo"  attrs="{'invisible': [('repayment_mode', '!=', 'credit_memo')]}"/>
                                 </group>
