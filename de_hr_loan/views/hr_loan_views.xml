@@ -142,9 +142,9 @@
                         <page string="Documents" name="loan_documents">
                             <field name="loan_document_ids" >
                                 <tree string="loan Documents" editable="bottom" create="false" edit="true" delete="false">
-                                    <field name="name" readonly="1" invisible="1"/>
+                                    <field name="name" readonly="1" invisible="0"/>
                                     <field name="doc_desc" readonly="1" required="1" />
-                                    <field name="attachment" attrs="{'required': [('is_mandatory', '=', True)]}" widget="binary" filename="name"/>
+                                    <field name="attachment" widget="binary" filename="name"/>
                                     <field name="loan_id" invisible="1"/>
                                     <field name="is_mandatory" invisible="0"/>
                                 </tree>

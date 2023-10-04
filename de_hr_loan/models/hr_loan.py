@@ -6,6 +6,7 @@ from pytz import timezone, UTC
 from odoo.tools import date_utils
 from odoo.addons.base.models.res_partner import _tz_get
 from dateutil.relativedelta import relativedelta
+import base64
 
 from odoo.tools import safe_eval
 
@@ -612,7 +613,8 @@ class HrLoanDocuments(models.Model):
     name = fields.Char(string='Document Name', readonly=True)
     doc_desc = fields.Char(string="Document")
     is_mandatory = fields.Boolean(string='Is Mandatory', default=False, readonly=True)
-    attachment = fields.Binary(string='Attachment', attachment=True)
+    
+    attachment = fields.Binary(string='Attachment', attachment=True)    
     loan_id = fields.Many2one('hr.loan', string='Loan', ondelete='cascade')
 
     def _message_post_attach_document(self, document, message):
@@ -639,5 +641,39 @@ class HrLoanDocuments(models.Model):
                 subtype_id=self.env['mail.message.subtype'].search([('name', '=', 'Note')]).id,
             )
             self._message_post_attach_document(document, loan_message)
+            
 
         return document
+
+    @api.model
+    def write(self, vals):
+        res = super(HrLoanDocuments, self).write(vals)
+
+        # Create a message and attach the document to it
+        if res:
+            #attachment_id = self.attachment.id if isinstance(self.attachment, self.env['ir.attachment']) else False
+            if self.attachment:
+                attachment_id = self.env['ir.attachment'].create({
+                    'name': self.name,
+                    'type': 'binary',
+                    'datas': self.attachment,
+                    'store_fname': self.name,
+                    'res_model': 'hr.loan',
+                    'res_id': self.loan_id.id,
+                })
+                message_id = self.env['mail.message'].create({
+                    'message_type': 'comment',
+                    'subtype_id': self.env['mail.message.subtype'].search([('name', '=', 'Note')]).id,
+                    'body': "Document Attached: %s" % self.name,
+                    'model': 'hr.loan',
+                    'res_id': self.loan_id.id,
+                    'record_name': self.loan_id.name,
+                    'attachment_ids': [(4, attachment_id.id)],
+                })
+                #loan_message = self.loan_id.message_post(
+                #    body="Document Attached with message: %s" % self.name,
+                #    attachment_ids=[(4, attachment_id.id)],
+                #    subtype_id=self.env['mail.message.subtype'].search([('name', '=', 'Note')]).id,
+                #)
+
+        return res
