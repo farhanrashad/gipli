@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_loan_line_form_view" model="ir.ui.view">
+        <field name="name">hr.loan.line.form.view</field>
+        <field name="model">hr.loan.line</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,verified,confirm,validate,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="loan_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                   
+                    
+                </sheet>
+                
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_loan_schedule_tree_view" model="ir.ui.view">
+        <field name="name">hr.loan.schedule.tree.view</field>
+        <field name="model">hr.loan.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date" />
+                <field name="loan_id" />
+                <field name="employee_id" />
+                <field name="state" widget="badge" decoration-success="state == 'close'" decoration-danger="state == 'pending'" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_loan_schedule_filter" model="ir.ui.view">
+        <field name="name">hr.loan.schedule.search</field>
+        <field name="model">hr.loan.line</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="loan_id"/>
+                <filter string="My Requests" name="myrequest" domain="[('employee_id.user_id.id', '=', uid)]" />
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state', 'in', ['draft'])]" />
+                <filter string="Pending" name="pending" domain="[('state', 'in', ['pending'])]" />
+
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="status" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="action_loan_schedule" model="ir.actions.act_window">
+        <field name="name">Loan schedule</field>
+        <field name="res_model">hr.loan.line</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{'create': False, 'search_default_pending': 1}</field>
+    </record>
+
+    <menuitem name="Loan Schedules"
+        parent="menu_loan_management"
+        id="menu_hr_loan_schedule"
+        sequence="3"
+        action="action_loan_schedule"/>
+
+    
+    
+</odoo>

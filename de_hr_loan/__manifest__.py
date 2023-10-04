@@ -25,6 +25,7 @@
         'wizard/loan_scheduler_compute_views.xml',
         'views/res_config_settings.xml',
         'views/hr_loan_reschedule_views.xml',
+        'views/hr_loan_schedule_views.xml',
         'views/hr_loan_dashboard_views.xml',
         'views/hr_loan_type_views.xml',
         'views/hr_loan_views.xml',
