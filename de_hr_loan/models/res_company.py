@@ -17,11 +17,13 @@ class Company(models.Model):
             ('quarterly', 'Quarterly'),
             ('semi_annual', 'Semi-Annually'),
             ('annual', 'Annually'),
-            ('no_limit', 'No Limit')
+            ('custom', 'Custom')
         ],
         string="Frequency", default='no_limit',
         help="Loan frequency determines how often an employee can apply for the next loan."
     )
+    default_loan_frequency_interval = fields.Integer(string='Frequency Interval', default=1)
+    
     default_interval_loan_mode = fields.Selection([
         ('fix', 'Fixed'),
         ('max', 'Maximum'),

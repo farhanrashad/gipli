@@ -48,7 +48,13 @@
                                     <field name="amount_per" attrs="{'invisible': [('calculation_type', '!=', 'percent')],'required': [('calculation_type', '=', 'percent')]}"/>
                                 </group>
                                 <group>
-                                    <field name="loan_frequency" />
+                                    <div class="o_td_label">
+                                        <label for="loan_frequency" string="Loan Frequency" />
+                                    </div>
+                                    <div name="loan_frequency">
+                                        <field name="loan_frequency" nolabel="1" style="width: 8rem;" />
+                                        <span class="ml8" ><field name="loan_frequency_interval" nolabel="1" style="width: 8rem;" /> Month(s)</span>
+                                    </div>
 
                                     <div class="o_td_label">
                                         <label for="interval_loan_mode" string="Loan Interval" />

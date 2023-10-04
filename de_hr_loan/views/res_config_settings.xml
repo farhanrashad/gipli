@@ -54,6 +54,10 @@
                                     <div class="mt16">
                                         <field name="default_loan_frequency"  />
                                     </div>
+                                    <div name="default_loan_frequency_interval" attrs="{'invisible': [('default_loan_frequency', '!=', 'custom')]}">
+                                        <field name="default_loan_frequency_interval" nolabel="1" style="width: 8rem;" attrs="{'required': [('default_loan_frequency', '=', 'custom')]}"/>
+                                        <span class="ml8" > Month(s)</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

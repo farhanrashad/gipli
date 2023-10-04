@@ -71,27 +71,29 @@ class LoanType(models.Model):
         [
             ('monthly', 'Monthly'),
             ('quarterly', 'Quarterly'),
-            ('half_yearly', 'Half Yearly'),
-            ('yearly', 'Yearly'),
-            ('no_limit', 'No Limit')
+            ('semi_annual', 'Semi-Annually'),
+            ('annual', 'Annually'),
+            ('custom', 'Custom')
         ],
         string="Frequency", required=True, default='no_limit',
         help="Loan frequency determines how often an employee can apply for the next loan."
-    )    
+    )
+    loan_frequency_interval = fields.Integer(string='Interval', required=True, default=1)
 
     interval_loan_mode = fields.Selection([
         ('fix', 'Fixed'),
         ('max', 'Maximum'),
     ], string='Interval Mode', required=True, default='fix',
         help="Loan interval specifies the number of months within which an employee must repay the loan, with options for a maximum limit or a fixed number of intervals."
-                                         )
-
+    )
+    interval_loan = fields.Integer(string='Interval', required=True, default=1)
+    
     # Compute all counts
     count_loan_pending = fields.Integer(compute='_compute_loan_count')
     count_loan_confirm = fields.Integer(compute='_compute_loan_count')
     count_loan_to_pay = fields.Integer(compute='_compute_loan_count')
     
-    interval_loan = fields.Integer(string='Interval', required=True, default=1)
+    
 
     loan_type_document_ids = fields.One2many('hr.loan.type.document', 'loan_type_id', string='Documents')
 
