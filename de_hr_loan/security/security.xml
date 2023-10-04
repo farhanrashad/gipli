@@ -3,8 +3,8 @@
     <data noupdate="1">
 
         <record model="ir.module.category" id="module_category_loan">
-            <field name="name">Loan Category</field>
-            <field name="description">Description of your custom group category.</field>
+            <field name="name">Loan Management</field>
+            <field name="description">Helps you to manage employee loans.</field>
             <field name="sequence">10</field> <!-- Adjust the sequence number as needed -->
         </record>
         
