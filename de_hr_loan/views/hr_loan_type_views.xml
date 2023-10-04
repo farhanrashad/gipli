@@ -47,7 +47,7 @@
                                     <field name="calculation_field_id" attrs="{'invisible': [('calculation_type', '!=', 'percent')]}"/>
                                     <field name="amount_per" attrs="{'invisible': [('calculation_type', '!=', 'percent')],'required': [('calculation_type', '=', 'percent')]}"/>
                                 </group>
-                                <group>
+                                <group string="Loan Policy">
                                     <div class="o_td_label">
                                         <label for="loan_frequency" string="Loan Frequency" />
                                     </div>
@@ -66,7 +66,7 @@
                                 </group>
                             </group>
                             <group>
-                                <group string="Disbursement">
+                                <group string="Repayment">
                                     <field name="repayment_model" invisible="1"/>
                                     <field name="repayment_model_id" options="{'no_create': True}" />
                                     <field name="prepayment_credit_memo"  attrs="{'invisible': [('repayment_model', '!=', 'account.move')]}"/>

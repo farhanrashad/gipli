@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'HRMS Loan Management',
-    'version': '16.0.1.0.0',
-    'summary': 'Manage Loan Requests',
+    'name': 'Employee Loan Management',
+    'summary': "Streamline employee loan management with our powerful application, simplifying financial transactions and enhancing workplace efficiency.",
     'description': """
-        Helps you to manage Loan Requests of your company's staff.
+        The Odoo Employee Loan Management Module is a comprehensive solution designed to streamline and automate the loan application, approval, and repayment processes for employees within your organization. This module offers a user-friendly interface and customizable features to simplify loan management while ensuring compliance and transparency.
         """,
-    'category': 'Generic Modules/Human Resources',
     'author': "Dynexcel",
-    'company': 'www.dynexcel.com',
-    'maintainer': 'Dynexcel',
     'website': "https://www.dynexcel.com",
+    'category': 'Human Resources',
+    'version': '0.3',
     'depends': ['base', 'hr', 'account','hr_contract'],
     'data': [
         'security/security.xml',
@@ -33,9 +31,11 @@
         'reports/report_loan.xml',
         
     ],
-    'images': ['static/description/banner.png'],
     'license': 'OPL-1',
+    'price': 75,
+    'currency': 'USD',
+    'images': ['static/description/banner.jpg'],
     'installable': True,
-    'auto_install': False,
     'application': False,
+    'auto_install': False,
 }
