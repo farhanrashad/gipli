@@ -36,7 +36,6 @@
     'images': ['static/description/banner.png'],
     'license': 'OPL-1',
     'installable': True,
-    'post_init_hook': '_de_hr_loan_post_init',
     'auto_install': False,
     'application': False,
 }

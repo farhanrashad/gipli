@@ -67,9 +67,9 @@
                             </group>
                             <group>
                                 <group string="Disbursement">
+                                    <field name="repayment_model" invisible="1"/>
                                     <field name="repayment_model_id" options="{'no_create': True}" />
-                                    <field name="repayment_mode" class="o_light_label" />
-                                    <field name="prepayment_credit_memo"  attrs="{'invisible': [('repayment_mode', '!=', 'credit_memo')]}"/>
+                                    <field name="prepayment_credit_memo"  attrs="{'invisible': [('repayment_model', '!=', 'account.move')]}"/>
                                 </group>
                             </group>
                             

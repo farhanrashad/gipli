@@ -35,14 +35,10 @@ class LoanType(models.Model):
         copy=False, check_company=True)
 
     repayment_model_id = fields.Many2one('ir.model', readonly=False, string="Repayment Mode",  
-                        ondelete='cascade', required=True, domain=lambda self: self._compute_model_domain(),
+                ondelete='cascade', required=True, domain=lambda self: self._compute_model_domain(),
                 help="Repayment mode defines the default method employees will use to repay their loans."
     )
-    repayment_mode = fields.Selection([
-        ('credit_memo', 'Credit Memo'),
-        ('payslip', 'Payslip'),
-        ('none', 'None'),
-    ], string='Re-Payment Mode', required=True, default='credit_memo')
+    repayment_model = fields.Char(related='repayment_model_id.model')
     prepayment_credit_memo = fields.Boolean(string='Is Prepayment')
     
     payment_product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
@@ -188,8 +184,8 @@ class LoanType(models.Model):
             ('name', '=', 'x_loan_lines')
         ], limit=1)
 
-        hr_loan_line_model = env['ir.model'].search([('model', '=', 'hr.loan.line')])
-        hr_payslip_model = env['ir.model'].search([('model', '=', 'hr.payslip')])
+        hr_loan_line_model = self.env['ir.model'].search([('model', '=', 'hr.loan.line')])
+        hr_payslip_model = self.env['ir.model'].search([('model', '=', 'hr.payslip')])
 
         # compute 
         compute_method = '''
@@ -205,9 +201,9 @@ for record in self:
         python_code_for_loan = """
 result = employee.compute_loan_from_payslip(payslip.id,'hr.payslip')
         """
-        category_id = env['hr.salary.rule.category'].search([('code','=','DED')],limit=1)
-        struct_id = env['hr.payroll.structure'].browse(1)
-        rule_exists = env['hr.salary.rule'].search([('code', '=', 'LOAN')],limit_id)
+        category_id = self.env['hr.salary.rule.category'].search([('code','=','DED')],limit=1)
+        struct_id = self.env['hr.payroll.structure'].browse(1)
+        rule_exists = self.env['hr.salary.rule'].search([('code', '=', 'LOAN')],limit=1)
         if hr_loan_line_model:
             if not payslip_field_exits_in_loan_line:
                 # Create the field 'x_payslip_id' if it doesn't exist
@@ -239,7 +235,7 @@ result = employee.compute_loan_from_payslip(payslip.id,'hr.payslip')
                         })]
                     })
                 if not rule_exists:
-                    salary_rule_id = env['hr.salary.rule'].create({
+                    salary_rule_id = self.env['hr.salary.rule'].create({
                         'name': 'Loan Deduction',
                         'category_id': category_id.id,
                         'code': 'LOAN',

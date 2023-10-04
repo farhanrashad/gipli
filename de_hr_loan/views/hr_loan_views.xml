@@ -74,11 +74,10 @@
                     <widget name="web_ribbon" title="Reconciled" attrs="{'invisible': [('state', '!=', 'close')]}"/>
                     <!-- Invisible Fields -->
                     <field name="company_id" invisible="1" />
-                    <field name="repayment_mode" invisible="1" />
+                    <field name="repayment_model" invisible="1" />
                     <field name="address_id" invisible="1" />
                     <field name="account_move_id" invisible="1" />
                     <field name="interval_loan_mode" invisible="1" />
-                    <field name="repayment_mode" invisible="1" />
                     <div class="oe_title">
                         <span class="o_form_label" >Request for Loan </span>
                         <h1 class="d-flex">

@@ -76,7 +76,7 @@ class HrLoan(models.Model):
     interval_loan = fields.Integer(string="Loan Interval", default=1, store=True, required=True, readonly=False,
                                    compute='_compute_from_loan_type',
                                  help="Number of intervals to disburse loan", )
-    repayment_mode = fields.Char(string='Repayment Mode', compute='_compute_from_loan_type')
+    repayment_model = fields.Char(string='Repayment Model', compute='_compute_from_loan_type')
     date_start = fields.Date(string="Loan Start Date", required=True, store=True, readonly=False,
                              compute='_compute_date_start',states=READONLY_FIELD_STATES,
                                help="Date of Start")
@@ -211,7 +211,7 @@ class HrLoan(models.Model):
             loan.interval_loan_mode = loan.loan_type_id.interval_loan_mode
             if loan.interval_loan_mode == 'fix' or loan.interval_loan == 0:
                 loan.interval_loan = loan.loan_type_id.interval_loan                
-            loan.repayment_mode = loan.loan_type_id.repayment_mode
+            loan.repayment_model = loan.loan_type_id.repayment_model_id.model
                 
     
     @api.depends('account_move_id.date')
@@ -250,12 +250,12 @@ class HrLoan(models.Model):
         loan_schedule_ids = self.loan_lines.search([
             ('state', 'in', ['draft','pending']),
             ('date', '<=', fields.Date.today()),
-            ('loan_id.repayment_mode', '=', 'credit_memo'),
+            ('loan_id.repayment_model', '=', 'account.move'),
         ])
         for line in loan_schedule_ids:
             try:
                 with self.env.cr.savepoint():
-                    if line.loan_id.loan_type_id.repayment_mode == 'credit_memo':
+                    if line.loan_id.loan_type_id.repayment_model == 'account.move':
                         if not line.loan_id.loan_type_id.prepayment_credit_memo:
                             if not line.account_move_id:
                                     account_move_id = self.env['account.move'].create(line._prepare_credit_memo())
@@ -270,7 +270,7 @@ class HrLoan(models.Model):
                             else:
                                 if line.account_move_id.payment_state in ('paid','in_payment'):
                                     line.state = 'close'
-                    elif line.loan_id.loan_type_id.repayment_mode == 'payslip':
+                    elif line.loan_id.loan_type_id.repayment_model == 'payslip':
                         try:
                             if line.x_payslip_id.state in ('done','paid'):
                                 line.state = 'close'
@@ -412,7 +412,7 @@ class HrLoan(models.Model):
         return values
         
     def _create_credit_memo(self):
-        if self.loan_type_id.repayment_mode == 'credit_memo' and self.loan_type_id.prepayment_credit_memo:
+        if self.loan_type_id.repayment_model == 'account.move' and self.loan_type_id.prepayment_credit_memo:
             for line in self.loan_lines:
                 # Create credit memo
                 account_move_id = self.env['account.move'].create({
