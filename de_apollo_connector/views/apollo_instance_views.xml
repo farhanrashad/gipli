@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Define the CRM Configuration menu -->
+        <menuitem id="menu_crm_config_apollo" name="Apollo" parent="crm.crm_menu_config" sequence="50"/>
+
+
+        <!-- Define the form view for Apollo Instance -->
+        <record id="view_apollo_instance_form" model="ir.ui.view">
+            <field name="name">apollo.instance.form</field>
+            <field name="model">apollo.instance</field>
+            <field name="arch" type="xml">
+                <form string="Apollo Instance">
+                    <header>
+                        <!-- Add a button in the header -->
+                        <button name="connection_test" type="object" string="Test Connection" class="btn-primary"/>
+                        <button name="button_draft" type="object" string="Set to Draft" />
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,verified,active" force_save="1"/>
+
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Trip to NY" force_save="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="url"/>
+                                <field name="api_key" widget="password" string="API Key"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Define the tree view for Apollo Instance -->
+        <record id="view_apollo_instance_tree" model="ir.ui.view">
+            <field name="name">apollo.instance.tree</field>
+            <field name="model">apollo.instance</field>
+            <field name="arch" type="xml">
+                <tree string="Apollo Instances">
+                    <field name="name"/>
+                    <field name="url"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Define the action for the Apollo Instance -->
+        <record id="action_apollo_instance" model="ir.actions.act_window">
+            <field name="name">Apollo Instances</field>
+            <field name="res_model">apollo.instance</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Create a menu item for Apollo Instance -->
+        <menuitem id="menu_apollo_instance_list" name="Apollo Instances" parent="menu_crm_config_apollo" action="action_apollo_instance" sequence="20"/>
+
+    </data>
+</odoo>
