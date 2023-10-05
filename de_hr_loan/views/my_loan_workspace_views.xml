@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_loan_my_dashboard" model="ir.actions.act_window">
+        <field name="name">Loan Overview</field>
+        <field name="res_model">hr.loan.type</field>
+        <field name="view_mode">kanban</field>
+    </record>
+    
+    <record id="action_my_loans" model="ir.actions.act_window">
+        <field name="name">My Loans</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.loan</field>
+        <field name="view_mode">tree,form,kanban,activity</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="de_hr_loan.view_loan_request_search_form"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('de_hr_loan.hr_loan_kanban_view')})]"/>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{'create':False, 'search_default_myrequest': 1}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new Loan request.
+            </p><p>
+                Use this menu to create loan requests.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_my_loan_schedule" model="ir.actions.act_window">
+        <field name="name">Loan schedule</field>
+        <field name="res_model">hr.loan.line</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{'create': False, 'edit': False, 'search_default_pending': 1}</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+    </record>
+
+    <record id="action_my_loan_reschedule" model="ir.actions.act_window">
+        <field name="name">Loan Reschedule Requests</field>
+        <field name="res_model">hr.loan.reschedule</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{'create': False, 'edit': False}</field>
+        <field name="domain">[('loan_id.employee_id.user_id', '=', uid)]</field>
+    </record>
+
+        <menuitem id="menu_my_loans" name="My Loans" parent="de_hr_workspace.menu_my_workspace" sequence="40"/>
+
+    <menuitem id="menu_my_loans_dashboard" name="New Requests" parent="menu_my_loans" action="action_loan_my_dashboard" sequence="10" />
+    
+    <menuitem id="menu_my_loans_loans" name="My Loans" parent="menu_my_loans" action="action_my_loans" sequence="20" />
+
+        <menuitem id="menu_my_loans_schedule" name="Loan Schedules" parent="menu_my_loans" action="action_my_loan_schedule" sequence="30" />
+
+        <menuitem id="menu_my_loans_reschedule_requests" name="Re-Schedule Requests" parent="menu_my_loans" action="action_my_loan_reschedule" sequence="30" />
+
+
+
+</odoo>
