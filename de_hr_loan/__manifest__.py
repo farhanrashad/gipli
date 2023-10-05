@@ -10,7 +10,7 @@
     'category': 'Human Resources',
     'version': '0.4',
     'live_test_url': 'https://youtu.be/BwokAjL_KZU',
-    'depends': ['base', 'hr', 'account','hr_contract'],
+    'depends': ['base', 'hr', 'account','hr_contract','de_hr_workspace'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -30,6 +30,7 @@
         'views/hr_loan_views.xml',
         'reports/report_loan_views.xml',
         'reports/report_loan.xml',
+        'views/my_loan_workspace_views.xml',
         
     ],
     'license': 'OPL-1',
