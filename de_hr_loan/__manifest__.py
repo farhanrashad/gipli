@@ -8,7 +8,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
-    'version': '0.5',
+    'version': '0.6',
     'live_test_url': 'https://youtu.be/BwokAjL_KZU',
     'depends': ['base', 'hr', 'account','hr_contract','de_hr_workspace'],
     'data': [
