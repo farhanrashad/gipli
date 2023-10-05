@@ -305,6 +305,26 @@ class HrLoan(models.Model):
             if not len(loan.loan_lines) or loan.amount <= 0:
                 loan.action_compute_intervals()
 
+            # Check Loan Policy for submission
+            prv_loan_id = self.env['hr.loan'].search([('employee_id','=',loan.employee_id.id),('state','not in',['draft','verify']),('id','!=',loan.id),('loan_type_id','=',loan.loan_type_id.id)],order='date_end desc',limit=1)
+            if loan.loan_type_id.loan_frequency == 'monthly':
+                if (prv_loan_id.date_end + relativedelta(months=1)) > fields.Date.today():
+                    raise ValidationError(_('You are eligible to submit your next loan application on the date of %s') % (prv_loan_id.date_end + relativedelta(months=1)))
+            elif loan.loan_type_id.loan_frequency == 'quarterly':
+                if (prv_loan_id.date_end + relativedelta(months=3)) > fields.Date.today():
+                    raise ValidationError(_('You are eligible to submit your next loan application on the date of %s') % (prv_loan_id.date_end + relativedelta(months=3)))
+            elif loan.loan_type_id.loan_frequency == 'semi_annual':
+                if (prv_loan_id.date_end + relativedelta(months=6)) > fields.Date.today():
+                    raise ValidationError(_('You are eligible to submit your next loan application on the date of %s') % (prv_loan_id.date_end + relativedelta(months=6)))
+            elif loan.loan_type_id.loan_frequency == 'annual':
+                if (prv_loan_id.date_end + relativedelta(months=12)) > fields.Date.today():
+                    raise ValidationError(_('You are eligible to submit your next loan application on the date of %s') % (prv_loan_id.date_end + relativedelta(months=12)))
+            elif loan.loan_type_id.loan_frequency == 'custom':
+                if loan.loan_type_id.loan_frequency_interval > 0:
+                    if (prv_loan_id.date_end + relativedelta(months=loan.loan_type_id.loan_frequency_interval)) > fields.Date.today():
+                        raise ValidationError(_('You are eligible to submit your next loan application on the date of %s') % (prv_loan_id.date_end + relativedelta(months=loan.loan_type_id.loan_frequency_interval)))
+
+                    
             # check constraint of documents
             missing_attachments = self.loan_document_ids.filtered(lambda doc: doc.is_mandatory and not doc.attachment)
             if missing_attachments:

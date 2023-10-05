@@ -53,7 +53,7 @@
                                     </div>
                                     <div name="loan_frequency">
                                         <field name="loan_frequency" nolabel="1" style="width: 8rem;" />
-                                        <span class="ml8" ><field name="loan_frequency_interval" nolabel="1" style="width: 8rem;" /> Month(s)</span>
+                                        <span class="ml8" attrs="{'invisible': [('loan_frequency', '!=', 'custom')]}"><field name="loan_frequency_interval" nolabel="1" style="width: 8rem;" attrs="{'required': [('loan_frequency', '=', 'custom')]}" /> Month(s)</span>
                                     </div>
 
                                     <div class="o_td_label">
