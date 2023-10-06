@@ -15,4 +15,7 @@ class APLPeopleSearchWizard(models.TransientModel):
     industry_keywords = fields.Char(string='Industry Keywords')
     no_of_employee = fields.Integer(string='No. of Employees')
 
+    def action_search(self):
+        pass
+
 
