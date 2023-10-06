@@ -1,0 +1,41 @@
+<odoo>
+    <data>
+        <!-- Define a form view for APLPeopleSearchWizard -->
+        <record id="view_apl_people_search_wizard_form" model="ir.ui.view">
+            <field name="name">apl.people.search.wizard.form</field>
+            <field name="model">apl.people.search.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" required="1"/>
+                                <field name="job_titles" widget="many2many_tags"/>
+                                <field name="company_name"/>
+                                 <field name="industry_keywords"/>
+                                <field name="no_of_employee"/>
+                            </group>
+                            <group>
+                                <field name="country_id"/>
+                                <field name="state_id" domain="[('country_id', '=', country_id)]"/>
+                                <field name="city"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Define an action to open the form view -->
+        <record id="action_apl_people_search_wizard" model="ir.actions.act_window">
+            <field name="name">Apollo People Search</field>
+            <field name="res_model">apl.people.search.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_apl_people_search_wizard_form"/>
+        </record>
+
+        <!-- Create a menu item to access the wizard -->
+        <menuitem id="menu_apl_people_search_wizard" name="People Search" parent="menu_apollo_prospecting" action="action_apl_people_search_wizard"/>
+    </data>
+</odoo>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <menuitem id="menu_apollo_prospecting" name="Apollo Prospecting"
+            parent="crm.crm_menu_root" sequence="20" />
+
+</odoo>
