@@ -31,7 +31,27 @@
                                 <field name="url"/>
                                 <field name="api_key" widget="password" string="API Key"/>
                             </group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
                         </group>
+                        <notebook>
+                            <page string="Configuration" name="config">
+                                <group>
+                                    <group string="Synchronization">
+                                        <field name="ap_contact_syn" />
+                                        <field name="ap_lead_syn" />
+                                    </group>
+                                    <group string="Import" >
+                                        <button name="button_import_contacts" type="object" class="btn-primary" string="Import Contacts" />
+                                        <button name="button_import_leads" type="object" class="btn-primary" string="Import Opportunities" />
+                                        <separator string="Export" />
+                                        <button name="button_import_contacts" type="object" class="btn-primary" string="Export Contacts" />
+                                        <button name="button_import_leads" type="object" class="btn-primary" string="Export Opportunities" />
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>

@@ -7,6 +7,11 @@ from odoo.tools import html_escape as escape
 import requests
 import json
 
+READONLY_FIELD_STATES = {
+    state: [('readonly', True)]
+    for state in {'verified', 'active'}
+}
+
 class ApolloInstance(models.Model):
     _name = 'apollo.instance'
     _description = 'Apollo Instance'
@@ -15,6 +20,9 @@ class ApolloInstance(models.Model):
     api_key = fields.Char(string='API Key', required=True, help='Secret API Key')
     url = fields.Char(string='URL', required=True)
 
+    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states=READONLY_FIELD_STATES, default=lambda self: self.env.company)
+
+
     state = fields.Selection([
         ('draft', 'Draft'), 
         ('verified', 'Verified'), 
@@ -22,7 +30,61 @@ class ApolloInstance(models.Model):
         string='Status',default='draft', required=True
     )
 
+    ap_contact_syn = fields.Boolean(
+        string='Contact Sync',
+        help="Synchronize contact with Apollo."
+    )
+
+    ap_lead_syn = fields.Boolean(
+        string='Lead Sync',
+        help="Synchronize Lead with Apollo."
+    )
+
+
     def button_draft(self):
+        
+        url = "https://api.apollo.io/v1/typed_custom_fields"
+
+        querystring = {
+            "api_key": self.api_key
+        }
+
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("GET", url, headers=headers, params=querystring)
+
+        raise UserError(response.text)
+
+
+
+        url = self.url + 'mixed_people/search'
+        data = {
+            "api_key": self.api_key,
+            "q_organization_domains": "apollo.io\ngoogle.com",
+            "page" : 1,
+            "person_titles" : ["sales manager", "engineer manager"]
+        }
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("POST", url, headers=headers, json=data)
+
+        #raise UserError(response.text)
+        
+        data = json.loads(response.text)
+        people_data = data.get('people', [])
+
+        
+        for person_data in people_data:
+            raise UserError(person_data.get('email'))
+        #raise UserError(people_data)
+        #raise UserError(response.text)
+
         self.write({
             'state':'draft'
         })
@@ -56,6 +118,10 @@ class ApolloInstance(models.Model):
             raise UserError(error_message)
         return notification
 
-        
+    def button_import_contacts(self):
+        pass
+
+    def button_import_leads(self):
+        pass
 
 

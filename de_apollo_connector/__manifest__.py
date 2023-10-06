@@ -26,7 +26,8 @@
     'data': [
         'security/ir.model.access.csv',
         'views/apollo_instance_views.xml',
-        'views/templates.xml',
+        'views/res_partner_views.xml',
+        'views/crm_lead_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
