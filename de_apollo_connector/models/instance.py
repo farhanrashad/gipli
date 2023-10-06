@@ -124,4 +124,7 @@ class ApolloInstance(models.Model):
     def button_import_leads(self):
         pass
 
+    def button_confirm(self):
+        pass
+
 
