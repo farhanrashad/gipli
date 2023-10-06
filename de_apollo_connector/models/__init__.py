@@ -3,3 +3,4 @@
 from . import instance
 from . import res_partner
 from . import crm_lead
+from . import apl_results

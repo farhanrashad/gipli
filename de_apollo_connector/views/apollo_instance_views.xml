@@ -8,7 +8,7 @@
         <!-- Define the form view for Apollo Instance -->
         <record id="view_apollo_instance_form" model="ir.ui.view">
             <field name="name">apollo.instance.form</field>
-            <field name="model">apollo.instance</field>
+            <field name="model">apl.instance</field>
             <field name="arch" type="xml">
                 <form string="Apollo Instance">
                     <header>
@@ -41,8 +41,8 @@
                             <page string="Configuration" name="config">
                                 <group>
                                     <group string="Synchronization">
-                                        <field name="ap_contact_syn" />
-                                        <field name="ap_lead_syn" />
+                                        <field name="contact_syn" />
+                                        <field name="lead_syn" />
                                     </group>
                                     <group string="Import" >
                                         <button name="button_import_contacts" type="object" class="btn-primary" string="Import Contacts" />
@@ -62,7 +62,7 @@
         <!-- Define the tree view for Apollo Instance -->
         <record id="view_apollo_instance_tree" model="ir.ui.view">
             <field name="name">apollo.instance.tree</field>
-            <field name="model">apollo.instance</field>
+            <field name="model">apl.instance</field>
             <field name="arch" type="xml">
                 <tree string="Apollo Instances">
                     <field name="name"/>
@@ -74,7 +74,7 @@
         <!-- Define the action for the Apollo Instance -->
         <record id="action_apollo_instance" model="ir.actions.act_window">
             <field name="name">Apollo Instances</field>
-            <field name="res_model">apollo.instance</field>
+            <field name="res_model">apl.instance</field>
             <field name="view_mode">tree,form</field>
         </record>
 

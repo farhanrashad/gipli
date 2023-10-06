@@ -30,6 +30,7 @@
         'views/res_partner_views.xml',
         'views/crm_lead_views.xml',
         'wizards/people_search_wizard_views.xml',
+        'views/apl_results_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -7,6 +7,12 @@
             <field name="arch" type="xml">
                 <form>
                     <sheet>
+                        <div class="oe_title">
+                        <span class="o_form_label" >Instance</span>
+                            <h1 class="d-flex">
+                                <field name="apl_instance_id" />
+                            </h1>
+                        </div>
                         <group>
                             <group>
                                 <field name="name" required="1"/>
@@ -19,6 +25,13 @@
                                 <field name="country_id"/>
                                 <field name="state_id" domain="[('country_id', '=', country_id)]"/>
                                 <field name="city"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="apl_page" />
+                            </group>
+                            <group>
                             </group>
                         </group>
                         <footer>

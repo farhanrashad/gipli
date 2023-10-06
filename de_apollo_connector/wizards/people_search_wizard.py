@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+
+import requests
+import json
+
 from odoo import api, fields, models
 
 
@@ -6,7 +10,8 @@ class APLPeopleSearchWizard(models.TransientModel):
     _name = "apl.people.search.wizard"
     _description = 'Apollo Search Wizard'
 
-    name = fields.Char(string='Name', required=True)
+    apl_instance_id = fields.Many2one('apl.instance', required=True)
+    name = fields.Char(string='Name', )
     job_titles = fields.Char(string='Job Titles')
     company_name = fields.Char(string='Company Name')
     country_id = fields.Many2one('res.country', string='Country')
@@ -15,7 +20,32 @@ class APLPeopleSearchWizard(models.TransientModel):
     industry_keywords = fields.Char(string='Industry Keywords')
     no_of_employee = fields.Integer(string='No. of Employees')
 
+    apl_page = fields.Integer('Page', required=True, help="Which page number from apollo to return. Defaults to 1")
+
     def action_search(self):
-        pass
+        url = self.apl_instance_id.url + 'mixed_people/search'
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json'
+        }
+        data = {
+            "api_key": self.apl_instance_id.api_key,
+            "q_organization_domains": "apollo.io\ngoogle.com",
+            "page" : 1,
+            "person_titles" : ["sales manager", "engineer manager"]
+        }
+        response = requests.request("POST", url, headers=headers, json=data)
+
+        data = json.loads(response.text)
+        people_data = data.get('people', [])
+        
+        for person_data in people_data:
+            person_values = {
+                'name': person_data.get('name'),
+                'title': person_data.get('title'),
+                'email': person_data.get('email'),
+                # Map other fields from JSON to your Odoo model fields
+            }
+            person = self.env['apl.results'].create(person_values)
 
 

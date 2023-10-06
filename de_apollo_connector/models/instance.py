@@ -13,7 +13,7 @@ READONLY_FIELD_STATES = {
 }
 
 class ApolloInstance(models.Model):
-    _name = 'apollo.instance'
+    _name = 'apl.instance'
     _description = 'Apollo Instance'
 
     name = fields.Char(string='Name', required=True)
@@ -30,12 +30,12 @@ class ApolloInstance(models.Model):
         string='Status',default='draft', required=True
     )
 
-    ap_contact_syn = fields.Boolean(
+    contact_syn = fields.Boolean(
         string='Contact Sync',
         help="Synchronize contact with Apollo."
     )
 
-    ap_lead_syn = fields.Boolean(
+    lead_syn = fields.Boolean(
         string='Lead Sync',
         help="Synchronize Lead with Apollo."
     )
