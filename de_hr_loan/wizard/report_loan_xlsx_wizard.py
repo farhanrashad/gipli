@@ -13,9 +13,9 @@ import psycopg2
 
 
 class HRLoanXLSXReprot(models.TransientModel):
-    """ Wizard for Employee Attendance Report """
+    """ Wizard for Employee Loan Report """
     _name = 'hr.loan.report.wizard'
-    _description = 'Employee Attendance Report Wizard'
+    _description = 'Employee Loan Report Wizard'
 
     start_date = fields.Date(string="Start date",required=True)
     end_date = fields.Date(string="End Date")
