@@ -7,10 +7,11 @@ from odoo.tools import html_escape as escape
 import requests
 import json
 
-class ApolloResults(models.Model):
-    _name = 'apl.results'
+class ApolloPeopleResults(models.Model):
+    _name = 'apl.people.results'
     _description = 'Apollo Results'
 
+    apl_id = fields.Char('ID')
     name = fields.Char('Name')
     title = fields.Char('title')
     email = fields.Char('Email')

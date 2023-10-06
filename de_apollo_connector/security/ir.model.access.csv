@@ -3,4 +3,4 @@ access_crm_apollo_manager,crm.apollo.instance.manager,model_apl_instance,sales_t
 access_crm_apollo_user,crm.apollo.user,model_apl_instance,sales_team.group_sale_salesman,1,1,1,0
 
 access_apl_people_search_wizard_user,access.apl.people.search.wizard.user,model_apl_people_search_wizard,sales_team.group_sale_salesman,1,1,1,0
-access_apl_results_user,apl.results.user,model_apl_results,sales_team.group_sale_salesman,1,1,1,0
+access_apl_people_results_user,apl.people.results.user,model_apl_people_results,sales_team.group_sale_salesman,1,1,1,0

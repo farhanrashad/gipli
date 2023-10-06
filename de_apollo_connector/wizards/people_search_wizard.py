@@ -3,8 +3,8 @@
 import requests
 import json
 
-from odoo import api, fields, models
-
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
 
 class APLPeopleSearchWizard(models.TransientModel):
     _name = "apl.people.search.wizard"
@@ -36,16 +36,29 @@ class APLPeopleSearchWizard(models.TransientModel):
         }
         response = requests.request("POST", url, headers=headers, json=data)
 
+        #raise UserError(response.text)
+        
         data = json.loads(response.text)
         people_data = data.get('people', [])
         
         for person_data in people_data:
             person_values = {
+                'apl_id': person_data.get('id'),
                 'name': person_data.get('name'),
                 'title': person_data.get('title'),
                 'email': person_data.get('email'),
                 # Map other fields from JSON to your Odoo model fields
             }
-            person = self.env['apl.results'].create(person_values)
+            self.env['apl.people.results'].unlink()
+            person = self.env['apl.people.results'].create(person_values)
+
+        # Return an action to open a new form view
+        action = {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree',
+            'name': _('Search Results'),
+            'res_model': 'apl.people.results',
+        }
+        return action
 
 

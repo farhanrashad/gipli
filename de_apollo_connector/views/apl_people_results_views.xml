@@ -4,9 +4,10 @@
         <!-- Define the tree view for Apollo Results -->
         <record id="view_apollo_results_tree" model="ir.ui.view">
             <field name="name">apollo.results.tree</field>
-            <field name="model">apl.results</field>
+            <field name="model">apl.people.results</field>
             <field name="arch" type="xml">
                 <tree string="Apollo Results">
+                    <field name="apl_id"/>
                     <field name="name"/>
                     <field name="title"/>
                     <field name="email"/>
@@ -15,14 +16,14 @@
         </record>
 
         <!-- Define the action for the Apollo Instance -->
-        <record id="action_apl_results" model="ir.actions.act_window">
+        <record id="action_apl_people_results" model="ir.actions.act_window">
             <field name="name">Apollo Instances</field>
-            <field name="res_model">apl.results</field>
+            <field name="res_model">apl.people.results</field>
             <field name="view_mode">tree,form</field>
         </record>
 
         <!-- this menu will be temporarily and will remove -->
-        <menuitem id="menu_apollo_results_list" name="Apollo Results" parent="menu_apollo_prospecting" action="action_apl_results" sequence="20"/>
+        <menuitem id="menu_apollo_results_list" name="Apollo Results" parent="menu_apollo_prospecting" action="action_apl_people_results" sequence="20"/>
 
     </data>
 </odoo>
