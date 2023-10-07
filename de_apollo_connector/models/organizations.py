@@ -28,5 +28,18 @@ class ApolloComapniesResults(models.Model):
     apl_people_ids = fields.One2many('apl.people', 'apl_people_company_id', string="Peoples")
 
 
-    def action_custom_button(self):
-        pass
+    def action_open_people(self):
+        people = self.mapped('apl_people_ids')
+        action = self.env['ir.actions.actions']._for_xml_id('de_apollo_connector.action_apl_people')
+        if len(people) > 1:
+            action['domain'] = [('id', 'in', people.ids)]
+        elif len(people) == 1:
+            form_view = [(self.env.ref('de_apollo_connector.apl_people_form_view').id, 'form')]
+            if 'views' in action:
+                action['views'] = form_view + [(state,view) for state,view in action['views'] if view != 'form']
+            else:
+                action['views'] = form_view
+            action['res_id'] = people.id
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action

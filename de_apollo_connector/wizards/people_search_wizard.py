@@ -30,9 +30,9 @@ class APLPeopleSearchWizard(models.TransientModel):
         }
         data = {
             "api_key": self.apl_instance_id.api_key,
-            "q_organization_domains": "apollo.io\ngoogle.com",
-            "page" : 1,
-            "person_titles" : ["sales manager", "engineer manager"]
+            #"q_organization_domains": "apollo.io\ngoogle.com",
+            "page" : 2,
+            "person_titles" : ["manager"]
         }
         #response = requests.request("POST", url, headers=headers, json=data)
 
@@ -76,6 +76,7 @@ class APLPeopleSearchWizard(models.TransientModel):
             
             person = self.env['apl.people'].create(person_values)
 
+            # Organization / Company Date
             organization_data = person_data.get('organization')
             if organization_data:
                 organization_values = {
@@ -88,6 +89,24 @@ class APLPeopleSearchWizard(models.TransientModel):
                 person.write({'apl_people_company_id': organization.id})
                 
 
+            # Employement History
+            employement_history_ids = person_data.get('employment_history', [])
+            for employement_history_id in employement_history_ids:
+                employment_values = {
+                    'degree': employement_history_id.get('degree'),
+                    'start_date': employement_history_id.get('start_date'),
+                    'end_date': employement_history_id.get('end_date'),
+                    'grade_level': employement_history_id.get('grade_level'),
+                    'kind': employement_history_id.get('kind'),
+                    'major': employement_history_id.get('major'),
+                    'description': employement_history_id.get('description'),
+                    'apl_people_id': person.id,
+                }
+                employement = self.env['apl.people.employment'].create(employment_values)
+
+                # Associate the Employment with the person
+                person.write({'people_employment_history_ids': [(4, employement.id)]})
+                
         # Return an action to open a new form view
         action = {
             'type': 'ir.actions.act_window',

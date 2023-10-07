@@ -7,7 +7,19 @@
             <field name="model">apl.companies</field>
             <field name="arch" type="xml">
                 <form string="Companies">
+                    <header>
+                        
+                    </header>
                     <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_open_people"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                type="object"
+                                >
+                                Employees
+                            </button>
+                        </div>
                         <group>
                             <group>
                                 <field name="name" />
@@ -23,17 +35,6 @@
                                 <field name="facebook_url" />
                             </group>
                         </group>
-                        <notebook>
-                            <page>
-                                <field name="apl_people_ids" > 
-                                    <tree string="People" editable="bottom" create="false" edit="true" delete="false">
-                                        <field name="name" />
-                                        <field name="title" />
-                                        <field name="email" />
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
                     </sheet>
                 </form>
             </field>
