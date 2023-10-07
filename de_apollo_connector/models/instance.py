@@ -42,7 +42,16 @@ class ApolloInstance(models.Model):
 
 
     def button_draft(self):
+
+        data = {
+            #"api_key": self.api_key,
+            "q_organization_domains": "apollo.io\ngoogle.com",
+            "page" : 1,
+            "person_titles" : ["sales manager", "engineer manager"]
+        }
         
+        raise UserError(self.fetch_json_data('mixed_people/search', data))
+
         url = "https://api.apollo.io/v1/typed_custom_fields"
 
         querystring = {
@@ -141,14 +150,21 @@ class ApolloInstance(models.Model):
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json'
         }
-
         try:
             url = self.url + api_name
-            data = api_data
-            data['api_key'] = self.api_key
+
+            # Initialize data as an empty dictionary if it's None
+            if api_data is None:
+                api_data = {}
+
+            # Add the api_key field to the data dictionary
+            api_data['api_key'] = self.api_key
+
+            #raise UserError(api_data)
             
-            response = requests.request("POST", url, headers=headers, json=data)        
-            jason_data = json.loads(response.text)
+            response = requests.request("POST", url, headers=headers, json=api_data)   
+            #raise UserError(response.text)
+            json_data = json.loads(response.text)
             return json_data
 
         except requests.exceptions.RequestException as e:

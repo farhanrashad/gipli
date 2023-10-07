@@ -7,10 +7,20 @@
             <field name="model">apl.people.results</field>
             <field name="arch" type="xml">
                 <tree string="Apollo Results" js_class="apl_search_button_in_tree">
-                    <field name="apl_id"/>
+                    <field name="apl_id" optional="hide"/>
+                    <field name="first_name" optional="hide"/>
+                    <field name="last_name" optional="hide"/>
                     <field name="name"/>
                     <field name="title"/>
                     <field name="email"/>
+                    <field name="email_status"/>
+                    <field name="linkedin_url" widget="url" options="{'class': 'fa fa-linkedin', 'target': '_blank'}" invisible="1"/>
+                    <button name="open_linkedin_profile" type="object" icon="fa-linkedin" />
+                    <button name="open_twitter_profile" type="object" icon="fa-twitter" />
+                    <button name="open_facebook_profile" type="object" icon="fa-facebook" />
+                    <button name="open_github_profile" type="object" icon="fa-github" />
+
+
                 </tree>
                
             </field>

@@ -34,19 +34,36 @@ class APLPeopleSearchWizard(models.TransientModel):
             "page" : 1,
             "person_titles" : ["sales manager", "engineer manager"]
         }
-        response = requests.request("POST", url, headers=headers, json=data)
+        #response = requests.request("POST", url, headers=headers, json=data)
 
         #raise UserError(response.text)
+
         
-        data = json.loads(response.text)
-        people_data = data.get('people', [])
+        #data = json.loads(response.text)
+        data = self.apl_instance_id.fetch_json_data('mixed_people/search', data)
+        # Check if data is a list, and if it is, assign it to people_data
+        if isinstance(data, list):
+            people_data = data
+        # If data is a dictionary, check if 'people' key exists and assign it to people_data
+        elif isinstance(data, dict):
+            people_data = data.get('people', [])
+    
+        #people_data = data.get('people', [])
         
         for person_data in people_data:
             person_values = {
                 'apl_id': person_data.get('id'),
+                'first_name': person_data.get('first_name'),
+                'last_name': person_data.get('last_name'),
                 'name': person_data.get('name'),
                 'title': person_data.get('title'),
                 'email': person_data.get('email'),
+                'email_status': person_data.get('email_status'),
+                'linkedin_url': person_data.get('linkedin_url'),
+                'twitter_url': person_data.get('twitter_url'),
+                'github_url': person_data.get('github_url'),
+                'facebook_url': person_data.get('facebook_url'),
+                'photo_url': person_data.get('photo_url'),
                 # Map other fields from JSON to your Odoo model fields
             }
             self.env['apl.people.results'].unlink()
@@ -58,6 +75,8 @@ class APLPeopleSearchWizard(models.TransientModel):
             'view_mode': 'tree',
             'name': _('Search Results'),
             'res_model': 'apl.people.results',
+            'context': {'create': False, 'edit': False},  # Add the context here
+
         }
         return action
 
