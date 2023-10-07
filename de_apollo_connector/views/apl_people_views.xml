@@ -8,6 +8,10 @@
             <field name="arch" type="xml">
                 <form string="People">
                     <sheet>
+                        <field name="photo_url" invisible="1"/>
+                        <div class="o_field_image o_field_widget oe_avatar">
+                            <field name="photo_image" widget="image" options="{'size': [128, 128]}"/>
+                        </div>
                         <group>
                             <group>
                                 <field name="name" />
@@ -54,8 +58,9 @@
                     <field name="apl_id" optional="hide"/>
                     <field name="first_name" optional="hide"/>
                     <field name="last_name" optional="hide"/>
-                    <field name="photo_url" widget="image" />
                     <field name="name"/>
+                    <field name="photo_url" optional="hide"/>
+                    <field name="photo_image" widget="image" options="{'size': [50, 50]}"/>
                     <field name="title"/>
                     <field name="email"/>
                     <field name="email_status"/>

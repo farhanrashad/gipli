@@ -3,7 +3,7 @@
 from odoo import api, fields, Command, models, _
 from odoo.exceptions import UserError, AccessError
 from odoo.tools import html_escape as escape
-
+import base64
 import requests
 import json
 
@@ -31,8 +31,34 @@ class ApolloPeople(models.Model):
 
     people_employment_history_ids = fields.One2many('apl.people.employment', 'apl_people_id', string="People")
 
-    def action_custom_button(self):
-        pass
+    photo_image = fields.Binary("Photo", compute='_compute_image', store=True)
+
+    @api.depends('photo_url')
+    def _compute_image(self):
+        """ Function to load an image from URL or local file path """
+        image = False
+        for record in self:
+            if record.photo_url:
+                if record.photo_url.startswith(('http://', 'https://')):
+                    # Load image from URL
+                    try:
+                        image = base64.b64encode(
+                            requests.get(record.photo_url).content)
+                    except Exception as e:
+                        # Handle URL loading errors
+                        raise UserError(_(f"Error loading image from URL: {str(e)}"))
+                else:
+                    # Load image from local file path
+                    try:
+                        with open(record.photo_url, 'rb') as image_file:
+                            image = base64.b64encode(image_file.read())
+                    except Exception as e:
+                        # Handle local file loading errors
+                        raise UserError(
+                            _(f"Error loading image from local path: {str(e)}"))
+            photo_image = image
+            if photo_image:
+                record.photo_image = photo_image
 
     def open_linkedin_profile(self):
         # Get the LinkedIn profile URL from a field in your model

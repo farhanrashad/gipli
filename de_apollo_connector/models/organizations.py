@@ -31,10 +31,10 @@ class ApolloComapniesResults(models.Model):
 
     apl_people_ids = fields.One2many('apl.people', 'apl_people_company_id', string="Peoples")
 
-    logo_image = fields.Binary("Logo", compute='_compute_image_added', store=True)
+    logo_image = fields.Binary("Logo", compute='_compute_image', store=True)
 
     @api.depends('logo_url')
-    def _compute_image_added(self):
+    def _compute_image(self):
         """ Function to load an image from URL or local file path """
         image = False
         for record in self:
