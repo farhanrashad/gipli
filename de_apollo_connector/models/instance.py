@@ -128,3 +128,34 @@ class ApolloInstance(models.Model):
         pass
 
 
+    
+    @api.model
+    def fetch_json_data(self, api_name, api_data=None):
+        """
+        Fetch JSON data from a given URL with optional data payload.
+        :param url: The URL to send the request to.
+        :param data: Optional data to send with the request.
+        :return: JSON data received in the response.
+        """
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json'
+        }
+
+        try:
+            url = self.url + api_name
+            data = api_data
+            data['api_key'] = self.api_key
+            
+            response = requests.request("POST", url, headers=headers, json=data)        
+            jason_data = json.loads(response.text)
+            return json_data
+
+        except requests.exceptions.RequestException as e:
+            # Handle any request exceptions
+            raise e
+
+        except json.JSONDecodeError as e:
+            # Handle JSON decoding errors
+            raise e
+
