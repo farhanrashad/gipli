@@ -6,9 +6,9 @@ import json
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
-class APLPeopleSearchWizard(models.TransientModel):
-    _name = "apl.people.search.wizard"
-    _description = 'Search People Wizard'
+class APLCompaniesSearchWizard(models.TransientModel):
+    _name = "apl.companies.search.wizard"
+    _description = 'Search Companies Wizard'
 
     apl_instance_id = fields.Many2one('apl.instance', required=True)
     name = fields.Char(string='Name', )

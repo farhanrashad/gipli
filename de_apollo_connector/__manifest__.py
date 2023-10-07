@@ -20,23 +20,25 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['crm','sale'],
+    'depends': ['crm'],
 
     # always loaded
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/apollo_views.xml',
         'views/apollo_instance_views.xml',
         'views/res_partner_views.xml',
         'views/crm_lead_views.xml',
         'wizards/people_search_wizard_views.xml',
+        'wizards/companies_search_wizard_views.xml',
         'views/apl_people_results_views.xml',
-        'views/sale_order_views.xml',
+        'views/apl_companies_results_views.xml',
     ],
     'assets': {
        'web.assets_backend': [
-           'de_apollo_connector/static/src/js/tree_button.js',
-           'de_apollo_connector/static/src/xml/button_search_people.xml',
+           'de_apollo_connector/static/src/js/button_search.js',
+           'de_apollo_connector/static/src/xml/button_search.xml',
        ],
     },
     # only loaded in demonstration mode

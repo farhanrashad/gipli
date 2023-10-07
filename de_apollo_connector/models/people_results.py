@@ -9,7 +9,7 @@ import json
 
 class ApolloPeopleResults(models.Model):
     _name = 'apl.people.results'
-    _description = 'Apollo Results'
+    _description = 'People Results'
 
     apl_id = fields.Char('ID')
     name = fields.Char('Name')

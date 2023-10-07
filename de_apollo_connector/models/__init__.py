@@ -3,4 +3,5 @@
 from . import instance
 from . import res_partner
 from . import crm_lead
-from . import apl_results
+from . import people_results
+from . import companies_results
