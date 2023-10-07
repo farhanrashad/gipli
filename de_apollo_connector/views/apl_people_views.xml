@@ -54,6 +54,7 @@
                     <field name="apl_id" optional="hide"/>
                     <field name="first_name" optional="hide"/>
                     <field name="last_name" optional="hide"/>
+                    <field name="photo_url" widget="image" />
                     <field name="name"/>
                     <field name="title"/>
                     <field name="email"/>

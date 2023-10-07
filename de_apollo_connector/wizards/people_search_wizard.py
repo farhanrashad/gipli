@@ -50,6 +50,10 @@ class APLPeopleSearchWizard(models.TransientModel):
             organization_data = data.get('organization', [])
     
         person_values = {}
+
+        self.env['apl.companies'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
+        self.env['apl.people'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
+        self.env['apl.people.employment'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
         
         for person_data in people_data:
             person_values = {
@@ -71,8 +75,6 @@ class APLPeopleSearchWizard(models.TransientModel):
                 'city': person_data.get('city'),
                 # Map other fields from JSON to your Odoo model fields
             }
-            self.env['apl.companies'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
-            self.env['apl.people'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
             
             person = self.env['apl.people'].create(person_values)
 
@@ -81,7 +83,17 @@ class APLPeopleSearchWizard(models.TransientModel):
             if organization_data:
                 organization_values = {
                     'name': organization_data.get('name'),
-                    # Add other fields from JSON to apl.organization model fields
+                    'website_url': organization_data.get('website_url'),
+                    'blog_url': organization_data.get('blog_url'),
+                    'angellist_url': organization_data.get('angellist_url'),
+                    'linkedin_url': organization_data.get('linkedin_url'),
+                    'linkedin_uid': organization_data.get('linkedin_uid'),
+                    'twitter_url': organization_data.get('twitter_url'),
+                    'facebook_url': organization_data.get('facebook_url'),
+                    'alexa_ranking': organization_data.get('alexa_ranking'),
+                    'founded_year': organization_data.get('founded_year'),
+                    'logo_url': organization_data.get('logo_url'),
+                    'primary_domain': organization_data.get('primary_domain'),
                 }
                 organization = self.env['apl.companies'].create(organization_values)
 
