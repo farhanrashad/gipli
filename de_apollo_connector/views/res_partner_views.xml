@@ -11,6 +11,8 @@
                         <group>
                             <group>
                                 <field name="ap_id" />
+                                <field name="update_required_for_apollo" />
+                                <field name="ap_date_sync" />
                             </group>
                         </group>
                     </page>

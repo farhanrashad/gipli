@@ -13,7 +13,7 @@ READONLY_FIELD_STATES = {
 }
 
 class ApolloInstance(models.Model):
-    _name = 'apollo.instance'
+    _name = 'apl.instance'
     _description = 'Apollo Instance'
 
     name = fields.Char(string='Name', required=True)
@@ -30,19 +30,28 @@ class ApolloInstance(models.Model):
         string='Status',default='draft', required=True
     )
 
-    ap_contact_syn = fields.Boolean(
+    contact_syn = fields.Boolean(
         string='Contact Sync',
         help="Synchronize contact with Apollo."
     )
 
-    ap_lead_syn = fields.Boolean(
+    lead_syn = fields.Boolean(
         string='Lead Sync',
         help="Synchronize Lead with Apollo."
     )
 
 
     def button_draft(self):
+
+        data = {
+            #"api_key": self.api_key,
+            "q_organization_domains": "apollo.io\ngoogle.com",
+            "page" : 1,
+            "person_titles" : ["sales manager", "engineer manager"]
+        }
         
+        raise UserError(self.fetch_json_data('mixed_people/search', data))
+
         url = "https://api.apollo.io/v1/typed_custom_fields"
 
         querystring = {
@@ -124,4 +133,45 @@ class ApolloInstance(models.Model):
     def button_import_leads(self):
         pass
 
+    def button_confirm(self):
+        pass
+
+
+    
+    @api.model
+    def fetch_json_data(self, api_name, api_data=None):
+        """
+        Fetch JSON data from a given URL with optional data payload.
+        :param url: The URL to send the request to.
+        :param data: Optional data to send with the request.
+        :return: JSON data received in the response.
+        """
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json'
+        }
+        try:
+            url = self.url + api_name
+
+            # Initialize data as an empty dictionary if it's None
+            if api_data is None:
+                api_data = {}
+
+            # Add the api_key field to the data dictionary
+            api_data['api_key'] = self.api_key
+
+            #raise UserError(api_data)
+            
+            response = requests.request("POST", url, headers=headers, json=api_data)   
+            #raise UserError(response.text)
+            json_data = json.loads(response.text)
+            return json_data
+
+        except requests.exceptions.RequestException as e:
+            # Handle any request exceptions
+            raise e
+
+        except json.JSONDecodeError as e:
+            # Handle JSON decoding errors
+            raise e
 
