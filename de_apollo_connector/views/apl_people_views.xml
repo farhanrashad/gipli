@@ -1,7 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Define the tree view for Apollo Results -->
+        <!-- People form view -->
+        <record id="apl_people_form_view" model="ir.ui.view">
+            <field name="name">apl.people.form.view</field>
+            <field name="model">apl.people</field>
+            <field name="arch" type="xml">
+                <form string="People">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" />
+                                <field name="title" />
+                                <field name="email" />
+                                <field name="country" />
+                                <field name="state" />
+                                <field name="city" />
+                                <field name="apl_people_company_id" />
+                            </group>
+                            <group>
+                                <field name="linkedin_url" />
+                                <field name="twitter_url" />
+                                <field name="facebook_url" />
+                                <field name="github_url" />
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Employement History" name="employment_history">
+                                <field name="people_employment_history_ids" > 
+                                    <tree string="Employement History" editable="bottom" create="false" edit="true" delete="false">
+                                        <field name="degree" />
+                                        <field name="start_date" />
+                                        <field name="end_date" />
+                                        <field name="grade_level" />
+                                        <field name="kind" />
+                                        <field name="major" />
+                                        <field name="description" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Peole tree View -->
         <record id="view_people_tree" model="ir.ui.view">
             <field name="name">people.tree</field>
             <field name="model">apl.people</field>
@@ -15,7 +59,7 @@
                     <field name="email"/>
                     <field name="email_status"/>
                     <field name="organization_id" optional="hide"/>
-                    <field name="apl_people_company_id"/>
+                    <field name="apl_people_company_id" widget="many2one_link"/>
                     <field name="linkedin_url" widget="url" options="{'class': 'fa fa-linkedin', 'target': '_blank'}" invisible="1"/>
                     <button name="open_linkedin_profile" type="object" icon="fa-linkedin" />
                     <button name="open_twitter_profile" type="object" icon="fa-twitter" />

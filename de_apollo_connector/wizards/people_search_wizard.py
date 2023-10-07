@@ -10,8 +10,8 @@ class APLPeopleSearchWizard(models.TransientModel):
     _name = "apl.people.search.wizard"
     _description = 'Search People Wizard'
 
-    apl_instance_id = fields.Many2one('apl.instance', required=True)
-    name = fields.Char(string='Name', )
+    apl_instance_id = fields.Many2one('apl.instance')
+    name = fields.Char(string='Name')
     job_titles = fields.Char(string='Job Titles')
     company_name = fields.Char(string='Company Name')
     country_id = fields.Many2one('res.country', string='Country')

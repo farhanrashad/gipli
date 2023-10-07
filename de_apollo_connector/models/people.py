@@ -11,24 +11,25 @@ class ApolloPeople(models.Model):
     _name = 'apl.people'
     _description = 'Apollo People'
 
-    apl_id = fields.Char('ID')
-    first_name = fields.Char('First Name')
-    last_name = fields.Char('Last Name')
-    name = fields.Char('Name')
-    organization_id = fields.Char('Organization ID')
-    title = fields.Char('Title')
-    email = fields.Char('Email')
-    email_status = fields.Char('Email Status')
-    linkedin_url = fields.Char('LinkedIn')
-    twitter_url = fields.Char('Twitter')
-    github_url = fields.Char('Github')
-    facebook_url = fields.Char('Facebook')
-    photo_url = fields.Char('Photo')
-    apl_people_company_id = fields.Many2one('apl.companies', string='Organization')
-    country = fields.Char('Country')
-    state = fields.Char('State')
-    city = fields.Char('City')
+    apl_id = fields.Char('ID', readonly=True)
+    first_name = fields.Char('First Name', readonly=True)
+    last_name = fields.Char('Last Name', readonly=True)
+    name = fields.Char('Name', readonly=True)
+    organization_id = fields.Char('Organization ID', readonly=True)
+    title = fields.Char('Title', readonly=True)
+    email = fields.Char('Email', readonly=True)
+    email_status = fields.Char('Email Status', readonly=True)
+    linkedin_url = fields.Char('LinkedIn', readonly=True)
+    twitter_url = fields.Char('Twitter', readonly=True)
+    github_url = fields.Char('Github', readonly=True)
+    facebook_url = fields.Char('Facebook', readonly=True)
+    photo_url = fields.Char('Photo', readonly=True)
+    apl_people_company_id = fields.Many2one('apl.companies', string='Organization', readonly=True)
+    country = fields.Char('Country', readonly=True)
+    state = fields.Char('State', readonly=True)
+    city = fields.Char('City', readonly=True)
 
+    people_employment_history_ids = fields.One2many('apl.people.employment', 'apl_people_id', string="People")
 
     def action_custom_button(self):
         pass
@@ -69,3 +70,16 @@ class ApolloPeople(models.Model):
                 'target': 'new',
             }
 
+class ApolloPeopleEmployment(models.Model):
+    _name = 'apl.people.employment'
+    _description = 'Apollo People Employement History'
+
+    apl_people_id = fields.Many2one('apl.people', string='People', readonly=True)
+    degree = fields.Char('Degree', readonly=True)
+    start_date = fields.Date('Start Date', readonly=True)
+    end_date = fields.Date('End Date', readonly=True)
+    grade_level = fields.Char('Grade Level', readonly=True)
+    kind = fields.Char('Kind', readonly=True)
+    major = fields.Char('Major', readonly=True)
+    description = fields.Text('Description', readonly=True)
+    

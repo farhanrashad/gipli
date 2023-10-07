@@ -1,6 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Companies form view -->
+        <record id="apl_companies_form_view" model="ir.ui.view">
+            <field name="name">apl.companies.form.view</field>
+            <field name="model">apl.companies</field>
+            <field name="arch" type="xml">
+                <form string="Companies">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" />
+                                <field name="founded_year" />
+                                <field name="primary_domain" />
+                            </group>
+                            <group>
+                                <field name="website_url" />
+                                <field name="blog_url" />
+                                <field name="angellist_url" />
+                                <field name="linkedin_url" />
+                                <field name="twitter_url" />
+                                <field name="facebook_url" />
+                            </group>
+                        </group>
+                        <notebook>
+                            <page>
+                                <field name="apl_people_ids" > 
+                                    <tree string="People" editable="bottom" create="false" edit="true" delete="false">
+                                        <field name="name" />
+                                        <field name="title" />
+                                        <field name="email" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Companies tree view -->
         <record id="view_companies_tree" model="ir.ui.view">
             <field name="name">Comapnies.tree</field>
             <field name="model">apl.companies</field>
