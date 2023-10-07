@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['crm'],
+    'depends': ['crm','sale'],
 
     # always loaded
     'data': [
@@ -31,7 +31,14 @@
         'views/crm_lead_views.xml',
         'wizards/people_search_wizard_views.xml',
         'views/apl_people_results_views.xml',
+        'views/sale_order_views.xml',
     ],
+    'assets': {
+       'web.assets_backend': [
+           'de_apollo_connector/static/src/js/tree_button.js',
+           'de_apollo_connector/static/src/xml/button_search_people.xml',
+       ],
+    },
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',

@@ -15,3 +15,6 @@ class ApolloPeopleResults(models.Model):
     name = fields.Char('Name')
     title = fields.Char('title')
     email = fields.Char('Email')
+
+    def action_custom_button(self):
+        pass

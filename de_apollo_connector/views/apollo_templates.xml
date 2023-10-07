@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <templates>
+        <t t-name="de_apollo_connector.tree_view_button_template" t-js="widget.viewType === 'list' &amp;&amp; widget.modelName === 'apl.people.search'">
+            <div class="oe-list-header">
+                <button class="btn btn-primary de-apollo-search-people">Search People</button>
+            </div>
+        </t>
+    </templates>
+</odoo>
