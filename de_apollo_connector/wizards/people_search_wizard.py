@@ -47,8 +47,9 @@ class APLPeopleSearchWizard(models.TransientModel):
         # If data is a dictionary, check if 'people' key exists and assign it to people_data
         elif isinstance(data, dict):
             people_data = data.get('people', [])
+            organization_data = data.get('organization', [])
     
-        #people_data = data.get('people', [])
+        person_values = {}
         
         for person_data in people_data:
             person_values = {
@@ -56,6 +57,7 @@ class APLPeopleSearchWizard(models.TransientModel):
                 'first_name': person_data.get('first_name'),
                 'last_name': person_data.get('last_name'),
                 'name': person_data.get('name'),
+                'organization_id': person_data.get('organization_id'),
                 'title': person_data.get('title'),
                 'email': person_data.get('email'),
                 'email_status': person_data.get('email_status'),
@@ -64,17 +66,34 @@ class APLPeopleSearchWizard(models.TransientModel):
                 'github_url': person_data.get('github_url'),
                 'facebook_url': person_data.get('facebook_url'),
                 'photo_url': person_data.get('photo_url'),
+                'country': person_data.get('country'),
+                'state': person_data.get('state'),
+                'city': person_data.get('city'),
                 # Map other fields from JSON to your Odoo model fields
             }
-            self.env['apl.people.results'].unlink()
-            person = self.env['apl.people.results'].create(person_values)
+            self.env['apl.companies'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
+            self.env['apl.people'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
+            
+            person = self.env['apl.people'].create(person_values)
+
+            organization_data = person_data.get('organization')
+            if organization_data:
+                organization_values = {
+                    'name': organization_data.get('name'),
+                    # Add other fields from JSON to apl.organization model fields
+                }
+                organization = self.env['apl.companies'].create(organization_values)
+
+                # Associate the organization with the person
+                person.write({'apl_people_company_id': organization.id})
+                
 
         # Return an action to open a new form view
         action = {
             'type': 'ir.actions.act_window',
             'view_mode': 'tree',
             'name': _('Search Results'),
-            'res_model': 'apl.people.results',
+            'res_model': 'apl.people',
             'context': {'create': False, 'edit': False},  # Add the context here
 
         }

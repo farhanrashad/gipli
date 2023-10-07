@@ -49,15 +49,15 @@ class APLCompaniesSearchWizard(models.TransientModel):
                 'email': person_data.get('email'),
                 # Map other fields from JSON to your Odoo model fields
             }
-            self.env['apl.people.results'].unlink()
-            person = self.env['apl.people.results'].create(person_values)
+            self.env['apl.companies'].search([('uid', '=', self.env.user.id)]).unlink()
+            person = self.env['apl.companies'].create(person_values)
 
         # Return an action to open a new form view
         action = {
             'type': 'ir.actions.act_window',
             'view_mode': 'tree',
             'name': _('Search Results'),
-            'res_model': 'apl.people.results',
+            'res_model': 'apl.companies',
         }
         return action
 

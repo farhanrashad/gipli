@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Applolo Connector",
+    'name': "Apollo Connector",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
-
-    'description': """
-        Long description of module's purpose
+        Odoo Apollo Integration
     """,
 
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
+    'description': """
+        The Odoo Apollo Integration module seamlessly connects your Odoo CRM with Apollo, enabling streamlined prospecting and lead enrichment. Search and import leads from Apollo, enrich lead data, synchronize information in real-time, and automate tasks, all within your Odoo CRM. Elevate your lead management with accurate, up-to-date data and efficient workflows.
+    """,
+    'author': "Dynexcel",
+    'website': "https://www.dynexcel.com",
+    'category': 'Sales/Marketing',
     'version': '0.1',
-
     # any module necessary for this one to work correctly
     'depends': ['crm'],
-
     # always loaded
     'data': [
-        'security/security.xml',
         'security/ir.model.access.csv',
         'views/apollo_views.xml',
         'views/apollo_instance_views.xml',
@@ -32,8 +24,8 @@
         'views/crm_lead_views.xml',
         'wizards/people_search_wizard_views.xml',
         'wizards/companies_search_wizard_views.xml',
-        'views/apl_people_results_views.xml',
-        'views/apl_companies_results_views.xml',
+        'views/apl_people_views.xml',
+        'views/apl_companies_views.xml',
     ],
     'assets': {
        'web.assets_backend': [

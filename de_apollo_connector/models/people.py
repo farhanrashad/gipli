@@ -7,24 +7,28 @@ from odoo.tools import html_escape as escape
 import requests
 import json
 
-class ApolloPeopleResults(models.Model):
-    _name = 'apl.people.results'
-    _description = 'People Results'
+class ApolloPeople(models.Model):
+    _name = 'apl.people'
+    _description = 'Apollo People'
 
     apl_id = fields.Char('ID')
     first_name = fields.Char('First Name')
     last_name = fields.Char('Last Name')
     name = fields.Char('Name')
-    title = fields.Char('title')
+    organization_id = fields.Char('Organization ID')
+    title = fields.Char('Title')
     email = fields.Char('Email')
-    email_status = fields.Char('email_status')
-    linkedin_url = fields.Char('linkedin_url')
-    twitter_url = fields.Char('twitter_url')
-    github_url = fields.Char('github_url')
-    facebook_url = fields.Char('facebook_url')
-    photo_url = fields.Char('photo_url')
-    
-    
+    email_status = fields.Char('Email Status')
+    linkedin_url = fields.Char('LinkedIn')
+    twitter_url = fields.Char('Twitter')
+    github_url = fields.Char('Github')
+    facebook_url = fields.Char('Facebook')
+    photo_url = fields.Char('Photo')
+    apl_people_company_id = fields.Many2one('apl.companies', string='Organization')
+    country = fields.Char('Country')
+    state = fields.Char('State')
+    city = fields.Char('City')
+
 
     def action_custom_button(self):
         pass
@@ -64,3 +68,4 @@ class ApolloPeopleResults(models.Model):
                 'url': linkedin_profile_url,
                 'target': 'new',
             }
+
