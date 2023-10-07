@@ -31,36 +31,34 @@ class ApolloComapniesResults(models.Model):
 
     apl_people_ids = fields.One2many('apl.people', 'apl_people_company_id', string="Peoples")
 
-    logo_image = fields.Binary("Logo", compute='_compute_image', store=True)
+    logo_image = fields.Binary("Logo", compute='_compute_image_added', store=True)
 
     @api.depends('logo_url')
-    def _compute_image(self):
+    def _compute_image_added(self):
         """ Function to load an image from URL or local file path """
+        image = False
         for record in self:
-            image = False
             if record.logo_url:
                 if record.logo_url.startswith(('http://', 'https://')):
                     # Load image from URL
                     try:
-                        response = requests.get(record.logo_url)
-                        if response.status_code == 200:
-                            image_data = response.content
-                            image = base64.b64encode(image_data)
-                            record.logo_image = image
-                        else:
-                            _logger.warning("HTTP error while fetching image from URL: %s", response.status_code)
+                        image = base64.b64encode(
+                            requests.get(record.logo_url).content)
                     except Exception as e:
-                        _logger.error("Error loading image from URL: %s", str(e))
+                        # Handle URL loading errors
+                        raise UserError(_(f"Error loading image from URL: {str(e)}"))
                 else:
                     # Load image from local file path
                     try:
                         with open(record.logo_url, 'rb') as image_file:
-                            image_data = image_file.read()
-                            image = base64.b64encode(image_data)
-                            record.logo_image = image
+                            image = base64.b64encode(image_file.read())
                     except Exception as e:
-                        _logger.error("Error loading image from local path: %s", str(e))
-
+                        # Handle local file loading errors
+                        raise UserError(
+                            _(f"Error loading image from local path: {str(e)}"))
+            logo_image = image
+            if logo_image:
+                record.logo_image = logo_image
 
     def action_open_people(self):
         people = self.mapped('apl_people_ids')
