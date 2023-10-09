@@ -23,7 +23,7 @@
                         </group>
                        
                         <footer>
-                            <button name="action_search" string="Search" type="object" class="btn-primary"/>
+                            <button name="action_process" string="Process" type="object" class="btn-primary"/>
                             <button string="Cancel" class="btn-secondary" special="cancel"/>
                         </footer>
                     </sheet>

@@ -12,5 +12,6 @@ class APLSendDataWizard(models.TransientModel):
 
     apl_instance_id = fields.Many2one('apl.instance')
 
-    def action_search(self):
-        pass
+    def action_process(self):
+        active_model = self.env.context.get('active_model')
+        raise UserError(active_model)

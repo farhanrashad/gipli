@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields
+
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
+
 
 class CRMTag(models.Model):
     _inherit = 'crm.tag'
@@ -33,8 +36,21 @@ class CRMLead(models.Model):
 
     update_required_for_apollo = fields.Boolean('Update Required for Apollo', help="Set to 'True' when this record requires an update in Apollo.")
 
-    def action_send_to_apollo(self):
-        pass
+    def action_send_to_apollo_data(self):
+        ''' Open the account.payment.register wizard to pay the selected journal entries.
+        :return: An action opening the account.payment.register wizard.
+        '''
+        return {
+            'name': _('Apollo'),
+            'res_model': 'apl.send.data.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'crm.lead',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
 
     
 
