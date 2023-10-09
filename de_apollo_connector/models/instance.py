@@ -151,14 +151,14 @@ class ApolloInstance(models.Model):
 
     def button_import_labels(self):
         data = {
-            'api_key': 'GbYvCle7WbRW0lFKYXlArw',
+            #'api_key': 'GbYvCle7WbRW0lFKYXlArw',
         }
         tags_data = self._get_apollo_data('labels', data)
-        category_id = self.env['res.partner_category']
+        category_id = self.env['res.partner.category']
         crm_tag_id = self.env['crm.tag']
         for tag in tags_data:
             if isinstance(tag, dict):  # Check if 'tag' is a dictionary
-                category_id = self.env['res.partner_category'].search([('apl_id','=',tag.get('id'))],limit=1)
+                category_id = self.env['res.partner.category'].search([('apl_id','=',tag.get('id'))],limit=1)
                 crm_tag_id = self.env['crm.tag'].search([('apl_id','=',tag.get('id'))],limit=1)
                 if tag.get('name'):
                     if category_id:
@@ -180,7 +180,30 @@ class ApolloInstance(models.Model):
                             'apl_id': tag.get('id'),
                         })
 
-        
+    def button_import_stages(self):
+        data = {}
+        stages_data = self._get_apollo_data('opportunity_stages', data)
+        #raise UserError(stages_data.get('opportunity_stages', []))
+        stage_id = self.env['crm.stage']
+        for stage in stages_data.get('opportunity_stages', []):
+            if isinstance(stage, dict):  # Check if 'tag' is a dictionary
+                stage_id = self.env['crm.stage'].search([('apl_id','=',stage.get('id'))],limit=1)
+                if stage.get('name'):
+                    if stage_id:
+                        stage_id.write({
+                            'name': stage.get('name'),
+                            'requirements': stage.get('description'),
+                            'is_won': stage.get('is_won'),
+                        })
+                    else:
+                        self.env['crm.stage'].create({
+                            'name': stage.get('name'),
+                            'apl_id': stage.get('id'),
+                            'requirements': stage.get('description'),
+                            'is_won': stage.get('is_won'),
+                        })
+
+                        
     def button_import_contacts(self):
         pass
 
@@ -237,7 +260,6 @@ class ApolloInstance(models.Model):
         }
         try:
             url = self.url + api_name
-            #raise UserError(url)
             # Initialize data as an empty dictionary if it's None
             if api_data is None:
                 api_data = {}
@@ -245,7 +267,6 @@ class ApolloInstance(models.Model):
             # Add the api_key field to the data dictionary
             api_data['api_key'] = self.api_key
 
-            #raise UserError(api_data)
             response = requests.request("GET", url, headers=headers, params=api_data)
             #raise UserError(response.text)
             json_data = json.loads(response.text)

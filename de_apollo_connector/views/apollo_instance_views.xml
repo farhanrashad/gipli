@@ -44,16 +44,22 @@
                                         <field name="contact_syn" />
                                         <field name="lead_syn" />
                                     </group>
-                                    <group string="Import" >
-                                        <button name="button_import_labels" type="object" class="btn-primary" string="Import Labels" />
-
-                                        <button name="button_import_contacts" type="object" class="btn-primary" string="Import Contacts" />
-                                        <button name="button_import_leads" type="object" class="btn-primary" string="Import Opportunities" />
-                                        <separator string="Export" />
-                                        <button name="button_import_contacts" type="object" class="btn-primary" string="Export Contacts" />
-                                        <button name="button_import_leads" type="object" class="btn-primary" string="Export Opportunities" />
+                                    <group>
                                     </group>
                                 </group>
+                                    <group >
+                                        <group string="Import">
+                                            <button name="button_import_labels" type="object" class="btn-primary btn-sm" string="Import Labels" />
+                                            <button name="button_import_stages" type="object" class="btn-primary btn-sm" string="Import Opportunity Stages" />
+
+                                        <button name="button_import_contacts" type="object" class="btn-primary btn-sm" string="Import Contacts" />
+                                        <button name="button_import_leads" type="object" class="btn-primary btn-sm" string="Import Opportunities" />
+                                        </group>
+                                        <group string="Export">
+                                        <button name="button_import_contacts" type="object" class="btn-primary btn-sm" string="Export Contacts" />
+                                        <button name="button_import_leads" type="object" class="btn-primary btn-sm" string="Export Opportunities" />
+                                        </group>
+                                    </group>
                             </page>
                         </notebook>
                     </sheet>

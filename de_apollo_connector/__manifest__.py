@@ -25,6 +25,7 @@
         'views/res_partner_views.xml',
         'views/crm_lead_views.xml',
         'views/crm_tag_views.xml',
+        'views/crm_stage_views.xml',
         'wizards/people_search_wizard_views.xml',
         'wizards/companies_search_wizard_views.xml',
         'views/apl_people_views.xml',
