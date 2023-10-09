@@ -45,6 +45,8 @@
                                         <field name="lead_syn" />
                                     </group>
                                     <group string="Import" >
+                                        <button name="button_import_labels" type="object" class="btn-primary" string="Import Labels" />
+
                                         <button name="button_import_contacts" type="object" class="btn-primary" string="Import Contacts" />
                                         <button name="button_import_leads" type="object" class="btn-primary" string="Import Opportunities" />
                                         <separator string="Export" />

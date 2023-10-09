@@ -8,8 +8,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//tree" position="inside">
                     <field name="apl_id" optional="hide"/>
-                    <field name="update_required_for_apollo" optional="hide"/>
-                    <field name="apl_date_sync" optional="hide"/>        
+                    <field name="apl_date_sync" optional="hide"/>
+                    <field name="apl_id" optional="hide"/>
                 </xpath>
             </field>
         </record>

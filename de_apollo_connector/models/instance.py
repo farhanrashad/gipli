@@ -47,7 +47,8 @@ class ApolloInstance(models.Model):
 
         data = {
             "api_key": "GbYvCle7WbRW0lFKYXlArw",
-            "q_keywords": "Addison Olson3 Addison Olson3",
+            #"q_keywords": "Addison Olson3 Addison Olson3",
+            "id": "6523cd7f8c4342008b263602",
             "sort_by_field": "contact_last_activity_date",
             "sort_ascending": False,
         }
@@ -148,6 +149,38 @@ class ApolloInstance(models.Model):
             raise UserError(error_message)
         return notification
 
+    def button_import_labels(self):
+        data = {
+            'api_key': 'GbYvCle7WbRW0lFKYXlArw',
+        }
+        tags_data = self._get_apollo_data('labels', data)
+        category_id = self.env['res.partner_category']
+        crm_tag_id = self.env['crm.tag']
+        for tag in tags_data:
+            if isinstance(tag, dict):  # Check if 'tag' is a dictionary
+                category_id = self.env['res.partner_category'].search([('apl_id','=',tag.get('id'))],limit=1)
+                crm_tag_id = self.env['crm.tag'].search([('apl_id','=',tag.get('id'))],limit=1)
+                if tag.get('name'):
+                    if category_id:
+                        category_id.write({
+                            'name': tag.get('name'),
+                        })
+                    else:
+                        self.env['res.partner.category'].create({
+                            'name': tag.get('name'),
+                            'apl_id': tag.get('id'),
+                        })
+                    if crm_tag_id:
+                        crm_tag_id.write({
+                            'name': tag.get('name'),
+                        })
+                    else:
+                        self.env['crm.tag'].create({
+                            'name': tag.get('name'),
+                            'apl_id': tag.get('id'),
+                        })
+
+        
     def button_import_contacts(self):
         pass
 
@@ -160,7 +193,7 @@ class ApolloInstance(models.Model):
 
     
     @api.model
-    def fetch_json_data(self, api_name, api_data=None):
+    def _post_apollo_data(self, api_name, api_data=None):
         """
         Fetch JSON data from a given URL with optional data payload.
         :param url: The URL to send the request to.
@@ -173,7 +206,7 @@ class ApolloInstance(models.Model):
         }
         try:
             url = self.url + api_name
-
+            #raise UserError(url)
             # Initialize data as an empty dictionary if it's None
             if api_data is None:
                 api_data = {}
@@ -184,6 +217,36 @@ class ApolloInstance(models.Model):
             #raise UserError(api_data)
             
             response = requests.request("POST", url, headers=headers, json=api_data)   
+            raise UserError(response.text)
+            json_data = json.loads(response.text)
+            return json_data
+
+        except requests.exceptions.RequestException as e:
+            # Handle any request exceptions
+            raise e
+
+        except json.JSONDecodeError as e:
+            # Handle JSON decoding errors
+            raise e
+
+    @api.model
+    def _get_apollo_data(self, api_name, api_data=None):
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json'
+        }
+        try:
+            url = self.url + api_name
+            #raise UserError(url)
+            # Initialize data as an empty dictionary if it's None
+            if api_data is None:
+                api_data = {}
+
+            # Add the api_key field to the data dictionary
+            api_data['api_key'] = self.api_key
+
+            #raise UserError(api_data)
+            response = requests.request("GET", url, headers=headers, params=api_data)
             #raise UserError(response.text)
             json_data = json.loads(response.text)
             return json_data

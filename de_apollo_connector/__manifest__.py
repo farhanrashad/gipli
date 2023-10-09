@@ -21,6 +21,7 @@
         'data/apollo_data.xml',
         'views/apollo_views.xml',
         'views/apollo_instance_views.xml',
+        'views/res_partner_category_views.xml',
         'views/res_partner_views.xml',
         'views/crm_lead_views.xml',
         'views/crm_tag_views.xml',
