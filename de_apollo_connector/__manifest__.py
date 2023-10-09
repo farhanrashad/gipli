@@ -18,6 +18,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'data/apollo_data.xml',
         'views/apollo_views.xml',
         'views/apollo_instance_views.xml',
         'views/res_partner_views.xml',

@@ -13,5 +13,8 @@ class CRMLead(models.Model):
 
     update_required_for_apollo = fields.Boolean('Update Required for Apollo', help="Set to 'True' when this record requires an update in Apollo.")
 
+    def action_send_to_apollo(self):
+        pass
+
     
 

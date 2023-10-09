@@ -43,12 +43,33 @@ class ApolloInstance(models.Model):
 
     def button_draft(self):
 
+        url = "https://api.apollo.io/v1/contacts/search"
+
+        data = {
+            "api_key": "GbYvCle7WbRW0lFKYXlArw",
+            #"q_keywords": "Tim Zheng, CEO, Apollo",
+            "sort_by_field": "contact_last_activity_date",
+            "sort_ascending": False,
+        }
+
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("POST", url, headers=headers, json=data)
+
+        raise UserError(response.text)
+
+
+
         data = {
             #"api_key": self.api_key,
             "q_organization_domains": "apollo.io\ngoogle.com",
             "page" : 1,
             "person_titles" : ["sales manager", "engineer manager"]
         }
+        
         
         raise UserError(self.fetch_json_data('mixed_people/search', data))
 
