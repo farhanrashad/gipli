@@ -76,3 +76,19 @@ class ResPartner(models.Model):
         })
         #raise UserError(data)
 
+    def action_send_to_apollo_data(self):
+        ''' Open the account.payment.register wizard to pay the selected journal entries.
+        :return: An action opening the account.payment.register wizard.
+        '''
+        return {
+            'name': _('Apollo'),
+            'res_model': 'apl.send.data.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'res.partner',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
+
