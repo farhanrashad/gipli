@@ -10,9 +10,9 @@
                     <page string="Apollo">
                         <group>
                             <group>
-                                <field name="ap_id" />
+                                <field name="apl_id" />
                                 <field name="update_required_for_apollo" />
-                                <field name="ap_date_sync" />
+                                <field name="apl_date_sync" />
                             </group>
                         </group>
                     </page>

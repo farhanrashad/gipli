@@ -47,7 +47,7 @@ class ApolloInstance(models.Model):
 
         data = {
             "api_key": "GbYvCle7WbRW0lFKYXlArw",
-            #"q_keywords": "Tim Zheng, CEO, Apollo",
+            "q_keywords": "Addison Olson3 Addison Olson3",
             "sort_by_field": "contact_last_activity_date",
             "sort_ascending": False,
         }

@@ -31,6 +31,26 @@ class ResPartner(models.Model):
             "state": self.state_id.name,
             "country": self.country_id.name,
             "present_raw_address": self.city + ", " + self.state_id.name + ", " + self.country_id.name,
+            "phone_numbers": [
+                {
+                  "raw_number": "+923001616395",
+                  "sanitized_number": "+923001616395",
+                  "type": "work_hq",
+                  "position": 0,
+                  "status": "no_status",
+                  "dnc_status": '',
+                  "dnc_other_info": ''
+                },
+                {
+                  "raw_number": "+923001616396",
+                  "sanitized_number": "+923001616396",
+                  "type": "mobile",
+                  "position": 1,
+                  "status": "valid_number",
+                  "dnc_status": '',
+                  "dnc_other_info": ''
+                }
+              ],
             #"label_names",
             #"present_raw_address":
         }
