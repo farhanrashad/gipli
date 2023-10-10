@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import requests
+import json
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+import pprint
 
+from urllib.parse import urlparse
 
 class CRMTag(models.Model):
     _inherit = 'crm.tag'
@@ -51,6 +55,37 @@ class CRMLead(models.Model):
             'target': 'new',
             'type': 'ir.actions.act_window',
         }
+
+    def _send_to_apollo(self, apl_instance_id):
+        self.ensure_one()
+        
+        lead_data = {}
+        apl_id = ''
+        lead_json = []
+        
+        for lead in self:
+            lead_data = {
+                "name": lead.name,
+                "amount": lead.expected_revenue,
+                #"opportunity_stage_id":"5c14XXXXXXXXXXXXXXXXXXXX",
+                #"closed_date":"2020-12-18",
+                "account_id": lead.partner_id.apl_id if lead.partner_id.apl_id else '',
+                "description":lead.description,
+                "source": lead.source_id.name,
+                "stage_name": lead.stage_id.name,
+                "is_won": True if lead.won_status == 'won' else False,
+                "is_closed": True if lead.won_status == 'won' else False,
+                "closed_lost_reason": lead.lost_reason_id.name,
+            }
+            if not lead.apl_id:
+                lead_json = apl_instance_id._post_apollo_data('opportunities', lead_data)
+                apl_id = lead_json["opportunity"]["id"]        
+                lead_id = lead.write({
+                    'apl_id': apl_id,
+                })
+            else:
+                api_str = 'opportunities' + '/' + lead.apl_id
+                lead_json = apl_instance_id._put_apollo_data(api_str, lead_data)
 
     
 

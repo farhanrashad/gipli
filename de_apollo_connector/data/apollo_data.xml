@@ -1,26 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        <record id="action_partner_send_to_apollo" model="ir.actions.server">
-            <field name="name">Send to Apollo</field>
-            <field name="model_id" ref="base.model_res_partner"/>
-            <field name="binding_model_id" ref="base.model_res_partner"/>
-            <field name="binding_view_types">form,tree</field>
+        <!-- Scheduler -->
+        <record forcecreate="True" id="ir_cron_contact_send_apollo_action" model="ir.cron">
+            <field name="name">Contacts update at Apollo: run scheduler</field>
+            <field name="model_id" ref="model_res_partner"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.action_send_to_apollo()
+model._reconcile_post_loan()
             </field>
+            <field eval="True" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
         </record>
 
-        <record id="action_crm_send_to_apollo" model="ir.actions.server">
-            <field name="name">Send to Apollo</field>
-            <field name="model_id" ref="crm.model_crm_lead"/>
-            <field name="binding_model_id" ref="crm.model_crm_lead"/>
-            <field name="binding_view_types">form,tree</field>
+        <!-- Scheduler -->
+        <record forcecreate="True" id="ir_cron_loan_scheduler_action" model="ir.cron">
+            <field name="name">Reconcile Loan: run scheduler</field>
+            <field name="model_id" ref="model_hr_loan"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.action_send_to_apollo()
+model._reconcile_post_loan()
             </field>
+            <field eval="True" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
         </record>
         
     </data>

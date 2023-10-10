@@ -30,10 +30,18 @@ class APLSendDataWizard(models.TransientModel):
     def action_process(self):
         active_model = self.env.context.get('active_model')
         active_ids = self.env.context.get('active_ids', [])
-        if active_model == 'res.partner':
-            self.sudo()._send_res_partner_to_apollo(active_ids)
-        elif active_model == 'crm.lead':
-            self.sudo()._send_lead_to_apollo(active_ids)
+
+        record_ids = self.env[active_model].search([('id','in',active_ids)])
+        for record in record_ids:
+            record._send_to_apollo(self.apl_instance_id)
+            
+        #if active_model == 'res.partner':
+        #    self.sudo()._send_res_partner_to_apollo(active_ids)
+        #elif active_model == 'crm.lead':
+        #    lead_ids = self.env['crm.lead'].search([('id','in',active_ids)])
+        #    for lead in lead_ids:
+        #        lead._send_lead_to_apollo(self.apl_instance_id)
+            #self.sudo()._send_lead_to_apollo(active_ids)
 
     def _send_res_partner_to_apollo(self, record_ids):
         self.ensure_one()
