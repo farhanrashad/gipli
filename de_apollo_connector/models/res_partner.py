@@ -14,6 +14,14 @@ class ResPartner(models.Model):
 
     update_required_for_apollo = fields.Boolean('Update Required for Apollo', help="Set to 'True' when this record requires an update in Apollo.")
 
+    linkedin_url = fields.Char('LinkedIn')
+    twitter_url = fields.Char('Twitter')
+    github_url = fields.Char('Github')
+    facebook_url = fields.Char('Facebook')
+    blog_url = fields.Char('Blog')
+    angellist_url = fields.Char('Angel List')
+    founded_year = fields.Integer('Founded Year', default=2001)
+
 
     def action_send_to_apollo(self):
         self.ensure_one()
@@ -54,7 +62,7 @@ class ResPartner(models.Model):
             #"label_names",
             #"present_raw_address":
         }
-        data = apl_instance_id.fetch_json_data('contacts', data)
+        data = apl_instance_id._post_apollo_data('contacts', data)
         
         apl_id = data["contact"]["id"]
         

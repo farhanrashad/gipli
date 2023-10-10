@@ -7,6 +7,9 @@ from odoo.tools import html_escape as escape
 import requests
 import json
 
+from urllib.parse import urlparse
+
+
 READONLY_FIELD_STATES = {
     state: [('readonly', True)]
     for state in {'verified', 'active'}
@@ -43,11 +46,15 @@ class ApolloInstance(models.Model):
 
     def button_draft(self):
 
+        parsed_url = urlparse("https://api.apollo.io")
+        domain = parsed_url.hostname
+        #raise UserError(domain)
+        
         url = "https://api.apollo.io/v1/contacts/search"
 
         data = {
             "api_key": "GbYvCle7WbRW0lFKYXlArw",
-            #"q_keywords": "Addison Olson3 Addison Olson3",
+            "q_keywords": "Deco Addict",
             "id": "6523cd7f8c4342008b263602",
             "sort_by_field": "contact_last_activity_date",
             "sort_ascending": False,
@@ -240,7 +247,7 @@ class ApolloInstance(models.Model):
             #raise UserError(api_data)
             
             response = requests.request("POST", url, headers=headers, json=api_data)   
-            raise UserError(response.text)
+            #raise UserError(response.text)
             json_data = json.loads(response.text)
             return json_data
 

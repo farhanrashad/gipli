@@ -18,6 +18,9 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//group[1]/group[1]" position="inside">
+                    <field name="founded_year" placeholder="e.g 2001" attrs="{'invisible': [('company_type', '!=', 'company')]}"/>
+                </xpath>
                 <xpath expr="//notebook" position="inside">
                     <page string="Apollo">
                         <group>
@@ -25,6 +28,14 @@
                                 <field name="apl_id" />
                                 <field name="update_required_for_apollo" />
                                 <field name="apl_date_sync" />
+                            </group>
+                            <group string="Social Accounts">
+                                <field name="linkedin_url" attrs="{'invisible': [('company_type', '!=', 'company')]}"/>
+                                <field name="twitter_url" attrs="{'invisible': [('company_type', '!=', 'company')]}"/>
+                                <field name="github_url" attrs="{'invisible': [('company_type', '!=', 'company')]}"/>
+                                <field name="facebook_url" attrs="{'invisible': [('company_type', '!=', 'company')]}"/>
+                                <field name="blog_url" attrs="{'invisible': [('company_type', '!=', 'company')]}"/>
+                                <field name="angellist_url" attrs="{'invisible': [('company_type', '!=', 'company')]}"/>
                             </group>
                         </group>
                     </page>
