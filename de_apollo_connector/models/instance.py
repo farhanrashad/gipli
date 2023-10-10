@@ -46,82 +46,21 @@ class ApolloInstance(models.Model):
 
     def button_draft(self):
 
-        parsed_url = urlparse("https://api.apollo.io")
-        domain = parsed_url.hostname
-        #raise UserError(domain)
-        
-        url = "https://api.apollo.io/v1/contacts/search"
-
-        data = {
-            "api_key": "GbYvCle7WbRW0lFKYXlArw",
-            "q_keywords": "Deco Addict",
-            "id": "6523cd7f8c4342008b263602",
-            "sort_by_field": "contact_last_activity_date",
-            "sort_ascending": False,
-        }
-
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-
-        response = requests.request("POST", url, headers=headers, json=data)
-
-        raise UserError(response.text)
-
-
-
-        data = {
-            #"api_key": self.api_key,
-            "q_organization_domains": "apollo.io\ngoogle.com",
-            "page" : 1,
-            "person_titles" : ["sales manager", "engineer manager"]
-        }
-        
-        
-        raise UserError(self.fetch_json_data('mixed_people/search', data))
-
-        url = "https://api.apollo.io/v1/typed_custom_fields"
+        url = "https://api.apollo.io/v1/opportunities/search"
 
         querystring = {
             "api_key": self.api_key
         }
-
+        
         headers = {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json'
         }
-
+        
         response = requests.request("GET", url, headers=headers, params=querystring)
 
         raise UserError(response.text)
 
-
-
-        url = self.url + 'mixed_people/search'
-        data = {
-            "api_key": self.api_key,
-            "q_organization_domains": "apollo.io\ngoogle.com",
-            "page" : 1,
-            "person_titles" : ["sales manager", "engineer manager"]
-        }
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-
-        response = requests.request("POST", url, headers=headers, json=data)
-
-        #raise UserError(response.text)
-        
-        data = json.loads(response.text)
-        people_data = data.get('people', [])
-
-        
-        for person_data in people_data:
-            raise UserError(person_data.get('email'))
-        #raise UserError(people_data)
-        #raise UserError(response.text)
 
         self.write({
             'state':'draft'
@@ -275,6 +214,34 @@ class ApolloInstance(models.Model):
             api_data['api_key'] = self.api_key
 
             response = requests.request("GET", url, headers=headers, params=api_data)
+            #raise UserError(response.text)
+            json_data = json.loads(response.text)
+            return json_data
+
+        except requests.exceptions.RequestException as e:
+            # Handle any request exceptions
+            raise e
+
+        except json.JSONDecodeError as e:
+            # Handle JSON decoding errors
+            raise e
+
+    @api.model
+    def _put_apollo_data(self, api_name, api_data=None):
+        headers = {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json'
+        }
+        try:
+            url = self.url + api_name
+            # Initialize data as an empty dictionary if it's None
+            if api_data is None:
+                api_data = {}
+
+            # Add the api_key field to the data dictionary
+            api_data['api_key'] = self.api_key
+
+            response = requests.request("PUT", url, headers=headers, params=api_data)
             #raise UserError(response.text)
             json_data = json.loads(response.text)
             return json_data
