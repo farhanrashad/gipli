@@ -45,9 +45,9 @@ class ApolloInstance(models.Model):
 
 
     def button_draft(self):
-
+        
         url = "https://api.apollo.io/v1/opportunities/search"
-
+        
         querystring = {
             "api_key": self.api_key
         }
@@ -58,9 +58,8 @@ class ApolloInstance(models.Model):
         }
         
         response = requests.request("GET", url, headers=headers, params=querystring)
-
+        
         raise UserError(response.text)
-
 
         self.write({
             'state':'draft'

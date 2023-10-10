@@ -13,7 +13,19 @@ class APLSendDataWizard(models.TransientModel):
     _name = "apl.send.data.wizard"
     _description = 'Search People Wizard'
 
-    apl_instance_id = fields.Many2one('apl.instance')
+    apl_instance_id = fields.Many2one(
+        'apl.instance',
+        string='APL Instance',
+        default=lambda self: self._compute_default_apl_instance(),
+    )
+
+    def _compute_default_apl_instance(self):
+        # Find an APL instance record in the current company and return its ID
+        apl_instance = self.env['apl.instance'].search([
+            ('company_id', '=', self.env.company.id),
+        ], limit=1)  # Limit to one record (if available)
+
+        return apl_instance.id if apl_instance else False
 
     def action_process(self):
         active_model = self.env.context.get('active_model')
@@ -191,5 +203,33 @@ class APLSendDataWizard(models.TransientModel):
                     
 
     def _send_lead_to_apollo(self, record_ids):
-        pass
+        self.ensure_one()
+        lead_ids = self.env['crm.lead'].search([('id','in',record_ids)])
         
+        lead_data = {}
+        apl_id = ''
+        lead_json = []
+        
+        for lead in lead_ids:
+            lead_data = {
+                "name": lead.name,
+                "amount": lead.expected_revenue,
+                #"opportunity_stage_id":"5c14XXXXXXXXXXXXXXXXXXXX",
+                #"closed_date":"2020-12-18",
+                "account_id": lead.partner_id.apl_id if lead.partner_id.apl_id else '',
+                "description":lead.description,
+                "source": lead.source_id.name,
+                "stage_name": lead.stage_id.name,
+                "is_won": True if lead.won_status == 'won' else False,
+                "is_closed": True if lead.won_status == 'won' else False,
+                "closed_lost_reason": lead.lost_reason_id.name,
+            }
+            if not lead.apl_id:
+                lead_json = self.apl_instance_id._post_apollo_data('opportunities', lead_data)
+                apl_id = lead_json["opportunity"]["id"]        
+                lead_id = lead.write({
+                    'apl_id': apl_id,
+                })
+            else:
+                api_str = 'opportunities' + '/' + lead.apl_id
+                lead_json = self.apl_instance_id._put_apollo_data(api_str, lead_data)
