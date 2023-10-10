@@ -46,6 +46,16 @@ class ResPartner(models.Model):
             'type': 'ir.actions.act_window',
         }
 
+    def _cron_send_to_apollo(self):
+        assign_cron = self.env["ir.config_parameter"].sudo().get_param("apl.leads.auto")
+        record_ids = self.env['res.partner'].search([('update_required_for_apollo','=',True)])
+        #apl_instance = self.env['apl.instance'].search([
+        #    ('company_id', '=', self.env.company.id),
+        #], limit=1)  # Limit to one record (if available)
+        if assign_cron:
+            for record in record_ids:
+                record._send_to_apollo(record.company_id.apl_instance_id)
+        
     def _send_to_apollo(self, apl_instance_id):
         self.ensure_one()
         

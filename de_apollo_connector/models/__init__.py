@@ -6,3 +6,5 @@ from . import res_partner
 from . import crm_lead
 from . import people
 from . import organizations
+from . import res_company
+from . import res_config_settings
