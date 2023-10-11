@@ -34,11 +34,22 @@ class AplOpsWizard(models.TransientModel):
     
                 for obj in json_data_list:
                     partner_id = self.env['res.partner'].search([('apl_id','=',obj.get('id'))],limit=1)
+                    state_id = self.env['res.country.state'].search([('name','=',obj.get('state'))],limit=1)
+                    country_id = self.env['res.country'].search([('name','=',obj.get('country'))],limit=1)
+                    
                     vals = {
                         'company_type': 'person',
                         'apl_id': obj.get('id'),
                         'apl_account_id': obj.get('account_id'),
                         'name': obj.get('name') + 'test',
+                        'linkedin_url': obj.get('linkedin_url'),
+                        'function': obj.get('title'),
+                        'photo_url': obj.get('photo_url'),
+                        'email': obj.get('email'),
+                        'city': obj.get('state'),
+                        'state_id': state_id.id,
+                        'country_id': country_id.id,
+                        'phone': obj.get('sanitized_phone'),
                     }
                     if partner_id: #Update Records
                         if self.duplicate_records:
@@ -47,6 +58,8 @@ class AplOpsWizard(models.TransientModel):
                             partner_id.write(vals)
                     else:
                         partner_id = self.env['res.partner'].create(vals)
+                    
+                    partner_id._compute_image()
             # -------------------------------------------------
             # apollo accounts are the companies contact in odoo
             # -------------------------------------------------
@@ -64,6 +77,15 @@ class AplOpsWizard(models.TransientModel):
                         'company_type': 'company',
                         'apl_id': obj.get('id'),
                         'name': obj.get('name') + 'test',
+                        'website_url': obj.get('website_url'),
+                        'blog_url': obj.get('blog_url'),
+                        'angellist_url': obj.get('angellist_url'),
+                        'linkedin_url': obj.get('linkedin_url'),
+                        'twitter_url': obj.get('twitter_url'),
+                        'facebook_url': obj.get('facebook_url'),
+                        'phone': obj.get('phone') + ',' + obj.get('sanitized_phone'),
+                        'photo_url': obj.get('logo_url'),
+                        'founded_year': obj.get('founded_year'),                        
                     }
                     if account_id: #Update Records
                         if self.duplicate_records:
@@ -73,10 +95,11 @@ class AplOpsWizard(models.TransientModel):
                     else:
                         account_id = self.env['res.partner'].create(vals)
                     
-                        if len(contact_ids):
-                            contact_ids.write({
-                                'parent_id': account_id.id,
-                            })
+                    if len(contact_ids):
+                        contact_ids.write({
+                            'parent_id': account_id.id,
+                        })
+                    account_id._compute_image()
             # -------------------------------------------------
             # apollo opportunities are the companies contact in odoo
             # -------------------------------------------------
@@ -89,3 +112,4 @@ class AplOpsWizard(models.TransientModel):
         #self.env['your.model'].create({'name': op_name})
 
         return {'type': 'ir.actions.act_window_close'}
+        

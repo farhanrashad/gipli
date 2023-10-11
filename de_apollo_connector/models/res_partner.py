@@ -31,6 +31,8 @@ class ResPartner(models.Model):
         help="Set to 'True' when this record requires an update in Apollo."
     )
 
+    photo_url = fields.Char('Photo', readonly=True)
+    
     linkedin_url = fields.Char('LinkedIn')
     twitter_url = fields.Char('Twitter')
     github_url = fields.Char('Github')
@@ -251,4 +253,31 @@ class ResPartner(models.Model):
             # Check if any field in the Partner record has changed
             any_field_changed = any(getattr(partner, field) != partner._origin[field] for field in partner._fields.keys())
             partner.update_required_for_apollo = any_field_changed
+
+    @api.depends('photo_url')
+    def _compute_image(self):
+        """ Function to load an image from URL or local file path """
+        image = False
+        for record in self:
+            if record.photo_url:
+                if record.photo_url.startswith(('http://', 'https://')):
+                    # Load image from URL
+                    try:
+                        image = base64.b64encode(
+                            requests.get(record.photo_url).content)
+                    except Exception as e:
+                        # Handle URL loading errors
+                        raise UserError(_(f"Error loading image from URL: {str(e)}"))
+                else:
+                    # Load image from local file path
+                    try:
+                        with open(record.photo_url, 'rb') as image_file:
+                            image = base64.b64encode(image_file.read())
+                    except Exception as e:
+                        # Handle local file loading errors
+                        raise UserError(
+                            _(f"Error loading image from local path: {str(e)}"))
+            photo_image = image
+            if photo_image:
+                record.image_1920 = photo_image
 
