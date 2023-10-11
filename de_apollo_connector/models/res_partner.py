@@ -183,6 +183,7 @@ class ResPartner(models.Model):
                     "headline": partner.function,
                     #"organization_name": "Dynexcel",
                     "email": partner.email if partner.email else '',
+                    #"sanitized_phone" : partner.phone if partner.phone else '',
                     "website_url": partner.website if partner.website else '',
                     "city": partner.city if partner.city else '',
                     "state": partner.state_id.name if partner.state_id else '',
@@ -191,8 +192,8 @@ class ResPartner(models.Model):
                     "label_names": label_names,
                     "phone_numbers": [
                         {
-                          "raw_number": "+923001616395",
-                          "sanitized_number": "+923001616395",
+                          "raw_number": partner.phone if partner.phone else '',
+                          "sanitized_number": partner.phone if partner.phone else '',
                           "type": "work_hq",
                           "position": 0,
                           "status": "no_status",
@@ -200,8 +201,8 @@ class ResPartner(models.Model):
                           "dnc_other_info": ''
                         },
                         {
-                          "raw_number": "+923001616396",
-                          "sanitized_number": "+923001616396",
+                          "raw_number": partner.mobile if partner.mobile else '',
+                          "sanitized_number": partner.mobile if partner.mobile else '',
                           "type": "mobile",
                           "position": 1,
                           "status": "valid_number",
