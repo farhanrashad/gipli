@@ -15,24 +15,23 @@
                         </div>
                         <group>
                             <group>
-                                <field name="name" required="1"/>
-                                <field name="job_titles" />
-                                <field name="company_name"/>
-                                 <field name="industry_keywords"/>
-                                <field name="no_of_employee"/>
+                                <field name="job_titles" placeholder="e.g Sales Director, Project Manager"/>
+                                <field name="org_domains" placeholder="e.g google.com,facebook.com"/>
+                                
                             </group>
                             <group>
-                                <field name="country_id"/>
-                                <field name="state_id" domain="[('country_id', '=', country_id)]"/>
-                                <field name="city"/>
+                               
                             </group>
                         </group>
-                        <group>
-                            <group>
-                                <field name="apl_page" />
-                            </group>
-                            <group>
-                            </group>
+                        <group string="Pages">
+                            <div class="o_td_label">
+                                <label for="page_start" />
+                            </div>
+                            <div name="page_start">
+                                <field name="page_start" nolabel="1" style="width: 8rem;" />
+                                <span class="ml8" > <strong> To Page: </strong><field name="page_last" nolabel="1" style="width: 8rem;" /></span>
+                            </div>
+                            <field name="result_append" />
                         </group>
                         <footer>
                             <button name="action_search" string="Search" type="object" class="btn-primary"/>
