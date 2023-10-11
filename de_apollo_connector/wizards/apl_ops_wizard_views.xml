@@ -6,7 +6,13 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="total_pages"/>
+                    <div class="o_td_label">
+                        <label for="page_start" />
+                    </div>
+                    <div name="page_start">
+                        <field name="page_start" nolabel="1" style="width: 8rem;" />
+                        <span class="ml8" > <strong> To Page: </strong><field name="page_last" nolabel="1" style="width: 8rem;" /></span>
+                    </div>
                 </group>
                 <div class="oe_form_field">
                     <div class="">

@@ -61,6 +61,10 @@ class ApolloInstance(models.Model):
         self.write({
             'state':'draft'
         })
+
+    def button_confirm(self):
+        pass
+        
     def connection_test(self):
         url = self.url + 'auth/health' #"https://api.apollo.io/v1/auth/health"
         querystring = {
@@ -162,18 +166,14 @@ class ApolloInstance(models.Model):
         }
         #for partner in partners:
 
-    def button_export_contacts(self):
+    def button_export(self):
         partners = self.env['res.partner'].search([('active', '=', True), '|', ('apl_id', '=', False), ('apl_date', '<', fields.Datetime.now())])
         #for partner in partners:
-            
-                
-    def button_import_leads(self):
-        pass
-
-    def button_confirm(self):
-        pass
 
 
+    # ---------------------------------------------------------
+    # ---------------------- Operations for Apollo ------------
+    # ---------------------------------------------------------
     
     @api.model
     def _post_apollo_data(self, api_name, api_data=None):

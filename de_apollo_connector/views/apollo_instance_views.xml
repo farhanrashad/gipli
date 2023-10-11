@@ -69,7 +69,7 @@
                                                             <button name="button_import" context="{'op_name':'accounts'}" icon="fa-arrow-right" type="object" string="Import Accounts" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_import_accounts" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <label for="apl_date_import_accounts" class="fw-bold o_form_label" string="The last accounts were imported on "/>
                                                     <b><field name="apl_date_import_accounts" nolabel="1"/></b>
                                                     <div class="text-muted">
                                                         Seamlessly import companies from Apollo into Odoo contacts.
@@ -86,7 +86,7 @@
                                                             <button name="button_import" icon="fa-arrow-right" type="object" string="Import Leads" context="{'op_name':'leads'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_import_leads" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <label for="apl_date_import_leads" class="fw-bold o_form_label" string="The last leads were imported on "/>
                                                     <b><field name="apl_date_import_leads" nolabel="1"/></b>
                                                     <div class="text-muted">
                                                         Seamlessly import leads or opportunities from Apollo into Odoo leads.
@@ -104,10 +104,10 @@
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_import" icon="fa-arrow-right" type="object" string="Export Contacts" class="btn-primary"/>
+                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Contacts" context="{'op_name':'contacts'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_export_contacts" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <label for="apl_date_export_contacts" class="fw-bold o_form_label" string="The last contacts were exported on "/>
                                                     <b><field name="apl_date_export_contacts" nolabel="1"/></b>
                                                     <div class="text-muted">
                                                         Seamlessly export individual and company contacts into Apollo contacts and accounts.
@@ -121,10 +121,10 @@
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_import" icon="fa-arrow-right" type="object" string="Export Leads" class="btn-primary"/>
+                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Leads" context="{'op_name':'leads'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_export_leads" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <label for="apl_date_export_leads" class="fw-bold o_form_label" string="The last leads were exported on "/>
                                                     <b><field name="apl_date_export_leads" nolabel="1"/></b>
                                                     <div class="text-muted">
                                                         Seamlessly export leads or opportunities into Apollo opportunities.

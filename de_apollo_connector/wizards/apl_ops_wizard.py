@@ -7,7 +7,9 @@ class AplOpsWizard(models.TransientModel):
     _name = 'apl.ops.wizard'
     _description = 'APL Ops Wizard'
 
-    total_pages = fields.Integer('Total Pages', default=1)
+    page_start = fields.Integer('From Page', default=1, required=True)
+    page_last = fields.Integer('Last Page', default=1, required=True)
+    
     duplicate_records = fields.Boolean('Ignore Duplicate Records')
     op_name = fields.Char(string='Operation')
     
@@ -15,6 +17,16 @@ class AplOpsWizard(models.TransientModel):
         ('lead', 'Lead'), ('opportunity', 'Opportunity')], required=True, tracking=15, index=True,
         default=lambda self: 'lead' if self.env['res.users'].has_group('crm.group_use_lead') else 'opportunity')
 
+    @api.constrains('page_start', 'page_last')
+    def _check_page_constraints(self):
+        for record in self:
+            if record.page_start < 0:
+                raise ValidationError("From Page cannot be less than 0.")
+            if record.page_last < 0:
+                raise ValidationError("Last Page cannot be less than 0.")
+            if record.page_start > record.page_last:
+                raise ValidationError("From Page cannot be greater than Last Page.")
+                
     @api.model
     def default_get(self, fields):
         res = super(AplOpsWizard, self).default_get(fields)
@@ -34,8 +46,9 @@ class AplOpsWizard(models.TransientModel):
 
         apl_instance_id = self.env['apl.instance'].browse(active_id)
 
-        page = self.total_pages
-        for i in range(1, page + 1):
+        start_page = self.page_start
+        last_page = self.page_last
+        for i in range(start_page, last_page + 1):
             data = {
                 "page" : i,
             }
