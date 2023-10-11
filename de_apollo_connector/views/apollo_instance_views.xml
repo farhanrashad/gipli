@@ -87,7 +87,7 @@
         </record>
 
         <!-- Create a menu item for Apollo Instance -->
-        <menuitem id="menu_apollo_instance_list" name="Apollo Instances" parent="menu_crm_config_apollo" action="action_apollo_instance" sequence="20"/>
+        <menuitem id="menu_apollo_instance_list" name="Instances" parent="menu_crm_config_apollo" action="action_apollo_instance" sequence="20"/>
 
     </data>
 </odoo>
