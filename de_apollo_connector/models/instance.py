@@ -167,7 +167,22 @@ class ApolloInstance(models.Model):
         #for partner in partners:
 
     def button_export(self):
-        partners = self.env['res.partner'].search([('active', '=', True), '|', ('apl_id', '=', False), ('apl_date', '<', fields.Datetime.now())])
+        #partners = self.env['res.partner'].search([('active', '=', True), '|', ('apl_id', '=', False), ('apl_date', '<', fields.Datetime.now())])
+        if self._context.get('op_name') == 'contacts':
+            partner_ids = self.env['res.partner'].search([('active', '=', True),('update_required_for_apollo', '=', True)])
+            for partner in partner_ids:
+                partner._send_to_apollo(self)
+            self.write({
+                'apl_date_export_contacts': self.env.cr.now(),
+            })
+        elif self._context.get('op_name') == 'leads':
+            lead_ids = self.env['crm.lead'].search([('active', '=', True),('update_required_for_apollo', '=', True)])
+            for lead in lead_ids:
+                lead._send_to_apollo(self)
+            self.write({
+                'apl_date_export_leads': self.env.cr.now(),
+            })
+            
         #for partner in partners:
 
 

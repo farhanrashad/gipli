@@ -68,7 +68,7 @@ class AplOpsWizard(models.TransientModel):
                         'company_type': 'person',
                         'apl_id': obj.get('id'),
                         'apl_account_id': obj.get('account_id'),
-                        'name': obj.get('name') + 'test',
+                        'name': obj.get('name'),
                         'linkedin_url': obj.get('linkedin_url'),
                         'function': obj.get('title'),
                         'photo_url': obj.get('photo_url'),
@@ -110,7 +110,7 @@ class AplOpsWizard(models.TransientModel):
                     vals = {
                         'company_type': 'company',
                         'apl_id': obj.get('id'),
-                        'name': obj.get('name') + 'test',
+                        'name': obj.get('name'),
                         'website_url': obj.get('website_url'),
                         'blog_url': obj.get('blog_url'),
                         'angellist_url': obj.get('angellist_url'),
@@ -164,7 +164,7 @@ class AplOpsWizard(models.TransientModel):
                             vals = {
                                 'company_type': 'company',
                                 'apl_id': obj1.get('id'),
-                                'name': obj1.get('name') + 'test',
+                                'name': obj1.get('name'),
                                 'website_url': obj1.get('website_url'),
                                 'blog_url': obj1.get('blog_url'),
                                 'angellist_url': obj1.get('angellist_url'),
@@ -183,7 +183,7 @@ class AplOpsWizard(models.TransientModel):
                         
                     vals = {
                         'apl_id': obj.get('id'),
-                        'name': obj.get('name') + 'test',
+                        'name': obj.get('name'),
                         'description': obj.get('description'),
                         'expected_revenue': obj.get('amount'),
                         'partner_id': partner_id.id,
