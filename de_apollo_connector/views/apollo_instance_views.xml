@@ -55,7 +55,24 @@
                                                     <label for="apl_date_import_contact" class="fw-bold o_form_label" string="The last contacts were imported on "/>
                                                     <b><field name="apl_date_import_contact" nolabel="1"/></b>
                                                     <div class="text-muted">
-                                                        Seamlessly import contacts and accounts from Apollo into Odoo contacts.
+                                                        Seamlessly import individual contacts from Apollo into Odoo contacts.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Import Accounts -->
+                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_import" context="{'op_name':'accounts'}" icon="fa-arrow-right" type="object" string="Import Accounts" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_import_contact" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <b><field name="apl_date_import_contact" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly import companies from Apollo into Odoo contacts.
                                                     </div>
                                                 </div>
                                             </div>

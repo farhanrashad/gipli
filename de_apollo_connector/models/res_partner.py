@@ -17,6 +17,11 @@ class ResPartner(models.Model):
         string='Apollo ID',
         help="The Apollo ID is used for tracking purposes."
     )
+    apl_account_id = fields.Char(
+        string='Apollo Account ID',
+        help="The Apollo account ID is parent id of the contacts."
+    )
+    
     apl_date_sync = fields.Datetime('Synronization Date', help="he date of the most recent synchronization of contacts with Apollo.")
 
     update_required_for_apollo = fields.Boolean(

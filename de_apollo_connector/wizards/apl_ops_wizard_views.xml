@@ -15,7 +15,9 @@
                         </div>
                     </div>
                 </div>
-                
+                <group>
+                    <field name="duplicate_records" />
+                </group>
                 <footer>
                     <button name="run_process" string="Process" type="object" class="btn-primary"/>
                     <button special="cancel" string="Cancel" class="btn-secondary"/>
