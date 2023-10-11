@@ -29,11 +29,11 @@ class ConvertDataWizard(models.TransientModel):
     def action_process(self):
         active_model = self.env.context.get('active_model')
         active_ids = self.env.context.get('active_ids', [])
-        record_ids = self.env[active_model].search([('id','in',active_ids),('status_converted','=',False)])
+        record_ids = self.env[active_model].search([('id','in',active_ids)])
         for record in record_ids:
             country_id = self.env['res.country'].search([('name','=',record.country)],limit=1)
             state_id = self.env['res.country.state'].search([('name','=',record.state)],limit=1)
-            if self.op_name == 'contacts':
+            if self.op_name == 'contacts' and record.status_converted != 'contact':
                 vals = {
                     'name': record.name,
                     'function': record.title,
@@ -76,7 +76,40 @@ class ConvertDataWizard(models.TransientModel):
                 record.write({
                     'status_converted': 'contact',
                 })
-            elif self.op_name == 'leads':
+            elif self.op_name == 'leads'  and record.status_converted != 'lead':
+                vals = {
+                    'name': record.name,
+                    'contact_name': record.name,
+                    'function': record.title,
+                    'email_from': record.email,
+                    'city': record.city,
+                    'country_id': country_id.id,
+                    'state_id': state_id.id,
+                    'type': self.type
+                }
+                lead_id = self.env['crm.lead'].create(vals)
+                if record.apl_people_company_id:
+                    comp_vals = {
+                        'name': record.apl_people_company_id.name,
+                        'email': record.apl_people_company_id.email,
+                        'website': record.apl_people_company_id.website_url,
+                        'blog_url': record.apl_people_company_id.blog_url,
+                        'angellist_url': record.apl_people_company_id.angellist_url,
+                        'linkedin_url': record.apl_people_company_id.linkedin_url,
+                        'twitter_url': record.apl_people_company_id.twitter_url,
+                        #'github_url': record.apl_people_company_id.github_url,
+                        'facebook_url': record.apl_people_company_id.facebook_url,
+                        'photo_url': record.apl_people_company_id.logo_url,
+                        'city': record.apl_people_company_id.city,
+                        'country_id': country_id.id,
+                        'state_id': state_id.id,
+                        'company_type': 'company',
+                        'founded_year': record.apl_people_company_id.founded_year,
+                    }
+                    company_partner_id = self.env['res.partner'].create(comp_vals)
+                    lead_id.write({
+                        'partner_id': company_partner_id.id,
+                    })
                 record.write({
                     'status_converted': 'lead',
                 })
