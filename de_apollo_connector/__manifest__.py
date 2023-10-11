@@ -29,6 +29,7 @@
         'views/crm_stage_views.xml',
         'wizards/people_search_wizard_views.xml',
         'wizards/companies_search_wizard_views.xml',
+        'wizards/apl_ops_wizard_views.xml',
         'views/apl_people_views.xml',
         'views/apl_companies_views.xml',
         'wizards/send_data_wizard_views.xml',

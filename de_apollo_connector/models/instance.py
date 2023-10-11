@@ -141,9 +141,27 @@ class ApolloInstance(models.Model):
                         })
 
                         
-    def button_import_contacts(self):
-        pass
+    def button_import(self):
+        
+        context = {
+            'default_op_name': self.name,
+        }
+        return {
+            'name': 'APL Ops Wizard',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'apl.ops.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': context,
+        }
+        #for partner in partners:
 
+    def button_export_contacts(self):
+        partners = self.env['res.partner'].search([('active', '=', True), '|', ('apl_id', '=', False), ('apl_date', '<', fields.Datetime.now())])
+        #for partner in partners:
+            
+                
     def button_import_leads(self):
         pass
 
