@@ -3,7 +3,7 @@
 import requests
 import json
 
-from odoo import api, fields, models, _
+from odoo import api, exceptions, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 import pprint
 
@@ -36,9 +36,14 @@ class CRMLead(models.Model):
         string='Apollo ID',
         help="The Apollo ID is used for tracking purposes."
     )
-    apl_date_sync = fields.Date('Synronization Date', help="he date of the most recent synchronization of contacts with Apollo.")
+    apl_date_sync = fields.Datetime('Synronization Date', help="he date of the most recent synchronization of contacts with Apollo.")
 
-    update_required_for_apollo = fields.Boolean('Update Required for Apollo', help="Set to 'True' when this record requires an update in Apollo.")
+    update_required_for_apollo = fields.Boolean(
+        string='Update Required for Apollo',
+        store=True,
+        default=True,
+        help="Set to 'True' when this record requires an update in Apollo."
+    )
 
     def action_send_to_apollo_data(self):
         ''' Open the account.payment.register wizard to pay the selected journal entries.
@@ -94,8 +99,23 @@ class CRMLead(models.Model):
                     'apl_id': apl_id,
                 })
             else:
-                api_str = 'opportunities' + '/' + lead.apl_id
-                lead_json = apl_instance_id._put_apollo_data(api_str, lead_data)
+                if lead.update_required_for_apollo == True:
+                    api_str = 'opportunities' + '/' + lead.apl_id
+                    lead_json = apl_instance_id._put_apollo_data(api_str, lead_data)
+            lead.write({
+                'apl_date_sync': self.env.cr.now(),
+                'update_required_for_apollo': False,
+            })
+
+    @api.onchange('name', 'expected_revenue', 'partner_id', 'description','stage_id','won_status',
+                  'function','phone','mobile'
+                 )
+    def _onchange_lead_for_apollo(self):
+        for lead in self:
+            # Check if any field in the lead record has changed
+            any_field_changed = any(getattr(lead, field) != lead._origin[field] for field in lead._fields.keys())
+            lead.update_required_for_apollo = any_field_changed
+
 
     
 

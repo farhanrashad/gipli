@@ -17,9 +17,14 @@ class ResPartner(models.Model):
         string='Apollo ID',
         help="The Apollo ID is used for tracking purposes."
     )
-    apl_date_sync = fields.Date('Synronization Date', help="he date of the most recent synchronization of contacts with Apollo.")
+    apl_date_sync = fields.Datetime('Synronization Date', help="he date of the most recent synchronization of contacts with Apollo.")
 
-    update_required_for_apollo = fields.Boolean('Update Required for Apollo', help="Set to 'True' when this record requires an update in Apollo.")
+    update_required_for_apollo = fields.Boolean(
+        string='Update Required for Apollo',
+        store=True,
+        default=True,
+        help="Set to 'True' when this record requires an update in Apollo."
+    )
 
     linkedin_url = fields.Char('LinkedIn')
     twitter_url = fields.Char('Twitter')
@@ -86,10 +91,10 @@ class ResPartner(models.Model):
                     "name": company_partner.name,
                     "website_url": company_partner.website,
                     "blog_url": company_partner.blog_url,
-                    "angellist_url": company_partner.blog_url,
-                    "linkedin_url": company_partner.blog_url,
-                    "twitter_url": company_partner.blog_url,
-                    "facebook_url": company_partner.blog_url,
+                    "angellist_url": company_partner.angellist_url,
+                    "linkedin_url": company_partner.linkedin_url,
+                    "twitter_url": company_partner.twitter_url,
+                    "facebook_url": company_partner.facebook_url,
                     #"primary_phone": {
                     #    "number": "+918602017706",
                     #    "source": "Scraped",
@@ -99,7 +104,7 @@ class ResPartner(models.Model):
                     #"alexa_ranking": null,
                     "phone": "+918602017706",
                     #"linkedin_uid": "13368669",
-                    "founded_year": 2007,
+                    "founded_year": company_partner.founded_year,
                     #"publicly_traded_symbol": null,
                     #"publicly_traded_exchange": null,
                     #"logo_url": "https://zenprospect-production.s3.amazonaws.com/uploads/pictures/63bfbeee7fb7aa0001605365/picture",
@@ -142,8 +147,13 @@ class ResPartner(models.Model):
                         'apl_id': account_apl_id,
                     })
                 else:
-                    api_str = 'accounts' + '/' + company_partner.apl_id
-                    data_acc = apl_instance_id._put_apollo_data(api_str, account_data)
+                    if company_partner.update_required_for_apollo == True:
+                        api_str = 'accounts' + '/' + company_partner.apl_id
+                        data_acc = apl_instance_id._put_apollo_data(api_str, account_data)
+                company_partner.write({
+                    'apl_date_sync': self.env.cr.now(),
+                    'update_required_for_apollo': False,
+                })
 
             # Create Contact in Apollo
             if partner.company_type == 'person':
@@ -218,8 +228,22 @@ class ResPartner(models.Model):
                     }
                     data_per = apl_instance_id._put_apollo_data(api_str, person_data)
                 else:
-                    api_str = 'contacts' + '/' + partner.apl_id
-                    data_per = apl_instance_id._put_apollo_data(api_str, person_data)
+                    if partner.update_required_for_apollo == True:
+                        api_str = 'contacts' + '/' + partner.apl_id
+                        data_per = apl_instance_id._put_apollo_data(api_str, person_data)
+                partner.write({
+                    'apl_date_sync': self.env.cr.now(),
+                    'update_required_for_apollo': False,
+                })
                     
-
+    @api.onchange('name', 'function', 'email', 'phone','mobile','website', 'ref', 'user_id','team_id',
+                  'city','state_id','country_id', 'category_id',
+                  'linkedin_url', 'twitter_url', 'github_url','facebook_url', 'blog_url', 
+                  'angellist_url', 'founded_year',
+                 )
+    def _onchange_partner_for_apollo(self):
+        for partner in self:
+            # Check if any field in the Partner record has changed
+            any_field_changed = any(getattr(partner, field) != partner._origin[field] for field in partner._fields.keys())
+            partner.update_required_for_apollo = any_field_changed
 
