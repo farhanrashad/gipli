@@ -9,14 +9,25 @@ class AplOpsWizard(models.TransientModel):
 
     total_pages = fields.Integer('Total Pages', default=1)
     duplicate_records = fields.Boolean('Ignore Duplicate Records')
+    op_name = fields.Char(string='Operation')
+    
     type = fields.Selection([
         ('lead', 'Lead'), ('opportunity', 'Opportunity')], required=True, tracking=15, index=True,
         default=lambda self: 'lead' if self.env['res.users'].has_group('crm.group_use_lead') else 'opportunity')
 
+    @api.model
+    def default_get(self, fields):
+        res = super(AplOpsWizard, self).default_get(fields)
+        if 'op_name' in self._context:
+            res['op_name'] = self._context.get('op_name')
+        return res
+
+        
     def run_process(self):
         # You can access the 'op_name' context variable here
         # It will contain the value passed from the button's context
         op_name = self._context.get('op_name')
+        #raise UserError(op_name)
 
         active_model = self.env.context.get('active_model')
         active_id = self.env.context.get('active_id', [])
@@ -63,6 +74,12 @@ class AplOpsWizard(models.TransientModel):
                         partner_id = self.env['res.partner'].create(vals)
                     
                     partner_id._compute_image()
+                    partner_id.write({
+                        'update_required_for_apollo': False,
+                    })
+                apl_instance_id.write({
+                    'apl_date_import_contacts': self.env.cr.now(),
+                })
             # -------------------------------------------------
             # apollo accounts are the companies contact in odoo
             # -------------------------------------------------
@@ -104,6 +121,13 @@ class AplOpsWizard(models.TransientModel):
                             'parent_id': account_id.id,
                         })
                     account_id._compute_image()
+                    account_id.write({
+                        'update_required_for_apollo': False,
+                    })
+                    
+                apl_instance_id.write({
+                    'apl_date_import_accounts': self.env.cr.now(),
+                })
             # -------------------------------------------------
             # apollo opportunities are the companies contact in odoo
             # -------------------------------------------------
@@ -140,6 +164,9 @@ class AplOpsWizard(models.TransientModel):
                             }
                             partner_id = self.env['res.partner'].create(vals)
                             partner_id._compute_image()
+                            partner_id.write({
+                                'update_required_for_apollo': False,
+                            })
                         
                     vals = {
                         'apl_id': obj.get('id'),
@@ -158,6 +185,14 @@ class AplOpsWizard(models.TransientModel):
                             lead_id.write(vals)
                     else:
                         lead_id = self.env['crm.lead'].create(vals)
+
+                    lead_id.write({
+                        'update_required_for_apollo': False,
+                    })
+                    
+                apl_instance_id.write({
+                    'apl_date_import_leads': self.env.cr.now(),
+                })
 
         #raise UserError(active_id)
         # You can now use the 'op_name' variable as needed

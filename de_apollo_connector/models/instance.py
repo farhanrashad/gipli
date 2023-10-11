@@ -34,11 +34,16 @@ class ApolloInstance(models.Model):
     )
 
     # operations fields
-    apl_date_import_contact = fields.Datetime(string='Contact import date')
+    apl_date_import_contacts = fields.Datetime(string='Contacts import date')
+    apl_date_import_accounts = fields.Datetime(string='Accounts import date')
+    apl_date_import_leads = fields.Datetime(string='Leads import date')
+
+    apl_date_export_contacts = fields.Datetime(string='Contacts export date')
+    apl_date_export_leads = fields.Datetime(string='Leads export date')
 
     def button_draft(self):
         
-        url = "https://api.apollo.io/v1/opportunities/search"
+        url = "https://api.apollo.io/v1/contacts/search"
         
         querystring = {
             "api_key": self.api_key
@@ -49,7 +54,7 @@ class ApolloInstance(models.Model):
             'Content-Type': 'application/json'
         }
         
-        response = requests.request("GET", url, headers=headers, params=querystring)
+        response = requests.request("POST", url, headers=headers, params=querystring)
         
         raise UserError(response.text)
 
@@ -147,7 +152,7 @@ class ApolloInstance(models.Model):
             'default_op_name': self.name,
         }
         return {
-            'name': 'APL Ops Wizard',
+            'name': 'Apollo Operations',
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'apl.ops.wizard',
