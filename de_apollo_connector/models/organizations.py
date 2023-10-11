@@ -17,6 +17,8 @@ class ApolloComapniesResults(models.Model):
 
     apl_id = fields.Char('ID', readonly=True)
     name = fields.Char('Name', readonly=True)
+    phone = fields.Char('Phone', readonly=True)
+    email = fields.Char('Email', readonly=True)
     website_url = fields.Char('Website', readonly=True)
     blog_url = fields.Char('Blog', readonly=True)
     angellist_url = fields.Char('Angel List', readonly=True)
@@ -28,10 +30,16 @@ class ApolloComapniesResults(models.Model):
     founded_year = fields.Integer('Founded Year', readonly=True)
     logo_url = fields.Char('Logo')
     primary_domain = fields.Char('Primary Domain', readonly=True)
+    country = fields.Char('Country', readonly=True)
+    state = fields.Char('State', readonly=True)
+    city = fields.Char('City', readonly=True)
 
     apl_people_ids = fields.One2many('apl.people', 'apl_people_company_id', string="Peoples")
 
     logo_image = fields.Binary("Logo", compute='_compute_image', store=True)
+    status_converted = fields.Selection([
+        ('lead', 'Lead'), ('contact', 'Contact')
+    ])
 
     @api.depends('logo_url')
     def _compute_image(self):

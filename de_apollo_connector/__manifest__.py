@@ -33,6 +33,7 @@
         'views/apl_people_views.xml',
         'views/apl_companies_views.xml',
         'wizards/send_data_wizard_views.xml',
+        'wizards/convert_data_wizard_views.xml',
     ],
     'assets': {
        'web.assets_backend': [

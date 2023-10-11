@@ -33,6 +33,10 @@ class ApolloPeople(models.Model):
 
     photo_image = fields.Binary("Photo", compute='_compute_image', store=True)
 
+    status_converted = fields.Selection([
+        ('lead', 'Lead'), ('contact', 'Contact')
+    ])
+
     @api.depends('photo_url')
     def _compute_image(self):
         """ Function to load an image from URL or local file path """
@@ -95,6 +99,37 @@ class ApolloPeople(models.Model):
                 'url': linkedin_profile_url,
                 'target': 'new',
             }
+
+    def action_convert_contacts(self):
+        ''' Open the apl.convert.data.wizard wizard to convert search results into Odoo contacts
+        '''
+        return {
+            'name': _('Convert into Contacts'),
+            'res_model': 'apl.convert.data.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'apl.people',
+                'active_ids': self.ids,
+                'op_name': 'contacts',
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
+    def action_convert_leads(self):
+        ''' Open the apl.convert.data.wizard wizard to convert search results into Odoo leads
+        '''
+        return {
+            'name': _('Convert into Leads'),
+            'res_model': 'apl.convert.data.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'apl.people',
+                'active_ids': self.ids,
+                'op_name': 'leads',
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
 
 class ApolloPeopleEmployment(models.Model):
     _name = 'apl.people.employment'

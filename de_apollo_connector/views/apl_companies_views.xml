@@ -29,6 +29,8 @@
                                 <field name="name" />
                                 <field name="founded_year" />
                                 <field name="primary_domain" />
+                                <field name="phone" />
+                                <field name="email" />
                             </group>
                             <group>
                                 <field name="website_url" />

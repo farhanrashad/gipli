@@ -43,7 +43,7 @@ class ApolloInstance(models.Model):
 
     def button_draft(self):
         
-        url = "https://api.apollo.io/v1/contacts/search"
+        url = "https://api.apollo.io/v1/mixed_people/search"
         
         querystring = {
             "api_key": self.api_key

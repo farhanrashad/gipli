@@ -97,6 +97,8 @@ class APLPeopleSearchWizard(models.TransientModel):
                     organization_values = {
                         'name': organization_data.get('name'),
                         'website_url': organization_data.get('website_url'),
+                        'phone': organization_data.get('phone'),
+                        'email': organization_data.get('email'),
                         'blog_url': organization_data.get('blog_url'),
                         'angellist_url': organization_data.get('angellist_url'),
                         'linkedin_url': organization_data.get('linkedin_url'),
