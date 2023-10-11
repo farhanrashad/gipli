@@ -9,6 +9,9 @@ class AplOpsWizard(models.TransientModel):
 
     total_pages = fields.Integer('Total Pages', default=1)
     duplicate_records = fields.Boolean('Ignore Duplicate Records')
+    type = fields.Selection([
+        ('lead', 'Lead'), ('opportunity', 'Opportunity')], required=True, tracking=15, index=True,
+        default=lambda self: 'lead' if self.env['res.users'].has_group('crm.group_use_lead') else 'opportunity')
 
     def run_process(self):
         # You can access the 'op_name' context variable here
@@ -68,11 +71,12 @@ class AplOpsWizard(models.TransientModel):
                 if isinstance(json_data, list):
                     json_data_list = json_data
                 elif isinstance(json_data, dict):
-                    json_data_list = json_data.get('contacts', [])
-    
+                    json_data_list = json_data.get('accounts', [])
+
+                #raise UserError(len(json_data_list))
                 for obj in json_data_list:
                     account_id = self.env['res.partner'].search([('apl_id','=',obj.get('id'))],limit=1)
-                    countact_ids = self.env['res.partner'].search([('apl_account_id','=',obj.get('id'))])
+                    contact_ids = self.env['res.partner'].search([('apl_account_id','=',obj.get('id'))])
                     vals = {
                         'company_type': 'company',
                         'apl_id': obj.get('id'),
@@ -83,7 +87,7 @@ class AplOpsWizard(models.TransientModel):
                         'linkedin_url': obj.get('linkedin_url'),
                         'twitter_url': obj.get('twitter_url'),
                         'facebook_url': obj.get('facebook_url'),
-                        'phone': obj.get('phone') + ',' + obj.get('sanitized_phone'),
+                        'phone': (obj.get('phone') or '') + (', ' + obj.get('sanitized_phone') if obj.get('sanitized_phone') else ''),
                         'photo_url': obj.get('logo_url'),
                         'founded_year': obj.get('founded_year'),                        
                     }
@@ -105,6 +109,55 @@ class AplOpsWizard(models.TransientModel):
             # -------------------------------------------------
             elif op_name == 'leads':
                 json_data = apl_instance_id._post_apollo_data('opportunities/search', data)
+                
+                if isinstance(json_data, list):
+                    json_data_list = json_data
+                elif isinstance(json_data, dict):
+                    json_data_list = json_data.get('opportunities', [])
+                    json_account_list = json_data.get('account', [])
+
+                for obj in json_data_list:
+                    lead_id = self.env['crm.lead'].search([('apl_id','=',obj.get('id'))],limit=1)
+                    partner_id = self.env['res.partner'].search([('apl_id','=',obj.get('account_id'))],limit=1)
+                    stage_id = self.env['res.partner'].search([('apl_id','=',obj.get('opportunity_stage_id'))],limit=1)
+
+                    #create account data
+                    if not partner_id:
+                        for obj1 in json_account_list:
+                            vals = {
+                                'company_type': 'company',
+                                'apl_id': obj1.get('id'),
+                                'name': obj1.get('name') + 'test',
+                                'website_url': obj1.get('website_url'),
+                                'blog_url': obj1.get('blog_url'),
+                                'angellist_url': obj1.get('angellist_url'),
+                                'linkedin_url': obj1.get('linkedin_url'),
+                                'twitter_url': obj1.get('twitter_url'),
+                                'facebook_url': obj1.get('facebook_url'),
+                                'phone': (obj1.get('phone') or '') + (', ' + obj1.get('sanitized_phone') if obj.get('sanitized_phone') else ''),
+                                'photo_url': obj1.get('logo_url'),
+                                'founded_year': obj1.get('founded_year'),                        
+                            }
+                            partner_id = self.env['res.partner'].create(vals)
+                            partner_id._compute_image()
+                        
+                    vals = {
+                        'apl_id': obj.get('id'),
+                        'name': obj.get('name') + 'test',
+                        'description': obj.get('description'),
+                        'expected_revenue': obj.get('amount'),
+                        'partner_id': partner_id.id,
+                        #'stage_id': stage_id.id,
+                        'date_closed': obj.get('closed_date'),
+                        'type': self.type,
+                    }
+                    if lead_id: #Update Records
+                        if self.duplicate_records:
+                            lead_id = self.env['crm.lead'].create(vals)
+                        else:
+                            lead_id.write(vals)
+                    else:
+                        lead_id = self.env['crm.lead'].create(vals)
 
         #raise UserError(active_id)
         # You can now use the 'op_name' variable as needed

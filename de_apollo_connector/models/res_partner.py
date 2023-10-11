@@ -8,8 +8,10 @@ import json
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 import pprint
-
+from odoo.tools import html_escape as escape
+import base64
 from urllib.parse import urlparse
+
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 

@@ -17,6 +17,7 @@
                 </div>
                 <group>
                     <field name="duplicate_records" />
+                    <field name="type" widget="radio"/>
                 </group>
                 <footer>
                     <button name="run_process" string="Process" type="object" class="btn-primary"/>
