@@ -33,16 +33,8 @@ class ApolloInstance(models.Model):
         string='Status',default='draft', required=True
     )
 
-    contact_syn = fields.Boolean(
-        string='Contact Sync',
-        help="Synchronize contact with Apollo."
-    )
-
-    lead_syn = fields.Boolean(
-        string='Lead Sync',
-        help="Synchronize Lead with Apollo."
-    )
-
+    # operations fields
+    apl_date_import_contact = fields.Datetime(string='Contact import date')
 
     def button_draft(self):
         

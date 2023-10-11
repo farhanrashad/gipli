@@ -38,28 +38,88 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Configuration" name="config">
+                            <page string="Settings" name="settings">
                                 <group>
-                                    <group string="Synchronization">
-                                        <field name="contact_syn" />
-                                        <field name="lead_syn" />
+                                    <group name="group_import_operations" string="Import Operations" col="1" class="row mt16 o_settings_container" groups="sales_team.group_sale_manager">
+                                        <div>
+                                            <!-- Import Contacts -->
+                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_import_contacts" context="{'project_id':id}" icon="fa-arrow-right" type="object" string="Import Contacts" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_import_contact" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <b><field name="apl_date_import_contact" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly import contacts and accounts from Apollo into Odoo contacts.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- import Opportunities -->
+                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_import_leads" icon="fa-arrow-right" type="object" string="Import Leads" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_import_contact" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <b><field name="apl_date_import_contact" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly import leads or opportunities from Apollo into Odoo leads.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </group>
-                                    <group>
+                                    <group name="group_export_operations" string="Export Operations" col="1" class="row mt16 o_settings_container" groups="sales_team.group_sale_manager">
+                                        <div>
+                                            <!-- Export Contacts -->
+                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_import_contacts" icon="fa-arrow-right" type="object" string="Export Contacts" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_import_contact" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <b><field name="apl_date_import_contact" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly export individual and company contacts into Apollo contacts and accounts.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Export Opportunities -->
+                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_import_contacts" icon="fa-arrow-right" type="object" string="Export Leads" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_import_contact" class="fw-bold o_form_label" string="The last contacts were imported on "/>
+                                                    <b><field name="apl_date_import_contact" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly export leads or opportunities into Apollo opportunities.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </group>
                                 </group>
-                                    <group >
-                                        <group string="Import">
-                                            <button name="button_import_labels" type="object" class="btn-primary btn-sm" string="Import Labels" />
-                                            <button name="button_import_stages" type="object" class="btn-primary btn-sm" string="Import Opportunity Stages" />
 
-                                        <button name="button_import_contacts" type="object" class="btn-primary btn-sm" string="Import Contacts" />
-                                        <button name="button_import_leads" type="object" class="btn-primary btn-sm" string="Import Opportunities" />
-                                        </group>
-                                        <group string="Export">
-                                        <button name="button_import_contacts" type="object" class="btn-primary btn-sm" string="Export Contacts" />
-                                        <button name="button_import_leads" type="object" class="btn-primary btn-sm" string="Export Opportunities" />
-                                        </group>
-                                    </group>
+                                        <!-- end -->
+                                
                             </page>
                         </notebook>
                     </sheet>
