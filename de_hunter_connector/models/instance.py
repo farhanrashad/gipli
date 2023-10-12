@@ -35,6 +35,15 @@ class HunterInstance(models.Model):
 
 
     def button_draft(self):
+        url = 'https://api.hunter.io/v2/domain-search?domain=stripe.com&api_key=c9280ab0813d7fee78ef90d0576ba532d09adc3f'
+        url = self.url + 'domain-search?domain=dynexcel.com&api_key=' + self.api_key
+        headers = {
+            'X-API-KEY': self.api_key,
+        }
+        response = requests.request("GET", url, headers=headers)
+
+        raise UserError(response.text)
+        
         self.write({
             'state':'draft'
         })
@@ -130,11 +139,27 @@ class HunterInstance(models.Model):
             raise e
 
     @api.model
-    def _get_apollo_data(self, api_name, api_data=None):
+    def _get_from_hunter(self, api_name, api_data=None):
+
+        #url = self.url + 'domain-search?domain=dynexcel.com&api_key=' + self.api_key
         headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
+            'X-API-KEY': self.api_key,
         }
+        api_data['api_key'] = self.api_key
+        
+        # Initialize an empty string
+        query_string = ""
+
+        # Iterate through the dictionary items
+        for key, value in api_data.items():
+            if query_string:
+                query_string += "&"
+            else:
+                query_string += "?"
+            query_string += f"{key}={value}"
+
+        raise UserError(query_string)
+        
         try:
             url = self.url + api_name
             # Initialize data as an empty dictionary if it's None
@@ -144,7 +169,7 @@ class HunterInstance(models.Model):
             # Add the api_key field to the data dictionary
             api_data['api_key'] = self.api_key
 
-            response = requests.request("GET", url, headers=headers, params=api_data)
+            response = requests.request("GET", url, headers=headers)
             #raise UserError(response.text)
             json_data = json.loads(response.text)
             return json_data

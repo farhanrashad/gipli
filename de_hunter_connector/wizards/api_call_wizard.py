@@ -16,26 +16,68 @@ class HunterApiCallWizard(models.TransientModel):
     hunter_instance_id = fields.Many2one(
         'hunter.instance',
         string='Hunter Instance',
-        default=lambda self: self._compute_default_apl_instance(),
+        default=lambda self: self._compute_default_hunter_instance(),
         domain = "[('state','=','active')]"
     )
 
-    def _compute_default_apl_instance(self):
+    def _compute_default_hunter_instance(self):
         # Find an APL instance record in the current company and return its ID
-        apl_instance = self.env['hunter.instance'].search([
+        hunter_instance = self.env['hunter.instance'].search([
             ('company_id', '=', self.env.company.id),('state', '=', 'active')
         ], limit=1)  # Limit to one record (if available)
 
         return hunter_instance.id if hunter_instance else False
 
+    api_type = fields.Selection([
+        ('domain', 'Domain Search'), ('company', 'Company Search'),
+        ('email_domain', 'Find Emails by Domain'), ('email_company', 'Find Emails by Company'),
+        ('email_name', 'Find Email by Name'), ('email_verify', 'Verify Email')
+    ], required=True, string="Operation Type", default='domain')
+
     def action_process(self):
         active_model = self.env.context.get('active_model')
         active_ids = self.env.context.get('active_ids', [])
 
+        
+        #raise UserError(active_ids)
+        
         record_ids = self.env[active_model].search([('id','in',active_ids)])
+        data = {}
         for record in record_ids:
-            record._send_to_apollo(self.apl_instance_id)
-            
+            #record._send_to_apollo(self.apl_instance_id)
+
+            if self.api_type in ('domain','email_domain'):
+                # Domain Parameter
+                if record.website:
+                    parsed_url = urlparse(record.website)
+                    domain = parsed_url.hostname
+                    if domain.startswith('www.'):
+                        domain = domain[4:]
+                    data['domain'] = domain
+
+            if self.api_type in ('company','email_company'):
+                # Company Name Paramter
+                if record.partner_name:
+                    company_name = record.partner_name
+                elif record.partner_id:
+                    if record.partner_id.parent_id:
+                        company_name = record.partner_id.parent_id.name
+                    else:
+                        company_name = record.partner_id.name
+                if company_name:
+                    data['company'] = company_name
+
+            if self.api_type in ('email_name'):
+                # Contact Name
+                if record.contact_name:
+                    data['full_name'] = record.contact_name
+
+            if self.api_type in ('email_verify'):
+                # Email
+                if record.email_from:
+                    data['email'] = record.email_from
+                                                
+            record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
         #if active_model == 'res.partner':
         #    self.sudo()._send_res_partner_to_apollo(active_ids)
         #elif active_model == 'crm.lead':

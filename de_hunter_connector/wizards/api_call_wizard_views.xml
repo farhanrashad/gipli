@@ -7,15 +7,17 @@
             <field name="arch" type="xml">
                 <form>
                     <sheet>
+                        <!--
                         <div class="oe_title">
                         <span class="o_form_label" >Instance</span>
                             <h1 class="d-flex">
                                 <field name="hunter_instance_id" options="{'no_create': True, 'no_open': True}"/>
                             </h1>
                         </div>
+                        -->
                         <group>
                             <group>
-                                
+                                <field name="api_type" widget="radio" />
                             </group>
                             <group>
                                

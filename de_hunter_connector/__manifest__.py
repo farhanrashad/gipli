@@ -28,6 +28,7 @@
         'views/instance_views.xml',
         'views/res_config_settings_views.xml',
         'wizards/api_call_wizard_views.xml',
+        'views/crm_lead_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
