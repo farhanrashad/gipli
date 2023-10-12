@@ -1,0 +1,34 @@
+<odoo>
+    <data>
+        <!-- Define a form view for Api Call Wizard -->
+        <record id="hunter_api_call_wizard_form" model="ir.ui.view">
+            <field name="name">hunter.api.call.wizard.form</field>
+            <field name="model">hunter.api.call.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                        <span class="o_form_label" >Instance</span>
+                            <h1 class="d-flex">
+                                <field name="hunter_instance_id" options="{'no_create': True, 'no_open': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                
+                            </group>
+                            <group>
+                               
+                            </group>
+                        </group>
+                       
+                        <footer>
+                            <button name="action_process" string="Process" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
