@@ -101,6 +101,7 @@
                     <field name="country" />
                     <field name="state" />
                     <field name="city" />
+                    <button name="action_open_details" icon="fa-arrow-right" type="object" string="Open Details" />
 
                 </tree>
                

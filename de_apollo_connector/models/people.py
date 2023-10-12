@@ -100,6 +100,17 @@ class ApolloPeople(models.Model):
                 'target': 'new',
             }
 
+    def action_open_details(self):
+        return {
+            'name': 'People',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'apl.people',
+            'res_id': self.id,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+        
     def action_convert_contacts(self):
         ''' Open the apl.convert.data.wizard wizard to convert search results into Odoo contacts
         '''
