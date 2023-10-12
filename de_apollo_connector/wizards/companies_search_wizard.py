@@ -10,7 +10,7 @@ class APLCompaniesSearchWizard(models.TransientModel):
     _name = "apl.companies.search.wizard"
     _description = 'Search Companies Wizard'
 
-    apl_instance_id = fields.Many2one('apl.instance', required=True)
+    apl_instance_id = fields.Many2one('apl.instance', required=True, domain="[('state','=','active')]")
     name = fields.Char(string='Name', )
     job_titles = fields.Char(string='Job Titles')
     company_name = fields.Char(string='Company Name')

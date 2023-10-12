@@ -17,12 +17,13 @@ class APLSendDataWizard(models.TransientModel):
         'apl.instance',
         string='APL Instance',
         default=lambda self: self._compute_default_apl_instance(),
+        domain = "[('state','=','active')]"
     )
 
     def _compute_default_apl_instance(self):
         # Find an APL instance record in the current company and return its ID
         apl_instance = self.env['apl.instance'].search([
-            ('company_id', '=', self.env.company.id),
+            ('company_id', '=', self.env.company.id),('state', '=', 'active')
         ], limit=1)  # Limit to one record (if available)
 
         return apl_instance.id if apl_instance else False

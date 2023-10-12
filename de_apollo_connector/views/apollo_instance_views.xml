@@ -38,7 +38,7 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Settings" name="settings">
+                            <page string="Settings" name="settings" attrs="{'invisible': [('state', '!=', 'active')]}">
                                 <group>
                                     <group name="group_import_operations" string="Import Operations" col="1" class="row mt16 o_settings_container" groups="sales_team.group_sale_manager">
                                         <div>
@@ -151,7 +151,7 @@
             <field name="arch" type="xml">
                 <tree string="Apollo Instances">
                     <field name="name"/>
-                    <field name="url"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>

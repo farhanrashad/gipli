@@ -19,9 +19,9 @@ class ApolloInstance(models.Model):
     _name = 'apl.instance'
     _description = 'Apollo Instance'
 
-    name = fields.Char(string='Name', required=True)
-    api_key = fields.Char(string='API Key', required=True, help='Secret API Key')
-    url = fields.Char(string='URL', required=True)
+    name = fields.Char(string='Name', required=True, readonly=True, states=READONLY_FIELD_STATES)
+    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=True, states=READONLY_FIELD_STATES)
+    url = fields.Char(string='URL', required=True, readonly=True, states=READONLY_FIELD_STATES)
 
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states=READONLY_FIELD_STATES, default=lambda self: self.env.company)
 
@@ -42,30 +42,27 @@ class ApolloInstance(models.Model):
     apl_date_export_leads = fields.Datetime(string='Leads export date')
 
     def button_draft(self):
-        
-        url = "https://api.apollo.io/v1/mixed_people/search"
-        
-        querystring = {
-            "api_key": self.api_key
-        }
-        
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-        
-        response = requests.request("POST", url, headers=headers, params=querystring)
-        
-        raise UserError(response.text)
-
         self.write({
             'state':'draft'
         })
 
     def button_confirm(self):
-        pass
+        self.write({
+            'state':'active'
+        })
         
     def connection_test(self):
+        
+        notification = {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Connection to Apollo successful; explore its capabilities now.'),
+                'type': 'warning',
+                'sticky': False,  #True/False will display for few seconds if false
+            },
+        }
+
         url = self.url + 'auth/health' #"https://api.apollo.io/v1/auth/health"
         querystring = {
             "api_key": self.api_key
@@ -79,15 +76,11 @@ class ApolloInstance(models.Model):
             self.write({
                 'state': 'verified'
             })
-            notification = {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('The connection to Apollo was successful.'),
-                    'type': 'success',
-                    'sticky': False,  #True/False will display for few seconds if false
-                },
-            }
+            notification['params'].update({
+                'title': _('The connection to Apollo was successful.'),
+                'type': 'success',
+                'next': {'type': 'ir.actions.act_window_close'},
+            })
             
         else:
             # The response indicates an error
@@ -95,6 +88,13 @@ class ApolloInstance(models.Model):
             raise UserError(error_message)
         return notification
 
+    def unlink(self):
+        for record in self:
+            if record.state != 'draft':
+                raise UserError("You cannot delete a record with a state other than 'draft'.")
+        return super(ApolloInstance, self).unlink()
+
+        
     def button_import_labels(self):
         data = {
             #'api_key': 'GbYvCle7WbRW0lFKYXlArw',

@@ -14,6 +14,7 @@ class APLPeopleSearchWizard(models.TransientModel):
         'apl.instance',
         string='APL Instance',
         default=lambda self: self._compute_default_apl_instance(),
+        domain = "[('state','=','active')]"
     )
     job_titles = fields.Char(string='Job Titles')
     org_domains = fields.Char(string='Company Domains')
@@ -27,6 +28,7 @@ class APLPeopleSearchWizard(models.TransientModel):
         # Find an APL instance record in the current company and return its ID
         apl_instance = self.env['apl.instance'].search([
             ('company_id', '=', self.env.company.id),
+            ('state','=','active')
         ], limit=1)  # Limit to one record (if available)
 
         return apl_instance.id if apl_instance else False
