@@ -5,4 +5,7 @@ access_crm_hunter_user,crm.hunter.user,model_hunter_instance,sales_team.group_sa
 access_hunter_api_call_wizard_user,access.hunter.api.call.wizard.user,model_hunter_api_call_wizard,sales_team.group_sale_salesman,1,1,1,1
 access_hunter_api_call_wizard_line_user,access.hunter.api.call.wizard.line.user,model_hunter_api_call_wizard_line,sales_team.group_sale_salesman,1,1,1,1
 
+access_crm_hunter_results,crm.hunter.results,model_hunter_results,,1,1,1,1
+
+
 

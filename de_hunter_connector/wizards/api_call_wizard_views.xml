@@ -15,24 +15,51 @@
                             </h1>
                         </div>
                         -->
-                        <group>
-                            <group>
-                                <field name="api_type" widget="radio" />
-                            </group>
-                            <group>
-                               
-                            </group>
+                        <group class="oe_inline" string="Update Fields">
+                            <div class="o_td_label">
+                                <label for="name_update" string="Name"/>
+                            </div>
+                            <div name="name_update">
+                                <span class="ml8">
+                                    <field name="name_update" nolabel="1" style="width: 6rem;" />
+                                </span>
+                                <span class="ml8">
+                                    <strong>Email:</strong> <field name="email_update" nolabel="1" style="width: 6rem;" />
+                                </span>
+                                <span class="ml8">
+                                    <strong>Position:</strong> <field name="position_update" nolabel="1" style="width: 6rem;" />
+                                </span>
+                                <span class="ml8">
+                                    <strong>Phone:</strong> <field name="phone_update" nolabel="1" style="width: 6rem;" />
+                                </span>
+                            </div>
                         </group>
-                       <notebook>
-                           <page string="Results" name="results">
-                               <field name="line_ids" widget="one2many_list">
-                                    <tree editable="bottom">
-                                        <field name="name"/>
-                                    </tree>
-                                </field>
-                           </page>
-                       </notebook>
+
+                        <field name="active_model" invisible="1"/>
+                        
+                        <field name="line_ids" widget="one2many_list" no_label="1">
+                            
+                            <tree editable="bottom" create="false" delete="false">
+                                <field name="record_select" nolabel="1" style="width: 4rem;"/>
+                                <field name="name"/>
+                                <field name="email"/>
+                                <field name="position"/>
+                                <field name="department"/>
+                                <field name="phone"/>
+                            </tree>
+                        </field>
+                        <group class="oe_inline">
+                            <div name="record_select">
+                                <field name="record_select" />
+                                <field name="record_unselect" invisible="1"/>
+                            </div>
+                            <div class="o_td_label">
+                                <label for="record_select" />
+                            </div>
+                            
+                        </group>
                         <footer>
+                            <button name="action_update_email" string="Update Email" type="object" class="btn-primary"/>
                             <button name="action_process" string="Process" type="object" class="btn-primary"/>
                             <button string="Cancel" class="btn-secondary" special="cancel"/>
                         </footer>
