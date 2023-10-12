@@ -145,29 +145,29 @@ class HunterInstance(models.Model):
         headers = {
             'X-API-KEY': self.api_key,
         }
-        api_data['api_key'] = self.api_key
-        
-        # Initialize an empty string
-        query_string = ""
-
-        # Iterate through the dictionary items
-        for key, value in api_data.items():
-            if query_string:
-                query_string += "&"
-            else:
-                query_string += "?"
-            query_string += f"{key}={value}"
-
-        raise UserError(query_string)
         
         try:
-            url = self.url + api_name
-            # Initialize data as an empty dictionary if it's None
+            
             if api_data is None:
                 api_data = {}
 
             # Add the api_key field to the data dictionary
             api_data['api_key'] = self.api_key
+
+            # Initialize an empty string
+            query_string = ""
+    
+            # Iterate through the dictionary items
+            for key, value in api_data.items():
+                if query_string:
+                    query_string += "&"
+                else:
+                    query_string += "?"
+                query_string += f"{key}={value}"
+
+            url = self.url+api_name+query_string
+            #raise UserError(url)
+            
 
             response = requests.request("GET", url, headers=headers)
             #raise UserError(response.text)

@@ -23,7 +23,15 @@
                                
                             </group>
                         </group>
-                       
+                       <notebook>
+                           <page string="Results" name="results">
+                               <field name="line_ids" widget="one2many_list">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                           </page>
+                       </notebook>
                         <footer>
                             <button name="action_process" string="Process" type="object" class="btn-primary"/>
                             <button string="Cancel" class="btn-secondary" special="cancel"/>
