@@ -26,17 +26,29 @@
             </field>
         </record>
 
-        <!--
+        
         <record id="res_partner_view_form_inherit_hunter" model="ir.ui.view">
             <field name="name">res.partner.form.inherit.hunter</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+                <!--
                 <xpath expr="//header" position="inside">
                     <button name="action_find_at_hunter" type="object" string="Find Emails" class="btn-primary"/>
                 </xpath>
+                -->
+                <xpath expr="//sheet" position="inside">
+                    <field name="email_verified" />
+                </xpath>
+                <xpath expr="//field[@name='email']" position="before">
+                    <button name="action_email_verify" class="text-danger" string="Verify" title="This email is not verified." type="object" attrs="{'invisible': [('email_verified', '=', 'valid')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='email']" position="after">
+                    <span class="fa fa-check-circle text-success oe_edit_only" title="Email Verified." attrs="{'invisible': [('email_verified', '!=', 'valid')]}"/>
+                    <span class="fa fa-times-circle text-warning oe_edit_only" title="Unverified Email." attrs="{'invisible': [('email_verified', '=', 'valid')]}"/>
+                </xpath>
             </field>
         </record>
-        -->
+        
     </data>
 </odoo>

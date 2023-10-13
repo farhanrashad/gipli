@@ -123,3 +123,6 @@ class res_partner(models.Model):
             'target': 'new',
             'type': 'ir.actions.act_window',
         }
+
+    def action_email_verify(self):
+        pass
