@@ -35,7 +35,6 @@
             <field name="arch" type="xml">
                 <form string="People">
                     <sheet>
-                        
                         <group>
                             <group>
                                 <field name="name" />
@@ -43,12 +42,21 @@
                                 <field name="position" />
                                 <field name="department" />
                                 <field name="phone" />
+                                <field name="website" />
                             </group>
                             <group>
-                               
+                                <field name="street" />
+                                <field name="city" />
+                                <field name="state" />
+                                <field name="country" />
+                                <field name="postal_code" />
                             </group>
                         </group>
-                        
+                        <notebook>
+                            <page name="internal_notes" string="Internal Notes">
+                            <field name="description" />
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -68,6 +76,7 @@
                     <field name="website"/>
                     <field name="department" optional="hide"/>
                     <field name="description" optional="hide"/>
+                    <button name="action_open_details" icon="fa-arrow-right" type="object" string="Open Details" />
                 </tree>
             </field>
         </record>

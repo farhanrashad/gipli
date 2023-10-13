@@ -16,7 +16,7 @@ class HunterFindEmailWizard(models.TransientModel):
     api_type = fields.Selection([
         ('domain', 'Domain Search'), ('company', 'Company Search'),
         ('email_domain', 'Find Emails by Domain'), ('email_company', 'Find Emails by Company'),
-        ('email_name', 'Find Email by Name'), ('email_verify', 'Verify Email')
+        ('email_verify', 'Verify Email')
     ], required=True, string="Operation Type", default='domain')
 
     company_id = fields.Many2one(
@@ -60,11 +60,21 @@ class HunterFindEmailWizard(models.TransientModel):
 
         if self.api_type in ('domain','company'):
             api_name = 'domain-search'
+        elif self.api_type in ('email_domain','email_company'):
+            api_name = 'email-finder'
+        elif self.api_type in ('email_verify'):
+            api_name = 'email-verifier'
 
-        json_data = hunter_instance_id._get_from_hunter('domain-search', data)
+        json_data = hunter_instance_id._get_from_hunter(api_name, data)
         
         company_name = json_data['data']['organization']
         company_domain = json_data['data']['domain']
+
+        country = json_data['data']['country']
+        state = json_data['data']['state']
+        city = json_data['data']['city']
+        postal_code = json_data['data']['postal_code']
+        street = json_data['data']['street']
 
         # other fields combined in description
         desc = f"Industry: {json_data['data']['industry']}\n"
@@ -97,6 +107,11 @@ class HunterFindEmailWizard(models.TransientModel):
                 "company_name": company_name,
                 "website": company_domain,
                 "description": desc,
+                "country": country,
+                "state": state,
+                "city": city,
+                "postal_code": postal_code,
+                "street": street,
             })
             self.env['hunter.results'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
             result_id = self.env['hunter.results'].create(contact_info)

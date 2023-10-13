@@ -17,14 +17,14 @@
                         </group>
                         <group>
                             <group>
-                                <field name="domain" placeholder="e.g google.com" attrs="{'invisible': [('api_type', 'not in', ['domain'])]}" />
-                                <field name="company_name" placeholder="e.g Google" attrs="{'invisible': [('api_type', 'not in', ['company'])]}" />
+                                <field name="domain" placeholder="e.g google.com" attrs="{'invisible': [('api_type', 'not in', ['domain','email_domain'])]}" />
+                                <field name="company_name" placeholder="e.g Google" attrs="{'invisible': [('api_type', 'not in', ['company','email_company'])]}" />
                                 <field name="email" placeholder="e.g info@google.com" attrs="{'invisible': [('api_type', 'not in', ['email_verify'])]}" />
                             </group>
                             <group>
-                                <field name="first_name" placeholder="e.g Joel" />
-                                <field name="last_name" placeholder="e.g Willis" />
-                                <field name="full_name" placeholder="e.g Joel Willis"/>
+                                <field name="first_name" placeholder="e.g Joel" attrs="{'invisible': [('api_type', 'not in', ['domain','email_domain','company','email_company'])]}" />
+                                <field name="last_name" placeholder="e.g Willis" attrs="{'invisible': [('api_type', 'not in', ['domain','email_domain','company','email_company'])]}" />
+                                <field name="full_name" placeholder="e.g Joel Willis" attrs="{'invisible': [('api_type', 'not in', ['domain','email_domain','company','email_company'])]}" />
                             </group>
                         </group>
                         

@@ -36,40 +36,31 @@ class ConvertDataWizard(models.TransientModel):
             if self.op_name == 'contacts' and record.status_converted != 'contact':
                 vals = {
                     'name': record.name,
-                    'function': record.title,
+                    'function': record.position,
                     'email': record.email,
-                    'linkedin_url': record.linkedin_url,
-                    'twitter_url': record.twitter_url,
-                    'github_url': record.github_url,
-                    'facebook_url': record.facebook_url,
-                    'photo_url': record.photo_url,
+                    'phone': record.phone,
+                    'website': record.website,
                     'city': record.city,
                     'country_id': country_id.id,
                     'state_id': state_id.id,
+                    'street': record.street,
+                    'zip': record.postal_code,
+                    'comment': record.description,
                     'company_type': 'person',
                 }
                 partner_id = self.env['res.partner'].create(vals)
-                partner_id._compute_image()
-                if record.apl_people_company_id:
-                    comp_vals = {
-                        'name': record.apl_people_company_id.name,
-                        'email': record.apl_people_company_id.email,
-                        'website': record.apl_people_company_id.website_url,
-                        'blog_url': record.apl_people_company_id.blog_url,
-                        'angellist_url': record.apl_people_company_id.angellist_url,
-                        'linkedin_url': record.apl_people_company_id.linkedin_url,
-                        'twitter_url': record.apl_people_company_id.twitter_url,
-                        #'github_url': record.apl_people_company_id.github_url,
-                        'facebook_url': record.apl_people_company_id.facebook_url,
-                        'photo_url': record.apl_people_company_id.logo_url,
-                        'city': record.apl_people_company_id.city,
-                        'country_id': country_id.id,
-                        'state_id': state_id.id,
-                        'company_type': 'company',
-                        'founded_year': record.apl_people_company_id.founded_year,
-                    }
-                    company_partner_id = self.env['res.partner'].create(comp_vals)
-                    company_partner_id._compute_image()
+                if record.company_name:
+                    company_partner_id = self.env['res.partner'].search([('name','=',record.company_name),('company_type','=','company')],limit=1)
+                    if not company_partner_id:
+                        comp_vals = {
+                            'name': record.company_name,
+                            'website': record.website,
+                            'city': record.city,
+                            'country_id': country_id.id,
+                            'state_id': state_id.id,
+                            'company_type': 'company',
+                        }
+                        company_partner_id = self.env['res.partner'].create(comp_vals)
                     partner_id.write({
                         'parent_id': company_partner_id.id,
                     })
@@ -80,36 +71,19 @@ class ConvertDataWizard(models.TransientModel):
                 vals = {
                     'name': record.name,
                     'contact_name': record.name,
-                    'function': record.title,
+                    'function': record.position,
                     'email_from': record.email,
                     'city': record.city,
                     'country_id': country_id.id,
                     'state_id': state_id.id,
-                    'type': self.type
+                    'street': record.street,
+                    'zip': record.postal_code,
+                    'type': self.type,
+                    'partner_name': record.company_name,
+                    'website': record.website,
+                    'description': record.description,
                 }
                 lead_id = self.env['crm.lead'].create(vals)
-                if record.apl_people_company_id:
-                    comp_vals = {
-                        'name': record.apl_people_company_id.name,
-                        'email': record.apl_people_company_id.email,
-                        'website': record.apl_people_company_id.website_url,
-                        'blog_url': record.apl_people_company_id.blog_url,
-                        'angellist_url': record.apl_people_company_id.angellist_url,
-                        'linkedin_url': record.apl_people_company_id.linkedin_url,
-                        'twitter_url': record.apl_people_company_id.twitter_url,
-                        #'github_url': record.apl_people_company_id.github_url,
-                        'facebook_url': record.apl_people_company_id.facebook_url,
-                        'photo_url': record.apl_people_company_id.logo_url,
-                        'city': record.apl_people_company_id.city,
-                        'country_id': country_id.id,
-                        'state_id': state_id.id,
-                        'company_type': 'company',
-                        'founded_year': record.apl_people_company_id.founded_year,
-                    }
-                    company_partner_id = self.env['res.partner'].create(comp_vals)
-                    lead_id.write({
-                        'partner_id': company_partner_id.id,
-                    })
                 record.write({
                     'status_converted': 'lead',
                 })

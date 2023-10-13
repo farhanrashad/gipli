@@ -32,6 +32,7 @@
         'views/crm_lead_views.xml',
         'views/partner_views.xml',
         'wizards/find_email_wizard_views.xml',
+        'wizards/convert_data_wizard_views.xml',
     ],
     'assets': {
        'web.assets_backend': [

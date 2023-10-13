@@ -14,21 +14,31 @@ class HunterResults(models.Model):
     phone = fields.Char(string='Phone', readonly=True)
     website = fields.Char(string='Website', readonly=True)
 
+    country = fields.Char(string='Country', readonly=True)
+    state = fields.Char(string='State', readonly=True)
+    city = fields.Char(string='City', readonly=True)
+    street = fields.Char(string='Street', readonly=True)
+    postal_code = fields.Char(string='Postal Code', readonly=True)
+
     company_name = fields.Char(string='Company Name')
     description = fields.Html(string='Description')
 
     lead_id = fields.Many2one('crm.lead', string="Lead")
     partner_id = fields.Many2one('res.partner', string="Partner")
 
+    status_converted = fields.Selection([
+        ('lead', 'Lead'), ('contact', 'Contact')
+    ])
+
     def action_convert_contacts(self):
         ''' Open the apl.convert.data.wizard wizard to convert search results into Odoo contacts
         '''
         return {
             'name': _('Convert into Contacts'),
-            'res_model': 'apl.convert.data.wizard',
+            'res_model': 'hunter.convert.data.wizard',
             'view_mode': 'form',
             'context': {
-                'active_model': 'apl.people',
+                'active_model': 'hunter.results',
                 'active_ids': self.ids,
                 'op_name': 'contacts',
             },
@@ -41,13 +51,24 @@ class HunterResults(models.Model):
         '''
         return {
             'name': _('Convert into Leads'),
-            'res_model': 'apl.convert.data.wizard',
+            'res_model': 'hunter.convert.data.wizard',
             'view_mode': 'form',
             'context': {
-                'active_model': 'apl.people',
+                'active_model': 'hunter.results',
                 'active_ids': self.ids,
                 'op_name': 'leads',
             },
             'target': 'new',
             'type': 'ir.actions.act_window',
+        }
+
+    def action_open_details(self):
+        return {
+            'name': 'Contact Detail',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'hunter.results',
+            'res_id': self.id,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
         }
