@@ -1,0 +1,54 @@
+<odoo>
+    <data>
+        <!-- Define a form view for Api Call Wizard -->
+        <record id="hunter_find_email_wizard_form" model="ir.ui.view">
+            <field name="name">hunter.find.email.wizard.form</field>
+            <field name="model">hunter.find.email.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="api_type" />
+                            </group>
+                            
+                        </group>
+                        <group>
+                            <group>
+                                <field name="domain" placeholder="e.g google.com" attrs="{'invisible': [('api_type', 'not in', ['domain'])]}" />
+                                <field name="company_name" placeholder="e.g Google" attrs="{'invisible': [('api_type', 'not in', ['company'])]}" />
+                                <field name="email" placeholder="e.g info@google.com" attrs="{'invisible': [('api_type', 'not in', ['email_verify'])]}" />
+                            </group>
+                            <group>
+                                <field name="first_name" placeholder="e.g Joel" />
+                                <field name="last_name" placeholder="e.g Willis" />
+                                <field name="full_name" placeholder="e.g Joel Willis"/>
+                            </group>
+                        </group>
+                        
+                        <footer>
+                            <button name="action_find_emails" string="Find Emails" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Define an action to open the form view -->
+        <record id="action_hunter_find_emails_wizard" model="ir.actions.act_window">
+            <field name="name">Find Emails</field>
+            <field name="res_model">hunter.find.email.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="hunter_find_email_wizard_form"/>
+        </record>
+
+        <!-- Create a menu item to access the wizard -->
+        <menuitem id="menu_hunter_main" name="Hunter"
+            parent="crm.crm_menu_root" sequence="20" />
+        
+        <menuitem id="menu_find_email_wizard" name="Find Emails" parent="menu_hunter_main" action="action_hunter_find_emails_wizard"/>
+        
+    </data>
+</odoo>
