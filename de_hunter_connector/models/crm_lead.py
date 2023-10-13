@@ -28,7 +28,7 @@ class CRMLead(models.Model):
     
     def action_find_at_hunter1(self):
         for record in self:
-            #record._send_to_apollo(self.apl_instance_id)
+            hunter_instance_id = record.company_id.hunter_instance_id or self.env.company.hunter_instance_id
             data = {}
             # Domain Parameter
             if record.website:
@@ -49,14 +49,14 @@ class CRMLead(models.Model):
             #if company_name:
                 #data['company'] = company_name
                                                 
-            data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
+            data = hunter_instance_id._get_from_hunter('domain-search', data)
 
             # Find again with company name
             if not data:
                 data = {
                     'company': company_name
                 }
-                data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
+                data = hunter_instance_id._get_from_hunter('domain-search', data)
                 
             emails = data['data']['emails']
             contact_info = []

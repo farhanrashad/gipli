@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 class HunterApiCallWizard(models.TransientModel):
     _name = "hunter.api.call.wizard"
-    _description = 'Search People Wizard'
+    _description = 'Hunter Call Api Wizard'
 
     name_update = fields.Boolean(string='Name', 
         default=lambda self: False if self._context.get('active_model') == 'res.partner' else True

@@ -61,7 +61,13 @@
             <field name="arch" type="xml">
                 <tree string="Hunter Results" js_class="hunter_find_email_button_in_tree">
                     <field name="name"/>
+                    <field name="company_name"/>
                     <field name="email"/>
+                    <field name="position"/>
+                    <field name="phone"/>
+                    <field name="website"/>
+                    <field name="department" optional="hide"/>
+                    <field name="description" optional="hide"/>
                 </tree>
             </field>
         </record>
@@ -73,5 +79,8 @@
             <field name="context">{'create': false, 'edit': false}</field>
 
         </record>
+
+        <menuitem id="menu_find_email_results" name="Email Results" parent="crm.crm_menu_root" action="action_hunter_results"/>
+        
     </data>
 </odoo>

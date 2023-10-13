@@ -11,7 +11,9 @@
                             <group>
                                 <field name="api_type" />
                             </group>
-                            
+                            <group>
+                                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                            </group>
                         </group>
                         <group>
                             <group>

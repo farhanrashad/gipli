@@ -133,7 +133,7 @@ class HunterInstance(models.Model):
             
 
             response = requests.request("GET", url, headers=headers)
-            raise UserError(response.text)
+            #raise UserError(response.text)
             json_data = json.loads(response.text)
             return json_data
 

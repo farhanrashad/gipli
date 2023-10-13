@@ -13,20 +13,6 @@ class res_partner(models.Model):
     _inherit = 'res.partner'
 
     def action_find_at_hunter(self):
-        return {
-                'name': _('Hunter'),
-                'res_model': 'hunter.api.call.wizard',
-                'view_mode': 'form',
-                'context': {
-                    'active_model': 'res.partner',
-                    'active_ids': self.ids,
-                    'active_id': self.id,
-                },
-                'target': 'new',
-                'type': 'ir.actions.act_window',
-            }
-    
-    def action_find_at_hunter1(self):
         for record in self:
             #record._send_to_apollo(self.apl_instance_id)
             hunter_instance_id = record.company_id.hunter_instance_id or self.env.company.hunter_instance_id
@@ -70,7 +56,6 @@ class res_partner(models.Model):
                 
                 # Combine first name and last name or use the email if names are not available
                 contact_name = f"{first_name} {last_name}" if first_name and last_name else email
-                
                 contact_info.append({
                     "email": email,
                     "name": contact_name,
