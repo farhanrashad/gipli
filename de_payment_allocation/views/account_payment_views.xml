@@ -1,0 +1,215 @@
+<odoo>
+  <data>
+      <record id="view_account_payment_tree_inherit" model="ir.ui.view">
+            <field name="name">view.account.payment.tree.inherit</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr='//field[@name="state"]' position='after' >
+                    <field name="payment_reconciled" optional="hide"/>
+                </xpath>
+          </field>
+      </record>
+       <!-- Form modification -->
+     <record id="account_payment_form_reconcile_view" model="ir.ui.view">
+            <field name="name">account.payment.form.reconcile.view</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr='//field[@name="move_id"]' position='replace' />
+                <xpath expr='//group[1]/group[2]' position='inside'>
+                    <field name='payment_reconciled' invisible='1' />
+                    <field name='move_id' invisible='1' required="0"/>
+                    <field name='matching_move_id' invisible='1' />
+                    
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_matchings"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            string="Matching"
+                            >
+                    </button>
+                </xpath>
+                
+                 <xpath expr='//header' position='inside'>
+                     <!--
+                     <button name="action_reconcile" string="Reconcile" type="object" class="oe_highlight" attrs="{'invisible': [('payment_reconciled','=',True)]}"/>
+-->
+                     
+                     <button name="action_process_openitems" string="Process Open Items" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                     <button name="action_process_openitems" string="Process Open Items" type="object" invisible="1" />
+
+                     
+                     <button name="action_generate_journal_entry" string="Generate Entry" type="object" class="oe_highlight" invisible="1"/>
+                     <button name="action_reconcile" string="Reconcile" type="object" class="oe_highlight" attrs="{'invisible': ['|',('state', '!=', 'posted'),('payment_reconciled','=',True)]}"/>
+                     
+                    <button name="action_unreconcile" string="Unreconcile" type="object" class="" attrs="{'invisible': ['|',('state', '!=', 'posted'),('payment_reconciled','=',False)]}"/>
+
+                </xpath>
+                 <xpath expr='//sheet' position='inside'>
+                     <notebook>
+                         <page string='Open Items'>
+                             <field name='payment_reconcile_line' invisible="1">
+                                 <tree editable='bottom' name="debit_lines">
+                                     <field name='move_id' string="Number" readonly="1"/>
+                                     <field name='account_id' string="Number" readonly="1"/>
+                                     <field name='date' string="Date" optional="hide" />
+                                     <field name='invoice_date' optional="hide" />
+                                     <field name='due_date'  readonly="1" />
+                                     <field name="company_currency_id" invisible="1" />
+                                     <field name="currency_id" invisible="1" />
+                                     <field name="recon_currency_id" invisible="1" />
+                                     <field name="amount_total" readonly="1" widget='monetary' optional="hide" options="{'currency_field': 'company_currency_id'}"/>
+                                     <field name="amount_total_signed" readonly="1" optional="hide" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    
+
+                                     
+                                     <field name="amount_residual" readonly="1" optional="show" string="Unassig Amount" widget='monetary' options="{'currency_field': 'company_currency_id'}"/>
+                                     <field name="amount_residual_currency" readonly="1" optional="show" string="Unassign Signed" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_residual_recon" readonly="1" optional="show" string="Unassign" widget='monetary' options="{'currency_field': 'recon_currency_id'}"/>
+
+                                    
+                                     
+                                    <field name='assigned' nolabel="1" widget="boolean_toggle" force_save='1' attrs="{'column_invisible':[('parent.state','!=','draft')]}"/>
+                                    <field name="amount_assigned_recon" string="Assigned" widget='monetary' options="{'currency_field': 'recon_currency_id'}" attrs="{'readonly':[('assigned','!=',True)],'required':[('assigned','=',True)]}"/>
+                                     
+                                    <field name="amount_assigned" readonly="1" optional="show" string="Assign Amount" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_assigned_currency" readonly="1" optional="show" string="Assign Signed" widget='monetary' options="{'currency_field': 'company_currency_id'}"/>
+                                     
+                                     <field name="is_debit_line" invisible="1"/>
+                                 </tree>
+                             </field>
+                             <h3>Debit</h3>
+                             <field name='payment_reconcile_debit_line' attrs="{'readonly':[('state','!=','draft')]}">
+                                 <tree editable='bottom' name="debit_lines" create="false" decoration-success="assigned == True" decoration-muted="assigned == False and parent.state == 'posted'">
+                                     <field name='move_id' string="Number" readonly="1"/>
+                                     <field name='account_id' string="Account" readonly="1"/>
+                                     <field name='date' string="Date" optional="hide" />
+                                     <field name='invoice_date' optional="hide" />
+                                     <field name='due_date'  optional="hide" />
+                                     
+                                     <field name="company_currency_id" invisible="1" />
+                                     <field name="currency_id" optional="show" />
+                                     <field name="recon_currency_id" invisible="1" />
+                                    <field name="amount_total_signed" readonly="1"/>
+                                     <field name="amount_assigned_recon" />
+
+                                     
+                                     <field name="amount_total" invisible="1" readonly="1" widget='monetary' optional="hide" options="{'currency_field': 'company_currency_id'}"/>
+                                     <field name="amount_total_signed" invisible="1" readonly="1" optional="hide" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                     <field name="amount_total_recon" readonly="1" optional="hide" widget='monetary' options="{'currency_field': 'recon_currency_id'}"/>
+                                     
+                                     <field name="amount_residual" invisible="1" readonly="1" optional="show" string="Unassig Amount" widget='monetary' options="{'currency_field': 'company_currency_id'}"/>
+                                     <field name="amount_residual_currency" invisible="1" readonly="1" optional="show" string="Unassign Signed" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_residual_recon" invisible="1" readonly="1" optional="show" string="Unassign" widget='monetary' options="{'currency_field': 'recon_currency_id'}"/>
+
+                                    
+                                     
+                                    <field name='assigned' nolabel="1" widget="boolean_toggle" force_save='1' attrs="{'column_invisible':[('parent.state','!=','draft')]}"/>
+                                    <field name="amount_assigned_recon" string="Assigned" invisible="1" widget='monetary' options="{'currency_field': 'recon_currency_id'}" attrs="{'readonly':[('assigned','!=',True)],'required':[('assigned','=',True)]}"/>
+                                     
+                                    <field name="amount_assigned" invisible="1" readonly="1" optional="show" string="Assign Amount" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_assigned_currency" invisible="1" readonly="1" optional="show" string="Assign Signed" widget='monetary' options="{'currency_field': 'company_currency_id'}"/>
+                                     
+                                     
+                                     <field name="is_debit_line" invisible="1"/>
+                                 </tree>
+                             </field>
+                        <!-- Credit Line -->
+                             <h3>Credit</h3>
+                             <field name='payment_reconcile_credit_line' attrs="{'readonly':[('state','!=','draft')]}">
+                                 <tree editable='bottom' name="debit_lines" create="false" decoration-success="assigned == True" decoration-muted="assigned == False and parent.state == 'posted'">
+                                     <field name='move_id' string="Number" readonly="1"/>
+                                     <field name='account_id' string="Account" readonly="1"/>
+                                     <field name='date' string="Date" optional="hide" />
+                                     <field name='invoice_date' optional="hide" />
+                                     <field name='due_date'  optional="hide" />
+                                     
+                                     <field name="company_currency_id" invisible="1" />
+                                     <field name="currency_id" invisible="1" />
+                                     <field name="recon_currency_id" invisible="1" />
+                                     
+                                     <field name="amount_total_signed" readonly="1"/>
+                                     <field name="amount_assigned_recon" />
+                                     
+                                     <field name="amount_total" invisible="1" readonly="1" widget='monetary' optional="hide" options="{'currency_field': 'company_currency_id'}"/>
+                                     <field name="amount_total_signed" invisible="1" readonly="1" optional="hide" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                     <field name="amount_total_recon" readonly="1" optional="hide" widget='monetary' options="{'currency_field': 'recon_currency_id'}"/>
+                                     
+                                     <field name="amount_residual" invisible="1" readonly="1" optional="show" string="Unassig Amount" widget='monetary' options="{'currency_field': 'company_currency_id'}"/>
+                                     <field name="amount_residual_currency" invisible="1" readonly="1" optional="show" string="Unassign Signed" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_residual_recon" invisible="1" readonly="1" optional="show" string="Unassign" widget='monetary' options="{'currency_field': 'recon_currency_id'}"/>
+
+                                    
+                                     
+                                    <field name='assigned' nolabel="1" widget="boolean_toggle" force_save='1' attrs="{'column_invisible':[('parent.state','!=','draft')]}"/>
+                                    <field name="amount_assigned_recon" string="Assigned" invisible="1" widget='monetary' options="{'currency_field': 'recon_currency_id'}" attrs="{'readonly':[('assigned','!=',True)],'required':[('assigned','=',True)]}"/>
+                                     
+                                    <field name="amount_assigned" readonly="1" invisible="1" optional="show" string="Assign Amount" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_assigned_currency" invisible="1" readonly="1" optional="show" string="Assign Signed" widget='monetary' options="{'currency_field': 'company_currency_id'}"/>
+                                     
+                                     <field name="is_debit_line" invisible="1"/>
+                                 </tree>
+                             </field>
+                             <!-- Total lines -->
+                             <group>
+                                 <group name="payment_detail" string="Payment Details">
+                                     <label for="writeoff_account_id" string="Post Difference In"/>
+                                     <div class="o_row">
+                                        <field name="writeoff_account_id" string="Post Difference In" options="{'no_create':True}" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
+                                     </div>
+                                     <field name="analytic_account_id" options="{'no_create':True}" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
+                                     <field name="writeoff_label" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
+                                     <label for="exchange_rate" />
+                                     <div>
+                                        <field name="exchange_rate" />
+                                        <i class="text-muted "><field name="last_exchange_rate" /> </i>
+                                    </div>
+                                </group>
+                                 <group class="oe_subtotal_footer oe_right" colspan="4" name="total" >
+                                    <field name="amount_debit_recon" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_credit_recon" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="amount_diff_recon" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <div class="oe_clear"/>
+                                    <field name="amount_debit_currency"  widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                                    <field name="amount_credit_currency" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                                    <field name="amount_diff_currency" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                                     
+                                     
+                                     
+                                     <field name="company_currency_id" invisible="1" />
+                                    
+                                 </group>
+                             </group>
+                         </page>
+                         
+                         <page string='Journal Items'>
+                             <field name='move_line_ids' >
+                                 <tree>
+                                     <field name='id' invisible="1"/>
+                                     <field name='move_id'  string='Entry'/>
+                                     <field name='account_id' />
+                                     <field name='partner_id'  optional='hide'/>
+                                     <field name='name' />
+                                     <field name='debit' />
+                                     <field name='credit' />
+                                     <field name='amount_currency' optional='show' />
+                                     <field name='analytic_account_id'  optional='hide'/>
+                                     <field name='analytic_tag_ids' widget='many2many_tags' optional='hide'/>
+                                     <field name='currency_id' optional='hide'/>
+                                     <field name='company_currency_id' optional='hide'/>
+                                     <field name='full_reconcile_id' optional='hide'/>
+                                     <field name='matching_number' optional='hide'/>
+                                     <field name='allocation_move_line_id' optional="hide" />
+                                 </tree>
+                             </field>
+                         </page>
+                     </notebook>
+                </xpath>
+            </field>
+        </record> 
+
+  </data>
+</odoo>

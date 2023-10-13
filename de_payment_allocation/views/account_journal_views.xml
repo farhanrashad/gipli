@@ -1,0 +1,15 @@
+<odoo>
+  <data>
+   <record id="view_journal_form" model="ir.ui.view">
+            <field name="name">view.journal.form</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_form"/>
+            <field name="arch" type="xml">
+                <xpath expr='//page[@name="advanced_settings"]/group[1]/group[1]' position='inside'>
+                     <field name='is_clearing'  />
+                     <field name='allow_payment_reconcile'  />
+                </xpath>                
+            </field>
+        </record> 
+  </data>
+</odoo>
