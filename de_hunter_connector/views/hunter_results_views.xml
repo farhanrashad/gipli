@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Server Action to convert into Contacts -->
+        <record id="action_hunter_emails_convert_contacts_wizard" model="ir.actions.server">
+            <field name="name">Convert Emails into Contacts</field>
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+            <field name="model_id" ref="de_hunter_connector.model_hunter_results"/>
+            <field name="binding_model_id" ref="de_hunter_connector.model_hunter_results"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.action_convert_contacts()
+            </field>
+        </record>
+
+        <record id="action_hunter_emails_convert_leads_wizard" model="ir.actions.server">
+            <field name="name">Convert Emails into Leads</field>
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+            <field name="model_id" ref="de_hunter_connector.model_hunter_results"/>
+            <field name="binding_model_id" ref="de_hunter_connector.model_hunter_results"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.action_convert_leads()
+            </field>
+        </record>
+        
+        <!-- Results form view -->
+        <record id="hunter_results_form_view" model="ir.ui.view">
+            <field name="name">hunter.results.form.view</field>
+            <field name="model">hunter.results</field>
+            <field name="arch" type="xml">
+                <form string="People">
+                    <sheet>
+                        
+                        <group>
+                            <group>
+                                <field name="name" />
+                                <field name="email" />
+                                <field name="position" />
+                                <field name="department" />
+                                <field name="phone" />
+                            </group>
+                            <group>
+                               
+                            </group>
+                        </group>
+                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Peole tree View -->
+        <record id="hunter_results_tree_view" model="ir.ui.view">
+            <field name="name">hunter.results.tree.view</field>
+            <field name="model">hunter.results</field>
+            <field name="arch" type="xml">
+                <tree string="Hunter Results" js_class="hunter_find_email_button_in_tree">
+                    <field name="name"/>
+                    <field name="email"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_hunter_results" model="ir.actions.act_window">
+            <field name="name">Hunter Emails</field>
+            <field name="res_model">hunter.results</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'create': false, 'edit': false}</field>
+
+        </record>
+    </data>
+</odoo>

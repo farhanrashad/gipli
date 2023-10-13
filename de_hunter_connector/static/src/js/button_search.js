@@ -8,14 +8,10 @@ odoo.define('de_hunter_connector.tree_search_buttons', function (require) {
     var TreeButtons = ListController.extend({
         buttons_template: 'de_hunter_connector.search_buttons',
         events: _.extend({}, ListController.prototype.events, {
-            'click .open_wizard_action_apl_people_search_results': '_OpenPeopleSearchWizard',
-            'click .open_wizard_action_companies_search': '_OpenCompaniesSearchWizard',
+            'click .open_wizard_action_find_email_results': '_OpenFindEmailWizard',
         }),
-        _OpenPeopleSearchWizard: function () {
-            this._openWizard('apl.people.search.wizard', 'Search People');
-        },
-        _OpenCompaniesSearchWizard: function () {
-            this._openWizard('apl.companies.search.wizard', 'Companies Search'); // Update with your actual model name
+        _OpenFindEmailWizard: function () {
+            this._openWizard('hunter.find.email.wizard', 'Find Email');
         },
         _openWizard: function (resModel, name) {
             this.do_action({
@@ -31,11 +27,11 @@ odoo.define('de_hunter_connector.tree_search_buttons', function (require) {
         },
     });
 
-    var AplSearchResultsListView = ListView.extend({
+    var FindEmailResultsListView = ListView.extend({
         config: _.extend({}, ListView.prototype.config, {
             Controller: TreeButtons,
         }),
     });
 
-    viewRegistry.add('apl_search_button_in_tree', AplSearchResultsListView);
+    viewRegistry.add('hunter_find_email_button_in_tree', FindEmailResultsListView);
 });

@@ -28,4 +28,11 @@ class HunterFindEmailWizard(models.TransientModel):
     
 
     def action_find_emails(self):
-        pass
+        action = {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree',
+            'name': _('Email Results'),
+            'res_model': 'hunter.results',
+            'domain': [('create_uid', '=', self.env.user.id)],
+            'context': {'create': False, 'edit': False},  # Add the context here
+        }
