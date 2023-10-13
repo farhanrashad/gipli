@@ -18,7 +18,7 @@ class res_partner(models.Model):
                 'res_model': 'hunter.api.call.wizard',
                 'view_mode': 'form',
                 'context': {
-                    'active_model': 'crm.lead',
+                    'active_model': 'res.partner',
                     'active_ids': self.ids,
                     'active_id': self.id,
                 },
@@ -29,6 +29,7 @@ class res_partner(models.Model):
     def action_find_at_hunter1(self):
         for record in self:
             #record._send_to_apollo(self.apl_instance_id)
+            hunter_instance_id = record.company_id.hunter_instance_id or self.env.company.hunter_instance_id
             data = {}
             # Domain Parameter
             if record.website:
@@ -45,15 +46,16 @@ class res_partner(models.Model):
                 company_name = record.name
             #if company_name:
                 #data['company'] = company_name
-                                                
-            data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
+
+            
+            data = hunter_instance_id._get_from_hunter('domain-search', data)
 
             # Find again with company name
             if not data:
                 data = {
                     'company': company_name
                 }
-                data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
+                data = hunter_instance_id._get_from_hunter('domain-search', data)
                 
             emails = data['data']['emails']
             contact_info = []
@@ -81,11 +83,11 @@ class res_partner(models.Model):
                 result_id = self.env['hunter.results'].create(contact_info)
 
         return {
-            'name': _('Hunter'),
+            'name': _('Find Emails'),
             'res_model': 'hunter.api.call.wizard',
             'view_mode': 'form',
             'context': {
-                'active_model': 'crm.lead',
+                'active_model': 'res.partner',
                 'active_ids': self.ids,
             },
             'target': 'new',

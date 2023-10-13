@@ -13,7 +13,9 @@ class HunterApiCallWizard(models.TransientModel):
     _name = "hunter.api.call.wizard"
     _description = 'Search People Wizard'
 
-    name_update = fields.Boolean(string='Name', default=True)
+    name_update = fields.Boolean(string='Name', 
+        default=lambda self: False if self._context.get('active_model') == 'res.partner' else True
+    )
     email_update = fields.Boolean(string='Email',default=True)
     position_update = fields.Boolean(string='Position', default=True)
     phone_update = fields.Boolean(string='Phone', default=True)
@@ -88,8 +90,7 @@ class HunterApiCallWizard(models.TransientModel):
             #raise UserError(len(selected_line))
             #if len(selected_line) != 1:
             #    raise UserError("You must select only one record.")
-            lead_id = self.env[self.active_model].browse(self.env.context.get('active_id'))
-            partner_id = self.env[self.active_model].browse(self.env.context.get('active_id'))
+            record_id = self.env[self.active_model].browse(self.env.context.get('active_id'))
             for line in selected_lines:
                 vals = {}
                 if active_model == 'crm.lead':
@@ -102,19 +103,16 @@ class HunterApiCallWizard(models.TransientModel):
                     if record.phone_update:
                         vals['phone'] = line.phone
                         
-                    lead_id.write(vals)
                 
                 elif active_model == 'res.partner':
                     if record.email_update:
                         vals['email'] = line.email
-                    if record.name_update:
-                        vals['name'] = line.name
                     if record.position_update:
                         vals['function'] = line.position
                     if record.phone_update:
                         vals['phone'] = line.phone
                         
-                    lead_id.write(vals)
+                record_id.write(vals)
 
         
     def action_convert_contacts(self):

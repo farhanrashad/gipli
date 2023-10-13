@@ -84,7 +84,7 @@ class CRMLead(models.Model):
                 result_id = self.env['hunter.results'].create(contact_info)
 
         return {
-            'name': _('Hunter'),
+            'name': _('Find Emails'),
             'res_model': 'hunter.api.call.wizard',
             'view_mode': 'form',
             'context': {

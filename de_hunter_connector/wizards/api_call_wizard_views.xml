@@ -17,14 +17,14 @@
                         -->
                         <group class="oe_inline" string="Update Fields">
                             <div class="o_td_label">
-                                <label for="name_update" string="Name"/>
+                                <label for="email_update" string="Email"/>
                             </div>
-                            <div name="name_update">
+                            <div name="email_update">
                                 <span class="ml8">
-                                    <field name="name_update" nolabel="1" style="width: 6rem;" />
+                                    <field name="email_update" nolabel="1" style="width: 6rem;" />
                                 </span>
-                                <span class="ml8">
-                                    <strong>Email:</strong> <field name="email_update" nolabel="1" style="width: 6rem;" />
+                                <span class="ml8" attrs="{'invisible': [('active_model', '=', 'res.partner')]}">
+                                    <strong>Name:</strong><field name="name_update" nolabel="1" style="width: 6rem;" />
                                 </span>
                                 <span class="ml8">
                                     <strong>Position:</strong> <field name="position_update" nolabel="1" style="width: 6rem;" />
