@@ -12,7 +12,52 @@ from urllib.parse import urlparse
 class res_partner(models.Model):
     _inherit = 'res.partner'
 
-    def action_find_at_hunter(self):
+    email_verified = fields.Char(string='Email Verified')
+    
+    def action_find_email(self):
+        hunter_instance_id = self.company_id.hunter_instance_id or self.env.company.hunter_instance_id
+        for record in self:
+            if not (record.name):
+                raise UserError("Please provide at least one of the following values: Company Name, Customer, or Contact Name.")
+
+            data = {}
+            company_name = ''
+            # Domain Parameter
+            parsed_url = urlparse(record.website)
+            domain = parsed_url.hostname
+            if domain and domain.startswith('www.'):
+                domain = domain[4:]
+
+            # Company Name Paramter
+            if record.name:
+                company_name = record.name
+                    
+            if record.website:
+                data['domain'] = domain
+            else:
+                if company_name:
+                    data['company'] = company_name
+
+            # add the first name
+            if company_name:
+                name_parts = record.name.split()
+                first_name = name_parts[0]
+                last_name = name_parts[-1]
+                data['first_name'] = first_name
+                data['last_name'] = last_name
+            
+            json_data = hunter_instance_id._get_from_hunter('email-finder', data)
+            email = json_data['data']['email']
+            verification_status = json_data['data']['verification']['status']
+            if email:
+                record.write({
+                    'email': email,
+                    'email_verified':verification_status,
+                })
+            else:
+                raise UserError("No email found for '%s'." % company_name)
+                
+    def action_find_bulk_emails(self):
         for record in self:
             #record._send_to_apollo(self.apl_instance_id)
             hunter_instance_id = record.company_id.hunter_instance_id or self.env.company.hunter_instance_id
