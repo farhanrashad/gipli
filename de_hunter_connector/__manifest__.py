@@ -40,4 +40,11 @@
            'de_hunter_connector/static/src/xml/button_search.xml',
        ],
     },
+    'license': 'OPL-1',
+    'price': 110,
+    'currency': 'USD',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': False,
+    'auto_install': False,
 }
