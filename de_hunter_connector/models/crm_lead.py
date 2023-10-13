@@ -50,6 +50,14 @@ class CRMLead(models.Model):
                 #data['company'] = company_name
                                                 
             data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
+
+            # Find again with company name
+            if not data:
+                data = {
+                    'company': company_name
+                }
+                data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
+                
             emails = data['data']['emails']
             contact_info = []
             #raise UserError(emails)
@@ -86,17 +94,4 @@ class CRMLead(models.Model):
             'target': 'new',
             'type': 'ir.actions.act_window',
         }
-    def action_find_at_hunter1(self):
-        return {
-            'name': _('Hunter'),
-            'res_model': 'hunter.api.call.wizard',
-            'view_mode': 'form',
-            'context': {
-                'active_model': 'crm.lead',
-                'active_ids': self.ids,
-            },
-            'target': 'new',
-            'type': 'ir.actions.act_window',
-        }
-
     

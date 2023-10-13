@@ -13,4 +13,5 @@ class HunterResults(models.Model):
     department = fields.Char(string='Department', readonly=True)
     phone = fields.Char(string='Phone', readonly=True)
 
-    lead_id = fields.Many2one('crm.lead')
+    lead_id = fields.Many2one('crm.lead', string="Lead")
+    partner_id = fields.Many2one('res.partner', string="Partner")

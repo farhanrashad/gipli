@@ -60,8 +60,12 @@ class HunterApiCallWizard(models.TransientModel):
         #raise UserError(record_ids)
         for wizard in self:
             lines = []
-            for lead in record_ids:
-                results = self.env['hunter.results'].search([])
+            for record in record_ids:
+                if active_model == 'crm.lead':
+                    results = self.env['hunter.results'].search([('lead_id','=',record.id)])
+                elif active_model == 'res.partner':
+                    results = self.env['hunter.results'].search([('partner_id','=',record.id)])
+                    
                 for result in results:
                     vals = {
                         'name': result.name,
@@ -80,94 +84,63 @@ class HunterApiCallWizard(models.TransientModel):
         for record in self:
             vals = {}
             selected_lines = record.line_ids.filtered(lambda r: r.record_select)
+            active_model = self.env.context.get('active_model')
             #raise UserError(len(selected_line))
             #if len(selected_line) != 1:
             #    raise UserError("You must select only one record.")
             lead_id = self.env[self.active_model].browse(self.env.context.get('active_id'))
+            partner_id = self.env[self.active_model].browse(self.env.context.get('active_id'))
             for line in selected_lines:
                 vals = {}
-                if record.email_update:
-                    vals['email_from'] = line.email
-                if record.name_update:
-                    vals['contact_name'] = line.name
-                if record.position_update:
-                    vals['function'] = line.position
-                if record.phone_update:
-                    vals['phone'] = line.phone
-                    
-                lead_id.write(vals)
+                if active_model == 'crm.lead':
+                    if record.email_update:
+                        vals['email_from'] = line.email
+                    if record.name_update:
+                        vals['contact_name'] = line.name
+                    if record.position_update:
+                        vals['function'] = line.position
+                    if record.phone_update:
+                        vals['phone'] = line.phone
+                        
+                    lead_id.write(vals)
+                
+                elif active_model == 'res.partner':
+                    if record.email_update:
+                        vals['email'] = line.email
+                    if record.name_update:
+                        vals['name'] = line.name
+                    if record.position_update:
+                        vals['function'] = line.position
+                    if record.phone_update:
+                        vals['phone'] = line.phone
+                        
+                    lead_id.write(vals)
 
         
-    def action_process(self):
+    def action_convert_contacts(self):
         active_model = self.env.context.get('active_model')
-        active_ids = self.env.context.get('active_ids', [])
-
-        
-        #raise UserError(active_ids)
+        active_ids = self.env.context.get('active_ids', [])        
         
         record_ids = self.env[active_model].search([('id','in',active_ids)])
-        data = {}
+
         for record in record_ids:
-            #record._send_to_apollo(self.apl_instance_id)
-
-            if self.api_type in ('domain','email_domain'):
-                # Domain Parameter
-                if record.website:
-                    parsed_url = urlparse(record.website)
-                    domain = parsed_url.hostname
-                    if domain.startswith('www.'):
-                        domain = domain[4:]
-                    data['domain'] = domain
-
-            if self.api_type in ('company','email_company'):
-                # Company Name Paramter
-                if record.partner_name:
-                    company_name = record.partner_name
-                elif record.partner_id:
-                    if record.partner_id.parent_id:
-                        company_name = record.partner_id.parent_id.name
-                    else:
-                        company_name = record.partner_id.name
-                if company_name:
-                    data['company'] = company_name
-
-            if self.api_type in ('email_name'):
-                # Contact Name
-                if record.contact_name:
-                    data['full_name'] = record.contact_name
-
-            if self.api_type in ('email_verify'):
-                # Email
-                if record.email_from:
-                    data['email'] = record.email_from
-                                                
-            data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
-            emails = data['data']['emails']
-            contact_info = []
-            for email_data in emails:
-                email = email_data['value']
-                first_name = email_data['first_name']
-                last_name = email_data['last_name']
-                
-                # Combine first name and last name or use the email if names are not available
-                contact_name = f"{first_name} {last_name}" if first_name and last_name else email
-                
-                contact_info.append({
-                    "email": email,
-                    "contact_name": contact_name,
-                    "wizard_id" :self.id,
-                })
-                result_id = self.env['hunter.api.call.wizard.line'].create(contact_info)
-
-        # Define the action to prevent the window from closing
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'hunter.api.call.wizard',
-            'res_id': self.id,
-            'view_mode': 'form',
-            'view_id': False,
-            'target': 'new',
-        }
+            vals = {}
+            for line in self.line_ids.filtered(lambda x: x.record_select):
+                vals = {
+                    'name': line.name,
+                    'phone': line.phone,
+                    'email': line.email,
+                    'function': line.position,
+                    'company_type': 'person',
+                    'type': 'contact',
+                }
+                if active_model == 'crm.lead':
+                    if record.partner_id:
+                        vals['parent_id'] = record.partner_id.id
+                elif active_model == 'res.partner':
+                    vals['parent_id'] = record.id
+                        
+                partner_id = self.env['res.partner'].create(vals)
 
 class HunterApiCallWizardResults(models.TransientModel):
     _name = 'hunter.api.call.wizard.line'

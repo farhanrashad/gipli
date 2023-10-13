@@ -17,7 +17,7 @@ READONLY_FIELD_STATES = {
 
 class HunterInstance(models.Model):
     _name = 'hunter.instance'
-    _description = 'Apollo Instance'
+    _description = 'Hunter Instance'
 
     name = fields.Char(string='Name', required=True, )
     api_key = fields.Char(string='API Key', required=True, help='Secret API Key', )
@@ -59,13 +59,13 @@ class HunterInstance(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Connection to Apollo successful; explore its capabilities now.'),
+                'title': _('Connection to Hunter successful; explore its capabilities now.'),
                 'type': 'warning',
                 'sticky': False,  #True/False will display for few seconds if false
             },
         }
 
-        url = self.url + '' #"https://api.apollo.io/v1/auth/health"
+        url = self.url + '' #"https://api.hunter.io/v1/auth/health"
         url = 'https://api.hunter.io/v2/domain-search?domain=stripe.com&api_key=c9280ab0813d7fee78ef90d0576ba532d09adc3f'
         url = self.url + 'domain-search?domain=dynexcel.com&api_key=' + self.api_key
         headers = {
@@ -77,7 +77,7 @@ class HunterInstance(models.Model):
                 'state': 'verified'
             })
             notification['params'].update({
-                'title': _('The connection to Apollo was successful.'),
+                'title': _('The connection to Hunter was successful.'),
                 'type': 'success',
                 'next': {'type': 'ir.actions.act_window_close'},
             })
@@ -92,7 +92,7 @@ class HunterInstance(models.Model):
         for record in self:
             if record.state != 'draft':
                 raise UserError("You cannot delete a record with a state other than 'draft'.")
-        return super(ApolloInstance, self).unlink()
+        return super(HunterInstance, self).unlink()
 
         
     
@@ -101,43 +101,6 @@ class HunterInstance(models.Model):
     # ---------------------- Operations for Hunter ------------
     # ---------------------------------------------------------
     
-    @api.model
-    def _post_apollo_data(self, api_name, api_data=None):
-        """
-        Fetch JSON data from a given URL with optional data payload.
-        :param url: The URL to send the request to.
-        :param data: Optional data to send with the request.
-        :return: JSON data received in the response.
-        """
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-        try:
-            url = self.url + api_name
-            #raise UserError(url)
-            # Initialize data as an empty dictionary if it's None
-            if api_data is None:
-                api_data = {}
-
-            # Add the api_key field to the data dictionary
-            api_data['api_key'] = self.api_key
-
-            #raise UserError(api_data)
-            
-            response = requests.request("POST", url, headers=headers, json=api_data)   
-            #raise UserError(response.text)
-            json_data = json.loads(response.text)
-            return json_data
-
-        except requests.exceptions.RequestException as e:
-            # Handle any request exceptions
-            raise e
-
-        except json.JSONDecodeError as e:
-            # Handle JSON decoding errors
-            raise e
-
     @api.model
     def _get_from_hunter(self, api_name, api_data=None):
 
@@ -181,32 +144,3 @@ class HunterInstance(models.Model):
         except json.JSONDecodeError as e:
             # Handle JSON decoding errors
             raise e
-
-    @api.model
-    def _put_apollo_data(self, api_name, api_data=None):
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-        try:
-            url = self.url + api_name
-            # Initialize data as an empty dictionary if it's None
-            if api_data is None:
-                api_data = {}
-
-            # Add the api_key field to the data dictionary
-            api_data['api_key'] = self.api_key
-
-            response = requests.request("PUT", url, headers=headers, params=api_data)
-            #raise UserError(response.text)
-            json_data = json.loads(response.text)
-            return json_data
-
-        except requests.exceptions.RequestException as e:
-            # Handle any request exceptions
-            raise e
-
-        except json.JSONDecodeError as e:
-            # Handle JSON decoding errors
-            raise e
-

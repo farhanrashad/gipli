@@ -39,17 +39,22 @@ class res_partner(models.Model):
                 data['domain'] = domain
 
             # Company Name Paramter
-            if record.partner_name:
-                company_name = record.partner_name
-            elif record.partner_id:
-                if record.partner_id.parent_id:
-                    company_name = record.partner_id.parent_id.name
-                else:
-                    company_name = record.partner_id.name
+            if record.parent_id:
+                company_name = record.parent_id.name
+            else:
+                company_name = record.name
             #if company_name:
                 #data['company'] = company_name
                                                 
             data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
+
+            # Find again with company name
+            if not data:
+                data = {
+                    'company': company_name
+                }
+                data = record.company_id.hunter_instance_id._get_from_hunter('domain-search', data)
+                
             emails = data['data']['emails']
             contact_info = []
             #raise UserError(emails)
@@ -70,7 +75,7 @@ class res_partner(models.Model):
                     "position": position,
                     "department": department,
                     "phone": phone_number,
-                    "lead_id" :self.id,
+                    "partner_id" :self.id,
                 })
                 self.env['hunter.results'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
                 result_id = self.env['hunter.results'].create(contact_info)
@@ -86,17 +91,3 @@ class res_partner(models.Model):
             'target': 'new',
             'type': 'ir.actions.act_window',
         }
-    def action_find_at_hunter1(self):
-        return {
-            'name': _('Hunter'),
-            'res_model': 'hunter.api.call.wizard',
-            'view_mode': 'form',
-            'context': {
-                'active_model': 'crm.lead',
-                'active_ids': self.ids,
-            },
-            'target': 'new',
-            'type': 'ir.actions.act_window',
-        }
-
-    
