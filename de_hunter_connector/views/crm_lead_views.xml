@@ -1,24 +1,38 @@
 <odoo>
     <data>
+        <record id="action_crm_hunter_find_bulk_emails" model="ir.actions.server">
+            <field name="name">Bulk Emails</field>
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="binding_model_id" ref="crm.model_crm_lead"/>
+            <field name="binding_view_types">form</field>
+            <field name="state">code</field>
+            <field name="code">
+                if record:
+                    action = record.action_find_bulk_emails()
+            </field>
+        </record>
+        
         <record id="crm_lead_view_form_inherit_hunter" model="ir.ui.view">
             <field name="name">crm.lead.view.form.inherit.hunter</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_lead_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
-                    <button name="action_find_at_hunter" type="object" string="Bulk Emails" class="btn-primary"/>
-
+                    <!--
+                    <button name="action_find_bulk_emails" type="object" string="Bulk Emails" class="btn-primary"/>
+-->
                     <button name="action_find_email" type="object" string="Find Email" class="btn-primary"/>
                 </xpath>
                 <xpath expr="//sheet" position="inside">
                     <field name="email_verified" />
                 </xpath>
                 <xpath expr="//field[@name='email_from']" position="before">
-                    <button name="action_email_verify" class="text-danger" string="Verify" title="This email is not verified." type="object" attrs="{'invisible': [('email_verified', '=', 'valid')]}"/>
+                    <button name="action_email_verify" class="text-danger" string="Verify" title="This email is not verified." type="object" attrs="{'invisible': [('email_verified', 'in', ['valid','accept_all'])]}"/>
                 </xpath>
                 <xpath expr="//field[@name='email_from']" position="after">
-                    <span class="fa fa-check-circle text-success oe_edit_only" title="Email Verified." attrs="{'invisible': [('email_verified', '!=', 'valid')]}"/>
-                    <span class="fa fa-times-circle text-warning oe_edit_only" title="Unverified Email." attrs="{'invisible': [('email_verified', '=', 'valid')]}"/>
+                    <span class="fa fa-check-circle text-success oe_edit_only" title="Email Verified." attrs="{'invisible': [('email_verified', 'not in', ['valid','accept_all'])]}"/>
+                    <span class="fa fa-times-circle text-warning oe_edit_only" title="Unverified Email." attrs="{'invisible': [('email_verified', 'in', ['valid','accept_all'])]}"/>
                     
 
                 </xpath>

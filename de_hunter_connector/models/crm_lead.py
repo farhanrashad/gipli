@@ -66,7 +66,7 @@ class CRMLead(models.Model):
 
             
         
-    def action_find_at_hunter(self):
+    def action_find_bulk_emails(self):
         for record in self:
             hunter_instance_id = record.company_id.hunter_instance_id or self.env.company.hunter_instance_id
             data = {}
@@ -136,5 +136,17 @@ class CRMLead(models.Model):
         }
 
     def action_email_verify(self):
-        pass
+        for record in self:
+            if not record.email_from:
+                raise UserError("Please enter email for verification.")
+            hunter_instance_id = record.company_id.hunter_instance_id or self.env.company.hunter_instance_id
+            data = {
+                'email': record.email_from,
+            }
+            json_data = hunter_instance_id._get_from_hunter('email-verifier', data)
+            status = json_data['data']['status']
+            record.write({
+                'email_verified':status,
+            })
+                
     
