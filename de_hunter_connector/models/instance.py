@@ -12,47 +12,33 @@ from urllib.parse import urlparse
 
 READONLY_FIELD_STATES = {
     state: [('readonly', True)]
-    for state in {'verified', 'active'}
+    for state in {'active'}
 }
 
 class HunterInstance(models.Model):
     _name = 'hunter.instance'
     _description = 'Hunter Instance'
 
-    name = fields.Char(string='Name', required=True, )
-    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', )
-    url = fields.Char(string='URL', required=True, )
+    name = fields.Char(string='Name', required=True, readonly=True, states=READONLY_FIELD_STATES,)
+    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=True, states=READONLY_FIELD_STATES,)
+    url = fields.Char(string='URL', required=True, readonly=True, states=READONLY_FIELD_STATES,)
 
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states=READONLY_FIELD_STATES, default=lambda self: self.env.company)
 
 
     state = fields.Selection([
         ('draft', 'Draft'), 
-        ('verified', 'Verified'), 
         ('active', 'Active')], 
         string='Status',default='draft', required=True
     )
 
 
     def button_draft(self):
-        url = 'https://api.hunter.io/v2/domain-search?domain=stripe.com&api_key=c9280ab0813d7fee78ef90d0576ba532d09adc3f'
-        url = self.url + 'domain-search?domain=dynexcel.com&api_key=' + self.api_key
-        headers = {
-            'X-API-KEY': self.api_key,
-        }
-        response = requests.request("GET", url, headers=headers)
-
-        raise UserError(response.text)
-        
         self.write({
             'state':'draft'
         })
 
-    def button_confirm(self):
-        self.write({
-            'state':'active'
-        })
-        
+    
     def connection_test(self):
         
         notification = {
@@ -75,7 +61,7 @@ class HunterInstance(models.Model):
         response = requests.request("GET", url, headers=headers)
         if response.status_code == 200: 
             self.write({
-                'state': 'verified'
+                'state': 'active'
             })
             notification['params'].update({
                 'title': _('The connection to Hunter was successful.'),
@@ -104,7 +90,9 @@ class HunterInstance(models.Model):
     
     @api.model
     def _get_from_hunter(self, api_name, api_data=None):
-
+        if self.state != 'active':
+            raise UserError('Connector Error')
+        
         #url = self.url + 'domain-search?domain=dynexcel.com&api_key=' + self.api_key
         headers = {
             'X-API-KEY': self.api_key,

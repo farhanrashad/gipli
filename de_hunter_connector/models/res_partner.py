@@ -62,6 +62,7 @@ class res_partner(models.Model):
             #record._send_to_apollo(self.apl_instance_id)
             hunter_instance_id = record.company_id.hunter_instance_id or self.env.company.hunter_instance_id
             data = {}
+            domain = ''
             # Domain Parameter
             if record.website:
                 parsed_url = urlparse(record.website)
@@ -71,26 +72,34 @@ class res_partner(models.Model):
                 data['domain'] = domain
 
             # Company Name Paramter
-            if record.parent_id:
-                company_name = record.parent_id.name
-            else:
+            if record.name:
                 company_name = record.name
-            #if company_name:
-                #data['company'] = company_name
+                data['company'] = company_name
 
+            #raise UserError(company_name)
             
-            data = hunter_instance_id._get_from_hunter('domain-search', data)
+            json_data = hunter_instance_id._get_from_hunter('domain-search', data)
 
-            # Find again with company name
-            if not data:
-                data = {
-                    'company': company_name
-                }
-                data = hunter_instance_id._get_from_hunter('domain-search', data)
-                
-            emails = data['data']['emails']
+            #company_name = json_data['data']['organization']
+            company_domain = json_data['data']['domain']
+
+            country = json_data['data']['country']
+            state = json_data['data']['state']
+            city = json_data['data']['city']
+            postal_code = json_data['data']['postal_code']
+            street = json_data['data']['street']
+    
+            # other fields combined in description
+            desc = f"Industry: {json_data['data']['industry']}\n"
+            desc += f"Twitter: {json_data['data']['twitter']}\n"
+            desc += f"Facebook: {json_data['data']['facebook']}\n"
+            desc += f"Linkedin: {json_data['data']['linkedin']}\n"
+            desc += f"Instagram: {json_data['data']['instagram']}\n"
+            desc += f"Youtube: {json_data['data']['youtube']}\n"
+            desc += f"Technologies: {', '.join(json_data['data']['technologies'])}"
+        
+            emails = json_data['data']['emails']
             contact_info = []
-            #raise UserError(emails)
             for email_data in emails:
                 email = email_data['value']
                 first_name = email_data['first_name']
@@ -107,7 +116,15 @@ class res_partner(models.Model):
                     "position": position,
                     "department": department,
                     "phone": phone_number,
-                    "partner_id" :self.id,
+                    "company_name": company_name,
+                    "website": company_domain,
+                    "description": desc,
+                    "country": country,
+                    "state": state,
+                    "city": city,
+                    "postal_code": postal_code,
+                    "street": street,
+                    "partner_id": record.id,
                 })
                 self.env['hunter.results'].search([('create_uid', '=', self.env.user.id)]).sudo().unlink()
                 result_id = self.env['hunter.results'].create(contact_info)

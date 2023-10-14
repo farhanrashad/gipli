@@ -88,8 +88,8 @@
             <field name="context">{'create': false, 'edit': false}</field>
 
         </record>
-
+        <!--
         <menuitem id="menu_find_email_results" name="Email Results" parent="crm.crm_menu_root" action="action_hunter_results"/>
-        
+        -->
     </data>
 </odoo>

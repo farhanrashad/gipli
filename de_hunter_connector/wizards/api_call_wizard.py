@@ -72,6 +72,9 @@ class HunterApiCallWizard(models.TransientModel):
                     vals = {
                         'name': result.name,
                         'email': result.email,
+                        'position': result.position,
+                        'department': result.department,
+                        'phone': result.phone,
                         'wizard_id': wizard.id,  # Set the wizard ID for the line record
                     }
                     line = self.env['hunter.api.call.wizard.line'].create(vals)
