@@ -25,6 +25,10 @@
                         <h1>
                             <field name="name" placeholder="e.g. MBA Fee"/>
                         </h1>
+                        <label for="course_ids"/>
+                        <h2>
+                            <field name="course_ids" widget="many2many_tags" />
+                        </h2>
                     </div>
                     <group>
                         <group>

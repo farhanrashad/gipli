@@ -16,7 +16,15 @@ class EnrolOrderTemplate(models.Model):
         return self.env.company.portal_confirmation_pay
 
     name = fields.Char('Fees Template', required=True)
+    
     enrol_order_tmpl_line = fields.One2many('oe.enrol.order.template.line', 'enrol_order_tmpl_id', 'Lines', copy=True)
+    course_ids = fields.Many2many(
+        'oe.school.course',  # Target model
+        'oe_enrol_course_rel',  # Relation table name (optional)
+        'enrol_tmpl_id',  # Field name for this model in the relation table
+        'course_id',  # Field name for the target model in the relation table
+        string='Courses', required=True
+    )
     note = fields.Html('Terms and conditions', translate=True)
     require_signature = fields.Boolean('Online Signature', default=_get_default_require_signature, help='Request a online signature to the customer in order to confirm orders automatically.')
     require_payment = fields.Boolean('Online Payment', default=_get_default_require_payment, help='Request an online payment to the customer in order to confirm orders automatically.')
