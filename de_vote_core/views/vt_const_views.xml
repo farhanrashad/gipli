@@ -1,0 +1,82 @@
+<odoo>
+    <data>
+        <!-- Form view -->
+        <record id="view_form_constituency" model="ir.ui.view">
+            <field name="name">constituency.form</field>
+            <field name="model">vt.const</field>
+            <field name="arch" type="xml">
+                <form string="Constituency Form">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="const_id"/>
+                            <field name="comment"/>
+                            <field name="barcode"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- Tree view -->
+        <record id="view_tree_constituency" model="ir.ui.view">
+            <field name="name">constituency.tree</field>
+            <field name="model">vt.const</field>
+            <field name="arch" type="xml">
+                <tree string="Constituency Tree View">
+                    <field name="name"/>
+                    <field name="active"/>
+                    <field name="const_id"/>
+                    <field name="barcode"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Kanban View -->
+        <record id="view_kanban_constituency" model="ir.ui.view">
+            <field name="name">constituency.kanban</field>
+            <field name="model">vt.const</field>
+            <field name="arch" type="xml">
+                <kanban class="oe_background_grey">
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_content">
+                                <div class="oe_kanban_global_click">
+                                    <div class="oe_avatar">
+                                        <field name="name"/>
+                                    </div>
+                                    <div class="oe_kanban_details">
+                                        <strong><field name="name"/></strong>
+                                        <field name="active"/>
+                                        <field name="const_id"/>
+                                        <field name="barcode"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Search view -->
+        <record id="view_search_constituency" model="ir.ui.view">
+            <field name="name">constituency.search</field>
+            <field name="model">vt.const</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="Constituency Name"/>
+                    <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+        <!-- Action View -->
+        <record id="action_constituency" model="ir.actions.act_window">
+            <field name="name">Constituencies</field>
+            <field name="res_model">vt.const</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,kanban</field>
+        </record>
+    </data>
+</odoo>
