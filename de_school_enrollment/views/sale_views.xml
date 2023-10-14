@@ -6,11 +6,8 @@
       <field name="inherit_id" ref="sale.view_order_form"/>
       <field name="arch" type="xml">
         <xpath expr="//header" position="inside">
-          <field name="is_enrollment_order" invisible="1"/>
-          <field name="has_pickable_lines" invisible="1"/>
-          <field name="has_returnable_lines" invisible="1"/>
-          <field name="has_late_lines" invisible="1"/>
-          <field name="enroll_status" invisible="1"/>
+          <field name="is_enrol_order" invisible="1"/>
+          <field name="enrol_status" invisible="1"/>
         </xpath>
         
       </field>

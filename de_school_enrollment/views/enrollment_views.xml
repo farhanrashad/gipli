@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Rental orders access -->
+    <!-- Enrollment orders Form View -->
+    <!--
+    <record id="enrol_order_form_view" model="ir.ui.view">
+        <field name="name">enrol.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <form string="Sales Order" class="">
+                <header>
+                </header>
+            </form>
+        </field>
+    </record>
+    -->
 
+    <!-- Inherited view -->
     <record id="enrollment_order_primary_form_view" model="ir.ui.view">
         <field name="name">enrollment.order.form</field>
         <field name="model">sale.order</field>
@@ -14,7 +27,7 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//header" position='inside'>
-                <field name="enroll_status" widget="statusbar" statusbar_visible="draft,pending,confirm"/>
+                <field name="enrol_status" widget="statusbar" statusbar_visible="draft,pending,confirm"/>
             </xpath>
             
             <xpath expr="//field[@name='partner_id']" position="attributes">
@@ -26,8 +39,11 @@
                 <field name="course_id" />
                 <field name="batch_id" />
             </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="domain">[('is_student', '=', True)]</attribute>
+            </xpath>
             
-          <!-- options key for rental app knowledge in the rental configurator -->
+          <!-- options key for Enrollment app knowledge in the enrollment configurator -->
           <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_id']" position='attributes'>
             <attribute name="context">{
                       'partner_id': parent.partner_id,
@@ -37,7 +53,7 @@
                       'company_id': parent.company_id,
                       'default_lst_price': price_unit,
                       'default_description_sale': name,
-                      'rental_products': True,
+                      'fee_product': True,
                   }
             </attribute>
             <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]</attribute>
@@ -55,41 +71,39 @@
                     'company_id': parent.company_id,
                     'default_list_price': price_unit,
                     'default_description_sale': name,
-                    'rental_products': True,
+                    'fee_product': True,
                 }
             </attribute>
-            <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]</attribute>
-            <attribute name="options">{
-              'no_open': True,
-              'rent': True
-            }</attribute>
+            <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id), ('fee_product', '=', True)]</attribute>
           </xpath>
           <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position='attributes'>
-            <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]</attribute>
+            <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id), ('fee_product', '=', True)]</attribute>
           </xpath>
             
             
             <xpath expr="//page[@name='customer_signature']" position="attributes">
                 <attribute name="string">Student Signature</attribute>
             </xpath>
-            
+<!--
+            <xpath expr="//page" position="attributes">
+                <attribute name="attrs">{'invisible': [('name', 'not in', ['order_lines'])]}</attribute>
+            </xpath>
+            -->
         </field>
       </record>
     
     <record id="enrollment_order_view_tree" model="ir.ui.view">
-      <field name="name">rental.order.tree</field>
+      <field name="name">enrol.order.tree</field>
       <field name="model">sale.order</field>
       <field name="arch" type="xml">
-        <tree sample="1" decoration-info="enroll_status in ['draft', 'sent']" decoration-muted="enroll_status == 'cancel'">
-          <field name="has_late_lines" invisible="1"/>
+        <tree sample="1" decoration-info="enrol_status in ['draft', 'sent']" decoration-muted="enrol_status == 'cancel'">
           <field name="name" readonly="1" decoration-bf="1"/>
           <field name="date_order" widget='date'/>
-          <field name="next_action_date" widget='remaining_days' attrs="{'invisible': ['|', ('enroll_status','=','pickup'), ('enroll_status','=','returned')]}"/>
           <field name="partner_id" readonly="1"/>
           <field name="user_id" optional="show" widget='many2one_avatar_user'/>
           <field name="team_id" optional="hide"/>
           <field name="amount_total" sum="Total Tax Included" widget="monetary" decoration-bf="1"/>
-          <field name="enroll_status" widget='badge' decoration-info="enroll_status == 'draft' or enroll_status == 'sent'" decoration-warning="enroll_status == 'pickup'" decoration-success="enroll_status == 'return'"/>
+          <field name="enrol_status" widget='badge' decoration-info="enrol_status == 'draft' or enrol_status == 'sent'" decoration-warning="enrol_status == 'pickup'" decoration-success="enrol_status == 'return'"/>
           <field name="state" invisible="1"/>
           <field name="currency_id" invisible="1"/>
         </tree>
@@ -102,23 +116,24 @@
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <!--
-        <field name="search_view_id" ref="rental_order_view_search"/>
+        <field name="search_view_id" ref="enrol_order_view_search"/>
 -->
-        <field name="domain">[('is_enrollment_order', '=', True)]</field>
-        <field name="context">{'default_is_enrollment_order': 1}</field>
+        <field name="domain">[('is_enrol_order', '=', True)]</field>
+        <field name="context">{'default_is_enrol_order': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create a new quotation, the first step of a new rental!
+                Create a new quotation, the first step of a new Enrollment Contract!
             </p><p>
-                Once the quotation is confirmed, it becomes a rental order.<br/> You will be able to create an invoice and collect the payment.
+                Once the quotation is confirmed, it becomes a Enrollment Contract.<br/> You will be able to create an invoice and collect the payment.
             </p>
         </field>
     </record>
 
+    
     <record id="enrollment_order_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="enrollment_order_primary_form_view"/>
+        <field name="view_id" ref="enrol_order_form_view"/>
         <field name="act_window_id" ref="enrollment_order_action"/>
     </record>
     

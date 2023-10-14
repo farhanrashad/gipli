@@ -46,47 +46,6 @@ class EnrolOrderTemplate(models.Model):
         if companies and self.company_id not in companies:
             self.company_id = companies[0]
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        records = super(EnrolOrderTemplate, self).create(vals_list)
-        records._update_product_translations()
-        return records
-
-    def write(self, vals):
-        if 'active' in vals and not vals.get('active'):
-            companies = self.env['res.company'].sudo().search([('enrol_order_tmpl_id', 'in', self.ids)])
-            companies.enrol_order_tmpl_id = None
-        result = super(EnrolOrderTemplate, self).write(vals)
-        self._update_product_translations()
-        return result
-
-    def _update_product_translations(self):
-        languages = self.env['res.lang'].search([('active', '=', 'true')])
-        for lang in languages:
-            for line in self.enrol_order_tmpl_line:
-                if line.name == line.product_id.get_product_multiline_description_sale():
-                    self.create_or_update_translations(model_name='oe.enrol.order.line,name', lang_code=lang.code,
-                                                       res_id=line.id,src=line.name,
-                                                       value=line.product_id.with_context(lang=lang.code).get_product_multiline_description_sale())
-                    
-    def create_or_update_translations(self, model_name, lang_code, res_id, src, value):
-        data = {
-            'type': 'model',
-            'name': model_name,
-            'lang': lang_code,
-            'res_id': res_id,
-            'src': src,
-            'value': value,
-            'state': 'inprogress',
-        }
-        existing_trans = self.env['ir.translation'].search([('name', '=', model_name),
-                                                            ('res_id', '=', res_id),
-                                                            ('lang', '=', lang_code)])
-        if not existing_trans:
-            self.env['ir.translation'].create(data)
-        else:
-            existing_trans.write(data)
-
 
 
 class EnrolOrderTemplateLine(models.Model):
@@ -139,6 +98,21 @@ class EnrolOrderTemplateLine(models.Model):
             "CHECK(display_type IS NULL OR (product_id IS NULL AND product_uom_qty = 0 AND product_uom_id IS NULL))",
             "Forbidden product, unit price, quantity, and UoM on non-accountable sale quote line"),
     ]
+
+    def _prepare_order_line_values(self):
+        """ Give the values to create the corresponding order line.
+
+        :return: `sale.order.line` create values
+        :rtype: dict
+        """
+        self.ensure_one()
+        return {
+            'display_type': self.display_type,
+            'name': self.name,
+            'product_id': self.product_id.id,
+            'product_uom_qty': self.product_uom_qty,
+            'product_uom': self.product_uom_id.id,
+        }
 
 
 
