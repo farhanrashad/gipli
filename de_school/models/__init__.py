@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from . import res_config_settings
+from . import resource_calendar
 from . import res_company
 from . import academic_year
 from . import student

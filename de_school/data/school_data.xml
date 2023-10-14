@@ -27,6 +27,7 @@
             <field name="name">Standard School Calendar</field>
             <field name="company_id" ref="base.main_company"/>
             <field name="hours_per_day">7.0</field>
+            <field name="is_school_calendar">True</field>
             <field name="attendance_ids"
                 eval="[(5, 0, 0),
                 (0, 0, {'name': 'Monday - Period 1', 'dayofweek': '0', 'hour_from': 9, 'hour_to': 10, 'day_period': 'morning'}),
