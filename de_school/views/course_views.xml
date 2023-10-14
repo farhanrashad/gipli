@@ -62,7 +62,7 @@
                             <field name="grading_type_id" options="{'no_open_create':True}"/>
                             <field name="enable_elective" />
                             <field name="color" widget="color_picker"/>
-                            <field name="sequence_id" />
+                            <field name="sequence_id" readonly="1"/>
                             <field name="company_id" options="{'no_create': True}" />
                         </group>
 						<notebook>
