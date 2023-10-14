@@ -31,7 +31,7 @@ class EnrollmentContract(models.Model):
     course_id = fields.Many2one('oe.school.course', string='Course')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
     
-    sale_order_fees_template_id = fields.Many2one('sale.order.fees.template', 'Fees Template', readonly=True, check_company=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+    enrol_order_tmpl_id = fields.Many2one('oe.enrol.order.template', 'Template', readonly=True, check_company=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
     
     def _compute_line_data_for_template_change(self, line):

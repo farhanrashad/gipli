@@ -22,7 +22,7 @@
             </xpath>
             
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="sale_order_fees_template_id" />
+                <field name="enrol_order_tmpl_id" />
                 <field name="course_id" />
                 <field name="batch_id" />
             </xpath>

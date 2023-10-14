@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="sale_order_fees_template_view_search" model="ir.ui.view">
-        <field name="name">sale.order.fees.template.search</field>
-        <field name="model">sale.order.fees.template</field>
+        <field name="name">enrol.order.template.search</field>
+        <field name="model">oe.enrol.order.template</field>
         <field name="arch" type="xml">
-            <search string="Search Quotation Template">
+            <search string="Search Template">
                 <field name="name"/>
                 <filter string="Archived" name="inactive" domain="[('active','=', False)]"/>
             </search>
         </field>
     </record>
 
-    <record id="sale_order_fees_template_view_form" model="ir.ui.view">
-        <field name="name">sale.order.fees.template.form</field>
-        <field name="model">sale.order.fees.template</field>
+    <record id="enrol_order_template_view_form" model="ir.ui.view">
+        <field name="name">enrol.order.fees.template.form</field>
+        <field name="model">oe.enrol.order.template</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <form string="Fees Template">
+            <form string="Enrolment Template">
                 <sheet>
                     <div name="button_box" class="oe_button_box"/>
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
@@ -37,8 +37,8 @@
                     </group>
                     <notebook name="main_book">
                         <page string="Lines" name="order_lines">
-                        <field name="sale_order_fees_template_line_ids" widget="section_and_note_one2many">
-                            <form string="Fees Template Lines">
+                        <field name="enrol_order_tmpl_line" widget="section_and_note_one2many">
+                            <form string="Template Lines">
                                 <!--
                                     We need the sequence field to be here for new lines to be added at the correct position.
                                     TODO: at some point we want to fix this in the framework so that an invisible field is not required.
@@ -67,7 +67,7 @@
                                     </page>
                                 </notebook>
                             </form>
-                            <tree string="Quotation Template Lines" editable="bottom">
+                            <tree string="Template Lines" editable="bottom">
                                 <control>
                                     <create name="add_product_control" string="Add a product"/>
                                     <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
@@ -104,9 +104,9 @@
         </field>
     </record>
 
-    <record id="sale_order_fees_template_view_tree" model="ir.ui.view">
-        <field name="name">sale.order.fees.template.tree</field>
-        <field name="model">sale.order.fees.template</field>
+    <record id="enrol_order_template_view_tree" model="ir.ui.view">
+        <field name="name">enrol.order.template.tree</field>
+        <field name="model">oe.enrol.order.template</field>
         <field name="type">tree</field>
         <field name="arch" type="xml">
             <tree string="Fees Template">
@@ -115,22 +115,20 @@
         </field>
     </record>
 
-    <record id="sale_order_fees_template_action" model="ir.actions.act_window">
-        <field name="name">Fees Templates</field>
+    <record id="action_enrol_order_template" model="ir.actions.act_window">
+        <field name="name">Enrollment Templates</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">sale.order.fees.template</field>
+        <field name="res_model">oe.enrol.order.template</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your Fees template
+                Create your template
             </p><p>
-                Use templates to create polished, professional quotes in minutes.
-                Send these quotes by email and let your customers sign online.
-                Use cross-selling and discounts to push and boost your sales.
+                The template will use for enrolment of students in different courses with similar charges.
             </p>
         </field>
     </record>
 
-    <menuitem id="sale_order_fees_template_menu" action="sale_order_fees_template_action" parent="menu_school_enrollment_menu_config" sequence="1" name="Fees Templates" groups="group_sale_order_fees_template"/>
+    <menuitem id="enrol_order_template_menu" action="action_enrol_order_template" parent="menu_school_enrollment_menu_config" sequence="1" name="Templates" groups="group_enrol_template"/>
 
 </odoo>
