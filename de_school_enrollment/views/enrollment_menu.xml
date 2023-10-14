@@ -12,7 +12,7 @@
               sequence = "10"
 			groups="group_enrol_user" />
     
-    <menuitem name="Reports" id="menu_school_enrollment_menu_reports"
+    <menuitem name="Reports" id="menu_school_enrol_menu_reports"
 			parent="menu_school_enrollment" 
               sequence = "90"
 			groups="group_enrol_user" />

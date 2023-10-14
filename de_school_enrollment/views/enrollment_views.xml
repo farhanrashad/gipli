@@ -15,7 +15,7 @@
     -->
 
     <!-- Inherited view -->
-    <record id="enrollment_order_primary_form_view" model="ir.ui.view">
+    <record id="enrol_contract_primary_form_view" model="ir.ui.view">
         <field name="name">enrollment.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="de_school_enrollment.enrollment_order_form_view"/>
@@ -133,7 +133,7 @@
     <record id="enrollment_order_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="enrol_order_form_view"/>
+        <field name="view_id" ref="enrol_contract_primary_form_view"/>
         <field name="act_window_id" ref="enrollment_order_action"/>
     </record>
     
