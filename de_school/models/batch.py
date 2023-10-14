@@ -7,15 +7,31 @@ from odoo.exceptions import UserError, AccessError
 class SchoolCourseBatch(models.Model):
     _name = 'oe.school.course.batch'
     _description = 'Course Batch'
-    
+
+    def _default_year_id(self):
+        # Search for the active academic year in oe.school.year
+        active_year = self.env['oe.school.year'].search([('active', '=', True)], limit=1)
+        return active_year.id if active_year else False
+        
     name = fields.Char(string='Batch', required=True, index=True, translate=True)
     course_id = fields.Many2one('oe.school.course', string='Course', required=True)
     subject_ids = fields.Many2many('oe.school.course.subject', compute='_compute_subjects')
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
-    date_start = fields.Date(string='Start Date', required=True)
-    date_end = fields.Date(string='End Date', required=True)
+    year_id = fields.Many2one('oe.school.year', string='Year', required=True, 
+                           default=lambda self: self._default_year_id(),
+                           domain="[('active','=',True)]")
+    date_start = fields.Date(string='Start Date', required=True, readonly=False,
+                             store=True, compute='_compute_date_from_school_year')
+    date_end = fields.Date(string='End Date', required=True, readonly=False,
+                           store=True, compute='_compute_date_from_school_year')
     
     def _compute_subjects(self):
         subject_ids = self.env['oe.school.course.subject'].search([('batch_ids','in', self.id)])
         self.subject_ids = subject_ids.ids
+
+    @api.depends('year_id')
+    def _compute_date_from_school_year(self):
+        for record in self:
+            record.date_start = record.year_id.date_start
+            record.date_end = record.year_id.date_end
     
