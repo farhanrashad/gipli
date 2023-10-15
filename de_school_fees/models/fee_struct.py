@@ -29,19 +29,9 @@ class FeeStructure(models.Model):
     #report_id = fields.Many2one('ir.actions.report', string="Report", domain="[('model','=','hr.feeslip'),('report_type','=','qweb-pdf')]", default=_get_default_report_id)
     feeslip_name = fields.Char(string="Feeslip Name", translate=True,
         help="Name to be set on a feeslip. Example: 'End of the year bonus'. If not set, the default value is 'Fee Slip'")
-    use_enrollment_contract_lines = fields.Boolean(default=True, help="contract lines won't be computed/displayed in fee slips.")
-    schedule_pay = fields.Selection([
-        ('monthly', 'Monthly'),
-        ('quarterly', 'Quarterly'),
-        ('semi-annually', 'Semi-annually'),
-        ('tri-annually', 'Tri-annually'),
-        ('annually', 'Annually'),
-        ('weekly', 'Weekly'),
-        ('bi-weekly', 'Bi-weekly'),
-        ('bi-monthly', 'Bi-monthly'),
-    ], compute='_compute_schedule_pay', store=True, readonly=False,
-    string='Scheduled Pay', index=True,
-    help="Defines the frequency of the wage payment.")
+    use_enrol_contract_lines = fields.Boolean(default=True, help="contract lines won't be computed/displayed in fee slips.")
+    schedule_pay_duration = fields.Integer(string='Schedule Pay', default=1, required=True)
+    pay_one_time = fields.Boolean('One Time Pay')
     input_line_type_ids = fields.Many2many('oe.feeslip.input.type', string='Other Input Line')
     
     # Academic Fields
@@ -49,10 +39,9 @@ class FeeStructure(models.Model):
     batch_ids = fields.Many2many('oe.school.course.batch', string='Course Batches')
 
 
-    #@api.depends('type_id')
-    def _compute_schedule_pay(self):
-        for structure in self:
-            #if not structure.type_id:
-            structure.schedule_pay = 'monthly'
-            #elif not structure.schedule_pay:
-            #structure.schedule_pay = structure.type_id.default_schedule_pay
+    @api.constrains('schedule_pay_duration')
+    def _check_schedule_pay_duration(self):
+        for record in self:
+            if record.schedule_pay_duration <= 0:
+                raise exceptions.ValidationError("Schedule Pay Duration must be greater than 0.")
+                

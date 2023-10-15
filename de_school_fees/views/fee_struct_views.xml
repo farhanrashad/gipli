@@ -60,13 +60,21 @@
                     <group name="fee_details">
                         <field name="active" invisible="1"/>
                         <field name="id" invisible="1"/>
-                        <field name="use_enrollment_contract_lines"/>
+                        <field name="use_enrol_contract_lines"/>
                         <field name="country_id" options="{'no_create': True, 'no_open': True}"/>
                     </group>
                     <group>
                         <field name="course_id" options="{'no_create': True, 'no_open': True}"/>
                         <field name="batch_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"/>
-                        <field name="schedule_pay"/>
+                        <div class="o_td_label" attrs="{'invisible': [('pay_one_time', '=', True)]}">
+                            <label for="schedule_pay_duration" string="Schedule Pay" />
+                        </div>
+                        <div name="schedule_pay_duration" attrs="{'invisible': [('pay_one_time', '=', True)]}">
+                            <span class="ml8">Every </span>
+                            <field name="schedule_pay_duration" nolabel="1" style="width: 8rem;" />
+                            <span class="ml8"> Month(s)</span>
+                        </div>
+                        <field name="pay_one_time" />
                     </group>
                 </group>
                 <notebook colspan="4">
@@ -75,7 +83,6 @@
                          <tree>
                             <field name="name"/>
                             <field name="code"/>
-                             <field name="schedule_pay"/>
                             <field name="category_id"/>
                              <field name="quantity"/>
                              <field name="amount_fix" />

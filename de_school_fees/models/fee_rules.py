@@ -16,18 +16,7 @@ class FeeRule(models.Model):
         help="The code of fee rules can be used as reference in computation of other rules. "
              "In that case, it is case sensitive.")
     fee_struct_id = fields.Many2one('oe.fee.struct', string="Fee Structure", required=True)
-    schedule_pay = fields.Selection([
-        ('monthly', 'Monthly'),
-        ('quarterly', 'Quarterly'),
-        ('semi-annually', 'Semi-annually'),
-        ('tri-annually', 'Tri-annually'),
-        ('annually', 'Annually'),
-        ('weekly', 'Weekly'),
-        ('bi-weekly', 'Bi-weekly'),
-        ('bi-monthly', 'Bi-monthly'),
-        ('one-time', 'One Time'),
-    ], store=True, readonly=False, required=True, default='monthly',
-    string='Frequency', index=True, help="Defines the frequency of fee.")
+    pay_one_time = fields.Boolean('One Time Pay')
     
     sequence = fields.Integer(required=True, index=True, default=5,
         help='Use to arrange calculation sequence')
