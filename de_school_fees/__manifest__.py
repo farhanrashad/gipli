@@ -18,7 +18,7 @@
     'installable': True,
     'application': True,
     # any module necessary for this one to work correctly
-    'depends': ['de_school','account'],
+    'depends': ['de_school','account','de_school_enrollment'],
 
     # always loaded
     'data': [

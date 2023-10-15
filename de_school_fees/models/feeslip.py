@@ -48,6 +48,14 @@ class FeeSlip(models.Model):
         domain="[('is_student', '=', True), ('active', '=', True)]")
     #department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id', readonly=True, store=True)
     #job_id = fields.Many2one('hr.job', string='Job Position', related='employee_id.job_id', readonly=True, store=True)
+
+    enrol_order_domain_ids = fields.Many2many('sale.order', compute='_compute_enrol_contract_domain_ids')
+    enrol_order_id = fields.Many2one(
+        'sale.order', string='Enrol Contract',
+        domain="[('id', 'in', enrol_order_domain_ids)]",
+        store=True, readonly=False,
+        states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+    
     date_from = fields.Date(
         string='From', readonly=True, required=True,
         default=lambda self: fields.Date.to_string(date.today().replace(day=1)), states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
@@ -131,6 +139,16 @@ class FeeSlip(models.Model):
     #)
     #salary_attachment_count = fields.Integer('Salary Attachment count', compute='_compute_salary_attachment_count')
 
+    @api.depends('company_id', 'student_id')
+    def _compute_enrol_contract_domain_ids(self):
+        for feeslip in self:
+            feeslip.enrol_order_domain_ids = self.env['sale.order'].search([
+                ('company_id', '=', feeslip.company_id.id),
+                ('partner_id', '=', feeslip.student_id.id),
+                ('state', '!=', 'cancel'),
+                ])
+            
+            
     @api.depends('student_id', 'fee_struct_id', 'date_from', 'date_to', 'fee_struct_id')
     def _compute_input_line_ids(self):
         attachment_types = self._get_attachment_types()
