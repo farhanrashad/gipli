@@ -11,12 +11,19 @@ class EnrollmentContract(models.Model):
     _inherit = 'sale.order'
 
     is_enrol_order = fields.Boolean("Enrol Order")
+    state = fields.Selection(selection_add=[('enrol', 'Enrol in Progress')])
     enrol_status = fields.Selection([
         ('draft', 'Draft'),
-        ('pending', 'Pending'),
-        ('confirm', 'Enrolled'),
-        ('drop', 'Dropped'),
-        ('cancel', 'Cancelled'),
+        ('submit','Pending Review'), #submitted and is awaiting review by the school or admission office.
+        ('review','Pending Review'), #reviewing the agreement and may request additional information or clarification.
+        ('approved', 'Approved'), # reviewed and approved by the school, indicating that the student is accepted.
+        ('pending', 'Pending Payment'), #accepted, and the agreement is pending payment of any fees or tuition.
+        ('done', 'Enrolled'), #The agreement is marked as done once the student has successfully 
+        ('open', 'Running'), #The student is officially enrolled and attending classes.
+        ('close', 'Close'), #close the contract, student completed the course.
+        ('reject', 'Rejected'), #he school has reviewed the agreement and decided not to accept the student.
+        ('cancel', 'Cancelled'), #student decides not to enroll after initially submitting the agreement,
+        ('expire', 'Expired'), #Some enrollment agreements may have an expiration date, if that date passes without acceptance, the status could be "Expired.
     ], string="Enroll Status", default='draft', store=True)
     # enroll_status = next action to do basically, but shown string is action done.
     
@@ -42,8 +49,38 @@ class EnrollmentContract(models.Model):
             order_lines_data[1][2]['sequence'] = -99
 
         self.order_line = order_lines_data
-    
 
+    #=== CRUD METHODS ===#
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'company_id' in vals:
+                self = self.with_company(vals['company_id'])
+            if vals.get('name', _("New")) == _("New"):
+                if vals.get('is_enrol_order', False):
+                    # Assign a new sequence for enrol orders
+                    seq_date = fields.Datetime.context_timestamp(
+                        self, fields.Datetime.to_datetime(vals.get('date_order')) if 'date_order' in vals else None
+                    )
+                    vals['name'] = self.env['ir.sequence'].next_by_code(
+                        'enrol.order', sequence_date=seq_date) or _("New")
+                    vals['state'] = 'enrol'  # Set the state to 'enrol'
+                else:
+                    # Use the default sequence and state for non-enrol orders
+                    seq_date = fields.Datetime.context_timestamp(
+                        self, fields.Datetime.to_datetime(vals.get('date_order')) if 'date_order' in vals else None
+                    )
+                    vals['name'] = self.env['ir.sequence'].next_by_code(
+                        'sale.order', sequence_date=seq_date) or _("New")
+                    vals['state'] = 'draft'  # Set the state to 'draft' (or another appropriate state)
+
+        return super(SaleOrder, self).create(vals_list)
+
+        
+    # All action Buttons
+    def button_submit(self):
+        pass
+        
 class EnrollmentOrderLine(models.Model):
     _inherit = 'sale.order.line'
 

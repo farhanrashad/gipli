@@ -30,6 +30,11 @@
         'views/enrollment_views.xml',
         'reports/enrol_report_views.xml',
     ],
+    'assets': {
+       'web.assets_backend': [
+           'de_school_enrollment/static/src/js/sale_order_hide_button.js',
+       ],
+    },
     'demo': [
         'demo/demo.xml',
     ],
