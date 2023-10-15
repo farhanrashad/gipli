@@ -81,6 +81,9 @@
                 <field name="state" widget="statusbar" statusbar_visible="draft,done,paid"/>
             </header>
             <sheet>
+                <!-- invisible Feilds -->
+                <field name="enrol_order_domain_ids" invisible="1" />
+                
                 <div class="oe_button_box" name="button_box">
                     <button type="object" class="oe_stat_button" id="open_work_entries"
                         icon="fa-calendar" name="action_open_work_entries" string="Work Entries">
@@ -112,7 +115,8 @@
                     <!--
                         <field name="feeslip_run_id" string="Batch"/>
 -->
-                        <field name="fee_struct_id" required="1"/>
+                        <field name="fee_struct_id" required="1" options="{'no_create': True}"/>
+                        <field name="enrol_order_id" required="1" options="{'no_create': True}"/>
                     <!--
                     <field name="salary_attachment_ids" invisible="1" force_save="1"/>
 -->

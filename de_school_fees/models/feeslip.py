@@ -145,7 +145,8 @@ class FeeSlip(models.Model):
             feeslip.enrol_order_domain_ids = self.env['sale.order'].search([
                 ('company_id', '=', feeslip.company_id.id),
                 ('partner_id', '=', feeslip.student_id.id),
-                ('state', '!=', 'cancel'),
+                ('enrol_status', '!=', 'open'),
+                ('is_enrol_order','=',True),
                 ])
             
             
