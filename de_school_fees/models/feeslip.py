@@ -101,9 +101,7 @@ class FeeSlip(models.Model):
         string='Made Payment Order ? ', readonly=True, copy=False,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     note = fields.Text(string='Internal Note', readonly=True, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
-    #contract_id = fields.Many2one( 'hr.contract', string='Contract', domain="[('company_id', '=', company_id)]",
-    #    compute='_compute_contract_id', store=True, readonly=False,
-    #    states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+   
     credit_note = fields.Boolean(
         string='Credit Note', readonly=True,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]},
@@ -175,7 +173,7 @@ class FeeSlip(models.Model):
                     #    summary=_('Previous Negative feeslip to Report'),
                     #    note=_('At least one previous negative net could be reported on this feeslip for <a href="#" data-oe-model="%s" data-oe-id="%s">%s</a>') % (
                     #        feeslip.student_id._name, feeslip.student_id.id, feeslip.student_id.display_name),
-                        #user_id=feeslip.contract_id.hr_responsible_id.id or self.env.ref('base.user_admin').id)
+                        #user_id=feeslip.enrol_order_id.hr_responsible_id.id or self.env.ref('base.user_admin').id)
             else:
                 feeslip.negative_net_to_report_display = False
                 feeslip.negative_net_to_report_amount = False
@@ -232,12 +230,12 @@ class FeeSlip(models.Model):
         for feeslip in self:
             feeslip.sum_worked_hours = sum([line.number_of_hours for line in feeslip.worked_days_line_ids])
 
-    #@api.depends('contract_id')
+    @api.depends('enrol_order_id')
     def _compute_normal_wage(self):
-        with_contract = self.filtered('contract_id')
-        (self - with_contract).normal_wage = 0
-        for feeslip in with_contract:
-            feeslip.normal_wage = feeslip._get_contract_wage()
+        with_enrol_order = self.filtered('enrol_order_id')
+        (self - with_enrol_order).normal_wage = 0
+        for feeslip in with_enrol_order:
+            feeslip.normal_wage = feeslip._get_enrol_order_wage()
 
     def _compute_is_superuser(self):
         self.update({'is_superuser': self.env.user._is_superuser() and self.user_has_groups("base.group_no_one")})
@@ -250,7 +248,7 @@ class FeeSlip(models.Model):
                 ('student_id', '=', feeslip.student_id.id),
                 ('date_from', '=', feeslip.date_from),
                 ('date_to', '=', feeslip.date_to),
-                #('contract_id', '=', feeslip.contract_id.id),
+                #('enrol_order_id', '=', feeslip.enrol_order_id.id),
                 ('fee_struct_id', '=', feeslip.struct_id.id),
                 ('credit_note', '=', True),
                 ('state', '!=', 'cancel'),
@@ -321,10 +319,10 @@ class FeeSlip(models.Model):
         self.env['ir.attachment'].sudo().create(attachments_vals_list)
 
     def action_feeslip_done(self):
-        invalid_feeslips = self.filtered(lambda p: p.contract_id and (p.contract_id.date_start > p.date_to or (p.contract_id.date_end and p.contract_id.date_end < p.date_from)))
+        invalid_feeslips = self.filtered(lambda p: p.enrol_order_id and (p.enrol_order_id.date_start > p.date_to or (p.enrol_order_id.date_end and p.enrol_order_id.date_end < p.date_from)))
         if invalid_feeslips:
-            raise ValidationError(_('The following employees have a contract outside of the feeslip period:\n%s', '\n'.join(invalid_feeslips.mapped('student_id.name'))))
-        if any(slip.contract_id.state == 'cancel' for slip in self):
+            raise ValidationError(_('The following employees have a enrol order outside of the feeslip period:\n%s', '\n'.join(invalid_feeslips.mapped('student_id.name'))))
+        if any(slip.enrol_order_id.state == 'cancel' for slip in self):
             raise ValidationError(_('You cannot valide a feeslip on which the contract is cancelled'))
         if any(slip.state == 'cancel' for slip in self):
             raise ValidationError(_("You can't validate a cancelled feeslip."))
@@ -452,17 +450,17 @@ class FeeSlip(models.Model):
 
     def _get_worked_day_lines_hours_per_day(self):
         self.ensure_one()
-        return self.contract_id.resource_calendar_id.hours_per_day
+        return self.enrol_order_id.resource_calendar_id.hours_per_day
 
-    def _get_out_of_contract_calendar(self):
+    def _get_out_of_enrol_order_calendar(self):
         self.ensure_one()
-        return self.contract_id.resource_calendar_id
+        return self.enrol_order_id.resource_calendar_id
 
     def _get_worked_day_lines_values(self, domain=None):
         self.ensure_one()
         res = []
         hours_per_day = self._get_worked_day_lines_hours_per_day()
-        work_hours = self.contract_id._get_work_hours(self.date_from, self.date_to, domain=domain)
+        work_hours = self.enrol_order_id._get_work_hours(self.date_from, self.date_to, domain=domain)
         work_hours_ordered = sorted(work_hours.items(), key=lambda x: x[1])
         biggest_work = work_hours_ordered[-1][0] if work_hours_ordered else 0
         add_days_rounding = 0
@@ -482,39 +480,39 @@ class FeeSlip(models.Model):
             res.append(attendance_line)
         return res
 
-    def _get_worked_day_lines(self, domain=None, check_out_of_contract=True):
+    def _get_worked_day_lines(self, domain=None, check_out_of_enrol_order=True):
         """
         :returns: a list of dict containing the worked days values that should be applied for the given feeslip
         """
         res = []
-        # fill only if the contract as a working schedule linked
+        # fill only if the Enrol Order as a working schedule linked
         self.ensure_one()
         if self:
-        #contract = self.contract_id
-        #if contract.resource_calendar_id:
+            enrol_order = self.enrol_order_id
+        #if enrol_order.resource_calendar_id:
         #    res = self._get_worked_day_lines_values(domain=domain)
-        #    if not check_out_of_contract:
+        #    if not check_out_of_enrol_order:
         #        return res
 
-            # If the contract doesn't cover the whole month, create
+            # If the Enrol Order doesn't cover the whole month, create
             # worked_days lines to adapt the wage accordingly
             out_days, out_hours = 0, 0
-            reference_calendar = self._get_out_of_contract_calendar()
-            if self.date_from < contract.date_start:
+            reference_calendar = self._get_out_of_enrol_order_calendar()
+            if self.date_from < enrol_order.date_start:
                 start = fields.Datetime.to_datetime(self.date_from)
-                stop = fields.Datetime.to_datetime(contract.date_start) + relativedelta(days=-1, hour=23, minute=59)
+                stop = fields.Datetime.to_datetime(enrol_order.date_start) + relativedelta(days=-1, hour=23, minute=59)
                 out_time = reference_lm96y6y8b ;calendar.get_work_duration_data(start, stop, compute_leaves=False, domain=['|', ('work_entry_type_id', '=', False), ('work_entry_type_id.is_leave', '=', False)])
                 out_days += out_time['days']
                 out_hours += out_time['hours']
-            if contract.date_end and contract.date_end < self.date_to:
-                start = fields.Datetime.to_datetime(contract.date_end) + relativedelta(days=1)
+            if enrol_order.date_end and enrol_order.date_end < self.date_to:
+                start = fields.Datetime.to_datetime(enrol_order.date_end) + relativedelta(days=1)
                 stop = fields.Datetime.to_datetime(self.date_to) + relativedelta(hour=23, minute=59)
                 out_time = reference_calendar.get_work_duration_data(start, stop, compute_leaves=False, domain=['|', ('work_entry_type_id', '=', False), ('work_entry_type_id.is_leave', '=', False)])
                 out_days += out_time['days']
                 out_hours += out_time['hours']
 
             if out_days or out_hours:
-                work_entry_type = self.env.ref('hr_payroll.hr_work_entry_type_out_of_contract')
+                work_entry_type = self.env.ref('hr_payroll.hr_work_entry_type_out_of_enrol_order')
                 res.append({
                     'sequence': work_entry_type.sequence,
                     'work_entry_type_id': work_entry_type.id,
@@ -535,7 +533,7 @@ class FeeSlip(models.Model):
         inputs_dict = {line.code: line for line in self.input_line_ids if line.code}
 
         student = self.student_id
-        #contract = self.contract_id
+        enrol_order = self.enrol_order_id
 
         localdict = {
             **self._get_base_local_dict(),
@@ -546,7 +544,7 @@ class FeeSlip(models.Model):
                 #'worked_days': WorkedDays(employee.id, worked_days_dict, self.env),
                 'inputs': InputLine(student.id, inputs_dict, self.env),
                 'student': student,
-                #'contract': contract,
+                'enrol_order': enrol_order,
                 'result_rules': ResultRules(student.id, {}, self.env)
             }
         }
@@ -617,7 +615,7 @@ class FeeSlip(models.Model):
                     'name': rule_name,
                     'note': html2plaintext(rule.note),
                     'fee_rule_id': rule.id,
-                    #'contract_id': localdict['contract'].id,
+                    #'enrol_order_id': localdict['enrol_order'].id,
                     'student_id': localdict['student'].id,
                     'amount': amount,
                     'quantity': qty,
@@ -632,21 +630,21 @@ class FeeSlip(models.Model):
             slip.company_id = slip.student_id.company_id
 
     @api.depends('student_id', 'date_from', 'date_to')
-    def _compute_contract_id(self):
+    def _compute_enrol_order_id(self):
         for slip in self:
             if not slip.student_id or not slip.date_from or not slip.date_to:
-                slip.contract_id = False
+                slip.enrol_order_id = False
                 continue
-            # Add a default contract if not already defined or invalid
-            if slip.contract_id and slip.student_id == slip.contract_id.student_id:
+            # Add a default enrol_order if not already defined or invalid
+            if slip.enrol_order_id and slip.student_id == slip.enrol_order_id.student_id:
                 continue
-            contracts = False #slip.student_id._get_contracts(slip.date_from, slip.date_to)
-            slip.contract_id = contracts[0] if contracts else False
+            enrol_orders = False #slip.student_id._get_enrol_orders(slip.date_from, slip.date_to)
+            slip.enrol_order_id = enrol_orders[0] if enrol_orders else False
 
     @api.depends('enrol_order_id','student_id')
     def _compute_struct_id(self):
         for slip in self.filtered(lambda p: not p.fee_struct_id):
-            slip.fee_struct_id = False #slip.contract_id.structure_type_id.default_struct_id
+            slip.fee_struct_id = False #slip.enrol_order_id.structure_type_id.default_struct_id
 
     @api.depends('student_id', 'fee_struct_id', 'date_from')
     def _compute_name(self):
@@ -860,14 +858,14 @@ class FeeSlip(models.Model):
             "url": "/debug/feeslip/%s" % self.id,
         }
 
-    def _get_contract_wage(self):
+    def _get_enrol_order_wage(self):
         self.ensure_one()
-        return self.contract_id._get_contract_wage()
+        return self.enrol_order_id._get_enrol_order_wage()
 
     def _get_paid_amount(self):
         self.ensure_one()
         if not self.worked_days_line_ids:
-            return self._get_contract_wage()
+            return self._get_enrol_order_wage()
         total_amount = 0
         for line in self.worked_days_line_ids:
             total_amount += line.amount
@@ -875,13 +873,13 @@ class FeeSlip(models.Model):
 
     def _get_unpaid_amount(self):
         self.ensure_one()
-        return self._get_contract_wage() - self._get_paid_amount()
+        return self._get_enrol_order_wage() - self._get_paid_amount()
 
-    def _is_outside_contract_dates(self):
+    def _is_outside_enrol_order_dates(self):
         self.ensure_one()
         feeslip = self
-        #contract = self.contract_id
-        return contract.date_start > feeslip.date_to or (contract.date_end and contract.date_end < feeslip.date_from)
+        #enrol_order = self.enrol_order_id
+        return enrol_order.date_start > feeslip.date_to or (enrol_order.date_end and enrol_order.date_end < feeslip.date_from)
 
     def _get_data_files_to_update(self):
         # Note: Use lists as modules/files order should be maintained
@@ -909,7 +907,7 @@ class FeeSlip(models.Model):
                 'name': line.name,
                 'note': line.note,
                 'salary_rule_id': line.salary_rule_id.id,
-                'contract_id': line.contract_id.id,
+                'enrol_order_id': line.enrol_order_id.id,
                 'student_id': line.student_id.id,
                 'amount': line.amount,
                 'quantity': line.quantity,
