@@ -95,7 +95,7 @@ class FeeSlip(models.Model):
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
     input_line_ids = fields.One2many(
         'oe.feeslip.input.line', 'feeslip_id', string='Feeslip Inputs', store=True,
-        #compute='_compute_input_line_ids', 
+        compute='_compute_input_line_ids', 
         readonly=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
     paid = fields.Boolean(
         string='Made Payment Order ? ', readonly=True, copy=False,
@@ -153,65 +153,7 @@ class FeeSlip(models.Model):
             feeslip.enrol_order_id = enrol_order_ids
             
             
-    @api.depends('student_id', 'fee_struct_id', 'date_from', 'date_to', 'fee_struct_id')
-    def _compute_input_line_ids(self):
-        attachment_types = self._get_attachment_types()
-        attachment_type_ids = [f.id for f in attachment_types.values()]
-        for slip in self:
-            if not slip.student_id or not slip.employee_id.salary_attachment_ids or not slip.fee_struct_id:
-                lines_to_remove = slip.input_line_ids.filtered(lambda x: x.input_type_id.id in attachment_type_ids)
-                slip.update({'input_line_ids': [Command.unlink(line.id) for line in lines_to_remove]})
-            if slip.employee_id.salary_attachment_ids:
-                lines_to_keep = slip.input_line_ids.filtered(lambda x: x.input_type_id.id not in attachment_type_ids)
-                input_line_vals = [Command.clear()] + [Command.link(line.id) for line in lines_to_keep]
-
-                valid_attachments = slip.employee_id.salary_attachment_ids.filtered(
-                    lambda a: a.state == 'open' and a.date_start <= slip.date_to
-                )
-
-                # Only take deduction types present in structure
-                deduction_types = list(set(valid_attachments.mapped('deduction_type')))
-                struct_deduction_lines = list(set(slip.fee_struct_id.rule_ids.mapped('code')))
-                included_deduction_types = [f for f in deduction_types if attachment_types[f].code in struct_deduction_lines]
-                for deduction_type in included_deduction_types:
-                    if not slip.fee_struct_id.rule_ids.filtered(lambda r: r.active and r.code == attachment_types[deduction_type].code):
-                        continue
-                    attachments = valid_attachments.filtered(lambda a: a.deduction_type == deduction_type)
-                    amount = sum(attachments.mapped('active_amount'))
-                    name = ', '.join(attachments.mapped('description'))
-                    input_type_id = attachment_types[deduction_type].id
-                    input_line_vals.append(Command.create({
-                        'name': name,
-                        'amount': amount,
-                        'input_type_id': input_type_id,
-                    }))
-                slip.update({'input_line_ids': input_line_vals})
-
-    #@api.depends('input_line_ids.input_type_id', 'input_line_ids')
-    def _compute_salary_attachment_ids(self):
-        attachment_types = self._get_attachment_types()
-        for slip in self:
-            if not slip.input_line_ids and not slip.salary_attachment_ids:
-                continue
-            attachments = self.env['hr.salary.attachment']
-            if slip.employee_id and slip.input_line_ids:
-                input_line_type_ids = slip.input_line_ids.mapped('input_type_id.id')
-                deduction_types = [f for f in attachment_types if attachment_types[f].id in input_line_type_ids]
-                attachments = slip.employee_id.salary_attachment_ids.filtered(
-                    lambda a: (
-                        a.state == 'open'
-                        and a.deduction_type in deduction_types
-                        and a.date_start <= slip.date_to
-                    )
-                )
-            slip.salary_attachment_ids = attachments
-
-    @api.depends('salary_attachment_ids')
-    def _compute_salary_attachment_count(self):
-        for slip in self:
-            slip.salary_attachment_count = len(slip.salary_attachment_ids)
-
-
+    
     @api.depends('student_id', 'state')
     def _compute_negative_net_to_report_display(self):
         activity_type = False #self.env.ref('hr_payroll.mail_activity_data_hr_feeslip_negative_net')
@@ -765,7 +707,8 @@ class FeeSlip(models.Model):
                 'name': line.name,
                 #'quantity': line.product_uom_qty,
                 'sequence': 10,
-                'code': 'code',
+                'product_id': line.product_id.id,
+                'code': line.product_id.default_code,
                 'amount': line.price_total,
                 'quantity': line.product_uom_qty,
                 'price_unit': line.price_unit,
@@ -773,19 +716,46 @@ class FeeSlip(models.Model):
             }) for line in sale_order_lines]
 
             return enrol_order_line_data
-
         return []
+
         
-        for sale_line in self.enrol_order_id.order_line:
-            existing_order_line = self.env['oe.feeslip.enrol.order.line'].search([('feeslip_id', '=', self.id)])
-            if existing_order_line:
-                existing_order_line.unlink()
-            self.env['oe.feeslip.enrol.order.line'].create({
-                'name': sale_line.product_id.name,
-                'feeslip_id': self.id,
+    @api.depends('student_id', 'fee_struct_id')
+    def _compute_input_line_ids(self):
+        valid_slips = self.filtered(lambda p: p.student_id and p.fee_struct_id)
+        if not valid_slips:
+            return
+        # Make sure to reset invalid payslip's worked days line
+        self.update({'input_line_ids': [(5, 0, 0)]})
+        if not valid_slips:
+            return
+
+        for slip in valid_slips:
+            #if not slip.struct_id.use_worked_day_lines:
+            #    continue
+            # YTI Note: We can't use a batched create here as the payslip may not exist
+            slip.update({'input_line_ids': slip._get_new_input_lines()})
+
+    def _get_new_input_lines(self):
+        # Retrieve the related sale.order
+        struct_id = self.fee_struct_id
+        if struct_id:
+            # Get the sale.order lines related to the sale.order
+            other_lines = struct_id.input_line_type_ids
+
+            # You may want to filter or modify the sale_order_lines based on your specific criteria
+            # In this example, we're including all lines.
+            
+            # Create a list of tuples for updating the enrol_order_line_ids field
+            other_line_data = [(0, 0, {
+                'name': line.name,
                 'sequence': 10,
-                'code': 'test',
-            })
+                'input_type_id': line.id,
+                'code': line.code,
+               
+            }) for line in other_lines]
+
+            return other_line_data
+        return []
 
 
     def _get_salary_line_total(self, code):

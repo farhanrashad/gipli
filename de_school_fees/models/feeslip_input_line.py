@@ -16,6 +16,6 @@ class FeeslipInput(models.Model):
     _allowed_input_type_ids = fields.Many2many('oe.feeslip.input.type', related='feeslip_id.fee_struct_id.input_line_type_ids')
     code = fields.Char(related='input_type_id.code', required=True, help="The code that can be used in the salary rules")
     amount = fields.Float(
-        string="Count",
+        string="Amount",
         help="It is used in computation. E.g. a rule for salesmen having 1%% commission of basic salary per product can defined in expression like: result = inputs.SALEURO.amount * contract.wage * 0.01.")
     #contract_id = fields.Many2one('hr.contract', string='Contract', required=True, help="The contract this input should be applied to")
