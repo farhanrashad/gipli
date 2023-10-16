@@ -16,6 +16,8 @@
 			parent="menu_school_fees" 
               sequence = "20"
 			 />
+
+    <menuitem id="menu_feeslip_schedule_menu" name="Schedule" sequence="30" parent="menu_school_fees"/>
     
     <menuitem name="Reports" id="menu_school_fees_menu_reports"
 			parent="menu_school_fees" 

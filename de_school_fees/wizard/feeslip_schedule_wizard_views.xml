@@ -1,0 +1,40 @@
+<odoo>
+    <data>
+        <!-- Define a form view for APLPeopleSearchWizard -->
+        <record id="feeslip_schedule_wizard_form_view" model="ir.ui.view">
+            <field name="name">feeslip.schedule.wizard.form.view</field>
+            <field name="model">oe.feeslip.schedule.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="course_id" options="{'no_create': True}"/>
+                            </group>
+                            <group>
+                               
+                            </group>
+                        </group>
+                        <footer>
+                            <button name="action_schedule" string="Schedule Fees" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Define an action to open the form view -->
+        <record id="action_feeslip_schedule_wizard" model="ir.actions.act_window">
+            <field name="name">Fee Schedules</field>
+            <field name="res_model">oe.feeslip.schedule.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="feeslip_schedule_wizard_form_view"/>
+        </record>
+
+        <!-- Create a menu item to access the wizard -->
+        
+        <menuitem id="menu_feeslip_schedule_wizard" name="Generate Schedules" parent="menu_feeslip_schedule_menu" action="action_feeslip_schedule_wizard"/>
+    </data>
+</odoo>

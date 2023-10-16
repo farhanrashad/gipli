@@ -23,4 +23,9 @@ access_feeslip_run_manager,access.feeslip.run.manager,model_oe_feeslip_run,accou
 
 access_feeslip_students,access.feeslip.students,model_oe_feeslip_students,account.group_account_manager,1,1,1,0
 
+access_feeslip_schedule_wizard_user,access.feeslip.schedule.wizard.user,model_oe_feeslip_schedule_wizard,account.group_account_invoice,1,1,1,1
+
+access_feeslip_schedule_user,access.feeslip.schedule.user,model_oe_feeslip_schedule,account.group_account_invoice,1,1,1,1
+
+
 
