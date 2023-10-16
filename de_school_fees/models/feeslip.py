@@ -46,9 +46,7 @@ class FeeSlip(models.Model):
         'res.partner', string='Student', required=True, readonly=True,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]},
         domain="[('is_student', '=', True), ('active', '=', True)]")
-    #department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id', readonly=True, store=True)
-    #job_id = fields.Many2one('hr.job', string='Job Position', related='employee_id.job_id', readonly=True, store=True)
-
+    
     enrol_order_id = fields.Many2one(
         'sale.order', string='Enrol Contract',
         #domain=lambda self: self._compute_enrol_order_domain(),
@@ -110,19 +108,9 @@ class FeeSlip(models.Model):
     feeslip_run_id = fields.Many2one('oe.feeslip.run', string='Batch Name', readonly=True,
     copy=False, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]}, ondelete='cascade',
     domain="[('company_id', '=', company_id)]")
-    sum_worked_hours = fields.Float(compute='_compute_worked_hours', store=True, help='Total hours of attendance and time off (paid or not)')
-    # YTI TODO: normal_wage to be removed
-    normal_wage = fields.Integer(compute='_compute_normal_wage', store=True)
     compute_date = fields.Date('Computed On')
-    basic_wage = fields.Monetary(compute='_compute_basic_net')
-    net_wage = fields.Monetary(compute='_compute_basic_net')
     currency_id = fields.Many2one('res.currency',string='Currency')
-    warning_message = fields.Char(compute='_compute_warning_message', store=True, readonly=False)
-    is_regular = fields.Boolean(compute='_compute_is_regular')
-    has_negative_net_to_report = fields.Boolean()
-    negative_net_to_report_display = fields.Boolean(compute='_compute_negative_net_to_report_display')
-    negative_net_to_report_message = fields.Char(compute='_compute_negative_net_to_report_display')
-    negative_net_to_report_amount = fields.Float(compute='_compute_negative_net_to_report_display')
+    
     is_superuser = fields.Boolean(compute="_compute_is_superuser")
     edited = fields.Boolean()
     queued_for_pdf = fields.Boolean(default=False)
@@ -150,61 +138,6 @@ class FeeSlip(models.Model):
             enrol_order_ids = self.env['sale.order'].search(domain)
             feeslip.enrol_order_id = enrol_order_ids
             
-            
-    
-    @api.depends('student_id', 'state')
-    def _compute_negative_net_to_report_display(self):
-        activity_type = False #self.env.ref('hr_payroll.mail_activity_data_hr_feeslip_negative_net')
-        for feeslip in self:
-            if feeslip.state in ['draft', 'verify']:
-                feeslips_to_report = self.env['oe.feeslip'].search([
-                    ('has_negative_net_to_report', '=', True),
-                    ('student_id', '=', feeslip.student_id.id),
-                    ('credit_note', '=', False),
-                ])
-                feeslip.negative_net_to_report_display = feeslips_to_report
-                feeslip.negative_net_to_report_amount = feeslips_to_report._get_line_values(['NET'], compute_sum=True)['NET']['sum']['total']
-                feeslip.negative_net_to_report_message = _(
-                    'Note: There are previous feeslips with a negative amount for a total of %s to report.',
-                    round(feeslip.negative_net_to_report_amount, 2))
-                #if feeslips_to_report and feeslip.state == 'verify' and not feeslip.activity_ids.filtered(lambda a: a.activity_type_id == activity_type):
-                    #feeslip.activity_schedule(
-                    #    'hr_payroll.mail_activity_data_hr_feeslip_negative_net',
-                    #    summary=_('Previous Negative feeslip to Report'),
-                    #    note=_('At least one previous negative net could be reported on this feeslip for <a href="#" data-oe-model="%s" data-oe-id="%s">%s</a>') % (
-                    #        feeslip.student_id._name, feeslip.student_id.id, feeslip.student_id.display_name),
-                        #user_id=feeslip.enrol_order_id.hr_responsible_id.id or self.env.ref('base.user_admin').id)
-            else:
-                feeslip.negative_net_to_report_display = False
-                feeslip.negative_net_to_report_amount = False
-                feeslip.negative_net_to_report_message = False
-
-    def _get_negative_net_input_type(self):
-        self.ensure_one()
-        return self.env.ref('hr_payroll.input_deduction')
-
-    def action_report_negative_amount(self):
-        self.ensure_one()
-        deduction_input_type = self._get_negative_net_input_type()
-        deduction_input_line = self.input_line_ids.filtered(lambda l: l.input_type_id == deduction_input_type)
-        if deduction_input_line:
-            deduction_input_line.amount += abs(self.negative_net_to_report_amount)
-        else:
-            self.write({'input_line_ids': [(0, 0, {
-                'input_type_id': deduction_input_type.id,
-                'amount': abs(self.negative_net_to_report_amount),
-            })]})
-            self.compute_sheet()
-        self.env['oe.feeslip'].search([
-            ('has_negative_net_to_report', '=', True),
-            ('student_id', '=', self.student_id.id),
-            ('credit_note', '=', False),
-        ]).write({'has_negative_net_to_report': False})
-        self.activity_feedback(['hr_payroll.mail_activity_data_hr_feeslip_negative_net'])
-
-    def _compute_is_regular(self):
-        for slip in self:
-            slip.is_regular = slip.fee_struct_id.type_id.default_struct_id == slip.fee_struct_id
 
     def _is_invalid(self):
         self.ensure_one()
@@ -212,30 +145,12 @@ class FeeSlip(models.Model):
             return _("This feeslip is not validated. This is not a legal document.")
         return False
 
-    #@api.depends('worked_days_line_ids', 'input_line_ids')
+    @api.depends('enrol_order_line_ids', 'input_line_ids')
     def _compute_line_ids(self):
         if not self.env.context.get("feeslip_no_recompute"):
             return
         for feeslip in self.filtered(lambda p: p.line_ids and p.state in ['draft', 'verify']):
             feeslip.line_ids = [(5, 0, 0)] + [(0, 0, line_vals) for line_vals in feeslip._get_feeslip_lines()]
-
-    def _compute_basic_net(self):
-        line_values = (self._origin)._get_line_values(['BASIC', 'NET'])
-        for feeslip in self:
-            feeslip.basic_wage = line_values['BASIC'][feeslip._origin.id]['total']
-            feeslip.net_wage = line_values['NET'][feeslip._origin.id]['total']
-
-    #@api.depends('worked_days_line_ids.number_of_hours', 'worked_days_line_ids.is_paid')
-    def _compute_worked_hours(self):
-        for feeslip in self:
-            feeslip.sum_worked_hours = sum([line.number_of_hours for line in feeslip.worked_days_line_ids])
-
-    @api.depends('enrol_order_id')
-    def _compute_normal_wage(self):
-        with_enrol_order = self.filtered('enrol_order_id')
-        (self - with_enrol_order).normal_wage = 0
-        for feeslip in with_enrol_order:
-            feeslip.normal_wage = feeslip._get_enrol_order_wage()
 
     def _compute_is_superuser(self):
         self.update({'is_superuser': self.env.user._is_superuser() and self.user_has_groups("base.group_no_one")})
@@ -660,18 +575,6 @@ class FeeSlip(models.Model):
                 'dates': format_date(self.env, slip.date_from, date_format="MMMM y", lang_code=lang)
             }
 
-    @api.depends('date_to')
-    def _compute_warning_message(self):
-        for slip in self.filtered(lambda p: p.date_to):
-            if slip.date_to > date_utils.end_of(fields.Date.today(), 'month'):
-                slip.warning_message = _(
-                    "This feeslip can be erroneous! Work entries may not be generated for the period from %(start)s to %(end)s.",
-                    start=date_utils.add(date_utils.end_of(fields.Date.today(), 'month'), days=1),
-                    end=slip.date_to,
-                )
-            else:
-                slip.warning_message = False
-
     @api.depends('student_id', 'enrol_order_id')
     def _compute_enrol_order_line_ids(self):
         valid_slips = self.filtered(lambda p: p.student_id)
@@ -818,22 +721,6 @@ class FeeSlip(models.Model):
                 result[code][feeslip_id][vals] += row[vals]
         return result
 
-    def _get_worked_days_line_amount(self, code):
-        wds = self.worked_days_line_ids.filtered(lambda wd: wd.code == code)
-        return sum([wd.amount for wd in wds])
-
-    def _get_worked_days_line_number_of_hours(self, code):
-        wds = self.worked_days_line_ids.filtered(lambda wd: wd.code == code)
-        return sum([wd.number_of_hours for wd in wds])
-
-    def _get_worked_days_line_number_of_days(self, code):
-        wds = self.worked_days_line_ids.filtered(lambda wd: wd.code == code)
-        return sum([wd.number_of_days for wd in wds])
-
-    def _get_input_line_amount(self, code):
-        lines = self.input_line_ids.filtered(lambda line: line.code == code)
-        return sum([line.amount for line in lines])
-
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super().fields_view_get(view_id, view_type, toolbar, submenu)
@@ -855,24 +742,6 @@ class FeeSlip(models.Model):
             "type": "ir.actions.act_url",
             "url": "/debug/feeslip/%s" % self.id,
         }
-
-    def _get_enrol_order_wage(self):
-        self.ensure_one()
-        return self.enrol_order_id.amount_total
-        #return self.enrol_order_id._get_enrol_order_wage()
-
-    def _get_paid_amount(self):
-        self.ensure_one()
-        if not self.worked_days_line_ids:
-            return self._get_enrol_order_wage()
-        total_amount = 0
-        for line in self.worked_days_line_ids:
-            total_amount += line.amount
-        return total_amount
-
-    def _get_unpaid_amount(self):
-        self.ensure_one()
-        return self._get_enrol_order_wage() - self._get_paid_amount()
 
     def _is_outside_enrol_order_dates(self):
         self.ensure_one()
