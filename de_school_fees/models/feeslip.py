@@ -529,7 +529,7 @@ class FeeSlip(models.Model):
 
     def _get_localdict(self):
         self.ensure_one()
-        Order_fee_lines_dict = {line.code: line for line in self.enrol_order_line_ids if line.code}
+        order_fee_lines_dict = {line.code: line for line in self.enrol_order_line_ids if line.code}
         inputs_dict = {line.code: line for line in self.input_line_ids if line.code}
 
         student = self.student_id
@@ -858,7 +858,8 @@ class FeeSlip(models.Model):
 
     def _get_enrol_order_wage(self):
         self.ensure_one()
-        return self.enrol_order_id._get_enrol_order_wage()
+        return self.enrol_order_id.amount_total
+        #return self.enrol_order_id._get_enrol_order_wage()
 
     def _get_paid_amount(self):
         self.ensure_one()

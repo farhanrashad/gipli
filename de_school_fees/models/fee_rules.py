@@ -68,17 +68,17 @@ result = rules.NET > categories.NET * 0.10''',
         default='''
                     # Available variables:
                     #----------------------
-                    # payslip: object containing the payslips
-                    # employee: hr.employee object
-                    # contract: hr.contract object
+                    # feeslip: object containing the feeslips - oe.feeslip
+                    # student: res.partner object
+                    # enrol_order: sale.order object for enrollment contract
                     # rules: object containing the rules code (previously computed)
                     # categories: object containing the computed fee rule categories (sum of amount of all rules belonging to that category).
-                    # worked_days: object containing the computed worked days.
-                    # inputs: object containing the computed inputs.
+                    # inputfee: object containing the computed inputs.
+                    # order_fee: object containing the fee line of student enrollment contract
 
                     # Note: returned value have to be set in the variable 'result'
 
-                    result = contract.wage * 0.10''')
+                    result = enrol_order.amount_total * 0.10''')
     amount_percentage_base = fields.Char(string='Percentage based on', help='result will be affected to a variable')
     partner_id = fields.Many2one('res.partner', string='Partner',
         help="Eventual third party involved in the fee payment of the employees.")
