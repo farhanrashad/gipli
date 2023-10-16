@@ -27,21 +27,19 @@ class FeeslipScheduleWizard(models.TransientModel):
             record.date_start = record.batch_id.date_start
             record.date_end = record.batch_id.date_end
 
-    @api.depends('date_start', 'date_end', 'fee_struct_id','fee_struct_id.schedule_pay_duration')
+    @api.depends('date_start', 'date_end', 'fee_struct_id')
     def _compute_installments(self):
         for record in self:
-            if record.date_start and record.date_end and record.fee_duration > 0 and record.fee_struct_id:
-                start_date = datetime.strptime(record.date_start, "%Y-%m-%d")
-                end_date = datetime.strptime(record.date_end, "%Y-%m-%d")
+            if record.date_start and record.date_end and record.fee_struct_id.schedule_pay_duration > 0:
                 installments = 0
-                current_date = start_date
+                current_date = record.date_start
 
                 if record.fee_struct_id.pay_one_time:
                     installments = 1
                 else:
-                    while current_date <= end_date:
+                    while current_date <= record.date_end:
                         installments += 1
-                        current_date = current_date + relativedelta(months=fee_struct_id.schedule_pay_duration)
+                        current_date = current_date + relativedelta(months=record.fee_struct_id.schedule_pay_duration)
 
                 record.installment = installments
                 
