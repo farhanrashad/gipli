@@ -9,4 +9,4 @@ class FeeslipSchedule(models.Model):
 
     course_id = fields.Many2one('oe.school.course', string='Course', required=True)
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch', required=True)
-    date = fields.Date(string='Date', default=lambda self: fields.Date.today(), required=True)
+    date = fields.Date(string='Date Due', default=lambda self: fields.Date.today(), required=True)
