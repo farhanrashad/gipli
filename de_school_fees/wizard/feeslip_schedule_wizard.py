@@ -45,5 +45,26 @@ class FeeslipScheduleWizard(models.TransientModel):
                 
                 
     def action_schedule(self):
-        #batch_ids = self.env['oe.school.course.batch'].search([('course_id','=',self.course_id)])
-        pass
+        vals = {}
+        for record in self:
+            if record.date_start and record.date_end and record.fee_struct_id.schedule_pay_duration > 0:
+                current_date = record.date_start
+                if record.fee_struct_id.pay_one_time:
+                    vals = {
+                        'batch_id': record.batch_id.id,
+                        'fee_struct_id': record.fee_struct_id.id,
+                        'date': current_date
+                    }
+                    schedule_id = self.env['oe.feeslip.schedule'].create(vals)
+                else:
+                    while current_date <= record.date_end:
+                        vals = {
+                            'batch_id': record.batch_id.id,
+                            'fee_struct_id': record.fee_struct_id.id,
+                            'date': current_date
+                        }
+                        schedule_id = self.env['oe.feeslip.schedule'].create(vals)
+                        current_date = current_date + relativedelta(months=record.fee_struct_id.schedule_pay_duration)        
+
+
+        

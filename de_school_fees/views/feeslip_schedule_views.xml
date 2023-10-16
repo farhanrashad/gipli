@@ -7,6 +7,7 @@
                 <tree editable="bottom" string="Feeslip Schedules" sample="1">
                     <field name="course_id"/>
                     <field name="batch_id"/>
+                    <field name="fee_struct_id"/>
                     <field name="date"/>
                 </tree>
             </field>
