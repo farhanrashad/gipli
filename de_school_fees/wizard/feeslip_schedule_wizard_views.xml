@@ -12,6 +12,7 @@
                                 <field name="batch_id" options="{'no_create': True}"/>
                                 <field name="fee_struct_id" options="{'no_create': True}"/>
                                 <field name="course_id" />
+                                <field name="installment" />
                             </group>
                             <group>
                                <label for="date_start" string="Dates"/>
@@ -42,6 +43,6 @@
 
         <!-- Create a menu item to access the wizard -->
         
-        <menuitem id="menu_feeslip_schedule_wizard" name="Generate Schedules" parent="menu_feeslip_schedule_menu" action="action_feeslip_schedule_wizard"/>
+        <menuitem id="menu_feeslip_schedule_wizard" name="Generate Schedules" sequence="10" parent="menu_feeslip_schedule_menu" action="action_feeslip_schedule_wizard"/>
     </data>
 </odoo>

@@ -18,7 +18,7 @@
             <field name="view_mode">tree</field>
         </record>
 
-        <menuitem id="menu_feeslip_schedule" name="Fee Schedules" parent="menu_feeslip_schedule_menu" action="action_feeslip_schedule"/>
+        <menuitem id="menu_feeslip_schedule" name="Fee Schedules" sequence="20" parent="menu_feeslip_schedule_menu" action="action_feeslip_schedule"/>
 
     </data>
 </odoo>
