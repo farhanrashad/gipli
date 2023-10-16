@@ -18,6 +18,7 @@
                 <field name="company_id" invisible="1"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'verify'" decoration-success="state in ('done','paid')"/>
+                <field name="amount_total" />
             </tree>
         </field>
     </record>
@@ -49,7 +50,7 @@
                                     <span><field name="name"/></span>
                                 </div>
                                 <div class="col-12">
-                                    <span>Net - </span>
+                                    <span>Total Fee - amount_total</span>
                                 </div>
                             </div>
                         </div>
@@ -80,7 +81,7 @@
             </header>
             <sheet>
                 <!-- invisible Feilds -->
-                
+                <field name="currency_id" />
                 <div class="oe_button_box" name="button_box">
                     <button type="object" class="oe_stat_button" id="open_work_entries"
                         icon="fa-calendar" name="action_open_work_entries" string="Work Entries">

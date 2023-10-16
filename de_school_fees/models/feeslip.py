@@ -109,8 +109,8 @@ class FeeSlip(models.Model):
     copy=False, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]}, ondelete='cascade',
     domain="[('company_id', '=', company_id)]")
     compute_date = fields.Date('Computed On')
-    currency_id = fields.Many2one('res.currency',string='Currency')
-    
+    currency_id = fields.Many2one(related='company_id.currency_id')
+    amount_total = fields.Monetary(string="Total", store=True, compute="_compute_amount_total")
     is_superuser = fields.Boolean(compute="_compute_is_superuser")
     edited = fields.Boolean()
     queued_for_pdf = fields.Boolean(default=False)
@@ -125,6 +125,11 @@ class FeeSlip(models.Model):
     #)
     #salary_attachment_count = fields.Integer('Salary Attachment count', compute='_compute_salary_attachment_count')
 
+    @api.depends('line_ids','line_ids.total')
+    def _compute_amount_total(self):
+        for record in self:
+            record.amount_total = sum(record.line_ids.mapped('total'))
+            
     @api.depends('company_id', 'student_id')
     def _compute_enrol_order_domain(self):
         # Define the domain criteria here
@@ -763,7 +768,7 @@ class FeeSlip(models.Model):
 
     def action_edit_feeslip_lines(self):
         self.ensure_one()
-        if not self.user_has_groups('hr_payroll.group_hr_payroll_manager'):
+        if not self.user_has_groups('de_school_fees.group_hr_payroll_manager'):
             raise UserError(_('This action is restricted to payroll managers only.'))
         if self.state == 'done':
             raise UserError(_('This action is forbidden on validated feeslips.'))

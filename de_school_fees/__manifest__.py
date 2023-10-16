@@ -32,7 +32,9 @@
         'views/feeslip_input_type_views.xml',
         'views/feeslip_views.xml',
         'wizard/feeslip_by_students_views.xml',
-        'views/feeslip_run_views.xml'
+        'views/feeslip_run_views.xml',
+        'reports/feeslip_report_template.xml',
+        'reports/feeslip_report.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
