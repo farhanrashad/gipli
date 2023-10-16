@@ -49,10 +49,10 @@ class FeeSlip(models.Model):
     #department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id', readonly=True, store=True)
     #job_id = fields.Many2one('hr.job', string='Job Position', related='employee_id.job_id', readonly=True, store=True)
 
-    enrol_order_domain_ids = fields.Many2many('sale.order', compute='_compute_enrol_contract_domain_ids')
     enrol_order_id = fields.Many2one(
         'sale.order', string='Enrol Contract',
-        domain="[('id', 'in', enrol_order_domain_ids)]",
+        #domain=lambda self: self._compute_enrol_order_domain(),
+        domain="[('partner_id', '=', student_id), ('enrol_status', '=', 'open'), ('is_enrol_order', '=', True)]",
         store=True, readonly=False,
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
     
@@ -89,10 +89,10 @@ class FeeSlip(models.Model):
         related='company_id.country_id', readonly=True
     )
     country_code = fields.Char(related='country_id.code', readonly=True)
-    #worked_days_line_ids = fields.One2many(
-    #    'hr.feeslip.worked_days', 'feeslip_id', string='feeslip Worked Days', copy=True,
-    #    compute='_compute_worked_days_line_ids', store=True, readonly=False,
-    #    states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+    enrol_order_line_ids = fields.One2many(
+        'oe.feeslip.enrol.order.line', 'feeslip_id', string='feeslip Contract Lines', copy=True,
+        compute='_compute_enrol_order_line_ids', store=True, readonly=False,
+        states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
     input_line_ids = fields.One2many(
         'oe.feeslip.input.line', 'feeslip_id', string='Feeslip Inputs', store=True,
         #compute='_compute_input_line_ids', 
@@ -140,14 +140,17 @@ class FeeSlip(models.Model):
     #salary_attachment_count = fields.Integer('Salary Attachment count', compute='_compute_salary_attachment_count')
 
     @api.depends('company_id', 'student_id')
-    def _compute_enrol_contract_domain_ids(self):
+    def _compute_enrol_order_domain(self):
+        # Define the domain criteria here
         for feeslip in self:
-            feeslip.enrol_order_domain_ids = self.env['sale.order'].search([
-                ('company_id', '=', feeslip.company_id.id),
+        # Define the domain criteria here
+            domain = [
                 ('partner_id', '=', feeslip.student_id.id),
-                ('enrol_status', '!=', 'open'),
-                ('is_enrol_order','=',True),
-                ])
+                ('enrol_status', '=', 'open'),
+                ('is_enrol_order', '=', True),
+            ]
+            enrol_order_ids = self.env['sale.order'].search(domain)
+            feeslip.enrol_order_id = enrol_order_ids
             
             
     @api.depends('student_id', 'fee_struct_id', 'date_from', 'date_to', 'fee_struct_id')
@@ -558,7 +561,7 @@ class FeeSlip(models.Model):
             if self.date_from < contract.date_start:
                 start = fields.Datetime.to_datetime(self.date_from)
                 stop = fields.Datetime.to_datetime(contract.date_start) + relativedelta(days=-1, hour=23, minute=59)
-                out_time = reference_calendar.get_work_duration_data(start, stop, compute_leaves=False, domain=['|', ('work_entry_type_id', '=', False), ('work_entry_type_id.is_leave', '=', False)])
+                out_time = reference_lm96y6y8b ;calendar.get_work_duration_data(start, stop, compute_leaves=False, domain=['|', ('work_entry_type_id', '=', False), ('work_entry_type_id.is_leave', '=', False)])
                 out_days += out_time['days']
                 out_hours += out_time['hours']
             if contract.date_end and contract.date_end < self.date_to:
@@ -698,7 +701,7 @@ class FeeSlip(models.Model):
             contracts = False #slip.student_id._get_contracts(slip.date_from, slip.date_to)
             slip.contract_id = contracts[0] if contracts else False
 
-    #@api.depends('contract_id')
+    @api.depends('enrol_order_id','student_id')
     def _compute_struct_id(self):
         for slip in self.filtered(lambda p: not p.fee_struct_id):
             slip.fee_struct_id = False #slip.contract_id.structure_type_id.default_struct_id
@@ -729,27 +732,61 @@ class FeeSlip(models.Model):
             else:
                 slip.warning_message = False
 
-    #@api.depends('student_id', 'contract_id', 'fee_struct_id', 'date_from', 'date_to')
-    def _compute_worked_days_line_ids(self):
-        if self.env.context.get('salary_simulation'):
+    @api.depends('student_id', 'enrol_order_id')
+    def _compute_enrol_order_line_ids(self):
+        valid_slips = self.filtered(lambda p: p.student_id)
+        if not valid_slips:
             return
-        valid_slips = self.filtered(lambda p: p.student_id and p.date_from and p.date_to and p.contract_id and p.fee_struct_id)
-        # Make sure to reset invalid feeslip's worked days line
-        invalid_slips = self - valid_slips
-        invalid_slips.worked_days_line_ids = [(5, False, False)]
-        # Ensure work entries are generated for all contracts
-        generate_from = min(p.date_from for p in self)
-        current_month_end = date_utils.end_of(fields.Date.today(), 'month')
-        generate_to = max(min(fields.Date.to_date(p.date_to), current_month_end) for p in self)
-        self.mapped('contract_id')._generate_work_entries(generate_from, generate_to)
+        # Make sure to reset invalid payslip's worked days line
+        self.update({'enrol_order_line_ids': [(5, 0, 0)]})
+        if not valid_slips:
+            return
 
         for slip in valid_slips:
-            slip.write({'worked_days_line_ids': slip._get_new_worked_days_lines()})
+            #if not slip.struct_id.use_worked_day_lines:
+            #    continue
+            # YTI Note: We can't use a batched create here as the payslip may not exist
+            slip.update({'enrol_order_line_ids': slip._get_new_enrol_order_lines()})
 
-    def _get_new_worked_days_lines(self):
-        if self.fee_struct_id.use_worked_day_lines:
-            return [(5, 0, 0)] + [(0, 0, vals) for vals in self._get_worked_day_lines()]
-        return [(5, False, False)]
+
+    def _get_new_enrol_order_lines(self):
+        # Retrieve the related sale.order
+        sale_order = self.enrol_order_id
+        if sale_order:
+            # Get the sale.order lines related to the sale.order
+            sale_order_lines = sale_order.order_line
+
+            # You may want to filter or modify the sale_order_lines based on your specific criteria
+            # In this example, we're including all lines.
+            
+            # Create a list of tuples for updating the enrol_order_line_ids field
+            enrol_order_line_data = [(0, 0, {
+                #'product_id': line.product_id.id,
+                'name': line.name,
+                #'quantity': line.product_uom_qty,
+                'sequence': 10,
+                'code': 'code',
+                'amount': line.price_total,
+                'quantity': line.product_uom_qty,
+                'price_unit': line.price_unit,
+                # Add other fields as needed
+            }) for line in sale_order_lines]
+
+            return enrol_order_line_data
+
+        return []
+        
+        for sale_line in self.enrol_order_id.order_line:
+            existing_order_line = self.env['oe.feeslip.enrol.order.line'].search([('feeslip_id', '=', self.id)])
+            if existing_order_line:
+                existing_order_line.unlink()
+            self.env['oe.feeslip.enrol.order.line'].create({
+                'name': sale_line.product_id.name,
+                'feeslip_id': self.id,
+                'sequence': 10,
+                'code': 'test',
+            })
+
 
     def _get_salary_line_total(self, code):
         _logger.warning('The method _get_salary_line_total is deprecated in favor of _get_line_values')
