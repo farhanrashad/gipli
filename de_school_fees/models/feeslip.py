@@ -9,7 +9,7 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, Command, fields, models, _
-from odoo.addons.de_school_fees.models.browsable_object import BrowsableObject, InputLine, Feeslips, ResultRules
+from odoo.addons.de_school_fees.models.browsable_object import BrowsableObject, InputFees, OrderFeeLines, Feeslips, ResultRules
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_round, date_utils, convert_file, html2plaintext
 from odoo.tools.float_utils import float_compare
@@ -529,7 +529,7 @@ class FeeSlip(models.Model):
 
     def _get_localdict(self):
         self.ensure_one()
-        #worked_days_dict = {line.code: line for line in self.worked_days_line_ids if line.code}
+        Order_fee_lines_dict = {line.code: line for line in self.enrol_order_line_ids if line.code}
         inputs_dict = {line.code: line for line in self.input_line_ids if line.code}
 
         student = self.student_id
@@ -541,8 +541,8 @@ class FeeSlip(models.Model):
                 'categories': BrowsableObject(student.id, {}, self.env),
                 'rules': BrowsableObject(student.id, {}, self.env),
                 'feeslip': Feeslips(student.id, self, self.env),
-                #'worked_days': WorkedDays(employee.id, worked_days_dict, self.env),
-                'inputs': InputLine(student.id, inputs_dict, self.env),
+                'order_fee': OrderFeeLines(student.id, order_fee_lines_dict, self.env),
+                'inputfee': InputFees(student.id, inputs_dict, self.env),
                 'student': student,
                 'enrol_order': enrol_order,
                 'result_rules': ResultRules(student.id, {}, self.env)
@@ -701,9 +701,7 @@ class FeeSlip(models.Model):
             
             # Create a list of tuples for updating the enrol_order_line_ids field
             enrol_order_line_data = [(0, 0, {
-                #'product_id': line.product_id.id,
                 'name': line.name,
-                #'quantity': line.product_uom_qty,
                 'sequence': 10,
                 'product_id': line.product_id.id,
                 'code': line.product_id.default_code,
@@ -712,7 +710,7 @@ class FeeSlip(models.Model):
                 'price_unit': line.price_unit,
                 'qty_invoiced': line.qty_invoiced,
                 'qty_to_invoice': line.qty_to_invoice,
-                # Add other fields as needed
+                'order_line_id': line.id,
             }) for line in sale_order_lines]
 
             return enrol_order_line_data

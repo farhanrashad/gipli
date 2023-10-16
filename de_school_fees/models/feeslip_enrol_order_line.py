@@ -21,6 +21,7 @@ class FeeEnrolOrderLine(models.Model):
     qty_to_invoice = fields.Float(string='qty_to_invoice')
     amount = fields.Monetary(string='Amount', store=True, copy=True)
     currency_id = fields.Many2one('res.currency', related='feeslip_id.currency_id')
+    order_line_id = fields.Many2one('sale.order.line', string="Order Line")
 
     #@api.depends('work_entry_type_id')
     def _compute_name(self):

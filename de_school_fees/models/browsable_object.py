@@ -25,7 +25,7 @@ class ResultRules(BrowsableObject):
     def __getitem__(self, key):
         return self.dict[key] if key in self.dict else {'total': 0, 'amount': 0, 'quantity': 0}
 
-class InputLine(BrowsableObject):
+class InputFees(BrowsableObject):
     """a class that will be used into the python code, mainly for usability purposes"""
     def sum(self, code, from_date, to_date=None):
         if to_date is None:
@@ -40,6 +40,20 @@ class InputLine(BrowsableObject):
 
 
 
+class OrderFeeLines(BrowsableObject):
+    """a class that will be used into the python code, mainly for usability purposes"""
+    def _sum(self, code, from_date, to_date=None):
+        if to_date is None:
+            to_date = fields.Date.today()
+        self.env.cr.execute("""
+            SELECT sum(amount) as amount, sum(price_unit) as price_unit, sum(quantity) as quantity
+            FROM oe_feeslip as hp, oe_feeslip_enrol_order_line as pi
+            WHERE hp.student_id = %s AND hp.state in ('done', 'paid')
+            AND hp.date_from >= %s AND hp.date_to <= %s AND hp.id = pi.feeslip_id AND pi.product_id IN (SELECT id FROM product_product WHERE default_code = %s)""",
+            (self.student_id, from_date, to_date, code))
+        return self.env.cr.fetchone()
+
+        
 class Feeslips(BrowsableObject):
     """a class that will be used into the python code, mainly for usability purposes"""
 

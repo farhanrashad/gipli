@@ -47,8 +47,8 @@ class FeeRule(models.Model):
 # student: res.partner object
 # rules: object containing the rules code (previously computed)
 # categories: object containing the computed fee rule categories (sum of amount of all rules belonging to that category).
-# inputs: object containing the computed inputs.
-
+# inputfee: object containing the computed inputs.
+# order_fee: object containing the fee line of student enrollment contract
 # Note: returned value have to be set in the variable 'result'
 
 result = rules.NET > categories.NET * 0.10''',
