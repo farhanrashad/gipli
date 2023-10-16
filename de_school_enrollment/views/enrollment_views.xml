@@ -32,8 +32,29 @@
             
             <xpath expr="//header" position="inside">
                 <button name="button_submit" id="button_submit" data-hotkey="v"
-                    string="Submit" class="btn-primary" type="object" context="{'validate_analytic': True}"
+                    string="Submit" class="btn-primary" type="object" 
                     attrs="{'invisible': [('enrol_status', 'not in', ['draft'])]}"/>
+
+                <button name="button_start_review" id="button_start_review" data-hotkey="v"
+                    string="Review Start" class="btn-primary" type="object" 
+                    attrs="{'invisible': [('enrol_status', 'not in', ['submit'])]}"/>
+
+                <button name="button_end_review" id="button_end_review" data-hotkey="v"
+                    string="Review End" class="btn-primary" type="object" 
+                    attrs="{'invisible': [('enrol_status', 'not in', ['review'])]}"/>
+
+                <button name="button_interview" id="button_interview" data-hotkey="v"
+                    string="Interview Taken" class="btn-primary" type="object" 
+                    attrs="{'invisible': [('enrol_status', 'not in', ['approved'])]}"/>
+
+                <button name="button_payment" id="button_payment" data-hotkey="v"
+                    string="Payment" class="btn-primary" type="object" 
+                    attrs="{'invisible': [('enrol_status', 'not in', ['pending'])]}"/>
+
+                <button name="button_confirm" id="button_confirm" data-hotkey="v"
+                    string="Confirm Enrollment" class="btn-primary" type="object" 
+                    attrs="{'invisible': [('enrol_status', 'not in', ['done'])]}"/>
+                
             </xpath>
             
             <xpath expr="//form[1]/header[1]/field[@name='state']" position="attributes">
