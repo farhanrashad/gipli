@@ -17,6 +17,8 @@ class FeeEnrolOrderLine(models.Model):
     code = fields.Char(string='Code')
     price_unit = fields.Float(string='Price Unit')
     quantity = fields.Float(string='Quantity')
+    qty_invoiced = fields.Float(string='qty_invoiced')
+    qty_to_invoice = fields.Float(string='qty_to_invoice')
     amount = fields.Monetary(string='Amount', store=True, copy=True)
     currency_id = fields.Many2one('res.currency', related='feeslip_id.currency_id')
 

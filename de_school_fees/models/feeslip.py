@@ -712,6 +712,8 @@ class FeeSlip(models.Model):
                 'amount': line.price_total,
                 'quantity': line.product_uom_qty,
                 'price_unit': line.price_unit,
+                'qty_invoiced': line.qty_invoiced,
+                'qty_to_invoice': line.qty_to_invoice,
                 # Add other fields as needed
             }) for line in sale_order_lines]
 
