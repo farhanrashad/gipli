@@ -39,7 +39,7 @@ class ResPartner(models.Model):
     admission_no = fields.Char('Admission No')
     
     course_id = fields.Many2one('oe.school.course', string='Course')
-    batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', domain="[('course_id','=',course_id)]")
     subject_ids = fields.Many2many('oe.school.course.subject', string='Subjects', compute='_compute_subjects')
     
     enrollment_ids = fields.One2many('oe.school.student.enrollment', 'partner_id', 'Enrollments')
