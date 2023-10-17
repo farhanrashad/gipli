@@ -10,7 +10,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Sales/Marketing',
-    'version': '0.2',
+    'version': '0.3',
     'live_test_url': 'https://youtu.be/BwokAjL_KZU',
     'depends': ['crm'],
     'data': [
@@ -43,6 +43,6 @@
     'currency': 'USD',
     'images': ['static/description/banner.gif'],
     'installable': True,
-    'application': False,
+    'application': True,
     'auto_install': False,
 }

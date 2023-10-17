@@ -30,13 +30,15 @@
                         </div>
                         <group>
                             <group>
-                                <field name="url"/>
-                                <field name="api_key" password="True" string="API Key"/>
+                                <field name="url" />
+                                <field name="url_sample" class="text-muted" nolabel="1" readonly="1"/>
                             </group>
                             <group>
+                                <field name="api_key" password="True" string="API Key"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                         </group>
+
                         <notebook>
                             <page string="Settings" name="settings" attrs="{'invisible': [('state', '!=', 'active')]}">
                                 <group>

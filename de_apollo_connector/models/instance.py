@@ -19,10 +19,11 @@ class ApolloInstance(models.Model):
     _name = 'apl.instance'
     _description = 'Apollo Instance'
 
-    name = fields.Char(string='Name', required=True, readonly=True, states=READONLY_FIELD_STATES)
-    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=True, states=READONLY_FIELD_STATES)
-    url = fields.Char(string='URL', required=True, readonly=True, states=READONLY_FIELD_STATES)
-
+    name = fields.Char(string='Name', required=True, readonly=False, states=READONLY_FIELD_STATES)
+    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=False, states=READONLY_FIELD_STATES)
+    url = fields.Char(string='URL', required=True, readonly=False, states=READONLY_FIELD_STATES)
+    url_sample = fields.Char(default='https://api.apollo.io/api/v1/')
+    
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states=READONLY_FIELD_STATES, default=lambda self: self.env.company)
 
 
