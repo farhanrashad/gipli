@@ -35,6 +35,7 @@
         'views/feeslip_run_views.xml',
         'reports/feeslip_report_template.xml',
         'reports/feeslip_report.xml',
+        'reports/feeslip_report_views.xml',
         'views/feeslip_schedule_views.xml',
         'wizard/feeslip_schedule_wizard_views.xml',
     ],

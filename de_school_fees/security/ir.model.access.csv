@@ -27,5 +27,8 @@ access_feeslip_schedule_wizard_user,access.feeslip.schedule.wizard.user,model_oe
 
 access_feeslip_schedule_user,access.feeslip.schedule.user,model_oe_feeslip_schedule,account.group_account_invoice,1,1,1,1
 
+access_feeslip_report_user,access.feeslip.report.user,model_oe_feeslip_report,account.group_account_invoice,1,1,1,1
+
+
 
 

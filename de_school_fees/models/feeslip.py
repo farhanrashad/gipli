@@ -48,6 +48,7 @@ class FeeSlip(models.Model):
         domain="[('is_student', '=', True), ('active', '=', True)]")
     course_id = fields.Many2one('oe.school.course',related='student_id.course_id')
     batch_id = fields.Many2one('oe.school.course.batch',related='student_id.batch_id')
+    
     enrol_order_id = fields.Many2one(
         'sale.order', string='Enrol Contract',
         #domain=lambda self: self._compute_enrol_order_domain(),

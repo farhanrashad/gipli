@@ -14,152 +14,83 @@ class FeeslipReport(models.Model):
     _rec_name = 'date_from'
     _order = 'date_from desc'
 
+    @api.model
+    def _get_done_states(self):
+        return ['sale', 'done']
 
-    count = fields.Integer('# Payslip', group_operator="sum", readonly=True)
-    count_work = fields.Integer('Work Days', group_operator="sum", readonly=True)
-    count_work_hours = fields.Integer('Work Hours', group_operator="sum", readonly=True)
-    count_leave = fields.Integer('Days of Paid Time Off', group_operator="sum", readonly=True)
-    count_leave_unpaid = fields.Integer('Days of Unpaid Time Off', group_operator="sum", readonly=True)
-    count_unforeseen_absence = fields.Integer('Days of Unforeseen Absence', group_operator="sum", readonly=True)
+    nbr = fields.Integer('# of Lines', readonly=True)
+    name = fields.Char(string="Name") 
+    student_id = fields.Many2one('res.partner',string='Student', readonly=True)
+    fee_struct_id = fields.Many2one('oe.fee.struct', string='Fee Struct', readonly=True)
+    course_id = fields.Many2one('oe.school.course',string='Couse', readonly=True)
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', readonly=True)
+    date_from = fields.Date(string='Date From', readonly=True)
+    date_to = fields.Date(string='Date To', readonly=True)
+    company_id = fields.Many2one('res.company',string='Company', readonly=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('verify', 'Waiting'),
+        ('done', 'Done'),
+        ('paid', 'Paid'),
+        ('cancel', 'Rejected')],
+        string='Status', readonly=True)
+    amount_total = fields.Float(string='Total Fee', readonly=True)
+    fee_name = fields.Char(string='Fee Name', readonly=True)
+    fee_amount = fields.Float(string='Fee Amount', readonly=True)
 
-    name = fields.Char('Payslip Name', readonly=True)
-    date_from = fields.Date('Start Date', readonly=True)
-    date_to = fields.Date('End Date', readonly=True)
-    company_id = fields.Many2one('res.company', 'Company', readonly=True)
 
-    employee_id = fields.Many2one('hr.employee', 'Employee', readonly=True)
-    department_id = fields.Many2one('hr.department', 'Department', readonly=True)
-    master_department_id = fields.Many2one('hr.department', 'Master Department', readonly=True)
-    job_id = fields.Many2one('hr.job', 'Job Position', readonly=True)
-    number_of_days = fields.Float('Number of Days', readonly=True)
-    number_of_hours = fields.Float('Number of Hours', readonly=True)
-    net_wage = fields.Float('Net Wage', readonly=True)
-    basic_wage = fields.Float('Basic Wage', readonly=True)
-    gross_wage = fields.Float('Gross Wage', readonly=True)
-    leave_basic_wage = fields.Float('Basic Wage for Time Off', readonly=True)
-    # Some of those might not be enabled (requiring respective work_entry modules) but adding them separately would require
-    # a module just for that
-    work_entry_source = fields.Selection([
-        ('calendar', 'Working Schedule'),
-        ('attendance', 'Attendances'),
-        ('planning', 'Planning')], readonly=True)
+    @property
+    def _table_query(self):
+        ''' Report needs to be dynamic to take into account multi-company selected + multi-currency rates '''
+        return '%s %s %s %s' % (self._select(), self._from(), self._where(), self._group_by())
 
-    work_code = fields.Many2one('hr.work.entry.type', 'Work type', readonly=True)
-    work_type = fields.Selection([
-        ('1', 'Regular Working Day'),
-        ('2', 'Paid Time Off'),
-        ('3', 'Unpaid Time Off')], string='Work, (un)paid Time Off', readonly=True)
-
-    def _select(self, additional_rules):
+    def _select(self):
         select_str = """
-            SELECT
-                p.id as id,
-                CASE WHEN wd.id = min_id.min_line THEN 1 ELSE 0 END as count,
-                CASE WHEN wet.is_leave THEN 0 ELSE wd.number_of_days END as count_work,
-                CASE WHEN wet.is_leave THEN 0 ELSE wd.number_of_hours END as count_work_hours,
-                CASE WHEN wet.is_leave and wd.amount <> 0 THEN wd.number_of_days ELSE 0 END as count_leave,
-                CASE WHEN wet.is_leave and wd.amount = 0 THEN wd.number_of_days ELSE 0 END as count_leave_unpaid,
-                CASE WHEN wet.is_unforeseen THEN wd.number_of_days ELSE 0 END as count_unforeseen_absence,
-                CASE WHEN wet.is_leave THEN wd.amount ELSE 0 END as leave_basic_wage,
-                p.name as name,
-                p.date_from as date_from,
-                p.date_to as date_to,
-                e.id as employee_id,
-                e.department_id as department_id,
-                d.master_department_id as master_department_id,
-                c.job_id as job_id,
-                c.work_entry_source as work_entry_source,
-                e.company_id as company_id,
-                wet.id as work_code,
-                CASE WHEN wet.is_leave IS NOT TRUE THEN '1' WHEN wd.amount = 0 THEN '3' ELSE '2' END as work_type,
-                wd.number_of_days as number_of_days,
-                wd.number_of_hours as number_of_hours,"""
-        handled_fields = []
-        for rule in additional_rules:
-            field_name = rule._get_report_field_name()
-            if field_name in handled_fields:
-                continue
-            handled_fields.append(field_name)
-            select_str += """
-                CASE WHEN wd.id = min_id.min_line THEN "%s".total ELSE 0 END as "%s",""" % (field_name, field_name)
-        select_str += """
-                CASE WHEN wd.id = min_id.min_line THEN pln.total ELSE 0 END as net_wage,
-                CASE WHEN wd.id = min_id.min_line THEN plb.total ELSE 0 END as basic_wage,
-                CASE WHEN wd.id = min_id.min_line THEN plg.total ELSE 0 END as gross_wage"""
+                SELECT
+                    min(slip.id) as id, 
+                    slip.name, 
+                    slip.student_id,
+                    slip.fee_struct_id,
+                    std.course_id,
+                    std.batch_id,
+                    slip.date_from, slip.date_to,
+                    slip.company_id,
+                    slip.state,
+                    sum(slip.amount_total) as amount_total, 
+                    line.name as fee_name,
+                    sum(line.total) as fee_amount
+        """
         return select_str
-
-    def _from(self, additional_rules):
+        
+    def _from(self):
         from_str = """
             FROM
-                (SELECT * FROM hr_payslip WHERE state IN ('done', 'paid')) p
-                left join hr_employee e on (p.employee_id = e.id)
-                left join hr_payslip_worked_days wd on (wd.payslip_id = p.id)
-                left join hr_work_entry_type wet on (wet.id = wd.work_entry_type_id)
-                left join (select payslip_id, min(id) as min_line from hr_payslip_worked_days group by payslip_id) min_id on (min_id.payslip_id = p.id)
-                left join hr_payslip_line pln on (pln.slip_id = p.id and pln.code = 'NET')
-                left join hr_payslip_line plb on (plb.slip_id = p.id and plb.code = 'BASIC')
-                left join hr_payslip_line plg on (plg.slip_id = p.id and plg.code = 'GROSS')
-                left join hr_contract c on (p.contract_id = c.id)
-                left join hr_department d on (e.department_id = d.id)"""
-        handled_fields = []
-        for rule in additional_rules:
-            field_name = rule._get_report_field_name()
-            if field_name in handled_fields:
-                continue
-            handled_fields.append(field_name)
-            from_str += """
-                left join hr_payslip_line "%s" on ("%s".slip_id = p.id and "%s".code = '%s')""" % (
-                    field_name, field_name, field_name, rule.code)
+            oe_feeslip slip
+            join oe_feeslip_line line on line.feeslip_id = slip.id
+            join res_partner std on slip.student_id = std.id
+        """
         return from_str
+    
+    def _where(self):
+        return """
+            WHERE
+                slip.name is not null
+        """
 
-    def _group_by(self, additional_rules):
+    def _group_by(self):
         group_by_str = """
-            GROUP BY """
-        handled_fields = []
-        for rule in additional_rules:
-            field_name = rule._get_report_field_name()
-            if field_name in handled_fields:
-                continue
-            handled_fields.append(field_name)
-            group_by_str += """
-                "%s".total,""" % (field_name)
-        group_by_str += """
-                e.id,
-                e.department_id,
-                d.master_department_id,
-                e.company_id,
-                wd.id,
-                wet.id,
-                p.id,
-                p.name,
-                p.date_from,
-                p.date_to,
-                pln.total,
-                plb.total,
-                plg.total,
-                min_id.min_line,
-                c.id"""
+            GROUP BY
+                slip.name, 
+                slip.student_id,
+                slip.fee_struct_id,
+                std.course_id,
+                std.batch_id,
+                slip.date_from, slip.date_to,
+                slip.company_id,
+                slip.state,
+                slip.amount_total, 
+                line.name,
+                line.total
+        """
         return group_by_str
-
-    def init(self):
-        additional_rules = self.env['hr.salary.rule'].search([('appears_on_payroll_report', '=', True)])
-        query = """
-        %s
-        %s
-        %s""" % (self._select(additional_rules), self._from(additional_rules), self._group_by(additional_rules))
-        tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute(
-            sql.SQL("CREATE or REPLACE VIEW {} as ({})").format(
-                sql.Identifier(self._table),
-                sql.SQL(query)))
-
-    @api.model
-    def _get_action(self):
-        # We have to make a method as literal_eval is forbidden in the server action safe_eval context
-        action = self.env['ir.actions.act_window']._for_xml_id('hr_payroll.payroll_report_action')
-        context = literal_eval(action.get('context', '{}'))
-        country_code = self.env.company.country_id.code
-        if country_code:
-            context.update({'country_code': country_code.lower()})
-        action['context'] = context
-        return action
+    
