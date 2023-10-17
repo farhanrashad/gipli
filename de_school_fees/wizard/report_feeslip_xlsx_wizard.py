@@ -209,7 +209,7 @@ class FeeslipXLSXReprot(models.TransientModel):
             'view_type': 'form',
             "view_mode": 'form',
             'view_id': False,
-            'res_model': 'hr.loan.save.xlsx.wizard',
+            'res_model': 'oe.feeslip.save.xlsx.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
         }

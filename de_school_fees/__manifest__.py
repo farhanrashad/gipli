@@ -38,6 +38,7 @@
         'reports/feeslip_report_views.xml',
         'wizard/report_feeslip_xlsx_wizard_views.xml',
         'views/feeslip_schedule_views.xml',
+        'wizard/save_xlsx_views.xml',
         'wizard/feeslip_schedule_wizard_views.xml',
     ],
     # only loaded in demonstration mode

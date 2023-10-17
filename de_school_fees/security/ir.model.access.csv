@@ -31,5 +31,8 @@ access_feeslip_report_user,access.feeslip.report.user,model_oe_feeslip_report,ac
 
 access_feeslip_xlsx_report_user,access.feeslip.xlsx.report.user,model_oe_report_feeslip_wizard,account.group_account_invoice,1,1,1,1
 
+access_feeslip_save_xlsx_wizard,access.feeslip.save.xlsx.wizard,model_oe_feeslip_save_xlsx_wizard,,1,1,1,1
+
+
 
 
