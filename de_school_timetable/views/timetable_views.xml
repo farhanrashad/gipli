@@ -8,10 +8,10 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        
-
                     </header>
                     <sheet string="Timetable">
+                        <!-- invisible fields -->
+                        <field name="repeat" invisible="1" />
                         <div class="oe_button_box" name="button_box">
                             <!-- Used by other modules-->
                         </div>
