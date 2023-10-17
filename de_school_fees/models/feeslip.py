@@ -78,8 +78,8 @@ class FeeSlip(models.Model):
         compute='_compute_line_ids', store=True, readonly=True, copy=True,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     company_id = fields.Many2one(
-        'res.company', string='Company', copy=False, required=False,
-        compute='_compute_company_id', store=True, readonly=False,
+        'res.company', string='Company', copy=False, required=True,
+       store=True, readonly=False,
         default=lambda self: self.env.company,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     country_id = fields.Many2one(
@@ -109,8 +109,9 @@ class FeeSlip(models.Model):
     copy=False, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]}, ondelete='cascade',
     domain="[('company_id', '=', company_id)]")
     compute_date = fields.Date('Computed On')
-    currency_id = fields.Many2one(related='company_id.currency_id')
+    currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
     amount_total = fields.Monetary(string="Total", store=True, compute="_compute_amount_total")
+    
     is_superuser = fields.Boolean(compute="_compute_is_superuser")
     edited = fields.Boolean()
     queued_for_pdf = fields.Boolean(default=False)
@@ -583,11 +584,6 @@ class FeeSlip(models.Model):
                     'feeslip_id': self.id,
                 }
         return result.values()
-
-    @api.depends('student_id')
-    def _compute_company_id(self):
-        for slip in self.filtered(lambda p: p.student_id):
-            slip.company_id = slip.student_id.company_id
 
     @api.depends('student_id', 'date_from', 'date_to')
     def _compute_enrol_order_id(self):
