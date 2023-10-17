@@ -23,7 +23,7 @@ class FeeslipXLSXReprot(models.TransientModel):
 
     def generate_excel_report(self):
         self.ensure_one()
-        file_path = 'loan_detail_report_' + str(fields.Date.today()) + '.xlsx'
+        file_path = 'fee_detail_report_' + str(fields.Date.today()) + '.xlsx'
         workbook = xlsxwriter.Workbook('/tmp/' + file_path)
 
         heading = workbook.add_format({'font_size': '12', 'align': 'center', 'bold': True,'border':True})
@@ -54,7 +54,7 @@ class FeeslipXLSXReprot(models.TransientModel):
         sheet.write(1, 0, 'Date', heading)
         sheet.merge_range(1, 1, 1, 2, (str(self.year_id.date_start) + ' - ' + str(self.year_id.date_end)), text)
 
-        sheet.write(1, 3, 'Loan Type(s)', heading)
+        sheet.write(1, 3, 'Course(s)', heading)
         sheet.merge_range(1, 4, 1, 6, courses, text)
 
         query = """
@@ -71,6 +71,7 @@ class FeeslipXLSXReprot(models.TransientModel):
             LEFT JOIN oe_school_course_batch batch on std.batch_id = batch.id
             WHERE slip.date_from >= %(date_from)s and slip.date_to <= %(date_to)s 
             and std.course_id = ANY(%(course_ids)s)
+            and slip.company_id = %(company_id)s
         """
         args = {
             'company_id': self.env.company,
@@ -118,7 +119,7 @@ class FeeslipXLSXReprot(models.TransientModel):
 
                 row += 1
 
-        # Loan Summary
+        # Fee Summary
         sheet = workbook.add_worksheet('Fee Summary')
 
         sheet.merge_range(0, 0, 0, 10, 'Fee Summary Report', heading)
@@ -126,23 +127,19 @@ class FeeslipXLSXReprot(models.TransientModel):
         sheet.write(1, 0, 'Date', heading)
         sheet.merge_range(1, 1, 1, 2, (str(self.year_id.date_start) + ' - ' + str(self.year_id.date_end)), text)
 
-        sheet.write(1, 3, 'Loan Type(s)', heading)
+        sheet.write(1, 3, 'Course(s)', heading)
         sheet.merge_range(1, 4, 1, 6, courses, text)
         
         query = """
             SELECT
-                slip.name, to_char(slip.date_from,'MM-DD-YYYY') as date_from, 
-                to_char(slip.date_to,'MM-DD-YYYY') as date_to, 
-                std.name as student_name, course.name -> 'en_US' as course,
-                batch.name -> 'en_US' as batch,
-                slip.state, line.name as fee_name, line.total as fee_amount
+                course.name as course, sum(line.total) as fee_amount
             FROM oe_feeslip slip
             JOIN oe_feeslip_line line on line.feeslip_id = slip.id
             JOIN res_partner std on line.student_id = std.id
-            LEFT JOIN oe_school_course course on std.course_id = course.id
-            LEFT JOIN oe_school_course_batch batch on std.batch_id = batch.id
+            JOIN oe_school_course course on std.course_id = course.id
             WHERE slip.date_from >= %(date_from)s and slip.date_to <= %(date_to)s 
-            and std.course_id = ANY(%(course_ids)s)
+            and slip.company_id = %(company_id)s
+            group by course.name
         """
         args = {
             'company_id': self.env.company,
@@ -154,17 +151,17 @@ class FeeslipXLSXReprot(models.TransientModel):
         rs_slips = self._cr.dictfetchall()
 
         sheet.write(2, 0, 'course', title)
-        sheet.write(2, 1, 'amount', title)
+        sheet.write(2, 1, 'fee_amount', title)
             
         row = 3
             
         if len(rs_slips):
-            for loan in rs_loans:
+            for slip in rs_slips:
                 sheet.set_column(row, 0, 20)
                 sheet.set_column(row, 1, 20)
 
-                sheet.write(row, 0, loan['name'],text)
-                sheet.write(row, 1, loan['name'],text)
+                sheet.write(row, 0, slip['name'],text)
+                sheet.write(row, 1, slip['name'],text)
                 
                 row += 1
                     
