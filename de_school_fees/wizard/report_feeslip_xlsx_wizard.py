@@ -17,10 +17,8 @@ class FeeslipXLSXReprot(models.TransientModel):
     _name = 'oe.report.feeslip.wizard'
     _description = 'Student Fee Details Report Wizard'
 
-    start_date = fields.Date(string="Start date",required=True)
-    end_date = fields.Date(string="End Date")
-
-    course_ids = fields.Many2many('oe.school.course',string="Course", required=True)
+    year_id = fields.Many2one('oe.school.year', string='Academic Year', required=True)
+    course_ids = fields.Many2many('oe.school.course',string="Course")
 
 
     def generate_excel_report(self):
@@ -39,25 +37,25 @@ class FeeslipXLSXReprot(models.TransientModel):
 
         sheet = workbook.add_worksheet('Fee Details')
 
-        end_date = self.end_date
-        if self.end_date:
-            end_date = self.end_date
+        end_date = self.year_id.date_end
+        if self.year_id.date_end:
+            end_date = self.year_id.date_end
         else:
             end_date = '2099-12-30'
 
-        if len(self.loan_type_ids):
-            loan_types = ", ".join(self.loan_type_ids.mapped('name'))
+        if len(self.course_ids):
+            courses = ", ".join(self.course_ids.mapped('name'))
         else:
-            loan_types = ""
+            courses = ""
 
 
         sheet.merge_range(0, 0, 0, 6, 'Fee Details Report', heading)
         
         sheet.write(1, 0, 'Date', heading)
-        sheet.merge_range(1, 1, 1, 2, (str(self.start_date) + ' - ' + str(self.end_date)), text)
+        sheet.merge_range(1, 1, 1, 2, (str(self.year_id.date_start) + ' - ' + str(self.year_id.date_end)), text)
 
         sheet.write(1, 3, 'Loan Type(s)', heading)
-        sheet.merge_range(1, 4, 1, 6, loan_types, text)
+        sheet.merge_range(1, 4, 1, 6, courses, text)
 
         query = """
             SELECT
@@ -68,16 +66,17 @@ class FeeslipXLSXReprot(models.TransientModel):
                 slip.state, line.name as fee_name, line.total as fee_amount
             FROM oe_feeslip slip
             JOIN oe_feeslip_line line on line.feeslip_id = slip.id
-            JOIN res.partner std on line.student_id = std.id
+            JOIN res_partner std on line.student_id = std.id
             LEFT JOIN oe_school_course course on std.course_id = course.id
             LEFT JOIN oe_school_course_batch batch on std.batch_id = batch.id
-            WHERE std.course_id = ANY(%(course_ids)s)
+            WHERE slip.date_from >= %(date_from)s and slip.date_to <= %(date_to)s 
+            and std.course_id = ANY(%(course_ids)s)
         """
         args = {
-            #'company_id': company_id,
-            'date_from': self.start_date,
-            'date_to': self.end_date or '2099-12-30',
-            'course_id': self.course_ids.ids
+            'company_id': self.env.company,
+            'date_from': self.year_id.date_start,
+            'date_to': self.year_id.date_end or '2099-12-30',
+            'course_ids': self.course_ids.ids
         }
         self.env.cr.execute(query, args)
         rs_slips = self._cr.dictfetchall()
@@ -125,74 +124,53 @@ class FeeslipXLSXReprot(models.TransientModel):
         sheet.merge_range(0, 0, 0, 10, 'Fee Summary Report', heading)
                 
         sheet.write(1, 0, 'Date', heading)
-        sheet.merge_range(1, 1, 1, 2, (str(self.start_date) + ' - ' + str(self.end_date)), text)
+        sheet.merge_range(1, 1, 1, 2, (str(self.year_id.date_start) + ' - ' + str(self.year_id.date_end)), text)
 
         sheet.write(1, 3, 'Loan Type(s)', heading)
-        sheet.merge_range(1, 4, 1, 6, loan_types, text)
+        sheet.merge_range(1, 4, 1, 6, courses, text)
         
         query = """
             SELECT
-                ln.name, to_char(ln.date,'MM-DD-YYYY') as date, 
-                e.name as employee_name, tp.name -> 'en_US' as loan_type,
-                to_char(ln.date_start,'MM-DD-YYYY') as date_start, to_char(ln.date_end,'MM-DD-YYYY') as date_end,
-                ln.amount as loan_amount, ln.amount_paid, ln.amount_disbursed, ln.amount_residual, ln.state
-            FROM hr_loan ln
-            JOIN hr_employee e on ln.employee_id = e.id
-            JOIN hr_loan_type tp on ln.loan_type_id = tp.id        
+                slip.name, to_char(slip.date_from,'MM-DD-YYYY') as date_from, 
+                to_char(slip.date_to,'MM-DD-YYYY') as date_to, 
+                std.name as student_name, course.name -> 'en_US' as course,
+                batch.name -> 'en_US' as batch,
+                slip.state, line.name as fee_name, line.total as fee_amount
+            FROM oe_feeslip slip
+            JOIN oe_feeslip_line line on line.feeslip_id = slip.id
+            JOIN res_partner std on line.student_id = std.id
+            LEFT JOIN oe_school_course course on std.course_id = course.id
+            LEFT JOIN oe_school_course_batch batch on std.batch_id = batch.id
+            WHERE slip.date_from >= %(date_from)s and slip.date_to <= %(date_to)s 
+            and std.course_id = ANY(%(course_ids)s)
         """
         args = {
-            #'company_id': company_id,
-            'date_from': self.start_date,
-            'date_to': self.end_date,
+            'company_id': self.env.company,
+            'date_from': self.year_id.date_start,
+            'date_to': self.year_id.date_end or '2099-12-30',
+            'course_ids': self.course_ids.ids
         }
         self.env.cr.execute(query, args)
-        rs_loans = self._cr.dictfetchall()
+        rs_slips = self._cr.dictfetchall()
 
-        sheet.write(2, 0, 'Reference', title)
-        sheet.write(2, 1, 'Date', title)
-        sheet.write(2, 2, 'Employee', title)
-        sheet.write(2, 3, 'Loan Type', title)
-        sheet.write(2, 4, 'Start Date', title)
-        sheet.write(2, 5, 'End Date', title)
-        sheet.write(2, 6, 'Loan Amount', title)
-        sheet.write(2, 7, 'Paid Amount', title)
-        sheet.write(2, 8, 'Disbursed', title)
-        sheet.write(2, 9, 'Residual', title)
-        sheet.write(2, 10, 'Status', title)
+        sheet.write(2, 0, 'course', title)
+        sheet.write(2, 1, 'amount', title)
             
         row = 3
             
-        if len(rs_loans):
+        if len(rs_slips):
             for loan in rs_loans:
                 sheet.set_column(row, 0, 20)
                 sheet.set_column(row, 1, 20)
-                sheet.set_column(row, 2, 30)
-                sheet.set_column(row, 3, 20)
-                sheet.set_column(row, 4, 10)
-                sheet.set_column(row, 5, 10)
-                sheet.set_column(row, 6, 10)
-                sheet.set_column(row, 7, 10)
-                sheet.set_column(row, 8, 10)
-                sheet.set_column(row, 9, 10)
-                sheet.set_column(row, 10, 10)
 
                 sheet.write(row, 0, loan['name'],text)
-                sheet.write(row, 1, loan['date'],text)
-                sheet.write(row, 2, loan['employee_name'],text)
-                sheet.write(row, 3, loan['loan_type'],text)
-                sheet.write(row, 4, loan['date_start'],text)
-                sheet.write(row, 5, loan['date_end'],text)
-                sheet.write(row, 6, loan['loan_amount'],number)
-                sheet.write(row, 7, loan['amount_paid'],number)
-                sheet.write(row, 8, loan['amount_disbursed'],number)
-                sheet.write(row, 9, loan['amount_residual'],number)
-                sheet.write(row, 10, loan['state'],text)
-
+                sheet.write(row, 1, loan['name'],text)
+                
                 row += 1
                     
             
         else:
-            sheet.merge_range(row , 3, row , 5,"No Data Was Found For This Employee In Selected Date", formate_1)
+            sheet.merge_range(row , 3, row , 5,"No Data Was Found For This student In Selected Date", text)
             row += 4
 
 
@@ -200,7 +178,7 @@ class FeeslipXLSXReprot(models.TransientModel):
         workbook.close()
         ex_report = base64.b64encode(open('/tmp/' + file_path, 'rb+').read())
 
-        excel_report_id = self.env['hr.loan.save.xlsx.wizard'].create({"document_frame": file_path,
+        excel_report_id = self.env['oe.feeslip.save.xlsx.wizard'].create({"document_frame": file_path,
                                                                         "file_name": ex_report})
 
         return {
