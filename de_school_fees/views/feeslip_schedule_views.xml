@@ -9,6 +9,8 @@
                     <field name="batch_id"/>
                     <field name="fee_struct_id"/>
                     <field name="date"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
                 </tree>
             </field>
         </record>

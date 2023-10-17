@@ -61,10 +61,21 @@ class FeeslipScheduleWizard(models.TransientModel):
                         vals = {
                             'batch_id': record.batch_id.id,
                             'fee_struct_id': record.fee_struct_id.id,
-                            'date': current_date
+                            'date': current_date,
+                            'date_from': current_date,
+                            'date_to': current_date + relativedelta(months=record.fee_struct_id.schedule_pay_duration) - relativedelta(days=1)
                         }
                         schedule_id = self.env['oe.feeslip.schedule'].create(vals)
-                        current_date = current_date + relativedelta(months=record.fee_struct_id.schedule_pay_duration)        
+                        current_date = current_date + relativedelta(months=record.fee_struct_id.schedule_pay_duration) 
+        # Return an action to open a new form view
+        action = {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree',
+            'name': _('Fee Schedules'),
+            'res_model': 'oe.feeslip.schedule',
+        }
+        return action
+
 
 
         
