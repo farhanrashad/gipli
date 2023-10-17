@@ -17,8 +17,8 @@ class CRMLead(models.Model):
     def action_find_email(self):
         hunter_instance_id = self.company_id.hunter_instance_id or self.env.company.hunter_instance_id
         for record in self:
-            if not (record.partner_id or record.partner_name or record.contact_name):
-                raise UserError("Please provide at least one of the following values: Company Name, Customer, or Contact Name.")
+            if not (record.contact_name):
+                raise UserError("Please provide Contact Name.")
 
             data = {}
             company_name = ''

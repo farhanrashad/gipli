@@ -19,9 +19,9 @@ class HunterInstance(models.Model):
     _name = 'hunter.instance'
     _description = 'Hunter Instance'
 
-    name = fields.Char(string='Name', required=True, readonly=True, states=READONLY_FIELD_STATES,)
-    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=True, states=READONLY_FIELD_STATES,)
-    url = fields.Char(string='URL', required=True, readonly=True, states=READONLY_FIELD_STATES,)
+    name = fields.Char(string='Name', required=True, readonly=False, states=READONLY_FIELD_STATES,)
+    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=False, states=READONLY_FIELD_STATES,)
+    url = fields.Char(string='URL', required=True, readonly=False, states=READONLY_FIELD_STATES,)
 
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states=READONLY_FIELD_STATES, default=lambda self: self.env.company)
 
@@ -51,8 +51,6 @@ class HunterInstance(models.Model):
             },
         }
 
-        url = self.url + '' #"https://api.hunter.io/v1/auth/health"
-        url = 'https://api.hunter.io/v2/domain-search?domain=stripe.com&api_key=c9280ab0813d7fee78ef90d0576ba532d09adc3f'
         url = self.url + 'domain-search?domain=dynexcel.com&api_key=' + self.api_key
         headers = {
             'X-API-KEY': self.api_key,
