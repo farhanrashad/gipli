@@ -14,7 +14,6 @@ from odoo.addons.base.models.res_partner import WARNING_MESSAGE, WARNING_HELP
 class ResPartner(models.Model):
     _inherit = 'res.partner'
     _rec_names_search = ['display_name', 'email', 'ref', 'vat', 'company_registry', 'roll_no','admission_no']  # TODO vat must be sanitized the same way for storing/searching
-
  
     is_student = fields.Boolean('Is Student')
     is_parent_student = fields.Boolean('Is Parent Student', store=True, compute='_compute_parent')
@@ -63,7 +62,16 @@ class ResPartner(models.Model):
     ], string='Merital Status')
     country_birth = fields.Many2one('res.country','Country of Birth')
     country_nationality = fields.Many2one('res.country','Nationality')
-    
+
+    #Gaurdian 
+    guardian_id = fields.Many2one('res.partner', string='Gaurdian', readonly=True, store=True,
+                compute='_compute_guardian',
+                help='A guardian is a person responsible for the student.',
+                                 )
+    guardian_name = fields.Char(string='Gaurdian Name', readonly=True, 
+                compute='_compute_guardian',
+                help='A guardian is a person responsible for the student.',
+                                 ) 
     # Medical Info
     student_complexion = fields.Char('Complexion') 
     student_weight = fields.Float('Weight (in kg)') 
@@ -73,7 +81,20 @@ class ResPartner(models.Model):
     student_allergic_history = fields.Text('Allergic History')
     student_emergency_contact = fields.Char('Emergency Contact Name') 
     student_emergency_phone = fields.Char('Emergency Contact Number')
-    
+
+    @api.depends('child_ids', 'child_ids.is_guardian')
+    def _compute_guardian(self):
+        for record in self:
+            guardian = record.child_ids.filtered(lambda x: x.is_guardian)
+            if guardian:
+                record.guardian_id = guardian[0].id
+                record.guardian_name = guardian[0].name
+            else:
+                record.guardian_id = False
+                record.guardian_name = False
+
+        
+            
     @api.onchange('contact_type')
     def _onchange_contact_type(self):
         for record in self:
