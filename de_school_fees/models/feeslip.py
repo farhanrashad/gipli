@@ -57,10 +57,9 @@ class FeeSlip(models.Model):
     
     date_from = fields.Date(
         string='From', readonly=True, required=True,
-        default=lambda self: fields.Date.to_string(date.today().replace(day=1)), states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
+        states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     date_to = fields.Date(
         string='To', readonly=True, required=True,
-        default=lambda self: fields.Date.to_string((datetime.now() + relativedelta(months=+1, day=1, days=-1)).date()),
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -607,7 +606,7 @@ class FeeSlip(models.Model):
         for slip in self.filtered(lambda p: not p.fee_struct_id):
             slip.fee_struct_id = False #slip.enrol_order_id.structure_type_id.default_struct_id
 
-    @api.depends('student_id', 'fee_struct_id', 'date_from')
+    @api.depends('student_id', 'fee_struct_id', 'date_from','date_to')
     def _compute_name(self):
         for slip in self.filtered(lambda p: p.student_id and p.date_from):
             lang = slip.student_id.sudo().lang or self.env.user.lang
@@ -615,10 +614,11 @@ class FeeSlip(models.Model):
             feeslip_name = slip.fee_struct_id.feeslip_name or _('Fee Slip')
             del context
 
-            slip.name = '%(feeslip_name)s - %(employee_name)s - %(dates)s' % {
+            slip.name = '%(feeslip_name)s - %(employee_name)s (%(date_from)s - %(date_to)s)' % {
                 'feeslip_name': feeslip_name,
                 'employee_name': slip.student_id.name,
-                'dates': format_date(self.env, slip.date_from, date_format="MMMM y", lang_code=lang)
+                'date_from': format_date(self.env, slip.date_from, date_format="MMMM y", lang_code=lang),
+                'date_to': format_date(self.env, slip.date_to, date_format="MMMM y", lang_code=lang)
             }
 
     @api.depends('student_id', 'enrol_order_id')
