@@ -1,10 +1,4 @@
 <odoo>
-    <record id="action_apollo_instance_from_settings" model="ir.actions.act_window">
-        <field name="name">Apollo Instances</field>
-        <field name="res_model">apl.instance</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-    
     <!--  Add Apollo Settings view  -->
     <record id="res_config_settings_view_form" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.inherit.sequence.opportunity.crm</field>

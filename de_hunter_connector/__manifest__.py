@@ -3,26 +3,17 @@
     'name': "Hunter Connector",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
-
-    'description': """
-        Long description of module's purpose
+        Odoo Hunter Integration Module
     """,
-
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
-
-    # any module necessary for this one to work correctly
+    'description': """
+        The Odoo Hunter Integration Module is a powerful tool that seamlessly connects your Odoo CRM system with the Hunter app, a leading email outreach and lead generation platform. This integration enables you to find and verify leads effortlessly through domain and company name searches, access contact information, and perform email finder and verification, all while working within your Odoo environment.
+    """,
+    'author': "Dynexcel",
+    'website': "https://www.dynexcel.com",
+    'category': 'Sales/Marketing',
+    'version': '0.2',
+    'live_test_url': 'https://youtu.be/BwokAjL_KZU',
     'depends': ['crm'],
-
-    # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/instance_views.xml',
@@ -45,6 +36,6 @@
     'currency': 'USD',
     'images': ['static/description/banner.gif'],
     'installable': True,
-    'application': False,
+    'application': True,
     'auto_install': False,
 }
