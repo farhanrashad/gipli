@@ -46,7 +46,8 @@ class FeeSlip(models.Model):
         'res.partner', string='Student', required=True, readonly=True,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]},
         domain="[('is_student', '=', True), ('active', '=', True)]")
-    
+    course_id = fields.Many2one('oe.school.course',related='student_id.course_id')
+    batch_id = fields.Many2one('oe.school.course.batch',related='student_id.batch_id')
     enrol_order_id = fields.Many2one(
         'sale.order', string='Enrol Contract',
         #domain=lambda self: self._compute_enrol_order_domain(),
@@ -125,6 +126,46 @@ class FeeSlip(models.Model):
     #)
     #salary_attachment_count = fields.Integer('Salary Attachment count', compute='_compute_salary_attachment_count')
 
+    @api.depends('course_id','batch_id','fee_struct_id')
+    @api.onchange('course_id','batch_id','fee_struct_id')
+    # Method to retrieve oe.feeslip.schedule records without generated oe.feeslip
+    def _find_fee_dates(self):
+        # Check if this is an existing record
+        domain = [('student_id', '=', self.student_id.id)]
+        if self._origin and self._origin.id:
+            domain.append(('id', '!=', self._origin.id))
+        
+        slip_id = self.env['oe.feeslip'].search(domain, limit=1, order="date_from desc")
+
+        #raise UserError(slip_id.name)
+        # Ensure that there is a current slip
+        if slip_id:
+            for record in self:
+                date_from = record.date_from
+                date_to = record.date_to
+                fee_schedule_id = record.env['oe.feeslip.schedule'].search([
+                        ('batch_id', '=', record.batch_id.id),
+                        ('course_id', '=', record.course_id.id),
+                        ('fee_struct_id', '=', record.fee_struct_id.id),
+                        ('date_from', '>', slip_id.date_to),
+                ], limit=1)
+                #raise UserError(fee_schedule_id.date_from)
+                if not fee_schedule_id:
+                    fee_schedule_id = record.env['oe.feeslip.schedule'].search([
+                            ('batch_id', '=', record.batch_id.id),
+                            ('course_id', '=', record.course_id.id),
+                            ('fee_struct_id', '=', record.fee_struct_id.id)
+                    ], limit=1)
+    
+                record.write({
+                        'date_from': fee_schedule_id.date_from,
+                        'date_to': fee_schedule_id.date_to
+                })
+        else:
+            # Handle the case where there is no current slip
+            pass
+
+            
     @api.depends('line_ids','line_ids.total')
     def _compute_amount_total(self):
         for record in self:
