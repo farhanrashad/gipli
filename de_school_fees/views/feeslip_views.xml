@@ -61,7 +61,7 @@
     </record>
 
     <record id="feeslip_form_view" model="ir.ui.view">
-        <field name="name">fee.slip.form.voew</field>
+        <field name="name">fee.slip.form.view</field>
         <field name="model">oe.feeslip</field>
         <field name="arch" type="xml">
             <form string="Feeslip">
