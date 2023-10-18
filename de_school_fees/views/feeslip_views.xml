@@ -94,7 +94,7 @@
 -->
                 </div>
                 <div class="oe_title" name="title">
-                    <h1><field name="student_id" placeholder="Student"/></h1>
+                    <h1><field name="student_id" placeholder="Student" context="{'form_view_ref':'de_school.student_primary_form_view'}"/></h1>
                     <h2><field name="number" attrs="{'invisible': [('state', '=', 'draft')]}"/></h2>
                 </div>
                 
@@ -114,7 +114,7 @@
                     <!--
                         <field name="feeslip_run_id" string="Batch"/>
 -->
-                        <field name="enrol_order_id" options="{'no_create': True}"/>
+                        <field name="enrol_order_id" options="{'no_create': True}" context="{'form_view_ref':'de_school_enrollment.enrol_contract_primary_form_view'}"/>
                         <field name="fee_struct_id" options="{'no_create': True}"/>
                     <!--
                     <field name="salary_attachment_ids" invisible="1" force_save="1"/>
