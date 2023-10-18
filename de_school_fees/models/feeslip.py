@@ -373,6 +373,8 @@ class FeeSlip(models.Model):
 
 
     def _prepare_line_values(self, line, product_id, date, quantity, price_unit):
+        feeslip_order_lines = self.env['oe.feeslip.enrol.order.line'].search([('feeslip_id','=',line.feeslip_id.id),('product_id', '=', line.fee_rule_id.product_id.id)])
+        sale_line_ids = [(4, order_line.id) for order_line in feeslip_order_lines.order_line_id]
         return {
             'name': line.name,
             'partner_id': line.partner_id.id,
@@ -381,6 +383,7 @@ class FeeSlip(models.Model):
             'date': date,
             'quantity': quantity,
             'price_unit': price_unit,
+            'sale_line_ids': sale_line_ids,
             #'analytic_distribution': (line.salary_rule_id.analytic_account_id and {line.salary_rule_id.analytic_account_id.id: 100}) or
             #                         (line.slip_id.contract_id.analytic_account_id.id and {line.slip_id.contract_id.analytic_account_id.id: 100})
         }
