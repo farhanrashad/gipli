@@ -111,7 +111,7 @@ class AplOpsWizard(models.TransientModel):
                         'company_type': 'company',
                         'apl_id': obj.get('id'),
                         'name': obj.get('name'),
-                        'website_url': obj.get('website_url'),
+                        'website': obj.get('website_url'),
                         'blog_url': obj.get('blog_url'),
                         'angellist_url': obj.get('angellist_url'),
                         'linkedin_url': obj.get('linkedin_url'),
