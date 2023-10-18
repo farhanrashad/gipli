@@ -25,6 +25,8 @@
         'security/ir.model.access.csv',
         'data/fee_data.xml',
         'data/feeslip_sequence.xml',
+        'data/ir_cron_data.xml',
+        'data/account_data.xml',
         'views/fees_menu.xml',
         'views/fee_category_views.xml',
         'views/fee_rule_views.xml',

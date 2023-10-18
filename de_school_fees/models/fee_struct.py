@@ -38,6 +38,18 @@ class FeeStructure(models.Model):
     course_id = fields.Many2one('oe.school.course', string='Course')
     batch_ids = fields.Many2many('oe.school.course.batch', string='Course Batches')
 
+    journal_id = fields.Many2one('account.journal', 'Salary Journal', readonly=False, required=True,
+        company_dependent=True,
+        default=lambda self: self.env['account.journal'].sudo().search([
+            ('type', '=', 'sale'), ('company_id', '=', self.env.company.id)], limit=1))
+
+    @api.constrains('journal_id')
+    def _check_journal_id(self):
+        for record_sudo in self.sudo():
+            if record_sudo.journal_id.currency_id and record_sudo.journal_id.currency_id != record_sudo.journal_id.company_id.currency_id:
+                raise ValidationError(
+                    _('Incorrect journal: The journal must be in the same currency as the company')
+                )
 
     @api.constrains('schedule_pay_duration')
     def _check_schedule_pay_duration(self):

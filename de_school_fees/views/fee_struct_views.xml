@@ -75,6 +75,7 @@
                             <span class="ml8"> Month(s)</span>
                         </div>
                         <field name="pay_one_time" />
+                        <field name="journal_id" options="{'no_create': True, 'no_open': True}"/>
                     </group>
                 </group>
                 <notebook colspan="4">

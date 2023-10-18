@@ -100,6 +100,11 @@
                         <field name="note"/>
                     </page>
                     <page name="billing" string="Billing">
+                        <group>
+                            <group>
+                                <field name="product_id" options="{'no_create': True}"/>
+                            </group>
+                        </group>
                     </page>
                 </notebook>
             </sheet>

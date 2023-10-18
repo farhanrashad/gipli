@@ -117,6 +117,8 @@ class FeeSlip(models.Model):
     edited = fields.Boolean()
     queued_for_pdf = fields.Boolean(default=False)
 
+    
+    
     #salary_attachment_ids = fields.Many2many(
     #    'hr.salary.attachment',
     #    relation='hr_feeslip_hr_salary_attachment_rel',
@@ -211,7 +213,7 @@ class FeeSlip(models.Model):
                 ('date_from', '=', feeslip.date_from),
                 ('date_to', '=', feeslip.date_to),
                 #('enrol_order_id', '=', feeslip.enrol_order_id.id),
-                ('fee_struct_id', '=', feeslip.struct_id.id),
+                ('fee_struct_id', '=', feeslip.fee_struct_id.id),
                 ('credit_note', '=', True),
                 ('state', '!=', 'cancel'),
                 ]):
@@ -281,40 +283,41 @@ class FeeSlip(models.Model):
         self.env['ir.attachment'].sudo().create(attachments_vals_list)
 
     def action_feeslip_done(self):
-        invalid_feeslips = self.filtered(lambda p: p.enrol_order_id and (p.enrol_order_id.date_start > p.date_to or (p.enrol_order_id.date_end and p.enrol_order_id.date_end < p.date_from)))
+        invalid_feeslips = self.filtered(lambda p: not p.enrol_order_id)
         if invalid_feeslips:
-            raise ValidationError(_('The following employees have a enrol order outside of the feeslip period:\n%s', '\n'.join(invalid_feeslips.mapped('student_id.name'))))
+            raise ValidationError(_('The following students have a enrol order outside of the feeslip period:\n%s', '\n'.join(invalid_feeslips.mapped('student_id.name'))))
         if any(slip.enrol_order_id.state == 'cancel' for slip in self):
             raise ValidationError(_('You cannot valide a feeslip on which the contract is cancelled'))
         if any(slip.state == 'cancel' for slip in self):
             raise ValidationError(_("You can't validate a cancelled feeslip."))
         self.write({'state' : 'done'})
-
-        line_values = self._get_line_values(['NET'])
-
-        self.filtered(lambda p: not p.credit_note and line_values['NET'][p.id]['total'] < 0).write({'has_negative_net_to_report': True})
-        self.mapped('feeslip_run_id').action_close()
-        # Validate work entries for regular feeslips (exclude end of year bonus, ...)
-        regular_feeslips = self.filtered(lambda p: p.fee_struct_id.type_id.default_struct_id == p.fee_struct_id)
-        work_entries = self.env['hr.work.entry']
-        for regular_feeslip in regular_feeslips:
-            work_entries |= self.env['hr.work.entry'].search([
-                ('date_start', '<=', regular_feeslip.date_to),
-                ('date_stop', '>=', regular_feeslip.date_from),
-                ('student_id', '=', regular_feeslip.student_id.id),
-            ])
-        if work_entries:
-            work_entries.action_validate()
-
+        
         if self.env.context.get('feeslip_generate_pdf'):
             if self.env.context.get('feeslip_generate_pdf_direct'):
                 self._generate_pdf()
             else:
                 self.write({'queued_for_pdf': True})
-                feeslip_cron = self.env.ref('hr_payroll.ir_cron_generate_feeslip_pdfs', raise_if_not_found=False)
+                feeslip_cron = self.env.ref('de_school_fees.ir_cron_generate_feeslip_pdfs', raise_if_not_found=False)
                 if feeslip_cron:
                     feeslip_cron._trigger()
 
+        self._action_create_account_move()
+
+    def _action_create_account_move(self):
+        precision = self.env['decimal.precision'].precision_get('Payroll')
+
+        # Add payslip without run
+        payslips_to_post = self.filtered(lambda slip: not slip.payslip_run_id)
+
+        # Adding pay slips from a batch and deleting pay slips with a batch that is not ready for validation.
+        payslip_runs = (self - payslips_to_post).mapped('payslip_run_id')
+        for run in payslip_runs:
+            if run._are_payslips_ready():
+                payslips_to_post |= run.slip_ids
+
+        # A payslip need to have a done state and not an accounting move.
+        payslips_to_post = payslips_to_post.filtered(lambda slip: slip.state == 'done' and not slip.move_id)
+        
     def action_feeslip_cancel(self):
         if not self.env.user._is_system() and self.filtered(lambda slip: slip.state == 'done'):
             raise UserError(_("Cannot cancel a feeslip that is done."))
@@ -702,68 +705,7 @@ class FeeSlip(models.Model):
         return []
 
 
-    def _get_salary_line_total(self, code):
-        _logger.warning('The method _get_salary_line_total is deprecated in favor of _get_line_values')
-        lines = self.line_ids.filtered(lambda line: line.code == code)
-        return sum([line.total for line in lines])
-
-    def _get_salary_line_quantity(self, code):
-        _logger.warning('The method _get_salary_line_quantity is deprecated in favor of _get_line_values')
-        lines = self.line_ids.filtered(lambda line: line.code == code)
-        return sum([line.quantity for line in lines])
-
-    def _get_line_values(self, code_list, vals_list=None, compute_sum=False):
-        if vals_list is None:
-            vals_list = ['total']
-        valid_values = {'quantity', 'amount', 'total'}
-        if set(vals_list) - valid_values:
-            raise UserError(_('The following values are not valid:\n%s', '\n'.join(list(set(vals_list) - valid_values))))
-        result = defaultdict(lambda: defaultdict(lambda: dict.fromkeys(vals_list, 0)))
-        if not self:
-            return result
-        self.flush()
-        selected_fields = ','.join('SUM(%s) AS %s' % (vals, vals) for vals in vals_list)
-        self.env.cr.execute("""
-            SELECT
-                p.id,
-                pl.code,
-                %s
-            FROM oe_feeslip_line pl
-            JOIN oe_feeslip p
-            ON p.id IN %s
-            AND pl.feeslip_id = p.id
-            AND pl.code IN %s
-            GROUP BY p.id, pl.code
-        """ % (selected_fields, '%s', '%s'), (tuple(self.ids), tuple(code_list)))
-        # self = hr.feeslip(1, 2)
-        # request_rows = [
-        #     {'id': 1, 'code': 'IP', 'total': 100, 'quantity': 1},
-        #     {'id': 1, 'code': 'IP.DED', 'total': 200, 'quantity': 1},
-        #     {'id': 2, 'code': 'IP', 'total': -2, 'quantity': 1},
-        #     {'id': 2, 'code': 'IP.DED', 'total': -3, 'quantity': 1}
-        # ]
-        request_rows = self.env.cr.dictfetchall()
-        # result = {
-        #     'IP': {
-        #         'sum': {'quantity': 2, 'total': 300},
-        #         1: {'quantity': 1, 'total': 100},
-        #         2: {'quantity': 1, 'total': 200},
-        #     },
-        #     'IP.DED': {
-        #         'sum': {'quantity': 2, 'total': -5},
-        #         1: {'quantity': 1, 'total': -2},
-        #         2: {'quantity': 1, 'total': -3},
-        #     },
-        # }
-        for row in request_rows:
-            code = row['code']
-            feeslip_id = row['id']
-            for vals in vals_list:
-                if compute_sum:
-                    result[code]['sum'][vals] += row[vals]
-                result[code][feeslip_id][vals] += row[vals]
-        return result
-
+    
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super().fields_view_get(view_id, view_type, toolbar, submenu)
