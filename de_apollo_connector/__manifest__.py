@@ -11,7 +11,7 @@
     'website': "https://www.dynexcel.com",
     'category': 'Sales/Marketing',
     'version': '0.4',
-    'live_test_url': 'https://youtu.be/BwokAjL_KZU',
+    'live_test_url': 'https://youtu.be/_qKgJmMrVq4',
     'depends': ['crm'],
     'data': [
         'security/ir.model.access.csv',
