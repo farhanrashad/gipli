@@ -207,7 +207,8 @@
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                             </group>
                             <group name="accounting">
-                                
+                                <field name="account_move_id" />
+                                <field name="date" />
                                 <field name="paid"/>
                             </group>
                         </group>

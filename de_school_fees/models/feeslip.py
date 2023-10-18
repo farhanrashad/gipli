@@ -5,6 +5,8 @@ import base64
 import logging
 
 from collections import defaultdict
+from markupsafe import Markup
+
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
@@ -12,6 +14,8 @@ from odoo import api, Command, fields, models, _
 from odoo.addons.de_school_fees.models.browsable_object import BrowsableObject, InputFees, OrderFeeLines, Feeslips, ResultRules
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_round, date_utils, convert_file, html2plaintext
+from odoo.tools import float_compare, float_is_zero, plaintext2html
+
 from odoo.tools.float_utils import float_compare
 from odoo.tools.misc import format_date
 from odoo.tools.safe_eval import safe_eval
@@ -117,6 +121,9 @@ class FeeSlip(models.Model):
     edited = fields.Boolean()
     queued_for_pdf = fields.Boolean(default=False)
 
+    account_move_id = fields.Many2one('account.move', 'Accounting Entry', readonly=True, copy=False)
+    date = fields.Date('Date Account', states={'draft': [('readonly', False)], 'verify': [('readonly', False)]}, readonly=True, help="Keep empty to use the period of the validation(Feeslip) date.")
+
     
     
     #salary_attachment_ids = fields.Many2many(
@@ -129,7 +136,7 @@ class FeeSlip(models.Model):
     #)
     #salary_attachment_count = fields.Integer('Salary Attachment count', compute='_compute_salary_attachment_count')
 
-    @api.depends('course_id','batch_id','fee_struct_id')
+    #@api.depends('course_id','batch_id','fee_struct_id')
     @api.onchange('course_id','batch_id','fee_struct_id')
     # Method to retrieve oe.feeslip.schedule records without generated oe.feeslip
     def _find_fee_dates(self):
@@ -142,7 +149,7 @@ class FeeSlip(models.Model):
 
         #raise UserError(slip_id.name)
         # Ensure that there is a current slip
-        if slip_id:
+        if self: #slip_id:
             for record in self:
                 date_from = record.date_from
                 date_to = record.date_to
@@ -159,7 +166,8 @@ class FeeSlip(models.Model):
                             ('course_id', '=', record.course_id.id),
                             ('fee_struct_id', '=', record.fee_struct_id.id)
                     ], limit=1)
-    
+
+                #raise UserError(fee_schedule_id)
                 record.write({
                         'date_from': fee_schedule_id.date_from,
                         'date_to': fee_schedule_id.date_to
@@ -301,22 +309,98 @@ class FeeSlip(models.Model):
                 if feeslip_cron:
                     feeslip_cron._trigger()
 
-        self._action_create_account_move()
+        self._action_create_fee_invoice()
+    
+    def _action_create_fee_invoice(self):
+        precision = self.env['decimal.precision'].precision_get('Fee')
+    
+        # Add feeslip without run
+        feeslips_to_post = self.filtered(lambda slip: not slip.feeslip_run_id)
+    
+        # Adding fee slips from a batch and deleting fee slips with a batch that is not ready for validation.
+        feeslip_runs = (self - feeslips_to_post).mapped('feeslip_run_id')
+        for run in feeslip_runs:
+            if run._are_feeslips_ready():
+                feeslips_to_post |= run.slip_ids
+    
+        # A feeslip needs to have a done state and not an accounting move.
+        feeslips_to_post = feeslips_to_post.filtered(lambda slip: slip.state == 'done' and not slip.account_move_id)
+    
+        # Check that a journal exists on all the structures
+        if any(not feeslip.fee_struct_id for feeslip in feeslips_to_post):
+            raise ValidationError(_('One of the contract for these feeslips has no structure type.'))
+        if any(not structure.journal_id for structure in feeslips_to_post.mapped('fee_struct_id')):
+            raise ValidationError(_('One of the feeslips structures has no account journal defined on it.'))
+    
+        # Map all feeslips by structure journal
+        # {'journal_id': [slip_ids]}
+        slip_mapped_data = defaultdict(list)
+        for slip in feeslips_to_post:
+            # Append slip to the list for the specific journal_id.
+            slip_mapped_data[slip.fee_struct_id.journal_id.id].append(slip)
+    
+        for journal_id in slip_mapped_data:
+            line_ids = []
+            #debit_sum = 0.0
+            #credit_sum = 0.0
+            date = fields.Date().end_of(slip.date_to, 'month')
+            move_dict = {
+                'narration': '',
+                'ref': date.strftime('%B %Y'),
+                'journal_id': journal_id,
+                'move_type': 'out_invoice',
+                'date': date,
+                'invoice_date': date,
+                'partner_id': self.student_id.id,
+            }
+            for slip in slip_mapped_data[journal_id]:
+                move_dict['narration'] += plaintext2html(slip.number or '' + ' - ' + slip.student_id.name or '')
+                move_dict['narration'] += Markup('<br/>')
+                slip_lines = slip._prepare_slip_lines(date, line_ids)
+                line_ids.extend(slip_lines)
+    
+            #for line_id in line_ids:
+            #    debit_sum += line_id['debit']
+            #    credit_sum += line_id['credit']
+    
+            # Add accounting lines in the move
+            move_dict['line_ids'] = [(0, 0, line_vals) for line_vals in line_ids]
+            #raise UserError(move_dict)
+            move = self._create_account_move(move_dict)
+            for slip in slip_mapped_data[journal_id]:
+                slip.write({'account_move_id': move.id, 'date': date})
+        return True
 
-    def _action_create_account_move(self):
-        precision = self.env['decimal.precision'].precision_get('Payroll')
 
-        # Add payslip without run
-        payslips_to_post = self.filtered(lambda slip: not slip.payslip_run_id)
+    def _prepare_line_values(self, line, product_id, date, quantity, price_unit):
+        return {
+            'name': line.name,
+            'partner_id': line.partner_id.id,
+            'product_id': product_id,
+            'journal_id': line.feeslip_id.fee_struct_id.journal_id.id,
+            'date': date,
+            'quantity': quantity,
+            'price_unit': price_unit,
+            #'analytic_distribution': (line.salary_rule_id.analytic_account_id and {line.salary_rule_id.analytic_account_id.id: 100}) or
+            #                         (line.slip_id.contract_id.analytic_account_id.id and {line.slip_id.contract_id.analytic_account_id.id: 100})
+        }
+        
+    def _prepare_slip_lines(self, date, line_ids):
+        self.ensure_one()
+        precision = self.env['decimal.precision'].precision_get('FEE')
+        new_lines = []
+        for line in self.line_ids:
+            product_id = line.fee_rule_id.product_id.id
+            quantity = line.quantity
+            price_unit = line.total
+            fee_line = self._prepare_line_values(line, product_id, date, quantity, price_unit)
+            fee_line['tax_ids'] = [(4, tax_id) for tax_id in line.fee_rule_id.product_id.taxes_id.ids]
+            new_lines.append(fee_line)
+        return new_lines
 
-        # Adding pay slips from a batch and deleting pay slips with a batch that is not ready for validation.
-        payslip_runs = (self - payslips_to_post).mapped('payslip_run_id')
-        for run in payslip_runs:
-            if run._are_payslips_ready():
-                payslips_to_post |= run.slip_ids
-
-        # A payslip need to have a done state and not an accounting move.
-        payslips_to_post = payslips_to_post.filtered(lambda slip: slip.state == 'done' and not slip.move_id)
+    def _create_account_move(self, values):
+        return self.env['account.move'].sudo().create(values)
+        
         
     def action_feeslip_cancel(self):
         if not self.env.user._is_system() and self.filtered(lambda slip: slip.state == 'done'):

@@ -38,7 +38,7 @@ class FeeStructure(models.Model):
     course_id = fields.Many2one('oe.school.course', string='Course')
     batch_ids = fields.Many2many('oe.school.course.batch', string='Course Batches')
 
-    journal_id = fields.Many2one('account.journal', 'Salary Journal', readonly=False, required=True,
+    journal_id = fields.Many2one('account.journal', 'Fee Journal', readonly=False, required=True,
         company_dependent=True,
         default=lambda self: self.env['account.journal'].sudo().search([
             ('type', '=', 'sale'), ('company_id', '=', self.env.company.id)], limit=1))
