@@ -34,7 +34,9 @@
     'assets': {
         'web.assets_backend': [
             'de_school_timetable/static/src/js/timetable_gantt_view.js',
-             'de_school_timetable/static/src/js/timetable_gantt_model.js',
+            'de_school_timetable/static/src/js/timetable_gantt_model.js',
+            'de_school_timetable/static/src/js/timetable_button_tree.js',
+            'de_school_timetable/static/src/xml/timetable_button.xml',
         ],
     },
     # only loaded in demonstration mode

@@ -13,7 +13,15 @@ class TimetableRecurrency(models.Model):
     
     timetable_ids = fields.One2many('oe.school.timetable', 'recurrency_id', string="Related Timetable Entries")
     repeat_interval = fields.Integer("Repeat Every", default=1, required=True)
-    repeat_type = fields.Selection([('forever', 'Forever'), ('until', 'Until')], string='Weeks', default='forever')
+    repeat_type = fields.Selection(
+        [
+            ('month', 'Month(s)'),
+            ('week', 'Week(s)'),
+            ('day', 'Day(s)'),
+        ],
+        string="Repeat Type", required=True, default='week',
+        help="Repeat type determines how often a course timetable schedule."
+    )
     repeat_until = fields.Datetime(string="Repeat Until", help="Up to which date should the plannings be repeated")
     last_generated_end_datetime = fields.Datetime("Last Generated End Date", readonly=True)
     company_id = fields.Many2one('res.company', string="Company", readonly=True, required=True, default=lambda self: self.env.company)
@@ -73,8 +81,8 @@ class TimetableRecurrency(models.Model):
                     recurrence_end_dt = recurrency.repeat_until
     
                 # find end of generation period (either the end of recurrence (if this one ends before the cron period), or the given `stop_datetime` (usually the cron period))
-                if not stop_datetime:
-                    stop_datetime = fields.Datetime.now() + get_timedelta(recurrency.company_id.planning_generation_interval, 'month')
+                #if not stop_datetime:
+                #    stop_datetime = fields.Datetime.now() + get_timedelta(recurrency.company_id.planning_generation_interval, 'month')
     
                 # Check if either recurrence_end_dt or stop_datetime is set
                 if recurrence_end_dt or stop_datetime:

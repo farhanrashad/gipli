@@ -63,6 +63,22 @@
                 </form>
             </field>
         </record>
+
+        <!-- timetable tree View -->
+        <record id="school_timetable_tree_view" model="ir.ui.view">
+            <field name="name">school.timetable.tree.view</field>
+            <field name="model">oe.school.timetable</field>
+            <field name="arch" type="xml">
+                <tree string="Timetable" js_class="timetable_button_in_tree">
+                    <field name="name"/>
+                    <field name="course_id"/>
+                    <field name="batch_id"/>
+                    <field name="subject_id"/>
+                    <field name="teacher_id"/>
+                </tree>
+               
+            </field>
+        </record>
         
         <record id="school_timetable_pivot_view" model="ir.ui.view">
             <field name="name">school.timetable.pivot.view</field>
@@ -141,7 +157,7 @@
                     color="color"
                     string="Planning"
                     thumbnails="{'user_id': 'image_128'}"
-                    js_class="timetable_gantt"
+                    js_class="timetable_gantt, timetable_button_in_tree"
                     display_unavailability="1"
                     sample="1"
                     precision="{'day': 'hour:quarter', 'week': 'day:half', 'month': 'day:full'}">
@@ -171,7 +187,7 @@
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'gantt', 'view_id': ref('school_timetable_view_gantt')}),
                 (0, 0, {'view_mode': 'calendar', 'view_id': ref('view_timetable_calendar')}),
-                (0, 0, {'view_mode': 'tree'}),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('school_timetable_tree_view')}),
                 (0, 0, {'view_mode': 'form'})]"/>
             <field name="search_view_id" ref="view_timetable_search_form"/>
             <field name="context">{'search_default_course': 1,'search_default_subject': 1}</field>
