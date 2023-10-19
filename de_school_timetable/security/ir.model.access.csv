@@ -7,4 +7,6 @@ access_school_timetable_recurrency_user,access.school.timetable.recurrency.user,
 access_school_timetable_recurrency_manager,access.school.timetable.recurrency.manager,model_oe_school_timetable_recurrency,de_school.group_school_manager,1,1,1,1
 
 access_report_timetable_period,access.report.timetable.period,model_oe_report_timetable_period,,1,0,0,0
+access_timetable_wizard,access.timetable.wizard,model_oe_school_timetable_wizard,,1,1,1,1
+
 

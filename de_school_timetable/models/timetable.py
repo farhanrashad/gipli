@@ -11,7 +11,6 @@ import pytz
 import uuid
 from math import ceil, modf
     
-    
 class SchoolTimetable(models.Model):
     _name = 'oe.school.timetable'
     _description = 'School Timetable'
@@ -29,9 +28,9 @@ class SchoolTimetable(models.Model):
     calendar_id = fields.Many2one('resource.calendar', related='company_id.resource_calendar_id')
     
     classroom_id = fields.Many2one('oe.school.building.room', 'Classroom', store=True,)
-    
-    start_datetime = fields.Datetime("Start Date", compute='_compute_datetime', store=True, readonly=False, required=True, copy=True)
-    end_datetime = fields.Datetime("End Date", compute='_compute_datetime', store=True, readonly=False, required=True, copy=True)
+    date = fields.Date('Date')
+    start_datetime = fields.Datetime("Start Date", compute='_compute_datetime', store=True, readonly=False, required=False, copy=True)
+    end_datetime = fields.Datetime("End Date", compute='_compute_datetime', store=True, readonly=False, required=False, copy=True)
     color = fields.Integer("Color", compute='_compute_color' )
     allocated_hours = fields.Float("Allocated Hours", compute='_compute_allocated_hours', store=True, readonly=False)
     allocated_percentage = fields.Float("Allocated Time (%)", default=100,
@@ -44,7 +43,7 @@ class SchoolTimetable(models.Model):
             ('published', 'Published'),
     ], string='Status', default='draft')
     is_hatched = fields.Boolean(compute='_compute_is_hatched')
-    timetable_period_id = fields.Many2one('resource.calendar.attendance', string='Period Templates', readonly=False, store=True, domain="[('calendar_id','=',calendar_id)]")
+    timetable_period_id = fields.Many2one('resource.calendar.attendance', string='Period Templates', readonly=False, required=True, store=True, domain="[('calendar_id','=',calendar_id)]")
     
     # Recurring (`repeat_` fields are none stored, only used for UI purpose)
     recurrency_id = fields.Many2one('oe.school.timetable.recurrency', readonly=True, index=True, ondelete="set null", copy=False)
@@ -87,12 +86,12 @@ class SchoolTimetable(models.Model):
             WHERE tt.id IN %s
         ''', [tuple(timetables.ids)])
         duplicated_tts = self.browse([r[0] for r in self._cr.fetchall()])
-        if duplicated_tts:
-            raise ValidationError(_('Duplicated period detected. You probably encoded twice the same period:\n%s') % "\n".join(
-                duplicated_tts.mapped(lambda m: "%(date_start)s" % {
-                    'date_start': m.start_datetime,
-                })
-            ))
+        #if duplicated_tts:
+        #    raise ValidationError(_('Duplicated period detected. You probably encoded twice the same period:\n%s') % "\n".join(
+         #       duplicated_tts.mapped(lambda m: "%(date_start)s" % {
+         #           'date_start': m.start_datetime,
+         #       })
+         #   ))
             
     def _get_tz(self):
         return (self.env.user.tz

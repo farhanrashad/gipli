@@ -7,4 +7,21 @@
                 </button>
         </t>
     </t>
+<!--
+    <t t-extend="CalendarView.buttons" t-name="de_school_timetable.timetable_button_calendar">
+        <t t-jquery=".o_calendar_buttons" t-operation="append">
+            <button>Custom Action</button>
+        </t>
+    </t>
+    -->
+    <!--
+    <t t-extend="CalendarView.buttons" t-name="de_school_timetable.timetable_button_calendar">
+        
+        <t t-jquery=".o_calendar_navigation_buttons" t-operation="before">
+                <button type="button" class="btn btn-primary open_wizard_action_timetable" style="margin-right: 10px; margin-left: 10px;">
+                    Timetable
+                </button>
+        </t>
+    </t>
+    -->
 </templates>

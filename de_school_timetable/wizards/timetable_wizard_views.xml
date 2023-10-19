@@ -1,0 +1,65 @@
+<odoo>
+    <data>
+        <!-- Define a form view for Timetable Wizard -->
+        <record id="timetable_wizard_form_view" model="ir.ui.view">
+            <field name="name">oe.school.timetable.wizard.form</field>
+            <field name="model">oe.school.timetable.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <field name="company_id" invisible="1" />
+                        <field name="calendar_id" invisible="1"/>
+                        
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" force_save="1"/>
+                            
+                                <label for="timetable_period_id"/>
+                                <field name="timetable_period_id" nolabel="1" class="text-break flex-wrap"
+                                     options="{'horizontal': true}" />
+                                <field name="course_id"/>
+                                <field name="batch_id" />
+                                <field name="subject_id"/>
+                                <field name="teacher_id"/>
+
+                                <label for="repeat" groups="de_school.group_school_manager"/>
+                                <div class="o_row">
+                                    <field name="repeat" />
+                                    <label for="repeat_interval" string="Every" attrs="{'invisible': [('repeat', '=', False)]}"/>
+                                    <div class="o_row" attrs="{'invisible': [('repeat', '=', False)]}">
+                                        <field name="repeat_interval" class="oe_inline col-lg-1" nolabel="1"/>
+                                        <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" attrs="{'required': [('repeat', '=', True)]}"/>
+                                    </div>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="date_start"/>
+                                <field name="date_end"/>
+                                <field name="classroom_id" options="{'no_create':True}"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="calendar_id" invisible="1"/>
+
+                                
+                            </group>
+                        </group>
+                        
+                        <footer>
+                            <button name="action_create_timetable" string="Create Timetable" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Define an action to open the form view -->
+        <record id="action_timetable_wizard" model="ir.actions.act_window">
+            <field name="name">Timetable</field>
+            <field name="res_model">oe.school.timetable.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="timetable_wizard_form_view"/>
+        </record>
+
+    </data>
+</odoo>

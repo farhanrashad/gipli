@@ -71,6 +71,7 @@
             <field name="arch" type="xml">
                 <tree string="Timetable" js_class="timetable_button_in_tree">
                     <field name="name"/>
+                    <field name="date"/>
                     <field name="course_id"/>
                     <field name="batch_id"/>
                     <field name="subject_id"/>
@@ -99,7 +100,8 @@
             <field name="model">oe.school.timetable</field>
             <field name="arch" type="xml">
                 <search string="Timetable">
-                    <field name="name" string="Timetable"/>
+                    <field name="name" string="Timetable" optional="hide"/>
+                    <field name="timetable_period_id" />
                     <field name="course_id" />
                     <field name="batch_id" />
                     <field name="subject_id" />
@@ -132,7 +134,7 @@
             <field name="name">school.calendar</field>
             <field name="model">oe.school.timetable</field>
             <field name="arch" type="xml">
-                <calendar string="Planning" date_start="start_datetime" date_stop="end_datetime" color="color" form_view_id="%(timetable_view_form_inherit)d" event_open_popup="True" quick_add="False" mode="month" >
+                <calendar string="Planning" date_start="date" color="color" form_view_id="%(timetable_view_form_inherit)d" js_class="timetable_button_in_calendar" event_open_popup="True" quick_add="False" mode="month" >
                     <field name="course_id" filters="1" color="color" />
                     <field name="is_hatched" invisible="1" />
                     <field name="subject_id" filters="2" color="color"/>
@@ -157,7 +159,7 @@
                     color="color"
                     string="Planning"
                     thumbnails="{'user_id': 'image_128'}"
-                    js_class="timetable_gantt, timetable_button_in_tree"
+                    js_class="timetable_gantt"
                     display_unavailability="1"
                     sample="1"
                     precision="{'day': 'hour:quarter', 'week': 'day:half', 'month': 'day:full'}">
@@ -183,7 +185,7 @@
         <record id="action_timetable_calendar_event" model="ir.actions.act_window">
             <field name="name">Timetable Planning</field>
             <field name="res_model">oe.school.timetable</field>
-            <field name="view_mode">gantt,calendar,tree,form</field>
+            <field name="view_mode">tree,form,gantt,calendar</field>
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'gantt', 'view_id': ref('school_timetable_view_gantt')}),
                 (0, 0, {'view_mode': 'calendar', 'view_id': ref('view_timetable_calendar')}),

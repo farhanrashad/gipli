@@ -1,14 +1,14 @@
-odoo.define('de_school_timetable.tree_timetable_button', function (require) {
+odoo.define('de_school_timetable.calendar_timetable_button', function (require) {
     "use strict";
     
-    var ListController = require('web.ListController');
-    var ListView = require('web.ListView');
+    var CalendarController = require('web.CalendarController');
+    var CalendarView = require('web.CalendarView');
     var viewRegistry = require('web.view_registry');
     
     
-    var TreeButtons = ListController.extend({
-        buttons_template: 'de_school_timetable.timetable_button_tree',
-        events: _.extend({}, ListController.prototype.events, {
+    var CalendarButton = CalendarController.extend({
+        buttons_template: 'de_school_timetable.timetable_button_calendar',
+        events: _.extend({}, CalendarController.prototype.events, {
             'click .open_wizard_action_timetable': '_OpenTimetableWizard',
         }),
         _OpenTimetableWizard: function () {
@@ -29,11 +29,11 @@ odoo.define('de_school_timetable.tree_timetable_button', function (require) {
         },
     });
 
-    var TimetableListView = ListView.extend({
-        config: _.extend({}, ListView.prototype.config, {
-            Controller: TreeButtons,
+    var TimetableCalendarView = CalendarView.extend({
+        config: _.extend({}, CalendarView.prototype.config, {
+            Controller: CalendarButton,
         }),
     });
 
-    viewRegistry.add('timetable_button_in_tree', TimetableListView);
+    viewRegistry.add('timetable_button_in_calendar', TimetableCalendarView);
 });
