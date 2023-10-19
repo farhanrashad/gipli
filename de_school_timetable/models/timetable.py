@@ -50,8 +50,18 @@ class SchoolTimetable(models.Model):
     recurrency_id = fields.Many2one('oe.school.timetable.recurrency', readonly=True, index=True, ondelete="set null", copy=False)
     repeat = fields.Boolean("Repeat", compute='_compute_repeat', inverse='_inverse_repeat')
     repeat_interval = fields.Integer("Repeat every", default=1, compute='_compute_repeat_interval', inverse='_inverse_repeat')
-    repeat_type = fields.Selection([('forever', 'Forever'), ('until', 'Until')], string='Repeat Type', default='forever', compute='_compute_repeat_type', inverse='_inverse_repeat')
-    repeat_until = fields.Date("Repeat Until", compute='_compute_repeat_until', inverse='_inverse_repeat', help="If set, the recurrence stop at that date. Otherwise, the recurrence is applied indefinitely.")
+    repeat_type = fields.Selection(
+        [
+            ('month', 'Month(s)'),
+            ('week', 'Week(s)'),
+            ('day', 'Day(s)'),
+        ],
+        string="Repeat Type", required=True, default='week',
+        help="Repeat type determines how often a course timetable schedule."
+    )
+    
+    #repeat_type = fields.Selection([('forever', 'Forever'), ('until', 'Until')], string='Repeat Type', default='forever', compute='_compute_repeat_type', inverse='_inverse_repeat')
+    #repeat_until = fields.Date("Repeat Until", compute='_compute_repeat_until', inverse='_inverse_repeat', help="If set, the recurrence stop at that date. Otherwise, the recurrence is applied indefinitely.")
     
     
     @api.constrains('timetable_period_id', 'start_datetime')
@@ -69,7 +79,7 @@ class SchoolTimetable(models.Model):
         self._cr.execute('''
             SELECT tt2.id
             FROM oe_school_timetable tt
-            JOIN oe_school_timetable_period period ON period.id = tt.timetable_period_id
+            JOIN resource_calendar_attendance period ON period.id = tt.timetable_period_id
             INNER JOIN oe_school_timetable tt2 ON
                 tt2.start_datetime = tt.start_datetime
                 AND tt2.timetable_period_id = period.id
@@ -90,38 +100,38 @@ class SchoolTimetable(models.Model):
                 or self.company_id.resource_calendar_id.tz
                 or 'UTC')
     
-    @api.depends('timetable_period_id')
+    @api.depends('batch_id')
     def _compute_datetime(self):
-        for tt in self.filtered(lambda s: s.timetable_period_id):
-            tt.start_datetime, tt.end_datetime = self._calculate_start_end_dates(tt.start_datetime,
-                                                                                     tt.end_datetime,
-                                                                                     tt.timetable_period_id,
-                                                                                     )
+        for record in self:
+            record.start_datetime = record.batch_id.date_start
+            record.end_datetime = record.batch_id.date_end
+            
+        #for tt in self.filtered(lambda s: s.timetable_period_id):
+        #    tt.start_datetime, tt.end_datetime = self._calculate_start_end_dates(tt.start_datetime,
+        #                                                                             tt.end_datetime,
+        #                                                                             tt.timetable_period_id,
+        #                                                                             )
     
     @api.model
-    def _calculate_start_end_dates(self,
-                                 start_datetime,
-                                 end_datetime,
-                                 timetable_period_id,
-                                 ):
-
+    def _calculate_start_end_dates(self, start_datetime, end_datetime, timetable_period_id):
+    
         def convert_datetime_timezone(dt, tz):
             return dt and pytz.utc.localize(dt).astimezone(tz)
-
+    
         user_tz = pytz.timezone(self._get_tz())
-
+    
         h = int(timetable_period_id.hour_from)
         m = round(modf(timetable_period_id.hour_from)[0] * 60.0)
-        start = pytz.utc.localize(start_datetime).astimezone(pytz.timezone(tt.company_id.resource_calendar_id.tz))
+        start = convert_datetime_timezone(start_datetime, pytz.timezone(self.env.user.tz or 'UTC'))
         start = start.replace(hour=int(h), minute=int(m))
         start = start.astimezone(pytz.utc).replace(tzinfo=None)
-            
+    
         h2 = int(timetable_period_id.hour_to)
         m2 = round(modf(timetable_period_id.hour_to)[0] * 60.0)
-        end = pytz.utc.localize(start_datetime).astimezone(pytz.timezone(tt.company_id.resource_calendar_id.tz))
+        end = convert_datetime_timezone(end_datetime, pytz.timezone(self.env.user.tz or 'UTC'))
         end = end.replace(hour=int(h2), minute=int(m2))
         end = end.astimezone(pytz.utc).replace(tzinfo=None)
-            
+    
         return (start, end)
 
     @api.depends('course_id','batch_id','subject_id','company_id')

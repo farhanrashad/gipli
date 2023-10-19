@@ -61,24 +61,33 @@ class TimetableRecurrency(models.Model):
 
     def _repeat_timetable(self, stop_datetime=False):
         Timetable = self.env['oe.school.timetable']
+        range_limit = fields.Datetime.now()
+
         for recurrency in self:
             timetab = Timetable.search([('recurrency_id', '=', recurrency.id)], limit=1, order='start_datetime DESC')
-
+    
             if timetab:
                 # find the end of the recurrence
                 recurrence_end_dt = False
                 if recurrency.repeat_type == 'until':
                     recurrence_end_dt = recurrency.repeat_until
-
+    
                 # find end of generation period (either the end of recurrence (if this one ends before the cron period), or the given `stop_datetime` (usually the cron period))
-                #if not stop_datetime:
-                #    stop_datetime = fields.Datetime.now() + get_timedelta(recurrency.company_id.planning_generation_interval, 'month')
-                range_limit = min([dt for dt in [recurrence_end_dt, stop_datetime] if dt])
-
+                if not stop_datetime:
+                    stop_datetime = fields.Datetime.now() + get_timedelta(recurrency.company_id.planning_generation_interval, 'month')
+    
+                # Check if either recurrence_end_dt or stop_datetime is set
+                if recurrence_end_dt or stop_datetime:
+                    range_limit = min([dt for dt in [recurrence_end_dt, stop_datetime] if dt])
+                else:
+                    # Handle the case when both recurrence_end_dt and stop_datetime are empty
+                    # You can raise an error or set a default value for range_limit
+                    range_limit = some_default_value  # You can define this value
+    
                 # generate recurring periods
                 recurrency_delta = get_timedelta(recurrency.repeat_interval, 'week')
                 next_start = Timetable._add_delta_with_dst(timetab.start_datetime, recurrency_delta)
-
+    
                 timetab_values_list = []
                 while next_start < range_limit:
                     timetab_values = timetab.copy_data({
@@ -91,13 +100,14 @@ class TimetableRecurrency(models.Model):
                     })[0]
                     timetab_values_list.append(timetab_values)
                     next_start = Timetable._add_delta_with_dst(next_start, recurrency_delta)
-
+    
                 if timetab_values_list:
                     Timetable.create(timetab_values_list)
                     recurrency.write({'last_generated_end_datetime': timetab_values_list[-1]['start_datetime']})
-
+    
             else:
                 recurrency.unlink()
+
 
                 
     def _delete_period(self, start_datetime):

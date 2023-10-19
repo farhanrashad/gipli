@@ -12,14 +12,20 @@
                     <sheet string="Timetable">
                         <!-- invisible fields -->
                         <field name="repeat" invisible="1" />
+                        <field name="company_id" invisible="1" />
+                        <field name="calendar_id" invisible="1"/>
+                        
                         <div class="oe_button_box" name="button_box">
                             <!-- Used by other modules-->
                         </div>
                         <group name="timetable_periods" class="oe_edit_only">
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" force_save="1"/>
+                            
                             <label for="timetable_period_id"/>
                             <field name="timetable_period_id" nolabel="1" class="text-break flex-wrap"
-                                widget="selection_badge" options="{'horizontal': true}"
+                                 options="{'horizontal': true}"
                             />
+                            <!--widget="selection_badge" -->
                         </group>
                         <group>
                             <group>
@@ -44,11 +50,12 @@
                                 <label for="repeat_interval" string="Every" attrs="{'invisible': [('repeat', '=', False)]}"/>
                                 <div class="o_row" attrs="{'invisible': [('repeat', '=', False)]}">
                                     <field name="repeat_interval" class="oe_inline col-lg-1" nolabel="1"/>
-                                    <span>Weeks</span>
                                     <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" attrs="{'required': [('repeat', '=', True)]}"/>
+                                    <!--
                                     <span class="col-lg-2">
                                         <field name="repeat_until" class="oe_inline" attrs="{'invisible': [('repeat_type', '!=', 'until')], 'required': [('repeat_type', '=', 'until')]}" nolabel="1"/>
                                     </span>
+                                    -->
                                 </div>
                             </div>
                         </group>
