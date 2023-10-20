@@ -73,6 +73,7 @@ class TimetableWizard(models.TransientModel):
             'view_mode': 'tree',
             'name': _('Timetable'),
             'res_model': 'oe.school.timetable',
+            'view_id': self.env.ref('de_school_timetable.school_timetable_tree_view').id,  # Replace 'your_module' with your module's name
             #'context': {'create': False, 'edit': False},
         }
         return action

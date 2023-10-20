@@ -70,7 +70,8 @@
             <field name="model">oe.school.timetable</field>
             <field name="arch" type="xml">
                 <tree string="Timetable" js_class="timetable_button_in_tree">
-                    <field name="name"/>
+                    <field name="name" optional="hide"/>
+                    <field name="timetable_period_id" />
                     <field name="date"/>
                     <field name="course_id"/>
                     <field name="batch_id"/>
