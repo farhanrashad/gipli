@@ -14,7 +14,8 @@
         </t>
     </t>
     -->
-
+    
+    <!--
     <t t-name="de_school_timetable.timetable_button_calendar" t-extend="CalendarView.Buttons">
        <xpath expr="//*[@class='btn btn-primary o_calendar_button_prev']" position="after">
            <button type="button" class="btn btn-primary" style="margin-left: 10px;"  t-on-click="OnTestClick">
@@ -22,6 +23,8 @@
            </button>
        </xpath>
    </t>
+    -->
+    
     <!--
     <t t-extend="CalendarView.buttons" t-name="de_school_timetable.timetable_button_calendar">
         <t t-jquery=".o_calendar_button_prev" t-operation="after">
