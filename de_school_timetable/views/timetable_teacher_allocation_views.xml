@@ -10,8 +10,7 @@
                     <field name="course_id" readonly="1"/>
 					<field name="batch_id" readonly="1"/>
 					<field name="subject_id" readonly="1"/>
-                    <field name="start_datetime" readonly="1"/>
-                    <field name="end_datetime" readonly="1"/>
+                    <field name="date" readonly="1"/>
                     <field name="teacher_id" readonly="0"/>
                     <field name="company_id" groups="base.group_multi_company" optional="hide"/>
 				</tree>
