@@ -34,6 +34,14 @@ class Admission(models.Model):
     ]
     _primary_email = 'email_from'
     _check_company_auto = True
+
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        search_domain = [('id', 'in', stages.ids)]
+        stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
+        return stages.browse(stage_ids)
+
     
     # Description
     name = fields.Char(string='Reference', copy=False, readonly=True, index=True, default=lambda self: _('New'))
@@ -59,7 +67,7 @@ class Admission(models.Model):
     type = fields.Selection([
         ('lead', 'Lead'), ('opportunity', 'Opportunity')],
         index=True, required=True, tracking=15,
-        default=lambda self: 'lead' if self.env['res.users'].has_group('group_school_admission_user') else 'opportunity')
+        default=lambda self: 'lead' if self.env['res.users'].has_group('de_school_team.group_school_admission_user') else 'opportunity')
     
     # Pipeline management
     stage_id = fields.Many2one(
@@ -140,12 +148,19 @@ class Admission(models.Model):
     # Academic Fields
     is_admission = fields.Boolean('Is Admission')
     admission_register_id = fields.Many2one('oe.admission.register',string="Admission Register", required=True)
-    course_id = fields.Many2one('oe.school.course', string='Course', required=True)
+    
+    course_id = fields.Many2one('oe.school.course', string='Course', compute='_compute_from_admission_register')
+    course_code = fields.Char(related='course_id.code')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
     
     # ------------------------------------------------------
     # ----------------- Computed Methods -------------------
     # ------------------------------------------------------
+    @api.depends('admission_register_id')
+    def _compute_from_admission_register(self):
+        for record in self:
+            record.course_id = record.admission_register_id.course_id.id
+
     @api.depends('company_id')
     def _compute_user_company_ids(self):
         all_companies = self.env['res.company'].search([])

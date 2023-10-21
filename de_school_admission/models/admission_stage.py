@@ -45,6 +45,8 @@ class Stage(models.Model):
     # This field for interface only
     team_count = fields.Integer('team_count', compute='_compute_team_count')
 
+    description = fields.Text(translate=True)
+
     @api.depends('name')
     def _compute_team_count(self):
         self.team_count = self.env['oe.admission.team'].search_count([])
