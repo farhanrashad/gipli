@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         #'data/ir_action_data.xml',
         'data/ir_sequence_data.xml',
+        'data/admission_data.xml',
         'views/admission_menu.xml',
         'views/mail_activity_views.xml',
         'views/admission_team_views.xml',

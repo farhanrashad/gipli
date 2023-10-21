@@ -43,9 +43,9 @@
                     </div>
                     <group>
                         <group>
+                            <field name="sequence"/>
                             <field name="is_close"/>
                             <field name="fold"/>
-                            
                         </group>
                         <field name="team_count" invisible="1"/>
                     </group>
