@@ -29,8 +29,6 @@ class SchoolTimetable(models.Model):
     
     classroom_id = fields.Many2one('oe.school.building.room', 'Classroom', store=True,)
     date = fields.Date('Date')
-    start_datetime = fields.Datetime("Start Date", compute='_compute_datetime', store=True, readonly=False, required=False, copy=True)
-    end_datetime = fields.Datetime("End Date", compute='_compute_datetime', store=True, readonly=False, required=False, copy=True)
     color = fields.Integer("Color", compute='_compute_color' )
     allocated_hours = fields.Float("Allocated Hours", compute='_compute_allocated_hours', store=True, readonly=False)
     allocated_percentage = fields.Float("Allocated Time (%)", default=100,
@@ -64,8 +62,11 @@ class SchoolTimetable(models.Model):
                 ('batch_id', '=', record.batch_id.id),
                 ('subject_id', '=', record.subject_id.id),
                 ('timetable_period_id', '=', record.timetable_period_id.id),
+                ('date', '=', record.date),
             ]
-            if self.search_count(domain) > 1:
+            timetable_count = self.env['oe.school.timetable'].search_count(domain)
+            #raise UserError(timetable_count)
+            if timetable_count > 1:
                 raise UserError("Timetable with the same Course, Batch, Subject, and Period already exists.")
 
     
