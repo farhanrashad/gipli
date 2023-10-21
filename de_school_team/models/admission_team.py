@@ -16,7 +16,7 @@ from odoo.release import version
 class AdmissionTeam(models.Model):
     _name = "oe.admission.team"
     _inherit = ['mail.thread']
-    _description = "Sales Team"
+    _description = "Admission Team"
     _order = "sequence ASC, create_date DESC, id DESC"
     _check_company_auto = True
 
@@ -93,9 +93,9 @@ class AdmissionTeam(models.Model):
         return [(6, 0, [self.env.uid])]
 
     # description
-    name = fields.Char('Sales Team', required=True, translate=True)
+    name = fields.Char('Admission Team', required=True, translate=True)
     sequence = fields.Integer('Sequence', default=10)
-    active = fields.Boolean(default=True, help="If the active field is set to false, it will allow you to hide the Sales Team without removing it.")
+    active = fields.Boolean(default=True, help="If the active field is set to false, it will allow you to hide the Admissions Team without removing it.")
     company_id = fields.Many2one(
         'res.company', string='Company', index=True,
         default=lambda self: self.env.company)
@@ -106,7 +106,7 @@ class AdmissionTeam(models.Model):
     # memberships
     is_membership_multi = fields.Boolean(
         'Multiple Memberships Allowed', compute='_compute_is_membership_multi',
-        help='If True, users may belong to several sales teams. Otherwise membership is limited to a single sales team.')
+        help='If True, users may belong to several Admissions teams. Otherwise membership is limited to a single Admissions team.')
     member_ids = fields.Many2many(
         'res.users', string='Salespersons',
         domain="['&', ('share', '=', False), ('company_ids', 'in', member_company_ids)]",
@@ -117,10 +117,10 @@ class AdmissionTeam(models.Model):
         help='UX: Limit to team company or all if no company')
     member_warning = fields.Text('Membership Issue Warning', compute='_compute_member_warning')
     admission_team_member_ids = fields.One2many(
-        'oe.admission.team.member', 'admission_team_id', string='Sales Team Members',
-        help="Add members to automatically assign their documents to this sales team.")
+        'oe.admission.team.member', 'admission_team_id', string='Admission Team Members',
+        help="Add members to automatically assign their documents to this Admission team.")
     admission_team_member_all_ids = fields.One2many(
-        'oe.admission.team.member', 'admission_team_id', string='Sales Team Members (incl. inactive)',
+        'oe.admission.team.member', 'admission_team_id', string='Admission Team Members (incl. inactive)',
         context={'active_test': False})
     # UX options
     color = fields.Integer(string='Color Index', help="The color of the channel")
@@ -256,7 +256,7 @@ class AdmissionTeam(models.Model):
 
     def action_primary_channel_button(self):
         """ Skeleton function to be overloaded It will return the adequate action
-        depending on the Sales Team's options. """
+        depending on the Admissions Team's options. """
         return False
 
     # ------------------------------------------------------------
@@ -271,10 +271,12 @@ class AdmissionTeam(models.Model):
     # GRAPH
     # ------------------------------------------------------------
 
-    def _graph_get_model(self):
+    def _graph_get_model1(self):
         """ skeleton function defined here because it'll be called by admission and/or sale
         """
-        raise UserError(_('Undefined graph model for Sales Team: %s', self.name))
+        raise UserError(_('Undefined graph model for Admissions Team: %s', self.name))
+
+    
 
     def _graph_get_dates(self, today):
         """ return a coherent start and end date for the dashboard graph covering a month period grouped by week.

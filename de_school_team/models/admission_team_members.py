@@ -105,7 +105,7 @@ class AdmissionTeamMember(models.Model):
 
     @api.depends('admission_team_id')
     def _compute_is_membership_multi(self):
-        multi_enabled = self.env['ir.config_parameter'].sudo().get_param('sales_team.membership_multi', False)
+        multi_enabled = self.env['ir.config_parameter'].sudo().get_param('de_school_team.membership_multi', False)
         self.is_membership_multi = multi_enabled
 
     @api.depends('is_membership_multi', 'active', 'user_id', 'admission_team_id')
@@ -147,7 +147,7 @@ class AdmissionTeamMember(models.Model):
           * creating a membership already existing as archived: do nothing as
             people can manage them from specific menu "Members";
         """
-        is_membership_multi = self.env['ir.config_parameter'].sudo().get_param('sales_team.membership_multi', False)
+        is_membership_multi = self.env['ir.config_parameter'].sudo().get_param('de_school_team.membership_multi', False)
         if not is_membership_multi:
             self._synchronize_memberships(values_list)
         return super(AdmissionTeamMember, self).create(values_list)
@@ -162,7 +162,7 @@ class AdmissionTeamMember(models.Model):
         maybe archive / activate them. Updating manually memberships by
         modifying user_id or team_id is advanced and does not benefit from our
         support. """
-        is_membership_multi = self.env['ir.config_parameter'].sudo().get_param('sales_team.membership_multi', False)
+        is_membership_multi = self.env['ir.config_parameter'].sudo().get_param('de_school_team.membership_multi', False)
         if not is_membership_multi and values.get('active'):
             self._synchronize_memberships([
                 dict(user_id=membership.user_id.id, admission_team_id=membership.admission_team_id.id)
