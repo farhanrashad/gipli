@@ -45,10 +45,7 @@ class SchoolTimetable(models.Model):
     is_hatched = fields.Boolean(compute='_compute_is_hatched')
     timetable_period_id = fields.Many2one('resource.calendar.attendance', string='Period Templates', readonly=False, required=True, store=True, domain="[('calendar_id','=',calendar_id)]")
     
-    # Recurring (`repeat_` fields are none stored, only used for UI purpose)
-    recurrency_id = fields.Many2one('oe.school.timetable.recurrency', readonly=True, index=True, ondelete="set null", copy=False)
-    repeat = fields.Boolean("Repeat", compute='_compute_repeat', inverse='_inverse_repeat')
-    repeat_interval = fields.Integer("Repeat every", default=1, compute='_compute_repeat_interval', inverse='_inverse_repeat')
+    repeat_interval = fields.Integer("Repeat every", default=1, required=True)
     repeat_type = fields.Selection(
         [
             ('month', 'Month(s)'),
@@ -59,11 +56,20 @@ class SchoolTimetable(models.Model):
         help="Repeat type determines how often a course timetable schedule."
     )
     
-    #repeat_type = fields.Selection([('forever', 'Forever'), ('until', 'Until')], string='Repeat Type', default='forever', compute='_compute_repeat_type', inverse='_inverse_repeat')
-    #repeat_until = fields.Date("Repeat Until", compute='_compute_repeat_until', inverse='_inverse_repeat', help="If set, the recurrence stop at that date. Otherwise, the recurrence is applied indefinitely.")
+    @api.constrains('course_id', 'batch_id', 'subject_id', 'timetable_period_id')
+    def _check_duplicate_timetable(self):
+        for record in self:
+            domain = [
+                ('course_id', '=', record.course_id.id),
+                ('batch_id', '=', record.batch_id.id),
+                ('subject_id', '=', record.subject_id.id),
+                ('timetable_period_id', '=', record.timetable_period_id.id),
+            ]
+            if self.search_count(domain) > 1:
+                raise UserError("Timetable with the same Course, Batch, Subject, and Period already exists.")
+
     
-    
-    @api.constrains('timetable_period_id', 'start_datetime')
+    #@api.constrains('timetable_period_id', 'start_datetime')
     def _check_timetable_period(self):
         for record in self:
             timetables = self.filtered(lambda tt: tt.timetable_period_id and tt.start_datetime)
@@ -159,65 +165,7 @@ class SchoolTimetable(models.Model):
             tt.is_hatched = tt.state == 'draft'
 
 
-
-    # Reapeat periods functionality
-    @api.depends('recurrency_id')
-    def _compute_repeat(self):
-        for tt in self:
-            if tt.recurrency_id:
-                tt.repeat = True
-            else:
-                tt.repeat = False
-
-    @api.depends('recurrency_id.repeat_interval')
-    def _compute_repeat_interval(self):
-        for tt in self:
-            if tt.recurrency_id:
-                tt.repeat_interval = slot.recurrency_id.repeat_interval
-            else:
-                tt.repeat_interval = False
-
-    @api.depends('recurrency_id.repeat_until')
-    def _compute_repeat_until(self):
-        for tt in self:
-            if tt.recurrency_id:
-                tt.repeat_until = tt.recurrency_id.repeat_until
-            else:
-                tt.repeat_until = False
-
-    @api.depends('recurrency_id.repeat_type')
-    def _compute_repeat_type(self):
-        for tt in self:
-            if tt.recurrency_id:
-                tt.repeat_type = slot.recurrency_id.repeat_type
-            else:
-                tt.repeat_type = False
-
-    def _inverse_repeat(self):
-        for tt in self:
-            if tt.repeat and not tt.recurrency_id.id:  # create the recurrence
-                repeat_until = False
-                if tt.repeat_type == "until":
-                    repeat_until = datetime.combine(fields.Date.to_date(tt.repeat_until), datetime.max.time())
-                    repeat_until = repeat_until.replace(tzinfo=pytz.timezone(tt.company_id.resource_calendar_id.tz or 'UTC')).astimezone(pytz.utc).replace(tzinfo=None)
-                recurrency_values = {
-                    'repeat_interval': tt.repeat_interval,
-                    'repeat_until': repeat_until,
-                    'repeat_type': tt.repeat_type,
-                    'company_id': tt.company_id.id,
-                }
-                recurrence = self.env['oe.school.timetable.recurrency'].create(recurrency_values)
-                tt.recurrency_id = recurrence
-                tt.recurrency_id._repeat_timetable()
-            # user wants to delete the recurrence
-            # here we also check that we don't delete by mistake a slot of which the repeat parameters have been changed
-            elif not tt.repeat and tt.recurrency_id.id and (
-                tt.repeat_type == tt.recurrency_id.repeat_type and
-                tt.repeat_until == tt.recurrency_id.repeat_until and
-                tt.repeat_interval == tt.recurrency_id.repeat_interval
-            ):
-                tt.recurrency_id._delete_period(tt.end_datetime)
-                tt.recurrency_id.unlink()  # will set recurrency_id to NULL
+    
                 
     # ----------------------------------------------------
     # Business Methods

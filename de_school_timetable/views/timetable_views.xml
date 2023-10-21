@@ -11,7 +11,6 @@
                     </header>
                     <sheet string="Timetable">
                         <!-- invisible fields -->
-                        <field name="repeat" invisible="1" />
                         <field name="company_id" invisible="1" />
                         <field name="calendar_id" invisible="1"/>
                         
@@ -44,18 +43,13 @@
                             </group>
                         </group>
                         <group col="4">
-                            <label for="repeat" groups="de_school.group_school_manager"/>
+                            <label for="repeat_interval" />
                             <div class="o_row">
-                                <field name="repeat" groups="de_school.group_school_manager"/>
-                                <label for="repeat_interval" string="Every" attrs="{'invisible': [('repeat', '=', False)]}"/>
-                                <div class="o_row" attrs="{'invisible': [('repeat', '=', False)]}">
+                                <label for="repeat_interval" string="Every" />
+                                <div class="o_row" >
                                     <field name="repeat_interval" class="oe_inline col-lg-1" nolabel="1"/>
-                                    <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" attrs="{'required': [('repeat', '=', True)]}"/>
-                                    <!--
-                                    <span class="col-lg-2">
-                                        <field name="repeat_until" class="oe_inline" attrs="{'invisible': [('repeat_type', '!=', 'until')], 'required': [('repeat_type', '=', 'until')]}" nolabel="1"/>
-                                    </span>
-                                    -->
+                                    <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" />
+                                   
                                 </div>
                             </div>
                         </group>

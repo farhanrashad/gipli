@@ -22,14 +22,10 @@
                                 <field name="subject_id"/>
                                 <field name="teacher_id"/>
 
-                                <label for="repeat" groups="de_school.group_school_manager"/>
+                                <label for="repeat_interval" label="Repeat"/>
                                 <div class="o_row">
-                                    <field name="repeat" />
-                                    <label for="repeat_interval" string="Every" attrs="{'invisible': [('repeat', '=', False)]}"/>
-                                    <div class="o_row" attrs="{'invisible': [('repeat', '=', False)]}">
                                         <field name="repeat_interval" class="oe_inline col-lg-1" nolabel="1"/>
-                                        <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" attrs="{'required': [('repeat', '=', True)]}"/>
-                                    </div>
+                                        <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" />
                                 </div>
                             </group>
                             <group>

@@ -24,8 +24,7 @@ class TimetableWizard(models.TransientModel):
     date_end = fields.Date("End Date", compute='_compute_datetime', store=True, readonly=False, required=True, copy=True)
     timetable_period_id = fields.Many2one('resource.calendar.attendance', string='Period', readonly=False, store=True, required=True, domain="[('calendar_id','=',calendar_id)]")
 
-    repeat = fields.Boolean("Repeat", )
-    repeat_interval = fields.Integer("Repeat every", default=1, )
+    repeat_interval = fields.Integer("Repeat Every", default=1, )
     repeat_type = fields.Selection(
         [
             ('month', 'Month(s)'),
