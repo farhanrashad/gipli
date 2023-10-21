@@ -365,6 +365,7 @@
         sequence="2"/>
       
       <!-- My Admissions -->
+      <!--
         <record model="ir.actions.act_window" id="action_my_admission">
             <field name="name">Admissions</field>
             <field name="res_model">oe.admission</field>
@@ -388,7 +389,7 @@
         parent="menu_school_admission_admission_main"
         action="action_my_admission"
         sequence="3"/>
-      
+      -->
       <!-- My Admission Activities -->
       <record id="admission_activities_tree_view" model="ir.ui.view">
             <field name="name">admission.activites.tree.view</field>

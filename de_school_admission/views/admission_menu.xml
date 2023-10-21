@@ -7,7 +7,7 @@
         web_icon="de_school_admission,static/description/icon.png"
         sequence="57" />
     
-    <menuitem name="Admission" id="menu_school_admission_admission_main"
+    <menuitem name="Admissions" id="menu_school_admission_admission_main"
 			parent="menu_school_admission" 
               sequence = "10"
 			groups="de_school_team.group_school_admission_user" />

@@ -7,6 +7,75 @@
             parent="menu_school_admission_menu_school_config"
             action="de_school_team.action_school_team_config"
             sequence="2"/>
+
+        <!-- My Admission team -->
+         <record model="ir.ui.view" id="admission_kanban_view">
+            <field name="name">admission.kanban.view</field>
+            <field name="model">oe.admission.team</field>
+            <field name="arch" type="xml">
+                <kanban class="oe_background_grey o_kanban_dashboard o_crm_team_kanban" create="0" sample="1">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="member_ids"/>
+                    <field name="color"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}">
+                                <div t-attf-class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+                                        <div class="o_primary o_text_overflow"><field name="name"/></div>
+                                    </div>
+                                    <div class="o_kanban_manage_button_section">
+                                        <a class="o_kanban_manage_toggle_button" href="#"><i class="fa fa-ellipsis-v" role="img" aria-label="Manage" title="Manage"/></a>
+                                    </div>
+                                </div>
+                                <div class="container o_kanban_card_content">
+                                    <div class="row o_kanban_card_upper_content">
+                                        <div class="col-4 o_kanban_primary_left" name="to_replace_in_sale_crm">
+                                            <button type="object" class="btn btn-primary" name="action_primary_channel_button"><field name="dashboard_button_name"/></button>
+                                        </div>
+                                        <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
+                                            <t name="first_options"/>
+                                            <t name="second_options"/>
+                                            <t name="third_options"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 o_kanban_primary_bottom">
+                                            <t t-call="AdmissionTeamDashboardGraph"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-name="AdmissionTeamDashboardGraph">
+                            <div t-if="record.dashboard_graph_data.raw_value" class="o_sales_team_kanban_graph_section">
+                                <field name="dashboard_graph_data" widget="dashboard_graph" t-att-graph_type="'bar'"/>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+         </record>
+      <record id="action_my_admission_team" model="ir.actions.act_window">
+            <field name="name">Pipeline</field>
+            <field name="res_model">oe.admission.team</field>
+            <field name="view_mode">kanban</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Define a new admission team!
+                </p>
+                <p>
+                    Use Admissions Teams to organize your admission departments. Each team will work with a separate pipeline.
+                </p>
+            </field>
+        </record>
+      <menuitem
+        id="menu_admission_teams"
+        name="Teams"
+        parent="menu_school_admission_admission_main"
+        action="action_my_admission_team"
+        sequence="30"/>
         
     </data>
 </odoo>
