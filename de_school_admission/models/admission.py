@@ -152,6 +152,9 @@ class Admission(models.Model):
     course_id = fields.Many2one('oe.school.course', string='Course', compute='_compute_from_admission_register')
     course_code = fields.Char(related='course_id.code')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
+
+    expected_revenue = fields.Monetary('Expected Revenue', currency_field='company_currency', tracking=True)
+
     
     # ------------------------------------------------------
     # ----------------- Computed Methods -------------------

@@ -7,7 +7,11 @@ from odoo.exceptions import UserError, AccessError
 class AdmissionTeam(models.Model):
     _inherit = "oe.admission.team"
 
-    count_loan_confirm = fields.Integer(string='Loan Confirm')
+    opportunities_count = fields.Integer(
+        string='# Opportunities', compute='_compute_opportunities_data')
+    opportunities_amount = fields.Monetary(
+        string='Opportunities Revenues', compute='_compute_opportunities_data')
+    
     count_loan_to_pay = fields.Integer(string='Loan Confirm')
     priority = fields.Integer(string='Priority')
     stage_id = fields.Integer(string='stage')
@@ -21,29 +25,82 @@ class AdmissionTeam(models.Model):
     def _graph_y_query(self):
         return 'count(*)'
         #return super(AdmissionTeam,self)._graph_y_query()
-        
-    def _compute_dashboard_button_name(self):
-        for record in self:
-            record.dashboard_button_name = record.name
-
-    def action_primary_channel_button(self):
-        self.ensure_one()
-        
-        return super(AdmissionTeam,self).action_primary_channel_button()
-
 
     def _compute_dashboard_graph(self):
         for team in self:
             team.dashboard_graph_data = json.dumps(team._get_dashboard_graph_data())
 
 
-    # Action buttons
-    def action_open_team_admissions(self):
+    def _compute_opportunities_data(self):
+        opportunity_data = self.env['oe.admission']._read_group([
+            ('team_id', 'in', self.ids),
+            ('type', '=', 'opportunity'),
+        ], ['expected_revenue:sum', 'team_id'], ['team_id'])
+        counts = {datum['team_id'][0]: datum['team_id_count'] for datum in opportunity_data}
+        amounts = {datum['team_id'][0]: datum['expected_revenue'] for datum in opportunity_data}
+        for team in self:
+            team.opportunities_count = counts.get(team.id, 0)
+            team.opportunities_amount = amounts.get(team.id, 0)
+            
+    # -----------------------------------------------------------------
+    # ----------------------- Action buttons- --------------------------
+    # ------------------------------------------------------------------
+    def action_open_team_admissions_all(self):
+        self.ensure_one()
         return {
-            'name': 'Team Admission',
+            'name': 'Admission',
+            'view_type': 'form',
+            'view_mode': 'kanban',
+            'res_model': 'oe.admission',
+            'type': 'ir.actions.act_window',
+        }
+    def action_open_team_admissions_pending(self):
+        self.ensure_one()
+        return {
+            'name': 'Admission',
+            'view_type': 'form',
+            'view_mode': 'kanban',
+            'res_model': 'oe.admission',
+            'type': 'ir.actions.act_window',
+        }
+    def action_open_team_admissions_confirm(self):
+        self.ensure_one()
+        return {
+            'name': 'Admission',
+            'view_type': 'form',
+            'view_mode': 'kanban',
+            'res_model': 'oe.admission',
+            'type': 'ir.actions.act_window',
+        }
+
+    def action_open_new_admissions(self):
+        self.ensure_one()
+        return {
+            'name': 'Admission',
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'oe.admission',
+            'type': 'ir.actions.act_window',
+        }
+        
+    def action_admin_config(self):
+        self.ensure_one()
+        return {
+            'name': self.name,
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'views': [[False, "form"]],
+            'res_model': 'oe.admission.team',
+            'res_id': self.id,
+        }
+
+    def action_edit_admissions_team(self):
+        return {
+           'name': 'Admission Team',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': self.id,
+            'res_model': 'oe.admission.team',
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
