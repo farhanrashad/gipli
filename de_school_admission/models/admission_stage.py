@@ -38,7 +38,7 @@ class Stage(models.Model):
     sequence = fields.Integer('Sequence', default=1, help="Used to order stages. Lower is better.")
     is_close = fields.Boolean('Is Close Stage?')
     requirements = fields.Text('Requirements', help="Enter here the internal requirements for this stage (ex: Offer sent to customer). It will appear as a tooltip over the stage's name.")
-    team_id = fields.Many2one('oe.admission.team', string='Sales Team', ondelete="set null",
+    team_id = fields.Many2one('oe.admission.team', string='Admissions Team', ondelete="set null",
         help='Specific team that uses this stage. Other teams will not be able to see or use this stage.')
     fold = fields.Boolean('Folded in Pipeline',
         help='This stage is folded in the kanban view when there are no records in that stage to display.')

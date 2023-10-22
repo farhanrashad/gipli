@@ -47,6 +47,9 @@
                             <field name="is_close"/>
                             <field name="fold"/>
                         </group>
+                        <group>
+                            <field name="team_id" options='{"no_open": True}'/>
+                        </group>
                         <field name="team_count" invisible="1"/>
                     </group>
                     <separator string="Requirements"/>

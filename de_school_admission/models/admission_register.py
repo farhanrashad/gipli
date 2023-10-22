@@ -61,6 +61,21 @@ class AdmissionRegister(models.Model):
 
     dashboard_graph_data = fields.Text(compute='_compute_dashboard_graph')
 
+    # calculate scroe or probability of the admission applicaiton
+    score_ids = fields.One2many('oe.admission.register.score', 'admission_register_id', string='Scores')
+    score_total = fields.Float(string='Total Score', compute='_compute_total_score', readonly=True)
+
+    @api.constrains('score_ids','score_ids.score')
+    def _check_total_score(self):
+        for record in self:
+            if sum(record.score_ids.mapped('score')) > 100:
+                raise UserError(_("Total Score cannot exceed 100."))
+
+
+    @api.depends('score_ids','score_ids.score')
+    def _compute_total_score(self):
+        for record in self:
+            record.score_total = sum(record.score_ids.mapped('score'))
     
     def _compute_opportunities_data(self):
         opportunity_data = self.env['oe.admission']._read_group([
@@ -310,16 +325,46 @@ class AdmissionRegister(models.Model):
             'res_id': self.id,
         }
 
-    def action_edit_admissions_team(self):
+    def action_edit_admissions_register(self):
         return {
-           'name': 'Admission Team',
+           'name': 'Admission Register',
             'view_type': 'form',
             'view_mode': 'form',
             'res_id': self.id,
-            'res_model': 'oe.admission.team',
+            'res_model': 'oe.admission.register',
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
+
+
+class AdmissionRegisterScore(models.Model):
+    _name = "oe.admission.register.score"
+    _description = "Admission Register Score"
+    _order = "stage_id asc"
+
+    stage_id = fields.Many2one('oe.admission.stage', string='Stage', index=True, tracking=True,
+                               required=True, copy=False,  ondelete='restrict',)
+    score = fields.Float(string='Score', digits=(5, 2), required=True,
+                        help="Score should be more than 0 and less than or equal to 100.")
+
+    admission_register_id = fields.Many2one('oe.admission.register', string='Admission Register', ondelete='cascade')
+
+    _sql_constraints = [
+        ('score_range', 'CHECK(score >= 0 AND score <= 100)', 'Score should be between 0 and 100.'),
+        ('unique_stage', 'UNIQUE(stage_id, admission_register_id)', 'Stage in this record should be unique.')
+    ]
+
+    @api.onchange('stage_id')
+    def _onchange_stage_id(self):
+        if self.stage_id and self.admission_register_id:
+            # Check for existing records with the same stage in the admission_register_id
+            existing_scores = self.env['oe.admission.register.score'].search([
+                ('admission_register_id', '=', self.admission_register_id.id),
+                ('stage_id', '=', self.stage_id.id),
+            ])
+            if existing_scores:
+                raise UserError(_("A score for this stage already exists in this admission register."))
+
 
     
             

@@ -166,16 +166,22 @@ class Admission(models.Model):
     # ------------------------------------------------------
     # ----------------- Computed Methods -------------------
     # ------------------------------------------------------
-    @api.depends(lambda self: ['stage_id', 'team_id'] + self._pls_get_safe_fields())
+    #@api.depends(lambda self: ['stage_id', 'team_id'] + self._pls_get_safe_fields())
+    @api.depends('stage_id','admission_register_id','admission_register_id.score_total')
     def _compute_probabilities(self):
-        #lead_probabilities = self.id #self._pls_get_naive_bayes_probabilities()
-        for lead in self:
-            #if lead.id in lead_probabilities:
-            #    was_automated = lead.active and lead.is_automated_probability
-            #    lead.automated_probability = lead_probabilities[lead.id]
-            #    if was_automated:
-            #        lead.probability = lead.automated_probability
-            lead.probability = 0
+        for admission in self:
+            if admission.stage_id:
+                total_score = sum(stage.score for stage in admission.admission_register_id.score_ids.filtered(lambda stage: stage.sequence < admission.stage_id.sequence))
+
+                # Add the current stage's score to the total score
+                current_stage_score = admission.admission_resgister_id.score_ids.filtered(lambda x:x.stage_id.id==admission.stage_id.id).score
+                total_score += current_stage_score
+
+                # Calculate the probability based on the total score
+                admission.probability = (total_score / 100) * 100
+            else:
+                admission.probability = 0
+
                     
     @api.depends('expected_revenue', 'probability')
     def _compute_prorated_revenue(self):

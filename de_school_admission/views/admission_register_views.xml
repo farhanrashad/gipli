@@ -70,7 +70,24 @@
                         </group>
                     </group>
                     <separator string="Description"/>
-                            <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Admission details..."/>
+                    <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Admission details..."/>
+                    <notebook>
+                        <page string="Score" name="scroe">
+                            <field name="score_ids">
+                                <tree editable="bottom">
+                                    <field name="stage_id" options='{"no_open": True, "no_create": True}'/>
+                                    <field name="score"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <group colspan="4">
+                                    <group class="oe_subtotal_footer oe_right" >
+                                        <field name="score_total" class="oe_subtotal_footer_separator" />
+                                    </group>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -175,7 +192,7 @@
                                                 <span>New</span>
                                             </div>
                                             <div role="menuitem">
-                                                <a name="action_open_new_admissions" type="object">Admission</a>
+                                                <a name="action_open_new_admissions" type="object">Application</a>
                                             </div>
                                         </div>
                                         <div class="col-4 o_kanban_card_manage_section o_kanban_manage_reports">
@@ -196,7 +213,7 @@
                                             <ul class="oe_kanban_colorpicker" data-field="color" role="menu"/>
                                         </div>
                                         <div role="menuitem" class="col-4">
-                                            <a name="action_edit_admissions_team" type="object">Configuration</a>
+                                            <a name="action_edit_admissions_register" type="object">Configuration</a>
                                         </div>
                                     </div>
                                 </div>

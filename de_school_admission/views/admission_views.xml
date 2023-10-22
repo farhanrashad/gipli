@@ -35,6 +35,24 @@
                         <div class="oe_title">
                             <label for="name" />
                             <h1><field class="text-break" name="name" required="1"/></h1>
+                            <h2 class="d-flex gap-2 g-0 align-items-end pb-3">
+                                <div attrs="{'invisible': [('type', '=', 'lead')]}">
+                                    <label for="expected_revenue" string="Estimated Fees" class="oe_edit_only pb-1"/>
+                                    <div class="d-flex align-items-end">
+                                        <field name="company_currency" invisible="1"/>
+                                        <field name="expected_revenue" class="oe_inline o_input_8ch" widget="monetary" options="{'currency_field': 'company_currency'}"/>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="oe_edit_only d-md-flex align-items-center">
+                                        <label for="probability"/>
+                                    </div>
+                                    <div id="probability" class="d-inline-block">
+                                        <field name="probability" widget="float" class="oe_inline o_input_6ch"/>
+                                        <span class="oe_grey"> %</span>
+                                    </div>
+                                </div>
+                            </h2>
                         </div>
                         <group>
                             <group>
@@ -210,15 +228,24 @@
                     class="o_kanban_small_column o_kanban_admissions"
                     on_create="quick_create"
                     quick_create_view="project.quick_create_task_form"
-                    examples="project"
+                    examples="Admission"
                     js_class="" sample="1"
                 >
+                    <field name="probability"/>
                     <field name="color"/>
                     <field name="priority"/>
                     <field name="stage_id" options='{"group_by_tooltip": {"description": "Description"}}'/>
+                    <field name="expected_revenue"/>
+                    <field name="kanban_state"/>
+                    <field name="activity_date_deadline"/>
                     <field name="user_id"/>
                     <field name="partner_id"/>
-                    
+                    <field name="activity_summary"/>
+                    <field name="active"/>
+                    <field name="company_currency"/>
+                    <field name="activity_state"/>
+                    <field name="activity_ids"/>
+                    <progressbar field="activity_state" colors="{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}" sum_field="expected_revenue"  help="This bar allows to filter the opportunities based on scheduled activities."/>
                     <templates>
                         <t t-name="kanban-box">
                             <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}  oe_kanban_global_click oe_kanban_card d-flex flex-column">
@@ -229,6 +256,9 @@
                                     </div>
                                     <div>
                                         <strong><field name="name"/></strong>
+                                    </div>
+                                    <div>
+                                        <field name="expected_revenue"/>
                                     </div>
                                     <div>
                                         <field name="course_code" options="{'color_field': 'color'}"/> / <field name="batch_id" />
@@ -321,7 +351,11 @@
             <field name="name">Pipeline</field>
             <field name="res_model">oe.admission</field>
             <field name="view_mode">kanban,tree,form,calendar,pivot,graph,activity</field>
-              <field name="search_view_id" ref="admission_search_view"/>
+            <field name="search_view_id" ref="admission_search_view"/>
+            <field name="context">{
+                    'default_type': 'opportunity',
+                    'search_default_assigned_to_me': 1
+            }</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     No application found. Let's create one!
@@ -367,53 +401,6 @@
         action="action_my_admission"
         sequence="3"/>
       -->
-      <!-- My Admission Activities -->
-      <record id="admission_activities_tree_view" model="ir.ui.view">
-            <field name="name">admission.activites.tree.view</field>
-            <field name="model">oe.admission</field>
-            <field name="mode">primary</field>
-            <field name="priority">20</field>
-            <field name="inherit_id" ref="admission_tree_view"/>
-            <field name="arch" type="xml">
-                
-                <field name="user_id" position="attributes">
-                    <attribute name="optional">hide</attribute>
-                </field>
-                <field name="team_id" position="attributes">
-                    <attribute name="optional">hide</attribute>
-                </field>
-            </field>
-        </record>
-      
-        <record id="action_my_admission_activities" model="ir.actions.act_window">
-            <field name="name">My Activities</field>
-            <field name="res_model">oe.admission</field>
-            <field name="view_mode">tree,calendar,form,activity</field>
-            <field name="view_id" ref="admission_activities_tree_view"/>
-            <field name="domain">[('activity_ids','!=',False)]</field>
-            <!--
-            <field name="search_view_id" ref="crm.view_crm_case_my_activities_filter"/>
-            <field name="context">{'default_type': 'opportunity',
-                    'search_default_assigned_to_me': 1}
-            </field>
--->
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Looks like nothing is planned.
-                </p><p>
-                    Schedule activities to keep track of everything you have to do.
-                </p>
-            </field>
-        </record>
-      
-      <menuitem
-        id="menu_admission_activities"
-        name="My Activities"
-        parent="menu_admission_main"
-        action="action_my_admission_activities"
-        sequence="4"/>
-      
-      
       
   </data>
 </odoo>
