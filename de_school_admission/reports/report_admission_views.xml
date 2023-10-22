@@ -26,10 +26,6 @@
                     <field name="color" invisible="1"/>
                     <field name="message_bounce" invisible="1"/>
                     <field name="probability" invisible="1"/>
-                    <field name="automated_probability" invisible="1"/>
-                    <field name="recurring_revenue_monthly" groups="crm.group_use_recurring_revenues"/>
-                    <field name="recurring_revenue_monthly_prorated" groups="crm.group_use_recurring_revenues"/>
-                    <field name="recurring_revenue" groups="crm.group_use_recurring_revenues"/>
                 </pivot>
             </field>
         </record>
@@ -57,12 +53,8 @@
                     <field name="create_date" interval="month"/>
                     <field name="team_id"/>
                     <field name="color" invisible="1"/>
-                    <field name="automated_probability" invisible="1"/>
                     <field name="message_bounce" invisible="1"/>
                     <field name="probability" invisible="1"/>
-                    <field name="recurring_revenue_monthly" groups="crm.group_use_recurring_revenues"/>
-                    <field name="recurring_revenue_monthly_prorated" groups="crm.group_use_recurring_revenues"/>
-                    <field name="recurring_revenue" groups="crm.group_use_recurring_revenues"/>
                 </graph>
             </field>
         </record>
@@ -103,7 +95,6 @@
                         <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         <newline/>
                         <field name="create_date"/>
-                        <field name="date_open"/>
                         <field name="date_closed"/>
                     </group>
                     <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
@@ -122,7 +113,6 @@
                         <filter string="Conversion Date" context="{'group_by':'date_conversion:month'}" name="conversion_date" help="Conversion Date from Lead to Opportunity" groups="crm.group_use_lead"/>
                         <filter string="Expected Closing" context="{'group_by':'date_deadline:month'}" name="date_deadline"/>
                         <filter string="Closed Date" context="{'group_by':'date_closed'}" name="date_closed_groupby"/>
-                        <filter string="Lost Reason" name="lostreason" context="{'group_by':'lost_reason_id'}"/>
                     </group>
                 </search>
             </field>
@@ -156,7 +146,7 @@
                    eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'graph', 'view_id': ref('admission_report_view_graph')}),
                           (0, 0, {'view_mode': 'pivot', 'view_id': ref('admission_report_view_pivot')}),
-                          (0, 0, {'view_mode': 'tree', 'view_id': ref('admission_report_tree_view')})]"/>
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('admission_tree_view')})]"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     No data found!
@@ -188,8 +178,8 @@
                    eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'graph', 'view_id': ref('admission_report_view_graph_lead')}),
                           (0, 0, {'view_mode': 'pivot', 'view_id': ref('admission_report_view_pivot_lead')}),
-                          (0, 0, {'view_mode': 'form', 'view_id': ref('admission_lead_view_form')}),
-                          (0, 0, {'view_mode': 'tree', 'view_id': ref('admission_lead_view_tree_reporting')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('admission_form_view')}),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('admission_tree_view')}),
                          ]"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
