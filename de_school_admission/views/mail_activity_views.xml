@@ -23,7 +23,7 @@
     <menuitem
         id="admission_menu_config_activity_types"
         name="Activity Types"
-        parent="menu_school_admission_menu_school_config"
+        parent="menu_admission_config_main"
         action="mail_activity_type_action_config_admissions"
         sequence="10"/>
     

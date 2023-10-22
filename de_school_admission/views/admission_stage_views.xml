@@ -73,7 +73,7 @@
     <menuitem
         id="admission_menu_config_admission_stages"
         name="Stages"
-        parent="menu_school_admission_menu_admission_config"
+        parent="menu_admission_config_main_admission"
         action="admission_stage_action"
         sequence="1"/>
 

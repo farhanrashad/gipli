@@ -9,3 +9,5 @@ access_school_admission_manager,access.school.admission.manager,model_oe_admissi
 
 access_school_admission_register_user,access.school.admission.register.user,model_oe_admission_register,de_school_team.group_school_admission_user,1,1,1,1
 access_school_admission_register_manager,access.school.admission.register.manager,model_oe_admission_register,de_school_team.group_school_admission_manager,1,1,1,1
+
+access_admission_activity_report_user,admission.activity.report.user,model_oe_admission_activity_report,base.group_user,1,0,0,0

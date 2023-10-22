@@ -335,7 +335,7 @@
       <menuitem
         id="menu_admission_pipeline"
         name="My Piepeline"
-        parent="menu_school_admission_admission_main"
+        parent="menu_admission_main"
         action="action_my_admission_pipeline"
         sequence="1"/>
       
@@ -360,7 +360,7 @@
       <menuitem
         id="menu_admission_inquiries"
         name="My Inquiries"
-        parent="menu_school_admission_admission_main"
+        parent="menu_admission_main"
         action="action_my_inquiries"
         sequence="2"/>
       
@@ -386,7 +386,7 @@
       <menuitem
         id="menu_admission_opportunities"
         name="My Admissions"
-        parent="menu_school_admission_admission_main"
+        parent="menu_admission_main"
         action="action_my_admission"
         sequence="3"/>
       -->
@@ -432,7 +432,7 @@
       <menuitem
         id="menu_admission_activities"
         name="My Activities"
-        parent="menu_school_admission_admission_main"
+        parent="menu_admission_main"
         action="action_my_admission_activities"
         sequence="4"/>
       

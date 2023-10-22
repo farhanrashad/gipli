@@ -93,7 +93,7 @@
     <menuitem
         id="admission_menu_config_admission_register"
         name="Admission Register"
-        parent="menu_school_admission_menu_admission_config"
+        parent="menu_admission_config_main_admission"
         action="action_admission_register"
         sequence="1"/>
 

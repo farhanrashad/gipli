@@ -142,7 +142,9 @@ class Admission(models.Model):
         ('3', 'Very High'),
     ], string='Priority',)
 
+    date_conversion = fields.Datetime('Conversion Date', readonly=True)
     date_deadline = fields.Date('Expected Closing', help="Estimate of the date on which the opportunity will be won.")
+    date_closed = fields.Datetime('Closed Date', readonly=True, copy=False)
 
     
     # Academic Fields

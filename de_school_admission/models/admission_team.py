@@ -82,6 +82,15 @@ class AdmissionTeam(models.Model):
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
         }
+
+    def admission_activity_report_action_team(self):
+        self.ensure_one()
+        return {
+            'name': 'Admission Activities',
+            'view_mode': 'graph,pivot,tree',
+            'res_model': 'oe.admission.activity.report',
+            'type': 'ir.actions.act_window',
+        }
         
     def action_admin_config(self):
         self.ensure_one()

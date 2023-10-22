@@ -4,7 +4,7 @@
         <menuitem
             id="admission_menu_config_admission_teams"
             name="Admission Teams"
-            parent="menu_school_admission_menu_school_config"
+            parent="menu_admission_config_main"
             action="de_school_team.action_school_team_config"
             sequence="2"/>
 
@@ -98,7 +98,7 @@
                                                 <a name="get_action_all_loan_type" type="object">Applications</a>
                                             </div>
                                             <div role="menuitem">
-                                                <a name="get_action_all_loan_type" type="object">Activities</a>
+                                                <a name="admission_activity_report_action_team" type="object">Activities</a>
                                             </div>
                                         </div>
                                     </div>
@@ -144,9 +144,9 @@
             </field>
         </record>
       <menuitem
-        id="menu_admission_teams"
+        id="menu_admission_main_teams"
         name="Teams"
-        parent="menu_school_admission_admission_main"
+        parent="menu_admission_main"
         action="action_my_admission_team"
         sequence="30"/>
         
