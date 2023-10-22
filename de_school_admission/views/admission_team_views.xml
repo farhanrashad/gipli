@@ -8,8 +8,94 @@
             action="de_school_team.action_school_team_config"
             sequence="2"/>
 
+        <!-- Admission kanban view -->
+        <record id="admission_team_kanban_view" model="ir.ui.view">
+            <field name="name">admission.kanban.view</field>
+            <field name="model">oe.admission.team</field>
+            <field name="arch" type="xml">
+                <kanban class="oe_background_grey o_kanban_dashboard o_crm_team_kanban" create="0" sample="1">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="member_ids"/>
+                    <field name="color"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}">
+                                <div t-attf-class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+                                        <div class="o_primary o_text_overflow"><field name="name"/></div>
+                                    </div>
+                                    <div class="o_kanban_manage_button_section">
+                                        <a class="o_kanban_manage_toggle_button" href="#"><i class="fa fa-ellipsis-v" role="img" aria-label="Manage" title="Manage"/></a>
+                                    </div>
+                                </div>
+                                <!-- Content -->
+                                <div class="container o_kanban_card_content">
+                                    <div class="row o_kanban_card_upper_content">
+                                        <div class="col-6 o_kanban_primary_left" name="to_replace_in_sale_crm">
+                                            <button type="object" class="btn btn-primary" name="action_primary_channel_button"><field name="dashboard_button_name"/></button>
+                                        </div>
+                                        <div class="col-6 o_kanban_primary_right" style="padding-bottom:0;">
+                                            <t name="first_options"/>
+                                            <t name="second_options"/>
+                                            <t name="third_options"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 o_kanban_primary_bottom">
+                                            <t t-call="AdmissionTeamDashboardGraph"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Menu -->
+                                <div class="container o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                    <div class="row">
+                                        <div class="col-4 o_kanban_card_manage_section o_kanban_manage_view">
+                                            <div role="menuitem" class="o_kanban_card_manage_title">
+                                                <span>View</span>
+                                            </div>
+                                            <div role="menuitem">
+                                                <a name="get_action_all_loan_type" type="object">All</a>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 o_kanban_card_manage_section o_kanban_manage_new">
+                                            <div role="menuitem" class="o_kanban_card_manage_title">
+                                                <span>New</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 o_kanban_card_manage_section o_kanban_manage_reports">
+                                            <div role="menuitem" class="o_kanban_card_manage_title">
+                                                <span>Reporting</span>
+                                            </div>
+                                            <div name="o_team_kanban_report_separator"/>
+                                        </div>
+                                    </div>
+    
+                                    <div t-if="widget.editable" class="o_kanban_card_manage_settings row" groups="sales_team.group_sale_manager">
+                                        <div role="menuitem" aria-haspopup="true" class="col-8">
+                                            <ul class="oe_kanban_colorpicker" data-field="color" role="menu"/>
+                                        </div>
+                                        <div role="menuitem" class="col-4">
+                                            <a class="dropdown-item" type="edit">Configuration</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End Header, content , menu -->
+                            </div>
+                        </t>
+                        <!-- start call -->
+                        <t t-name="AdmissionTeamDashboardGraph">
+                            <div t-if="record.dashboard_graph_data.raw_value" class="o_sales_team_kanban_graph_section">
+                                <field name="dashboard_graph_data" widget="dashboard_graph" t-att-graph_type="'bar'"/>
+                            </div>
+                        </t>
+                        <!-- End Call -->
+                    </templates>
+                </kanban>
+            </field>
+        </record>
         <!-- My Admission team -->
-         <record model="ir.ui.view" id="admission_kanban_view">
+         <record model="ir.ui.view" id="admission_kanban_view1">
             <field name="name">admission.kanban.view</field>
             <field name="model">oe.admission.team</field>
             <field name="arch" type="xml">
@@ -35,7 +121,9 @@
                                             <button type="object" class="btn btn-primary" name="action_primary_channel_button"><field name="dashboard_button_name"/></button>
                                         </div>
                                         <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
+                                            <!-- First Option -->
                                             <t name="first_options"/>
+                                            <!-- Second option -->
                                             <t name="second_options"/>
                                             <t name="third_options"/>
                                         </div>
@@ -46,6 +134,49 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="container o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                    <div class="row">
+                                        <div class="col-4 o_kanban_card_manage_section o_kanban_manage_view">
+                                            <div role="menuitem" class="o_kanban_card_manage_title">
+                                                <span>View1</span>
+                                            </div>
+                                            <div role="menuitem">
+                                                <a name="action_open_team_admissions" type="object">All Admissions</a>
+                                            </div>
+                                        </div>
+                                         <div class="col-4 o_kanban_card_manage_section o_kanban_manage_new">
+                                            <div role="menuitem" class="o_kanban_card_manage_title">
+                                                <span>New</span>
+                                            </div>
+                                              <div >
+                                                <a name="action_open_team_admissions" type="action">
+                                                    Admissions
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 o_kanban_card_manage_section o_kanban_manage_reports">
+                                            <div role="menuitem" class="o_kanban_card_manage_title">
+                                                <span>Reporting</span>
+                                            </div>
+                                            <div name="o_team_kanban_report_separator"/>
+                                             <div >
+                                                <a name="action_open_team_admissions" type="action">
+                                                    Admissions
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Color Picker -->
+                                <div t-if="widget.editable" class="o_kanban_card_manage_settings row" groups="de_school_team.group_school_admission_manager">
+                                    <div role="menuitem" aria-haspopup="true" class="col-8">
+                                        <ul class="oe_kanban_colorpicker" data-field="color" role="menu"/>
+                                    </div>
+                                    <div role="menuitem" class="col-4">
+                                        <a class="dropdown-item" type="edit">Configuration</a>
+                                    </div>
+                                </div>
+                                
                             </div>
                         </t>
                         <t t-name="AdmissionTeamDashboardGraph">
@@ -61,6 +192,9 @@
             <field name="name">Pipeline</field>
             <field name="res_model">oe.admission.team</field>
             <field name="view_mode">kanban</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('admission_team_kanban_view')}),
+            ]"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Define a new admission team!

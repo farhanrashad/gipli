@@ -7,6 +7,11 @@ from odoo.exceptions import UserError, AccessError
 class AdmissionTeam(models.Model):
     _inherit = "oe.admission.team"
 
+    count_loan_confirm = fields.Integer(string='Loan Confirm')
+    count_loan_to_pay = fields.Integer(string='Loan Confirm')
+    priority = fields.Integer(string='Priority')
+    stage_id = fields.Integer(string='stage')
+
     dashboard_button_name = fields.Char(string="Dashboard Button", compute='_compute_dashboard_button_name')
     dashboard_graph_data = fields.Text(compute='_compute_dashboard_graph')
 
@@ -30,3 +35,15 @@ class AdmissionTeam(models.Model):
     def _compute_dashboard_graph(self):
         for team in self:
             team.dashboard_graph_data = json.dumps(team._get_dashboard_graph_data())
+
+
+    # Action buttons
+    def action_open_team_admissions(self):
+        return {
+            'name': 'Team Admission',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'oe.admission',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
