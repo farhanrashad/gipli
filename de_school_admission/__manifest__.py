@@ -36,6 +36,7 @@
         'views/admission_tag_views.xml',
         'views/admission_register_views.xml',
         'views/admission_views.xml',
+        'reports/report_admission_views.xml',
         'reports/report_admission_activity_views.xml',
     ],
     'installable': True,

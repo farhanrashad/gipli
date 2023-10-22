@@ -100,11 +100,12 @@
        </record>
 
         <menuitem
-        id="menu_admission_reports_admission_activities"
-        name="Activities"
-        parent="menu_admission_reports"
-        action="action_admission_activity_report"
-        sequence="20"/>
+            id="menu_admission_reports_admission_activities"
+            name="Activities"
+            parent="menu_admission_reports"
+            action="action_admission_activity_report"
+            sequence="30"
+        />
     
         <record id="admission_activity_report_action_team" model="ir.actions.act_window">
             <field name="name">Admission Activities</field>

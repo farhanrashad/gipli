@@ -155,12 +155,45 @@ class Admission(models.Model):
     course_code = fields.Char(related='course_id.code')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
 
+    # Probability (Opportunity only)
+    probability = fields.Float(
+        'Probability', group_operator="avg", copy=False,
+        compute='_compute_probabilities', readonly=False, store=True)
     expected_revenue = fields.Monetary('Expected Revenue', currency_field='company_currency', tracking=True)
+    prorated_revenue = fields.Monetary('Prorated Revenue', currency_field='company_currency', store=True, compute="_compute_prorated_revenue")
 
     
     # ------------------------------------------------------
     # ----------------- Computed Methods -------------------
     # ------------------------------------------------------
+    @api.depends(lambda self: ['stage_id', 'team_id'] + self._pls_get_safe_fields())
+    def _compute_probabilities(self):
+        #lead_probabilities = self.id #self._pls_get_naive_bayes_probabilities()
+        for lead in self:
+            #if lead.id in lead_probabilities:
+            #    was_automated = lead.active and lead.is_automated_probability
+            #    lead.automated_probability = lead_probabilities[lead.id]
+            #    if was_automated:
+            #        lead.probability = lead.automated_probability
+            lead.probability = 0
+                    
+    @api.depends('expected_revenue', 'probability')
+    def _compute_prorated_revenue(self):
+        for lead in self:
+            lead.prorated_revenue = round((lead.expected_revenue or 0.0) * (lead.probability or 0) / 100.0, 2)
+
+    def _pls_get_safe_fields(self):
+        """ As config_parameters does not accept M2M field,
+            we the fields from the formated string stored into the Char config field.
+            To avoid sql injections when using that list, we return only the fields
+            that are defined on the model. """
+        pls_fields_config = self.env['ir.config_parameter'].sudo().get_param('crm.pls_fields')
+        pls_fields = pls_fields_config.split(',') if pls_fields_config else []
+        pls_safe_fields = [field for field in pls_fields if field in self._fields.keys()]
+        return pls_safe_fields
+
+    
+    
     @api.depends('admission_register_id')
     def _compute_from_admission_register(self):
         for record in self:
