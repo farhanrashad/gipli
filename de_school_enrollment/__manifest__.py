@@ -28,6 +28,7 @@
         'views/product_views.xml',
         'views/sale_views.xml',
         'views/enrollment_views.xml',
+        'views/student_views.xml',
         'reports/enrol_report_views.xml',
     ],
     'assets': {
