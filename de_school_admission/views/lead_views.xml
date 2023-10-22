@@ -1,0 +1,28 @@
+<odoo>
+    <data>
+        <!-- My Inquiries -->
+          <record model="ir.actions.act_window" id="action_admission_inquiries">
+                <field name="name">Inquiries</field>
+                <field name="res_model">oe.admission</field>
+                <field name="view_mode">tree,form</field>
+                <field name="view_ids" eval="[(5, 0, 0),
+                    (0, 0, {'view_mode': 'tree', 'view_id': ref('admission_tree_view')}),
+                    (0, 0, {'view_mode': 'form', 'view_id': ref('admission_form_view')}),
+                ]"/>
+                <field name="domain">[('type','=','opportunity'),('is_admission','=',True)]</field>
+                <field name="context">{
+                        'default_type': 'opportunity',
+                        'default_is_admission': True,
+                    }
+                </field>
+            </record>
+          
+          <menuitem
+            id="menu_admission_inquiries"
+            name="Inquiries"
+            parent="menu_admission"
+            action="action_admission_inquiries"
+            groups="de_school_admission.group_use_enquiries"
+            sequence="20"/>
+    </data>
+</odoo>

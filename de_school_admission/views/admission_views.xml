@@ -339,30 +339,7 @@
         action="action_my_admission_pipeline"
         sequence="1"/>
       
-      <!-- My Inquiries -->
-      <record model="ir.actions.act_window" id="action_my_inquiries">
-            <field name="name">Inquiries</field>
-            <field name="res_model">oe.admission</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('admission_tree_view')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('admission_form_view')}),
-            ]"/>
-            <field name="domain">[('type','=','opportunity'),('is_admission','=',True)]</field>
-            <field name="context">{
-                    'default_type': 'opportunity',
-                    'default_is_admission': True,
-                }
-            </field>
-        </record>
       
-      
-      <menuitem
-        id="menu_admission_inquiries"
-        name="My Inquiries"
-        parent="menu_admission_main"
-        action="action_my_inquiries"
-        sequence="2"/>
       
       <!-- My Admissions -->
       <!--
