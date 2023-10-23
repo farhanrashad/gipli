@@ -173,13 +173,13 @@ class Admission(models.Model):
         for admission in self:
             if admission.stage_id:
                 # Filter the score_ids related to the admission register that are below the current stage
-                stage_scores = admission.admission_register_id.score_ids.filtered(
-                    lambda stage: stage.sequence <= admission.stage_id.sequence
-                )
-    
+                #stage_scores = admission.admission_register_id.score_ids.filtered(
+                #    lambda stage: stage.sequence <= admission.stage_id.sequence
+                #)
+                
                 # Calculate the total score as the sum of stage scores
-                total_score = sum(stage_scores.mapped('score'))
-    
+                #total_score = sum(stage_scores.mapped('score'))
+                total_score = 0
                 # Calculate the probability based on the total score
                 admission.probability = (total_score / 100) * 100
             else:
@@ -261,7 +261,7 @@ class Admission(models.Model):
             user = admission.user_id
             if admission.team_id and user in (admission.team_id.member_ids | admission.team_id.user_id):
                 continue
-            team_domain = [('type','=','opportunity')] #[('use_leads', '=', True)] if lead.type == 'lead' else [('use_leads', '=', True)]
+            team_domain = [] #[('use_leads', '=', True)] if lead.type == 'lead' else [('use_leads', '=', True)]
             team = self.env['oe.admission.team']._get_default_team_id(user_id=user.id, domain=team_domain)
             admission.team_id = team.id
     

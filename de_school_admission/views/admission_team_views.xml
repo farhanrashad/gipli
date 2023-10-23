@@ -33,13 +33,13 @@
                                 <div class="container o_kanban_card_content">
                                     <div class="row o_kanban_card_upper_content">
                                         <div class="col-4 o_kanban_primary_left" name="to_replace_in_sale_crm">
-                                            <button type="object" class="btn btn-primary" name="action_open_team_admissions_all">APPLICATIONS</button>
+                                            <button type="object" class="btn btn-primary" name="action_open_team_admissions_all" context="{'team_id': active_id}" >APPLICATIONS</button>
                                         </div>
                                         <div class="row col-8" >
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
-                                                <a name="353" type="action" context="{'search_default_open_opportunities': True}"> <!-- context="{'search_default_probability': NOT or < 100}" -->
+                                                <a name="action_open_applications" type="object" context="{'search_default_open_opportunities': True, 'team_id': active_id}">
                                                     <field name="opportunities_count" class="me-1"/>
-                                                    <t t-if="record.opportunities_count.raw_value == 1">Open Applications</t>
+                                                    <t t-if="record.opportunities_count.raw_value == 1">Open Application</t>
                                                     <t t-else="">Open Applications</t>
                                                 </a>
                                             </div>
@@ -47,7 +47,7 @@
                                                 <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                             </div>
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
-                                                <a name="353" type="action" context="{'search_default_open_opportunities': True}"> <!-- context="{'search_default_probability': NOT or < 100}" -->
+                                                <a name="action_open_overdue_applications" type="object" context="{'search_default_open_opportunities': True,'team_id': active_id}"> <!-- context="{'search_default_probability': NOT or < 100}" -->
                                                     <field name="opportunities_count" class="me-1"/>
                                                     <t t-if="record.opportunities_count.raw_value == 1">Overdue Applications</t>
                                                     <t t-else="">Overdue Applications</t>
@@ -73,21 +73,16 @@
                                                 <span>View</span>
                                             </div>
                                             <div role="menuitem">
-                                                <a name="action_open_team_admissions_all" type="object">All</a>
+                                                <a name="action_open_team_admissions_all" type="object"  context="{'team_id': active_id}">applications</a>
                                             </div>
-                                            <div role="menuitem">
-                                                <a name="action_open_team_admissions_pending" type="object">Pending</a>
-                                            </div>
-                                            <div role="menuitem">
-                                                <a name="action_open_team_admissions_confirm" type="object">Confirm</a>
-                                            </div>
+                                           
                                         </div>
                                         <div class="col-4 o_kanban_card_manage_section o_kanban_manage_new">
                                             <div role="menuitem" class="o_kanban_card_manage_title">
                                                 <span>New</span>
                                             </div>
                                             <div role="menuitem">
-                                                <a name="action_open_new_admissions" type="object">Admission</a>
+                                                <a name="action_open_new_admissions" type="object"  context="{'team_id': active_id}">Admission</a>
                                             </div>
                                         </div>
                                         <div class="col-4 o_kanban_card_manage_section o_kanban_manage_reports">
@@ -95,10 +90,10 @@
                                                 <span>Reporting</span>
                                             </div>
                                             <div role="menuitem">
-                                                <a name="get_action_all_loan_type" type="object">Applications</a>
+                                                <a name="action_report_admission_analysis" type="object"  context="{'team_id': active_id}">Applications</a>
                                             </div>
                                             <div role="menuitem">
-                                                <a name="admission_activity_report_action_team" type="object">Activities</a>
+                                                <a name="admission_activity_report_action_team" type="object"  context="{'team_id': active_id}">Activities</a>
                                             </div>
                                         </div>
                                     </div>

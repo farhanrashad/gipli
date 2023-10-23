@@ -267,12 +267,15 @@ class AdmissionRegister(models.Model):
     # -----------------------------------------------------------------
     # ----------------------- Action buttons- --------------------------
     # ------------------------------------------------------------------
-    def action_open_admission_register(self):
+    def action_open_all_register_applications(self):
         self.ensure_one()
+        active_id = self.env.context.get('admission_register_id')
         context = {
             'default_type': 'opportunity',
-            'search_default_assigned_to_me': 1,
         }
+        if active_id:
+            context['search_default_admission_register_id'] = active_id
+            context['default_admission_register_id'] = active_id
         return {
             'name': 'Admission',
             'view_type': 'form',
@@ -282,28 +285,10 @@ class AdmissionRegister(models.Model):
             'context': context,
             'domain': [('admission_register_id','=',self.id)]
         }
-    def action_open_team_admissions_pending(self):
-        self.ensure_one()
-        return {
-            'name': 'Admission',
-            'view_type': 'form',
-            'view_mode': 'kanban,tree,form',
-            'res_model': 'oe.admission',
-            'type': 'ir.actions.act_window',
-        }
-    def action_open_team_admissions_confirm(self):
-        self.ensure_one()
-        return {
-            'name': 'Admission',
-            'view_type': 'form',
-            'view_mode': 'kanban,tree,form',
-            'res_model': 'oe.admission',
-            'type': 'ir.actions.act_window',
-        }
 
     def action_open_new_admissions(self):
         self.ensure_one()
-        active_id = self.env.context.get('active_id')
+        active_id = self.env.context.get('admission_register_id')
         context = {
             'default_type': 'opportunity',
         }
@@ -320,8 +305,78 @@ class AdmissionRegister(models.Model):
         }
 
 
+    def action_open_applications(self):
+        self.ensure_one()
+        active_id = self.env.context.get('admission_register_id')
+        context = {
+            'default_type': 'opportunity',
+            'search_default_open_opportunities': True,
+            'default_user_id': self.env.user,
+        }
+        if active_id:
+            context['search_default_admission_register_id'] = [active_id]
+            context['default_admission_register_id'] = active_id
+        return {
+            'name': 'Overdue',
+            'view_type': 'form',
+            'view_mode': 'kanban,tree,graph,form,calendar,pivot',
+            'res_model': 'oe.admission',
+            'type': 'ir.actions.act_window',
+            'context': context,
+            'domain': [('admission_register_id','=',self.id)]
+        }
+        
+    def action_open_overdue_applications(self):
+        self.ensure_one()
+        active_id = self.env.context.get('admission_register_id')
+        context = {
+            'default_type': 'opportunity',
+            'search_default_overdue_opp': 1,
+            'default_user_id': self.env.user,
+        }
+        if active_id:
+            context['search_default_admission_register_id'] = [active_id]
+            context['default_admission_register_id'] = active_id
+        return {
+            'name': 'Overdue',
+            'view_type': 'form',
+            'view_mode': 'kanban,tree,graph,form,calendar,pivot',
+            'res_model': 'oe.admission',
+            'type': 'ir.actions.act_window',
+            'context': context,
+            'domain': [('team_id','=',self.id)]
+        }
+        
+    def action_report_admission_analysis(self):
+        self.ensure_one()
+        active_id = self.env.context.get('admission_register_id')
+        context = {
+            'default_type': 'opportunity',
+        }
+        if active_id:
+            context['search_default_admission_register_id'] = [active_id]
+            context['default_admission_register_id'] = active_id
+            context['search_default_admissionteam'] = active_id
+        return {
+            'name': 'Analysis',
+            'view_mode': 'graph,pivot,tree,form',
+            'res_model': 'oe.admission',
+            'type': 'ir.actions.act_window',
+            'context': context,
+            'domain': [('admission_register_id','=',self.id)],
+            'res_id': self.id,
+            'action_id': self.env.ref('de_school_admission.admission_report_action').id,
+        }
+        
     def admission_activity_report_action_team(self):
         self.ensure_one()
+        active_id = self.env.context.get('admission_register_id')
+        context = {
+            'default_type': 'opportunity',
+        }
+        if active_id:
+            context['search_default_admission_register_id'] = active_id
+            context['default_admission_register_id'] = active_id
         return {
             'name': 'Admission Activities',
             'view_mode': 'graph,pivot,tree',
