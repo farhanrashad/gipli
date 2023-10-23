@@ -35,7 +35,11 @@ class Admission(models.Model):
     _primary_email = 'email_from'
     _check_company_auto = True
 
-
+    @api.model
+    def _compute_default_expected_revenue(self):
+        default_value = self.course_id.expected_revenue
+        return default_value
+        
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         search_domain = [('id', 'in', stages.ids)]
@@ -170,13 +174,16 @@ class Admission(models.Model):
     probability = fields.Float(
         'Probability', group_operator="avg", copy=False,
         compute='_compute_probabilities', readonly=False, store=True)
-    expected_revenue = fields.Monetary('Expected Revenue', currency_field='company_currency', tracking=True)
+    expected_revenue = fields.Monetary('Expected Revenue', 
+                                       default='_compute_default_expected_revenue',
+                                       currency_field='company_currency', tracking=True)
     prorated_revenue = fields.Monetary('Prorated Revenue', currency_field='company_currency', store=True, compute="_compute_prorated_revenue")
 
     
     # ------------------------------------------------------
     # ----------------- Computed Methods -------------------
     # ------------------------------------------------------
+    
     def _compute_admission_setting_values(self):
         application_score = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_score', False)
         application_revenue = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_revenue', False)
@@ -198,6 +205,10 @@ class Admission(models.Model):
                 else:
                     lead.won_status = 'pending'
         
+    @api.onchange('course_id')
+    def _onchange_course_id(self):
+        for record in self:
+            record.expected_revenue = record.course_id.expected_revenue
         
     #@api.depends(lambda self: ['stage_id', 'team_id'] + self._pls_get_safe_fields())
     @api.depends('stage_id', 'admission_register_id', 
