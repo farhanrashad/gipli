@@ -57,6 +57,7 @@
                 <sheet>
                     <field name="active" invisible="1"/>
                     <field name="company_id" invisible="1"/>
+                    <field name="is_application_score" invisible="1"/>
                     <div class="oe_title">
                         <label for="name"/>
                         <h1>
@@ -85,14 +86,14 @@
                     <separator string="Description"/>
                     <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Admission details..."/>
                     <notebook>
-                        <page string="Score" name="scroe">
+                        <page string="Score" name="scroe" attrs="{'invisible': [('is_application_score', '!=', True)]}">
                             <field name="score_ids">
                                 <tree editable="bottom">
                                     <field name="stage_id" options='{"no_open": True, "no_create": True}'/>
                                     <field name="score"/>
                                 </tree>
                             </field>
-                            <group>
+                            <group attrs="{'invisible': [('is_application_score', '!=', True)]}">
                                 <group colspan="4">
                                     <group class="oe_subtotal_footer oe_right" >
                                         <field name="score_total" class="oe_subtotal_footer_separator" />
@@ -136,6 +137,7 @@
                 <kanban class="oe_background_grey o_kanban_dashboard o_admission_register_kanban" create="0" sample="1">
                     <field name="name"/>
                     <field name="color"/>
+                    <field name="is_application_revenue" invisible="1" />
                     <templates>
                         <t t-name="kanban-box">
                             <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}">
@@ -161,7 +163,7 @@
                                                     <t t-else="">Open Applications</t>
                                                 </a>
                                             </div>
-                                            <div class="col-4 text-end text-truncate">
+                                            <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
                                                 <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                             </div>
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
@@ -177,7 +179,7 @@
                                         </div>
                                         
                                     </div>
-                                    <div class="row">
+                                    <div class="row" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
                                         <div class="col-12 o_kanban_primary_bottom">
                                             <t t-call="AdmissionTeamDashboardGraph"/>
                                         </div>

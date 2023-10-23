@@ -19,6 +19,13 @@ class AdmissionTeam(models.Model):
     dashboard_button_name = fields.Char(string="Dashboard Button", compute='_compute_dashboard_button_name')
     dashboard_graph_data = fields.Text(compute='_compute_dashboard_graph')
 
+    is_application_revenue = fields.Boolean(string='Allow Expected Revenue', compute='_compute_admission_setting_values')
+
+    def _compute_admission_setting_values(self):
+        application_revenue = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_revenue', False)
+        for record in self:
+            record.is_application_revenue = application_revenue
+
     def _graph_get_model(self):
         return 'oe.admission'
 

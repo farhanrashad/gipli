@@ -62,6 +62,9 @@ class AdmissionRegister(models.Model):
     dashboard_graph_data = fields.Text(compute='_compute_dashboard_graph')
 
     # calculate scroe or probability of the admission applicaiton
+    is_application_score = fields.Boolean(string='Allow Score', compute='_compute_admission_setting_values')
+    is_application_revenue = fields.Boolean(string='Allow Expected Revenue', compute='_compute_admission_setting_values')
+
     score_ids = fields.One2many('oe.admission.register.score', 'admission_register_id', string='Scores')
     score_total = fields.Float(string='Total Score', compute='_compute_total_score', readonly=True)
 
@@ -71,6 +74,12 @@ class AdmissionRegister(models.Model):
             if sum(record.score_ids.mapped('score')) > 100:
                 raise UserError(_("Total Score cannot exceed 100."))
 
+    def _compute_admission_setting_values(self):
+        application_score = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_score', False)
+        application_revenue = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_revenue', False)
+        for record in self:
+            record.is_application_score = application_score
+            record.is_application_revenue = application_revenue
 
     @api.depends('score_ids','score_ids.score')
     def _compute_total_score(self):

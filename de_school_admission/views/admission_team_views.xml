@@ -18,6 +18,7 @@
                     <field name="user_id"/>
                     <field name="member_ids"/>
                     <field name="color"/>
+                    <field name="is_application_revenue" invisible="1" />
                     <templates>
                         <t t-name="kanban-box">
                             <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}">
@@ -43,7 +44,7 @@
                                                     <t t-else="">Open Applications</t>
                                                 </a>
                                             </div>
-                                            <div class="col-4 text-end text-truncate">
+                                            <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
                                                 <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                             </div>
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
@@ -59,7 +60,7 @@
                                         </div>
                                         
                                     </div>
-                                    <div class="row">
+                                    <div class="row" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
                                         <div class="col-12 o_kanban_primary_bottom">
                                             <t t-call="AdmissionTeamDashboardGraph"/>
                                         </div>
