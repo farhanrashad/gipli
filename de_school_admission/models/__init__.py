@@ -6,3 +6,4 @@ from . import admission_register
 from . import admission
 from . import admission_team
 from . import admission_lost_reason
+from . import course

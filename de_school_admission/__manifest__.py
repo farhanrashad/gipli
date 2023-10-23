@@ -43,6 +43,7 @@
         'reports/report_admission_views.xml',
         'reports/report_admission_activity_views.xml',
         'wizards/lost_reason_wizard_views.xml',
+        'views/course_views.xml',
     ],
     'installable': True,
     'application': True,
