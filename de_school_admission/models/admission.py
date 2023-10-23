@@ -165,6 +165,8 @@ class Admission(models.Model):
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
 
     # Probability (Opportunity only)
+    is_application_score = fields.Boolean(string='Allow Score', compute='_compute_admission_setting_values')
+    is_application_revenue = fields.Boolean(string='Allow Expected Revenue', compute='_compute_admission_setting_values')
     probability = fields.Float(
         'Probability', group_operator="avg", copy=False,
         compute='_compute_probabilities', readonly=False, store=True)
@@ -175,7 +177,15 @@ class Admission(models.Model):
     # ------------------------------------------------------
     # ----------------- Computed Methods -------------------
     # ------------------------------------------------------
-    @api.depends('active', 'probability')
+    def _compute_admission_setting_values(self):
+        application_score = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_score', False)
+        application_revenue = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_revenue', False)
+
+        for record in self:
+            record.is_application_score = application_score
+            record.is_application_revenue = application_revenue
+    
+    @api.depends('active', 'probability','stage_id')
     def _compute_won_status(self):
         for lead in self:
             if lead.active and lead.probability == 100:
@@ -183,7 +193,10 @@ class Admission(models.Model):
             elif not lead.active and lead.probability == 0:
                 lead.won_status = 'lost'
             else:
-                lead.won_status = 'pending'
+                if lead.stage_id.is_close:
+                    lead.won_status = 'won'
+                else:
+                    lead.won_status = 'pending'
         
         
     #@api.depends(lambda self: ['stage_id', 'team_id'] + self._pls_get_safe_fields())
@@ -193,13 +206,12 @@ class Admission(models.Model):
         for admission in self:
             if admission.stage_id:
                 # Filter the score_ids related to the admission register that are below the current stage
-                #stage_scores = admission.admission_register_id.score_ids.filtered(
-                #    lambda stage: stage.sequence <= admission.stage_id.sequence
-                #)
+                stage_scores = admission.admission_register_id.score_ids.filtered(
+                    lambda line: line.stage_id.sequence <= admission.stage_id.sequence
+                )
                 
                 # Calculate the total score as the sum of stage scores
-                #total_score = sum(stage_scores.mapped('score'))
-                total_score = 0
+                total_score = sum(stage_scores.mapped('score'))
                 # Calculate the probability based on the total score
                 admission.probability = (total_score / 100) * 100
             else:
@@ -608,3 +620,15 @@ class Admission(models.Model):
             'target': 'new',
             'context': context,
         }
+    def toggle_active(self):
+        """ When archiving: mark probability as 0. When re-activating
+        update probability again, for leads and opportunities. """
+        res = super(Admission, self).toggle_active()
+        activated = self.filtered(lambda lead: lead.active)
+        archived = self.filtered(lambda lead: not lead.active)
+        if activated:
+            activated.write({'lost_reason_id': False})
+            activated._compute_probabilities()
+        if archived:
+            archived.write({'probability': 0})
+        return res

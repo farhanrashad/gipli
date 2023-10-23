@@ -23,6 +23,33 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Admission -->
+                        <h2>Admissions</h2>
+                        <div class="row mt16 o_settings_container" id="end_contract_setting">
+                            <div class="col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="is_application_score"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="is_application_score"/>
+                                    <div class="text-muted">
+                                        Manage application scoreks to better manage admissions.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="is_application_revenue"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="is_application_revenue"/>
+                                    <div class="text-muted">
+                                        Manage expected revenue/Fee to plan revenue thorugh admission process.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- -->
                     </div>
                 </xpath>
             </field>
