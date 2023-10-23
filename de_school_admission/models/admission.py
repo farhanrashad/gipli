@@ -148,7 +148,11 @@ class Admission(models.Model):
 
     
     # Academic Fields
-    is_admission_confirmed = fields.Boolean('Is Admission Confirmed')
+    won_status = fields.Selection([
+        ('won', 'Won'),
+        ('lost', 'Lost'),
+        ('pending', 'Pending'),
+    ], string='Is Won', compute='_compute_won_status', store=True)
     admission_register_id = fields.Many2one('oe.admission.register',string="Admission Register", required=True)
     
     course_id = fields.Many2one('oe.school.course', string='Course', compute='_compute_from_admission_register')
@@ -166,6 +170,17 @@ class Admission(models.Model):
     # ------------------------------------------------------
     # ----------------- Computed Methods -------------------
     # ------------------------------------------------------
+    @api.depends('active', 'probability')
+    def _compute_won_status(self):
+        for lead in self:
+            if lead.active and lead.probability == 100:
+                lead.won_status = 'won'
+            elif not lead.active and lead.probability == 0:
+                lead.won_status = 'lost'
+            else:
+                lead.won_status = 'pending'
+        
+        
     #@api.depends(lambda self: ['stage_id', 'team_id'] + self._pls_get_safe_fields())
     @api.depends('stage_id', 'admission_register_id', 
                  'admission_register_id.score_ids', 'admission_register_id.score_ids.score')
@@ -447,7 +462,7 @@ class Admission(models.Model):
             else:
                 lead.company_currency = lead.company_id.currency_id
     # ----------------------------------------------------
-    # ------------------- Operations ---------------------
+    # ------------------- CRUD ---------------------
     # ----------------------------------------------------
     @api.model
     def create(self, vals):
@@ -458,3 +473,106 @@ class Admission(models.Model):
 
         result = super(Admission, self).create(vals)
         return result
+
+    # -------------------------------------------------------
+    # ------------------- Button Actions --------------------
+    # -------------------------------------------------------
+    def action_set_won_rainbowman(self):
+        self.ensure_one()
+        self.action_set_won()
+
+        message = self._get_rainbowman_message()
+        if message:
+            return {
+                'effect': {
+                    'fadeout': 'slow',
+                    'message': message,
+                    'img_url': '/web/image/%s/%s/image_1024' % (self.team_id.user_id._name, self.team_id.user_id.id) if self.team_id.user_id.image_1024 else '/web/static/img/smile.svg',
+                    'type': 'rainbow_man',
+                }
+            }
+        return True
+
+    def get_rainbowman_message(self):
+        self.ensure_one()
+        if self.stage_id.is_won:
+            return self._get_rainbowman_message()
+        return False
+
+    def _get_rainbowman_message(self):
+        if not self.user_id or not self.team_id:
+            return False
+        if not self.expected_revenue:
+            # Show rainbow man for the first won lead of a salesman, even if expected revenue is not set. It is not
+            # very often that leads without revenues are marked won, so simply get count using ORM instead of query
+            today = fields.Datetime.today()
+            user_won_leads_count = self.search_count([
+                ('type', '=', 'opportunity'),
+                ('user_id', '=', self.user_id.id),
+                ('probability', '=', 100),
+                ('date_closed', '>=', date_utils.start_of(today, 'year')),
+                ('date_closed', '<', date_utils.end_of(today, 'year')),
+            ])
+            if user_won_leads_count == 1:
+                return _('Go, go, go! Congrats for your first deal.')
+            return False
+
+        self.flush_model()  # flush fields to make sure DB is up to date
+        query = """
+            SELECT
+                SUM(CASE WHEN user_id = %(user_id)s THEN 1 ELSE 0 END) as total_won,
+                MAX(CASE WHEN date_closed >= CURRENT_DATE - INTERVAL '30 days' AND user_id = %(user_id)s THEN expected_revenue ELSE 0 END) as max_user_30,
+                MAX(CASE WHEN date_closed >= CURRENT_DATE - INTERVAL '7 days' AND user_id = %(user_id)s THEN expected_revenue ELSE 0 END) as max_user_7,
+                MAX(CASE WHEN date_closed >= CURRENT_DATE - INTERVAL '30 days' AND team_id = %(team_id)s THEN expected_revenue ELSE 0 END) as max_team_30,
+                MAX(CASE WHEN date_closed >= CURRENT_DATE - INTERVAL '7 days' AND team_id = %(team_id)s THEN expected_revenue ELSE 0 END) as max_team_7
+            FROM oe_admission
+            WHERE
+                type = 'opportunity'
+            AND
+                active = True
+            AND
+                probability = 100
+            AND
+                DATE_TRUNC('year', date_closed) = DATE_TRUNC('year', CURRENT_DATE)
+            AND
+                (user_id = %(user_id)s OR team_id = %(team_id)s)
+        """
+        self.env.cr.execute(query, {'user_id': self.user_id.id,
+                                    'team_id': self.team_id.id})
+        query_result = self.env.cr.dictfetchone()
+
+        message = False
+        if query_result['total_won'] == 1:
+            message = _('Go, go, go! Congrats for your first deal.')
+        elif query_result['max_team_30'] == self.expected_revenue:
+            message = _('Boom! Team record for the past 30 days.')
+        elif query_result['max_team_7'] == self.expected_revenue:
+            message = _('Yeah! Deal of the last 7 days for the team.')
+        elif query_result['max_user_30'] == self.expected_revenue:
+            message = _('You just beat your personal record for the past 30 days.')
+        elif query_result['max_user_7'] == self.expected_revenue:
+            message = _('You just beat your personal record for the past 7 days.')
+        return message
+
+    def action_set_lost(self, **additional_values):
+        """ Lost semantic: probability = 0 or active = False """
+        res = self.action_archive()
+        if additional_values:
+            self.write(dict(additional_values))
+        return res
+
+    def action_application_lost(self):
+        self.ensure_one()
+        active_id = self.env.context.get('admission_id')
+        context = {
+            'default_type': 'opportunity',
+        }
+        if active_id:
+            context['default_admission_id'] = active_id
+        return {
+            'name': 'Lost Reason',
+            'view_mode': 'form',
+            'res_model': 'oe.admission.lost.wizard',
+            'type': 'ir.actions.act_window',
+            'context': context,
+        }
