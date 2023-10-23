@@ -148,7 +148,7 @@ class Admission(models.Model):
 
     
     # Academic Fields
-    is_admission = fields.Boolean('Is Admission')
+    is_admission_confirmed = fields.Boolean('Is Admission Confirmed')
     admission_register_id = fields.Many2one('oe.admission.register',string="Admission Register", required=True)
     
     course_id = fields.Many2one('oe.school.course', string='Course', compute='_compute_from_admission_register')
@@ -167,20 +167,24 @@ class Admission(models.Model):
     # ----------------- Computed Methods -------------------
     # ------------------------------------------------------
     #@api.depends(lambda self: ['stage_id', 'team_id'] + self._pls_get_safe_fields())
-    @api.depends('stage_id','admission_register_id','admission_register_id.score_total')
+    @api.depends('stage_id', 'admission_register_id', 
+                 'admission_register_id.score_ids', 'admission_register_id.score_ids.score')
     def _compute_probabilities(self):
         for admission in self:
             if admission.stage_id:
-                total_score = sum(stage.score for stage in admission.admission_register_id.score_ids.filtered(lambda stage: stage.sequence < admission.stage_id.sequence))
-
-                # Add the current stage's score to the total score
-                current_stage_score = admission.admission_resgister_id.score_ids.filtered(lambda x:x.stage_id.id==admission.stage_id.id).score
-                total_score += current_stage_score
-
+                # Filter the score_ids related to the admission register that are below the current stage
+                stage_scores = admission.admission_register_id.score_ids.filtered(
+                    lambda stage: stage.sequence <= admission.stage_id.sequence
+                )
+    
+                # Calculate the total score as the sum of stage scores
+                total_score = sum(stage_scores.mapped('score'))
+    
                 # Calculate the probability based on the total score
                 admission.probability = (total_score / 100) * 100
             else:
                 admission.probability = 0
+
 
                     
     @api.depends('expected_revenue', 'probability')
@@ -257,9 +261,9 @@ class Admission(models.Model):
             user = admission.user_id
             if admission.team_id and user in (admission.team_id.member_ids | admission.team_id.user_id):
                 continue
-            #team_domain = [('use_leads', '=', True)] if lead.type == 'lead' else [('use_leads', '=', True)]
-            #team = self.env['oe.admission.team']._get_default_team_id(user_id=user.id, domain=team_domain)
-            admission.team_id = False #team.id
+            team_domain = [('type','=','opportunity')] #[('use_leads', '=', True)] if lead.type == 'lead' else [('use_leads', '=', True)]
+            team = self.env['oe.admission.team']._get_default_team_id(user_id=user.id, domain=team_domain)
+            admission.team_id = team.id
     
     @api.depends('user_id', 'team_id', 'partner_id')
     def _compute_company_id(self):

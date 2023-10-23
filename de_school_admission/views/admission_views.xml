@@ -1,6 +1,6 @@
 <odoo>
   <data> 
-      
+      <!-- form view -->
       <record id="admission_form_view" model="ir.ui.view">
             <field name="name">admission.form.view</field>
             <field name="model">oe.admission</field>
@@ -34,7 +34,7 @@
                         </div>
                         <div class="oe_title">
                             <label for="name" />
-                            <h1><field class="text-break" name="name" required="1"/></h1>
+                            <h1><field class="text-break" name="name" required="1" placeholder="Full Name e.g John Doe"/></h1>
                             <h2 class="d-flex gap-2 g-0 align-items-end pb-3">
                                 <div attrs="{'invisible': [('type', '=', 'lead')]}">
                                     <label for="expected_revenue" string="Estimated Fees" class="oe_edit_only pb-1"/>
@@ -145,7 +145,45 @@
                 </form>
             </field>
         </record>
-    
+
+      <!-- Quick create form view -->
+      <record id="quick_create_admission_form" model="ir.ui.view">
+            <field name="name">admission.form.quick_create</field>
+            <field name="model">oe.admission</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="contact_name" string="Student Name" placeholder="Full Name e.g. John Doe" />
+                        <field name="admission_register_id"  options="{'no_open': True, 'no_create': True}"/>
+                        <field name="course_id" />
+                        <field name="email_from" string="Email" />
+                        <field name="phone" string="Phone" />
+                        <field name="priority" class="oe_inline" nolabel="1" widget="priority"/>
+                        <field name="company_currency" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="user_id" invisible="1"/>
+                        <field name="user_company_ids" invisible="1"/>
+                        <field name="team_id" invisible="1"/>
+                        <field name="type" invisible="1"/>
+                        <field name="partner_name" invisible="1"/>
+                        <field name="partner_id" invisible="1"/>
+                        <field name="country_id" invisible="1"/>
+                        <field name="state_id" invisible="1"/>
+                        <field name="city" invisible="1"/>
+                        <field name="street" invisible="1"/>
+                        <field name="street2" invisible="1"/>
+                        <field name="zip" invisible="1"/>
+                        <field name="mobile" invisible="1"/>
+                        <field name="website" invisible="1"/>
+                        <field name="title" invisible="1"/>
+                        <field name="activity_ids" invisible="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+    <!-- Tree view -->
       <record id="admission_tree_view" model="ir.ui.view">
             <field name="name">admission.tree.view</field>
             <field name="model">oe.admission</field>
@@ -227,7 +265,7 @@
                     default_group_by="stage_id"
                     class="o_kanban_small_column o_kanban_admissions"
                     on_create="quick_create"
-                    quick_create_view="project.quick_create_task_form"
+                    quick_create_view="de_school_admission.quick_create_admission_form"
                     examples="Admission"
                     js_class="" sample="1"
                 >
@@ -249,6 +287,18 @@
                     <templates>
                         <t t-name="kanban-box">
                             <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}  oe_kanban_global_click oe_kanban_card d-flex flex-column">
+                                <!-- Kanban Menu -->
+                                <div class="o_dropdown_kanban dropdown">
+                                    <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" data-bs-display="static" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <t t-if="widget.editable"><a role="menuitem" type="edit" class="dropdown-item">Edit</a></t>
+                                        <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
+                                        <ul class="oe_kanban_colorpicker" data-field="color"/>
+                                    </div>
+                                </div>
+                                <!-- Kanban Content -->
                                 <div class="oe_kanban_content flex-grow-1">
                                     <div class="o_kanban_record_title oe_kanban_details">
                                         <strong><field name="contact_name"/></strong>
@@ -353,8 +403,8 @@
             <field name="view_mode">kanban,tree,form,calendar,pivot,graph,activity</field>
             <field name="search_view_id" ref="admission_search_view"/>
             <field name="context">{
-                    'default_type': 'opportunity',
-                    'search_default_assigned_to_me': 1
+                'default_type': 'opportunity',
+                'search_default_assigned_to_me': 1
             }</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

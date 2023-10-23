@@ -269,19 +269,25 @@ class AdmissionRegister(models.Model):
     # ------------------------------------------------------------------
     def action_open_admission_register(self):
         self.ensure_one()
+        context = {
+            'default_type': 'opportunity',
+            'search_default_assigned_to_me': 1,
+        }
         return {
             'name': 'Admission',
             'view_type': 'form',
-            'view_mode': 'kanban',
+            'view_mode': 'kanban,tree,form',
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
+            'context': context,
+            'domain': [('admission_register_id','=',self.id)]
         }
     def action_open_team_admissions_pending(self):
         self.ensure_one()
         return {
             'name': 'Admission',
             'view_type': 'form',
-            'view_mode': 'kanban',
+            'view_mode': 'kanban,tree,form',
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
         }
@@ -290,20 +296,29 @@ class AdmissionRegister(models.Model):
         return {
             'name': 'Admission',
             'view_type': 'form',
-            'view_mode': 'kanban',
+            'view_mode': 'kanban,tree,form',
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
         }
 
     def action_open_new_admissions(self):
         self.ensure_one()
+        active_id = self.env.context.get('active_id')
+        context = {
+            'default_type': 'opportunity',
+        }
+        if active_id:
+            context['search_default_admission_register_id'] = active_id
+            context['default_admission_register_id'] = active_id
         return {
             'name': 'Admission',
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
+            'context': context,
         }
+
 
     def admission_activity_report_action_team(self):
         self.ensure_one()
