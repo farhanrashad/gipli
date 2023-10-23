@@ -7,10 +7,10 @@
             <field name="arch" type="xml">
                 <form class="o_lead_opportunity_form" js_class="crm_form">
                     <header>
-                        <button name="action_set_won_rainbowman" string="Won"
-                            type="object" class="oe_highlight" data-hotkey="w" title="Mark as won"
+                        <button name="action_accept_application" string="Accept"
+                            type="object" class="oe_highlight" data-hotkey="w" title="Accept Application"
                             attrs="{'invisible': ['|','|', ('active','=',False), ('probability', '=', 100), ('type', '=', 'lead')]}"/>
-                        <button name="action_application_lost" string="Lost" data-hotkey="l" title="Mark as lost" type="object" context="{'admission_id': active_id}" attrs="{'invisible': ['|', ('type', '=', 'lead'), '&amp;',('active', '=', False),('probability', '&lt;', 100)]}"/>
+                        <button name="action_application_lost" string="Reject" data-hotkey="l" title="Reject Application" type="object" context="{'admission_id': active_id}" attrs="{'invisible': ['|', ('type', '=', 'lead'), '&amp;',('active', '=', False),('probability', '&lt;', 100)]}"/>
                         
                         <field name="stage_id" widget="statusbar"
                             options="{'clickable': '1', 'fold_field': 'fold'}"
@@ -37,6 +37,8 @@
                         <div class="oe_button_box" name="button_box">
                             
                         </div>
+                        <widget name="web_ribbon" title="Rejected" bg_color="bg-danger" attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}"/>
+                        <widget name="web_ribbon" title="Accepted" attrs="{'invisible': [('probability', '&lt;', 100)]}" />
                         <div class="oe_title">
                             <label for="name" />
                             <h1><field class="text-break" name="name" required="1" placeholder="Full Name e.g John Doe"/></h1>

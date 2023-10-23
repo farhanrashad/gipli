@@ -147,12 +147,17 @@ class Admission(models.Model):
     date_closed = fields.Datetime('Closed Date', readonly=True, copy=False)
 
     
-    # Academic Fields
+    # Accept and Reject
     won_status = fields.Selection([
         ('won', 'Won'),
         ('lost', 'Lost'),
         ('pending', 'Pending'),
     ], string='Is Won', compute='_compute_won_status', store=True)
+    lost_reason_id = fields.Many2one(
+        'oe.admission.lost.reason', string='Lost Reason',
+        index=True, ondelete='restrict', tracking=True)
+
+    # Academic Fields
     admission_register_id = fields.Many2one('oe.admission.register',string="Admission Register", required=True)
     
     course_id = fields.Many2one('oe.school.course', string='Course', compute='_compute_from_admission_register')
@@ -477,7 +482,7 @@ class Admission(models.Model):
     # -------------------------------------------------------
     # ------------------- Button Actions --------------------
     # -------------------------------------------------------
-    def action_set_won_rainbowman(self):
+    def action_accept_application(self):
         self.ensure_one()
         self.action_set_won()
 
@@ -499,7 +504,7 @@ class Admission(models.Model):
         # group the leads by team_id, in order to write once by values couple (each write leads to frequency increment)
         leads_by_won_stage = {}
         for lead in self:
-            won_stages = self._stage_find(domain=[('is_won', '=', True)], limit=None)
+            won_stages = self._stage_find(domain=[('is_close', '=', True)], limit=None)
             # ABD : We could have a mixed pipeline, with "won" stages being separated by "standard"
             # stages. In the future, we may want to prevent any "standard" stage to have a higher
             # sequence than any "won" stage. But while this is not the case, searching
