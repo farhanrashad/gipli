@@ -157,7 +157,7 @@
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
                                                 <a name="action_open_applications" type="action" context="{'admission_register_id': active_id, 'search_default_open_opportunities': True}"> <!-- context="{'search_default_probability': NOT or < 100}" -->
                                                     <field name="opportunities_count" class="me-1"/>
-                                                    <t t-if="record.opportunities_count.raw_value == 1">Open Applications</t>
+                                                    <t t-if="record.opportunities_count.raw_value == 1">Open Application</t>
                                                     <t t-else="">Open Applications</t>
                                                 </a>
                                             </div>
@@ -167,7 +167,7 @@
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
                                                 <a name="action_open_overdue_applications" type="object" context="{'admission_register_id': active_id, 'search_default_open_opportunities': True}"> <!-- context="{'search_default_probability': NOT or < 100}" -->
                                                     <field name="opportunities_count" class="me-1"/>
-                                                    <t t-if="record.opportunities_count.raw_value == 1">Overdue Applications</t>
+                                                    <t t-if="record.opportunities_count.raw_value == 1">Overdue Application</t>
                                                     <t t-else="">Overdue Applications</t>
                                                 </a>
                                             </div>

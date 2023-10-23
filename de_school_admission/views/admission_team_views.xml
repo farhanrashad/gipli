@@ -49,7 +49,7 @@
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
                                                 <a name="action_open_overdue_applications" type="object" context="{'search_default_open_opportunities': True,'team_id': active_id}"> <!-- context="{'search_default_probability': NOT or < 100}" -->
                                                     <field name="opportunities_count" class="me-1"/>
-                                                    <t t-if="record.opportunities_count.raw_value == 1">Overdue Applications</t>
+                                                    <t t-if="record.opportunities_count.raw_value == 1">Overdue Application</t>
                                                     <t t-else="">Overdue Applications</t>
                                                 </a>
                                             </div>
@@ -73,7 +73,7 @@
                                                 <span>View</span>
                                             </div>
                                             <div role="menuitem">
-                                                <a name="action_open_team_admissions_all" type="object"  context="{'team_id': active_id}">applications</a>
+                                                <a name="action_open_team_admissions_all" type="object"  context="{'team_id': active_id}">Applications</a>
                                             </div>
                                            
                                         </div>
@@ -82,7 +82,7 @@
                                                 <span>New</span>
                                             </div>
                                             <div role="menuitem">
-                                                <a name="action_open_new_admissions" type="object"  context="{'team_id': active_id}">Admission</a>
+                                                <a name="action_open_new_admissions" type="object"  context="{'team_id': active_id}">Application</a>
                                             </div>
                                         </div>
                                         <div class="col-4 o_kanban_card_manage_section o_kanban_manage_reports">
