@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError, AccessError
 
 
 class SaleOrder(models.Model):
@@ -19,3 +20,4 @@ class SaleOrder(models.Model):
     @api.onchange('admission_id')
     def _onchange_admission_id(self):
         self.admission_register_id = self.admission_id.admission_register_id.id
+        self.admission_team_id = self.admission_id.team_id.id

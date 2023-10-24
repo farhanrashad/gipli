@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="action_team_enrol_orders" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('de_school_enrollment.enrollment_order_view_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('de_school_enrollment.enrol_contract_primary_form_view')}),
+            ]"/>
+        <field name="search_view_id" ref="de_school_enrollment.enrol_order_view_search"/>
+        <field name="domain">[('is_enrol_order', '=', True),('admission_team_id','=',active_id)]</field>
+        <field name="context">{
+            'default_is_enrol_order': 1,
+            'search_default_inprogress_orders':1,
+            'search_default_team_id': [active_id],
+            'search_default_admission_team_id': [active_id],
+            'default_admission_team_id': active_id,
+            'default_user_id': uid,
+            'create': False,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new quotation, the first step of a new Enrollment Contract!
+            </p><p>
+                Once the quotation is confirmed, it becomes a Enrollment Contract.<br/> You will be able to create an invoice and collect the payment.
+            </p>
+        </field>
+    </record>
+    
     <record id="admission_team_form_view_inherit_enrol" model="ir.ui.view">
         <field name="name">admission.team.form.view.inherit.enrol</field>
         <field name="model">oe.admission.team</field>
@@ -7,7 +36,12 @@
         <field name="arch" type="xml">
             <xpath expr="//t[@name='first_options']" position="after">
                 <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
-                    <a name="action_open_enrol_orders" type="object" context="{'search_default_open_opportunities': True, 'team_id': active_id}">
+                    <a name="%(action_team_enrol_orders)d" type="action" context="{'team_id': active_id}">
+                        <field name="enrol_orders_count" class="me-1"/>
+                        <t t-if="record.enrol_orders_count.raw_value == 1">Enrolment Order</t>
+                        <t t-else="">Enrollment Orders</t>
+                    </a>
+                    <a name="action_open_enrol_orders" type="object" context="{'team_id': active_id}">
                         <field name="enrol_orders_count" class="me-1"/>
                         <t t-if="record.enrol_orders_count.raw_value == 1">Enrolment Order</t>
                         <t t-else="">Enrollment Orders</t>
