@@ -28,6 +28,7 @@
         'views/admission_team_views.xml',
         'views/admission_team_members_views.xml',
         'views/admission_tag_views.xml',
+        'views/student_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
