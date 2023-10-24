@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
+    <record id="enrol_contract_primary_form_view_inherit" model="ir.ui.view">
+        <field name="name">enrollment.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="de_school_enrollment.enrol_contract_primary_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="admission_team_id" options='{"no_open": True, "no_create": True}'/>
+            </xpath>
+        </field>
+    </record>
+    
     <record id="action_enrol_order_new" model="ir.actions.act_window">
         <field name="name">Quotation</field>
         <field name="res_model">sale.order</field>

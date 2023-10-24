@@ -2,3 +2,4 @@
 
 from . import sale_order
 from . import admission
+from . import admission_team
