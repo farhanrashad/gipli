@@ -87,7 +87,7 @@ class Admission(models.Model):
 
     def _prepare_student_values(self, partner_name, is_company=False, parent_id=False):
         # Call the original method to get the base result
-        res = super(YourAdmissionModel, self)._prepare_student_values(partner_name, is_company, parent_id)
+        res = super(Admission, self)._prepare_student_values(partner_name, is_company, parent_id)
 
         # Add 'admission_team_id' to the result
         res['admission_team_id'] = self.team_id.id  # Replace 'team_id' with the correct field
