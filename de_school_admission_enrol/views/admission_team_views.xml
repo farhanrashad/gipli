@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="admission_team_form_view_inherit_enrol" model="ir.ui.view">
+        <field name="name">admission.team.form.view.inherit.enrol</field>
+        <field name="model">oe.admission.team</field>
+        <field name="inherit_id" ref="de_school_admission.admission_team_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='container o_kanban_card_content']/div[@class='row col-8']" position="inside">
+                <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
+                    <a name="action_open_applications" type="object" context="{'search_default_open_opportunities': True, 'team_id': active_id}">
+                        <field name="opportunities_count" class="me-1"/>
+                        <t t-if="record.opportunities_count.raw_value == 1">Open Application</t>
+                        <t t-else="">Open Applications</t>
+                    </a>
+                </div>
+                <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                    <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

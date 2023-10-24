@@ -28,6 +28,7 @@
         'views/sale_order_views.xml',
         'views/admission_views.xml',
         'wizards/admission_enrol_student_wizard_views.xml',
+        'views/admission_team_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
