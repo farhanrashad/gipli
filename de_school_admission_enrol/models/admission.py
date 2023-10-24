@@ -43,17 +43,20 @@ class Admission(models.Model):
         }
 
     def _action_create_enrol_order(self):
-        action = self.env["ir.actions.actions"]._for_xml_id("de_school_enrollment.enrollment_order_action")
-        action['context'] = self._prepare_opportunity_quotation_context()
+        action = self.env["ir.actions.actions"]._for_xml_id("de_school_admission_enrol.action_enrol_order_new")
+        action['context'] = self._prepare_enrol_order_context()
         action['context']['search_default_admission_id'] = self.id
         action['context']['active_test'] = True
         return action
 
-    def _prepare_opportunity_quotation_context(self):
+    def _prepare_enrol_order_context(self):
         """ Prepares the context for a new quotation (sale.order) by sharing the values of common fields """
         self.ensure_one()
         quotation_context = {
             'default_admission_id': self.id,
+            'default_admission_register_id': self.admission_register_id.id,
+            'default_course_id': self.course_id.id,
+            'default_batch_id': self.batch_id.id,
             'default_partner_id': self.partner_id.id,
             'default_origin': self.name,
             'default_company_id': self.company_id.id or self.env.company.id,
