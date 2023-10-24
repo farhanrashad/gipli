@@ -103,7 +103,7 @@
                                             <span>New</span>
                                         </div>
                                         <div role="menuitem">
-                                            <a name="create_request" type="object">Loan Request</a>
+                                            <a name="create_request" type="object">Request</a>
                                         </div>
                                     </div>
                                 </div>

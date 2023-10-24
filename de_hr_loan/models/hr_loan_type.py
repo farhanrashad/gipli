@@ -34,12 +34,16 @@ class LoanType(models.Model):
     sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
         copy=False, check_company=True)
 
+
+    # Repayment or loan disbursment fields
+    allow_repayment = fields.Boolean('Enable Repayment', help='Loan repayment will applicate only if true')
     repayment_model_id = fields.Many2one('ir.model', readonly=False, string="Repayment Mode",  
-                ondelete='cascade', required=True, domain=lambda self: self._compute_model_domain(),
+                ondelete='cascade', 
+                domain=lambda self: self._compute_model_domain(),
                 help="Repayment mode defines the default method employees will use to repay their loans."
     )
     repayment_model = fields.Char(related='repayment_model_id.model')
-    prepayment_credit_memo = fields.Boolean(string='Is Prepayment')
+    prepayment_credit_memo = fields.Boolean(string='Is Prepayment', help='This feature allow to create credit memos for loan repayment.')
     
     payment_product_id = fields.Many2one('product.product', string="Product", required=True, domain="[('type','=','service')]")
 
@@ -71,7 +75,7 @@ class LoanType(models.Model):
             ('annual', 'Annually'),
             ('custom', 'Custom')
         ],
-        string="Frequency", required=True, default='no_limit',
+        string="Frequency", required=True, default='monthly',
         help="Loan frequency determines how often an employee can apply for the next loan."
     )
     loan_frequency_interval = fields.Integer(string='Interval', required=True, default=1)
@@ -202,23 +206,24 @@ for record in self:
         python_code_for_loan = """
 result = employee.compute_loan_from_payslip(payslip.id,'hr.payslip')
         """
-        category_id = self.env['hr.salary.rule.category'].search([('code','=','DED')],limit=1)
-        struct_id = self.env['hr.payroll.structure'].browse(1)
-        rule_exists = self.env['hr.salary.rule'].search([('code', '=', 'LOAN')],limit=1)
-        if hr_loan_line_model:
-            if not payslip_field_exits_in_loan_line:
-                # Create the field 'x_payslip_id' if it doesn't exist
-                self.env['ir.model.fields'].create({
-                    'name': 'x_payslip_id',
-                    'field_description': 'Payslip Reference',
-                    'model_id': hr_loan_line_model.id,
-                    'ttype': 'many2one',
-                    'relation': 'hr.payslip',
-                    'store': True,
-                    'copied': False,
-                    'help': 'Reference to the associated payslip',
-                })
-            if hr_payslip_model:
+        if hr_payslip_model:
+            category_id = self.env['hr.salary.rule.category'].search([('code','=','DED')],limit=1)
+            struct_id = self.env['hr.payroll.structure'].browse(1)
+            rule_exists = self.env['hr.salary.rule'].search([('code', '=', 'LOAN')],limit=1)
+            if hr_loan_line_model:
+                if not payslip_field_exits_in_loan_line:
+                    # Create the field 'x_payslip_id' if it doesn't exist
+                    self.env['ir.model.fields'].create({
+                        'name': 'x_payslip_id',
+                        'field_description': 'Payslip Reference',
+                        'model_id': hr_loan_line_model.id,
+                        'ttype': 'many2one',
+                        'relation': 'hr.payslip',
+                        'store': True,
+                        'copied': False,
+                        'help': 'Reference to the associated payslip',
+                    })
+            #if hr_payslip_model:
                 if not loanline_field_exits_in_payslip:
                     hr_payslip_model.write({
                         'field_id': [(0, 0, {

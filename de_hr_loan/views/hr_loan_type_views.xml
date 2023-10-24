@@ -67,9 +67,10 @@
                             </group>
                             <group>
                                 <group string="Repayment">
+                                    <field name="allow_repayment" />
                                     <field name="repayment_model" invisible="1"/>
-                                    <field name="repayment_model_id" options="{'no_create': True}" />
-                                    <field name="prepayment_credit_memo"  attrs="{'invisible': [('repayment_model', '!=', 'account.move')]}"/>
+                                    <field name="repayment_model_id" options="{'no_create': True}" attrs="{'invisible': [('allow_repayment', '=', False)],'required': [('allow_repayment', '=', True)]}"/>
+                                    <field name="prepayment_credit_memo"  attrs="{'invisible': ['|',('repayment_model', '!=', 'account.move'),('allow_repayment', '=', False)]}"/>
                                 </group>
                             </group>
                             
