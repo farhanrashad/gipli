@@ -33,6 +33,15 @@ class EnrollmentContract(models.Model):
     
     enrol_order_tmpl_id = fields.Many2one('oe.enrol.order.template', 'Template', readonly=True, check_company=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
+    admission_team_id = fields.Many2one(
+        comodel_name='oe.admission.team',
+        string="Admission Team",
+        compute='_compute_admission_team_id',
+        store=True, readonly=False, precompute=True, ondelete="set null",
+        change_default=True, check_company=True,  # Unrequired company
+        tracking=True,
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+
     @api.onchange('enrol_order_tmpl_id')
     def _onchange_enrol_order_tmpl_id(self):
         enrol_order_template = self.enrol_order_tmpl_id.with_context(lang=self.partner_id.lang)
@@ -50,6 +59,21 @@ class EnrollmentContract(models.Model):
 
         self.order_line = order_lines_data
 
+    @api.depends('partner_id', 'user_id')
+    def _compute_admission_team_id(self):
+        cached_teams = {}
+        for order in self:
+            default_team_id = self.env.context.get('default_admission_team_id', False) or order.team_id.id or order.partner_id.team_id.id
+            user_id = order.user_id.id
+            company_id = order.company_id.id
+            key = (default_team_id, user_id, company_id)
+            if key not in cached_teams:
+                cached_teams[key] = self.env['oe.admission.team'].with_context(
+                    default_team_id=default_team_id
+                )._get_default_team_id(
+                    user_id=user_id, domain=[('company_id', 'in', [company_id, False])])
+            order.admission_team_id = cached_teams[key]
+            
     #=== CRUD METHODS ===#
     @api.model_create_multi
     def create(self, vals_list):

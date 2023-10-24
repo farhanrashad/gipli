@@ -107,6 +107,10 @@
             <xpath expr="//page[@name='customer_signature']" position="attributes">
                 <attribute name="string">Student Signature</attribute>
             </xpath>
+        <xpath expr="//field[@name='user_id']" position="after">
+            <field name="admission_team_id" options='{"no_open": True, "no_create": True}' attrs="{'invisible':[('is_enrol_order','=',True)]}"/>
+        </xpath>
+            
 <!--
             <xpath expr="//page" position="attributes">
                 <attribute name="attrs">{'invisible': [('name', 'not in', ['order_lines'])]}</attribute>
@@ -155,6 +159,7 @@
                     <filter string="Status" name="groupby_status" context="{'group_by': 'enrol_status'}"/>
                     <separator/>
                     <filter string="Salesperson" name="salesperson" domain="[]" context="{'group_by': 'user_id'}"/>
+                    <filter string="Team" name="admissionteam" domain="[]" context="{'group_by': 'admission_team_id'}"/>
                     <filter string="Student" name="student" domain="[]" context="{'group_by': 'partner_id'}"/>
                 </group>
                 <searchpanel>
@@ -164,6 +169,7 @@
             </search>
         </field>
     </record>
+    
     <record id="enrollment_order_action" model="ir.actions.act_window">
         <field name="name">Contracts</field>
         <field name="type">ir.actions.act_window</field>
