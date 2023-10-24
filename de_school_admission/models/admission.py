@@ -157,11 +157,11 @@ class Admission(models.Model):
         index=True, ondelete='restrict', tracking=True)
 
     # Academic Fields
-    admission_register_id = fields.Many2one('oe.admission.register',string="Admission Register", required=True)
+    admission_register_id = fields.Many2one('oe.admission.register',string="Admission Register")
     
     course_id = fields.Many2one('oe.school.course', string='Course', compute='_compute_from_admission_register')
     course_code = fields.Char(related='course_id.code')
-    batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', domain="[('course_id','=',course_id)]")
 
     # Probability (Opportunity only)
     is_application_score = fields.Boolean(string='Allow Score', compute='_compute_admission_setting_values')
@@ -643,3 +643,17 @@ class Admission(models.Model):
         if archived:
             archived.write({'probability': 0})
         return res
+
+    def action_convert_into_application(self):
+        return {
+            'name': _('Convert to Applications'),
+            'res_model': 'oe.admission.lead2op.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'oe.admission',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
+        

@@ -22,3 +22,4 @@ access_admission_lost_reason,admission.lost.reason,model_oe_admission_lost_reaso
 
 access_admission_lost_wizard,access.admission.lost.wizard,model_oe_admission_lost_wizard,de_school_team.group_school_admission_user,1,1,1,0
 
+access_admission_lead2op_wizard_user,access.admission.lead2op.wizard.user,model_oe_admission_lead2op_wizard,de_school_team.group_school_admission_user,1,1,1,0

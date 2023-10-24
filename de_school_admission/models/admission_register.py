@@ -292,7 +292,7 @@ class AdmissionRegister(models.Model):
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
             'context': context,
-            'domain': [('admission_register_id','=',self.id)]
+            'domain': [('admission_register_id','=',self.id),('type','=','opportunity')]
         }
 
     def action_open_new_admissions(self):
@@ -332,7 +332,7 @@ class AdmissionRegister(models.Model):
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
             'context': context,
-            'domain': [('admission_register_id','=',self.id)]
+            'domain': [('admission_register_id','=',self.id),('type','=','opportunity')],
         }
         
     def action_open_overdue_applications(self):
@@ -353,7 +353,7 @@ class AdmissionRegister(models.Model):
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
             'context': context,
-            'domain': [('team_id','=',self.id)]
+            'domain': [('admission_register_id','=',self.id),('type','=','opportunity')],
         }
         
     def action_report_admission_analysis(self):
@@ -372,7 +372,7 @@ class AdmissionRegister(models.Model):
             'res_model': 'oe.admission',
             'type': 'ir.actions.act_window',
             'context': context,
-            'domain': [('admission_register_id','=',self.id)],
+            'domain': [('admission_register_id','=',self.id),('type','=','opportunity')],
             'res_id': self.id,
             'action_id': self.env.ref('de_school_admission.admission_report_action').id,
         }

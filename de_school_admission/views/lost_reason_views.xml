@@ -69,7 +69,7 @@
 
      <menuitem
         id="admission_menu_config_lost_reason"
-        name="Register"
+        name="Lost Reasons"
         parent="menu_admission_config_main_admission"
         action="action_admission_lost_reason"
         sequence="40"
