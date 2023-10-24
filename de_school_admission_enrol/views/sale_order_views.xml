@@ -8,6 +8,9 @@
             <xpath expr="//group[@name='technical']" position="inside">
                 <field name="admission_id" help="Log in the chatter from which opportunity the order originates" groups="de_school_team.group_school_admission_manager"/>
             </xpath>
+            <xpath expr="//field[@name='course_id']" position="before">
+                <field name="admission_register_id" options='{"no_open": True, "no_create": True}'/>
+            </xpath>
         </field>
     </record>
     
