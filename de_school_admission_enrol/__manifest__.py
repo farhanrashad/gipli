@@ -24,9 +24,10 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        #'views/views.xml',
-        #'views/templates.xml',
+        'security/ir.model.access.csv',
+        'views/sale_order_views.xml',
+        'views/admission_views.xml',
+        'wizards/admission_enrol_student_wizard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

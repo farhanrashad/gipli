@@ -2,13 +2,14 @@
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.osv import expression
 
 
 class Admission(models.Model):
     _inherit = 'oe.admission'
 
+    sale_amount_total = fields.Monetary(compute='_compute_sale_data', string="Sum of Orders", help="Untaxed Total of Confirmed Orders", currency_field='company_currency')
     sale_order_count = fields.Integer(compute='_compute_sale_data', string="Number of Enrol Orders")
     order_ids = fields.One2many('sale.order', 'admission_id', string='Orders')
 
@@ -27,3 +28,56 @@ class Admission(models.Model):
 
     def _get_lead_sale_order_domain(self):
         return [('state', 'not in', ('draft', 'sent', 'cancel'))]
+
+    def action_new_enrol_order(self):
+        return {
+            'name': _('New Contacts'),
+            'res_model': 'oe.admission.enrol.student.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'oe.admission',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
+
+    def _action_create_enrol_order(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("de_school_enrollment.enrollment_order_action")
+        action['context'] = self._prepare_opportunity_quotation_context()
+        action['context']['search_default_admission_id'] = self.id
+        action['context']['active_test'] = True
+        return action
+
+    def _prepare_opportunity_quotation_context(self):
+        """ Prepares the context for a new quotation (sale.order) by sharing the values of common fields """
+        self.ensure_one()
+        quotation_context = {
+            'default_admission_id': self.id,
+            'default_partner_id': self.partner_id.id,
+            'default_origin': self.name,
+            'default_company_id': self.company_id.id or self.env.company.id,
+            'default_tag_ids': [(6, 0, self.tag_ids.ids)],
+            'default_is_enrol_order': True,
+        }
+        if self.team_id:
+            quotation_context['default_team_id'] = self.team_id.id
+        if self.user_id:
+            quotation_context['default_user_id'] = self.user_id.id
+        return quotation_context
+
+    def action_view_enrol_order(self):
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id("de_school_enrollment.enrollment_order_action")
+        action['context'] = {
+            'search_default_partner_id': self.partner_id.id,
+            'default_partner_id': self.partner_id.id,
+            'default_admission_id': self.id,
+            'default_is_enrol_order': True,
+        }
+        action['domain'] = expression.AND([[('admission_id', '=', self.id)], self._get_lead_sale_order_domain()])
+        orders = self.order_ids.filtered_domain(self._get_lead_sale_order_domain())
+        if len(orders) == 1:
+            action['views'] = [(self.env.ref('de_school_admission.enrollment_order_form').id, 'form')]
+            action['res_id'] = orders.id
+        return action
