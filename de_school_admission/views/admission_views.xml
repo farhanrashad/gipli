@@ -144,8 +144,8 @@
                                 <field name="lost_reason_id" attrs="{'invisible': [('active', '=', True)]}"/>
                             </group>
                             <group string="Academic" name="academic">
-                                <field name="admission_register_id" attrs="{'required':[('type','=','opportunity')]}" options="{'no_create_edit': True}" required="1"/>
-                                <field name="course_id" options="{'no_create_edit': True}" required="1"/>
+                                <field name="admission_register_id" attrs="{'required':[('type','=','opportunity')]}" options="{'no_create_edit': True}" />
+                                <field name="course_id" options="{'no_create_edit': True}" />
                                 <field name="batch_id" options="{'no_create_edit': True}" domain="[('course_id','=',course_id)]"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>

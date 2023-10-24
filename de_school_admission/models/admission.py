@@ -90,19 +90,19 @@ class Admission(models.Model):
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
     partner_is_blacklisted = fields.Boolean('Partner is blacklisted', related='partner_id.is_blacklisted', readonly=True)
-    contact_name = fields.Char('Contact Name', tracking=30,compute='_compute_contact_name', readonly=False, store=True)
+    contact_name = fields.Char('Contact Name', tracking=30,compute='_compute_contact_name', copy=False, readonly=False, store=True)
     partner_name = fields.Char(
         'Company Name', tracking=20, index=True,
-        compute='_compute_partner_name', readonly=False, store=True,
+        compute='_compute_partner_name', readonly=False, store=True,copy=False,
         help='The name of the future partner company that will be created while converting the lead into opportunity')
     title = fields.Many2one('res.partner.title', string='Title', compute='_compute_title', readonly=False, store=True)
     email_from = fields.Char(
-        'Email', tracking=40, index=True,
+        'Email', tracking=40, index=True,copy=False,
         compute='_compute_email_from', inverse='_inverse_email_from', readonly=False, store=True)
     phone = fields.Char(
         'Phone', tracking=50,
-        compute='_compute_phone', inverse='_inverse_phone', readonly=False, store=True)
-    mobile = fields.Char('Mobile', compute='_compute_mobile', readonly=False, store=True)
+        compute='_compute_phone', inverse='_inverse_phone', copy=False,readonly=False, store=True)
+    mobile = fields.Char('Mobile', compute='_compute_mobile', copy=False, readonly=False, store=True)
     phone_state = fields.Selection([
         ('correct', 'Correct'),
         ('incorrect', 'Incorrect')], string='Phone Quality', compute="_compute_phone_state", store=True)
@@ -645,13 +645,19 @@ class Admission(models.Model):
         return res
 
     def action_convert_into_application(self):
+        active_model = self.env.context.get('active_model')
+        active_ids = self.env.context.get('active_ids', [])
+        record_ids = self.env[active_model].search([('id','in',active_ids)])
+        if self.env[active_model].search_count([('id', 'in', active_ids), ('type', '=', 'opportunity')]) > 0:
+            raise UserError("Closed/Dead enquiries cannot be converted into applications.")
+
         return {
             'name': _('Convert to Applications'),
             'res_model': 'oe.admission.lead2op.wizard',
             'view_mode': 'form',
             'context': {
                 'active_model': 'oe.admission',
-                'active_ids': self.ids,
+                'active_ids': active_ids,
             },
             'target': 'new',
             'type': 'ir.actions.act_window',
