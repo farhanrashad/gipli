@@ -260,35 +260,32 @@ class HrLoan(models.Model):
         ])
         #raise UserError(loan_schedule_ids.loan_id)
         for line in loan_schedule_ids:
-            try:
-                with self.env.cr.savepoint():
-                    if line.loan_id.loan_type_id.repayment_model == 'account.move':
-                        if not line.loan_id.loan_type_id.prepayment_credit_memo:
-                            if not line.account_move_id:
-                                account_move_id = self.env['account.move'].create(line._prepare_credit_memo())
-                                #raise UserError(account_move_id)
-                                line.write({
-                                    'state': 'pending',
-                                    'account_move_id': account_move_id.id,
-                                })
-                                account_move_id.action_post()
-                            else:
-                                if line.account_move_id.payment_state in ('paid','in_payment'):
+            if line.loan_id.loan_type_id.allow_repayment:
+                try:
+                    with self.env.cr.savepoint():
+                        if line.loan_id.loan_type_id.repayment_model == 'account.move':
+                            if not line.loan_id.loan_type_id.prepayment_credit_memo:
+                                if not line.account_move_id:
+                                    account_move_id = self.env['account.move'].create(line._prepare_credit_memo())
+                                    #raise UserError(account_move_id)
+                                    line.write({
+                                        'state': 'pending',
+                                        'account_move_id': account_move_id.id,
+                                    })
+                                    account_move_id.action_post()
+                                else:
+                                    if line.account_move_id.payment_state in ('paid','in_payment'):
+                                        line.state = 'close'
+                        elif line.loan_id.loan_type_id.repayment_model == 'hr.payslip':
+                            try:
+                                if line.x_payslip_id.state in ('done','paid'):
                                     line.state = 'close'
-                    elif line.loan_id.loan_type_id.repayment_model == 'hr.payslip':
-                        try:
-                            if line.x_payslip_id.state in ('done','paid'):
-                                line.state = 'close'
-                        except:
-                            pass
-                        
-            except UserError as e:
-                msg = _('The loan journal entries could not be posted for the following reason: %(error_message)s', error_message=e)
-                line.loan_id.message_post(body=msg, message_type='comment')
-
-        #if len(moves) == 100:  # assumes there are more whenever search hits limit
-        #    self.env.ref('account.ir_cron_auto_post_draft_entry')._trigger()
-
+                            except:
+                                pass
+                            
+                except UserError as e:
+                    msg = _('The loan journal entries could not be posted for the following reason: %(error_message)s', error_message=e)
+                    line.loan_id.message_post(body=msg, message_type='comment')
         
     # ------------------------------------------------
     # -------------- Action Buttons ------------------
