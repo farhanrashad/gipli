@@ -301,6 +301,7 @@
                     <field name="company_currency"/>
                     <field name="activity_state"/>
                     <field name="activity_ids"/>
+                    <field name="is_application_revenue" invisible="1" />
                     <progressbar field="activity_state" colors="{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}" sum_field="expected_revenue"  help="This bar allows to filter the opportunities based on scheduled activities."/>
                     <templates>
                         <t t-name="kanban-box">
@@ -325,7 +326,7 @@
                                     <div>
                                         <strong><field name="name"/></strong>
                                     </div>
-                                    <div>
+                                    <div attrs="{'invisible': [('is_application_revenue', '=', False)]}">
                                         <field name="expected_revenue"/>
                                     </div>
                                     <div>

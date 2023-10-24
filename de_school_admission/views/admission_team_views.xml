@@ -54,7 +54,7 @@
                                                     <t t-else="">Overdue Applications</t>
                                                 </a>
                                             </div>
-                                            <div class="col-4 text-end text-truncate">
+                                            <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
                                                 <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                             </div>
                                         </div>
