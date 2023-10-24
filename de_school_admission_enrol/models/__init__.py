@@ -3,4 +3,4 @@
 from . import sale_order
 from . import admission
 from . import admission_team
-from . import res_partner
+#from . import res_partner
