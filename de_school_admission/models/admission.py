@@ -776,4 +776,104 @@ class Admission(models.Model):
                 return "week", earliest_start_dt.date()
             else:
                 return "month", earliest_start_dt.date()
+
+    # Partner/Student Creation and assignment
+    def _handle_partner_assignment(self, force_partner_id=False, create_missing=True):
+        """ Update student (partner_id) of leads. Purpose is to set the same
+        partner on most leads; either through a newly created partner either
+        through a given partner_id.
+
+        :param int force_partner_id: if set, update all leads to that customer;
+        :param create_missing: for leads without customer, create a new one
+          based on lead information;
+        """
+        for lead in self:
+            if force_partner_id:
+                lead.partner_id = force_partner_id
+            if not lead.partner_id and create_missing:
+                partner = lead._create_student()
+                lead.partner_id = partner.id
+
+    def _find_matching_partner(self, email_only=False):
+        """ Try to find a matching partner with available information on the
+        lead, using notably customer's name, email, ...
+
+        :param email_only: Only find a matching based on the email. To use
+            for automatic process where ilike based on name can be too dangerous
+        :return: partner browse record
+        """
+        self.ensure_one()
+        partner = self.partner_id
+
+        if not partner and self.email_from:
+            partner = self.env['res.partner'].search([('email', '=', self.email_from)], limit=1)
+
+        if not partner and not email_only:
+            # search through the existing partners based on the lead's partner or contact name
+            # to be aligned with _create_customer, search on lead's name as last possibility
+            for customer_potential_name in [self[field_name] for field_name in ['partner_name', 'contact_name', 'name'] if self[field_name]]:
+                partner = self.env['res.partner'].search([('name', 'ilike', '%' + customer_potential_name + '%')], limit=1)
+                if partner:
+                    break
+
+        return partner
+        
+    def _create_student(self):
+        """ Create a partner from lead data and link it to the lead.
+
+        :return: newly-created partner browse record
+        """
+        Partner = self.env['res.partner']
+        contact_name = self.contact_name
+        if not contact_name:
+            contact_name = Partner._parse_partner_name(self.email_from)[0] if self.email_from else False
+
+        if self.partner_name:
+            partner_company = Partner.create(self._prepare_student_values(self.partner_name, is_company=True))
+        elif self.partner_id:
+            partner_company = self.partner_id
+        else:
+            partner_company = None
+
+        if contact_name:
+            return Partner.create(self._prepare_student_values(contact_name, is_company=False, parent_id=partner_company.id if partner_company else False))
+
+        if partner_company:
+            return partner_company
+        return Partner.create(self._prepare_student_values(self.name, is_company=False))
+
+    def _prepare_student_values(self, partner_name, is_company=False, parent_id=False):
+        """ Extract data from lead to create a partner.
+
+        :param name : furtur name of the partner
+        :param is_company : True if the partner is a company
+        :param parent_id : id of the parent partner (False if no parent)
+
+        :return: dictionary of values to give at res_partner.create()
+        """
+        email_parts = tools.email_split(self.email_from)
+        res = {
+            'name': partner_name,
+            'user_id': self.env.context.get('default_user_id') or self.user_id.id,
+            'comment': self.description,
+            'team_id': self.team_id.id,
+            'parent_id': parent_id,
+            'phone': self.phone,
+            'mobile': self.mobile,
+            'email': email_parts[0] if email_parts else False,
+            'title': self.title.id,
+            #'function': self.function,
+            'street': self.street,
+            'street2': self.street2,
+            'zip': self.zip,
+            'city': self.city,
+            'country_id': self.country_id.id,
+            'state_id': self.state_id.id,
+            'website': self.website,
+            'is_company': is_company,
+            'type': 'contact'
+        }
+        if self.lang_id:
+            res['lang'] = self.lang_id.code
+        return res
         
