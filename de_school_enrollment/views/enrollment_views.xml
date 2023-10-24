@@ -108,7 +108,7 @@
                 <attribute name="string">Student Signature</attribute>
             </xpath>
         <xpath expr="//field[@name='user_id']" position="after">
-            <field name="admission_team_id" options='{"no_open": True, "no_create": True}' attrs="{'invisible':[('is_enrol_order','=',True)]}"/>
+            <field name="admission_team_id" options='{"no_open": True, "no_create": True}' attrs="{'invisible':[('is_enrol_order','=',False)]}"/>
         </xpath>
             
 <!--
