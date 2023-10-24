@@ -20,7 +20,18 @@
     'version': '16.0.0.2',
 
     # any module necessary for this one to work correctly
-    'depends': ['de_school','de_school_team'],
+    'depends': [
+        'de_school',
+        'de_school_team',
+        'base_setup',
+        'mail',
+        'calendar',
+        'resource',
+        'utm',
+        'contacts',
+        'digest',
+        'phone_validation',
+    ],
 
     # always loaded
     'data': [
@@ -30,8 +41,8 @@
         'data/ir_sequence_data.xml',
         'data/admission_data.xml',
         'data/lost_reason_data.xml',
-        'views/res_config_settings.xml',
         'views/admission_menu.xml',
+        'views/res_config_settings.xml',
         'views/mail_activity_views.xml',
         'views/admission_team_views.xml',
         'views/admission_team_members_views.xml',

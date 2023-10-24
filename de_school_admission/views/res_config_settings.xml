@@ -16,7 +16,7 @@
                                     <field name="group_use_enquiries"/>
                                 </div>
                                 <div class="o_setting_right_pane">
-                                    <label for="group_use_lead"/>
+                                    <label for="group_use_enquiries"/>
                                     <div class="text-muted">
                                         Manage admission enquiries before creation of application.
                                     </div>
