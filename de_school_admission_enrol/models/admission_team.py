@@ -23,11 +23,10 @@ class AdmissionTeam(models.Model):
         active_id = self.env.context.get('team_id')
         context = {
             'default_team_id': active_id,
-            'search_default_open_opportunities': True,
         }
         if active_id:
             context['search_default_team_id'] = [active_id]
-            context['default_team_id'] = active_id
+            context['search_default_inprogress_orders'] = True
         return {
             'name': 'Open Contracts',
             'view_type': 'form',
@@ -37,4 +36,5 @@ class AdmissionTeam(models.Model):
             'context': context,
             'domain': [('team_id','=',self.id),('is_enrol_order','=','True')],
             'action_id': self.env.ref('de_school_enrollment.enrollment_order_action').id,
+            'search_view_id': self.env.ref('de_school_enrollment.enrol_order_view_search').id,
         }

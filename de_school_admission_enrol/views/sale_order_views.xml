@@ -10,6 +10,18 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Inherit search view -->
+    <record id="enrol_order_view_search_inherit" model="ir.ui.view">
+        <field name="name">enrollment.order.search</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="de_school_enrollment.enrol_order_view_search"/>
+        <field name="arch" type="xml">
+            <filter name="salesperson" position="after">
+                <filter string="Team" name="admissionteam" domain="[]" context="{'group_by': 'admission_team_id'}"/>
+            </filter>
+        </field>
+    </record>
     
     <record id="action_enrol_order_new" model="ir.actions.act_window">
         <field name="name">Quotation</field>
