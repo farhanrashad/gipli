@@ -34,11 +34,6 @@ class Admission(models.Model):
     ]
     _primary_email = 'email_from'
     _check_company_auto = True
-
-    @api.model
-    def _compute_default_expected_revenue(self):
-        default_value = self.course_id.expected_revenue
-        return default_value
         
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -174,8 +169,8 @@ class Admission(models.Model):
     probability = fields.Float(
         'Probability', group_operator="avg", copy=False,
         compute='_compute_probabilities', readonly=False, store=True)
-    expected_revenue = fields.Monetary('Expected Revenue', 
-                                       default='_compute_default_expected_revenue',
+    expected_revenue = fields.Monetary('Expected Revenue', default=0, store=True,
+                                       compute='_compute_default_expected_revenue',
                                        currency_field='company_currency', tracking=True)
     prorated_revenue = fields.Monetary('Prorated Revenue', currency_field='company_currency', store=True, compute="_compute_prorated_revenue")
 
@@ -204,6 +199,11 @@ class Admission(models.Model):
                     lead.won_status = 'won'
                 else:
                     lead.won_status = 'pending'
+
+    @api.depends('course_id')
+    def _compute_default_expected_revenue(self):
+         for record in self:
+            record.expected_revenue = record.course_id.expected_revenue
         
     @api.onchange('course_id')
     def _onchange_course_id(self):
