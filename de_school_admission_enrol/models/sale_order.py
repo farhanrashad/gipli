@@ -10,11 +10,6 @@ class SaleOrder(models.Model):
         'oe.admission', string='Application', check_company=True,
         domain="[('type', '=', 'opportunity'), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
-    admission_team_id = fields.Many2one(
-        'oe.admission.team', string='Admission Team', check_company=True, index=True, tracking=True,
-        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
-        compute='_compute_team_id', ondelete="set null", readonly=False, store=True)
-
     admission_register_id = fields.Many2one('oe.admission.register',string="Admission Register")
 
     
@@ -23,5 +18,4 @@ class SaleOrder(models.Model):
 
     @api.onchange('admission_id')
     def _onchange_admission_id(self):
-        self.admission_team_id = self.admission_id.team_id.id
         self.admission_register_id = self.admission_id.admission_register_id.id

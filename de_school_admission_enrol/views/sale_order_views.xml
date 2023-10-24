@@ -5,21 +5,9 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="de_school_enrollment.enrol_contract_primary_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='user_id']" position="after">
-                <field name="admission_team_id" options='{"no_open": True, "no_create": True}'/>
+            <xpath expr="//group[@name='technical']" position="inside">
+                <field name="admission_id" help="Log in the chatter from which opportunity the order originates" groups="de_school_team.group_school_admission_manager"/>
             </xpath>
-        </field>
-    </record>
-
-    <!-- Inherit search view -->
-    <record id="enrol_order_view_search_inherit" model="ir.ui.view">
-        <field name="name">enrollment.order.search</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="de_school_enrollment.enrol_order_view_search"/>
-        <field name="arch" type="xml">
-            <filter name="salesperson" position="after">
-                <filter string="Team" name="admissionteam" domain="[]" context="{'group_by': 'admission_team_id'}"/>
-            </filter>
         </field>
     </record>
     
