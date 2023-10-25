@@ -48,8 +48,10 @@
                 <header>
                     <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
                     <button name="button_open" states="draft" string="Start Attendance" type="object" class="oe_highlight" data-hotkey="o" />
+                    <button name="button_mark_attendance" states="progress" string="Mark Attendances" type="object" class="oe_highlight" data-hotkey="o" />
+
                     <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
-                    <button name="button_close" type="object" string="Attendance Taken" states="progress" data-hotkey="l"/>
+                    <button name="button_close" type="object" string="Close" states="progress" data-hotkey="l"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,progress,done" readonly="1"/>
                 </header>
                 <sheet>

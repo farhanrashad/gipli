@@ -31,6 +31,7 @@
         'views/attendance_views.xml',
         'views/attendance_register_views.xml',
         'views/attendance_sheet_views.xml',
+        'wizards/mark_attendance_wizard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

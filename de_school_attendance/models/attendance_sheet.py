@@ -47,16 +47,30 @@ class AttendanceSheet(models.Model):
 
     def button_draft(self):
         self.write({'state': 'draft'})
-        return {}
 
     def button_open(self):
         self.write({'state': 'progress'})
-        return {}
 
     def button_close(self):
         self.write({'state': 'done'})
-        return {}
         
     def button_cancel(self):
         self.write({'state': 'draft'})
-        return {}
+
+    def button_mark_attendance(self):
+        self.ensure_one()
+        #raise UserError(self.id)
+        
+        action = {
+            'name': _('Mark Attendance'),
+            'res_model': 'oe.attendance.mark.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'oe.attendance.sheet',
+                'active_ids': self.ids,
+                'active_id': self.id,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
+        return action
