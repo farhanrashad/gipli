@@ -30,6 +30,7 @@
         'wizards/admission_enrol_student_wizard_views.xml',
         'views/admission_team_views.xml',
         'views/admission_register_views.xml',
+        'reports/report_enrol_order_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
