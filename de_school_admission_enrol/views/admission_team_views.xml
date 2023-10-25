@@ -16,6 +16,17 @@
                 <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
                     <field name="enrol_orders_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 </div>
+                <!-- To Invoice Orders -->
+                <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
+                    <a name="action_open_pending_fees" type="object" context="{'team_id': active_id}">
+                        <field name="enrol_toinvoice_count" class="me-1"/>
+                        <t t-if="record.enrol_toinvoice_count.raw_value == 1">Order to Fee</t>
+                        <t t-else="">Order to Fees</t>
+                    </a>
+                </div>
+                <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                    <field name="enrol_toinvoice_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </div>
             </xpath>
         </field>
     </record>
