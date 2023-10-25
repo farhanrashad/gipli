@@ -39,6 +39,12 @@ class AdmissionTeam(models.Model):
         action['domain'] = expression.AND([[('is_enrol_order', '=', True)], self._get_enrol_order_domain()])
         return action
 
+    def action_open_report_enrol_orders(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("de_school_enrollment.action_enrol_report")
+        action['context'] = self._prepare_enrol_order_context()
+        action['domain'] = expression.AND([[('is_enrol_order', '=', True)], self._get_enrol_order_domain()])
+        return action
+
     def action_open_pending_fees(self):
         action = self.env["ir.actions.actions"]._for_xml_id("de_school_enrollment.enrollment_order_action")
         action['context'] = self._prepare_enrol_order_context()

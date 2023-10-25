@@ -16,16 +16,17 @@
                 <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
                     <field name="enrol_orders_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 </div>
-                <!-- To Invoice Orders -->
-                <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
-                    <a name="action_open_pending_fees" type="object" context="{'team_id': active_id}">
-                        <field name="enrol_toinvoice_count" class="me-1"/>
-                        <t t-if="record.enrol_toinvoice_count.raw_value == 1">Order to Fee</t>
-                        <t t-else="">Order to Fees</t>
-                    </a>
+            </xpath>
+            <!-- add more links in view menu -->
+            <xpath expr="//div[hasclass('o_kanban_manage_view')]" position="inside">
+                <div role="menuitem">
+                    <a name="action_open_enrol_orders" type="object"  context="{'team_id': active_id}">Enrollments</a>
                 </div>
-                <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
-                    <field name="enrol_toinvoice_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            </xpath>
+            <!-- add more links in Reporting Menu -->
+            <xpath expr="//div[hasclass('o_kanban_manage_reports')]" position="inside">
+                <div role="menuitem">
+                    <a name="action_open_report_enrol_orders" type="object"  context="{'team_id': active_id}">Enrollments</a>
                 </div>
             </xpath>
         </field>
