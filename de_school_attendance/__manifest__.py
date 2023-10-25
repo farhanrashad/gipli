@@ -29,6 +29,8 @@
         'views/attendance_menu.xml',
         'views/res_config_settings_views.xml',
         'views/attendance_views.xml',
+        'views/attendance_register_views.xml',
+        'views/attendance_sheet_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

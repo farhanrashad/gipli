@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="attendance_sheet_search" model="ir.ui.view">
+        <field name="name">Attendance Sheet - Search</field>
+        <field name="model">oe.attendance.sheet</field>
+        <field name="arch" type="xml">
+            <search string="Sheet Search">
+                <field name="name"/>
+                <separator/>
+                <filter string="Open" name="open_sheet"
+                    domain="[('state', '=', 'progress')]"
+                />
+                <filter string="Closed" name="close_sheet"
+                    domain="[('state', '=', 'close')]"
+                />
+                <separator/>
+                <group expand="0" string="Group By" colspan="16">
+                        <filter string="Course" name="course" context="{'group_by':'course_id'}"/>
+                        <filter name="stage" string="Stage" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Attendance Sheet TREE VIEW + MUTI_EDIT -->
+    <record id="attendance_sheet_tree_view" model="ir.ui.view">
+        <field name="name">attendance.sheet.tree.view</field>
+        <field name="model">oe.attendance.sheet</field>
+        <field name="arch" type="xml">
+            <tree string="Attendance Sheet" >
+                <field name="name"/>
+                <field name="attendance_register_id" options="{'no_create': True}"/>
+                <field name="date" />
+                <field name="course_id" />
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                <field name="state" optional="show" widget="badge" decoration-success="state == 'progress'" decoration-muted="state == 'close' or state == 'cancel'" decoration-info="state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="attendance_sheet_form_view" model="ir.ui.view">
+        <field name="name">attendance.sheet.form.view</field>
+        <field name="model">oe.attendance.sheet</field>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <form string="Attendance Sheet">
+                <header>
+                    <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
+                    <button name="button_open" states="draft" string="Start Attendance" type="object" class="oe_highlight" data-hotkey="o" />
+                    <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
+                    <button name="button_close" type="object" string="Attendance Taken" states="progress" data-hotkey="l"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,progress,done" readonly="1"/>
+                </header>
+                <sheet>
+                    <field name="company_id" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Fall 2023"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="attendance_register_id" options="{'no_create': True}"/>
+                            <field name="course_id" />
+                            <field name="date" />
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Attendance Sheet Details..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_attendance_sheet" model="ir.actions.act_window">
+        <field name="name">Attendance Sheet</field>
+        <field name="res_model">oe.attendance.sheet</field>
+        <field name="view_id" ref="attendance_sheet_tree_view"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Set a new stage in your admission pipeline
+          </p><p>
+            Stages allow admission persons to easily track how a specific application
+            is positioned in the admission cycle.
+          </p>
+        </field>
+    </record>
+    
+    <menuitem
+        id="menu_school_attendance_main_attendance_sheet"
+        name="Sheet"
+        parent="menu_school_attendance_main"
+        action="action_attendance_sheet"
+        sequence="20"
+    />
+
+    
+    
+</odoo>
