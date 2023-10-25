@@ -153,14 +153,19 @@
                 <separator/>
                 <filter string="Enrollments" domain="[('is_enrol_order', '=', True)]" name="from_enrollment"/>
                 <separator/>
-                <filter string="In Progress" domain="[('enrol_status', 'in', ['draft','submit','review','approved','pending','done'])]" name="inprogress_orders"/>
+                <filter string="To Process" domain="[('enrol_status', 'in', ['draft','submit','review','approved'])]" name="inprogress_orders"/>
+                <filter string="To Pay" domain="[('enrol_status', 'in', ['pending'])]" name="to_confirm_orders"/>
+                <filter string="To Confirm" domain="[('enrol_status', 'in', ['done'])]" name="to_confirm_orders"/>
+                <filter string="Running" domain="[('enrol_status', 'in', ['open'])]" name="running_orders"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Status" name="groupby_status" context="{'group_by': 'enrol_status'}"/>
                     <separator/>
                     <filter string="Salesperson" name="salesperson" domain="[]" context="{'group_by': 'user_id'}"/>
                     <filter string="Team" name="admissionteam" domain="[]" context="{'group_by': 'admission_team_id'}"/>
-                    <filter string="Student" name="student" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <separator/>
+                    <filter string="Student" name="groupby_student" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Course" name="groupby_course" domain="[]" context="{'group_by': 'course_id'}"/>
                 </group>
                 <searchpanel>
                     <field name="enrol_status" icon="fa-retweet" enable_counters="1"/>
