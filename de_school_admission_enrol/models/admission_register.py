@@ -6,8 +6,8 @@ from odoo.exceptions import UserError, AccessError
 from odoo.osv import expression
 
 
-class AdmissionTeam(models.Model):
-    _inherit = "oe.admission.team"
+class AdmissionRegister(models.Model):
+    _inherit = "oe.admission.register"
 
     enrol_orders_count = fields.Integer(
         string='# Enrol Orders', compute='_compute_enrol_orders_data')
@@ -16,7 +16,7 @@ class AdmissionTeam(models.Model):
 
     def _compute_enrol_orders_data(self):
         for record in self:
-            order_ids = self.env['sale.order'].search([('admission_team_id','=',record.id),('is_enrol_order','=',True)])
+            order_ids = self.env['sale.order'].search([('admission_register_id','=',record.id),('is_enrol_order','=',True)])
             record.enrol_orders_count = len(order_ids)
             record.enrol_orders_amount = sum(order_ids.mapped('amount_total'))
 
@@ -27,18 +27,18 @@ class AdmissionTeam(models.Model):
         return action
 
     def _get_enrol_order_domain(self):
-        return [('admission_team_id', '=', self.id)]
+        return [('admission_register_id', '=', self.id)]
          
     def _prepare_enrol_order_context(self):
         """ Prepares the context for a new quotation (sale.order) by sharing the values of common fields """
         self.ensure_one()
         order_context = {
-            'default_admission_team_id': self.id,
-            'search_default_admission_team_id': self.id,
+            'default_admission_register_id': self.id,
+            'search_default_admission_register_id': self.id,
             'search_default_inprogress_orders': 1,
             'create':False,
         }
-        order_context['default_admission_team_id'] = self.id
+        order_context['default_admission_register_id'] = self.id
         if self.user_id:
             order_context['default_user_id'] = self.user_id.id
         return order_context

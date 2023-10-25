@@ -13,6 +13,18 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Search view -->
+    <record id="enrol_order_view_search_inherit" model="ir.ui.view">
+        <field name="name">enrol.order.view.search.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="de_school_enrollment.enrol_order_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='groupby_course']" position="after">
+                <filter string="Admission Register" name="groupby_admission_register" domain="[]" context="{'group_by': 'admission_register_id'}"/>
+            </xpath>
+        </field>
+    </record>
     
     <record id="action_enrol_order_new" model="ir.actions.act_window">
         <field name="name">Quotation</field>

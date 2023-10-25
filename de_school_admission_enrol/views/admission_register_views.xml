@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="admission_team_form_view_inherit_enrol" model="ir.ui.view">
-        <field name="name">admission.team.form.view.inherit.enrol</field>
-        <field name="model">oe.admission.team</field>
-        <field name="inherit_id" ref="de_school_admission.admission_team_kanban_view"/>
+    <record id="admission_register_form_view_inherit_enrol" model="ir.ui.view">
+        <field name="name">admission.register.form.view.inherit.enrol</field>
+        <field name="model">oe.admission.register</field>
+        <field name="inherit_id" ref="de_school_admission.admission_register_kanban_view"/>
         <field name="arch" type="xml">
             <xpath expr="//t[@name='first_options']" position="after">
                 <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
