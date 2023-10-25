@@ -48,6 +48,14 @@
         <field name="arch" type="xml">
             <search string="Enrollment Analysis">
                 <field name="date"/>
+                <field name="user_id"/>
+                <field name="admission_team_id"/>
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="partner_id"/>
+                <field name="country_id"/>
+                <field name="industry_id"/>
+                
                 <filter string="Date" name="year" invisible="1" date="date" default_period="this_year"/>
                 <separator/>
                 <filter string="To Process" domain="[('enrol_status', 'in', ['draft','submit','review','approved'])]" name="inprogress_orders"/>
@@ -57,14 +65,7 @@
                 <separator/>
                 <filter name="filter_date" date="date" default_period="this_month"/>
                 <filter name="filter_order_date" invisible="1" string="Enrollment: Last 365 Days" domain="[('date', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(days=-365), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
-                <separator/>
-                <field name="user_id"/>
-                <field name="admission_team_id"/>
-                <field name="product_id"/>
-                <field name="categ_id"/>
-                <field name="partner_id"/>
-                <field name="country_id"/>
-                <field name="industry_id"/>
+                
                 <group expand="0" string="Extended Filters">
                     <field name="categ_id" filter_domain="[('categ_id', 'child_of', self)]"/>
                     <field name="company_id" groups="base.group_multi_company"/>
@@ -74,6 +75,7 @@
                     <filter string="Admissions Team" name="admission_team" context="{'group_by':'admission_team_id'}"/>
                     <filter string="Student" name="student" context="{'group_by':'partner_id'}"/>
                     <filter string="Student Country" name="country_id" context="{'group_by':'country_id'}"/>
+                    <separator/>
                     <filter string="Fee Product" name="Product" context="{'group_by':'product_id'}"/>
                     <filter string="Fee Product Category" name="Category" context="{'group_by':'categ_id'}"/>
                     <filter string="Enrol Status" name="enrol_status" context="{'group_by':'enrol_status'}"/>
