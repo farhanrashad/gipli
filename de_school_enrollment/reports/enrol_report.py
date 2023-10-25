@@ -5,7 +5,7 @@ from odoo import api, fields, models, tools
 
 
 class EnrolReport(models.Model):
-    _name = "enrol.report"
+    _name = "report.enrol.order"
     _description = "Enrollment Analysis Report"
     _auto = False
     _rec_name = 'date'

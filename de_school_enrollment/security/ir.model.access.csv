@@ -5,5 +5,5 @@ access_enrol_order_template_system,access.enrol.order.template,model_oe_enrol_or
 access_enrol_order_template_line_user,access.enrol.order.template.line.user,model_oe_enrol_order_template_line,group_enrol_user,1,0,0,0
 access_enrol_order_template_line_manager,access_enrol_order_template.line.manager,model_oe_enrol_order_template_line,group_enrol_manager,1,1,1,1
 
-access_enrol_report_user,enrol.report.user,model_enrol_report,group_enrol_user,1,0,0,0
+access_enrol_report_user,enrol.report.user,model_report_enrol_order,group_enrol_user,1,0,0,0
 
