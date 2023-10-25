@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_inherit_school_attendance" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.school.attendance</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="90"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="attendance" id="attendance" string="Attendance" data-key="de_school_attendance" groups="de_school_attendance.group_student_attendance_manager">
+                        <h2>Student Attendance</h2>
+                        <div class="row mt16 o_settings_container" id="end_contract_setting">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="group_student_attendance_use_pin"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="group_student_attendance_use_pin"/>
+                                    <div class="text-muted">
+                                        Use PIN codes (defined on the Student's profile) to check-in.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Admission -->
+                        <!--
+                        <h2>Admissions</h2>
+                        <div class="row mt16 o_settings_container" id="end_contract_setting">
+                            <div class="col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="is_application_score"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="is_application_score"/>
+                                    <div class="text-muted">
+                                        Manage application scoreks to better manage admissions.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="is_application_revenue"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="is_application_revenue"/>
+                                    <div class="text-muted">
+                                        Manage expected revenue/Fee to plan revenue thorugh admission process.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+                        <!-- -->
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+    <record id="action_school_attendance_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'de_school_attendance'}</field>
+    </record>
+    
+    <menuitem id="menu_school_attendance_general_settings"
+        name="Settings"
+        parent="menu_student_attendance_config_main"
+        sequence="0"
+        action="action_school_attendance_config_settings"
+        groups="base.group_system"/>
+    
+</odoo>
