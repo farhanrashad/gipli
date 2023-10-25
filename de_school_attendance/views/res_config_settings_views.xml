@@ -9,8 +9,40 @@
             <field name="arch" type="xml">
                 <xpath expr="//div[hasclass('settings')]" position="inside">
                     <div class="app_settings_block" data-string="attendance" id="attendance" string="Attendance" data-key="de_school_attendance" groups="de_school_attendance.group_student_attendance_manager">
+                        <!-- Section 1 Attendance mode/type configuration -->
                         <h2>Student Attendance</h2>
-                        <div class="row mt16 o_settings_container" id="end_contract_setting">
+                        <div class="row mt16 o_settings_container" name="attendance_mode_setting_container">
+                            <!-- Enable Attendance Mode by period/class or by daily -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_right_pane">
+                                    <label for="student_attendance_mode"/>
+                                    <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." role="img" aria-label="Values set here are company-specific." groups="base.group_multi_company"/>
+                                    <div class="row">
+                                        <div class="text-muted col-lg-10">
+                                            Define the way the user will be identified by the application.
+                                        </div>
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="student_attendance_mode" widget="radio" required="1" class="w-75"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Set either attendance record with time -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="student_attendance_with_time"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="student_attendance_with_time"/>
+                                    <div class="text-muted">
+"Maintain check-in and check-out times along with attendance if 'True,' otherwise record only 'present' and 'absent' statuses."                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt16 o_settings_container" name="student_attendance_setting_container">
+                            <!-- Enable student attendance pin -->
                             <div class="col-12 col-lg-6 o_setting_box">
                                 <div class="o_setting_left_pane">
                                     <field name="group_student_attendance_use_pin"/>
@@ -23,6 +55,8 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Enable Attendance Mode by period/class or by daily -->
+                        
                         <!-- Admission -->
                         <!--
                         <h2>Admissions</h2>
