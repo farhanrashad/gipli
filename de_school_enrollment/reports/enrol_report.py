@@ -171,7 +171,7 @@ class EnrolReport(models.Model):
             l.display_type IS NULL and t.fee_product=True """
 
     def _group_by_enrol(self):
-        return """
+        groupby_ = """
             l.product_id,
             l.order_id,
             t.uom_id,
@@ -197,6 +197,7 @@ class EnrolReport(models.Model):
             l.discount,
             s.id,
             currency_table.rate"""
+        return groupby_
 
     def _query(self):
         with_ = self._with_enrol()
