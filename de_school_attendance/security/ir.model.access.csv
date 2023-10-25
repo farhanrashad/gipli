@@ -1,6 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-
-access_de_school_attendance,access.de.school.attendance,model_oe_school_attendance,,1,1,1,1
-access_de_wizard_attendance,de_school_attendance.wizard_attendance,model_oe_school_attend_register_wizard,,1,1,1,1
-access_de_wizard_attendance_report,de_school_attendance.wizard_attendance_report,model_oe_school_attend_report_wizard,,1,1,1,1
-access_de_attendance_report,de_school_attendance.attendance_report,model_oe_school_dynamic_report,,1,1,1,1
