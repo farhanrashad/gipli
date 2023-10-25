@@ -36,7 +36,8 @@ class EnrolReport(models.Model):
     nbr = fields.Integer('# of Lines', readonly=True)
     pricelist_id = fields.Many2one('product.pricelist', 'Pricelist', readonly=True)
     analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', readonly=True)
-    team_id = fields.Many2one('crm.team', 'Sales Team', readonly=True)
+    admission_team_id = fields.Many2one('oe.admission.team', 'Admissions Team', readonly=True)
+    is_enrol_order = fields.Boolean(string='Enrollment Order')
     country_id = fields.Many2one('res.country', 'Customer Country', readonly=True)
     industry_id = fields.Many2one('res.partner.industry', 'Customer Industry', readonly=True)
     commercial_partner_id = fields.Many2one('res.partner', 'Customer Entity', readonly=True)
@@ -112,7 +113,8 @@ class EnrolReport(models.Model):
             t.categ_id AS categ_id,
             s.pricelist_id AS pricelist_id,
             s.analytic_account_id AS analytic_account_id,
-            s.team_id AS team_id,
+            s.admission_team_id AS admission_team_id,
+            s.is_enrol_order,
             p.product_tmpl_id,
             partner.country_id AS country_id,
             partner.industry_id AS industry_id,
@@ -186,7 +188,8 @@ class EnrolReport(models.Model):
             s.source_id,
             s.pricelist_id,
             s.analytic_account_id,
-            s.team_id,
+            s.admission_team_id,
+            s.is_enrol_order,
             p.product_tmpl_id,
             partner.country_id,
             partner.industry_id,

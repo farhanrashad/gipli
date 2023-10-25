@@ -161,8 +161,8 @@
                 <group expand="0" string="Group By">
                     <filter string="Status" name="groupby_status" context="{'group_by': 'enrol_status'}"/>
                     <separator/>
-                    <filter string="Salesperson" name="salesperson" domain="[]" context="{'group_by': 'user_id'}"/>
-                    <filter string="Team" name="admissionteam" domain="[]" context="{'group_by': 'admission_team_id'}"/>
+                    <filter string="Admission Officer" name="user_id" domain="[]" context="{'group_by': 'user_id'}"/>
+                    <filter string="Team" name="admission_team" domain="[]" context="{'group_by': 'admission_team_id'}"/>
                     <separator/>
                     <filter string="Student" name="groupby_student" domain="[]" context="{'group_by': 'partner_id'}"/>
                     <filter string="Course" name="groupby_course" domain="[]" context="{'group_by': 'course_id'}"/>
