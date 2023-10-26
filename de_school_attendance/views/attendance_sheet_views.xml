@@ -46,12 +46,15 @@
         <field name="arch" type="xml">
             <form string="Attendance Sheet">
                 <header>
-                    <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
+                    <button name="button_draft" states="cancel,progress" string="Set to Draft" type="object" data-hotkey="n"/>
                     <button name="button_open" states="draft" string="Start Attendance" type="object" class="oe_highlight" data-hotkey="o" />
-                    <button name="button_mark_attendance" states="progress" string="Mark Attendances" type="object" class="oe_highlight" data-hotkey="o" />
+                    <button name="button_mark_attendance" string="Mark Attendances" type="object" class="oe_highlight" data-hotkey="m" attrs="{'invisible': ['|',('sheet_to_close','=',True),('state','!=','progress')]}"/>
+                    <button name="button_close" type="object" string="Close Attendance" data-hotkey="c" attrs="{'invisible': ['|',('sheet_to_close','=',True),('state','!=','progress')]}"/>
+                    <button name="button_close" type="object" string="Close Attendance" data-hotkey="c" class="oe_highlight" attrs="{'invisible': ['|',('sheet_to_close','!=',True),('state','!=','progress')]}"/>
+                    <button name="button_mark_attendance" string="Mark Attendances" type="object"  data-hotkey="m" attrs="{'invisible': ['|',('sheet_to_close','!=',True),('state','!=','progress')]}"/>
 
                     <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
-                    <button name="button_close" type="object" string="Close" states="progress" data-hotkey="l"/>
+                    
                     <field name="state" widget="statusbar" statusbar_visible="draft,progress,done" readonly="1"/>
                 </header>
                 <sheet>
@@ -66,14 +69,26 @@
                         <group>
                             <field name="attendance_register_id" options="{'no_create': True}"/>
                             <field name="course_id" />
-                            <field name="date" />
+                            <field name="batch_id" options="{'no_create': True}"/>
                         </group>
                         <group>
+                            <field name="date" />
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                            <field name="sheet_to_close" />
                         </group>
                     </group>
                     <separator string="Description"/>
                     <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Attendance Sheet Details..."/>
+                    <notebook>
+                       <page string="Student" name="student">
+                           <field name="attendance_sheet_line">
+                                <tree editable="bottom">
+                                    <field name="student_id"/>
+                                    <field name="attendance_mode"/>
+                                </tree>
+                            </field>
+                       </page>
+                   </notebook>
                 </sheet>
             </form>
         </field>

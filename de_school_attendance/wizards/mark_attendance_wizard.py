@@ -21,6 +21,7 @@ class AttendanceMarkWizard(models.TransientModel):
         relation='oe_attendance_mark_wizard_students_rel',
         column1='wizard_id',
         column2='student_id',
+        domain="[('is_student','=',True)]",
         string='Students'
     )
 
@@ -45,6 +46,30 @@ class AttendanceMarkWizard(models.TransientModel):
     def action_process_attendance(self):
         active_model = self.env.context.get('active_model')
         active_ids = self.env.context.get('active_ids', [])
-        record_ids = self.env[active_model].search([('id','in',active_ids)])
+        active_id = self.env.context.get('active_id', [])
+        record_id = self.env[active_model].search([('id','=',active_id)])
+
+        student_ids = self.env['res.partner'].search([('course_id','=',record_id.course_id.id),('batch_id','=',record_id.batch_id.id),('is_student','=',True)])
+        rem_student_ids = student_ids - self.student_ids
+        attendance_values = []
+        # If mode_attendance is 'absent', create records for selected students with 'absent' flag
+        if self.mode_attendance == 'absent':
+            for student in self.student_ids:
+                attendance_values.append({
+                    'student_id': student.id,
+                    'attendance_mode': 'absent',
+                    'attendance_sheet_id': record_id.id,
+                })
+            for student in rem_student_ids:
+                attendance_values.append({
+                    'student_id': student.id,
+                    'attendance_mode': 'present',
+                    'attendance_sheet_id': record_id.id,
+                })
+            if len(record_id.attendance_sheet_line):
+                record_id.attendance_sheet_line.unlink()
+            #record_id.attendance_sheet_line.create(attendance_values)
+            #raise UserError(active_model)
+            self.env['oe.attendance.sheet.line'].create(attendance_values)
         
     

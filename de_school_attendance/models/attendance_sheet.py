@@ -30,8 +30,12 @@ class AttendanceSheet(models.Model):
     
     attendance_register_id = fields.Many2one('oe.attendance.register', string='Attendance Register', required=True, states=READONLY_STATES,)
     course_id = fields.Many2one('oe.school.course', related='attendance_register_id.course_id')
-        
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', required=True, states=READONLY_STATES,)
+
     description = fields.Html(string='Description')
+
+    sheet_to_close = fields.Boolean(string='Sheet to Close', compute='_compute_sheet_to_close')
+    attendance_sheet_line = fields.One2many('oe.attendance.sheet.line', 'attendance_sheet_id', string='Sheet Lines')
 
     _sql_constraints = [
         ('unique_date_attendance_register', 'unique(date, attendance_register_id)', 
@@ -39,6 +43,17 @@ class AttendanceSheet(models.Model):
         ),
     ]
 
+    @api.depends('state','attendance_sheet_line')
+    def _compute_sheet_to_close(self):
+        for record in self:
+            if record.state == 'progress':
+                if len(record.attendance_sheet_line) > 0:
+                    record.sheet_to_close = True
+                else:
+                    record.sheet_to_close = False
+            else:
+                record.sheet_to_close = False
+        
     def unlink(self):
         for record in self:
             if record.state != 'draft':
@@ -74,3 +89,20 @@ class AttendanceSheet(models.Model):
             'type': 'ir.actions.act_window',
         }
         return action
+
+class AttendanceSheet(models.Model):
+    _name = "oe.attendance.sheet.line"
+    _description = "Attendance Sheet Line"
+    _order = "student_id asc"
+
+    attendance_sheet_id = fields.Many2one('oe.attendance.sheet', string='Attendance Sheet')
+    student_id = fields.Many2one('res.partner', string="Student", 
+                                 domain="[('is_student','=',True)]",
+                                 required=True, ondelete='cascade', index=True)
+    attendance_mode = fields.Selection([
+        ('present', 'Present'),
+        ('absent', 'Absent'),
+        ('late', 'Late'),
+    ], string='Attendance Mode', default='present')
+                                 
+    
