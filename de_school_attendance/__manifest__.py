@@ -33,6 +33,7 @@
         'views/attendance_sheet_views.xml',
         'wizards/mark_attendance_wizard_views.xml',
         'wizards/report_attendance_xlsx_wizard_views.xml',
+        'wizards/save_xlsx_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
