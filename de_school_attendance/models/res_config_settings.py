@@ -10,7 +10,7 @@ class ResConfigSettings(models.TransientModel):
         implied_group="de_school_attendance.group_student_attendance_use_pin")
 
     group_student_attendance_use_day = fields.Boolean(
-        string='Day Attendance',
+        string='Day Attendance', 
         implied_group="de_school_attendance.group_student_attendance_use_day")
     group_student_attendance_use_period = fields.Boolean(
         string='Period Attendance',
@@ -32,23 +32,9 @@ class ResConfigSettings(models.TransientModel):
             self.group_student_attendance_use_day = False
             self.group_student_attendance_use_period = True
             
-    def set_values111(self):
-        day_grp = self.env.ref('de_school_attendance.group_student_attendance_use_day')
-        period_grp = self.env.ref('de_school_attendance.group_student_attendance_use_period')
-        base_user = self.env.ref('base.group_user')
-        base_user_implied_ids = base_user.implied_ids
-        day_grp.write({'users': [(4, base_user.id)]})
-        #self.group_student_attendance_use_day = True
-        #self.group_student_attendance_use_period = True
-        #if self.student_attendance_mode == 'day':
-        #    self.group_student_attendance_use_day = True
-        #    self.group_student_attendance_use_period = False
-        #else:
-        #    self.group_student_attendance_use_day = False
-        #    self.group_student_attendance_use_period = True
             
     @api.onchange('student_attendance_mode')
-    def _onchange_group_stock_multi_locations(self):
+    def _onchange_student_attendance_mode(self):
         self.group_student_attendance_use_day = False
         self.group_student_attendance_use_period = False
         
@@ -56,3 +42,16 @@ class ResConfigSettings(models.TransientModel):
             self.group_student_attendance_use_day = True
         else:
             self.group_student_attendance_use_period = True
+
+    #def set_values(self):
+    #    super().set_values()
+    #    self.company_id.email = ''
+    #    if self.student_attendance_mode == 'day':
+    #        self.company_id.email = 'day@day123.com'
+    #    else:
+    #        self.company_id.email = 'period@period123.com'
+        # install a chart of accounts for the given company (if required)
+        #if self.env.company == self.company_id \
+        #        and self.chart_template_id \
+        #        and self.chart_template_id != self.company_id.chart_template_id:
+        #    self.chart_template_id._load(self.env.company)

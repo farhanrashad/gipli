@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
-from odoo.osv.expression import OR
-
+from odoo import api, fields, models, _
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
@@ -25,5 +22,23 @@ class ResCompany(models.Model):
         ('back', 'Back Camera'),
     ], string='Student Barcode Source', default='front')
     student_attendance_kiosk_delay = fields.Integer(default=10)
+
+    def _enable_attendance_menu(self):
+        if self.student_attendance_mode == 'day':
+            self.email = 'day@day123.com'
+        else:
+            self.email = 'period@period123.com'
+        
+    @api.model_create_multi
+    def create1(self, vals_list):
+        companies = super(ResCompany, self).create(vals_list)
+        for company in companies:
+            company.sudo()._enable_attendance_menu()
+
+    def write111(self, values):
+        res = super(ResCompany, self).write(values)
+        for company in self:
+            company.sudo()._enable_attendance_menu()
+        return res
 
 
