@@ -14,7 +14,7 @@ from odoo.exceptions import AccessError
 
 class StudentAttendance(models.Model):
     _name = "oe.student.attendance"
-    _description = "Attendance"
+    _description = "Student Attendance"
     _order = "check_in desc"
 
 

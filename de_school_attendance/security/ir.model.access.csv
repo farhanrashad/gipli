@@ -9,3 +9,6 @@ access_student_attendance_sheet_officer,student.attendance.sheet.user,model_oe_a
 access_student_attendance_sheet_line_officer,student.attendance.sheet.line.user,model_oe_attendance_sheet_line,group_student_attendance_user,1,1,1,1
 
 access_attendance_mark_wizard_officer,attendance.mark.wizard.user,model_oe_attendance_mark_wizard,group_student_attendance_user,1,1,1,1
+
+access_report_attendance_xlsx_wizard_officer,report.attendance.xlsx.wizard.user,model_oe_report_student_attendance_xlsx_wizard,group_student_attendance_user,1,1,1,1
+
