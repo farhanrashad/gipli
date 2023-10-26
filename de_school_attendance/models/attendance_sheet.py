@@ -28,11 +28,13 @@ class AttendanceSheet(models.Model):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, states=READONLY_STATES,)
     student_attendance_mode = fields.Selection(related='company_id.student_attendance_mode')
     date = fields.Date(string='Date', required=True, states=READONLY_STATES,)
+    check_in = fields.Datetime(string="Check In", default=fields.Datetime.now, states=READONLY_STATES,)
+    check_out = fields.Datetime(string="Check Out", states=READONLY_STATES,)
     
     attendance_register_id = fields.Many2one('oe.attendance.register', string='Attendance Register', required=True, states=READONLY_STATES,)
     course_id = fields.Many2one('oe.school.course', related='attendance_register_id.course_id')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch', required=True, states=READONLY_STATES,)
-    subject_id = fields.Many2one('oe.school.course.subject', string='Batch', 
+    subject_id = fields.Many2one('oe.school.course.subject', string='Subject', 
                                  domain="[('course_ids','in',course_id)]",
                                  states=READONLY_STATES,)
     description = fields.Html(string='Description')
@@ -71,6 +73,20 @@ class AttendanceSheet(models.Model):
         self.write({'state': 'progress'})
 
     def button_close(self):
+        for line in self.attendance_sheet_line:
+            vals = {
+                'student_id': line.student_id.id,
+                'attendance_type': line.attendance_type,
+                'is_late_arrival': line.is_late_arrival,
+                'attendance_sheet_id': line.attendance_sheet_id.id,
+                'date_attendance': self.date,
+            }
+            if self.student_attendance_mode == 'period':
+                vals['check_in'] = self.check_in
+                vals['check_out'] = self.check_out
+            else:
+                vals['check_in'] = self.date
+            self.env['oe.student.attendance'].create(vals)
         self.write({'state': 'done'})
         
     def button_cancel(self):
@@ -106,7 +122,7 @@ class AttendanceSheet(models.Model):
     attendance_type = fields.Selection([
         ('present', 'Present'),
         ('absent', 'Absent'),
-    ], string='Attendance Mode', default='present')
+    ], string='Attendance Type', default='present')
     is_late_arrival = fields.Boolean(string='Late Arrival')
                                  
     

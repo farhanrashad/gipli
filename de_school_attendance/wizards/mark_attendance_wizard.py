@@ -14,7 +14,7 @@ class AttendanceMarkWizard(models.TransientModel):
     attendance_type = fields.Selection([
         ('absent', 'Mark Absent'),
         ('present', 'Mark Present'),
-    ], string='Attendance Mode', default='absent', required=True)
+    ], string='Attendance Type', default='absent', required=True)
 
     is_late_arrival = fields.Boolean(string='Late Arrival')
     student_ids = fields.Many2many('res.partner',
@@ -53,17 +53,17 @@ class AttendanceMarkWizard(models.TransientModel):
         rem_student_ids = student_ids - self.student_ids
         attendance_values = []
         # If mode_attendance is 'absent', create records for selected students with 'absent' flag
-        if self.mode_attendance == 'absent':
+        if self.attendance_type == 'absent':
             for student in self.student_ids:
                 attendance_values.append({
                     'student_id': student.id,
-                    'attendance_mode': 'absent',
+                    'attendance_type': 'absent',
                     'attendance_sheet_id': record_id.id,
                 })
             for student in rem_student_ids:
                 attendance_values.append({
                     'student_id': student.id,
-                    'attendance_mode': 'present',
+                    'attendance_type': 'present',
                     'attendance_sheet_id': record_id.id,
                 })
             if len(record_id.attendance_sheet_line):

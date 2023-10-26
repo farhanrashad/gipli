@@ -24,6 +24,7 @@ class StudentAttendance(models.Model):
                                  default=_default_student, 
                                  domain="[('is_student','=',True)]",
                                  required=True, ondelete='cascade', index=True)
+    date_attendance = fields.Date('Attendance Date', required=True)
     check_in = fields.Datetime(string="Check In", default=fields.Datetime.now)
     check_out = fields.Datetime(string="Check Out")
     attendance_hours = fields.Float(string='Attendance Hours', compute='_compute_attendance_hours', store=True, readonly=True)
@@ -31,7 +32,7 @@ class StudentAttendance(models.Model):
     attendance_type = fields.Selection([
         ('present', 'Present'),
         ('absent', 'Absent'),
-    ], string='Attendance Mode', default='present')
+    ], string='Attendance Type', default='present')
     is_late_arrival = fields.Boolean(string='Late Arrival')
     attendance_sheet_id = fields.Many2one('oe.attendance.sheet', string='Attendance Sheet')
     # Compute Methods

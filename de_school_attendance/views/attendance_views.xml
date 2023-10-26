@@ -55,6 +55,7 @@
                     <group>
                         <group>
                             <field name="student_id"/>
+                            <field name="date_attendance"/>
                             <field name="check_in"/>
                             <field name="check_out"/>
                             <field name="attendance_hours" string="Attendance Hours" widget="float_time" optional="hide"/>

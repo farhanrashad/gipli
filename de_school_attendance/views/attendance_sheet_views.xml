@@ -74,6 +74,9 @@
                         </group>
                         <group>
                             <field name="date" />
+                                <field name="check_in" attrs="{'invisible':[('student_attendance_mode','!=','period')],'required':[('student_attendance_mode','=','period')]}"/>
+                                <field name="check_out" attrs="{'invisible':[('student_attendance_mode','!=','period')],'required':[('student_attendance_mode','=','period')]}"/>
+
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                             <field name="sheet_to_close" />
                             <field name="student_attendance_mode" />
@@ -87,7 +90,7 @@
                                 <tree editable="bottom">
                                     <field name="student_id"/>
                                     <field name="attendance_type"/>
-                                    <field name="is_late_arrival" />
+                                    <field name="is_late_arrival" attrs="{'readonly':[('attendance_type','=','absent')]}"/>
                                 </tree>
                             </field>
                        </page>
