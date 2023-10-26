@@ -8,6 +8,8 @@
             <field name="inherit_id" ref="base.res_config_settings_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[hasclass('settings')]" position="inside">
+                    
+                    
                     <div class="app_settings_block" data-string="attendance" id="attendance" string="Attendance" data-key="de_school_attendance" groups="de_school_attendance.group_student_attendance_manager">
                         <!-- Section 1 Attendance mode/type configuration -->
                         <h2>Student Attendance</h2>
@@ -20,6 +22,8 @@
                                     <div class="row">
                                         <div class="text-muted col-lg-10">
                                             Define the way the user will be identified by the application.
+                                            <field name="group_student_attendance_use_day" readonly="1" />
+                    <field name="group_student_attendance_use_period" readonly="1" />
                                         </div>
                                     </div>
                                     <div class="content-group">

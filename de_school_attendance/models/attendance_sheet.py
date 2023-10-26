@@ -25,7 +25,7 @@ class AttendanceSheet(models.Model):
         ('done', 'Attendance Taken'),
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, states=READONLY_STATES,)
+    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company, states=READONLY_STATES,)
     student_attendance_mode = fields.Selection(related='company_id.student_attendance_mode')
     date = fields.Date(string='Date', required=True, states=READONLY_STATES,)
     check_in = fields.Datetime(string="Check In", default=fields.Datetime.now, states=READONLY_STATES,)
@@ -40,9 +40,9 @@ class AttendanceSheet(models.Model):
     description = fields.Html(string='Description')
 
     sheet_to_close = fields.Boolean(string='Sheet to Close', compute='_compute_sheet_to_close')
-    attendance_sheet_line = fields.One2many('oe.attendance.sheet.line', 'attendance_sheet_id', string='Sheet Lines')
-
-    
+    attendance_sheet_line = fields.One2many('oe.attendance.sheet.line', 'attendance_sheet_id', 
+                        states={'draft': [('readonly', False)], 'progress': [('readonly', False)]},
+                        readonly=True, string='Sheet Lines')
     _sql_constraints = [
         ('unique_date_attendance_register', 'unique(date, attendance_register_id)', 
          'Attendance has already been marked for the given date.'
@@ -80,6 +80,7 @@ class AttendanceSheet(models.Model):
                 'is_late_arrival': line.is_late_arrival,
                 'attendance_sheet_id': line.attendance_sheet_id.id,
                 'date_attendance': self.date,
+                'company_id': self.company_id,
             }
             if self.student_attendance_mode == 'period':
                 vals['check_in'] = self.check_in
