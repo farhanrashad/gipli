@@ -22,8 +22,8 @@
                                     <div class="row">
                                         <div class="text-muted col-lg-10">
                                             Define the way the user will be identified by the application.
-                                            <field name="group_student_attendance_use_day" readonly="1" />
-                    <field name="group_student_attendance_use_period" readonly="1" />
+                                            <field name="group_student_attendance_use_day" invisible="1" />
+                    <field name="group_student_attendance_use_period" invisible="1" />
                                         </div>
                                     </div>
                                     <div class="content-group">
