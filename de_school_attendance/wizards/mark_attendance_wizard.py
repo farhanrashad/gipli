@@ -11,12 +11,12 @@ class AttendanceMarkWizard(models.TransientModel):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.user.company_id, index=True, readonly=False)
 
     attendance_sheet_id = fields.Many2one('oe.attendance.sheet',string="Attendance Sheet", readonly=True )
-    mode_attendance = fields.Selection([
+    attendance_type = fields.Selection([
         ('absent', 'Mark Absent'),
         ('present', 'Mark Present'),
-        ('late', 'Mark Late Arrivals'),
     ], string='Attendance Mode', default='absent', required=True)
 
+    is_late_arrival = fields.Boolean(string='Late Arrival')
     student_ids = fields.Many2many('res.partner',
         relation='oe_attendance_mark_wizard_students_rel',
         column1='wizard_id',

@@ -70,11 +70,13 @@
                             <field name="attendance_register_id" options="{'no_create': True}"/>
                             <field name="course_id" />
                             <field name="batch_id" options="{'no_create': True}"/>
+                            <field name="subject_id" options="{'no_create': True}" attrs="{'invisible':[('student_attendance_mode','!=','period')],'required':[('student_attendance_mode','=','period')]}"/>
                         </group>
                         <group>
                             <field name="date" />
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                             <field name="sheet_to_close" />
+                            <field name="student_attendance_mode" />
                         </group>
                     </group>
                     <separator string="Description"/>
@@ -84,7 +86,8 @@
                            <field name="attendance_sheet_line">
                                 <tree editable="bottom">
                                     <field name="student_id"/>
-                                    <field name="attendance_mode"/>
+                                    <field name="attendance_type"/>
+                                    <field name="is_late_arrival" />
                                 </tree>
                             </field>
                        </page>

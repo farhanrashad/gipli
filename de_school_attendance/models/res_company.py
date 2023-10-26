@@ -10,7 +10,7 @@ class ResCompany(models.Model):
 
     student_attendance_mode = fields.Selection([
         ('day', 'By Day'),
-        ('period', 'By Class / Period'),
+        ('period', 'By Subject / Period'),
     ], string='Student Attendance Mode', default='day')
     student_attendance_with_time = fields.Boolean('Mark Attendance with Time')
     

@@ -9,7 +9,8 @@
                 <group>
                     <group>
                         <field name="attendance_sheet_id" />
-                        <field name="mode_attendance" widget="radio"/>
+                        <field name="attendance_type" widget="radio"/>
+                        <field name="is_late_arrival" attrs="{'invisible':[('attendance_type','!=','present')]}" />
                     </group>
                     <group>
                         <field name="company_id" groups="base.group_multi_company"/>

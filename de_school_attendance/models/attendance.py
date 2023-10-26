@@ -28,12 +28,11 @@ class StudentAttendance(models.Model):
     check_out = fields.Datetime(string="Check Out")
     attendance_hours = fields.Float(string='Attendance Hours', compute='_compute_attendance_hours', store=True, readonly=True)
 
-    attendance_mode = fields.Selection([
+    attendance_type = fields.Selection([
         ('present', 'Present'),
         ('absent', 'Absent'),
-        ('late', 'Late'),
     ], string='Attendance Mode', default='present')
-    
+    is_late_arrival = fields.Boolean(string='Late Arrival')
     attendance_sheet_id = fields.Many2one('oe.attendance.sheet', string='Attendance Sheet')
     # Compute Methods
     @api.depends('check_in', 'check_out')

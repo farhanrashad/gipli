@@ -26,17 +26,21 @@ class AttendanceSheet(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, states=READONLY_STATES,)
+    student_attendance_mode = fields.Selection(related='company_id.student_attendance_mode')
     date = fields.Date(string='Date', required=True, states=READONLY_STATES,)
     
     attendance_register_id = fields.Many2one('oe.attendance.register', string='Attendance Register', required=True, states=READONLY_STATES,)
     course_id = fields.Many2one('oe.school.course', related='attendance_register_id.course_id')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch', required=True, states=READONLY_STATES,)
-
+    subject_id = fields.Many2one('oe.school.course.subject', string='Batch', 
+                                 domain="[('course_ids','in',course_id)]",
+                                 states=READONLY_STATES,)
     description = fields.Html(string='Description')
 
     sheet_to_close = fields.Boolean(string='Sheet to Close', compute='_compute_sheet_to_close')
     attendance_sheet_line = fields.One2many('oe.attendance.sheet.line', 'attendance_sheet_id', string='Sheet Lines')
 
+    
     _sql_constraints = [
         ('unique_date_attendance_register', 'unique(date, attendance_register_id)', 
          'Attendance has already been marked for the given date.'
@@ -99,10 +103,10 @@ class AttendanceSheet(models.Model):
     student_id = fields.Many2one('res.partner', string="Student", 
                                  domain="[('is_student','=',True)]",
                                  required=True, ondelete='cascade', index=True)
-    attendance_mode = fields.Selection([
+    attendance_type = fields.Selection([
         ('present', 'Present'),
         ('absent', 'Absent'),
-        ('late', 'Late'),
     ], string='Attendance Mode', default='present')
+    is_late_arrival = fields.Boolean(string='Late Arrival')
                                  
     
