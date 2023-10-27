@@ -31,13 +31,10 @@
         'views/attendance_views.xml',
         'views/attendance_register_views.xml',
         'views/attendance_sheet_views.xml',
-        'reports/report_student_attendance_views.xml',
+        #'views/student_attendance_views.xml',
+        #'reports/report_student_attendance_views.xml',
         'wizards/mark_attendance_wizard_views.xml',
         'wizards/report_attendance_xlsx_wizard_views.xml',
         'wizards/save_xlsx_views.xml',
-    ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
     ],
 }
