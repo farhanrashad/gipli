@@ -3,8 +3,6 @@
 
 import io
 import json
-import base64
-
 from datetime import datetime, date
 from dateutil.rrule import rrule, DAILY
 
@@ -12,11 +10,7 @@ from odoo import fields, models, _
 from odoo.exceptions import ValidationError
 from odoo.tools import date_utils
 
-try:
-    from odoo.tools.misc import xlsxwriter
-except ImportError:
-    import xlsxwriter
-    
+
 class StudentAttendanceReport(models.TransientModel):
     """ Wizard for Attendance XLSX Report """
     _name = 'oe.report.student.attendance.xlsx.wizard'
@@ -44,11 +38,6 @@ class StudentAttendanceReport(models.TransientModel):
         text_total = workbook.add_format({'font_size': '14', 'align': 'left', 'border':True, 'bold':True, 'bg_color': '#ccffff'})
         number_total = workbook.add_format({'font_size': '14', 'bold':True, 'align': 'right', 'num_format':'#,##0.00', 'border':True, 'bg_color': '#ccffff'})
 
-        border = workbook.add_format({'border': 1})
-        green = workbook.add_format({'bg_color': '#28A828', 'border': 1})
-        red = workbook.add_format({'bg_color': '#ff3333', 'border': 1})
-        rose = workbook.add_format({'bg_color': '#DA70D6', 'border': 1})
-        
         sheet = workbook.add_worksheet('Attendance Details')
 
         sheet.merge_range(0, 0, 0, 6, 'Attendance Details Report', heading)
@@ -59,11 +48,11 @@ class StudentAttendanceReport(models.TransientModel):
         sheet.write(1, 3, 'Course', heading)
         sheet.merge_range(1, 4, 1, 6, self.course_id.name, text)
 
-        start_date = self.date_from #datetime.strptime(self.date_from, '%Y-%m-%d').date()
-        end_date = self.date_to #datetime.strptime(self.date_to, '%Y-%m-%d').date()
+        start_date = datetime.strptime(self.date_from, '%Y-%m-%d').date()
+        end_date = datetime.strptime(self.date_to, '%Y-%m-%d').date()
         
         query = """
-            select p.name, a.date_attendance as date,
+            select p.name, a.date_attendance,
                 a.attendance_status
             from oe_student_attendance a 
             LEFT JOIN res_partner p on a.student_id = p.id
@@ -73,64 +62,53 @@ class StudentAttendanceReport(models.TransientModel):
 
         date_range = rrule(DAILY, dtstart=start_date, until=end_date)
 
-        row = 15
-        col = 2
-        for date_data in date_range:
-            col += 1
-            sheet.write(row, col, date_data.strftime('%Y-%m-%d'), border)
-        row = 16
-        col = 2
-        for date_data in date_range:
-            col += 1
-            sheet.write(row, col, date_data.strftime('%a'), border)
-
-        # Student Date
-        student_names = []
-        attendance_list = []
-        for doc in docs:
-            if doc['name'] not in student_names:
-                date_sum_list = []
-                student_names.append(doc['name'])
-                for date_data in date_range:
-                    date_out = date_data.strftime('%Y-%m-%d')
-                    record_list = list(
-                        filter(
-                            lambda x: x['name'] == doc['name'] and x[
-                                'date'].strftime(
-                                '%Y-%m-%d') == date_out, docs))
-                    if record_list:
-                        date_sum_list.append(record_list[0])
-                    else:
-                        date_sum_list.append({
-                            'name': '',
-                            'date': '',
-                            'attendance_status': 0
-                        })
-                attendance_list.append({
-                    'name': doc['name'],
-                    'status': doc['attendance_status'],
-                    'items': date_sum_list
-                })
         
-        row = 17
-        i = 0
-        for rec in attendance_list:
-            row += 1
-            col = 1
-            i += 1
-            sheet.write(row, col, i, border)
-            col += 1
-            sheet.write(row, col, rec['name'], border)
-            for item in rec['items']:
-                col += 1
-                if item['attendance_status'] == 'present':
-                    sheet.write(row, col, 'P', green)
-                elif item['attendance_status'] == 'absent':
-                    sheet.write(row, col, 'A', red)
-                #        work.hours_per_day:
-                #    sheet.write(row, col, item['sum'], rose)
-                #else:
-                #    sheet.write(row, col, item['sum'], red)
+        #raise UserError(len(rs_attendance))
+        sheet.write(3, 0, 'Student', title)
+        #sheet.write(2, 1, 'Status', title)
+        col = 1
+        # Dates Query
+        query = """
+                SELECT distinct to_char(t.date_attendance,'MM-DD-YYYY') as dated
+                    from oe_student_attendance t
+                    WHERE t.date_attendance >= %(date_from)s and t.date_attendance <= %(date_to)s
+                    and t.company_id = %(company_id)s
+        """
+        args = {
+                'company_id': self.company_id.id,
+                'date_from': self.date_from,
+                'date_to': self.date_to,
+                'course_id': self.course_id.id,
+        }
+        self.env.cr.execute(query, args)
+        rs_attendance_dates = self._cr.dictfetchall()
+        for dt in rs_attendance_dates:
+            sheet.write(3, col, dt['dated'],text)
+            # 2nd Query Student
+            query = """
+                SELECT distinct t.student_id as student_id
+                    from oe_student_attendance t
+                    WHERE to_char(t.date_attendance,'MM-DD-YYYY') = %(dated)s
+                    and t.company_id = %(company_id)s
+            """
+    
+            args = {
+                'company_id': self.company_id.id,
+                'date_from': self.date_from,
+                'date_to': self.date_to,
+                'course_id': self.course_id.id,
+                'dated': dt['dated'],
+            }
+            self.env.cr.execute(query, args)
+            rs_students = self._cr.dictfetchall()
+            row = 4
+            for student in rs_students:
+                sheet.write(row, 0, student['student_id'],text)
+                row += 1
+        else:
+            sheet.merge_range(row , 3, row , 5,"No Data Was Found For This student In Selected Date", text)
+            row += 4
+
 
 
         workbook.close()
