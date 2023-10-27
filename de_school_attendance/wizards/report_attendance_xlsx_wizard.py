@@ -37,13 +37,9 @@ class StudentAttendanceReport(models.TransientModel):
 
         heading = workbook.add_format({'font_size': '12', 'align': 'center', 'bold': True,'border':True})
         title = workbook.add_format({'font_size': '10', 'align': 'center', 'bold': True, 'border':True, 'bg_color': '#ccffff'})
-                
-        text = workbook.add_format({'font_size': '10', 'align': 'left', 'border':True,})
-        number = workbook.add_format({'font_size': '10', 'align': 'right', 'num_format':'#,##0.00', 'border':True})
-        
-        text_total = workbook.add_format({'font_size': '14', 'align': 'left', 'border':True, 'bold':True, 'bg_color': '#ccffff'})
-        number_total = workbook.add_format({'font_size': '14', 'bold':True, 'align': 'right', 'num_format':'#,##0.00', 'border':True, 'bg_color': '#ccffff'})
 
+        
+        
         border = workbook.add_format({'border': 1})
         green = workbook.add_format({'bg_color': '#28A828', 'border': 1})
         red = workbook.add_format({'bg_color': '#ff3333', 'border': 1})
@@ -54,34 +50,43 @@ class StudentAttendanceReport(models.TransientModel):
         sheet.merge_range(0, 0, 0, 6, 'Attendance Details Report', heading)
         
         sheet.write(1, 0, 'Date', heading)
-        sheet.merge_range(1, 1, 1, 2, (str(self.date_from) + ' - ' + str(self.date_to)), text)
+        sheet.merge_range(1, 1, 1, 2, (str(self.date_from) + ' - ' + str(self.date_to)), title)
 
         sheet.write(1, 3, 'Course', heading)
-        sheet.merge_range(1, 4, 1, 6, self.course_id.name, text)
+        sheet.merge_range(1, 4, 1, 6, self.course_id.name, title)
 
         start_date = self.date_from #datetime.strptime(self.date_from, '%Y-%m-%d').date()
         end_date = self.date_to #datetime.strptime(self.date_to, '%Y-%m-%d').date()
+
+        sheet.set_column(1, 1, 15)
+        sheet.set_column(2, 2, 15)
         
         query = """
             select p.name, a.date_attendance as date,
-                a.attendance_status
+                a.attendance_status,
+                p.roll_no, p.admission_no, guardian.name as guardian_name
             from oe_student_attendance a 
             LEFT JOIN res_partner p on a.student_id = p.id
+            LEFT JOIN res_partner guardian on p.guardian_id = guardian.id
+            LEFT join oe_school_course c on p.course_id = c.id
+            LEFT join oe_school_course_batch b on b.course_id = b.id
             """
         self.env.cr.execute(query)
         docs = self.env.cr.dictfetchall()
 
         date_range = rrule(DAILY, dtstart=start_date, until=end_date)
 
-        row = 15
-        col = 2
+        row = 3
+        col = 6
         for date_data in date_range:
             col += 1
+            sheet.set_column(row, col, 10)
             sheet.write(row, col, date_data.strftime('%Y-%m-%d'), border)
-        row = 16
-        col = 2
+        row = 4
+        col = 6
         for date_data in date_range:
             col += 1
+            sheet.set_column(row, col, 10)
             sheet.write(row, col, date_data.strftime('%a'), border)
 
         # Student Date
@@ -112,13 +117,23 @@ class StudentAttendanceReport(models.TransientModel):
                     'items': date_sum_list
                 })
         
-        row = 17
+        row = 4
         i = 0
         for rec in attendance_list:
             row += 1
-            col = 1
+            col = 0
             i += 1
             sheet.write(row, col, i, border)
+            col += 1
+            sheet.write(row, col, rec['name'], border)
+            col += 1
+            sheet.write(row, col, rec['name'], border)
+            col += 1
+            sheet.write(row, col, rec['name'], border)
+            col += 1
+            sheet.write(row, col, rec['name'], border)
+            col += 1
+            sheet.write(row, col, rec['name'], border)
             col += 1
             sheet.write(row, col, rec['name'], border)
             for item in rec['items']:
