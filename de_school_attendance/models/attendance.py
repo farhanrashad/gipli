@@ -29,7 +29,7 @@ class StudentAttendance(models.Model):
 
     attendance_hours = fields.Float(string='Attendance Hours', compute='_compute_attendance_hours', store=True, readonly=True)
 
-    attendance_type = fields.Selection([
+    attendance_status = fields.Selection([
         ('present', 'Present'),
         ('absent', 'Absent'),
     ], string='Attendance Type', default='present')

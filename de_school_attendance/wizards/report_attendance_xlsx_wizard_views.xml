@@ -37,6 +37,7 @@
         parent="menu_student_attendance_reports"
         id="menu_report_loan_details_xlsx"
         action="action_report_student_attendance_xlsx"
+        sequence="20"
     />
 
 </odoo>

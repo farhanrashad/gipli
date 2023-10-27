@@ -10,7 +10,7 @@
                 <field name="student_id"/>
                 <field name="date_attendance" />
                  <field name="attendance_sheet_id" optional="hide" />
-                <field name="attendance_type" />
+                <field name="attendance_status" />
             </tree>
         </field>
     </record>
@@ -26,7 +26,7 @@
                 <field name="check_out" />
                 <field name="attendance_hours" string="Attendance Hours" widget="float_time" />
                  <field name="attendance_sheet_id" optional="hide" />
-                <field name="attendance_type" />
+                <field name="attendance_status" />
             </tree>
         </field>
     </record>
@@ -74,7 +74,7 @@
                             <field name="check_in"/>
                             <field name="check_out"/>
                             <field name="attendance_hours" string="Attendance Hours" widget="float_time" optional="hide"/>
-                            <field name="attendance_type"/>
+                            <field name="attendance_status"/>
                         </group>
                         <group>
                             <field name="attendance_sheet_id" options="{'no_create': True}"/>

@@ -76,7 +76,7 @@ class AttendanceSheet(models.Model):
         for line in self.attendance_sheet_line:
             vals = {
                 'student_id': line.student_id.id,
-                'attendance_type': line.attendance_type,
+                'attendance_status': line.attendance_status,
                 'is_late_arrival': line.is_late_arrival,
                 'attendance_sheet_id': line.attendance_sheet_id.id,
                 'date_attendance': self.date,
@@ -120,7 +120,7 @@ class AttendanceSheet(models.Model):
     student_id = fields.Many2one('res.partner', string="Student", 
                                  domain="[('is_student','=',True)]",
                                  required=True, ondelete='cascade', index=True)
-    attendance_type = fields.Selection([
+    attendance_status = fields.Selection([
         ('present', 'Present'),
         ('absent', 'Absent'),
     ], string='Attendance Type', default='present')

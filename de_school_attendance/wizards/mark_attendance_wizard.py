@@ -11,7 +11,7 @@ class AttendanceMarkWizard(models.TransientModel):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.user.company_id, index=True, readonly=False)
 
     attendance_sheet_id = fields.Many2one('oe.attendance.sheet',string="Attendance Sheet", readonly=True )
-    attendance_type = fields.Selection([
+    attendance_status = fields.Selection([
         ('absent', 'Mark Absent'),
         ('present', 'Mark Present'),
     ], string='Attendance Type', default='absent', required=True)
@@ -53,17 +53,17 @@ class AttendanceMarkWizard(models.TransientModel):
         rem_student_ids = student_ids - self.student_ids
         attendance_values = []
         # If mode_attendance is 'absent', create records for selected students with 'absent' flag
-        if self.attendance_type == 'absent':
+        if self.attendance_status == 'absent':
             for student in self.student_ids:
                 attendance_values.append({
                     'student_id': student.id,
-                    'attendance_type': 'absent',
+                    'attendance_status': 'absent',
                     'attendance_sheet_id': record_id.id,
                 })
             for student in rem_student_ids:
                 attendance_values.append({
                     'student_id': student.id,
-                    'attendance_type': 'present',
+                    'attendance_status': 'present',
                     'attendance_sheet_id': record_id.id,
                 })
             if len(record_id.attendance_sheet_line):

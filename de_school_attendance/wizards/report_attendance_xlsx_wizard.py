@@ -49,37 +49,31 @@ class StudentAttendanceReport(models.TransientModel):
         sheet.write(1, 3, 'Course', heading)
         sheet.merge_range(1, 4, 1, 6, self.course_id.name, text)
 
+        #raise UserError(len(rs_attendance))
+        sheet.write(3, 0, 'Student', title)
+        #sheet.write(2, 1, 'Status', title)
+        col = 1
+        # Dates Query
         query = """
-            SELECT distinct to_char(t.date_attendance,'MM-DD-YYYY') as dated
-                from oe_student_attendance t
-                WHERE t.date_attendance >= %(date_from)s and t.date_attendance <= %(date_to)s
-                and t.company_id = %(company_id)s
+                SELECT distinct to_char(t.date_attendance,'MM-DD-YYYY') as dated
+                    from oe_student_attendance t
+                    WHERE t.date_attendance >= %(date_from)s and t.date_attendance <= %(date_to)s
+                    and t.company_id = %(company_id)s
         """
-
         args = {
-            'company_id': self.company_id.id,
-            'date_from': self.date_from,
-            'date_to': self.date_to,
-            'course_id': self.course_id.id
+                'company_id': self.company_id.id,
+                'date_from': self.date_from,
+                'date_to': self.date_to,
+                'course_id': self.course_id.id,
         }
         self.env.cr.execute(query, args)
         rs_attendance_dates = self._cr.dictfetchall()
-
-        #raise UserError(len(rs_attendance))
-        sheet.write(2, 0, 'Student', title)
-        sheet.write(2, 1, 'Date', title)
-        sheet.write(2, 2, 'Status', title)
-        row = 3
-        col = 1
-        if len(rs_attendance_dates):
-            for d in rs_attendance_dates:
-                sheet.set_column(row, col, 20)
-                sheet.write(row, col, d['dated'],text)
-
+        for dt in rs_attendance_dates:
+            sheet.write(3, col, dt['dated'],text)
+            # 2nd Query Student
             query = """
-                SELECT s.name as student, t.date_attendance, t.attendance_type
+                SELECT distinct t.student_id as student_id
                     from oe_student_attendance t
-                    join res_partner s on t.student_id = s.id
                     WHERE to_char(t.date_attendance,'MM-DD-YYYY') = %(dated)s
                     and t.company_id = %(company_id)s
             """
@@ -89,28 +83,16 @@ class StudentAttendanceReport(models.TransientModel):
                 'date_from': self.date_from,
                 'date_to': self.date_to,
                 'course_id': self.course_id.id,
-                'dated': d['dated'],
+                'dated': dt['dated'],
             }
             self.env.cr.execute(query, args)
-            rs_attendance = self._cr.dictfetchall()
-    
+            rs_students = self._cr.dictfetchall()
             row = 4
-            
-            if len(rs_attendance):
-                for attend in rs_attendance:
-                    sheet.set_column(row, col, 20)
-                    sheet.set_column(row, col, 20)
-                    sheet.set_column(row, col, 30)
-    
-                    sheet.write(row, col, attend['student'],text)
-                    sheet.write(row, col, attend['date_attendance'],text)
-                    sheet.write(row, col, attend['attendance_type'],text)
-    
-                    row += 1
-            col += 1
-            
+            for student in rs_students:
+                sheet.write(row, 0, student['student_id'],text)
+                row += 1
         else:
-            sheet.merge_range(row , 3, row , 5,"No Data Was Found For This student In Selected Date", formate_1)
+            sheet.merge_range(row , 3, row , 5,"No Data Was Found For This student In Selected Date", text)
             row += 4
 
 

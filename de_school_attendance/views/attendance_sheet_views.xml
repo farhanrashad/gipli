@@ -89,8 +89,8 @@
                            <field name="attendance_sheet_line">
                                 <tree editable="bottom">
                                     <field name="student_id"/>
-                                    <field name="attendance_type"/>
-                                    <field name="is_late_arrival" attrs="{'readonly':[('attendance_type','=','absent')]}"/>
+                                    <field name="attendance_status"/>
+                                    <field name="is_late_arrival" attrs="{'readonly':[('attendance_status','=','absent')]}"/>
                                 </tree>
                             </field>
                        </page>
