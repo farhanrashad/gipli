@@ -29,6 +29,7 @@
         'data/exam_data.xml',
         'views/exam_menu.xml',
         'views/exam_type_views.xml',
+        'views/exam_grade_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

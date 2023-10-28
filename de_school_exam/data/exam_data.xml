@@ -5,21 +5,18 @@
 
     </data>
     <data noupdate="1">
-        <!-- Grading Type -->
+        <!-- Exam Type -->
         <record model="oe.exam.type" id="exam_type_1">
-          <field name="name">Numeric Grading</field>
+          <field name="name">Unit Tests</field>
         </record>
         <record model="oe.exam.type" id="exam_type_2">
-          <field name="name">Letter Grading</field>
+          <field name="name">Class Tests</field>
         </record>
         <record model="oe.exam.type" id="exam_type_3">
-          <field name="name">Pass/Fail Grading</field>
+          <field name="name">Midterm Exams</field>
         </record>
         <record model="oe.exam.type" id="exam_type_4">
-          <field name="name">Credit/No Credit</field>
-        </record>
-        <record model="oe.exam.type" id="exam_type_5">
-          <field name="name">Weighted Grading</field>
+          <field name="name">Final Exams</field>
         </record>
     </data>
 </odoo>
