@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+
+    </data>
+    <data noupdate="1">
+        <!-- Grading Type -->
+        <record model="oe.exam.type" id="exam_type_1">
+          <field name="name">Numeric Grading</field>
+        </record>
+        <record model="oe.exam.type" id="exam_type_2">
+          <field name="name">Letter Grading</field>
+        </record>
+        <record model="oe.exam.type" id="exam_type_3">
+          <field name="name">Pass/Fail Grading</field>
+        </record>
+        <record model="oe.exam.type" id="exam_type_4">
+          <field name="name">Credit/No Credit</field>
+        </record>
+        <record model="oe.exam.type" id="exam_type_5">
+          <field name="name">Weighted Grading</field>
+        </record>
+    </data>
+</odoo>
