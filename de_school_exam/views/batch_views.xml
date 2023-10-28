@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>       
+        <record id="school_course_batch_form_view_inherit_exam" model="ir.ui.view">
+            <field name="name">school.couse.batch.form.view.inherit.exam</field>
+            <field name="model">oe.school.course.batch</field>
+            <field name="inherit_id" ref="de_school.school_course_batch_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='course_id']" position="after">
+                    <field name="exam_grade_id" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

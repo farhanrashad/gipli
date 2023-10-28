@@ -1,6 +1,13 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_exam_type_officer,access.exam.type.officer,model_oe_exam_type,de_school_exam.group_exam_user,1,1,1,0
-access_exam_type_manager,access.exam.type.manager,model_oe_exam_type,de_school_exam.group_exam_user,1,1,1,1
+access_exam_type_manager,access.exam.type.manager,model_oe_exam_type,de_school_exam.group_exam_manager,1,1,1,1
 
 access_exam_grade_officer,access.exam.grade.officer,model_oe_exam_grade,de_school_exam.group_exam_user,1,1,1,0
-access_exam_grade_manager,access.exam.grade.manager,model_oe_exam_grade,de_school_exam.group_exam_user,1,1,1,1
+access_exam_grade_manager,access.exam.grade.manager,model_oe_exam_grade,de_school_exam.group_exam_manager,1,1,1,1
+
+access_exam_grade_line_officer,access.exam.grade.line.officer,model_oe_exam_grade_line,de_school_exam.group_exam_user,1,1,1,0
+access_exam_grade_line_manager,access.exam.grade.line.manager,model_oe_exam_grade_line,de_school_exam.group_exam_manager,1,1,1,1
+
+access_exam_grade_batch_officer,access.exam.grade.batch.officer,model_oe_exam_batch_grade,de_school_exam.group_exam_user,1,1,1,0
+access_exam_grade_batch_manager,access.exam.grade.batch.manager,model_oe_exam_batch_grade,de_school_exam.group_exam_manager,1,1,1,1
+

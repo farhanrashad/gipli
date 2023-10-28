@@ -37,8 +37,8 @@
                                     <tree editable="bottom">
                                         <field name="exam_grade_id" invisible="1"/>
                                         <field name="name"/>
-                                        <field name="score_min" attrs="{'column_invisbile':[('parent.enable_score','!=',True)]}"/>
-                                        <field name="credit_points" attrs="{'column_invisbile':[('parent.enable_credit_points','!=',True)]}"/>
+                                        <field name="score_min" attrs="{'column_invisible':[('parent.enable_score','!=',True)],'required':[('parent.enable_score','=',True)]}"/>
+                                        <field name="credit_points" attrs="{'column_invisible':[('parent.enable_credit_points','!=',True)],'required':[('parent.enable_credit_points','=',True)]}"/>
 
                                     </tree>
                                 </field>
