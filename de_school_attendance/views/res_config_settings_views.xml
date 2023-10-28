@@ -36,10 +36,10 @@
                             <!-- Set either attendance record with time -->
                             <div class="col-12 col-lg-6 o_setting_box">
                                 <div class="o_setting_left_pane">
-                                    <field name="student_attendance_with_time"/>
+                                    <field name="group_student_attendance_use_time"/>
                                 </div>
                                 <div class="o_setting_right_pane">
-                                    <label for="student_attendance_with_time"/>
+                                    <label for="group_student_attendance_use_time"/>
                                     <div class="text-muted">
 "Maintain check-in and check-out times along with attendance if 'True,' otherwise record only 'present' and 'absent' statuses."                                    </div>
                                 </div>

@@ -47,7 +47,7 @@ class StudentAttendance(models.Model):
                                  domain="[('course_ids','in',course_id)]",
                                 )
     period_id = fields.Many2one('resource.calendar.attendance', string="Period",
-                                compute='_compute_period_id',
+                                compute='_compute_period_id', readonly=False,
                                 store=True, 
                                )
     
@@ -87,8 +87,9 @@ class StudentAttendance(models.Model):
     @api.constrains('check_in', 'date_attendance')
     def _check_check_in_date(self):
         for attendance in self:
-            if attendance.check_in.date() != attendance.date_attendance:
-                raise ValidationError("Check In date must match the Attendance Date.")
+            if attendance.check_in:
+                if attendance.check_in.date() != attendance.date_attendance:
+                    raise ValidationError("Check In date must match the Attendance Date.")
 
     
     # ----------------------------------------
@@ -114,7 +115,7 @@ class StudentAttendance(models.Model):
     def _compute_check_in(self):
         for attendance in self:
             if attendance.date_attendance:
-                attendance.check_in = self.datetime.combine(attendance.date_attendance, time(9, 0))
+                attendance.check_in = datetime.combine(attendance.date_attendance, time(9, 0))
             else:
                 attendance.check_in = False
 

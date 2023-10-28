@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- tree views -->
-    <record id="student_attendance_day_tree_view" model="ir.ui.view">
-        <field name="name">student.attendance.tree.view</field>
-        <field name="model">oe.student.attendance</field>
-        <field name="arch" type="xml">
-            <tree string="Student attendances" editable="bottom" sample="1">
-                <field name="student_attendance_mode" invisible="1" />
-                <field name="roll_no" />
-                <field name="student_id" context="{'form_view_ref':'de_school.student_primary_form_view'}"/>
-                <field name="date_attendance" />
-                <field name="course_id" />
-                <field name="batch_id" />
-                 <field name="attendance_sheet_id" optional="hide" />
-                <field name="attendance_status" />
-            </tree>
-        </field>
-    </record>
-    <record id="student_attendance_period_tree_view" model="ir.ui.view">
+    <record id="student_attendance_tree_view" model="ir.ui.view">
         <field name="name">student.attendance.tree.view</field>
         <field name="model">oe.student.attendance</field>
         <field name="arch" type="xml">
@@ -28,12 +12,11 @@
                 <field name="date_attendance" />
                  <field name="course_id" />
                 <field name="batch_id" />
-                <field name="subject_id" />
-                <field name="check_in" />
-                <field name="check_out" />
-                <field name="period_id" />
-                <field name="subject_id" />
-                <field name="attendance_hours" string="Attendance Hours" widget="float_time" />
+                <field name="subject_id" groups="de_school_attendance.group_student_attendance_use_period"/>
+                <field name="check_in" groups="de_school_attendance.group_student_attendance_use_time"/>
+                <field name="check_out" groups="de_school_attendance.group_student_attendance_use_time"/>
+                <field name="period_id" groups="de_school_attendance.group_student_attendance_use_period"/>
+                <field name="attendance_hours" string="Attendance Hours" widget="float_time" groups="de_school_attendance.group_student_attendance_use_time"/>
                  <field name="attendance_sheet_id" optional="hide" />
                 <field name="attendance_status" />
             </tree>
@@ -116,27 +99,12 @@
         </field>
     </record>
     <!-- Action views -->
-    <record id="action_student_attendance_day" model="ir.actions.act_window">
+    <record id="action_student_attendance" model="ir.actions.act_window">
         <field name="name">Attendances</field>
         <field name="res_model">oe.student.attendance</field>
         <field name="view_mode">tree,kanban,form</field>
         <field name="context">{"search_default_today":1}</field>
-        <field name="view_id" ref="student_attendance_day_tree_view" />
-        <field name="search_view_id" ref="student_attendance_search_view" />
-        <field name="help" type="html">
-            <p class="o_view_nocontent_empty_folder">
-                No attendance records found
-            </p><p>
-                The attendance records of your students will be displayed here.
-            </p>
-        </field>
-    </record>
-    <record id="action_student_attendance_period" model="ir.actions.act_window">
-        <field name="name">Attendances</field>
-        <field name="res_model">oe.student.attendance</field>
-        <field name="view_mode">tree,kanban,form</field>
-        <field name="context">{"search_default_today":1}</field>
-        <field name="view_id" ref="student_attendance_period_tree_view" />
+        <field name="view_id" ref="student_attendance_tree_view" />
         <field name="search_view_id" ref="student_attendance_search_view" />
         <field name="help" type="html">
             <p class="o_view_nocontent_empty_folder">
@@ -148,18 +116,12 @@
     </record>
 
     <!-- Menus -->
-    <menuitem id="menu_school_attendance_attendance_day"
+    <menuitem id="menu_school_attendance_attendance"
         name="Attendances"
         parent="menu_school_attendance_main"
         sequence="20"
-        action="action_student_attendance_day"
-        groups="de_school_attendance.group_student_attendance_use_day"
+        action="action_student_attendance"
     />
-    <menuitem id="menu_school_attendance_attendance_period"
-        name="Attendances"
-        parent="menu_school_attendance_main"
-        sequence="20"
-        action="action_student_attendance_period"
-        groups="de_school_attendance.group_student_attendance_use_period"
+   
     />
 </odoo>
