@@ -7,8 +7,11 @@
         <field name="arch" type="xml">
             <tree string="Student attendances" editable="bottom" sample="1">
                 <field name="student_attendance_mode" invisible="1" />
-                <field name="student_id"/>
+                <field name="roll_no" />
+                <field name="student_id" context="{'form_view_ref':'de_school.student_primary_form_view'}"/>
                 <field name="date_attendance" />
+                <field name="course_id" />
+                <field name="batch_id" />
                  <field name="attendance_sheet_id" optional="hide" />
                 <field name="attendance_status" />
             </tree>
@@ -20,10 +23,16 @@
         <field name="arch" type="xml">
             <tree string="Student attendances" editable="bottom" sample="1">
                 <field name="student_attendance_mode" invisible="1" />
-                <field name="student_id"/>
+                <field name="roll_no" />
+                <field name="student_id" context="{'form_view_ref':'de_school.student_primary_form_view'}"/>
                 <field name="date_attendance" />
+                 <field name="course_id" />
+                <field name="batch_id" />
+                <field name="subject_id" />
                 <field name="check_in" />
                 <field name="check_out" />
+                <field name="period_id" />
+                <field name="subject_id" />
                 <field name="attendance_hours" string="Attendance Hours" widget="float_time" />
                  <field name="attendance_sheet_id" optional="hide" />
                 <field name="attendance_status" />

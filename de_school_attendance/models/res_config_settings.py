@@ -12,6 +12,7 @@ class ResConfigSettings(models.TransientModel):
     group_student_attendance_use_day = fields.Boolean(
         string='Day Attendance', 
         implied_group="de_school_attendance.group_student_attendance_use_day")
+    
     group_student_attendance_use_period = fields.Boolean(
         string='Period Attendance',
         implied_group="de_school_attendance.group_student_attendance_use_period")
