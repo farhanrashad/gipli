@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>       
+        <menuitem name="Course" id="menu_exam_course_course"
+            parent="menu_exam_course" 
+            action="de_school.action_oe_school_course"
+            groups="de_school_exam.group_exam_user" 
+            sequence="10"
+        />
+    </data>
+</odoo>

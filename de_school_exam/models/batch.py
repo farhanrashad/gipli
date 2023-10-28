@@ -7,13 +7,7 @@ class CourseBatch(models.Model):
     _inherit = 'oe.school.course.batch'
 
     exam_grade_id = fields.Many2one('oe.exam.grade', string='Grade')
-    exam_batch_grade_line = fields.One2many('oe.exam.batch.grade', 'couse_batch_id', string='Batch Grade Lines')
+    enable_score = fields.Boolean(related='exam_grade_id.enable_score')
+    enable_credit_points = fields.Boolean(related='exam_grade_id.enable_credit_points')
 
-class BatchGradeLine(models.Model):
-    _name = 'oe.exam.batch.grade'
-    _description = 'Exam Grading Line'
-
-    couse_batch_id = fields.Many2one('oe.school.couse.batch', string='Batch')
-    name = fields.Char(string='Grade', required=True)
-    score_min = fields.Float(string='Min Score (%)')
-    credit_points = fields.Float(string='Credit Points')
+    exam_grade_line = fields.One2many(related='exam_grade_id.exam_grade_line')

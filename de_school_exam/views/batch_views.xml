@@ -7,9 +7,29 @@
             <field name="inherit_id" ref="de_school.school_course_batch_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='course_id']" position="after">
-                    <field name="exam_grade_id" />
+                    <field name="exam_grade_id" options="{'no_open': True, 'no_create': True}" groups="de_school_exam.group_exam_user,de_school_exam.group_exam_manager" />
+                    <field name="enable_score" invisible="1" />
+                    <field name="enable_credit_points" invisible="1" />
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Grading" name="grading">
+                        <field name="exam_grade_line">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                                <field name="score_min" attrs="{'column_invisible':[('parent.enable_score','!=',True)],'required':[('parent.enable_score','=',True)]}"/>
+                                <field name="credit_points" attrs="{'column_invisible':[('parent.enable_credit_points','!=',True)],'required':[('parent.enable_credit_points','=',True)]}"/>
+                            </tree>
+                        </field>
+                    </page>
                 </xpath>
             </field>
         </record>
+
+        <menuitem name="Batch" id="menu_exam_course_batch"
+            parent="menu_exam_course" 
+            action="de_school.action_course_batch"
+            groups="de_school_exam.group_exam_user" 
+            sequence="20"
+        />
     </data>
 </odoo>

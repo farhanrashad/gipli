@@ -11,6 +11,11 @@
 			parent="menu_exam" 
               sequence = "10"
 			groups="de_school_exam.group_exam_user" />
+
+    <menuitem name="Course" id="menu_exam_course"
+			parent="menu_exam" 
+              sequence = "30"
+			groups="de_school_exam.group_exam_user" />
     
     <menuitem name="Reports" id="menu_exam_reports"
 			parent="menu_exam" 
