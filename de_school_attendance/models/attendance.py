@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from operator import itemgetter
 
 import pytz
@@ -114,7 +114,7 @@ class StudentAttendance(models.Model):
     def _compute_check_in(self):
         for attendance in self:
             if attendance.date_attendance:
-                attendance.check_in = attendance.date_attendance
+                attendance.check_in = self.datetime.combine(attendance.date_attendance, time(9, 0))
             else:
                 attendance.check_in = False
 
