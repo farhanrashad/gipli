@@ -6,11 +6,13 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-        
-class Exam(models.Model):
-    _name = 'oe.exam'
+
+
+class ExamSession(models.Model):
+    _name = 'oe.exam.session'
+    _description = 'Exam Session'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
-    _description = 'Exam'
+    _order = "name asc"
 
     READONLY_STATES = {
         'progress': [('readonly', True)],
@@ -18,18 +20,18 @@ class Exam(models.Model):
         'cancel': [('readonly', True)],
     }
     
-    exam_session_id = fields.Many2one(
-        comodel_name='oe.exam.session',
-        string="Exam Session",
-        required=True, ondelete='cascade', index=True, copy=False)
-    subject_id = fields.Many2one(
-        comodel_name='oe.school.course.subject',
-        string="Subject",
-        change_default=True, ondelete='restrict', )
+    name = fields.Char(string='Name', required=True)
     marks_min = fields.Float(string='Minimum Marks', required=True)
     marks_max = fields.Float(string='Maximum Marks', required=True)
-    date_start = fields.Datetime(string='Start Time')
-    date_end = fields.Datetime(string='End Time')
+    course_id = fields.Many2one(
+        comodel_name='oe.school.course',
+        string="Course",
+        change_default=True, ondelete='restrict', )
+    exam_type_id = fields.Many2one('oe.exam.type', string='Exam Type', required=True)
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        required=True, index=True,
+        default=lambda self: self.env.company)
 
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -37,28 +39,12 @@ class Exam(models.Model):
         ('close', 'Closed'),
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        required=True, index=True,
-        default=lambda self: self.env.company)
-    # Address Fields
-    address_id = fields.Many2one('res.partner', 'Work Address', compute="_compute_address_id", store=True, readonly=False,
-        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
-    exam_location_id = fields.Many2one('oe.school.building.room', 'Exam Location', compute="_compute_exam_location_id", store=True, readonly=False,
-    domain="[('building_id.address_id', '=', address_id)]")
     
+
+    exam_line = fields.One2many('oe.exam', 'exam_session_id', string='Exams')
+    exam_count = fields.Integer('Exam Count', default='_compute_exam')
+
     # Compute Methods
-    @api.depends('company_id')
-    def _compute_address_id(self):
-        for exam in self:
-            address = exam.company_id.partner_id.address_get(['default'])
-            exam.address_id = address['default'] if address else False
-
-    @api.depends('address_id')
-    def _compute_exam_location_id(self):
-        to_reset = self.filtered(lambda e: e.address_id != e.exam_location_id.building_id.address_id)
-        to_reset.exam_location_id = False
-
     def _compute_exam(self):
         for record in self:
             record.exam_count = len(record.exam_line)

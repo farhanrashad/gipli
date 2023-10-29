@@ -32,6 +32,7 @@
         'views/exam_grade_views.xml',
         'views/course_views.xml',
         'views/batch_views.xml',
+        'views/exam_session_views.xml',
         'views/exam_views.xml',
     ],
     # only loaded in demonstration mode
