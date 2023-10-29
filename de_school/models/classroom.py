@@ -7,9 +7,13 @@ from odoo.exceptions import UserError, AccessError
 class ClassroomBuilding(models.Model):
     _name = 'oe.school.building'
     _description = 'School Building'
-    name = fields.Char(string='Building Name', required=True, index=True, translate=True)
-    company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
-    
+    _order = 'name'
+
+    active = fields.Boolean(default=True)
+    name = fields.Char(string="Building", required=True)
+    company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company)
+    address_id = fields.Many2one('res.partner', required=True, string="Building Address", domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+        
 class ClassroomBuildingRoom(models.Model):
     _name = 'oe.school.building.room'
     _description = 'Classrooms'
