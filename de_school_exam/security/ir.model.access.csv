@@ -8,4 +8,11 @@ access_exam_grade_manager,access.exam.grade.manager,model_oe_exam_grade,de_schoo
 access_exam_grade_line_officer,access.exam.grade.line.officer,model_oe_exam_grade_line,de_school_exam.group_exam_user,1,1,1,0
 access_exam_grade_line_manager,access.exam.grade.line.manager,model_oe_exam_grade_line,de_school_exam.group_exam_manager,1,1,1,1
 
+access_exam_officer,access.exam.officer,model_oe_exam,de_school_exam.group_exam_user,1,1,1,0
+access_exam__manager,access.exam.manager,model_oe_exam,de_school_exam.group_exam_manager,1,1,1,1
+
+access_exam_line_officer,access.exam.line.officer,model_oe_exam_line,de_school_exam.group_exam_user,1,1,1,0
+access_exam_line_manager,access.exam.line.manager,model_oe_exam_line,de_school_exam.group_exam_manager,1,1,1,1
+
+
 

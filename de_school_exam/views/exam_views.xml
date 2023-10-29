@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <!-- Exam -->
+        <record id="exam_tree_view" model="ir.ui.view">
+			<field name="name">exam.tree.view</field>
+			<field name="model">oe.exam</field>
+			<field name="arch" type="xml">
+				<tree string="Exam " >
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+
+        <record id="exam_form_view" model="ir.ui.view">
+            <field name="name">exam.form.view</field>
+            <field name="model">oe.exam</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form string="Exam">
+                    <header>
+                        <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
+                        <button name="button_open" states="draft" string="Open" type="object" class="oe_highlight" data-hotkey="o" />
+                        <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
+                        <button name="button_close" type="object" string="Close Admission" states="progress" data-hotkey="l"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,progress,close" readonly="1"/>
+                    </header>
+                    <sheet>
+                        <field name="company_id" invisible="1" />
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" placeholder="e.g Fall 2023-Mid Term"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="course_id" options="{'no_open':True,'no_create':True}"/>
+                                <field name="exam_type_id" options="{'no_open':True,'no_create':True}"/>
+                                <separator string="Exam Venue" />
+                                <field name="address_id" options="{'no_create':True}"/>
+                                <field name="exam_location_id" options="{'no_create':True}"/>
+                            </group>
+                            <group>
+                                <field name="marks_min" />
+                                <field name="marks_max" />
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':True}"/>
+                            </group>y
+                        </group>
+                        <notebook>
+                           <page string="Subject" name="subject">
+                               <field name="exam_line">
+                                    <tree editable="bottom">
+                                        <field name="exam_id" invisible="1"/>
+                                        <field name="subject_id" options="{'no_open':True,'no_create':True}"/>
+                                        <field name="marks_min" />
+                                        <field name="marks_max" />
+                                        <field name="date_start" />
+                                        <field name="date_end" />
+                                    </tree>
+                                </field>
+                           </page>
+                       </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="exam_search_view" model="ir.ui.view">
+            <field name="name">exam.search.view</field>
+            <field name="model">oe.exam</field>
+            <field name="arch" type="xml">
+                <search string="Exam">
+                    <field name="name" string="Exam Reference"/>
+                </search>
+             </field>
+        </record>
+        
+        <record id="action_exam" model="ir.actions.act_window">
+            <field name="name">Exam</field>
+            <field name="res_model">oe.exam</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="exam_search_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new exam
+                </p>
+            </field>
+        </record>
+        
+        <menuitem name="Exam" id="menu_exam_config_main_exam"
+            parent="menu_exam_main" 
+            action="action_exam"
+            groups="de_school_exam.group_exam_user" 
+            sequence="10"
+        />
+        
+    </data>
+</odoo>
