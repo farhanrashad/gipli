@@ -127,7 +127,7 @@ class AdmissionRegister(models.Model):
         for record in self:
             if record.state != 'draft' and record.no_of_applicants > 0:
                 raise exceptions.UserError("You cannot delete a record with applicants when the status is not 'Draft'.")
-        return super(YourModel, self).unlink()
+        return super(AdmissionRegister, self).unlink()
 
     def button_draft(self):
         self.write({'state': 'draft'})
