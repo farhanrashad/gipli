@@ -67,7 +67,7 @@ class ExamSession(models.Model):
 
     def button_close(self):
         for session in self:
-            if any(exam.state != 'close' for exam in session.exam_line.filtered(lambda e: e.state != 'cancel')):
+            if any(exam.state != 'done' for exam in session.exam_line.filtered(lambda e: e.state != 'cancel')):
                 raise UserError(_('Please close all the exams before closing the session %s') % (session.name))
         self.write({'state': 'close'})
         
