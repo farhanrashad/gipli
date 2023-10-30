@@ -41,8 +41,10 @@ class Exam(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('progress', 'Open'),
-        ('close', 'Closed'),
+        ('schedule', 'Scheduled'),
+        ('complete', 'Completed'),
+        ('prepare', 'Result Prepared'),
+        ('done', 'Result Updated'),
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
     company_id = fields.Many2one(
@@ -114,14 +116,27 @@ class Exam(models.Model):
     def button_draft(self):
         self.write({'state': 'draft'})
 
-    def button_open(self):
-        self.write({'state': 'progress'})
+    def button_schedule(self):
+        self.write({'state': 'schedule'})
 
     def button_close(self):
-        self.write({'state': 'close'})
+        self.write({'state': 'complete'})
         
     def button_cancel(self):
         self.write({'state': 'draft'})
+
+    def button_prepare_result(self):
+        student_ids = self.env['res.partner'].search([('course_id',self.exam_session_id.course_id.id),('batch_id',self.batch_id.id)])
+        for student in student_ids:
+            exam_result = self.env['oe.exam.result'].create({
+                'student_id': student.id,
+                'exam_id': self.id,
+                'marks': 0,
+            })
+        self.write({'state': 'prepare'})
+
+    def button_complete_result(self):
+        self.write({'state': 'done'})
 
     def action_view_exam_results(self):
         context = {
