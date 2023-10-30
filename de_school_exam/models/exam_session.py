@@ -20,18 +20,20 @@ class ExamSession(models.Model):
         'cancel': [('readonly', True)],
     }
     
-    name = fields.Char(string='Name', required=True)
-    marks_min = fields.Float(string='Minimum Marks', required=True)
-    marks_max = fields.Float(string='Maximum Marks', required=True)
+    name = fields.Char(string='Name', required=True, states=READONLY_STATES,)
+    marks_min = fields.Float(string='Minimum Marks', required=True, states=READONLY_STATES,)
+    marks_max = fields.Float(string='Maximum Marks', required=True, states=READONLY_STATES,)
     course_id = fields.Many2one(
         comodel_name='oe.school.course',
         string="Course",
-        change_default=True, ondelete='restrict', )
-    exam_type_id = fields.Many2one('oe.exam.type', string='Exam Type', required=True)
+        change_default=True, ondelete='restrict', states=READONLY_STATES,)
+    exam_type_id = fields.Many2one('oe.exam.type', string='Exam Type', required=True, states=READONLY_STATES,)
     company_id = fields.Many2one(
         comodel_name='res.company',
         required=True, index=True,
-        default=lambda self: self.env.company)
+        default=lambda self: self.env.company,
+        states=READONLY_STATES,
+    )
 
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -41,8 +43,8 @@ class ExamSession(models.Model):
     ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
     
 
-    exam_line = fields.One2many('oe.exam', 'exam_session_id', string='Exams')
-    exam_count = fields.Integer('Exam Count', default='_compute_exam')
+    exam_line = fields.One2many('oe.exam', 'exam_session_id', string='Exams', states=READONLY_STATES,)
+    exam_count = fields.Integer('Exam Count', compute='_compute_exam')
 
     # Compute Methods
     def _compute_exam(self):
@@ -73,5 +75,20 @@ class ExamSession(models.Model):
         self.write({'state': 'draft'})
         return {}
 
-    
-
+    def action_view_exams(self):
+        #self.ensure_one()
+        #raise UserError(self.id)
+        context = {
+            'default_exam_session_id': self.id,
+            'exam_session_id': self.id,
+        }
+        action = {
+            'name': 'Exam',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'oe.exam',
+            'type': 'ir.actions.act_window',
+            'context': context,
+            #'domain': [('admission_register_id','=',self.id),('type','=','opportunity')]
+        }
+        return action
