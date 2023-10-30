@@ -61,11 +61,9 @@ class ExamSession(models.Model):
     # Action Buttons
     def button_draft(self):
         self.write({'state': 'draft'})
-        return {}
 
     def button_open(self):
         self.write({'state': 'progress'})
-        return {}
 
     def button_close(self):
         for session in self:
@@ -75,7 +73,6 @@ class ExamSession(models.Model):
         
     def button_cancel(self):
         self.write({'state': 'draft'})
-        return {}
 
     def action_view_exams(self):
         #self.ensure_one()

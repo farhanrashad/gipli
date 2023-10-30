@@ -40,6 +40,13 @@ class ExamResult(models.Model):
         string="Student", required=True, states=READONLY_STATES,
         change_default=True, ondelete='restrict', 
     )
+    roll_no = fields.Char(related='student_id.roll_no')
+    admission_no = fields.Char(related='student_id.admission_no')
+    
+    attendance_status = fields.Selection([
+        ('present', 'Present'),
+        ('absent', 'Absent'),
+    ], string='Attendance Type', default='present', required=True)
     
     marks = fields.Float(string='Obtained Marks', required=True, states=READONLY_STATES,)
     exam_grade_line_id = fields.Many2one('oe.exam.grade.line', string='Exam Grade')
@@ -63,11 +70,11 @@ class ExamResult(models.Model):
 
             
     # CRUD Operations
-    def unlink(self):
+    def unlink11(self):
         for record in self:
             if record.exam_id.state != 'draft':
                 raise ValidationError("You cannot delete result.")
-        return super(Exam, self).unlink()
+        return super(ExamResult, self).unlink()
 
         
     

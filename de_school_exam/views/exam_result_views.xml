@@ -9,8 +9,12 @@
 				<tree string="Exam" editable="bottom">
                     <field name="exam_id" options="{'no_open':True,'no_create':True}"/>
                     <field name="student_id" options="{'no_open':True,'no_create':True}"/>
+                    <field name="roll_no" />
+                    <field name="admission_no" />
+                    
                     <field name="batch_id"/>
 					<field name="subject_id"/>
+                    <field name="attendance_status" />
                     <field name="marks" />
                     <field name="exam_grade_line_id" />
 				</tree>

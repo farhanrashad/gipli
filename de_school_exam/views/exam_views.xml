@@ -25,12 +25,12 @@
                     <header>
                         <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
                         <button name="button_schedule" states="draft" string="Schedule Exam" type="object" class="oe_highlight" data-hotkey="o" />
-                        <button name="button_close" type="object" string="Close Exam" states="schedule" data-hotkey="l"/>
-                        <button name="button_prepare_result" type="object" string="Prepare Result" states="complete" data-hotkey="l"/>
-                        <button name="button_complete_result" type="object" string="Result Completed" states="prepare" data-hotkey="l"/>
+                        <button name="button_close" type="object" string="Close Exam" states="schedule" class="oe_highlight" data-hotkey="l"/>
+                        <button name="button_prepare_result" type="object" string="Prepare Result" states="complete" class="oe_highlight" data-hotkey="l"/>
+                        <button name="button_complete_result" type="object" string="Result Completed" states="prepare" class="oe_highlight" data-hotkey="l"/>
                         
                         <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
-                        <field name="state" widget="statusbar" statusbar_visible="draft,progress,close" readonly="1"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,schedule,complete,prepare,done" readonly="1"/>
                         
                     </header>
                     <sheet>

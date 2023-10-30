@@ -14,8 +14,10 @@ class Exam(models.Model):
     _rec_name = 'subject_id'
 
     READONLY_STATES = {
-        'progress': [('readonly', True)],
-        'close': [('readonly', True)],
+        'schedule': [('readonly', True)],
+        'complete': [('readonly', True)],
+        'prepare': [('readonly', True)],
+        'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     }
     
@@ -126,16 +128,21 @@ class Exam(models.Model):
         self.write({'state': 'draft'})
 
     def button_prepare_result(self):
-        student_ids = self.env['res.partner'].search([('course_id',self.exam_session_id.course_id.id),('batch_id',self.batch_id.id)])
+        student_ids = self.env['res.partner'].search([('course_id','=',self.exam_session_id.course_id.id),('batch_id','=',self.batch_id.id)])
+        #raise UserError(student_ids)
         for student in student_ids:
             exam_result = self.env['oe.exam.result'].create({
                 'student_id': student.id,
                 'exam_id': self.id,
+                'attendance_status': 'present',
                 'marks': 0,
             })
         self.write({'state': 'prepare'})
 
     def button_complete_result(self):
+        for exam in self:
+            if any(er.marks == 0 for er in exam.exam_result_line.filtered(lambda e: e.attendance_status == 'present')):
+                raise UserError("One or more student's marks are not updated.")
         self.write({'state': 'done'})
 
     def action_view_exam_results(self):
