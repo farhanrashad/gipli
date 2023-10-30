@@ -34,6 +34,7 @@
         'views/batch_views.xml',
         'views/exam_session_views.xml',
         'views/exam_views.xml',
+        'views/exam_result_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

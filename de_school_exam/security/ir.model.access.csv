@@ -12,8 +12,10 @@ access_exam_session_officer,access.exam.session.officer,model_oe_exam_session,de
 access_exam_session_manager,access.exam.session.manager,model_oe_exam_session,de_school_exam.group_exam_manager,1,1,1,1
 
 access_exam_officer,access.exam.officer,model_oe_exam,de_school_exam.group_exam_user,1,1,1,0
-access_exam__manager,access.exam.manager,model_oe_exam,de_school_exam.group_exam_manager,1,1,1,1
+access_exam_manager,access.exam.manager,model_oe_exam,de_school_exam.group_exam_manager,1,1,1,1
 
+access_exam_result_officer,access.exam.result.officer,model_oe_exam_result,de_school_exam.group_exam_user,1,1,1,0
+access_exam_result_manager,access.exam.result.manager,model_oe_exam_result,de_school_exam.group_exam_manager,1,1,1,1
 
 
 

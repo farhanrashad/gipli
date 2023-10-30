@@ -1,0 +1,73 @@
+# -*- coding: utf-8 -*-
+
+from babel.dates import format_date
+from datetime import date
+from dateutil.relativedelta import relativedelta
+
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
+        
+class ExamResult(models.Model):
+    _name = 'oe.exam.result'
+    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
+    _description = 'Exam Results'
+    _rec_name = 'student_id'
+
+    READONLY_STATES = {
+        'progress': [('readonly', True)],
+        'close': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    }
+    
+    exam_id = fields.Many2one(
+        comodel_name='oe.exam',
+        string="Exam", states=READONLY_STATES,
+        required=True, ondelete='cascade', index=True, copy=False)
+
+    batch_id = fields.Many2one(
+        comodel_name='oe.school.course.batch',
+        related='exam_id.batch_id'
+    )
+    
+    subject_id = fields.Many2one(
+        comodel_name='oe.school.course.subject',
+        related='exam_id.subject_id',
+    )
+
+    student_id = fields.Many2one(
+        comodel_name='res.partner',
+        domain="[('is_student','=',True),('batch_id','=',batch_id)]",
+        string="Student", required=True, states=READONLY_STATES,
+        change_default=True, ondelete='restrict', 
+    )
+    
+    marks = fields.Float(string='Obtained Marks', required=True, states=READONLY_STATES,)
+    exam_grade_line_id = fields.Many2one('oe.exam.grade.line', string='Exam Grade')
+    
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        required=True, index=True,
+        states=READONLY_STATES,
+        default=lambda self: self.env.company)
+    
+    # ----------------------------------------
+    # Constrains
+    # ----------------------------------------
+
+    @api.constrains('marks')
+    def _check_marks_range(self):
+        for record in self:
+            if record.marks < record.exam_id.marks_min or record.marks > record.exam_id.marks_max:
+                raise ValidationError(f"Obtained Marks must be between {record.exam_id.marks_min} and {record.exam_id.marks_max}.")
+
+
+            
+    # CRUD Operations
+    def unlink(self):
+        for record in self:
+            if record.exam_id.state != 'draft':
+                raise ValidationError("You cannot delete result.")
+        return super(Exam, self).unlink()
+
+        
+    

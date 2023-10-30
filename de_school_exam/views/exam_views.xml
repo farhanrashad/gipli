@@ -31,6 +31,15 @@
                     </header>
                     <sheet>
                         <field name="company_id" invisible="1" />
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_exam_results"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-trophy"
+                            >
+                                <field name="exam_result_count" widget="statinfo" string="Results"/>
+                            </button>
+                        </div>
                         <group>
                             <group>
                                 <field name="batch_id" options="{'no_open':True,'no_create':True}"/>

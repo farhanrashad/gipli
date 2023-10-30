@@ -64,8 +64,14 @@ class Exam(models.Model):
     exam_hours = fields.Float(string='Exam Hours', 
                               compute='_compute_exam_hours', 
                               store=True, readonly=True)
+
+    exam_result_line = fields.One2many('oe.exam.result', 'exam_id', string='Exams', states=READONLY_STATES,)
+    exam_result_count = fields.Integer('Exam Result Count', compute='_compute_exam_result')
     
+    # ----------------------------------------
     # Compute Methods
+    # ----------------------------------------
+    
     @api.depends('company_id')
     def _compute_address_id(self):
         for exam in self:
@@ -77,10 +83,6 @@ class Exam(models.Model):
         to_reset = self.filtered(lambda e: e.address_id != e.exam_location_id.building_id.address_id)
         to_reset.exam_location_id = False
 
-
-    # ----------------------------------------
-    # Compute Methods
-    # ----------------------------------------
     @api.depends('date_start', 'date_end')
     def _compute_exam_hours(self):
         for exam in self:
@@ -89,7 +91,10 @@ class Exam(models.Model):
                 exam.exam_hours = delta.total_seconds() / 3600.0
             else:
                 exam.exam_hours = False
-                
+
+    def _compute_exam_result(self):
+        for record in self:
+            record.exam_result_count = len(record.exam_result_line)
             
     # CRUD Operations
     def unlink(self):
@@ -108,16 +113,28 @@ class Exam(models.Model):
     # Action Buttons
     def button_draft(self):
         self.write({'state': 'draft'})
-        return {}
 
     def button_open(self):
         self.write({'state': 'progress'})
-        return {}
 
     def button_close(self):
         self.write({'state': 'close'})
-        return {}
         
     def button_cancel(self):
         self.write({'state': 'draft'})
-        return {}
+
+    def action_view_exam_results(self):
+        context = {
+            'default_exam_id': self.id,
+            'exam_id': self.id,
+        }
+        action = {
+            'name': 'Exam Result',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'oe.exam.result',
+            'type': 'ir.actions.act_window',
+            'context': context,
+        }
+        return action
+    
