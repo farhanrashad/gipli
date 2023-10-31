@@ -47,7 +47,7 @@ class ExamResult(models.Model):
         ('present', 'Present'),
         ('absent', 'Absent'),
     ], string='Attendance Type', default='present', required=True)
-    
+    seat_no = fields.Char('Seat No')
     marks = fields.Float(string='Obtained Marks', required=True, states=READONLY_STATES,)
     exam_grade_line_id = fields.Many2one('oe.exam.grade.line', string='Exam Grade')
     

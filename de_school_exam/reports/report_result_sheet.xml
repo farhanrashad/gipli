@@ -81,7 +81,7 @@
                 </t>
             </t>
         </template>
-        <!--  Loan Report  -->
+        <!--  Exam Report  -->
         <record id="exam_sheet_report" model="ir.actions.report">
             <field name="name">Print Exam Sheet</field>
             <field name="model">oe.exam</field>

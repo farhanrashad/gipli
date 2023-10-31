@@ -67,8 +67,8 @@
                 </t>
             </t>
         </template>
-        <!--  Loan Report  -->
-        <record id="exam_sheet_report" model="ir.actions.report">
+        <!--  Exam Session Report  -->
+        <record id="exam_session_report" model="ir.actions.report">
             <field name="name">Print Exam Sheet</field>
             <field name="model">oe.exam.session</field>
             <field name="report_type">qweb-pdf</field>
