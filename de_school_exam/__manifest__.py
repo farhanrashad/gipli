@@ -35,6 +35,8 @@
         'views/exam_session_views.xml',
         'views/exam_views.xml',
         'views/exam_result_views.xml',
+        'reports/report_exam_sheet.xml',
+        'reports/report_result_sheet.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
