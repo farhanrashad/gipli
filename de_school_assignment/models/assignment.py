@@ -5,6 +5,7 @@ from odoo import models, fields, api
 
 class Assignment(models.Model):
     _name = 'oe.assignment'
+    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
     _description = 'Assignment'
 
     READONLY_STATES = {
@@ -40,10 +41,16 @@ class Assignment(models.Model):
         help='Batches to assign assignments'
     )
 
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        required=True, index=True,
+        states=READONLY_STATES,
+        default=lambda self: self.env.company)
+    
     note = fields.Text('Description')
     date_due = fields.Datetime(string='Due Date', required=True)
     date = fields.Datetime(string='Date', default=fields.Datetime.now, required=True, help='Assignment Date')
-    date_issue = fields.Datetime(string='Issue Date')
+    date_publish = fields.Datetime(string='Publish Date')
 
     assignment_line_ids = fields.One2many('oe.assignment.line', 'assignment_id', string='Assignments', states=READONLY_STATES,)
     assignment_count = fields.Integer('Assignment Count', compute='_compute_exam')
@@ -54,6 +61,23 @@ class Assignment(models.Model):
         string='Submit lines',
         copy=False,
         states=READONLY_STATES,
-        domain=[('display_type', 'in', ('product', 'line_section', 'line_note'))],
+        domain=[('assignment_status', 'in', ('submit'))],
     )
     assignment_submit_count = fields.Integer('Assignment Count', compute='_compute_exam')
+
+    # Action Buttons
+    def button_draft(self):
+        self.write({'state': 'draft'})
+
+    def button_publish(self):
+        self.write({'state': 'publish'})
+
+    def button_close(self):
+        self.write({'state': 'close'})
+        
+    def button_cancel(self):
+        self.write({'state': 'draft'})
+
+    def action_view_assigned_assignments(self):
+        pass
+        
