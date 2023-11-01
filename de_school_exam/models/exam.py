@@ -163,14 +163,52 @@ class Exam(models.Model):
         }
         return action
 
+    @api.model
+    def _fields_view_get_results(self, arch):
+        arch = super(Exam, self)._fields_view_get_results(arch)
+
+        doc = etree.fromstring(arch)
+
+        if doc.xpath("//field[@name='credit_points']"):
+            return arch
+
+        replacement_xml = """
+            <field name='credit_points' placeholder="%(placeholder)s" class="o_credit_points"  />
+        """
+
+        replacement_data = {
+            'placeholder': _('Credit Points'),
+        }
+
+        for results_node in doc.xpath("//group[@name='results_group']"):
+            replacement_formatted = replacement_xml % replacement_data
+            for replace_node in etree.fromstring(replacement_formatted).getchildren():
+                results_node.append(replace_node)
+
+        arch = etree.tostring(doc, encoding='unicode')
+        return arch
+        
     def button_open_result(self):
         
-        view_id = self.env['ir.ui.view'].search([('name','=','dynamic_extend_result_tree_view')])
-        if view_id:
-            view_id.unlink()
+        #view_id = self.env['ir.ui.view'].search([('name','=','dynamic_extend_result_tree_view')])
+        #if view_id:
+        #    view_id.unlink()
             
+        #if self.batch_id.enable_credit_points:
+        #    self.open_dynamic_tree_view()
+
+        #view_id = self.env.ref('de_school_exam.exam_result_tree_view')
+        #view_id.render()
+        #view_id.load()
+        #self.env.ref('de_school_exam.exam_result_tree_view').arch
+
         if self.batch_id.enable_credit_points:
-            self.open_dynamic_tree_view()
+            #action['action_id'] = self.env.ref('de_school_exam.action_exam_result_grade').id
+            #raise UserError('grade')
+            action = self.env['ir.actions.actions']._for_xml_id('de_school_exam.action_exam_result_grade')
+        else:
+            #action['action_id'] = self.env.ref('de_school_exam.action_exam_result').id
+            action = self.env['ir.actions.actions']._for_xml_id('de_school_exam.action_exam_result')
         
         context = {
             'default_exam_id': self.id,
@@ -178,18 +216,19 @@ class Exam(models.Model):
             'create': False,
             'delete': False,
         }
-    
-        action = {
-            'name': 'Exam Result',
-            'view_type': 'form',
-            'view_mode': 'tree,form',
-            'res_model': 'oe.exam.result',
-            'type': 'ir.actions.act_window',
-            'context': context,
-        }
+        action['context'] = context
+        #action = {
+        #    'name': 'Exam Result',
+        #    'view_type': 'form',
+        #    'view_mode': 'tree,form',
+        #    'res_model': 'oe.exam.result',
+        #    'type': 'ir.actions.act_window',
+        #    'context': context,
+        #}
         return action
+        
 
-    def open_dynamic_tree_view(self):    
+    def open_dynamic_tree_view(self):
         tree_view_id = self.env['ir.ui.view'].create({
             'name': 'dynamic_extend_result_tree_view',
             'model': 'oe.exam.result',
