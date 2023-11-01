@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import fields, models, api, _
+from odoo.exceptions import AccessError, UserError, ValidationError
+from datetime import datetime, timedelta, time
 
 
 class Assignment(models.Model):
@@ -90,7 +92,11 @@ class Assignment(models.Model):
                     'student_id': student.id,
                     'state': 'draft',
                 })
-        self.write({'state': 'publish'})
+                #self._action_send_email(student)
+            partner_ids_to_add = student_ids.ids
+            self.message_subscribe(partner_ids=partner_ids_to_add)
+            self._action_send_email(student_ids)
+            self.write({'state': 'publish'})
 
     def button_close(self):
         self.write({'state': 'close'})
@@ -100,4 +106,38 @@ class Assignment(models.Model):
 
     def action_view_assigned_assignments(self):
         pass
+
+    def _action_send_email(self, student_ids):
+        """ send email to students for assignment """
+        self.ensure_one()
+        lang = self.env.context.get('lang')
+        mail_template = self.env.ref('de_school_assignment.mail_template_publish_new_assignment', raise_if_not_found=False)
+        if mail_template and mail_template.lang:
+            lang = mail_template._render_lang(self.ids)[self.id]
+
+        recipients = student_ids.mapped('email')
+        if recipients:
+            mail_template.with_context(lang=lang).send_mail(self.id, email_values={'email_to': recipients})
+
+
+            
+    # Schedule Action
+    def _expire_assignments(self):
+        ''' This method is called from a cron job.
+        It is used to post entries such as those created by the module
+        account_asset and recurring entries created in _post().
+        '''
+        assignment_ids = self.search([
+            ('state', '=', 'publish'),
+            ('date_due', '<=', datetime.now()),
+        ])
+        for assignment in assignment_ids:
+            try:
+                with self.env.cr.savepoint():
+                    assignment.write({
+                        'state': 'close',
+                    })
+            except UserError as e:
+                    msg = _('The assignment entries could not be closed for the following reason: %(error_message)s', error_message=e)
+                    assignment.message_post(body=msg, message_type='comment')
         

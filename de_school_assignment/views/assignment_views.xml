@@ -27,7 +27,7 @@
                         <button name="button_publish" states="draft" string="Publish" type="object" class="oe_highlight" data-hotkey="o" />
                         <button name="button_close" type="object" string="Close assignment" states="publish" class="oe_highlight" data-hotkey="l"/>
                         
-                        <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
+                        <button name="button_cancel" states="publish" string="Cancel" type="object" data-hotkey="x" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,publish,close" readonly="1"/>
                         
                     </header>
@@ -69,7 +69,7 @@
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':True}"/>
                             </group>y
                         </group>
-                        <field name="note" class="oe-bordered-editor field_description" placeholder="Description of the assignment..."/>
+                        <field name="note" class="oe-bordered-editor field_description" placeholder="Assignment Instructions..."/>
                          
                     </sheet>
                     <div class="oe_chatter">

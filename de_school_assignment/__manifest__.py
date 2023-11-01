@@ -26,6 +26,8 @@
     'data': [
         'security/assignment_security.xml',
         'security/ir.model.access.csv',
+        'data/assignment_data.xml',
+        'data/mail_template_data.xml',
         'views/assignment_menu.xml',
         'views/assignment_views.xml',
         'views/assignment_line_views.xml',
