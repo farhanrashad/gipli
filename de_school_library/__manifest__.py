@@ -36,6 +36,7 @@
         'views/sale_order_views.xml',
         'views/student_views.xml',
         'views/teacher_views.xml',
+        'views/agreement_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
