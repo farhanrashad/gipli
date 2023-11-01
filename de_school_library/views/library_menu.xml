@@ -16,6 +16,11 @@
 			parent="menu_library_root" 
               sequence = "20"
 			groups="group_library_user" />
+
+    <menuitem name="Patron" id="menu_library_patron_main"
+			parent="menu_library_root" 
+              sequence = "30"
+			groups="group_library_user" />
     
     <menuitem name="Reports" id="menu_library_menu_reports"
 			parent="menu_library_root" 
