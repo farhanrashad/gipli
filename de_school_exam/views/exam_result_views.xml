@@ -105,13 +105,14 @@
             </field>
         </record>
 
+        <!--
         <menuitem name="Exam Results" id="menu_exam_main_exam_results"
             parent="menu_exam_main" 
             action="action_exam_result"
             groups="de_school_exam.group_exam_user" 
             sequence="30"
         />
-
+        -->
 
         <record id="action_exam_result_grade" model="ir.actions.act_window">
             <field name="name">Exam Result</field>
