@@ -17,30 +17,36 @@
                             <h1><field name="name" placeholder="e.g. The Enigmatic Chronicles: Secrets of the Lost City"/></h1>
                         </div>
                         <group name="product_details">
-                            <group string="General Information">
+                            <group string="General Information" name="general_info">
                                 <field name="active" invisible="1"/>
                                 <field name="type" invisible="1"/>
                                 <field name="detailed_type" invisible="1"/>
+                                
+                                <field name="genre_id" required="1" options="{'no_create':True,'no_open':True}" />
+                                <field name="isbn_no" required="1"/>
+                                <field name="edition_book" string="Edition" />
+                                <field name="default_code" help="Use this reference as a internal number of a book."/>
+                                <field name="book_lang_id" options="{'no_create':True}" />
+                                <field name="book_pages" />
+                                <field name="product_tag_ids" string="Keywords or Tags" widget="many2many_tags"/>
+                                
+                            </group>
+                            <group name="circulation_info">
+                                <field name="publisher_id" options="{'no_create':True}" />
+                                <field name="date_publish" />
+                                <field name="author_id" options="{'no_create':True}" />
+                                
                                 <field name="lst_price" help="sale price for the fee product"/>
                                 <field name="uom_id" groups="uom.group_uom" options="{'no_create': True}"/>
                                 <field name="uom_po_id" invisible="1"/>
-                                <label for="isbn_no"/>
-                                <div>
-                                    <field name="isbn_no" required="1"/>
-                                    <span class="d-inline-block"><i class="text-muted">(International Standard Book Number): A unique identifier for the book.</i></span>
-                                </div>
-                                <label for="default_code"/>
-                                <div>
-                                    <field name="default_code"/>
-                                    <span class="d-inline-block"><i class="text-muted">Use this reference as a internal library number of a book.</i></span>
-                                </div>
-                                <field name="company_id" groups="base.group_multi_company"/>
-                            </group>
-                            <group string="Accounting">
+                                <field name="categ_id" options="{'no_create':True,'no_open':True}" help="Categorized books for inventory"/>
+                                
+                                <separator string="Accounting" />
                                 <field name="property_account_income_id" groups="account.group_account_readonly"/>
                                 <field name="taxes_id" widget="many2many_tags"
                                        context="{'default_type_tax_use':'sale', 'default_price_include': 1}"
                                        options="{'no_quick_create': True}"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                         </group>
                         <notebook>
