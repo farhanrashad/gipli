@@ -24,7 +24,7 @@ class Assignment(models.Model):
     
     course_id = fields.Many2one(
         comodel_name='oe.school.course',
-        string="Course",
+        string="Course", required=True,
         change_default=True, ondelete='restrict', states=READONLY_STATES,)
     subject_id = fields.Many2one(
         comodel_name='oe.school.course.subject',
@@ -37,7 +37,8 @@ class Assignment(models.Model):
         relation='assignment_batch_ids',
         column1='assignment_id',
         column2='batch_id',
-        string='Batches',
+        string='Batches', required=True,
+        domain="[('course_id','=',course_id)]",
         help='Batches to assign assignments'
     )
 
@@ -46,6 +47,8 @@ class Assignment(models.Model):
         required=True, index=True,
         states=READONLY_STATES,
         default=lambda self: self.env.company)
+
+    file_assignment = fields.Binary(string='Assignment', attachment=True)    
     
     note = fields.Text('Description')
     date_due = fields.Datetime(string='Due Date', required=True)
@@ -53,7 +56,7 @@ class Assignment(models.Model):
     date_publish = fields.Datetime(string='Publish Date')
 
     assignment_line_ids = fields.One2many('oe.assignment.line', 'assignment_id', string='Assignments', states=READONLY_STATES,)
-    assignment_count = fields.Integer('Assignment Count', compute='_compute_exam')
+    assignment_count = fields.Integer('Assignment Count', compute='_compute_assignment')
     
     assignment_submit_line_ids = fields.One2many(  # /!\ assignment_submit_line_ids is just a subset of assignment_line_ids.
         'oe.assignment.line',
@@ -61,15 +64,32 @@ class Assignment(models.Model):
         string='Submit lines',
         copy=False,
         states=READONLY_STATES,
-        domain=[('assignment_status', 'in', ('submit'))],
+        domain=[('state', '=', 'submit')],
     )
-    assignment_submit_count = fields.Integer('Assignment Count', compute='_compute_exam')
+    assignment_submit_count = fields.Integer('Assignment Count', compute='_compute_submitted_assignment')
 
+    # compute Methods
+    def _compute_assignment(self):
+        for record in self:
+            record.assignment_count = len(record.assignment_line_ids)
+
+    def _compute_submitted_assignment(self):
+        for record in self:
+            record.assignment_submit_count = len(record.assignment_submit_line_ids)
+            
     # Action Buttons
     def button_draft(self):
         self.write({'state': 'draft'})
 
     def button_publish(self):
+        for record in self:
+            student_ids = self.env['res.partner'].search([('is_student','=',True),('batch_id','in',record.batch_ids.ids)])
+            for student in student_ids:
+                assignment_line_id = self.env['oe.assignment.line'].create({
+                    'assignment_id': record.id,
+                    'student_id': student.id,
+                    'state': 'draft',
+                })
         self.write({'state': 'publish'})
 
     def button_close(self):

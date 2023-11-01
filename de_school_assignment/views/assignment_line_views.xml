@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <!-- Assignment -->
+        <record id="assignment_line_tree_view" model="ir.ui.view">
+			<field name="name">assignment.line.tree.view</field>
+			<field name="model">oe.assignment.line</field>
+			<field name="arch" type="xml">
+				<tree string="Assignment Line" >
+                    <field name="student_id"/>
+                    <field name="assignment_id"/>
+                    <field name="course_id"/>
+					<field name="subject_id"/>
+                    <field name="batch_id"/>
+                    <field name="date_due" />
+                    <field name="state" />
+				</tree>
+			</field>
+		</record>
+
+        <record id="assignment_line_form_view" model="ir.ui.view">
+            <field name="name">assignment.line.form.view</field>
+            <field name="model">oe.assignment.line</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form string="Assignment">
+                    <header>
+                        <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
+                        <button name="button_submit" states="draft" string="Submit" type="object" class="oe_highlight" data-hotkey="o" />                        
+                        <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submit" readonly="1"/>
+                        
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="assignment_id" options="{'no_create':True}"/>
+                                <field name="student_id" options="{'no_create':True}"/>
+                                <field name="course_id" options="{'no_open':True,'no_create':True}"/>
+                                <field name="subject_id" options="{'no_open':True,'no_create':True}"/>
+                                <field name="batch_id" options="{'no_open':True,'no_create':True}"/>
+                            </group>
+                            <group>
+                                <field name="file_assignment" widget="binary" />
+                                <field name="file_submit" widget="binary" />
+                                <field name="date_due" />
+                                <field name="date" />
+                                
+                            </group>y
+                        </group>
+                         <notebook>
+                            <page name="description_page" string="Description">
+                                <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Assignment description..."/>
+                            </page>
+                         </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+        <record id="assignment_line_search_view" model="ir.ui.view">
+            <field name="name">assignment.line.search.view</field>
+            <field name="model">oe.assignment.line</field>
+            <field name="arch" type="xml">
+                <search string="Assignment">
+                    <field name="batch_id" string="Batch"/>
+                </search>
+             </field>
+        </record>
+        
+        <record id="action_assignment_line" model="ir.actions.act_window">
+            <field name="name">Assignment</field>
+            <field name="res_model">oe.assignment.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="assignment_line_search_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new assignment
+                </p>
+            </field>
+        </record>
+        
+        <menuitem name="Submit Assignment" id="menu_assignment_main_submit_assignment"
+            parent="menu_assignment_main" 
+            action="action_assignment_line"
+            groups="de_school_assignment.group_assignment_user" 
+            sequence="20"
+        />
+        
+    </data>
+</odoo>

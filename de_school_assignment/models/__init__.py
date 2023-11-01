@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
 from . import assignment
-from . import assignment_submit
+from . import assignment_line

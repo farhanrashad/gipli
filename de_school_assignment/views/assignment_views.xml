@@ -37,9 +37,16 @@
                             <button name="action_view_assigned_assignments"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-trophy"
+                                icon="fa-user"
                             >
                                 <field name="assignment_count" widget="statinfo" string="Assigned"/>
+                            </button>
+                            <button name="action_view_assigned_assignments"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-file"
+                            >
+                                <field name="assignment_submit_count" widget="statinfo" string="Submit"/>
                             </button>
                         </div>
                         <div class="oe_title">
@@ -53,6 +60,7 @@
                                 <field name="course_id" options="{'no_open':True,'no_create':True}"/>
                                 <field name="subject_id" options="{'no_open':True,'no_create':True}"/>
                                 <field name="batch_ids" widget="many2many_tags" options="{'no_open':True,'no_create':True}"/>
+                                <field name="file_assignment" widget="binary" />
                             </group>
                             <group>
                                 <field name="date" />
@@ -61,13 +69,8 @@
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':True}"/>
                             </group>y
                         </group>
-                         <notebook>
-                            <page name="description_page" string="Description">
-                                
-                                        <field name="note" nolabel="1" placeholder="Terms and conditions..."/>
-                                    
-                            </page>
-                         </notebook>
+                        <field name="note" class="oe-bordered-editor field_description" placeholder="Description of the assignment..."/>
+                         
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids"/>
