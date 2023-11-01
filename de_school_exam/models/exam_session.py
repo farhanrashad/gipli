@@ -107,5 +107,4 @@ class ExamSession(models.Model):
         }
         return action
 
-    def button_open_result(self):
-        pass
+    

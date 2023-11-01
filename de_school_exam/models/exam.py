@@ -160,3 +160,19 @@ class Exam(models.Model):
         }
         return action
     
+    def button_open_result(self):
+        context = {
+            'default_exam_id': self.id,
+            'exam_id': self.id,
+            'create': False,
+            'delete': False,
+        }
+        action = {
+            'name': 'Exam Result',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'oe.exam.result',
+            'type': 'ir.actions.act_window',
+            'context': context,
+        }
+        return action

@@ -25,6 +25,10 @@
                     <header>
                         <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
                         <button name="button_schedule" states="draft" string="Schedule Exam" type="object" class="oe_highlight" data-hotkey="o" />
+
+                        <button name="button_open_result" states="prepare,done" string="Open Result" type="object" class="oe_highlight" data-hotkey="o" />
+
+                        
                         <button name="button_close" type="object" string="Close Exam" states="schedule" class="oe_highlight" data-hotkey="l"/>
                         <button name="button_prepare_result" type="object" string="Prepare Result" states="complete" class="oe_highlight" data-hotkey="l"/>
                         <button name="button_complete_result" type="object" string="Result Completed" states="prepare" class="oe_highlight" data-hotkey="l"/>
