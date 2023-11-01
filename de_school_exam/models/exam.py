@@ -6,7 +6,10 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
-        
+
+from lxml import etree
+import xml.etree.ElementTree as ET
+
 class Exam(models.Model):
     _name = 'oe.exam'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
@@ -159,14 +162,23 @@ class Exam(models.Model):
             'context': context,
         }
         return action
-    
+
     def button_open_result(self):
+        
+        view_id = self.env['ir.ui.view'].search([('name','=','dynamic_extend_result_tree_view')])
+        if view_id:
+            view_id.unlink()
+            
+        if self.batch_id.enable_credit_points:
+            self.open_dynamic_tree_view()
+        
         context = {
             'default_exam_id': self.id,
             'exam_id': self.id,
             'create': False,
             'delete': False,
         }
+    
         action = {
             'name': 'Exam Result',
             'view_type': 'form',
@@ -176,3 +188,18 @@ class Exam(models.Model):
             'context': context,
         }
         return action
+
+    def open_dynamic_tree_view(self):    
+        tree_view_id = self.env['ir.ui.view'].create({
+            'name': 'dynamic_extend_result_tree_view',
+            'model': 'oe.exam.result',
+            'type': 'tree',
+            'inherit_id': self.env.ref('de_school_exam.exam_result_tree_view').id,
+            'arch': """
+                <data>
+                    <field name="marks" position="after">
+                        <field name="credit_points" />
+                    </field>
+                </data>
+            """
+        })

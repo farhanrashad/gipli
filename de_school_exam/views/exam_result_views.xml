@@ -11,7 +11,24 @@
                     <field name="student_id" options="{'no_open':True,'no_create':True}"/>
                     <field name="roll_no" />
                     <field name="admission_no" />
-                    
+                    <field name="batch_id"/>
+					<field name="subject_id"/>
+                    <field name="attendance_status" />
+                    <field name="marks" />
+				</tree>
+			</field>
+		</record>
+
+        <!--
+        <record id="exam_result_grade_tree_view" model="ir.ui.view">
+			<field name="name">exam.result.grade.tree.view</field>
+			<field name="model">oe.exam.result</field>
+			<field name="arch" type="xml">
+				<tree string="Exam" editable="bottom">
+                    <field name="exam_id" options="{'no_open':True,'no_create':True}"/>
+                    <field name="student_id" options="{'no_open':True,'no_create':True}"/>
+                    <field name="roll_no" />
+                    <field name="admission_no" />
                     <field name="batch_id"/>
 					<field name="subject_id"/>
                     <field name="attendance_status" />
@@ -20,7 +37,7 @@
 				</tree>
 			</field>
 		</record>
-
+-->
         <record id="exam_result_form_view" model="ir.ui.view">
             <field name="name">exam.result.form.view</field>
             <field name="model">oe.exam.result</field>
@@ -74,13 +91,34 @@
             <field name="res_model">oe.exam.result</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="exam_result_search_view"/>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('exam_result_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('exam_result_form_view')}),
+            ]"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a new Exam Result
                 </p>
             </field>
         </record>
-        
+
+        <!--
+        <record id="action_exam_result_grade" model="ir.actions.act_window">
+            <field name="name">Exam Result</field>
+            <field name="res_model">oe.exam.result</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="exam_result_search_view"/>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('exam_result_grade_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('exam_result_form_view')}),
+            ]"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new Exam Result with grade
+                </p>
+            </field>
+        </record>
+        -->
         <menuitem name="Exam Results" id="menu_exam_main_exam_results"
             parent="menu_exam_main" 
             action="action_exam_result"

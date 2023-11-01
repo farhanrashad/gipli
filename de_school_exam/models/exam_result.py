@@ -49,6 +49,7 @@ class ExamResult(models.Model):
     ], string='Attendance Type', default='present', required=True)
     seat_no = fields.Char('Seat No')
     marks = fields.Float(string='Obtained Marks', required=True, states=READONLY_STATES,)
+    credit_points = fields.Float(string='Credit Points')
     exam_grade_line_id = fields.Many2one('oe.exam.grade.line', string='Exam Grade', compute='_compute_exam_grade')
     
     company_id = fields.Many2one(
