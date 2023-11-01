@@ -167,7 +167,7 @@
     
     <menuitem 
         id="menu_library_circulation_main_agreement" 
-        name="Contracts" 
+        name="Agreements" 
         parent="menu_library_circulation_main" 
         sequence="1" 
         action="action_circulation_agreement"
