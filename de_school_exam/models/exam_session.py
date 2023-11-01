@@ -5,7 +5,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class ExamSession(models.Model):
@@ -25,7 +25,7 @@ class ExamSession(models.Model):
     marks_max = fields.Float(string='Maximum Marks', required=True, states=READONLY_STATES,)
     course_id = fields.Many2one(
         comodel_name='oe.school.course',
-        string="Course",
+        string="Course", required=True,
         change_default=True, ondelete='restrict', states=READONLY_STATES,)
     exam_type_id = fields.Many2one('oe.exam.type', string='Exam Type', required=True, states=READONLY_STATES,)
     company_id = fields.Many2one(
@@ -45,6 +45,21 @@ class ExamSession(models.Model):
 
     exam_line = fields.One2many('oe.exam', 'exam_session_id', string='Exams', states=READONLY_STATES,)
     exam_count = fields.Integer('Exam Count', compute='_compute_exam')
+
+    # Constraints
+    @api.constrains('state')
+    def _check_state(self):
+        for record in self:
+            if record.state != 'cancel':
+                # Check the uniqueness constraint when the state is not 'cancel'
+                if self.env['oe.exam.session'].search([
+                    ('course_id', '=', record.course_id.id),
+                    ('exam_type_id', '=', record.exam_type_id.id),
+                    ('state', '!=', 'cancel'),
+                    ('id', '!=', record.id),
+                ]):
+                    raise ValidationError("Exam Session arleady started for this course!")
+
 
     # Compute Methods
     def _compute_exam(self):
@@ -91,3 +106,6 @@ class ExamSession(models.Model):
             #'domain': [('admission_register_id','=',self.id),('type','=','opportunity')]
         }
         return action
+
+    def button_open_result(self):
+        pass

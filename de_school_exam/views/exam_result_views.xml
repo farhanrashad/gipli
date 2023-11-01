@@ -58,7 +58,13 @@
             <field name="model">oe.exam.result</field>
             <field name="arch" type="xml">
                 <search string="Exam">
-                    <field name="batch_id" string="Exam Reference"/>
+                    <field name="student_id" />
+                    <field name="seat_no" />
+                    <group expand="0" string="Group By">
+                        <filter string="Subject" name="group_subject" domain="[]" context="{'group_by': 'subject_id'}"/>
+                        <filter name="Batch" string="group_batch" domain="[]" context="{'group_by': 'batch_id'}"/>
+                        <filter string="attendance_status" name="group_state" domain="[]" context="{'group_by': 'attendance_status'}"/>
+                    </group>
                 </search>
              </field>
         </record>

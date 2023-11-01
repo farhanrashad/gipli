@@ -8,6 +8,8 @@
 			<field name="arch" type="xml">
 				<tree string="Exam Session" >
 					<field name="name"/>
+                    <field name="exam_type_id" />
+                    <field name="state" />
 				</tree>
 			</field>
 		</record>
@@ -21,6 +23,9 @@
                     <header>
                         <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
                         <button name="button_open" states="draft" string="Start Exam Session" type="object" class="oe_highlight" data-hotkey="o" />
+                        
+                        <button name="button_open_result" states="progress,close" string="Open Result" type="object" class="oe_highlight" data-hotkey="o" />
+
                         <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
                         <button name="button_close" type="object" string="Close Session" states="progress" class="oe_highlight" data-hotkey="l"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,progress,close" readonly="1"/>
@@ -71,6 +76,14 @@
             <field name="arch" type="xml">
                 <search string="Exam Session">
                     <field name="name" string="Exam Session"/>
+                    <field name="course_id" />
+                    <field name="state" />
+                    <filter string="Open" domain="[('state', '=', 'progress')]" name="open_exam_filter"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Course" name="group_course" domain="[]" context="{'group_by': 'course_id'}"/>
+                        <filter name="Exam Type" string="group_examtype" domain="[]" context="{'group_by': 'exam_type_id'}"/>
+                        <filter string="State" name="group_state" domain="[]" context="{'group_by': 'state'}"/>
+                    </group>
                 </search>
              </field>
         </record>

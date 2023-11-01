@@ -81,7 +81,17 @@
             <field name="model">oe.exam</field>
             <field name="arch" type="xml">
                 <search string="Exam">
+                    <field name="subject_id" />
                     <field name="batch_id" string="Exam Reference"/>
+                    <filter string="Scheduled" domain="[('state', '=', 'schedule')]" name="schedule_exam_filter"/>
+                    <filter string="Awaiting Result" domain="[('state', 'in', ['complete','prepare'])]" name="awaiting_result_filter"/>
+                    <filter string="Result Updated" domain="[('state', 'in', ['done'])]" name="result_updated_filter"/>
+
+                    <group expand="0" string="Group By">
+                        <filter string="Subject" name="group_subject" domain="[]" context="{'group_by': 'subject_id'}"/>
+                        <filter name="Batch" string="group_batch" domain="[]" context="{'group_by': 'batch_id'}"/>
+                        <filter string="State" name="group_state" domain="[]" context="{'group_by': 'state'}"/>
+                    </group>
                 </search>
              </field>
         </record>
