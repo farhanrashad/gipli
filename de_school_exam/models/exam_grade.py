@@ -9,7 +9,6 @@ class ExamGrade(models.Model):
     _order = "name asc"
 
     name = fields.Char(string='Name', required=True)
-    enable_score = fields.Boolean('Enable Min Score (%)')
     enable_credit_points = fields.Boolean('Enable Credit Points')
 
     exam_grade_line = fields.One2many('oe.exam.grade.line', 'exam_grade_id', string='Exam Grade Lines')

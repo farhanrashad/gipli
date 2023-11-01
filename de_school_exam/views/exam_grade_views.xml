@@ -27,7 +27,6 @@
                         </div>
                         <group>
                             <group>
-                                <field name="enable_score" />
                                 <field name="enable_credit_points" />
                             </group>
                         </group>
@@ -37,7 +36,7 @@
                                     <tree editable="bottom">
                                         <field name="exam_grade_id" invisible="1"/>
                                         <field name="name"/>
-                                        <field name="score_min" attrs="{'column_invisible':[('parent.enable_score','!=',True)],'required':[('parent.enable_score','=',True)]}"/>
+                                        <field name="score_min" />
                                         <field name="credit_points" attrs="{'column_invisible':[('parent.enable_credit_points','!=',True)],'required':[('parent.enable_credit_points','=',True)]}"/>
 
                                     </tree>
