@@ -306,7 +306,8 @@ class HrLoan(models.Model):
             prv_loan_id = self.env['hr.loan'].search([('employee_id','=',loan.employee_id.id),('state','not in',['draft','verify']),('id','!=',loan.id),('loan_type_id','=',loan.loan_type_id.id)],order='date_end desc',limit=1)
             if loan.loan_type_id.loan_frequency == 'monthly':
                 if (prv_loan_id.date_end + relativedelta(months=1)) > fields.Date.today():
-                    raise ValidationError(_('You are eligible to submit your next loan application on the date of %s') % (prv_loan_id.date_end + relativedelta(months=1)))
+                    if prv_loan_id:
+                        raise ValidationError(_('You are eligible to submit your next loan application on the date of %s') % (prv_loan_id.date_end + relativedelta(months=1)))
             elif loan.loan_type_id.loan_frequency == 'quarterly':
                 if (prv_loan_id.date_end + relativedelta(months=3)) > fields.Date.today():
                     raise ValidationError(_('You are eligible to submit your next loan application on the date of %s') % (prv_loan_id.date_end + relativedelta(months=3)))
@@ -490,7 +491,7 @@ class HrLoan(models.Model):
         
     def _get_responsible_for_approval(self):
         self.ensure_one()
-        responsible = self.employee_id.parent_id
+        responsible = self.employee_id.parent_id.user_id
         return responsible
         
     def activity_update(self):
