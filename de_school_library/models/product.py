@@ -29,6 +29,7 @@ class ProductTemplate(models.Model):
         string="Author",
         change_default=True, ondelete='restrict')
     date_publish = fields.Date('Publication Date')
+    product_fees_ids = fields.One2many('oe.library.product.fees', 'product_template_id', string="Library Fees", auto_join=True, copy=True)
 
     
     

@@ -7,6 +7,8 @@
             <field name="arch" type="xml">
                 <form string="Expense Categories">
                     <sheet>
+                        <field name="is_book" invisible="1" />
+                        
                         <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                         <field name='product_variant_count' invisible='1'/>
                         <field name="id" invisible="True"/>
@@ -52,6 +54,27 @@
                         <notebook>
                             <page string="Internal Note" name="internal_note">
                                 <field name="description" placeholder="This note will be shown to users when they select this expense product."/>
+                            </page>
+                            <page string="Library Fees" name="library_fees" attrs="{'invisible': [('is_book','=',False)]}">
+                              <group>
+                                <group name="pricing">
+                                    <field name="product_fees_ids" nolabel="1" colspan="2">
+                                      <tree editable="bottom">
+                                        <control>
+                                            <create name="add_product_pricing" string="Add a price"/>
+                                        </control>
+                                        <field name="product_variant_ids" widget="many2many_tags"
+                                          groups="product.group_product_variant"
+                                          domain="[('product_tmpl_id', '=', parent.id)]"
+                                          attrs="{'column_invisible': [('parent.product_variant_count', '&lt;', 2)]}"/>
+                                        <field name="recurrence_id" string="Period"/>
+                                        <field name="pricelist_id" groups="product.group_product_pricelist"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="price"/>
+                                      </tree>
+                                    </field>
+                                </group>
+                              </group>
                             </page>
                         </notebook>
                     </sheet>
