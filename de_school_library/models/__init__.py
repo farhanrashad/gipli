@@ -5,4 +5,4 @@ from . import res_partner
 from . import product
 from . import sale_order
 from . import product_pricing
-from . import fees_recurrence
+from . import fee_period

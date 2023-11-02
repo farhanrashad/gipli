@@ -128,8 +128,7 @@
                     <separator/>
                     <filter string="Library Officer" name="user_id" domain="[]" context="{'group_by': 'user_id'}"/>
                     <separator/>
-                    <filter string="Student" name="groupby_student" domain="[]" context="{'group_by': 'partner_id'}"/>
-                    <filter string="Course" name="groupby_course" domain="[]" context="{'group_by': 'course_id'}"/>
+                    <filter string="Patron" name="groupby_patron" domain="[]" context="{'group_by': 'partner_id'}"/>
                 </group>
                 <searchpanel>
                     <field name="borrow_status" icon="fa-retweet" enable_counters="1"/>

@@ -19,17 +19,17 @@
           <field name="name">Litrature</field>
         </record>
 
-        <record id="recurrence_daily" model="oe.library.fees.recurrence">
+        <record id="recurrence_daily" model="oe.library.fees.period">
             <field name="name">Daily</field>
             <field name="duration">1</field>
             <field name="unit">day</field>
         </record>
-        <record id="recurrence_weekly" model="oe.library.fees.recurrence">
+        <record id="recurrence_weekly" model="oe.library.fees.period">
             <field name="name">Weekly</field>
             <field name="duration">1</field>
             <field name="unit">week</field>
         </record>
-        <record id="recurrence_monthly" model="oe.library.fees.recurrence">
+        <record id="recurrence_monthly" model="oe.library.fees.period">
             <field name="name">Monthly</field>
             <field name="duration">1</field>
             <field name="unit">month</field>

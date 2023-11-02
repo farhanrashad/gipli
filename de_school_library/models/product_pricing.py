@@ -25,11 +25,11 @@ class ProductLibraryFees(models.Model):
     """ Library Fees """
     _name = 'oe.library.product.fees'
     _description = 'Library Pricing'
-    _order = 'product_template_id,price,pricelist_id,recurrence_id'
+    _order = 'product_template_id,price,pricelist_id,library_fee_period_id'
 
     name = fields.Char(compute='_compute_name')
     description = fields.Char(compute='_compute_description')
-    recurrence_id = fields.Many2one('oe.library.fees.recurrence', string='Recurrency', required=True)
+    library_fee_period_id = fields.Many2one('oe.library.fees.period', string='Recurrency', required=True)
     price = fields.Monetary(string="Price", required=True, default=1.0)
     currency_id = fields.Many2one('res.currency', 'Currency', compute='_compute_currency_id', store=True)
     product_template_id = fields.Many2one('product.template', string="Product Templates", ondelete='cascade',
@@ -52,7 +52,7 @@ class ProductLibraryFees(models.Model):
                 description += format_amount(self.env, amount=pricing.price, currency=pricing.currency_id)
             else:
                 description += format_amount(self.env, amount=pricing.price, currency=pricing.currency_id)
-            description += _("/%s", pricing.recurrence_id.unit)
+            description += _("/%s", pricing.library_fee_period_id.unit)
             pricing.description = description
 
 

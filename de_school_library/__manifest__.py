@@ -29,6 +29,7 @@
         'data/library_data.xml',
         'views/library_menu.xml',
         'views/genre_views.xml',
+        'views/fee_periods_views.xml',
         'views/product_views.xml',
         'views/res_partner_views.xml',
         'views/publisher_views.xml',

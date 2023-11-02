@@ -6,9 +6,9 @@ from odoo.tools import get_timedelta
 from odoo.tools import float_compare, float_is_zero
 
 
-class FeeRecurrence(models.Model):
-    _name = 'oe.library.fees.recurrence'
-    _description = 'Sale temporal Recurrence'
+class FeePeriod(models.Model):
+    _name = 'oe.library.fees.period'
+    _description = 'Fee Period'
     _order = 'unit,duration'
 
     active = fields.Boolean(default=True)
