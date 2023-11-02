@@ -113,9 +113,15 @@
                 <separator/>
                 <filter string="Circulation Agreement" domain="[('is_borrow_order', '=', True)]" name="from_circulation_agreement"/>
                 <separator/>
+                    <filter name="filter_today" string="To Do Today"
+                    domain="[('next_action_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),
+                            ('next_action_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
+                    <filter string="Late" name="late_circulation_agreements"
+                    domain="[('borrow_status', 'in', ['issue', 'return']), ('next_action_date', '&lt;', (datetime.datetime.now() + relativedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <separator/>
                 <filter string="Reserved" domain="[('borrow_status', 'in', ['reserve'])]" name="reserve_agreement"/>
-                <filter string="Issued" domain="[('borrow_status', 'in', ['issue'])]" name="issued_agreement"/>
-                <filter string="Returned" domain="[('borrow_status', 'in', ['return'])]" name="returned_agreement"/>
+                <filter string="Issued" domain="[('borrow_status', 'in', ['issue'])]" name="filter_to_issue"/>
+                <filter string="Returned" domain="[('borrow_status', 'in', ['return'])]" name="filter_to_return"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Status" name="groupby_status" context="{'group_by': 'borrow_status'}"/>
@@ -143,9 +149,10 @@
         <field name="context">{'default_is_borrow_order': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create a new circulation agreement!
+                Create a new request, the first step of a new circulation agreement!
             </p><p>
-                The circulation agreement will use to issue and return books to patron. 
+                Once the request is confirmed, it becomes a circulation agreement.
+You will be able to issue and return books to patron.
             </p>
         </field>
     </record>
@@ -173,4 +180,94 @@
         action="action_circulation_agreement"
     />
 
+    <!-- Issue agreement -->
+    <menuitem 
+        id="menu_library_circulation_main_agreement_todo_today" 
+        name="To Do Today" 
+        parent="menu_library_circulation_main" 
+        sequence="20" 
+    />
+    
+    <record id="action_circulation_agreement_issue" model="ir.actions.act_window">
+        <field name="name">Circulation Agreement</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="circulation_agreement_search_view"/>
+        <field name="domain">[('is_borrow_order', '=', True)]</field>
+        <field name="context">{'default_is_borrow_order': 1,'search_default_filter_today': 1,'search_default_filter_to_issue':1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                There isn't any scheduled issue or return.
+            </p><p>
+                You can search on a larger period using the filters here above
+or create a new circulation agreement.
+            </p>
+        </field>
+    </record>
+
+    
+    <record id="circulation_agreement_issue_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="circulation_agreement_form_view"/>
+        <field name="act_window_id" ref="action_circulation_agreement_issue"/>
+    </record>
+    
+    <record id="circulation_agreement_issue_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="circulation_agreement_tree_view"/>
+        <field name="act_window_id" ref="action_circulation_agreement_issue"/>
+    </record>
+    
+    <menuitem 
+        id="menu_library_circulation_main_agreement_issue" 
+        name="Issue" 
+        parent="menu_library_circulation_main_agreement_todo_today" 
+        sequence="1" 
+        action="action_circulation_agreement_issue"
+    />
+    
+    <!-- Return Agreement -->
+    <record id="action_circulation_agreement_return" model="ir.actions.act_window">
+        <field name="name">Circulation Agreement</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="circulation_agreement_search_view"/>
+        <field name="domain">[('is_borrow_order', '=', True)]</field>
+        <field name="context">{'default_is_borrow_order': 1,'search_default_filter_today': 1,'search_default_filter_to_return':1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                There isn't any scheduled issue or return.
+            </p><p>
+                You can search on a larger period using the filters here above
+or create a new circulation agreement.
+            </p>
+        </field>
+    </record>
+
+    
+    <record id="circulation_agreement_return_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="circulation_agreement_form_view"/>
+        <field name="act_window_id" ref="action_circulation_agreement_return"/>
+    </record>
+    
+    <record id="circulation_agreement_return_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="circulation_agreement_tree_view"/>
+        <field name="act_window_id" ref="action_circulation_agreement_return"/>
+    </record>
+    
+    <menuitem 
+        id="menu_library_circulation_main_agreement_return" 
+        name="Return" 
+        parent="menu_library_circulation_main_agreement_todo_today" 
+        sequence="1" 
+        action="action_circulation_agreement_return"
+    />
 </odoo>
