@@ -40,8 +40,9 @@
         'views/agreement_views.xml',
         'wizards/fee_configurator_views.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'assets': {
+        'web.assets_backend': [
+            'sale_renting/static/src/**/*',
+        ],
+    },
 }
