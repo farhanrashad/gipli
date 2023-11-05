@@ -38,6 +38,7 @@
         'views/student_views.xml',
         'views/teacher_views.xml',
         'views/agreement_views.xml',
+        'wizards/fee_configurator_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
