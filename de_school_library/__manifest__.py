@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['de_school','sale','stock'],
+    'depends': ['de_school','sale','stock','web'],
 
     # always loaded
     'data': [
@@ -41,8 +41,9 @@
         'wizards/fee_configurator_views.xml',
     ],
     'assets': {
-        'web.assets_backend': [
-            'sale_renting/static/src/**/*',
-        ],
+       'web.assets_backend': [
+           'de_school_library/static/src/js/library_fee_config_wizard.js',
+           'de_school_library/static/src/**/*',
+       ],
     },
 }

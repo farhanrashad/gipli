@@ -38,7 +38,10 @@
                       'is_book': True,
                   }
             </attribute>
+              <!--
             <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]</attribute>
+              -->
+              <attribute name="domain">[('is_book', '=', True)]</attribute>
             <attribute name="options">{
               'no_open': True,
             }</attribute>
@@ -58,7 +61,11 @@
             <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id), ('is_book', '=', True)]</attribute>
           </xpath>
           <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position='attributes'>
+              <!--
             <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id), ('is_book', '=', True)]</attribute>
+              -->
+            <attribute name="domain">[('is_book', '=', True)]</attribute>
+
           </xpath>
 
         <xpath expr="//field[@name='order_line']//form//field[@name='product_uom_qty']" position='after'>
