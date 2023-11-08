@@ -45,6 +45,36 @@ class ProductLibraryFees(models.Model):
             if not record.name:
                 record.name = 'hello' #_("%s %s", record.duration, record.unit)
 
+    @api.depends_context('lang')
+    @api.depends('library_fee_period_id')
+    def _compute_name(self):
+        for pricing in self:
+            # TODO in master: use pricing.recurrence_id.duration_display
+            pricing.name = _(
+                "%s %s",
+                pricing.library_fee_period_id.duration,
+                pricing._get_unit_label(pricing.library_fee_period_id.duration))
+
+    def _get_unit_label(self, duration):
+        """ Get the translated product pricing unit label. """
+        # TODO in master: remove in favor of env['sale.temporal.recurrence']_get_unit_label
+        if duration is None:
+            return ""
+        if float_compare(duration, 1.0, precision_digits=2) < 1\
+           and not float_is_zero(duration, precision_digits=2):
+            singular_labels = {
+                'hour': _lt("Hour"),
+                'day': _lt("Day"),
+                'week': _lt("Week"),
+                'month': _lt("Month"),
+                'year': _lt("Year"),
+            }
+            if self.library_fee_period_id.unit in singular_labels:
+                return singular_labels[self.library_fee_period_id.unit]
+        return dict(
+            self.env['oe.library.fees.period']._fields['unit']._description_selection(self.env)
+        )[self.library_fee_period_id.unit]
+    
     def _compute_description(self):
         for pricing in self:
             description = ""
@@ -54,5 +84,19 @@ class ProductLibraryFees(models.Model):
                 description += format_amount(self.env, amount=pricing.price, currency=pricing.currency_id)
             description += _("/%s", pricing.library_fee_period_id.unit)
             pricing.description = description
+
+    @api.model
+    def _compute_duration_vals(self, start_date, end_date):
+        duration = end_date - start_date
+        vals = dict(hour=(duration.days * 24 + duration.seconds / 3600))
+        vals['day'] = math.ceil(vals['hour'] / 24)
+        vals['week'] = math.ceil(vals['day'] / 7)
+        duration_diff = relativedelta(end_date, start_date)
+        months = 1 if duration_diff.days or duration_diff.hours or duration_diff.minutes else 0
+        months += duration_diff.months
+        months += duration_diff.years * 12
+        vals['month'] = months
+        vals['year'] = months/12
+        return vals
 
 
