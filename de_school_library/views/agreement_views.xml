@@ -75,6 +75,8 @@
         <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
             <field name="invoice_lines" widget="many2many_tags" optional="hide"/>
             <field name="invoice_status" optional="hide"/>
+            <button name="rent_product" type="object" string="Rent Product" class="btn-primary" />
+
         </xpath>
             
             <xpath expr="//page[@name='customer_signature']" position="attributes">
@@ -121,10 +123,10 @@
                 <filter string="Circulation Agreement" domain="[('is_borrow_order', '=', True)]" name="from_circulation_agreement"/>
                 <separator/>
                     <filter name="filter_today" string="To Do Today"
-                    domain="[('next_action_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),
-                            ('next_action_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
+                    domain="[('borrow_next_action_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),
+                            ('borrow_next_action_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
                     <filter string="Late" name="late_circulation_agreements"
-                    domain="[('borrow_status', 'in', ['issue', 'return']), ('next_action_date', '&lt;', (datetime.datetime.now() + relativedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                    domain="[('borrow_status', 'in', ['issue', 'return']), ('borrow_next_action_date', '&lt;', (datetime.datetime.now() + relativedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <separator/>
                 <filter string="Reserved" domain="[('borrow_status', 'in', ['reserve'])]" name="reserve_agreement"/>
                 <filter string="Issued" domain="[('borrow_status', 'in', ['issue'])]" name="filter_to_issue"/>

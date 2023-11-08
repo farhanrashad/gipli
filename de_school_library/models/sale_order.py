@@ -20,7 +20,7 @@ class CirculationAgreement(models.Model):
         ('cancel', 'Cancelled'), 
     ], string="Borrow Status", default='draft', store=True, tracking=True, index=True,)
 
-    next_action_date = fields.Datetime(
+    borrow_next_action_date = fields.Datetime(
         string="Next Action", compute='_compute_next_action_date', store=True)
 
     #has_pickable_lines = fields.Boolean(compute="_compute_rental_status", store=True)
@@ -38,10 +38,10 @@ class CirculationAgreement(models.Model):
                 min_return_date = min(returnable_lines.mapped('return_date')) if returnable_lines else 0
                 if min_pickup_date and pickeable_lines and (not returnable_lines or min_pickup_date <= min_return_date):
                     order.borrow_status = 'pickup'
-                    order.next_action_date = min_pickup_date
+                    order.borrow_next_action_date = min_pickup_date
                 elif returnable_lines:
                     order.borrow_status = 'return'
-                    order.next_action_date = min_return_date
+                    order.borrow_next_action_date = min_return_date
                 else:
                     order.borrow_status = 'return'
                     order.next_action_date = False
@@ -51,12 +51,14 @@ class CirculationAgreement(models.Model):
                 #order.has_pickable_lines = False
                 #order.has_returnable_lines = False
                 #order.rental_status = order.state if order.is_borrow_order else False
-                order.next_action_date = False
+                order.borrow_next_action_date = False
     
-    @api.depends('is_borrow_order', 'next_action_date', 'rental_status')
+    @api.depends('is_borrow_order', 'borrow_next_action_date', 'rental_status')
     def _compute_has_late_lines(self):
         for order in self:
             order.has_late_lines = (
                 order.is_borrow_order
                 and order.rental_status in ['pickup', 'return']  # has_pickable_lines or has_returnable_lines
-                and order.next_action_date and order.next_action_date < fields.Datetime.now())
+                and order.borrow_next_action_date and order.borrow_next_action_date < fields.Datetime.now())
+
+    

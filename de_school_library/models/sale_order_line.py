@@ -12,4 +12,18 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     is_borrow_order = fields.Boolean(related='order_id.is_borrow_order')
-    is_product_rentable = fields.Boolean(related='product_id.is_book', depends=['product_id'])
+    is_product_book = fields.Boolean(related='product_id.is_book', depends=['product_id'])
+
+    def rent_product(self):
+        action = {
+            'name': _('Rent a Product'),
+            'res_model': 'oe.library.fee.config.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'sale.order.line',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
+        return action

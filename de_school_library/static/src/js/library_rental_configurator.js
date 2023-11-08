@@ -1,19 +1,15 @@
-odoo.define('de_school_library.library_fee_config_wizard', function (require) {
+odoo.define('de_school_library.sale_order_line_wizard', function (require) {
     "use strict";
 
-    var core = require('web.core');
-    var _t = core._t;
+    var ListRenderer = require('web.ListRenderer');
     var Dialog = require('web.Dialog');
-    var rpc = require('web.rpc');
-    var ListRenderer = require('web.ListRenderer'); // Import the ListRenderer
 
     ListRenderer.include({
         _renderRow: function (record, options) {
             var $row = this._super.apply(this, arguments);
 
-            // Check if the record is a sale order line
             if (record.model === 'sale.order.line') {
-                var productField = $row.find('.o_sol_product_many2one input');
+                var productField = $row.find('.o_sol_product_many2one_cell input');
                 productField.on('change', this, this._onProductChange.bind(this, record));
             }
 
@@ -24,22 +20,22 @@ odoo.define('de_school_library.library_fee_config_wizard', function (require) {
             var product_id = ev.currentTarget.value;
 
             if (product_id) {
-                // Customize the wizard title and message
-                var wizardTitle = _t("Your Wizard Title");
-                var wizardMessage = _t("Your Wizard Message");
+                // Customize the wizard title and message for your module
+                var wizardTitle = "Your Wizard Title";
+                var wizardMessage = "Your Wizard Message";
 
                 var dialog = new Dialog(this, {
                     title: wizardTitle,
-                    size: 'medium', // You can adjust the size as needed
+                    size: 'medium',
                     $content: $('<div>').text(wizardMessage),
                     buttons: [{
-                        text: _t("Ok"),
+                        text: "Ok",
                         classes: 'btn-primary',
                         click: function () {
                             dialog.close();
                         },
                     }, {
-                        text: _t("Cancel"),
+                        text: "Cancel",
                         close: true,
                     }],
                 });

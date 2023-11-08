@@ -40,9 +40,13 @@
         'views/agreement_views.xml',
         'wizards/fee_configurator_views.xml',
     ],
+    'js': [
+        'de_school_library/static/src/js/library_fee_config_wizard.js',
+    ],
     'assets': {
        'web.assets_backend': [
-           'de_school_library/static/src/js/library_fee_config_wizard.js',
+           #'de_school_library/static/src/js/library_fee_config_wizard.js',
+           #'de_school_library/static/src/js/library_fee_config_wizard.js',
            'de_school_library/static/src/**/*',
        ],
     },
