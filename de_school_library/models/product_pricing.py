@@ -99,4 +99,20 @@ class ProductLibraryFees(models.Model):
         vals['year'] = months/12
         return vals
 
+    def _compute_price(self, duration, unit):
+        """Compute the price for a specified duration of the current pricing rule.
+        :param float duration: duration in hours
+        :param str unit: duration unit (hour, day, week)
+        :return float: price
+        """
+        self.ensure_one()
+        if duration <= 0 or self.library_fee_period_id.duration <= 0:
+            return self.price
+        if unit != self.library_fee_period_id.unit:
+            converted_duration = math.ceil((duration * PERIOD_RATIO[unit]) / (self.library_fee_period_id.duration * PERIOD_RATIO[self.library_fee_period_id.unit]))
+        else:
+            converted_duration = math.ceil(duration / self.library_fee_period_id.duration)
+        return self.price * converted_duration
+
+
 

@@ -22,6 +22,7 @@ class SaleOrderLine(models.Model):
             'context': {
                 'active_model': 'sale.order.line',
                 'active_ids': self.ids,
+                'active_id': self.id,
             },
             'target': 'new',
             'type': 'ir.actions.act_window',

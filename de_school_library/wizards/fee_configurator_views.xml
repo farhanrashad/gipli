@@ -42,6 +42,9 @@
                                 <field name="unit_price"/>
                                 <field name="currency_id" invisible="1"/>
                             </div>
+
+                            <field name="order_line_id" readonly="1" />
+                            <field name="pricelist_id" readonly="1" />
                         </group>
                     </group>
                     <notebook name="debug" groups="base.group_no_one" invisible="1">
