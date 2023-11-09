@@ -46,7 +46,7 @@ class ProductTemplate(models.Model):
         """
         self.ensure_one()
         best_pricing_rule = self.env['oe.library.product.fees']
-        if not self.product_pricing_ids:
+        if not self.product_fees_ids:
             return best_pricing_rule
         # Two possibilities: start_date and end_date are provided or the duration with its unit.
         pricelist = kwargs.get('pricelist', self.env['product.pricelist'])
@@ -64,7 +64,7 @@ class ProductTemplate(models.Model):
             if duration and unit:
                 price = pricing._compute_price(duration, unit)
             else:
-                price = pricing._compute_price(duration_dict[pricing.recurrence_id.unit], pricing.recurrence_id.unit)
+                price = pricing._compute_price(duration_dict[pricing.library_fee_period_id.unit], pricing.library_fee_period_id.unit)
             if pricing.currency_id != currency:
                 price = pricing.currency_id._convert(
                     from_amount=price,

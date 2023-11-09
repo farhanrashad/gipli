@@ -63,7 +63,7 @@ class LibraryFeeWizard(models.TransientModel):
         record_id = self.env[active_model].search([('id','=',active_id)])
         
         res['order_line_id'] = self._context.get('active_id')
-        res['pricelist_id'] = record_id.order_id.pricelist_id.id
+        #res['pricelist_id'] = record_id.order_id.pricelist_id.id
         res['product_id'] = record_id.product_id.id
         res['uom_id'] = record_id.product_uom.id
         
@@ -87,8 +87,8 @@ class LibraryFeeWizard(models.TransientModel):
                 duration_dict = self.env['oe.library.product.fees']._compute_duration_vals(wizard.pickup_date, wizard.return_date)
                 if wizard.pricing_id:
                     values = {
-                        'duration_unit': wizard.pricing_id.recurrence_id.unit,
-                        'duration': duration_dict[wizard.pricing_id.recurrence_id.unit]
+                        'duration_unit': wizard.pricing_id.library_fee_period_id.unit,
+                        'duration': duration_dict[wizard.pricing_id.library_fee_period_id.unit]
                     }
                 else:
                     values = {

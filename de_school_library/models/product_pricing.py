@@ -114,5 +114,41 @@ class ProductLibraryFees(models.Model):
             converted_duration = math.ceil(duration / self.library_fee_period_id.duration)
         return self.price * converted_duration
 
+    def _applies_to(self, product):
+        """ Check whether current pricing applies to given product.
+        :param product.product product:
+        :return: true if current pricing is applicable for given product, else otherwise.
+        """
+        self.ensure_one()
+        return (
+            self.product_template_id == product.product_tmpl_id
+            and (
+                not self.product_variant_ids
+                or product in self.product_variant_ids))
+        
+    @api.model
+    def _get_suitable_pricings(self, product, pricelist=None, first=False):
+        """ Get the suitable pricings for given product and pricelist.
+
+        Note: model method
+        """
+        is_product_template = product._name == "product.template"
+        available_pricings = self.env['oe.library.product.fees']
+        if pricelist:
+            for pricing in product.product_fees_ids:
+                if pricing.pricelist_id == pricelist\
+                   and (is_product_template or pricing._applies_to(product)):
+                    if first:
+                        return pricing
+                    available_pricings |= pricing
+
+        for pricing in product.product_fees_ids:
+            if not pricing.pricelist_id and (is_product_template or pricing._applies_to(product)):
+                if first:
+                    return pricing
+                available_pricings |= pricing
+
+        return available_pricings
+
 
 
