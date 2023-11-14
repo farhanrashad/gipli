@@ -75,7 +75,7 @@
         <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
             <field name="invoice_lines" widget="many2many_tags" optional="hide"/>
             <field name="invoice_status" optional="hide"/>
-            <button name="rent_product" type="object" string="Rent Product" class="btn-primary" />
+            <button name="schedule_product" type="object" class="btn-primary" icon="fa-arrow-right"/>
 
         </xpath>
             

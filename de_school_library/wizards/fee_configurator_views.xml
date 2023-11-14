@@ -55,6 +55,7 @@
                     </notebook>
                     <footer>
                         <button string="Add" class="btn-primary" special="save" data-hotkey="v"/>
+                        <button name="action_save" string="Process" type="object" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
                     </footer>
                 </sheet>

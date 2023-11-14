@@ -175,4 +175,14 @@ class LibraryFeeWizard(models.TransientModel):
                             product_unit_price += tax_res['amount']
                 wizard.unit_price = product_unit_price
             #wizard.unit_price = 100
-    
+
+    def action_save(self):
+        active_model = self.env.context.get('active_model')
+        active_ids = self.env.context.get('active_ids', [])
+        active_id = self.env.context.get('active_id', [])
+        record_id = self.env[active_model].search([('id','=',active_id)])
+        for record in record_id:
+            record.write({
+                'price_unit': self.unit_price,
+                'product_uom_qty': self.quantity,
+            })
