@@ -68,6 +68,9 @@
 
           </xpath>
 
+            <xpath expr="//field[@name='order_line']//form//field[@name='name']" position="before">
+                <button name="schedule_product" type="object" class="btn-primary" icon="fa-calendar"/>
+            </xpath>
         <xpath expr="//field[@name='order_line']//form//field[@name='product_uom_qty']" position='after'>
             <field name="qty_invoiced" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
             <field name="qty_to_invoice" optional="hide" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
@@ -75,8 +78,7 @@
         <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
             <field name="invoice_lines" widget="many2many_tags" optional="hide"/>
             <field name="invoice_status" optional="hide"/>
-            <button name="schedule_product" type="object" class="btn-primary" icon="fa-arrow-right"/>
-
+            <button name="schedule_product" type="object" class="btn-primary" icon="fa-calendar"/>
         </xpath>
             
             <xpath expr="//page[@name='customer_signature']" position="attributes">

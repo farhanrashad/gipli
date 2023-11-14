@@ -66,7 +66,12 @@ class LibraryFeeWizard(models.TransientModel):
         #res['pricelist_id'] = record_id.order_id.pricelist_id.id
         res['product_id'] = record_id.product_id.id
         res['uom_id'] = record_id.product_uom.id
-        
+        if record_id.book_pickup_date:
+            res['pickup_date'] = record_id.book_pickup_date
+        if record_id.book_return_date:
+            res['return_date'] = record_id.book_return_date
+        if record_id.product_uom_qty > 1:
+            res['quantity'] = record_id.product_uom_qty
         return res
 
 
@@ -185,4 +190,7 @@ class LibraryFeeWizard(models.TransientModel):
             record.write({
                 'price_unit': self.unit_price,
                 'product_uom_qty': self.quantity,
+                'book_pickup_date': self.pickup_date,
+                'book_return_date': self.return_date,
+                'name': self.product_id.name + ' ' + str(self.pickup_date) + ' to ' + str(self.return_date),
             })

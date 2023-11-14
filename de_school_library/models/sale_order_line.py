@@ -14,6 +14,12 @@ class SaleOrderLine(models.Model):
     is_borrow_order = fields.Boolean(related='order_id.is_borrow_order')
     is_product_book = fields.Boolean(related='product_id.is_book', depends=['product_id'])
 
+
+    book_pickup_date = fields.Datetime(
+        string="Pickup", )
+    book_return_date = fields.Datetime(
+        string="Return", )
+    
     def schedule_product(self):
         action = {
             'name': _('Rent a Book'),
