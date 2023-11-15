@@ -75,7 +75,7 @@
         </field>
     </record>
 
-    <record id="action_rental_report" model="ir.actions.act_window">
+    <record id="action_library_report" model="ir.actions.act_window">
         <field name="name">Catalog Analysis</field>
         <field name="res_model">oe.library.report</field>
         <field name="view_mode">graph,pivot</field>
@@ -96,6 +96,15 @@
         </field>
     </record>
 
+    <menuitem 
+        id="menu_report_library" 
+        name="Catalog Analysis" 
+        parent="menu_library_menu_reports" 
+        sequence="1" 
+        action="action_library_report"
+    />
+
+    
     <record id="action_report_library" model="ir.actions.report">
         <field name="name">Pickup and Return Receipt</field>
         <field name="model">sale.order</field>
@@ -107,12 +116,6 @@
         <field name="binding_type">report</field>
     </record>
 
-    <menuitem 
-        id="menu_report_library" 
-        name="Catalog Analysis" 
-        parent="menu_library_menu_reports" 
-        sequence="1" 
-        action="action_report_library"
-    />
+    
     
 </odoo>
