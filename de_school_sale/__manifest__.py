@@ -13,7 +13,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Sale/School',
-    'version': '16.0.0.1',
+    'version': '17.0.0.1',
     'installable': True,
     'auto_install': False,
     'application': True,

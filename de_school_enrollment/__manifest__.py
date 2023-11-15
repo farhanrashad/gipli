@@ -14,7 +14,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'School',
-    'version': '16.0.0.2',
+    'version': '17.0.0.2',
     'installable': True,
     'auto_install': False,
     'application': True,
