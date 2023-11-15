@@ -17,7 +17,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Sales/Library',
-    'version': '0.1',
+    'version': '0.2',
 
     # any module necessary for this one to work correctly
     'depends': ['de_school','sale','stock','web'],
@@ -39,6 +39,7 @@
         'views/teacher_views.xml',
         'views/agreement_views.xml',
         'wizards/fee_configurator_views.xml',
+        'reports/report_library_views.xml',
     ],
     'js': [
         'de_school_library/static/src/js/library_fee_config_wizard.js',
