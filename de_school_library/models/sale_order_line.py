@@ -19,7 +19,18 @@ class SaleOrderLine(models.Model):
         string="Pickup", )
     book_return_date = fields.Datetime(
         string="Return", )
-    
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        """Clean rental related data if new product cannot be rented."""
+        if (not self.is_product_book) and self.is_borrow_order:
+            self.update({
+                'is_borrow_order': False,
+                'book_pickup_date': False,
+                'book_return_date': False,
+            })
+       
+            
     def schedule_product(self):
         action = {
             'name': _('Rent a Book'),
