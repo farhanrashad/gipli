@@ -11,6 +11,7 @@ from odoo.tools import format_datetime, format_time
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    borrow_status = fields.Selection(related='order_id.borrow_status')
     is_borrow_order = fields.Boolean(related='order_id.is_borrow_order')
     is_product_book = fields.Boolean(related='product_id.is_book', depends=['product_id'])
 

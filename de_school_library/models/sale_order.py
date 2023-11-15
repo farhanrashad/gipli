@@ -13,6 +13,7 @@ class CirculationAgreement(models.Model):
     is_borrow_order = fields.Boolean("Circulation Agreement")
     borrow_status = fields.Selection([
         ('draft', 'Draft'),
+        ('confirm','Confirm'), 
         ('reserve','Reserve'), # Reserve book will hold the book and will not avaible for issuance.
         ('issue','Issued'), # book issue to petron.
         ('return', 'Returned'), # book return by petron.
@@ -60,5 +61,25 @@ class CirculationAgreement(models.Model):
                 order.is_borrow_order
                 and order.rental_status in ['pickup', 'return']  # has_pickable_lines or has_returnable_lines
                 and order.borrow_next_action_date and order.borrow_next_action_date < fields.Datetime.now())
+
+
+    def action_confirm(self):
+        if self.is_borrow_order:
+            self._action_borrow_order()
+        else:
+            super(CirculationAgreement, self).action_confirm()
+
+    def _action_borrow_order(self):
+        self.write({
+            'state': 'sale',
+            'borrow_status': 'confirm',
+        })
+
+
+    def open_issue_form(self):
+        pass
+    def open_return_form(self):
+        pass
+    
 
     

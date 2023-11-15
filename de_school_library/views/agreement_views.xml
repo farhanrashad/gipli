@@ -14,8 +14,31 @@
             </xpath>
             
             <xpath expr="//header" position='inside'>
-                <field name="borrow_status" widget="statusbar" statusbar_visible="draft,issue,return"/>
+                <field name="borrow_status" widget="statusbar" statusbar_visible="draft,confirm,issue,return"/>
             </xpath>
+            
+            <button name="action_quotation_send" position="before">
+                <button name="open_issue_form" type="object" class="btn-primary" string="PICKUP" data-hotkey="y"
+                    attrs="{'invisible':['|', ('has_pickable_lines','=',False), ('state', 'not in', ['sale', 'done'])]}"/>
+                <button name="open_return_form" type="object" class="btn-primary" string="RETURN" data-hotkey="k"
+                    attrs="{'invisible':['|',
+                    ('state', 'not in', ['sale', 'done']),
+                    '|',
+                        ('has_returnable_lines','=',False),
+                        '&amp;',
+                        ('has_returnable_lines','=',True),
+                        ('has_pickable_lines','=',True)]
+                    }"/>
+                <button name="open_return_form" type="object" class="btn-secondary" string="RETURN" data-hotkey="k"
+                    attrs="{'invisible':['|',
+                    ('state', 'not in', ['sale', 'done']),
+                    '|',
+                        ('has_returnable_lines','=',False),
+                        '&amp;',
+                        ('has_returnable_lines','=',True),
+                        ('has_pickable_lines','=',False)]
+                    }"/>
+            </button>
             
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="string">Patron</attribute>
@@ -25,6 +48,9 @@
                 <attribute name="domain">[('is_student', '=', True)]</attribute>
             </xpath>
 
+            <xpath expr="//notebook/page[@name='order_lines']/field/tree" position="inside">
+                <field name="borrow_status" invisible="1" />
+            </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_id']" position="replace">
             <field name="product_id" 
                 context="{
@@ -39,36 +65,37 @@
                 }"
                 domain="[('is_book', '=', True)]"
                 options="{'no_open':True}" 
+                attrs="{'readonly': [('borrow_status', '!=', 'draft')]}"
             />
-            <button name="schedule_product" type="object" class="btn-primary" icon="fa-calendar"/>
+            <button name="schedule_product" type="object" class="" icon="fa-calendar" help="Edit Configuration"/>
         </xpath>
           
-          <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_template_id']" position='attributes'>
-            <attribute name="context">{
-                    'partner_id': parent.partner_id,
-                    'quantity': product_uom_qty,
-                    'pricelist': parent.pricelist_id,
-                    'uom':product_uom,
-                    'company_id': parent.company_id,
-                    'default_list_price': price_unit,
-                    'default_description_sale': name,
-                    'is_book': True,
-                }
-            </attribute>
-            <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id), ('is_book', '=', True)]</attribute>
+          <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_template_id']" position="replace">
           </xpath>
-          <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position='attributes'>
-              <!--
-            <attribute name="domain">['|', ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id), ('is_book', '=', True)]</attribute>
-              -->
-            <attribute name="domain">[('is_book', '=', True)]</attribute>
+          
 
-          </xpath>
-
-            <xpath expr="//field[@name='order_line']//form//field[@name='name']" position="before">
-                <button name="schedule_product" type="object" class="btn-primary" icon="fa-calendar"/>
-            </xpath>
-        <xpath expr="//field[@name='order_line']//form//field[@name='product_uom_qty']" position='after'>
+        <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_uom_qty']" position="replace">
+            <field name="product_uom_qty"  
+                attrs="{'readonly': [('borrow_status', '!=', 'draft')]}" 
+            />
+        </xpath>
+        <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='price_unit']" position="replace">
+            <field name="price_unit"  
+                attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0),('borrow_status', '!=', 'draft')]}"
+            />
+        </xpath>
+        <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='tax_id']" position="replace">
+            <field
+                name="tax_id"
+                widget="many2many_tags"
+                options="{'no_create': True}"
+                domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id), ('country_id', '=', parent.tax_country_id)]"
+                context="{'active_test': True}"
+                attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0),('borrow_status', '!=', 'draft')]}"
+                optional="show"
+            />
+        </xpath>
+        <xpath expr="//field[@name='order_line']//form//field[@name='product_uom_qty']" position="after">
             <field name="qty_invoiced" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
             <field name="qty_to_invoice" optional="hide" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
         </xpath>
