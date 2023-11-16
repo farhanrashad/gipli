@@ -15,9 +15,10 @@
                             <field name="product_id" readonly="1" force_save="1" options="{'no_open': True}"/>
                             <field name="order_line_id" invisible="1"/>
                             <field name="order_wizard_id" invisible="1"/>
+                            <field name="issue_lot_id" force_save="1" options="{'no_open': True}"/>
                             <field name="qty_reserved" readonly="1" attrs="{'column_invisible':[('parent.status', '=', 'return')]}"/>
                             <field name="qty_delivered" attrs="{'readonly':[('parent.status', '=', 'return')]}" force_save="1"/>
-                            <field name="qty_returned" attrs="{'column_invisible':[('parent.status', '=', 'pickup')]}"/>
+                            <field name="qty_returned" attrs="{'column_invisible':[('parent.status', '=', 'issue')]}"/>
                             <field name="is_late" invisible="1"/>
                             <field name="status" invisible="1"/>
                             <button icon="fa-clock-o" attrs="{

@@ -102,6 +102,8 @@ class LibraryProcessingLine(models.TransientModel):
 
     is_late = fields.Boolean(default=False)  # make related on sol is_late ?
 
+    issue_lot_id = fields.Many2one('stock.lot')
+    
     @api.constrains('qty_returned', 'qty_delivered')
     def _only_pickedup_can_be_returned(self):
         for wizard_line in self:
