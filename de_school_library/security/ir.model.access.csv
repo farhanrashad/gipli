@@ -12,3 +12,5 @@ access_library_fee_config_wizard_user,access.library.fee.config.wizard.user,mode
 
 access_library_report_user,access.library.report.user,model_oe_library_report,de_school_library.group_library_user,1,0,0,0
 access_library_report_manager,access.library.report.user,model_oe_library_report,de_school_library.group_library_manager,1,0,0,0
+
+access_library_process_wizard_user,access.library.process.wizard.user,model_oe_library_process_wizard,de_school_library.group_library_user,1,1,1,0

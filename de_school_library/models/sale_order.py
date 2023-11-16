@@ -77,9 +77,38 @@ class CirculationAgreement(models.Model):
 
 
     def open_issue_form(self):
-        pass
+        status = "confirm"
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        order_line_ids = self.order_line.filtered(
+            lambda r: r.state in ['sale', 'done'] and r.is_rental and float_compare(r.product_uom_qty, r.qty_delivered, precision_digits=precision) > 0)
+        
+        context = {
+            'order_line_ids': order_line_ids,
+            'default_status': status,
+            'default_order_id': self.id,
+        }
+        return {
+            'name': _('Validate a issue') if status == 'confirm' else _('Validate a return'),
+            'view_mode': 'form',
+            'res_model': 'oe.library.process.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': context
+        }
     def open_return_form(self):
-        pass
+        context = {
+            'order_line_ids': order_line_ids,
+            'default_status': status,
+            'default_order_id': self.id,
+        }
+        return {
+            'name': _('Validate a pickup') if status == 'pickup' else _('Validate a return'),
+            'view_mode': 'form',
+            'res_model': 'oe.library.process.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': context
+        }
     
 
     
