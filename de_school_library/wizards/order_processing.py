@@ -10,42 +10,59 @@ class LibraryProcessing(models.TransientModel):
     _description = 'Pick-up/Return products'
 
     order_id = fields.Many2one('sale.order', required=True, ondelete='cascade')
-    rental_wizard_line_ids = fields.One2many('oe.library.process.wizard.line', 'rental_order_wizard_id')
+    wizard_line_ids = fields.One2many('oe.library.process.wizard.line', 'order_wizard_id')
     status = fields.Selection(
         selection=[
-            ('pickup', 'Pickup'),
+            ('issue', 'Issued'),
             ('return', 'Return'),
         ],
     )
     has_late_lines = fields.Boolean(compute='_compute_has_late_lines')
 
-    #@api.onchange('order_id')
+    @api.model
+    def default_get(self, fields):
+        res = super(LibraryProcessing, self).default_get(fields)
+        active_model = self.env.context.get('active_model')
+        active_id = self.env.context.get('active_id', [])
+        record_id = self.env[active_model].search([('id','=',active_id)])
+        
+        #res['order_line_id'] = self._context.get('active_id')
+        res['order_id'] = record_id.id
+        res['status'] = self.env.context.get('status', [])
+        #res['uom_id'] = record_id.product_uom.id
+        
+        return res
+
+    
+    @api.onchange('order_id')
     def _get_wizard_lines(self):
         """Use Wizard lines to set by default the pickup/return value
         to the total pickup/return value expected"""
-        rental_lines_ids = self.env.context.get('order_line_ids', [])
-        rental_lines_to_process = self.env['sale.order.line'].browse(rental_lines_ids)
+        #order_line_ids = self.env.context.get('order_line_ids', [])
+        #order_lines = self.env['sale.order.line'].browse(order_line_ids)
 
+        order_lines = self.env['sale.order.line'].search([('order_id','=',self.order_id.id)])
         # generate line values
-        if rental_lines_to_process:
+        #raise ValidationError(order_lines)
+        if order_lines:
             lines_values = []
-            for line in rental_lines_to_process:
+            for line in order_lines:
                 lines_values.append(self.env['oe.library.process.wizard.line']._default_wizard_line_vals(line, self.status))
 
-            self.rental_wizard_line_ids = [(6, 0, [])] + [(0, 0, vals) for vals in lines_values]
+            self.wizard_line_ids = [(6, 0, [])] + [(0, 0, vals) for vals in lines_values]
 
-    @api.depends('rental_wizard_line_ids')
+    @api.depends('wizard_line_ids')
     def _compute_has_late_lines(self):
         for wizard in self:
-            wizard.has_late_lines = wizard.rental_wizard_line_ids and any(line.is_late for line in wizard.rental_wizard_line_ids)
+            wizard.has_late_lines = wizard.wizard_line_ids and any(line.is_late for line in wizard.wizard_line_ids)
 
     def apply(self):
         """Apply the wizard modifications to the SaleOrderLine(s).
 
-        And logs the rental infos in the SaleOrder chatter
+        And logs the infos in the SaleOrder chatter
         """
         for wizard in self:
-            msg = wizard.rental_wizard_line_ids._apply()
+            msg = wizard.wizard_line_ids._apply()
             if msg:
                 for key, value in wizard._fields['status']._description_selection(wizard.env):
                     if key == wizard.status:
@@ -60,11 +77,11 @@ class LibraryProcessing(models.TransientModel):
 
 class LibraryProcessingLine(models.TransientModel):
     _name = 'oe.library.process.wizard.line'
-    _description = 'RentalOrderLine transient representation'
+    _description = 'Library Order Processing transient representation'
 
     @api.model
     def _default_wizard_line_vals(self, line, status):
-        delay_price = line.product_id._compute_delay_price(fields.Datetime.now() - line.return_date)
+        #delay_price = line.product_id._compute_delay_price(fields.Datetime.now() - line.return_date)
         return {
             'order_line_id': line.id,
             'product_id': line.product_id.id,
@@ -74,13 +91,13 @@ class LibraryProcessingLine(models.TransientModel):
             'is_late': line.is_late and delay_price > 0
         }
 
-    rental_order_wizard_id = fields.Many2one('oe.library.process.wizard', 'Rental Order Wizard', required=True, ondelete='cascade')
-    status = fields.Selection(related='rental_order_wizard_id.status')
+    order_wizard_id = fields.Many2one('oe.library.process.wizard', 'Order Wizard', required=True, ondelete='cascade')
+    status = fields.Selection(related='order_wizard_id.status')
 
     order_line_id = fields.Many2one('sale.order.line', required=True, ondelete='cascade')
     product_id = fields.Many2one('product.product', string='Product', required=True, ondelete='cascade')
     qty_reserved = fields.Float("Reserved")
-    qty_delivered = fields.Float("Picked-up")
+    qty_delivered = fields.Float("Issued")
     qty_returned = fields.Float("Returned")
 
     is_late = fields.Boolean(default=False)  # make related on sol is_late ?

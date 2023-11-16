@@ -83,7 +83,11 @@ class CirculationAgreement(models.Model):
             lambda r: r.state in ['sale', 'done'] and r.is_rental and float_compare(r.product_uom_qty, r.qty_delivered, precision_digits=precision) > 0)
         
         context = {
+            'active_model': 'sale.order',
+            'active_id': self.id,
+            
             'order_line_ids': order_line_ids,
+            'status': 'issue',
             'default_status': status,
             'default_order_id': self.id,
         }

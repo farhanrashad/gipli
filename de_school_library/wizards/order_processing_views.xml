@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="rental_order_wizard_view_form" model="ir.ui.view">
-        <field name="name">rental.order.wizard.form</field>
+    <record id="library_process_order_wizard_view_form" model="ir.ui.view">
+        <field name="name">library.process.order.wizard.form</field>
         <field name="model">oe.library.process.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <field name="status" invisible="1"/>
+                    <field name="status" invisible="0"/>
                     <field name="has_late_lines" invisible="1"/>
-                    <field name="order_id" invisible="1"/>
-                    <field name="rental_wizard_line_ids">
+                    <field name="order_id" invisible="0"/>
+                    <field name="wizard_line_ids">
                         <tree create="false" editable="top">
                             <field name="product_id" readonly="1" force_save="1" options="{'no_open': True}"/>
                             <field name="order_line_id" invisible="1"/>
-                            <field name="rental_order_wizard_id" invisible="1"/>
+                            <field name="order_wizard_id" invisible="1"/>
                             <field name="qty_reserved" readonly="1" attrs="{'column_invisible':[('parent.status', '=', 'return')]}"/>
                             <field name="qty_delivered" attrs="{'readonly':[('parent.status', '=', 'return')]}" force_save="1"/>
                             <field name="qty_returned" attrs="{'column_invisible':[('parent.status', '=', 'pickup')]}"/>
