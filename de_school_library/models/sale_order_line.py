@@ -36,7 +36,8 @@ class SaleOrderLine(models.Model):
     is_book_late = fields.Boolean(
         string="Is overdue", compute='_compute_is_late',
         help="The products haven't been returned in time")
-
+    is_book_added = fields.Boolean(string='Book Line')
+        
     @api.depends('book_pricing_id', 'book_issue_date', 'book_return_date')
     def _compute_book_duration(self):
         for wizard in self:

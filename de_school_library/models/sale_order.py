@@ -77,6 +77,18 @@ class CirculationAgreement(models.Model):
 
 
     def add_book(self):
+        action = self.env['ir.actions.actions']._for_xml_id('de_school_library.action_sale_order_line')
+        context = {
+            'active_model': 'sale.order.line',
+            'active_ids': self.ids,
+            'active_id': self.id,
+        }
+        action['context'] = context
+        action['res_id'] = self.id
+        return action
+
+    
+    def add_book1(self):
         #sale_line = self.env['sale.order.line'].create({
         #    'price_unit': 1,
         #    'product_uom_qty': 0,
@@ -85,6 +97,7 @@ class CirculationAgreement(models.Model):
         #    'name': 'Schedule Book',
         #    'order_id': self.id,
         #})
+        
         action = {
             'name': _('Add a Book'),
             'res_model': 'oe.library.fee.config.wizard',
