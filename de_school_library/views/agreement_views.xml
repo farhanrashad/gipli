@@ -39,11 +39,13 @@
             </xpath>
 
             <!-- add a book button -->
+            <!--
             <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']" position="before">
                 <button name="add_book" type="object" class="btn-primary" string="ADD A BOOK" data-hotkey="y"
                     attrs="{'invisible':[('borrow_status', 'not in', ['draft'])]}"/>
             </xpath>
-
+            -->
+            
             <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']" position="attributes">
                 <attribute name="context">{
                     'form_view_ref': 'de_school_library.sale_order_line_form_view'
