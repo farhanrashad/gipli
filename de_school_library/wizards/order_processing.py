@@ -87,8 +87,8 @@ class LibraryProcessingLine(models.TransientModel):
             'product_id': line.product_id.id,
             'qty_reserved': line.product_uom_qty,
             'qty_delivered': line.qty_delivered if status == 'return' else line.product_uom_qty - line.qty_delivered,
-            'book_returned': line.book_returned if status == 'pickup' else line.qty_delivered - line.book_returned,
-            'is_book_late': line.is_book_late and delay_price > 0
+            'book_returned': line.book_returned if status == 'issue' else line.qty_delivered - line.book_returned,
+            #'is_book_late': line.is_book_late and delay_price > 0
         }
 
     order_wizard_id = fields.Many2one('oe.library.process.wizard', 'Order Wizard', required=True, ondelete='cascade')
@@ -102,7 +102,9 @@ class LibraryProcessingLine(models.TransientModel):
 
     is_book_late = fields.Boolean(default=False)  # make related on sol is_book_late ?
 
-    issue_lot_id = fields.Many2one('stock.lot', domain="[('product_id','=',product_id)]")
+    issue_lot_ids = fields.Many2many('stock.lot', 'book_issue_serial_rel',
+                    domain="[('product_id','=',product_id)]"
+                )
     
     @api.constrains('book_returned', 'qty_delivered')
     def _only_pickedup_can_be_returned(self):

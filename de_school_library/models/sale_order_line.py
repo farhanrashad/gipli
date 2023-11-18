@@ -36,8 +36,23 @@ class SaleOrderLine(models.Model):
     is_book_late = fields.Boolean(
         string="Is overdue", compute='_compute_is_late',
         help="The products haven't been returned in time")
-    is_book_added = fields.Boolean(string='Book Line')
-        
+
+    @api.depends('book_return_date')
+    def _compute_is_late(self):
+        now = fields.Datetime.now()
+        line.is_book_late = False
+        for line in self:
+            # By default, an order line is considered late only if it has one hour of delay
+            if line.book_return_date:
+                if line.book_return_date < now:
+                    line.is_book_late = True
+                else:
+                    line.is_book_late = False
+            else:
+                line.is_book_late = False
+            #line.is_book_late = False #line.book_return_date < now
+
+    
     @api.depends('book_pricing_id', 'book_issue_date', 'book_return_date')
     def _compute_book_duration(self):
         for wizard in self:
