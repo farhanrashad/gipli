@@ -84,6 +84,8 @@ class CirculationAgreement(models.Model):
             'context': {
                 'active_model': 'sale.order.line',
                 'active_id': 0, #self.id,
+                'order_id': self.id,
+                'record_mode': 'new',
             },
             'target': 'new',
             'type': 'ir.actions.act_window',

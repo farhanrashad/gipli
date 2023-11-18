@@ -188,11 +188,24 @@ class LibraryFeeWizard(models.TransientModel):
         active_ids = self.env.context.get('active_ids', [])
         active_id = self.env.context.get('active_id', [])
         record_id = self.env[active_model].search([('id','=',active_id)])
-        for record in record_id:
-            record.write({
+        vals = {}
+        if self.env.context.get('record_mode', []) == 'new':
+            new_record_id = self.env['sale.order.line'].create({
+                'product_id': self.product_id.id,
+                'product_uom': self.product_id.uom_id.id,
                 'price_unit': self.unit_price,
                 'product_uom_qty': self.quantity,
                 'book_issue_date': self.issue_date,
                 'book_return_date': self.return_date,
                 'name': self.product_id.name + ' ' + str(self.issue_date) + ' to ' + str(self.return_date),
+                'order_id': self.env.context.get('order_id', []),
             })
+            for record in record_id:
+                record.write({
+                    'price_unit': self.unit_price,
+                    'product_uom_qty': self.quantity,
+                    'book_issue_date': self.issue_date,
+                    'book_return_date': self.return_date,
+                    'name': self.product_id.name + ' ' + str(self.issue_date) + ' to ' + str(self.return_date),
+                })
+            
