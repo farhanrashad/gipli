@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="sale_order_line_form_view" model="ir.ui.view">
+      <field name="name">sale.order.line.form.view</field>
+      <field name="model">sale.order.line</field>
+      <field name="arch" type="xml">
+        <form >
+            <sheet>
+                <group>
+                    <group>
+                        <label for="book_issue_date" string="Dates"/>
+                            <div class="o_row">
+                                <field name="book_issue_date" widget="daterange" options="{'related_end_date': 'book_return_date'}"/>
+                                <span> to </span>
+                                <field name="book_return_date" widget="daterange" options="{'related_start_date': 'book_issue_date'}"/>
+                            </div>
+                         <label for="duration"/>
+                            <div>
+                                <field name="duration" class="oe_inline"/>
+                                <span> </span>
+                                <field name="duration_unit" class="oe_inline col-lg-4" readonly="1"/>
+                            </div>
+                    </group>
+                    <group>
+                        <field name="product_uom_category_id" invisible="1" />
+                        <label for="product_uom_qty"/>
+                            <div name="qty_to_reserve">
+                                <field name="product_uom_qty" style="max-width: 5rem"/>
+                                <field name="product_uom" class="oe_inline" options="{'no_open':1}"/>
+                            </div>
+                            <label for="price_unit"/>
+                            <div>
+                                <field name="price_unit"/>
+                                <field name="currency_id" invisible="1"/>
+                            </div>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+      </field>
+  </record>
+
+    <record id="action_sale_order_line" model="ir.actions.act_window">
+        <field name="name">Rent a product</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="sale_order_line_form_view"/>
+    </record>
+    
+</odoo>

@@ -8,24 +8,24 @@ import { Record, RelationalModel } from "@web/views/basic_relational_model";
  * window when a product with 'rent_ok' is selected.
  *
  */
-export class LibraryConfiguratorRelationalModel extends RelationalModel {
+export class RentalConfiguratorRelationalModel extends RelationalModel {
     setup(params, { action }) {
         super.setup(...arguments);
         this.action = action;
     }
 }
 
-LibraryConfiguratorRelationalModel.services = [...RelationalModel.services, "action"];
+RentalConfiguratorRelationalModel.services = [...RelationalModel.services, "action"];
 
-export class LibraryConfiguratorRecord extends Record {
+export class RentalConfiguratorRecord extends Record {
 
-    _getLibraryInfos() {
+    _getRentalInfos() {
         return {
             start_date: this.data.pickup_date,
             return_date: this.data.return_date,
             price_unit: this.data.unit_price,
             product_uom_qty: this.data.quantity,
-            is_borrow_order: true,
+            is_rental: true,
         };
     }
 
@@ -33,7 +33,7 @@ export class LibraryConfiguratorRecord extends Record {
      * We let the regular process take place to allow the validation of the required fields
      * to happen.
      *
-     * Then we can manually close the window, providing Library information to the caller.
+     * Then we can manually close the window, providing rental information to the caller.
      *
      * @override
      */
@@ -45,16 +45,16 @@ export class LibraryConfiguratorRecord extends Record {
         this.model.action.doAction({
             type: "ir.actions.act_window_close",
             infos: {
-                libraryConfiguration: this._getLibraryInfos(),
+                rentalConfiguration: this._getRentalInfos(),
             },
         });
         return true;
     }
 }
 
-LibraryConfiguratorRelationalModel.Record = LibraryConfiguratorRecord;
+RentalConfiguratorRelationalModel.Record = RentalConfiguratorRecord;
 
 registry.category("views").add("library_configurator_form", {
     ...formView,
-    Model: LibraryConfiguratorRelationalModel,
+    Model: RentalConfiguratorRelationalModel,
 });

@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Library",
-
     'summary': """
     Library Management
         """,
-
     'description': """
         Library Management
     """,
-
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-
     'category': 'Sales/Library',
     'version': '0.2',
-
     'depends': ['de_school','sale','stock','web'],
-
     'data': [
         'security/library_security.xml',
         'security/ir.model.access.csv',
@@ -30,6 +24,7 @@
         'views/publisher_views.xml',
         'views/author_views.xml',
         'views/sale_order_views.xml',
+        'views/sale_order_line_views.xml',
         'views/student_views.xml',
         'views/teacher_views.xml',
         'views/agreement_views.xml',
@@ -42,9 +37,7 @@
     ],
     'assets': {
        'web.assets_backend': [
-           #'de_school_library/static/src/js/library_fee_config_wizard.js',
-           #'de_school_library/static/src/js/library_fee_config_wizard.js',
-           'de_school_library/static/src/**/*',
+           #'de_school_library/static/src/**/*',
        ],
     },
 }

@@ -118,7 +118,7 @@ class LibraryFeeWizard(models.TransientModel):
                     currency=wizard.currency_id or company.currency_id,
                 )
 
-    #@api.onchange('pricing_id', 'currency_id', 'duration', 'duration_unit')
+    @api.onchange('pricing_id', 'currency_id', 'duration', 'duration_unit')
     @api.depends('pricing_id', 'currency_id', 'duration', 'duration_unit')
     def _compute_unit_price(self):
         for wizard in self:
@@ -188,9 +188,13 @@ class LibraryFeeWizard(models.TransientModel):
         active_ids = self.env.context.get('active_ids', [])
         active_id = self.env.context.get('active_id', [])
         record_id = self.env[active_model].search([('id','=',active_id)])
+        order_id = self.env['sale.order'].search([('id','=',self.env.context.get('order_id', []))])
+
+        #raise UserError(order_id)
         vals = {}
         if self.env.context.get('record_mode', []) == 'new':
-            new_record_id = self.env['sale.order.line'].create({
+            #new_record_id = self.env['sale.order.line'].create({
+            new_record_id = order_id.order_line.create({
                 'product_id': self.product_id.id,
                 'product_uom': self.product_id.uom_id.id,
                 'price_unit': self.unit_price,
@@ -200,21 +204,18 @@ class LibraryFeeWizard(models.TransientModel):
                 'name': self.product_id.name + ' ' + str(self.issue_date) + ' to ' + str(self.return_date),
                 'order_id': self.env.context.get('order_id', []),
             })
-            self.flush()
-        else:
-            for record in record_id:
-                record.write({
-                    'price_unit': self.unit_price,
-                    'product_uom_qty': self.quantity,
-                    'book_issue_date': self.issue_date,
-                    'book_return_date': self.return_date,
-                    'name': self.product_id.name + ' ' + str(self.issue_date) + ' to ' + str(self.return_date),
-                })
-        # Execute JavaScript to update the view
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'reload',
-            'code': "window.location.reload();",  # You can replace this with your custom JavaScript code
-        }
-
             
+        #else:
+        for record in record_id:
+            record.write({
+                'price_unit': self.unit_price,
+                'product_uom_qty': self.quantity,
+                'book_issue_date': self.issue_date,
+                'book_return_date': self.return_date,
+                'name': self.product_id.name + ' ' + str(self.issue_date) + ' to ' + str(self.return_date),
+            })
+            record['price_unit'] = self.unit_price
+        self.flush()
+        #self.env.cr.commit()
+
+        

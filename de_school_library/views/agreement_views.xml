@@ -44,6 +44,12 @@
                     attrs="{'invisible':[('borrow_status', 'not in', ['draft'])]}"/>
             </xpath>
 
+            <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']" position="attributes">
+                <attribute name="context">{
+                    'form_view_ref': 'de_school_library.sale_order_line_form_view'
+                }
+                </attribute>
+            </xpath>
             
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_id']" position="replace">
             <field name="product_id" 
@@ -66,8 +72,8 @@
           
           <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_template_id']" position="replace">
           </xpath>
-          
 
+        
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_uom_qty']" position="replace">
             <field name="product_uom_qty"  
                 attrs="{'readonly': [('borrow_status', '!=', 'draft')]}" 
@@ -75,7 +81,7 @@
         </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='price_unit']" position="replace">
             <field name="price_unit"  
-                attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0),('borrow_status', '!=', 'draft')]}"
+                attrs="{'readonly': [('borrow_status', '!=', 'draft')]}"
             />
         </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='tax_id']" position="replace">
