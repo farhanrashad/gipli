@@ -77,13 +77,21 @@ class CirculationAgreement(models.Model):
 
 
     def add_book(self):
+        #sale_line = self.env['sale.order.line'].create({
+        #    'price_unit': 1,
+        #    'product_uom_qty': 0,
+            #'book_issue_date': self.issue_date,
+            #'book_return_date': self.return_date,
+        #    'name': 'Schedule Book',
+        #    'order_id': self.id,
+        #})
         action = {
             'name': _('Add a Book'),
             'res_model': 'oe.library.fee.config.wizard',
             'view_mode': 'form',
             'context': {
                 'active_model': 'sale.order.line',
-                'active_id': 0, #self.id,
+                'active_id': 0, #sale_line.id,
                 'order_id': self.id,
                 'record_mode': 'new',
             },

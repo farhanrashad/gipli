@@ -200,6 +200,8 @@ class LibraryFeeWizard(models.TransientModel):
                 'name': self.product_id.name + ' ' + str(self.issue_date) + ' to ' + str(self.return_date),
                 'order_id': self.env.context.get('order_id', []),
             })
+            self.flush()
+        else:
             for record in record_id:
                 record.write({
                     'price_unit': self.unit_price,
@@ -208,4 +210,11 @@ class LibraryFeeWizard(models.TransientModel):
                     'book_return_date': self.return_date,
                     'name': self.product_id.name + ' ' + str(self.issue_date) + ' to ' + str(self.return_date),
                 })
+        # Execute JavaScript to update the view
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+            'code': "window.location.reload();",  # You can replace this with your custom JavaScript code
+        }
+
             
