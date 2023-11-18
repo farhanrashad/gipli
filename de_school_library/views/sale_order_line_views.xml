@@ -6,13 +6,15 @@
       <field name="arch" type="xml">
         <form >
             <sheet>
+                <field name="company_id" invisible="1" />
+                <field name="product_id" invisible="1" />
                 <group>
                     <group>
                         <label for="book_issue_date" string="Dates"/>
                             <div class="o_row">
-                                <field name="book_issue_date" widget="daterange" options="{'related_end_date': 'book_return_date'}"/>
+                                <field name="book_issue_date" required="1" widget="daterange" options="{'related_end_date': 'book_return_date'}"/>
                                 <span> to </span>
-                                <field name="book_return_date" widget="daterange" options="{'related_start_date': 'book_issue_date'}"/>
+                                <field name="book_return_date" required="1" widget="daterange" options="{'related_start_date': 'book_issue_date'}"/>
                             </div>
                          <label for="duration"/>
                             <div>
@@ -33,6 +35,8 @@
                                 <field name="price_unit"/>
                                 <field name="currency_id" invisible="1"/>
                             </div>
+                        <field name="book_pricing_id" invisible="0" />
+                        <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" force_save="1"/>
                     </group>
                 </group>
             </sheet>
