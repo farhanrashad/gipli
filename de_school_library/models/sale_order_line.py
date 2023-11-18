@@ -15,11 +15,9 @@ class SaleOrderLine(models.Model):
     is_borrow_order = fields.Boolean(related='order_id.is_borrow_order')
     is_product_book = fields.Boolean(related='product_id.is_book', depends=['product_id'])
 
-
-    book_pickup_date = fields.Datetime(
-        string="Pickup", )
-    book_return_date = fields.Datetime(
-        string="Return", )
+    book_issue_date = fields.Datetime(string='Issue Date')
+    book_return_date = fields.Datetime(string="Return Date")
+    book_returned = fields.Float("Returned", default=0.0, copy=False)
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
@@ -27,7 +25,7 @@ class SaleOrderLine(models.Model):
         if (not self.is_product_book) and self.is_borrow_order:
             self.update({
                 'is_borrow_order': False,
-                'book_pickup_date': False,
+                'book_issue_date': False,
                 'book_return_date': False,
             })
        

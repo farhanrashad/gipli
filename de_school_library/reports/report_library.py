@@ -35,12 +35,12 @@ class LibraryReport(models.Model):
         return """
             sol.product_uom_qty / (u.factor * u2.factor) AS quantity,
             sol.qty_delivered / (u.factor * u2.factor) AS qty_delivered,
-            sol.qty_returned / (u.factor * u2.factor) AS qty_returned
+            sol.book_returned / (u.factor * u2.factor) AS qty_returned
         """
 
     def _price(self):
         return """
-            sol.price_subtotal / (date_part('day',sol.return_date - sol.start_date) + 1)
+            sol.price_subtotal / (date_part('day',sol.book_return_date - sol.book_issue_date) + 1)
         """
 
     def _select(self):
@@ -54,7 +54,7 @@ class LibraryReport(models.Model):
             sol.salesman_id AS user_id,
             pt.categ_id,
             p.product_tmpl_id,
-            generate_series(sol.start_date::date, sol.return_date::date, '1 day'::interval)::date date,
+            generate_series(sol.book_issue_date::date, sol.book_return_date::date, '1 day'::interval)::date date,
             %s AS price,
             sol.company_id,
             sol.state,
