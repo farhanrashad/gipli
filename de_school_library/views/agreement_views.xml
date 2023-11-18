@@ -37,6 +37,14 @@
             <xpath expr="//notebook/page[@name='order_lines']/field/tree" position="inside">
                 <field name="borrow_status" invisible="1" />
             </xpath>
+
+            <!-- add a book button -->
+            <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']" position="before">
+                <button name="open_issue_form" type="object" class="btn-primary" string="ADD A BOOK" data-hotkey="y"
+                    attrs="{'invisible':[('borrow_status', 'not in', ['draft'])]}"/>
+            </xpath>
+
+            
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_id']" position="replace">
             <field name="product_id" 
                 context="{

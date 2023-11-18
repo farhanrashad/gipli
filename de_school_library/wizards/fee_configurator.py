@@ -28,7 +28,7 @@ class LibraryFeeWizard(models.TransientModel):
         string="Pricing", help="Best Pricing Rule based on duration")
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
 
-    pickup_date = fields.Datetime(
+    issue_date = fields.Datetime(
         string="Pickup", required=True,
         default=lambda s: fields.Datetime.now() + relativedelta(minute=0, second=0, hours=1))
     return_date = fields.Datetime(
@@ -66,8 +66,8 @@ class LibraryFeeWizard(models.TransientModel):
         #res['pricelist_id'] = record_id.order_id.pricelist_id.id
         res['product_id'] = record_id.product_id.id
         res['uom_id'] = record_id.product_uom.id
-        if record_id.book_pickup_date:
-            res['pickup_date'] = record_id.book_pickup_date
+        if record_id.book_issue_date:
+            res['issue_date'] = record_id.book_issue_date
         if record_id.book_return_date:
             res['return_date'] = record_id.book_return_date
         if record_id.product_uom_qty > 1:
@@ -81,15 +81,15 @@ class LibraryFeeWizard(models.TransientModel):
             wizard.currency_id = wizard.pricelist_id.currency_id or wizard.env.company.currency_id
     
 
-    @api.depends('pricing_id', 'pickup_date', 'return_date')
+    @api.depends('pricing_id', 'issue_date', 'return_date')
     def _compute_duration(self):
         for wizard in self:
             values = {
                 'duration_unit': 'day',
                 'duration': 1.0,
             }
-            if wizard.pickup_date and wizard.return_date:
-                duration_dict = self.env['oe.library.product.fees']._compute_duration_vals(wizard.pickup_date, wizard.return_date)
+            if wizard.issue_date and wizard.return_date:
+                duration_dict = self.env['oe.library.product.fees']._compute_duration_vals(wizard.issue_date, wizard.return_date)
                 if wizard.pricing_id:
                     values = {
                         'duration_unit': wizard.pricing_id.library_fee_period_id.unit,
@@ -102,14 +102,14 @@ class LibraryFeeWizard(models.TransientModel):
                     }
             wizard.update(values)
 
-    @api.depends('pickup_date', 'return_date')
+    @api.depends('issue_date', 'return_date')
     def _compute_pricing(self):
         self.pricing_id = False
         for wizard in self:
             if wizard.product_id:
                 company = wizard.company_id or wizard.env.company
                 wizard.pricing_id = wizard.product_id._get_best_library_fee_rule(
-                    start_date=wizard.pickup_date,
+                    start_date=wizard.issue_date,
                     end_date=wizard.return_date,
                     pricelist=wizard.pricelist_id,
                     company=company,
@@ -122,11 +122,11 @@ class LibraryFeeWizard(models.TransientModel):
         for wizard in self:
             if wizard.pricelist_id:
                 wizard.unit_price = wizard.pricelist_id._get_product_price(
-                    wizard.product_id, 1, start_date=wizard.pickup_date,
+                    wizard.product_id, 1, start_date=wizard.issue_date,
                     end_date=wizard.return_date
                 )
                 raise UserError(wizard.pricelist_id._get_product_price(
-                    wizard.product_id, 1, start_date=wizard.pickup_date,
+                    wizard.product_id, 1, start_date=wizard.issue_date,
                     end_date=wizard.return_date
                 ))
             elif wizard.pricing_id and wizard.duration > 0:
@@ -190,7 +190,7 @@ class LibraryFeeWizard(models.TransientModel):
             record.write({
                 'price_unit': self.unit_price,
                 'product_uom_qty': self.quantity,
-                'book_pickup_date': self.pickup_date,
+                'book_issue_date': self.issue_date,
                 'book_return_date': self.return_date,
-                'name': self.product_id.name + ' ' + str(self.pickup_date) + ' to ' + str(self.return_date),
+                'name': self.product_id.name + ' ' + str(self.issue_date) + ' to ' + str(self.return_date),
             })

@@ -87,7 +87,7 @@ class LibraryProcessingLine(models.TransientModel):
             'product_id': line.product_id.id,
             'qty_reserved': line.product_uom_qty,
             'qty_delivered': line.qty_delivered if status == 'return' else line.product_uom_qty - line.qty_delivered,
-            'qty_returned': line.qty_returned if status == 'pickup' else line.qty_delivered - line.qty_returned,
+            'book_returned': line.book_returned if status == 'pickup' else line.qty_delivered - line.book_returned,
             'is_late': line.is_late and delay_price > 0
         }
 
@@ -98,16 +98,16 @@ class LibraryProcessingLine(models.TransientModel):
     product_id = fields.Many2one('product.product', string='Product', required=True, ondelete='cascade')
     qty_reserved = fields.Float("Reserved")
     qty_delivered = fields.Float("Issued")
-    qty_returned = fields.Float("Returned")
+    book_returned = fields.Float("Returned")
 
     is_late = fields.Boolean(default=False)  # make related on sol is_late ?
 
     issue_lot_id = fields.Many2one('stock.lot', domain="[('product_id','=',product_id)]")
     
-    @api.constrains('qty_returned', 'qty_delivered')
+    @api.constrains('book_returned', 'qty_delivered')
     def _only_pickedup_can_be_returned(self):
         for wizard_line in self:
-            if wizard_line.status == 'return' and wizard_line.qty_returned > wizard_line.qty_delivered:
+            if wizard_line.status == 'return' and wizard_line.book_returned > wizard_line.qty_delivered:
                 raise ValidationError(_("You can't return more than what's been picked-up."))
 
     def _apply(self):
@@ -129,13 +129,13 @@ class LibraryProcessingLine(models.TransientModel):
                     vals['start_date'] = now
                 order_line.update(vals)
 
-            elif wizard_line.status == 'return' and wizard_line.qty_returned > 0:
+            elif wizard_line.status == 'return' and wizard_line.book_returned > 0:
                 if wizard_line.is_late:
                     # Delays facturation
-                    order_line._generate_delay_line(wizard_line.qty_returned)
+                    order_line._generate_delay_line(wizard_line.book_returned)
 
                 order_line.update({
-                    'qty_returned': order_line.qty_returned + wizard_line.qty_returned
+                    'book_returned': order_line.book_returned + wizard_line.book_returned
                 })
         return msg
 
@@ -150,7 +150,7 @@ class LibraryProcessingLine(models.TransientModel):
         if self.status == 'pickup':
             return self.qty_delivered, order_line.qty_delivered, order_line.qty_delivered + self.qty_delivered
         else:
-            return self.qty_returned, order_line.qty_returned, order_line.qty_returned + self.qty_returned
+            return self.book_returned, order_line.book_returned, order_line.book_returned + self.book_returned
 
     def _generate_log_message(self):
         msg = ""
