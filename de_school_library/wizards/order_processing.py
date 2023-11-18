@@ -54,7 +54,7 @@ class LibraryProcessing(models.TransientModel):
     @api.depends('wizard_line_ids')
     def _compute_has_late_lines(self):
         for wizard in self:
-            wizard.has_late_lines = wizard.wizard_line_ids and any(line.is_late for line in wizard.wizard_line_ids)
+            wizard.has_late_lines = wizard.wizard_line_ids and any(line.is_book_late for line in wizard.wizard_line_ids)
 
     def apply(self):
         """Apply the wizard modifications to the SaleOrderLine(s).
@@ -88,7 +88,7 @@ class LibraryProcessingLine(models.TransientModel):
             'qty_reserved': line.product_uom_qty,
             'qty_delivered': line.qty_delivered if status == 'return' else line.product_uom_qty - line.qty_delivered,
             'book_returned': line.book_returned if status == 'pickup' else line.qty_delivered - line.book_returned,
-            'is_late': line.is_late and delay_price > 0
+            'is_book_late': line.is_book_late and delay_price > 0
         }
 
     order_wizard_id = fields.Many2one('oe.library.process.wizard', 'Order Wizard', required=True, ondelete='cascade')
@@ -100,7 +100,7 @@ class LibraryProcessingLine(models.TransientModel):
     qty_delivered = fields.Float("Issued")
     book_returned = fields.Float("Returned")
 
-    is_late = fields.Boolean(default=False)  # make related on sol is_late ?
+    is_book_late = fields.Boolean(default=False)  # make related on sol is_book_late ?
 
     issue_lot_id = fields.Many2one('stock.lot', domain="[('product_id','=',product_id)]")
     
@@ -130,7 +130,7 @@ class LibraryProcessingLine(models.TransientModel):
                 order_line.update(vals)
 
             elif wizard_line.status == 'return' and wizard_line.book_returned > 0:
-                if wizard_line.is_late:
+                if wizard_line.is_book_late:
                     # Delays facturation
                     order_line._generate_delay_line(wizard_line.book_returned)
 

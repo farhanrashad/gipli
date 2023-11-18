@@ -19,6 +19,17 @@ class SaleOrderLine(models.Model):
     book_return_date = fields.Datetime(string="Return Date")
     book_returned = fields.Float("Returned", default=0.0, copy=False)
 
+    is_book_late = fields.Boolean(
+        string="Is overdue", compute='_compute_is_late',
+        help="The products haven't been returned in time")
+
+    @api.depends('book_return_date')
+    def _compute_is_late(self):
+        now = fields.Datetime.now()
+        for line in self:
+            # By default, an order line is considered late only if it has one hour of delay
+            line.is_book_late = line.book_return_date < now
+            
     @api.onchange('product_id')
     def _onchange_product_id(self):
         """Clean rental related data if new product cannot be rented."""
