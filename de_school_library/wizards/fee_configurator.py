@@ -19,7 +19,7 @@ class LibraryFeeWizard(models.TransientModel):
     product_id = fields.Many2one(
         'product.product', "Product", required=True, ondelete='cascade',
         domain=[('is_book', '=', True)], help="Product to rent (has to be rentable)")
-    uom_id = fields.Many2one('uom.uom', 'Unit of Measure', readonly=True, default=_default_uom_id)
+    uom_id = fields.Many2one('uom.uom', 'Unit of Measure', readonly=True)
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company.id, store=False)
     currency_id = fields.Many2one('res.currency', string="Currency", compute='_compute_currency_id')
 
@@ -60,19 +60,21 @@ class LibraryFeeWizard(models.TransientModel):
         active_model = self.env.context.get('active_model')
         active_ids = self.env.context.get('active_ids', [])
         active_id = self.env.context.get('active_id', [])
-        record_id = self.env[active_model].search([('id','=',active_id)])
-        
-        res['order_line_id'] = self._context.get('active_id')
-        #res['pricelist_id'] = record_id.order_id.pricelist_id.id
-        res['product_id'] = record_id.product_id.id
-        res['uom_id'] = record_id.product_uom.id
-        if record_id.book_issue_date:
-            res['issue_date'] = record_id.book_issue_date
-        if record_id.book_return_date:
-            res['return_date'] = record_id.book_return_date
-        if record_id.product_uom_qty > 1:
-            res['quantity'] = record_id.product_uom_qty
-        return res
+
+        if active_model == 'sale.order.line':
+            record_id = self.env[active_model].search([('id','=',active_id)])
+            
+            res['order_line_id'] = self._context.get('active_id')
+            #res['pricelist_id'] = record_id.order_id.pricelist_id.id
+            res['product_id'] = record_id.product_id.id
+            res['uom_id'] = record_id.product_uom.id
+            if record_id.book_issue_date:
+                res['issue_date'] = record_id.book_issue_date
+            if record_id.book_return_date:
+                res['return_date'] = record_id.book_return_date
+            if record_id.product_uom_qty > 1:
+                res['quantity'] = record_id.product_uom_qty
+            return res
 
 
     @api.depends('pricelist_id')
@@ -116,7 +118,7 @@ class LibraryFeeWizard(models.TransientModel):
                     currency=wizard.currency_id or company.currency_id,
                 )
 
-    @api.onchange('pricing_id', 'currency_id', 'duration', 'duration_unit')
+    #@api.onchange('pricing_id', 'currency_id', 'duration', 'duration_unit')
     @api.depends('pricing_id', 'currency_id', 'duration', 'duration_unit')
     def _compute_unit_price(self):
         for wizard in self:

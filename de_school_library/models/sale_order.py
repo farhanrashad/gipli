@@ -76,6 +76,20 @@ class CirculationAgreement(models.Model):
         })
 
 
+    def add_book(self):
+        action = {
+            'name': _('Add a Book'),
+            'res_model': 'oe.library.fee.config.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'sale.order.line',
+                'active_id': 0, #self.id,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
+        return action
+        
     def open_issue_form(self):
         status = "confirm"
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
