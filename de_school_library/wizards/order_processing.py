@@ -131,7 +131,6 @@ class LibraryProcessingLine(models.TransientModel):
                 if order_line.book_issue_date > now:
                     vals['book_issue_date'] = now
                 order_line.update(vals)
-                self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
                 order_line.order_id.write({
                     'borrow_status': 'issue',
                 })
@@ -143,6 +142,7 @@ class LibraryProcessingLine(models.TransientModel):
                 order_line.update({
                     'book_returned': order_line.book_returned + wizard_line.book_returned
                 })
+            self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
         return msg
 
     def _prepare_stock_move_values(self,line):

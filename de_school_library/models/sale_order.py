@@ -19,7 +19,7 @@ class CirculationAgreement(models.Model):
         ('return', 'Returned'), # book return by petron.
         ('done', 'Done'), # agreement closed 
         ('cancel', 'Cancelled'), 
-    ], string="Borrow Status", default='draft', store=True, tracking=True, index=True,)
+    ], string="Borrow Status", default='draft', store=True, tracking=True, index=True,copy=False)
 
     borrow_next_action_date = fields.Datetime(
         string="Next Action", compute='_compute_next_action_date', store=True)
