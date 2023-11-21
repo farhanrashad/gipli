@@ -117,7 +117,7 @@ class CirculationAgreement(models.Model):
         status = "confirm"
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         order_line_ids = self.order_line.filtered(
-            lambda r: r.state in ['sale', 'done'] and r.is_rental and float_compare(r.product_uom_qty, r.qty_delivered, precision_digits=precision) > 0)
+            lambda r: r.state in ['sale', 'done'] and r.is_borrow_order and float_compare(r.product_uom_qty, r.qty_delivered, precision_digits=precision) > 0)
         
         context = {
             'active_model': 'sale.order',

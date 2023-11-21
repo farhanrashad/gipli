@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class LibraryProcessing(models.TransientModel):
@@ -122,15 +122,19 @@ class LibraryProcessingLine(models.TransientModel):
         now = fields.Datetime.now()
         for wizard_line in self:
             order_line = wizard_line.order_line_id
-            if wizard_line.status == 'pickup' and wizard_line.qty_delivered > 0:
+            order_line.mapped('company_id').filtered(lambda company: not company.library_loc_id)._create_library_location()
+            if wizard_line.status == 'issue' and wizard_line.qty_delivered > 0:
                 delivered_qty = order_line.qty_delivered + wizard_line.qty_delivered
                 vals = {'qty_delivered': delivered_qty}
                 if delivered_qty > order_line.product_uom_qty:
                     vals['product_uom_qty'] = delivered_qty
-                if order_line.start_date > now:
-                    vals['start_date'] = now
+                if order_line.book_issue_date > now:
+                    vals['book_issue_date'] = now
                 order_line.update(vals)
-
+                self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
+                order_line.order_id.write({
+                    'borrow_status': 'issue',
+                })
             elif wizard_line.status == 'return' and wizard_line.book_returned > 0:
                 if wizard_line.is_book_late:
                     # Delays facturation
@@ -141,6 +145,27 @@ class LibraryProcessingLine(models.TransientModel):
                 })
         return msg
 
+    def _prepare_stock_move_values(self,line):
+        self.ensure_one()
+        if self.status == 'issue':
+            library_location = line.order_id.company_id.rental_loc_id
+            stock_location = line.order_id.warehouse_id.lot_stock_id
+        else:
+            stock_location = line.order_id.company_id.rental_loc_id
+            library_location = line.order_id.warehouse_id.lot_stock_id
+        return {
+            'reference': _('Library Move:' + line.order_id.name),
+            'name': _('Library Move:' + line.order_id.name),
+            'date': fields.Datetime.now(),
+            'location_id': stock_location.id,
+            'location_dest_id': library_location.id,
+            'company_id': line.order_id.company_id.id,
+            'product_id': line.product_id.id,
+            'product_uom_qty': self.qty_delivered,
+            'warehouse_id': line.order_id.warehouse_id.id,
+            'state': 'done',
+        }
+        
     def _get_diff(self):
         """Return the quantity changes due to the wizard line.
 
