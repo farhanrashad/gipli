@@ -51,7 +51,7 @@
                 }
                 </attribute>
             </xpath>
-            
+        <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_template_id']" position="replace" />
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_id']" position="replace">
             <field name="product_id" 
                 context="{
@@ -68,7 +68,10 @@
                 options="{'no_open':True}" 
                 attrs="{'readonly': [('borrow_status', '!=', 'draft')]}"
             />
-            <button name="schedule_product" type="object" class="" icon="fa-calendar" help="Edit Configuration"/>
+            <button name="schedule_product" type="object" class="" 
+                icon="fa-calendar" help="Edit Configuration"
+                attrs="{'invisible': [('borrow_status', '!=', 'draft')]}" 
+            />
         </xpath>
         
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_uom_qty']" position="replace">
@@ -93,7 +96,7 @@
             />
         </xpath>
   <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='qty_delivered']" position="after">
-            <field name="book_returned" optional="hide" />
+            <field name="book_returned" />
         </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
             <field name="invoice_lines" widget="many2many_tags" optional="hide"/>
