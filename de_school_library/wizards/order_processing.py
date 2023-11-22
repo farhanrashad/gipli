@@ -142,6 +142,9 @@ class LibraryProcessingLine(models.TransientModel):
                 order_line.update({
                     'book_returned': order_line.book_returned + wizard_line.book_returned
                 })
+                order_line.order_id.write({
+                    'borrow_status': 'return',
+                })
             self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
         return msg
 

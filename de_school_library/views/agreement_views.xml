@@ -22,8 +22,7 @@
                     attrs="{'invisible':[('borrow_status', 'not in', ['confirm'])]}"/>
                 <button name="open_return_form" type="object" class="btn-primary" string="RETURN" data-hotkey="k"
                     attrs="{'invisible':[('borrow_status', 'not in', ['issue'])]}"/>
-                <button name="open_return_form" type="object" class="btn-secondary" string="RETURN" data-hotkey="k"
-                   />
+                
             </button>
             
             <xpath expr="//field[@name='partner_id']" position="attributes">
@@ -97,8 +96,9 @@
                 optional="show"
             />
         </xpath>
-        <xpath expr="//field[@name='order_line']//form//field[@name='product_uom_qty']" position="after">
-            <field name="qty_invoiced" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
+        <xpath expr="//notebook/page[@name='order_lines']/field/tree//field[@name='price_unit']" position="before">
+            <field name="book_returned" optional="hide" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
+            <field name="qty_invoiced" optional="hide" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
             <field name="qty_to_invoice" optional="hide" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
         </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
