@@ -70,10 +70,6 @@
             />
             <button name="schedule_product" type="object" class="" icon="fa-calendar" help="Edit Configuration"/>
         </xpath>
-          
-          <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_template_id']" position="replace">
-          </xpath>
-
         
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_uom_qty']" position="replace">
             <field name="product_uom_qty"  
@@ -96,10 +92,8 @@
                 optional="show"
             />
         </xpath>
-        <xpath expr="//notebook/page[@name='order_lines']/field/tree//field[@name='price_unit']" position="before">
-            <field name="book_returned" optional="hide" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
-            <field name="qty_invoiced" optional="hide" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
-            <field name="qty_to_invoice" optional="hide" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
+  <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='qty_delivered']" position="after">
+            <field name="book_returned" optional="hide" />
         </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
             <field name="invoice_lines" widget="many2many_tags" optional="hide"/>
@@ -114,6 +108,21 @@
         </xpath>
         </field>
       </record>
+
+    <record id="circulation_agreement_form_view_inherit" model="ir.ui.view">
+        <field name="name">circulation.agreement.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="de_school_library.circulation_agreement_form_view"/>
+        <field name="mode">primary</field>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='qty_delivered']" position="after">
+            <field name="book_returned" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
+                
+        </xpath>
+        </field>
+    </record>
+
     
     <record id="circulation_agreement_tree_view" model="ir.ui.view">
       <field name="name">circulation.agreement.tree.view</field>
