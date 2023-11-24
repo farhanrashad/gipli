@@ -31,6 +31,8 @@ class ProductTemplate(models.Model):
     date_publish = fields.Date('Publication Date')
     product_fees_ids = fields.One2many('oe.library.product.fees', 'product_template_id', string="Library Fees", auto_join=True, copy=True)
 
+    book_charge_hourly = fields.Float("Charge Hour", help="Fine by hour overdue", company_dependent=True)
+    book_charge_daily = fields.Float("Charge Day", help="Fine by day overdue", company_dependent=True)
 
     def _get_best_library_fee_rule(
         self, product=False, start_date=False, end_date=False, duration=False, unit='', **kwargs

@@ -143,6 +143,11 @@
                                       </tree>
                                     </field>
                                 </group>
+                                  <group string="RESERVATIONS">
+                                       <field name="book_charge_hourly" widget="monetary"/>
+                                        <field name="book_charge_daily" widget="monetary"/>
+                                        <field name="currency_id" invisible="1"/>
+                                  </group>
                               </group>
                             </page>
                             <page name="inventory" string="Inventory">

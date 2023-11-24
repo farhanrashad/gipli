@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from datetime import timedelta, date
+from pytz import timezone, UTC
+
 from odoo import api, fields, models, _
+from odoo.tools import format_datetime, format_time
 from odoo.exceptions import ValidationError, UserError
 
 
@@ -41,7 +45,7 @@ class LibraryProcessing(models.TransientModel):
         #order_line_ids = self.env.context.get('order_line_ids', [])
         #order_lines = self.env['sale.order.line'].browse(order_line_ids)
 
-        order_lines = self.env['sale.order.line'].search([('order_id','=',self.order_id.id)])
+        order_lines = self.env['sale.order.line'].search([('order_id','=',self.order_id.id),('product_id.is_book','=',True)])
         # generate line values
         #raise ValidationError(order_lines)
         if order_lines:
@@ -138,14 +142,13 @@ class LibraryProcessingLine(models.TransientModel):
                 if wizard_line.order_line_id.is_book_late:
                     # Delays facturation
                     wizard_line._generate_delay_line(wizard_line.book_returned)
-                    #raise UserError(order_line._generate_delay_line(wizard_line.book_returned))
-                #order_line.update({
-                #    'book_returned': order_line.book_returned + wizard_line.book_returned
-                #})
-                #order_line.order_id.write({
-                #    'borrow_status': 'return',
-                #})
-            #self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
+                order_line.update({
+                    'book_returned': order_line.book_returned + wizard_line.book_returned
+                })
+                order_line.order_id.write({
+                    'borrow_status': 'return',
+                })
+            self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
         return msg
 
     def _prepare_stock_move_values(self,line):
@@ -215,7 +218,7 @@ class LibraryProcessingLine(models.TransientModel):
 
         duration = fields.Datetime.now() - self.order_line_id.book_return_date
 
-        delay_price = self.product_id._compute_delay_price(duration)
+        delay_price = self.product_id._compute_book_delay_price(duration)
         if delay_price <= 0.0:
             return
 
@@ -243,8 +246,8 @@ class LibraryProcessingLine(models.TransientModel):
 
         delay_price = self.product_id.currency_id._convert(
             from_amount=delay_price,
-            to_currency=self.currency_id,
-            company=self.company_id,
+            to_currency=self.order_line_id.currency_id,
+            company=self.order_line_id.order_id.company_id,
             date=date.today(),
         )
 
@@ -253,3 +256,36 @@ class LibraryProcessingLine(models.TransientModel):
         self.order_line_id.order_id.write({
             'order_line': [(0, 0, vals)]
         })
+
+    def _prepare_delay_line_vals(self, delay_product, delay_price, qty):
+        """Prepare values of delay line.
+
+        :param float delay_price:
+        :param float quantity:
+        :param delay_product: Product used for the delay_line
+        :type delay_product: product.product
+        :return: sale.order.line creation values
+        :rtype dict:
+        """
+        delay_line_description = self._get_delay_line_description()
+        return {
+            'name': delay_line_description,
+            'product_id': delay_product.id,
+            'product_uom_qty': qty,
+            'product_uom': self.product_id.uom_id.id,
+            'qty_delivered': qty,
+            'price_unit': delay_price,
+        }
+
+    def _get_delay_line_description(self):
+        # Shouldn't tz be taken from self.order_id.user_id.tz ?
+        tz = self._get_tz()
+        return "%s\n%s: %s\n%s: %s" % (
+            self.product_id.name,
+            _("Expected"),
+            format_datetime(self.with_context(use_babel=True).env, self.order_line_id.book_return_date, tz=tz, dt_format=False),
+            _("Returned"),
+            format_datetime(self.with_context(use_babel=True).env, fields.Datetime.now(), tz=tz, dt_format=False)
+        )
+    def _get_tz(self):
+        return self.env.context.get('tz') or self.env.user.tz or 'UTC'

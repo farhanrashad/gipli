@@ -24,3 +24,12 @@ class ProductProduct(models.Model):
         else:
             action = self.env["ir.actions.actions"]._for_xml_id('stock.stock_replenishment_product_product_action')
         return action
+
+    def _compute_book_delay_price(self, duration):
+        """Compute daily and hourly delay price.
+
+        :param timedelta duration: datetime representing the delay.
+        """
+        days = duration.days
+        hours = duration.seconds // 3600
+        return days * self.book_charge_daily + hours * self.book_charge_hourly
