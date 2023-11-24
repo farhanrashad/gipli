@@ -54,7 +54,7 @@ class CirculationAgreement(models.Model):
                 #order.rental_status = order.state if order.is_borrow_order else False
                 order.borrow_next_action_date = False
     
-    @api.depends('is_borrow_order', 'borrow_next_action_date', 'rental_status')
+    @api.depends('is_borrow_order', 'borrow_next_action_date', 'borrow_status')
     def _compute_has_late_lines(self):
         for order in self:
             order.has_late_lines = (
@@ -74,45 +74,6 @@ class CirculationAgreement(models.Model):
             'state': 'sale',
             'borrow_status': 'confirm',
         })
-
-
-    def add_book(self):
-        action = self.env['ir.actions.actions']._for_xml_id('de_school_library.action_sale_order_line')
-        context = {
-            'active_model': 'sale.order.line',
-            'active_ids': self.ids,
-            'active_id': self.id,
-        }
-        action['context'] = context
-        action['res_id'] = self.id
-        return action
-
-    
-    def add_book1(self):
-        #sale_line = self.env['sale.order.line'].create({
-        #    'price_unit': 1,
-        #    'product_uom_qty': 0,
-            #'book_issue_date': self.issue_date,
-            #'book_return_date': self.return_date,
-        #    'name': 'Schedule Book',
-        #    'order_id': self.id,
-        #})
-        
-        action = {
-            'name': _('Add a Book'),
-            'res_model': 'oe.library.fee.config.wizard',
-            'view_mode': 'form',
-            'context': {
-                'active_model': 'sale.order.line',
-                'active_id': 0, #sale_line.id,
-                'order_id': self.id,
-                'record_mode': 'new',
-            },
-            'target': 'new',
-            'type': 'ir.actions.act_window',
-        }
-        return action
-        
     def open_issue_form(self):
         status = "confirm"
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')

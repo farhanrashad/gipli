@@ -36,14 +36,6 @@
             <xpath expr="//notebook/page[@name='order_lines']/field/tree" position="inside">
                 <field name="borrow_status" invisible="1" />
             </xpath>
-
-            <!-- add a book button -->
-            <!--
-            <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']" position="before">
-                <button name="add_book" type="object" class="btn-primary" string="ADD A BOOK" data-hotkey="y"
-                    attrs="{'invisible':[('borrow_status', 'not in', ['draft'])]}"/>
-            </xpath>
-            -->
             
             <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']" position="attributes">
                 <attribute name="context">{
@@ -101,6 +93,7 @@
         <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
             <field name="invoice_lines" widget="many2many_tags" optional="hide"/>
             <field name="invoice_status" optional="hide"/>
+            <field name="is_book_late" invisible="0"/>
         </xpath>
             
             <xpath expr="//page[@name='customer_signature']" position="attributes">
