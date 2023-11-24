@@ -16,6 +16,11 @@ class ResCompany(models.Model):
         "This location is internal because products in rental"
         "are still considered as company assets.")
 
+    book_charge_product_id = fields.Many2one(
+        'product.product', string="Product",
+        help="The product is used to add the book fine to the sales order",
+        domain="[('type', '=', 'service')]")
+
     def _create_library_location(self):
         for company in self.sudo():
             if not company.library_loc_id:

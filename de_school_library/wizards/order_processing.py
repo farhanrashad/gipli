@@ -135,17 +135,17 @@ class LibraryProcessingLine(models.TransientModel):
                     'borrow_status': 'issue',
                 })
             elif wizard_line.status == 'return' and wizard_line.book_returned > 0:
-                if wizard_line.is_book_late:
+                if wizard_line.order_line_id.is_book_late:
                     # Delays facturation
-                    order_line._generate_delay_line(wizard_line.book_returned)
-
-                order_line.update({
-                    'book_returned': order_line.book_returned + wizard_line.book_returned
-                })
-                order_line.order_id.write({
-                    'borrow_status': 'return',
-                })
-            self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
+                    wizard_line._generate_delay_line(wizard_line.book_returned)
+                    #raise UserError(order_line._generate_delay_line(wizard_line.book_returned))
+                #order_line.update({
+                #    'book_returned': order_line.book_returned + wizard_line.book_returned
+                #})
+                #order_line.order_id.write({
+                #    'borrow_status': 'return',
+                #})
+            #self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
         return msg
 
     def _prepare_stock_move_values(self,line):
@@ -198,3 +198,58 @@ class LibraryProcessingLine(models.TransientModel):
                 # If qty = 1, product has been picked up, no need to specify quantity
                 # But if ordered_qty > 1.0: we need to still specify pickedup/returned qty
         return msg
+
+    def _generate_delay_line(self, qty):
+        """Generate a sale order line representing the delay cost due to the late return.
+
+        :param float qty:
+        :param timedelta duration:
+        """
+        self.ensure_one()
+
+        self.order_line_id.order_id.update({
+            'note': str(fields.Datetime.now()),
+        })
+        #if qty <= 0 or not self.is_book_late:
+        #    return
+
+        duration = fields.Datetime.now() - self.order_line_id.book_return_date
+
+        delay_price = self.product_id._compute_delay_price(duration)
+        if delay_price <= 0.0:
+            return
+
+        
+        # migrate to a function on res_company get_extra_product?
+        delay_product = self.order_line_id.order_id.company_id.book_charge_product_id
+        
+        if not delay_product:
+            delay_product = self.env['product.product'].with_context(active_test=False).search(
+                [('default_code', '=', 'BOOK_Charge'), ('type', '=', 'service')], limit=1)
+            if not delay_product:
+                delay_product = self.env['product.product'].create({
+                    "name": "Book Charge",
+                    "standard_price": 0.0,
+                    "type": 'service',
+                    "default_code": "BOOK_Charge",
+                    "purchase_ok": False,
+                })
+                # Not set to inactive to allow users to put it back in the settings
+                # In case they removed it.
+            self.order_line_id.order_id.company_id.book_charge_product_id = delay_product
+
+        if not delay_product.active:
+            return
+
+        delay_price = self.product_id.currency_id._convert(
+            from_amount=delay_price,
+            to_currency=self.currency_id,
+            company=self.company_id,
+            date=date.today(),
+        )
+
+        vals = self._prepare_delay_line_vals(delay_product, delay_price, qty)
+
+        self.order_line_id.order_id.write({
+            'order_line': [(0, 0, vals)]
+        })

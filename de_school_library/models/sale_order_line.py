@@ -171,7 +171,62 @@ class SaleOrderLine(models.Model):
             })
         #self.schedule_product()
        
-            
+    def _generate_delay_line(self, qty):
+        """Generate a sale order line representing the delay cost due to the late return.
+
+        :param float qty:
+        :param timedelta duration:
+        """
+        self.ensure_one()
+
+        self.order_id.update({
+            'note': str(fields.Datetime.now()),
+        })
+        
+        if qty <= 0 or not self.is_book_late:
+            return
+
+        duration = fields.Datetime.now() - self.return_date
+
+        #delay_price = self.product_id._compute_delay_price(duration)
+        #if delay_price <= 0.0:
+        #    return
+
+        
+        # migrate to a function on res_company get_extra_product?
+        delay_product = self.company_id.book_charge_product_id
+        
+        if not delay_product:
+            delay_product = self.env['product.product'].with_context(active_test=False).search(
+                [('default_code', '=', 'BOOK_Charge'), ('type', '=', 'service')], limit=1)
+            if not delay_product:
+                delay_product = self.env['product.product'].create({
+                    "name": "Book Charge",
+                    "standard_price": 0.0,
+                    "type": 'service',
+                    "default_code": "BOOK_Charge",
+                    "purchase_ok": False,
+                })
+                # Not set to inactive to allow users to put it back in the settings
+                # In case they removed it.
+            self.company_id.book_charge_product_id = delay_product
+
+        if not delay_product.active:
+            return
+
+        delay_price = self.product_id.currency_id._convert(
+            from_amount=delay_price,
+            to_currency=self.currency_id,
+            company=self.company_id,
+            date=date.today(),
+        )
+
+        vals = self._prepare_delay_line_vals(delay_product, delay_price, qty)
+
+        self.order_id.write({
+            'order_line': [(0, 0, vals)]
+        })
+
     def schedule_product(self):
         action = self.env['ir.actions.actions']._for_xml_id('de_school_library.action_sale_order_line')
         context = {
