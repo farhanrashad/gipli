@@ -73,14 +73,41 @@ class SaleOrderLine(models.Model):
                     }
             wizard.update(values)
 
-    @api.onchange('book_issue_date', 'book_return_date','product_id')
-    def _compute_name_onchange(self):
-        for line in self:
-            line.write({
-                'name': (('[' + line.product_id.default_code + '] ') if line.product_id.default_code else '') + line.product_id.name + ' \n' + str(line.book_issue_date) + ' to \n' + str(line.book_return_date)
-            })
+    @api.depends('book_issue_date','book_return_date','is_borrow_order')
+    def _compute_name(self):
+        """Override to add the compute dependency.
 
-    
+        The custom name logic can be found below in _get_sale_order_line_multiline_description_sale.
+        """
+        super()._compute_name()
+        
+    def _get_sale_order_line_multiline_description_sale(self):
+        """Add Rental information to the SaleOrderLine name."""
+        res = super()._get_sale_order_line_multiline_description_sale()
+        if self.is_borrow_order:
+            self._compute_unit_price()
+            res += self._get_book_order_line_description()
+        return res
+
+    def _get_book_order_line_description(self):
+        tz = self._get_tz()
+        if self.book_issue_date and self.book_return_date\
+           and self.book_issue_date.replace(tzinfo=UTC).astimezone(timezone(tz)).date()\
+               == self.book_return_date.replace(tzinfo=UTC).astimezone(timezone(tz)).date():
+            # If return day is the same as pickup day, don't display return_date Y/M/D in description.
+            return_date_part = format_time(self.with_context(use_babel=True).env, self.book_return_date, tz=tz, time_format=False)
+        else:
+            return_date_part = format_datetime(self.with_context(use_babel=True).env, self.book_return_date, tz=tz, dt_format=False)
+
+        return "\n%s %s %s" % (
+            format_datetime(self.with_context(use_babel=True).env, self.book_issue_date, tz=tz, dt_format=False),
+            _("to"),
+            return_date_part,
+        )
+        
+    def _get_tz(self):
+        return self.env.context.get('tz') or self.env.user.tz or 'UTC'
+        
     @api.depends('book_issue_date', 'book_return_date','product_id','duration')
     def _compute_book_pricing(self):
         for wizard in self:
