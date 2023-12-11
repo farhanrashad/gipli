@@ -109,6 +109,9 @@ class LibraryProcessingLine(models.TransientModel):
     issue_lot_ids = fields.Many2many('stock.lot', 'book_issue_serial_rel',
                     domain="[('product_id','=',product_id)]"
                 )
+    return_lot_ids = fields.Many2many('stock.lot', 'book_return_serial_rel',
+                    domain="[('product_id','=',product_id)]"
+                )
     
     @api.constrains('book_returned', 'qty_delivered')
     def _only_pickedup_can_be_returned(self):
@@ -128,6 +131,8 @@ class LibraryProcessingLine(models.TransientModel):
             order_line = wizard_line.order_line_id
             order_line.mapped('company_id').filtered(lambda company: not company.library_loc_id)._create_library_location()
             if wizard_line.status == 'issue' and wizard_line.qty_delivered > 0:
+                if len(wizard_line.issue_lot_ids) == 0:
+                    return False
                 delivered_qty = order_line.qty_delivered + wizard_line.qty_delivered
                 vals = {'qty_delivered': delivered_qty}
                 if delivered_qty > order_line.product_uom_qty:
@@ -139,6 +144,8 @@ class LibraryProcessingLine(models.TransientModel):
                     'borrow_status': 'issue',
                 })
             elif wizard_line.status == 'return' and wizard_line.book_returned > 0:
+                if len(wizard_line.return_lot_ids) == 0:
+                    return False
                 if wizard_line.order_line_id.is_book_late:
                     # Delays facturation
                     wizard_line._generate_delay_line(wizard_line.book_returned)
