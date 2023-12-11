@@ -24,7 +24,7 @@ class ResCompany(models.Model):
     def _create_library_location(self):
         for company in self.sudo():
             if not company.library_loc_id:
-                company.rental_loc_id = self.env['stock.location'].sudo().create({
+                company.library_loc_id = self.env['stock.location'].sudo().create({
                     "name": "Borrow",
                     "usage": "internal",
                     "company_id": company.id,

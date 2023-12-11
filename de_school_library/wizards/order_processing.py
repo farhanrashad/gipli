@@ -154,10 +154,10 @@ class LibraryProcessingLine(models.TransientModel):
     def _prepare_stock_move_values(self,line):
         self.ensure_one()
         if self.status == 'issue':
-            library_location = line.order_id.company_id.rental_loc_id
+            library_location = line.order_id.company_id.library_loc_id
             stock_location = line.order_id.warehouse_id.lot_stock_id
         else:
-            stock_location = line.order_id.company_id.rental_loc_id
+            stock_location = line.order_id.company_id.library_loc_id
             library_location = line.order_id.warehouse_id.lot_stock_id
         return {
             'reference': _('Library Move:' + line.order_id.name),
