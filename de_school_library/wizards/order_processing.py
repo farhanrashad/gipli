@@ -143,6 +143,7 @@ class LibraryProcessingLine(models.TransientModel):
                 order_line.order_id.write({
                     'borrow_status': 'issue',
                 })
+                lot_ids = wizard_line.issue_lot_ids
             elif wizard_line.status == 'return' and wizard_line.book_returned > 0:
                 if len(wizard_line.return_lot_ids) == 0:
                     return False
@@ -155,7 +156,10 @@ class LibraryProcessingLine(models.TransientModel):
                 order_line.order_id.write({
                     'borrow_status': 'return',
                 })
-            self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
+                lot_ids = wizard_line.return_lot_ids
+            stock_move_id = self.env['stock.move'].create(self._prepare_stock_move_values(order_line))
+            for lot in lot_ids:
+                stock_move_line_id = self.env['stock.move.line'].create(self._prepare_stock_move_line_values(order_line,stock_move_id,lot))
         return msg
 
     def _prepare_stock_move_values(self,line):
@@ -176,6 +180,28 @@ class LibraryProcessingLine(models.TransientModel):
             'product_id': line.product_id.id,
             'product_uom_qty': self.qty_delivered,
             'warehouse_id': line.order_id.warehouse_id.id,
+            'state': 'done',
+        }
+    def _prepare_stock_move_line_values(self,line, stock_move_id,lot):
+        self.ensure_one()
+        if self.status == 'issue':
+            library_location = line.order_id.company_id.library_loc_id
+            stock_location = line.order_id.warehouse_id.lot_stock_id
+        else:
+            stock_location = line.order_id.company_id.library_loc_id
+            library_location = line.order_id.warehouse_id.lot_stock_id
+        return {
+            'reference': _('Library Move:' + line.order_id.name),
+            #'name': _('Library Move:' + line.order_id.name),
+            'date': fields.Datetime.now(),
+            'location_id': stock_location.id,
+            'location_dest_id': library_location.id,
+            'company_id': line.order_id.company_id.id,
+            'product_id': line.product_id.id,
+            'qty_done': self.qty_delivered,
+            #'warehouse_id': line.order_id.warehouse_id.id,
+            'lot_id': lot.id,
+            'move_id': stock_move_id.id,
             'state': 'done',
         }
         
