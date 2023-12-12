@@ -11,6 +11,11 @@
     'website': "https://www.dynexcel.com",
     'category': 'Sales/Library',
     'version': '0.2',
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'license': 'OPL-1',
+    
     'depends': ['de_school','sale','stock','web'],
     'data': [
         'security/library_security.xml',

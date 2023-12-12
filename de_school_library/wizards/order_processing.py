@@ -109,10 +109,17 @@ class LibraryProcessingLine(models.TransientModel):
     issue_lot_ids = fields.Many2many('stock.lot', 'book_issue_serial_rel',
                     domain="[('product_id','=',product_id)]"
                 )
-    return_lot_ids = fields.Many2many('stock.lot', 'book_return_serial_rel',
-                    domain="[('product_id','=',product_id)]"
-                )
     
+    return_lot_ids = fields.Many2many('stock.lot', 'book_return_serial_rel',
+                    domain="[('product_id','=',product_id)]", 
+                    compute='_compute_all_return',
+                )
+
+    @api.depends('status','order_line_id')
+    def _compute_all_return(self):
+        for line in self:
+            line.return_lot_ids = line.order_line_id.library_issue_lot_ids
+        
     @api.constrains('book_returned', 'qty_delivered')
     def _only_pickedup_can_be_returned(self):
         for wizard_line in self:
@@ -139,6 +146,7 @@ class LibraryProcessingLine(models.TransientModel):
                     vals['product_uom_qty'] = delivered_qty
                 if order_line.book_issue_date > now:
                     vals['book_issue_date'] = now
+                vals['library_issue_lot_ids'] = wizard_line.issue_lot_ids
                 order_line.update(vals)
                 order_line.order_id.write({
                     'borrow_status': 'issue',
@@ -151,7 +159,8 @@ class LibraryProcessingLine(models.TransientModel):
                     # Delays facturation
                     wizard_line._generate_delay_line(wizard_line.book_returned)
                 order_line.update({
-                    'book_returned': order_line.book_returned + wizard_line.book_returned
+                    'book_returned': order_line.book_returned + wizard_line.book_returned,
+                    'library_returned_lot_ids': wizard_line.return_lot_ids
                 })
                 order_line.order_id.write({
                     'borrow_status': 'return',

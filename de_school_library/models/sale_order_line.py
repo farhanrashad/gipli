@@ -37,6 +37,9 @@ class SaleOrderLine(models.Model):
         string="Is overdue", compute='_compute_is_book_late',
         help="The products haven't been returned in time")
 
+    library_issue_lot_ids = fields.Many2many('stock.lot', 'library_issue_lot_rel', domain="[('product_id','=',product_id)]", copy=False)
+    library_returned_lot_ids = fields.Many2many('stock.lot', 'library_returned_lot_rel', domain="[('product_id','=',product_id)]", copy=False)
+    
     @api.depends('book_return_date')
     def _compute_is_book_late(self):
         now = fields.Datetime.now()
