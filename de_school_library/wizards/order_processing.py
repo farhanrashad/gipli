@@ -92,7 +92,7 @@ class LibraryProcessingLine(models.TransientModel):
             'qty_reserved': line.product_uom_qty,
             'qty_delivered': line.qty_delivered if status == 'return' else line.product_uom_qty - line.qty_delivered,
             'book_returned': line.book_returned if status == 'issue' else line.qty_delivered - line.book_returned,
-            #'is_book_late': line.is_book_late and delay_price > 0
+            'is_book_late': line.is_book_late #and delay_price > 0
         }
 
     order_wizard_id = fields.Many2one('oe.library.process.wizard', 'Order Wizard', required=True, ondelete='cascade')
@@ -115,6 +115,16 @@ class LibraryProcessingLine(models.TransientModel):
                     compute='_compute_all_return',
                 )
 
+    @api.onchange('issue_lot_ids')
+    def _update_issued_quantity(self):
+        for line in self:
+            line.qty_delivered = len(line.issue_lot_ids)
+
+    @api.onchange('return_lot_ids')
+    def _update_returned_quantity(self):
+        for line in self:
+            line.book_returned = len(line.return_lot_ids)
+    
     @api.depends('status','order_line_id')
     def _compute_all_return(self):
         for line in self:
