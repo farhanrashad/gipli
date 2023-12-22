@@ -79,15 +79,21 @@
                                     </div>
                                 </div>
                             </h2>
-                        </div>
-                        <group>
-                            <group>
+                            <h4>
+                                <field name="title" class="w-auto" nolabel="1" style="width: 7rem;" />
+                            </h4>
+                            <h1>
                                 <label for="contact_name" string="Applicant Name" attrs="{'invisible':[('won_status','=','won')]}"/>
                                 <label for="contact_name" string="Student Name" attrs="{'invisible':[('won_status','!=','won')]}"/>
                                 <div class="d-flex flex-row align-items-start">
-                                    <field name="title" class="w-auto" nolabel="1" style="width: 7rem;" />
+                                    
                                     <field name="contact_name" required="1" class="oe_inline text-start" placeholder="Full Name e.g John Doe"/>
                                 </div>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                    
                                 <label for="street_page_lead" string="Address"/>
                                 <div class="o_address_format">
                                     <field name="street" id="street_page_lead" placeholder="Street..." class="o_address_street"/>

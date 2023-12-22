@@ -37,7 +37,17 @@ class Admission(models.Model):
         
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
-        search_domain = [('id', 'in', stages.ids)]
+        # retrieve team_id from the context and write the domain
+        # - ('id', 'in', stages.ids): add columns that should be present
+        # - OR ('fold', '=', False): add default columns that are not folded
+        # - OR ('team_ids', '=', team_id), ('fold', '=', False) if team_id: add team columns that are not folded
+        team_id = self._context.get('default_team_id')
+        if team_id:
+            search_domain = ['|', ('id', 'in', stages.ids), '|', ('team_id', '=', False), ('team_id', '=', team_id)]
+        else:
+            search_domain = ['|', ('id', 'in', stages.ids), ('team_id', '=', False)]
+
+        # perform search
         stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
         return stages.browse(stage_ids)
 
