@@ -8,13 +8,13 @@ class ResUsers(models.Model):
     _inherit = 'res.users'
 
     admission_team_ids = fields.Many2many(
-        'oe.school.team', 'admission_team_member', 'user_id', 'admission_team_id', string='Admission Teams',
+        'oe.admission.team', 'admission_team_member', 'user_id', 'admission_team_id', string='Admission Teams',
         check_company=True, copy=False, readonly=True,
         compute='_compute_admission_team_ids', search='_search_admission_team_ids')
     
     admission_team_member_ids = fields.One2many('oe.admission.team.member', 'user_id', string='Admission Team Members')
     admission_team_id = fields.Many2one(
-        'oe.school.team', string='Admission Team', compute='_compute_admission_team_id',
+        'oe.admission.team', string='Admission Team', compute='_compute_admission_team_id',
         readonly=True, store=True,
         help="Main user admissions team. Used notably for pipeline, or to set admission team in admission or enrollment")
 
