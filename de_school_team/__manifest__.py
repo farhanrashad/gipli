@@ -16,7 +16,7 @@
     'website': "https://www.dynexcel.com",
 
     'category': 'School/CRM',
-    'version': '16.0.0.3',
+    'version': '16.0.0.4',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'mail','de_school'],
@@ -25,6 +25,7 @@
     'data': [
         'security/school_team_security.xml',
         'security/ir.model.access.csv',
+        'data/team_data.xml',
         'views/admission_team_views.xml',
         'views/admission_team_members_views.xml',
         'views/admission_tag_views.xml',
