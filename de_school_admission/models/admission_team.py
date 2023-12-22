@@ -191,7 +191,7 @@ class AdmissionTeam(models.Model):
     #TODO JEM : refactor this stuff with xml action, proper customization,
     @api.model
     def action_your_admission(self):
-        action = self.env["ir.actions.actions"]._for_xml_id("de_school_admission.school_admission_action_pipeline")
+        action = self.env["ir.actions.actions"]._for_xml_id("de_school_admission.action_my_admission_pipeline")
         return self._action_update_to_pipeline(action)
 
     @api.model
@@ -219,6 +219,5 @@ class AdmissionTeam(models.Model):
         action_context = safe_eval(action['context'], {'uid': self.env.uid})
         if user_team_id:
             action_context['default_admission_team_id'] = user_team_id
-
         action['context'] = action_context
         return action

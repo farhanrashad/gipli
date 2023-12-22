@@ -2,11 +2,19 @@
 <odoo>
 
     <record id="action_your_admission" model="ir.actions.server">
-        <field name="name">Crm: My Admission Pipeline</field>
+        <field name="name">Admission: My Admission Pipeline</field>
         <field name="model_id" ref="de_school_team.model_oe_admission_team"/>
         <field name="state">code</field>
         <field name="groups_id"  eval="[(4, ref('base.group_user'))]"/>
         <field name="code">action = model.action_your_admission()</field>
     </record>
 
+    <record id="action_admission_forecast" model="ir.actions.server">
+        <field name="name">Admission: Forecast</field>
+        <field name="model_id" ref="de_school_team.model_oe_admission_team"/>
+        <field name="state">code</field>
+        <field name="groups_id"  eval="[(4, ref('base.group_user'))]"/>
+        <field name="code">action = model.action_admission_forecast()</field>
+    </record>
+    
 </odoo>
