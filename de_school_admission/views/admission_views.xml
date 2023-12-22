@@ -189,7 +189,7 @@
                 <form>
                     <group>
                         <field name="contact_name" string="Student Name" placeholder="Full Name e.g. John Doe" />
-                        <field name="admission_register_id"  options="{'no_open': True, 'no_create': True}"/>
+                        <field name="admission_register_id" required="1" options="{'no_open': True, 'no_create': True}"/>
                         <field name="course_id" />
                         <field name="email_from" string="Email" />
                         <field name="phone" string="Phone" />
