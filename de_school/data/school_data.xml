@@ -6,6 +6,7 @@
     </data>
     <data noupdate="1">
         <!-- Grading Type -->
+        <!--
         <record model="oe.school.course.grading.type" id="school_course_grading_type_normal">
           <field name="name">Normal</field>
         </record>
@@ -21,6 +22,7 @@
         <record model="oe.school.course.grading.type" id="school_course_grading_type_icse">
           <field name="name">ICSE</field>
         </record>
+        -->
         
         <!-- working time / timetable data -->
         <record id="school_resource_calendar_std" model="resource.calendar">

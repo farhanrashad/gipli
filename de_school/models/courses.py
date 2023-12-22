@@ -6,10 +6,10 @@ from odoo.exceptions import UserError, AccessError
 from random import randint
 
 
-class CourseGradingType(models.Model):
-    _name = 'oe.school.course.grading.type'
-    _description = 'Course Grading Type'
-    name = fields.Char(string='Type', required=True, index=True, translate=True) 
+#class CourseGradingType(models.Model):
+#    _name = 'oe.school.course.grading.type'
+#    _description = 'Course Grading Type'
+#    name = fields.Char(string='Type', required=True, index=True, translate=True) 
 
     
 class OeSchoolCourse(models.Model):
@@ -26,7 +26,7 @@ class OeSchoolCourse(models.Model):
     parent_id = fields.Many2one('oe.school.course', string='Parent Course', index=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     active = fields.Boolean('Active', default=True)
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
-    grading_type_id = fields.Many2one('oe.school.course.grading.type', string='Grading Type', required=True)
+    #grading_type_id = fields.Many2one('oe.school.course.grading.type', string='Grading Type', required=True)
 
     enable_elective = fields.Boolean('Enable Elective Subjects Selection')
     subject_ids = fields.Many2many('oe.school.course.subject', compute='_compute_subjects')
