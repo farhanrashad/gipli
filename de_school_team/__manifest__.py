@@ -16,7 +16,7 @@
     'website': "https://www.dynexcel.com",
 
     'category': 'School/CRM',
-    'version': '16.0.0.2',
+    'version': '16.0.0.3',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'mail','de_school'],
