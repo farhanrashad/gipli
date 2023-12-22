@@ -11,6 +11,13 @@
 			parent="menu_admission" 
               sequence = "10"
 			groups="de_school_team.group_school_admission_user" />
+
+    <menuitem
+        id="menu_admission_opportunities"
+        name="My Pipeline"
+        parent="menu_admission_main"
+        action="de_school_admission.action_your_admission"
+        sequence="1"/>
     
     <menuitem name="Reports" id="menu_admission_reports"
 			parent="menu_admission" 
