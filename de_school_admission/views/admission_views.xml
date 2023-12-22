@@ -447,13 +447,15 @@
                 </p>
             </field>
         </record>
+
+      <!--
       <menuitem
         id="menu_admission_pipeline"
         name="My Piepeline"
         parent="menu_admission_main"
         action="action_my_admission_pipeline"
         sequence="1"/>
-      
+      -->
       
       <record model="ir.actions.act_window" id="school_admission_action_pipeline">
             <field name="name">Pipeline</field>

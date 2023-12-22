@@ -14,7 +14,7 @@
 
     <menuitem
         id="menu_admission_opportunities"
-        name="My Pipeline"
+        name="My Admission"
         parent="menu_admission_main"
         action="de_school_admission.action_your_admission"
         sequence="1"/>
