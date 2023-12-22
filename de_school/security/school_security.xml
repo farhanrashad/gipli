@@ -28,7 +28,8 @@
         <record id="group_school_manager" model="res.groups">
             <field name="name">Administrator</field>
             <field name="category_id" ref="module_category_openrol_school"/>
-            <field name="implied_ids" eval="[(4, ref('group_school_user')),(4, ref('base.group_user')),(4, ref('base.group_erp_manager'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_school_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
         
     </data>
