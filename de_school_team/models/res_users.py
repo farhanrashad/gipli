@@ -19,13 +19,13 @@ class ResUsers(models.Model):
         help="Main user admissions team. Used notably for pipeline, or to set admission team in admission or enrollment")
 
 
-    @api.depends('crm_team_member_ids.active')
+    @api.depends('admission_team_member_ids.active')
     def _compute_admission_team_ids(self):
         for user in self:
-            user.crm_team_ids = user.crm_team_member_ids.crm_team_id
+            user.admission_team_ids = user.admission_team_member_ids.admission_team_id
 
     def _search_admission_team_ids(self, operator, value):
-        return [('crm_team_member_ids.crm_team_id', operator, value)]
+        return [('admission_team_member_ids.admission_team_id', operator, value)]
 
     
     @api.depends('admission_team_member_ids.admission_team_id', 'admission_team_member_ids.create_date', 'admission_team_member_ids.active')
@@ -35,4 +35,4 @@ class ResUsers(models.Model):
                 user.admission_team_id = False
             else:
                 sorted_memberships = user.admission_team_member_ids  # sorted by create date
-                user.sale_team_id = sorted_memberships[0].admission_team_id if sorted_memberships else False
+                user.admission_team_id = sorted_memberships[0].admission_team_id if sorted_memberships else False

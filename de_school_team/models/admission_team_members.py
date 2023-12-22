@@ -7,7 +7,7 @@ from odoo import api, exceptions, fields, models, _
 class AdmissionTeamMember(models.Model):
     _name = 'oe.admission.team.member'
     _inherit = ['mail.thread']
-    _description = 'Sales Team Member'
+    _description = 'Admission Team Member'
     _rec_name = 'user_id'
     _order = 'create_date ASC'
     _check_company_auto = True
