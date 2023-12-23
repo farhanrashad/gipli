@@ -14,10 +14,10 @@ class EnrollmentContract(models.Model):
     state = fields.Selection(selection_add=[('enrol', 'Enrol in Progress')])
     enrol_status = fields.Selection([
         ('draft', 'Draft'),
-        ('submit','Pending Review'), #submitted and is awaiting review by the school or admission office.
-        ('review','Under Review'), #reviewing the agreement and may request additional information or clarification.
-        ('approved', 'Approved'), # reviewed and approved by the school, indicating that the student is accepted.
-        ('pending', 'Pending Payment'), #accepted, and the agreement is pending payment of any fees or tuition.
+        ('process','In Process'), #submitted and is awaiting review by the school or admission office.
+        #('review','Under Review'), #reviewing the agreement and may request additional information or clarification.
+        #('approved', 'Approved'), # reviewed and approved by the school, indicating that the student is accepted.
+        #('pending', 'Pending Payment'), #accepted, and the agreement is pending payment of any fees or tuition.
         ('done', 'Done'), #The agreement is marked as done once the student has successfully 
         ('open', 'Running'), #The student is officially enrolled and attending classes.
         ('close', 'Close'), #close the contract, student completed the course.
@@ -104,7 +104,7 @@ class EnrollmentContract(models.Model):
     # All action Buttons
     def button_submit(self):
         self.write({
-            'enrol_status': 'submit'
+            'enrol_status': 'process'
         })
 
     def button_start_review(self):
@@ -117,20 +117,21 @@ class EnrollmentContract(models.Model):
             'enrol_status': 'approved'
         })
         
-    def button_interview(self):
+    def button_confirm(self):
         self.write({
-            'enrol_status': 'pending'
+            'enrol_status': 'done'
         })
+        self.action_confirm()
 
     def button_payment(self):
         self.write({
             'enrol_status': 'done'
         })
 
-    def button_confirm(self):
-        self.write({
-            'enrol_status': 'open'
-        })
+    #def button_confirm(self):
+    #    self.write({
+    #        'enrol_status': 'open'
+    #    })
 class EnrollmentOrderLine(models.Model):
     _inherit = 'sale.order.line'
 

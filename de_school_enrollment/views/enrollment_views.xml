@@ -13,6 +13,7 @@
                     string="Submit" class="btn-primary" type="object" 
                     attrs="{'invisible': [('enrol_status', 'not in', ['draft'])]}"/>
 
+                <!--
                 <button name="button_start_review" id="button_start_review" data-hotkey="v"
                     string="Review Start" class="btn-primary" type="object" 
                     attrs="{'invisible': [('enrol_status', 'not in', ['submit'])]}"/>
@@ -21,10 +22,13 @@
                     string="Review End" class="btn-primary" type="object" 
                     attrs="{'invisible': [('enrol_status', 'not in', ['review'])]}"/>
 
-                <button name="button_interview" id="button_interview" data-hotkey="v"
-                    string="Interview Taken" class="btn-primary" type="object" 
-                    attrs="{'invisible': [('enrol_status', 'not in', ['approved'])]}"/>
+                -->
+                
+                <button name="button_confirm" id="button_confirm" data-hotkey="v"
+                    string="Accept" class="btn-primary" type="object" 
+                    attrs="{'invisible': [('enrol_status', 'not in', ['process'])]}"/>
 
+                <!--
                 <button name="button_payment" id="button_payment" data-hotkey="v"
                     string="Payment" class="btn-primary" type="object" 
                     attrs="{'invisible': [('enrol_status', 'not in', ['pending'])]}"/>
@@ -32,6 +36,16 @@
                 <button name="button_confirm" id="button_confirm" data-hotkey="v"
                     string="Confirm Enrollment" class="btn-primary" type="object" 
                     attrs="{'invisible': [('enrol_status', 'not in', ['done'])]}"/>
+
+                -->
+                
+                <button id="create_invoice" name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
+                    type="action" class="btn-primary" data-hotkey="q"
+                    attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                <button id="create_invoice_percentage" name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
+                    type="action" context="{'default_advance_payment_method': 'percentage'}" data-hotkey="q"
+                    attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'sale')]}"/>
+                
                 
             </xpath>
             
@@ -42,7 +56,7 @@
             
             
             <xpath expr="//header" position='inside'>
-                <field name="enrol_status" widget="statusbar" statusbar_visible="draft,submit,review,approved,pending,done,open"/>
+                <field name="enrol_status" widget="statusbar" statusbar_visible="draft,process,done,open"/>
             </xpath>
             
             <xpath expr="//field[@name='partner_id']" position="attributes">
@@ -53,6 +67,7 @@
                 <field name="course_id" required="1"/>
                 <field name="batch_id" />
                 <field name="enrol_order_tmpl_id" domain="[('course_ids','in',course_id)]"/>
+                <field name="state" />
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="domain">[('is_student', '=', True)]</attribute>
