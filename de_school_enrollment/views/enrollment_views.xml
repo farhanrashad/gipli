@@ -39,13 +39,7 @@
 
                 -->
                 
-                <button id="create_invoice" name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
-                    type="action" class="btn-primary" data-hotkey="q"
-                    attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
-                <button id="create_invoice_percentage" name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
-                    type="action" context="{'default_advance_payment_method': 'percentage'}" data-hotkey="q"
-                    attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'sale')]}"/>
-                
+               
                 
             </xpath>
             
@@ -146,8 +140,10 @@
           <field name="team_id" optional="hide"/>
           <field name="amount_total" sum="Total Tax Included" widget="monetary" decoration-bf="1"/>
           <field name="enrol_status" widget='badge' decoration-info="enrol_status == 'draft' or enrol_status == 'sent'" decoration-warning="enrol_status == 'pickup'" decoration-success="enrol_status == 'return'"/>
-          <field name="state" invisible="1"/>
+          <field name="state"  optional="hide"/>
           <field name="currency_id" invisible="1"/>
+                        <field name="invoice_status" optional="hide"/>
+
         </tree>
       </field>
     </record>
