@@ -63,7 +63,7 @@
                 <!--
                 <field name="enrol_order_tmpl_id" domain="[('course_ids','in',course_id)]"/>
                 -->
-                <field name="state" />
+                <field name="state" invisible="1" />
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="domain">[('is_student', '=', True)]</attribute>
