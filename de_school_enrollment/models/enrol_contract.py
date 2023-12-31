@@ -113,7 +113,23 @@ class EnrollmentContract(models.Model):
 
         return super(EnrollmentContract, self).create(vals_list)
 
-        
+
+    # -----------------------------------------------
+    # --------------- Constraints -------------------
+    # -----------------------------------------------
+    @api.constrains('enrol_status', 'partner_id')
+    def _check_open_contract(self):
+        for record in self:
+            if record.is_enrol_order:
+                #raise UserError(record['enrol_status'])
+                open_order = self.env['sale.order'].search_count([('enrol_status', 'in', ['open']), ('partner_id', '=', record.partner_id.id), ('id', '!=', record.id)])
+                process_order = self.env['sale.order'].search_count([('enrol_status', 'in', ['open']), ('partner_id', '=', record.partner_id.id)])
+    
+                #raise UserError(process_order)
+                if (record.enrol_status == 'open' and process_order > 1) or open_order > 1:
+                    raise models.ValidationError("One of student contract is already running.")
+
+    
     # All action Buttons
     def button_submit(self):
         if len(self.order_line) == 0:
