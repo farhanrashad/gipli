@@ -31,7 +31,7 @@ class EnrollmentContract(models.Model):
     course_id = fields.Many2one('oe.school.course', string='Course')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
     
-    enrol_order_tmpl_id = fields.Many2one('oe.enrol.order.template', 'Template', readonly=True, check_company=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+    #enrol_order_tmpl_id = fields.Many2one('oe.enrol.order.template', 'Template', readonly=True, check_company=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
     admission_team_id = fields.Many2one(
         comodel_name='oe.admission.team',
@@ -42,7 +42,7 @@ class EnrollmentContract(models.Model):
         tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
-    @api.onchange('enrol_order_tmpl_id')
+    #@api.onchange('enrol_order_tmpl_id')
     def _onchange_enrol_order_tmpl_id(self):
         enrol_order_template = self.enrol_order_tmpl_id.with_context(lang=self.partner_id.lang)
 
