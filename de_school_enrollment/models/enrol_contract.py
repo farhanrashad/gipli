@@ -32,8 +32,10 @@ class EnrollmentContract(models.Model):
     # enroll_status = next action to do basically, but shown string is action done.
     
     # Academic Fields
-    course_id = fields.Many2one('oe.school.course', string='Course')
-    batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
+    course_id = fields.Many2one('oe.school.course', string='Course', 
+                                store=True, compute='_compute_from_partner')
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', 
+                               store=True, compute='_compute_from_partner')
     
     #enrol_order_tmpl_id = fields.Many2one('oe.enrol.order.template', 'Template', readonly=True, check_company=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
@@ -46,6 +48,28 @@ class EnrollmentContract(models.Model):
         tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
+    # -----------------------------------------------
+    # --------------- Constraints -------------------
+    # -----------------------------------------------
+    @api.constrains('enrol_status', 'partner_id')
+    def _check_open_contract(self):
+        for record in self:
+            if record.is_enrol_order:
+                #raise UserError(record['enrol_status'])
+                open_order = self.env['sale.order'].search_count([('enrol_status', 'in', ['open']), ('partner_id', '=', record.partner_id.id), ('id', '!=', record.id)])
+                process_order = self.env['sale.order'].search_count([('enrol_status', 'in', ['open']), ('partner_id', '=', record.partner_id.id)])
+    
+                #raise UserError(process_order)
+                if (record.enrol_status == 'open' and process_order > 1) or open_order > 1:
+                    raise models.ValidationError("One of student contract is already running.")
+
+
+    @api.depends('partner_id')
+    def _compute_from_partner(self):
+        for record in self:
+            record.course_id = record.partner_id.course_id
+            record.batch_id = record.partner_id.batch_id
+            
     #@api.onchange('enrol_order_tmpl_id')
     def _onchange_enrol_order_tmpl_id(self):
         enrol_order_template = self.enrol_order_tmpl_id.with_context(lang=self.partner_id.lang)
@@ -114,20 +138,7 @@ class EnrollmentContract(models.Model):
         return super(EnrollmentContract, self).create(vals_list)
 
 
-    # -----------------------------------------------
-    # --------------- Constraints -------------------
-    # -----------------------------------------------
-    @api.constrains('enrol_status', 'partner_id')
-    def _check_open_contract(self):
-        for record in self:
-            if record.is_enrol_order:
-                #raise UserError(record['enrol_status'])
-                open_order = self.env['sale.order'].search_count([('enrol_status', 'in', ['open']), ('partner_id', '=', record.partner_id.id), ('id', '!=', record.id)])
-                process_order = self.env['sale.order'].search_count([('enrol_status', 'in', ['open']), ('partner_id', '=', record.partner_id.id)])
     
-                #raise UserError(process_order)
-                if (record.enrol_status == 'open' and process_order > 1) or open_order > 1:
-                    raise models.ValidationError("One of student contract is already running.")
 
     
     # All action Buttons
