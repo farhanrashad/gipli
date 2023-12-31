@@ -2,7 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import timedelta, date
-from odoo import api, fields, models, _
+from odoo import api, fields, models, SUPERUSER_ID, _
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools import float_compare, format_datetime, format_time
 from pytz import timezone, UTC
 
@@ -18,13 +19,16 @@ class EnrollmentContract(models.Model):
         #('review','Under Review'), #reviewing the agreement and may request additional information or clarification.
         #('approved', 'Approved'), # reviewed and approved by the school, indicating that the student is accepted.
         #('pending', 'Pending Payment'), #accepted, and the agreement is pending payment of any fees or tuition.
-        ('done', 'Done'), #The agreement is marked as done once the student has successfully 
+        #('done', 'Done'), #The agreement is marked as done once the student has successfully 
         ('open', 'Running'), #The student is officially enrolled and attending classes.
         ('close', 'Close'), #close the contract, student completed the course.
         ('reject', 'Rejected'), #he school has reviewed the agreement and decided not to accept the student.
         ('cancel', 'Cancelled'), #student decides not to enroll after initially submitting the agreement,
         ('expire', 'Expired'), #Some enrollment agreements may have an expiration date, if that date passes without acceptance, the status could be "Expired.
-    ], string="Enroll Status", default='draft', store=True, tracking=True, index=True,)
+    ], string="Enroll Status", default='draft', 
+        readonly=True, copy=False, index=True,
+        tracking=3, store=True, 
+                                   )
     # enroll_status = next action to do basically, but shown string is action done.
     
     # Academic Fields
@@ -80,20 +84,29 @@ class EnrollmentContract(models.Model):
         for vals in vals_list:
             if 'company_id' in vals:
                 self = self.with_company(vals['company_id'])
+
             if vals.get('name', _("New")) == _("New"):
                 if vals.get('is_enrol_order', False):
                     # Assign a new sequence for enrol orders
-                    seq_date = fields.Datetime.context_timestamp(
-                        self, fields.Datetime.to_datetime(vals.get('date_order')) if 'date_order' in vals else None
-                    )
+                    date_order = vals.get('date_order')
+                    if date_order:
+                        date_order = fields.Datetime.to_datetime(date_order)
+                        seq_date = fields.Datetime.context_timestamp(self, date_order)
+                    else:
+                        seq_date = fields.Datetime.now()
+
                     vals['name'] = self.env['ir.sequence'].next_by_code(
                         'enrol.order', sequence_date=seq_date) or _("New")
                     vals['state'] = 'enrol'  # Set the state to 'enrol'
                 else:
                     # Use the default sequence and state for non-enrol orders
-                    seq_date = fields.Datetime.context_timestamp(
-                        self, fields.Datetime.to_datetime(vals.get('date_order')) if 'date_order' in vals else None
-                    )
+                    date_order = vals.get('date_order')
+                    if date_order:
+                        date_order = fields.Datetime.to_datetime(date_order)
+                        seq_date = fields.Datetime.context_timestamp(self, date_order)
+                    else:
+                        seq_date = fields.Datetime.now()
+
                     vals['name'] = self.env['ir.sequence'].next_by_code(
                         'sale.order', sequence_date=seq_date) or _("New")
                     vals['state'] = 'draft'  # Set the state to 'draft' (or another appropriate state)
@@ -103,6 +116,11 @@ class EnrollmentContract(models.Model):
         
     # All action Buttons
     def button_submit(self):
+        if len(self.order_line) == 0:
+            raise UserError(_(
+                    "You can not submit an application without line."
+                    ))
+            
         self.write({
             'enrol_status': 'process'
         })
@@ -119,7 +137,7 @@ class EnrollmentContract(models.Model):
         
     def button_confirm(self):
         self.write({
-            'enrol_status': 'done'
+            'enrol_status': 'open'
         })
         self.action_confirm()
 
@@ -128,10 +146,26 @@ class EnrollmentContract(models.Model):
             'enrol_status': 'done'
         })
 
-    #def button_confirm(self):
+    def action_draft(self):
+        res = super(EnrollmentContract,self).action_draft()
+        self.write({
+            'enrol_status': 'draft',
+            'state': 'enrol'
+        })
+        return res
+        
+    def action_cancel(self):
+        res = super(EnrollmentContract,self).action_cancel()
+        self.write({
+            'enrol_status': 'cancel'
+        })
+        return res
+    #def button_open(self):
     #    self.write({
     #        'enrol_status': 'open'
     #    })
+
+
 class EnrollmentOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
