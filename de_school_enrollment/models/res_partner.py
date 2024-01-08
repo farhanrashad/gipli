@@ -22,7 +22,7 @@ class ResPartner(models.Model):
         return self.env['sale.order'].search(
             expression.AND([[('partner_id', 'in', self.ids)],
             state_domain,
-            [('date_start', '<=', date_to),
+            [('date_enrol_start', '<=', date_to),
                 '|',
-                    ('date_end', '=', False),
-                    ('date_end', '>=', date_from)]]))
+                    ('date_enrol_end', '=', False),
+                    ('date_enrol_end', '>=', date_from)]]))
