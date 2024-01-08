@@ -51,7 +51,12 @@
             <xpath expr="//header" position='inside'>
                 <field name="enrol_status" widget="statusbar" statusbar_visible="draft,process,open"/>
             </xpath>
-            
+            <xpath expr="//field[@name='date_order']" position="after">
+                <label for="date_enrol_start" string="Duration"/>
+                <div class="o_row">
+                    <field name="date_enrol_start" required="1" class="oe_inline o_hr_narrow_field"/> - <field name="date_enrol_end" required="1" class="oe_inline o_hr_narrow_field"/>
+                </div>
+            </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="string">Student</attribute>
             </xpath>

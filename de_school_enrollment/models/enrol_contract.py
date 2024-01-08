@@ -48,6 +48,10 @@ class EnrollmentContract(models.Model):
         tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
+    date_enrol_start = fields.Date('Start Date', default=fields.Date.today, tracking=True, index=True)
+    date_enrol_end = fields.Date('End Date', tracking=True,
+        help="End date of the enrollment.")
+    
     # -----------------------------------------------
     # --------------- Constraints -------------------
     # -----------------------------------------------
