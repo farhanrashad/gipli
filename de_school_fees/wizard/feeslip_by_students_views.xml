@@ -15,6 +15,7 @@
                     <separator string="Department" colspan="2"/>
                     <div class="o_row">
                         <p class="text-muted w-50">Set a specific department if you wish to select all the students from this department (and subdepartments) at once.</p>
+                        <field name="course_id" nolabel="1"/>
                     </div>
                     <separator string="Students"/>
                     <field name="student_ids" nolabel="1">

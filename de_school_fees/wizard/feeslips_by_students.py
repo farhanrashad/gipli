@@ -17,7 +17,7 @@ class FeeslipStudents(models.TransientModel):
     _description = 'Generate feeslips for all selected students'
 
     def _get_available_contracts_domain(self):
-        return [('contract_ids.state', 'in', ('open', 'close')), ('company_id', '=', self.env.company.id)]
+        return [('enrol_order_ids.enrol_status', 'in', ('open', 'close')), ('company_id', '=', self.env.company.id)]
 
     def _get_students(self):
         active_student_ids = self.env.context.get('active_student_ids', False)
@@ -28,19 +28,20 @@ class FeeslipStudents(models.TransientModel):
 
     student_ids = fields.Many2many('res.partner', 'oe_student_group_rel', 'feeslip_id', 'student_id', 'Students',
                                     default=lambda self: self._get_students(), required=True,
-                                    #compute='_compute_student_ids', 
+                                    compute='_compute_student_ids', 
+                                   domain="[('is_student','=',True)]",
                                    store=True, readonly=False)
     fee_struct_id = fields.Many2one('oe.fee.struct', string='Fee Structure')
-    #department_id = fields.Many2one('hr.department')
+    course_id = fields.Many2one('oe.school.course')
 
-    #@api.depends('department_id')
+    @api.depends('course_id')
     def _compute_student_ids(self):
         for wizard in self:
             domain = wizard._get_available_contracts_domain()
-            if wizard.department_id:
+            if wizard.course_id:
                 domain = expression.AND([
                     domain,
-                    [('department_id', 'child_of', self.department_id.id)]
+                    [('course_id', 'child_of', self.course_id.id)]
                 ])
             wizard.student_ids = self.env['res.partner'].search(domain)
 
@@ -104,9 +105,9 @@ class FeeslipStudents(models.TransientModel):
         feeslips = self.env['oe.feeslip']
         Feeslip = self.env['oe.feeslip']
 
-        #contracts = students._get_contracts(
-        #    payslip_run.date_start, payslip_run.date_end, states=['open', 'close']
-        #).filtered(lambda c: c.active)
+        contracts = students._get_enrol_orders(
+            payslip_run.date_start, payslip_run.date_end, states=['open', 'close']
+        ).filtered(lambda c: c.active)
         #contracts._generate_work_entries(payslip_run.date_start, payslip_run.date_end)
         #work_entries = self.env['hr.work.entry'].search([
         #    ('date_start', '<=', payslip_run.date_end),
@@ -115,7 +116,9 @@ class FeeslipStudents(models.TransientModel):
         #])
         #self._check_undefined_slots(work_entries, payslip_run)
 
-        if(self.structure_id.type_id.default_struct_id == self.structure_id):
+        if self.fee_struct_id:
+        #if(self.fee_struct_id.type_id.default_struct_id == self.fee_struct_id):
+            """
             work_entries = work_entries.filtered(lambda work_entry: work_entry.state != 'validated')
             if work_entries._check_if_error():
                 work_entries_by_contract = defaultdict(lambda: self.env['hr.work.entry'])
@@ -136,7 +139,7 @@ class FeeslipStudents(models.TransientModel):
                     }
                 }
 
-
+            """
         default_values = Feeslip.default_get(Feeslip.fields_get())
         feeslips_vals = []
         for contract in self._filter_contracts(contracts):
