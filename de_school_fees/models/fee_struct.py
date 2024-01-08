@@ -31,7 +31,7 @@ class FeeStructure(models.Model):
         help="Name to be set on a feeslip. Example: 'End of the year bonus'. If not set, the default value is 'Fee Slip'")
     use_enrol_contract_lines = fields.Boolean(default=True, help="contract lines won't be computed/displayed in fee slips.")
     schedule_pay_duration = fields.Integer(string='Schedule Pay', default=1, required=True)
-    pay_one_time = fields.Boolean('One Time Pay')
+    #pay_one_time = fields.Boolean('One Time Pay')
     input_line_type_ids = fields.Many2many('oe.feeslip.input.type', string='Other Input Line')
     
     # Academic Fields

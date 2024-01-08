@@ -66,15 +66,14 @@
                     <group>
                         <field name="course_id" options="{'no_create': True, 'no_open': True}"/>
                         <field name="batch_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"/>
-                        <div class="o_td_label" attrs="{'invisible': [('pay_one_time', '=', True)]}">
+                        <div class="o_td_label" >
                             <label for="schedule_pay_duration" string="Schedule Pay" />
                         </div>
-                        <div name="schedule_pay_duration" attrs="{'invisible': [('pay_one_time', '=', True)]}">
+                        <div name="schedule_pay_duration" >
                             <span class="ml8">Every </span>
                             <field name="schedule_pay_duration" nolabel="1" style="width: 8rem;" />
                             <span class="ml8"> Month(s)</span>
                         </div>
-                        <field name="pay_one_time" />
                         <field name="journal_id" options="{'no_create': True, 'no_open': True}"/>
                     </group>
                 </group>

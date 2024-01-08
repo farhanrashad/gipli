@@ -16,7 +16,7 @@ class FeeRule(models.Model):
         help="The code of fee rules can be used as reference in computation of other rules. "
              "In that case, it is case sensitive.")
     fee_struct_id = fields.Many2one('oe.fee.struct', string="Fee Structure", required=True)
-    pay_one_time = fields.Boolean('One Time Pay')
+    #pay_one_time = fields.Boolean('One Time Pay')
     
     sequence = fields.Integer(required=True, index=True, default=5,
         help='Use to arrange calculation sequence')
