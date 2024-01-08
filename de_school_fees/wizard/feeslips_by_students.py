@@ -91,6 +91,7 @@ class FeeslipStudents(models.TransientModel):
         if not students:
             raise UserError(_("You must select student(s) to generate feeslip(s)."))
 
+        #raise UserError(feeslip_run)
         #Prevent a feeslip_run from having multiple feeslips for the same student
         students -= feeslip_run.slip_ids.student_id
         success_result = {
@@ -106,15 +107,16 @@ class FeeslipStudents(models.TransientModel):
         Feeslip = self.env['oe.feeslip']
 
         contracts = students._get_enrol_orders(
-            payslip_run.date_start, payslip_run.date_end, states=['open', 'close']
-        ).filtered(lambda c: c.active)
-        #contracts._generate_work_entries(payslip_run.date_start, payslip_run.date_end)
+            feeslip_run.date_start, feeslip_run.date_end, states=['open', 'close']
+        )
+        #.filtered(lambda c: c.active)
+        #contracts._generate_work_entries(feeslip_run.date_start, feeslip_run.date_end)
         #work_entries = self.env['hr.work.entry'].search([
-        #    ('date_start', '<=', payslip_run.date_end),
-        #    ('date_stop', '>=', payslip_run.date_start),
+        #    ('date_start', '<=', feeslip_run.date_end),
+        #    ('date_stop', '>=', feeslip_run.date_start),
         #    ('student_id', 'in', students.ids),
         #])
-        #self._check_undefined_slots(work_entries, payslip_run)
+        #self._check_undefined_slots(work_entries, feeslip_run)
 
         if self.fee_struct_id:
         #if(self.fee_struct_id.type_id.default_struct_id == self.fee_struct_id):
@@ -145,12 +147,12 @@ class FeeslipStudents(models.TransientModel):
         for contract in self._filter_contracts(contracts):
             values = dict(default_values, **{
                 'name': _('New Feeslip'),
-                'student_id': contract.student_id.id,
+                'student_id': contract.partner_id.id,
                 'feeslip_run_id': feeslip_run.id,
                 'date_from': feeslip_run.date_start,
                 'date_to': feeslip_run.date_end,
-                'contract_id': contract.id,
-                'struct_id': self.structure_id.id or contract.structure_type_id.default_struct_id.id,
+                'enrol_order_id': contract.id,
+                'fee_struct_id': self.fee_struct_id.id, #or contract.structure_type_id.default_struct_id.id,
             })
             feeslips_vals.append(values)
         feeslips = Feeslip.with_context(tracking_disable=True).create(feeslips_vals)
