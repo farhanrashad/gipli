@@ -4,3 +4,4 @@
 #from . import enrol_template
 from . import enrol_contract
 from . import product
+from . import res_partner
