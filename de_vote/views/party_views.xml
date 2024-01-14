@@ -10,11 +10,10 @@
             <field name="arch" type="xml">
                 
                 <xpath expr="//field[@name='type']" position="attributes">
-                    <attribute name="readonly">1</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='parent_id']" position="attributes">
-                    <attribute name="required">1</attribute>
-                    <attribute name="placeholder">Political Party</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 
                 <xpath expr="//field[@name='vat']" position="attributes">
@@ -93,8 +92,8 @@
             <!--
             <field name="search_view_id" ref="rental_order_view_search"/>
             -->
-            <field name="context">{'default_is_member':'False','default_company_type':'company','default_type':'contact'}</field>
-            <field name="domain">[('company_type','=','company')]</field>
+            <field name="context">{'default_is_pol_party':'True', 'default_company_type':'company'}</field>
+            <field name="domain">[('is_pol_party','=',True)]</field>
             <field name="view_ids"
 				eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('base.res_partner_kanban_view')}),
@@ -102,7 +101,7 @@
                 (0, 0, {'view_mode': 'form', 'view_id': ref('parties_primary_form_view')})]" />
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    Create a student
+                    Create a Political Party
                   </p><p>
                 
                 </p>

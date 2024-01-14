@@ -15,6 +15,7 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
  
     is_member = fields.Boolean('Is Member')
+    is_pol_party = fields.Boolean('Is Political Party')
     
     # Demographic Info
     date_birth = fields.Date(string='Date of Birth')
