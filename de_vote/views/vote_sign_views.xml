@@ -8,7 +8,8 @@
 			<field name="arch" type="xml">
 				<tree string="Vote Sign">
 					<field name="display_name"/>
-                    <field name="company_id" />
+                    <field name="code" />
+                    <field name="image_128" />
 				</tree>
 			</field>
 		</record>
@@ -33,7 +34,6 @@
                             </group>
                             <group>
                                 <field name="color" widget="color_picker"/>
-                                <field name="company_id" options="{'no_create': True}" />
                             </group>
                         </group>
 					</sheet>
@@ -54,13 +54,13 @@
         </record>
         
         <record id="action_vote_sign" model="ir.actions.act_window">
-            <field name="name">Locations</field>
+            <field name="name">Symbols</field>
             <field name="res_model">vote.sign</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="view_location_filter"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    Create a new location
+                    Create a new symbol
                 </p>
             </field>
         </record>

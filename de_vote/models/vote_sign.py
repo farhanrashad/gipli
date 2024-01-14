@@ -14,10 +14,9 @@ class VoteSign(models.Model):
     def _default_color(self):
         return randint(1, 11)
     
-    name = fields.Char(string='Location', required=True, index=True, translate=True) 
+    name = fields.Char(string='Symbol Name', required=True, index=True, translate=True) 
     code = fields.Char(string='Code', required=True, size=10)
     active = fields.Boolean('Active', default=True)
-    company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
 
     color = fields.Integer(default=_default_color)
     

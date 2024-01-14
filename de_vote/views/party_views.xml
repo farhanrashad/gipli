@@ -39,7 +39,15 @@
                     <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
-            
+
+                <xpath expr="//form[1]/sheet[1]/group[1]" position="before">
+                    <group>
+                        <group>
+                            <field name="vote_sign_id" options="{'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                </xpath>
+                
                 <xpath expr="//page[1]" position='after'>
                     <page name='demographic_info' string="Demographic Info" attrs="{'invisible': [('is_member', '!=', True)]}">
                         <group>
