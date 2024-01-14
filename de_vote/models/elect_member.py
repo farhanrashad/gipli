@@ -56,7 +56,11 @@ class VoteElectMember(models.Model):
     description = fields.Html('Notes')
     active = fields.Boolean('Active', default=True, tracking=True)
 
-    elect_year_id = fields.Many2one('vote.elect.year', string='Election Year', ondelete="set null",)
+    elect_year_id = fields.Many2one(
+        'vote.elect.year', string='Election Year', check_company=True, index=True, tracking=True,
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
+        #compute='_compute_elect_year_id', 
+        ondelete="set null", readonly=False, store=True)
     
     # Pipeline management
     stage_id = fields.Many2one(
@@ -70,6 +74,23 @@ class VoteElectMember(models.Model):
         ('green', 'Next activity is planned')], string='Kanban State',
         compute='_compute_kanban_state')
 
+    color = fields.Integer('Color Index', default=0)
+    
+    # Customer / contact
+    partner_id = fields.Many2one(
+        'res.partner', string='Customer', check_company=True, index=True, tracking=10,
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
+        help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
+
+    user_id = fields.Many2one(
+        'res.users', string='Admission Officer', default=lambda self: self.env.user,
+        domain="['&', ('share', '=', False), ('company_ids', 'in', user_company_ids)]",
+        check_company=True, index=True, tracking=True)
+    user_company_ids = fields.Many2many(
+        'res.company', compute='_compute_user_company_ids',
+        help='UX: Limit to lead company or all if no company')
+    
+    
     @api.depends('elect_year_id')
     def _compute_stage_id(self):
         for mem in self:

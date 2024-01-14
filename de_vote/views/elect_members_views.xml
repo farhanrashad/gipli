@@ -1,0 +1,72 @@
+<odoo>
+  <data> 
+      <!-- form view -->
+      <record id="elect_member_form_view" model="ir.ui.view">
+            <field name="name">elect.member.form.view</field>
+            <field name="model">vote.elect.member</field>
+            <field name="arch" type="xml">
+                <form class="o_lead_opportunity_form" js_class="crm_form">
+                </form>
+            </field>
+      </record>
+
+      <!-- Tree view -->
+      <record id="elect_member_tree_view" model="ir.ui.view">
+            <field name="name">elect.member.tree.view</field>
+            <field name="model">vote.elect.member</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="Elections" sample="1" multi_edit="1">
+                </tree>
+            </field>
+      </record>
+
+      <record id="elect_calendar_view" model="ir.ui.view">
+            <field name="name">elect.calendar.view</field>
+            <field name="model">vote.elect.member</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Elections" create="0" mode="month" date_start="activity_date_deadline" color="user_id" hide_time="true" event_limit="5">
+                    <field name="partner_id" avatar_field="avatar_128"/>
+                    <field name="user_id" filters="1" invisible="1"/>
+                </calendar>
+            </field>
+        </record>
+      
+      <record id="elect_graph_view" model="ir.ui.view">
+            <field name="name">elect.member.graph.view</field>
+            <field name="model">vote.elect.member</field>
+            <field name="arch" type="xml">
+                <graph string="Elections" sample="1">
+                    <field name="stage_id"/>
+                    <field name="user_id"/>
+                    <field name="color" invisible="1"/>
+                </graph>
+            </field>
+        </record>
+      
+      <record id="admission_pivot_view" model="ir.ui.view">
+            <field name="name">elect.member.pivot.view</field>
+            <field name="model">vote.elect.member</field>
+            <field name="arch" type="xml">
+                <pivot string="Elections" sample="1">
+                    <field name="create_date" interval="month" type="row"/>
+                    <field name="stage_id" type="col"/>
+                    <field name="color" invisible="1"/>
+                </pivot>
+            </field>
+        </record>
+
+      <!-- Search view -->
+      <record id="elect_search_view" model="ir.ui.view">
+            <field name="name">elect.search.view</field>
+            <field name="model">vote.elect.member</field>
+            <field name="priority">15</field>
+            <field name="arch" type="xml">
+                <search string="Search Members">
+                </search>
+            </field>
+      </record>
+      
+  </data>
+</odoo>
