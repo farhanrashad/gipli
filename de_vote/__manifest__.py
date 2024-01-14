@@ -29,6 +29,7 @@
         'views/constituency_views.xml',
         'views/vote_sign_views.xml',
         'views/elect_stage_views.xml',
+        'views/elect_year_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
