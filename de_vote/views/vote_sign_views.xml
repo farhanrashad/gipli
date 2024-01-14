@@ -42,7 +42,7 @@
 		</record>
         
         <record id="view_vote_sign_filter" model="ir.ui.view">
-            <field name="name">location.sign.search</field>
+            <field name="name">vote.sign.search</field>
             <field name="model">vote.sign</field>
             <field name="arch" type="xml">
                 <search string="Signs">

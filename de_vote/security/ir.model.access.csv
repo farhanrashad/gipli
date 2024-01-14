@@ -1,4 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_vote_const_type,access.vote.const.type,model_vote_const_type,,1,0,0,0
+access_vote_const_type_user,access.vote.const.type.user,model_vote_const_type,de_vote.group_vote_user,1,1,1,1
+
 access_vote_const,access.vote.const,model_vote_const,,1,0,0,0
 access_vote_const_user,access.vote.const.user,model_vote_const,de_vote.group_vote_user,1,1,1,1
 

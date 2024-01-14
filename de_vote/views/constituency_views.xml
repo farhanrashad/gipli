@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
+
+        <record id="action_constituency_type_tree_view" model="ir.ui.view">
+			<field name="name">action.constituency.type.tree.view</field>
+			<field name="model">vote.const.type</field>
+			<field name="arch" type="xml">
+				<tree string="Constituency Type" editable="bottom" edit="1">
+                    <field name="name"/>
+				</tree>
+			</field>
+		</record>
+        
+        <record id="action_constituency_type" model="ir.actions.act_window">
+            <field name="name">Constituency Type</field>
+            <field name="res_model">vote.const.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new Constituency
+                </p>
+            </field>
+        </record>
+        
+        <menuitem name="Const Type" id="menu_main_config_constituency"
+                    parent="menu_main_config" action="action_constituency"
+                    groups="group_vote_manager" sequence="1"/>
+        
         <!-- constituency -->
         <record id="vote_constituency_tree_view" model="ir.ui.view">
 			<field name="name">vote.constituency.tree.view</field>
@@ -67,7 +93,7 @@
         
         <menuitem name="constituency" id="menu_main_config_constituency"
                     parent="menu_main_config" action="action_constituency"
-                    groups="group_vote_manager" sequence="1"/>
+                    groups="group_vote_manager" sequence="2"/>
         
         
         
