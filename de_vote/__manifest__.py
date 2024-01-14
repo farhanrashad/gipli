@@ -28,6 +28,7 @@
         'security/ir.model.access.csv',
         'security/security_views.xml',
         'data/vote_data.xml',
+        'data/ir_action_data.xml',
         'views/menu_views.xml',
         'views/res_partner_views.xml',
         'views/member_views.xml',

@@ -67,6 +67,13 @@
                 </search>
             </field>
       </record>
+
+      <menuitem
+        id="menu_main_members_pipeline"
+        name="Members"
+        parent="menu_main_members"
+        action="kde_vote.action_elect_member"
+        sequence="1"/>
       
   </data>
 </odoo>

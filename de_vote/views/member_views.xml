@@ -110,7 +110,7 @@
         </record>
 
         
-        <menuitem name="Members" id="menu_main_members_members" sequence="1" parent="menu_main_members" action="action_res_partner_members" />
+        <menuitem name="Contacts" id="menu_main_members_members" sequence="1" parent="menu_main_members" action="action_res_partner_members" />
         
     </data>
 </odoo>
