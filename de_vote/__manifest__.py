@@ -25,7 +25,7 @@
         'views/res_partner_views.xml',
         'views/member_views.xml',
         'views/party_views.xml',
-        'views/location_views.xml',
+        'views/constituency_views.xml',
         'views/vote_sign_views.xml',
     ],
     # only loaded in demonstration mode

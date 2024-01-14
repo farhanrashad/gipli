@@ -17,7 +17,8 @@ class ResPartner(models.Model):
     is_member = fields.Boolean('Is Member')
     is_pol_party = fields.Boolean('Is Political Party')
     
-    vote_sign_id = fields.Many2one('vote.sign', string='Electorial Sign')
+    vote_sign_id = fields.Many2one('vote.sign', string='Sign')
+    vote_sign_image = fields.Binary('vote_sign_id.image_1920')
     
     # Demographic Info
     date_birth = fields.Date(string='Date of Birth')

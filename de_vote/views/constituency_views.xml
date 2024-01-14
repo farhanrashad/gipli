@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
-        <!-- Location -->
-        <record id="vote_location_tree_view" model="ir.ui.view">
-			<field name="name">vote.location.tree.view</field>
-			<field name="model">vote.location</field>
+        <!-- constituency -->
+        <record id="vote_constituency_tree_view" model="ir.ui.view">
+			<field name="name">vote.constituency.tree.view</field>
+			<field name="model">vote.const</field>
 			<field name="arch" type="xml">
-				<tree string="Location">
+				<tree string="Constituency">
 					<field name="display_name"/>
                     <field name="company_id" />
                     <field name="parent_id"/>
 				</tree>
 			</field>
 		</record>
-		<record id="vote_location_form_view" model="ir.ui.view">
-			<field name="name">vote.location.form.view</field>
-			<field name="model">vote.location</field>
+		<record id="vote_constituency_form_view" model="ir.ui.view">
+			<field name="name">vote.constituency.form.view</field>
+			<field name="model">vote.const</field>
 			<field name="arch" type="xml">
-				<form string="Location">
+				<form string="Constituency">
 					<sheet>
                         <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                         <field name="active" invisible="1"/>
@@ -41,32 +41,32 @@
 			</field>
 		</record>
         
-        <record id="view_location_filter" model="ir.ui.view">
-            <field name="name">location.search</field>
-            <field name="model">vote.location</field>
+        <record id="view_constituency_filter" model="ir.ui.view">
+            <field name="name">constituency.search</field>
+            <field name="model">vote.const</field>
             <field name="arch" type="xml">
-                <search string="Locations">
-                    <field name="name" string="Locations"/>
+                <search string="Constituency">
+                    <field name="name" string="Constituency"/>
                     <separator/>
                     <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
                 </search>
              </field>
         </record>
         
-        <record id="action_location" model="ir.actions.act_window">
-            <field name="name">Locations</field>
-            <field name="res_model">vote.location</field>
+        <record id="action_constituency" model="ir.actions.act_window">
+            <field name="name">constituency</field>
+            <field name="res_model">vote.const</field>
             <field name="view_mode">tree,form</field>
-            <field name="search_view_id" ref="view_location_filter"/>
+            <field name="search_view_id" ref="view_constituency_filter"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    Create a new location
+                    Create a new Constituency
                 </p>
             </field>
         </record>
         
-        <menuitem name="Locations" id="menu_main_config_location"
-                    parent="menu_main_config" action="action_location"
+        <menuitem name="constituency" id="menu_main_config_constituency"
+                    parent="menu_main_config" action="action_constituency"
                     groups="group_vote_manager" sequence="1"/>
         
         

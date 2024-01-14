@@ -9,7 +9,7 @@
 				<tree string="Vote Sign">
 					<field name="display_name"/>
                     <field name="code" />
-                    <field name="image_128" />
+                    <field name="image_128" optional="show" options="{&quot;size&quot;:[0,50]}" widget="image"/>
 				</tree>
 			</field>
 		</record>
@@ -57,7 +57,7 @@
             <field name="name">Symbols</field>
             <field name="res_model">vote.sign</field>
             <field name="view_mode">tree,form</field>
-            <field name="search_view_id" ref="view_location_filter"/>
+            <field name="search_view_id" ref="view_vote_sign_filter"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a new symbol
