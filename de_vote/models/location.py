@@ -27,10 +27,7 @@ class VoteLocation(models.Model):
     active = fields.Boolean('Active', default=True)
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
 
-    color = fields.Integer(default=_default_color)
-    
-    sequence_id = fields.Many2one('ir.sequence', 'Roll Number Sequence', copy=False, check_company=True)
-    
+    color = fields.Integer(default=_default_color)    
     
     @api.depends('name', 'parent_id.complete_name')
     def _compute_complete_name(self):

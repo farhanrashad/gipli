@@ -2,3 +2,4 @@
 
 from . import member
 from . import location
+from . import vote_sign

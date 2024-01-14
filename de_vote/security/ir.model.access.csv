@@ -1,3 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_vote_location,access.vote.location,model_vote_location,,1,0,0,0
 access_vote_location_user,access.vote.location.user,model_vote_location,de_vote.group_vote_user,1,1,1,1
+
+access_vote_sign,access.vote.sign,model_vote_sign,,1,0,0,0
+access_vote_sign_user,access.vote.sign.user,model_vote_sign,de_vote.group_vote_user,1,1,1,1
+

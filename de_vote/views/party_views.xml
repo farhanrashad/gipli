@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>       
-        <record id="member_primary_form_view" model="ir.ui.view">
+        <record id="parties_primary_form_view" model="ir.ui.view">
             <field name="name">member.form.view</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="de_vote.view_partner_form_inherit_member"/>
@@ -61,7 +61,7 @@
         </record>
         
         <!-- Member Tree View -->
-        <record id="partner_member_tree_view" model="ir.ui.view">
+        <record id="partner_parties_tree_view" model="ir.ui.view">
             <field name="name">res.partner.student.tree.view</field>
             <field name="model">res.partner</field>
             <field eval="8" name="priority"/>
@@ -85,7 +85,7 @@
             </field>
         </record>
         
-        <record id="action_res_partner_members" model="ir.actions.act_window">
+        <record id="action_res_partner_parties" model="ir.actions.act_window">
             <field name="name">Members</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>
@@ -93,13 +93,13 @@
             <!--
             <field name="search_view_id" ref="rental_order_view_search"/>
             -->
-            <field name="context">{'default_is_member':'True','default_company_type':'person','default_type':'contact'}</field>
-            <field name="domain">[('is_member','=','True')]</field>
+            <field name="context">{'default_is_member':'False','default_company_type':'company','default_type':'contact'}</field>
+            <field name="domain">[('company_type','=','company')]</field>
             <field name="view_ids"
 				eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('base.res_partner_kanban_view')}),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('partner_member_tree_view')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('member_primary_form_view')})]" />
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('partner_parties_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('parties_primary_form_view')})]" />
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a student
@@ -110,7 +110,7 @@
         </record>
 
         
-        <menuitem name="Members" id="menu_main_members_members" sequence="1" parent="menu_main_members" action="action_res_partner_members" />
+        <menuitem name="Parties" id="menu_main_members_parties" sequence="2" parent="menu_main_members" action="action_res_partner_parties" />
         
     </data>
 </odoo>
