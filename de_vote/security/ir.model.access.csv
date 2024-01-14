@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_de_vote_de_vote,de_vote.de_vote,model_de_vote_de_vote,base.group_user,1,1,1,1
+access_vote_location,access.vote.location,model_vote_location,,1,0,0,0
+access_vote_location_user,access.vote.location.user,model_vote_location,de_vote.group_vote_user,1,1,1,1
