@@ -4,7 +4,7 @@
     <menuitem name="Vote"
         id="vote_main_menu"
         groups="group_vote_user,group_vote_manager"
-        web_icon="de_school,static/description/icon.png"
+        web_icon="de_vote,static/description/icon.png"
         sequence="40" />
     
     <menuitem name="Members" id="menu_main_members"
