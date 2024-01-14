@@ -67,7 +67,7 @@
         
         <menuitem name="Symbols" id="menu_main_config_vote_sign"
                     parent="menu_main_config" action="action_vote_sign"
-                    groups="group_vote_manager" sequence="2"/>
+                    groups="group_vote_manager" sequence="3"/>
         
     </data>
 </odoo>

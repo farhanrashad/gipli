@@ -22,5 +22,10 @@
 			parent="vote_main_menu" 
               sequence = "100"
 			groups="group_vote_manager" />
+
+    <menuitem name="Electoral" id="menu_main_config_elect"
+			parent="menu_main_config" 
+              sequence = "1"
+			groups="group_vote_manager" />
     
 </odoo>

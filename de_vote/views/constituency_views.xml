@@ -23,8 +23,8 @@
             </field>
         </record>
         
-        <menuitem name="Const Type" id="menu_main_config_constituency"
-                    parent="menu_main_config" action="action_constituency"
+        <menuitem name="Const Type" id="menu_main_config_constituency_type"
+                    parent="menu_main_config" action="action_constituency_type"
                     groups="group_vote_manager" sequence="1"/>
         
         <!-- constituency -->
@@ -80,7 +80,7 @@
         </record>
         
         <record id="action_constituency" model="ir.actions.act_window">
-            <field name="name">constituency</field>
+            <field name="name">Constituency</field>
             <field name="res_model">vote.const</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="view_constituency_filter"/>
@@ -91,7 +91,7 @@
             </field>
         </record>
         
-        <menuitem name="constituency" id="menu_main_config_constituency"
+        <menuitem name="Constituency" id="menu_main_config_constituency"
                     parent="menu_main_config" action="action_constituency"
                     groups="group_vote_manager" sequence="2"/>
         

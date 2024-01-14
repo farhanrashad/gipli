@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="const_type_na" model="vote.const.type">
+            <field name="name">National Assembly Constituencies</field>
+        </record>
+
+        <record id="const_type_pa" model="vote.const.type">
+            <field name="name">Provincial Assembly Constituencies</field>
+        </record>
+
+        <record id="const_type_senate" model="vote.const.type">
+            <field name="name">Senate Constituencies</field>
+        </record>
+
+        <record id="const_type_lb" model="vote.const.type">
+            <field name="name">Local Government Constituencies</field>
+        </record>
+
+        <record id="const_type_tribal" model="vote.const.type">
+            <field name="name">Tribal Areas Constituencies</field>
+        </record>
+
+        <record id="const_type_women" model="vote.const.type">
+            <field name="name">Women and Minority Reserved Constituencies</field>
+        </record>
+
+        
+    </data>
+</odoo>

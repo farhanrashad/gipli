@@ -21,12 +21,14 @@
     'data': [
         'security/ir.model.access.csv',
         'security/security_views.xml',
+        'data/vote_data.xml',
         'views/menu_views.xml',
         'views/res_partner_views.xml',
         'views/member_views.xml',
         'views/party_views.xml',
         'views/constituency_views.xml',
         'views/vote_sign_views.xml',
+        'views/elect_stage_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

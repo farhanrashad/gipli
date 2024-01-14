@@ -9,3 +9,11 @@ access_vote_const_user,access.vote.const.user,model_vote_const,de_vote.group_vot
 access_vote_sign,access.vote.sign,model_vote_sign,,1,0,0,0
 access_vote_sign_user,access.vote.sign.user,model_vote_sign,de_vote.group_vote_user,1,1,1,1
 
+access_vote_elect_year,access.vote.elect.year,model_vote_elect_year,,1,0,0,0
+access_vote_elect_year_user,access.vote.elect.year.user,model_vote_elect_year,de_vote.group_vote_user,1,1,1,1
+
+access_vote_elect_year,access.vote.elect.year,model_vote_elect_year,,1,0,0,0
+access_vote_elect_year_user,access.vote.elect.year.user,model_vote_elect_year,de_vote.group_vote_user,1,1,1,1
+
+access_vote_elect_stage,access.vote.elect.stage,model_vote_elect_stage,,1,0,0,0
+access_vote_elect_stage_user,access.vote.elect.stage.user,model_vote_elect_stage,de_vote.group_vote_user,1,1,1,1
