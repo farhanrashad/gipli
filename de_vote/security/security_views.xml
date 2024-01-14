@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record model="ir.module.category" id="module_category_members">
+            <field name="name">Memebers</field>
+            <field name="description">Helps you handle subscription memebers.</field>
+            <field name="sequence">7</field>
+        </record>
+
+        <record id="group_vote_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_category_members"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')),(4, ref('base.group_erp_manager'))]"/>
+        </record>
+        
+        <record id="group_vote_manager" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="module_category_members"/>
+            <field name="implied_ids" eval="[(4, ref('group_vote_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo>
