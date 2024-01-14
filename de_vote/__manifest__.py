@@ -16,7 +16,13 @@
     'category': 'Sales',
     'version': '16.0.0.1',
 
-    'depends': ['base'],
+    'depends': [
+        'base',
+        'mail',
+        'calendar',
+        'resource',
+        'utm',
+    ],
 
     'data': [
         'security/ir.model.access.csv',

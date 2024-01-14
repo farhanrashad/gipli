@@ -57,7 +57,7 @@
                     <div class="oe_title">
                         <label for="name"/>
                         <h1>
-                            <field name="name" placeholder="e.g. Fall 2023"/>
+                            <field name="name" placeholder="e.g. Election 2024"/>
                         </h1>
                     </div>
                     <group>

@@ -17,3 +17,9 @@ access_vote_elect_year_user,access.vote.elect.year.user,model_vote_elect_year,de
 
 access_vote_elect_stage,access.vote.elect.stage,model_vote_elect_stage,,1,0,0,0
 access_vote_elect_stage_user,access.vote.elect.stage.user,model_vote_elect_stage,de_vote.group_vote_user,1,1,1,1
+
+access_vote_elect_member,access.vote.elect.stage,model_vote_elect_stage,,1,0,0,0
+access_vote_elect_stage_user,access.vote.elect.stage.user,model_vote_elect_stage,de_vote.group_vote_user,1,1,1,1
+
+access_vote_elect_member,access.vote.elect.member,model_vote_elect_member,,1,0,0,0
+access_vote_elect_member_user,access.vote.elect.member.user,model_vote_elect_member,de_vote.group_vote_user,1,1,1,1
