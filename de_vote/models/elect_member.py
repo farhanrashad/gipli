@@ -135,6 +135,10 @@ class VoteElectMember(models.Model):
                                      domain="[('is_pol_party','=',True)]",
                                      required=True
                                     )
+
+
+    member_ref_line = fields.One2many('vote.elect.member.ref', 'elect_member_id', 'Reference')
+    
     proposer_partner_id = fields.Many2one('res.partner', string='Proposer', 
                                      domain="['&',('is_pol_party','=',False),('is_member','=',False)]",
                                      required=True
@@ -188,6 +192,13 @@ class VoteElectMember(models.Model):
                     kanban_state = 'red'
             mem.kanban_state = kanban_state
 
+class MemberRef(models.Model):
+    _name = 'vote.elect.member.ref'
+    _description = 'Member References'
+    
+    elect_member_id = fields.Many2one('vote.elect.member', string='Member', required=True, ondelete='cascade', index=True, copy=False)
+    member_ref_type_id = fields.Many2one('vote.member.ref.type', string='Ref Type', required=True)
+    name = fields.Char('Name', required=True)
 
     
     

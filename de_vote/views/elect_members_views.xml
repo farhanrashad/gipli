@@ -50,21 +50,18 @@
                                     <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
                                 </div>
                             </group>
-                            <group string="References">
-                                <field name="proposer_partner_id" options="{'no_create': True}" />
-                                <field name="seconder_partner_id" options="{'no_create': True}" />
+                            <group name="additional_info">
                                 <field name="elect_year_id" />
                             </group>
                         </group>
                         <notebook>
                             <page string="References" name="references">
-                                <group>
-                                    <group>
-                                <field name="prop_name" string="Name" />
-                                <div class="o_address_format">
-                                </div>
-                                    </group>
-                                </group>
+                                <field name="member_ref_line" widget="one2many_list" >
+                                    <tree editable ="bottom" >
+                                        <field name="member_ref_type_id" options="{'no_create': True}" />
+                                        <field name="name" />
+                                    </tree>
+                                </field>
                             </page>
                             
                         </notebook>

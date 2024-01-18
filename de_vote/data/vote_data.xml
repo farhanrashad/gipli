@@ -38,7 +38,7 @@
         <!-- Election Data -->
         <record id="elect_stage_0" model="vote.elect.stage">
             <field name="sequence">10</field>
-            <field name="name">Inquiry</field>
+            <field name="name">Nominee</field>
         </record>
     
         <record id="elect_stage_1" model="vote.elect.stage">
