@@ -8,6 +8,7 @@
 			<field name="arch" type="xml">
 				<tree string="Constituency Type" editable="bottom" edit="1">
                     <field name="name"/>
+                    
 				</tree>
 			</field>
 		</record>
@@ -36,6 +37,7 @@
 					<field name="display_name"/>
                     <field name="company_id" />
                     <field name="parent_id"/>
+                    <field name="const_type_id"/>
 				</tree>
 			</field>
 		</record>
@@ -56,6 +58,7 @@
                         <group >
                             <group>
                                 <field name="code" />
+                                <field name="const_type_id" options="{'no_create': True,'no_open': True}" />
                             </group>
                             <group>
                                 <field name="color" widget="color_picker"/>

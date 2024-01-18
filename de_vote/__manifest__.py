@@ -37,6 +37,7 @@
         'views/vote_sign_views.xml',
         'views/elect_stage_views.xml',
         'views/elect_year_views.xml',
+        'views/member_ref_type_views.xml',
         'views/elect_members_views.xml',
     ],
     # only loaded in demonstration mode

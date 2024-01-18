@@ -21,5 +21,8 @@ access_vote_elect_stage_user,access.vote.elect.stage.user,model_vote_elect_stage
 access_vote_elect_member,access.vote.elect.stage,model_vote_elect_stage,,1,0,0,0
 access_vote_elect_stage_user,access.vote.elect.stage.user,model_vote_elect_stage,de_vote.group_vote_user,1,1,1,1
 
+access_vote_member_ref_type,access.vote.member.ref.type,model_vote_member_ref_type,,1,0,0,0
+access_vote_member_ref_type_user,access.vote.member.ref.type.user,model_vote_member_ref_type,de_vote.group_vote_user,1,1,1,1
+
 access_vote_elect_member,access.vote.elect.member,model_vote_elect_member,,1,0,0,0
 access_vote_elect_member_user,access.vote.elect.member.user,model_vote_elect_member,de_vote.group_vote_user,1,1,1,1

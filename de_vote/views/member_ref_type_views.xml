@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+        <record id="member_ref_type_tree_view" model="ir.ui.view">
+			<field name="name">member.ref.type.tree.view</field>
+			<field name="model">vote.member.ref.type</field>
+			<field name="arch" type="xml">
+				<tree string="Constituency Type" editable="bottom" edit="1">
+                    <field name="name"/>
+                    
+				</tree>
+			</field>
+		</record>
+        
+        <record id="action_member_ref_type" model="ir.actions.act_window">
+            <field name="name">Member Reference Type</field>
+            <field name="res_model">vote.member.ref.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new member's reference type
+                </p>
+            </field>
+        </record>
+        
+        <menuitem name="Member Reference" id="menu_main_config_member_ref"
+                    parent="menu_main_config" action="action_member_ref_type"
+                    groups="group_vote_manager" sequence="20"/>
+        
+        
+        
+    </data>
+</odoo>

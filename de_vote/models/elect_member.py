@@ -20,7 +20,6 @@ from odoo.tools import date_utils, email_re, email_split, is_html_empty
 
 _logger = logging.getLogger(__name__)
 
-
 class VoteElectMember(models.Model):
     _name = "vote.elect.member"
     _description = 'Election Member'
@@ -52,6 +51,8 @@ class VoteElectMember(models.Model):
     description = fields.Html('Notes')
     active = fields.Boolean('Active', default=True, tracking=True)
 
+
+    
     elect_year_id = fields.Many2one(
         'vote.elect.year', string='Election Year', check_company=True, index=True, tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
@@ -78,6 +79,39 @@ class VoteElectMember(models.Model):
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
 
+    contact_name = fields.Char('Contact Name', tracking=30,compute='_compute_contact_name', copy=False, readonly=False, store=True)
+    partner_name = fields.Char(
+        'Company Name', tracking=20, index=True,
+        compute='_compute_partner_name', readonly=False, store=True,copy=False,
+        help='The name of the future partner company that will be created while converting the lead into opportunity')
+    title = fields.Many2one('res.partner.title', string='Title', compute='_compute_title', readonly=False, store=True)
+    email_from = fields.Char(
+        'Email', tracking=40, index=True,copy=False,
+        compute='_compute_email_from', inverse='_inverse_email_from', readonly=False, store=True)
+    phone = fields.Char(
+        'Phone', tracking=50,
+        compute='_compute_phone', inverse='_inverse_phone', copy=False,readonly=False, store=True)
+    mobile = fields.Char('Mobile', compute='_compute_mobile', copy=False, readonly=False, store=True)
+    phone_state = fields.Selection([
+        ('correct', 'Correct'),
+        ('incorrect', 'Incorrect')], string='Phone Quality', compute="_compute_phone_state", store=True)
+    email_state = fields.Selection([
+        ('correct', 'Correct'),
+        ('incorrect', 'Incorrect')], string='Email Quality', compute="_compute_email_state", store=True)
+    website = fields.Char('Website', index=True, help="Website of the contact", compute="_compute_website", readonly=False, store=True)
+
+    # Address fields
+    street = fields.Char('Street', compute='_compute_partner_address_values', readonly=False, store=True)
+    street2 = fields.Char('Street2', compute='_compute_partner_address_values', readonly=False, store=True)
+    zip = fields.Char('Zip', change_default=True, compute='_compute_partner_address_values', readonly=False, store=True)
+    city = fields.Char('City', compute='_compute_partner_address_values', readonly=False, store=True)
+    state_id = fields.Many2one(
+        "res.country.state", string='State',
+        compute='_compute_partner_address_values', readonly=False, store=True,
+        domain="[('country_id', '=?', country_id)]")
+    country_id = fields.Many2one(
+        'res.country', string='Country',
+        compute='_compute_partner_address_values', readonly=False, store=True)
     user_id = fields.Many2one(
         'res.users', string='Admission Officer', default=lambda self: self.env.user,
         domain="['&', ('share', '=', False), ('company_ids', 'in', user_company_ids)]",
@@ -86,7 +120,36 @@ class VoteElectMember(models.Model):
         'res.company', compute='_compute_user_company_ids',
         help='UX: Limit to lead company or all if no company')
     
+    # UX
+    partner_email_update = fields.Boolean('Partner Email will Update', compute='_compute_partner_email_update')
+    partner_phone_update = fields.Boolean('Partner Phone will Update', ) #compute='_compute_partner_phone_update')
+
+
+    # Constituency fields
+    const_type_id = fields.Many2one('vote.const.type', string='Constituency Type', required=True)
+    const_id = fields.Many2one('vote.const', string='Constituency', 
+                                    domain="[('const_type_id','=',const_type_id)]",
+                                    required=True
+                                   )
+    pol_partner_id = fields.Many2one('res.partner', string='Political Party', 
+                                     domain="[('is_pol_party','=',True)]",
+                                     required=True
+                                    )
+    proposer_partner_id = fields.Many2one('res.partner', string='Proposer', 
+                                     domain="['&',('is_pol_party','=',False),('is_member','=',False)]",
+                                     required=True
+                                    )
+    seconder_partner_id = fields.Many2one('res.partner', string='Seconder', 
+                                     domain="['&',('is_pol_party','=',False),('is_member','=',False)]",
+                                     required=True
+                                    )
+
+    # Proposer
+    prop_name = fields.Char('Proposer Name')
     
+    # Seconder
+    scndr_name = fields.Char('Seconder Name')
+        
     @api.depends('elect_year_id')
     def _compute_stage_id(self):
         for mem in self:

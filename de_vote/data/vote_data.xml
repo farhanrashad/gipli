@@ -26,6 +26,15 @@
         </record>
 
 
+        <!-- Member References Type -->
+        <record id="member_ref_type_proposer" model="vote.member.ref.type">
+            <field name="name">Proposer</field>
+        </record>
+
+        <record id="member_ref_type_seconder" model="vote.member.ref.type">
+            <field name="name">Seconder</field>
+        </record>
+        
         <!-- Election Data -->
         <record id="elect_stage_0" model="vote.elect.stage">
             <field name="sequence">10</field>

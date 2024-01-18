@@ -76,7 +76,8 @@
             <field name="arch" type="xml">
                 <tree string="Students" sample="1" multi_edit="1">
                     <field name="display_name" string="Name"/>
-                    <field name="vote_sign_image" optional="show" options="{&quot;size&quot;:[0,50]}" widget="image"/>
+                    <field name="image_1920" optional="show" options="{&quot;size&quot;:[0,50]}" widget="image"/>
+                    <field name="vote_sign_image" string="Sign" optional="show" options="{&quot;size&quot;:[0,50]}" widget="image"/>
                     <field name="function" invisible="1"/>
                     <field name="ref" optional="hide" />
                     <field name="phone" class="o_force_ltr" optional="show"/>
@@ -93,6 +94,7 @@
                 </tree>
             </field>
         </record>
+
         
         <record id="action_res_partner_parties" model="ir.actions.act_window">
             <field name="name">Members</field>

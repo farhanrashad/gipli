@@ -29,7 +29,7 @@ class Constituency(models.Model):
 
     color = fields.Integer(default=_default_color)    
 
-    const_type_id = fields.Many2one('vote.const.type', string='Constituency Type')
+    const_type_id = fields.Many2one('vote.const.type', string='Constituency Type', required=True)
     
     @api.depends('name', 'parent_id.complete_name')
     def _compute_complete_name(self):
