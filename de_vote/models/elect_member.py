@@ -35,13 +35,9 @@ class VoteElectMember(models.Model):
     
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
-        # retrieve team_id from the context and write the domain
-        # - ('id', 'in', stages.ids): add columns that should be present
-        # - OR ('fold', '=', False): add default columns that are not folded
-        # - OR ('team_ids', '=', team_id), ('fold', '=', False) if team_id: add team columns that are not folded
-        team_id = self._context.get('default_elect_year_id')
-        if team_id:
-            search_domain = ['|', ('id', 'in', stages.ids), '|', ('elect_year_id', '=', False), ('elect_year_id', '=', team_id)]
+        year_id = self._context.get('default_elect_year_id')
+        if year_id:
+            search_domain = ['|', ('id', 'in', stages.ids), '|', ('elect_year_id', '=', False), ('elect_year_id', '=', year_id)]
         else:
             search_domain = ['|', ('id', 'in', stages.ids), ('elect_year_id', '=', False)]
 
@@ -97,7 +93,7 @@ class VoteElectMember(models.Model):
             if not mem.stage_id:
                 mem.stage_id = mem._stage_find(domain=[('fold', '=', False)]).id
     
-    def _stage_find(self, team_id=False, domain=None, order='sequence, id', limit=1):
+    def _stage_find(self, elect_year_id=False, domain=None, order='sequence, id', limit=1):
         
         elect_year_ids = set()
         if elect_year_id:
@@ -114,7 +110,7 @@ class VoteElectMember(models.Model):
         if domain:
             search_domain += list(domain)
         # perform search, return the first found
-        return self.env['oe.admission.stage'].search(search_domain, order=order, limit=limit)
+        return self.env['vote.elect.stage'].search(search_domain, order=order, limit=limit)
 
     @api.depends('activity_date_deadline')
     def _compute_kanban_state(self):
