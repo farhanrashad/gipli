@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Page : Find Candidate -->
+        <template id="find_candidate_form" name="Find a Candidate">
+            <t t-set="additional_title">Find a Candidate</t>
+            <div class="container">
+                <h2 class="text-muted">
+                    Select Constituency
+                </h2>
+            </div>
+        </template>
+    </data>
+</odoo>

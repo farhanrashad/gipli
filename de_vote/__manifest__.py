@@ -22,6 +22,7 @@
         'calendar',
         'resource',
         'utm',
+        'website',
     ],
 
     'data': [
@@ -39,6 +40,7 @@
         'views/elect_year_views.xml',
         'views/member_ref_type_views.xml',
         'views/elect_members_views.xml',
+        'views/member_templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
