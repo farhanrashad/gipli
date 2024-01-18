@@ -8,8 +8,10 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, AccessError
+from odoo.tools.safe_eval import safe_eval
 from odoo.release import version
+
 
 
 class ElectionYear(models.Model):
@@ -39,6 +41,39 @@ class ElectionYear(models.Model):
 
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
 
+    # ------------------------------------------------------------
+    # ACTIONS
+    # ------------------------------------------------------------
+
+    #TODO JEM : refactor this stuff with xml action, proper customization,
+    @api.model
+    def action_elect_member(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("de_vote.action_elect_member_pipeline")
+        return self._action_update_to_pipeline(action)
+
+    @api.model
+    def _action_update_to_pipeline(self, action):
+        year_id = self.env['vote.elect.year'].search([('state','=','progress')],limit=1).id
+        if year_id:
+            # To ensure that the team is readable in multi company
+            year_id = self.env['vote.elect.year'].search([('state','=','progress')],limit=1).id
+        else:
+            year_id = self.env['vote.elect.year'].search([('state','=','progress')],limit=1).id
+            action['help'] = "<p class='o_view_nocontent_smiling_face'>%s</p><p>" % _("Create an Opportunity")
+            if year_id:
+                if self.user_has_groups('de_vote.group_vote_manager'):
+                    action['help'] += "<p>%s</p>" % _("""As you are a member of no Sales Team, you are showed the Pipeline of the <b>first team by default.</b>
+                                        To work with the CRM, you should <a name="%d" type="action" tabindex="-1">join a team.</a>""",
+                                        self.env.ref('de_vote.action_elect_year').id)
+                else:
+                    action['help'] += "<p>%s</p>" % _("""As you are a member of no Sales Team, you are showed the Pipeline of the <b>first team by default.</b>
+                                        To work with the CRM, you should join a team.""")
+        action_context = safe_eval(action['context'], {'uid': self.env.uid})
+        if year_id:
+            action_context['default_elect_year_id'] = year_id
+        action['context'] = action_context
+        return action
+    
 
     def unlink(self):
         for record in self:
@@ -61,3 +96,5 @@ class ElectionYear(models.Model):
     def button_cancel(self):
         self.write({'state': 'draft'})
         return {}
+
+    

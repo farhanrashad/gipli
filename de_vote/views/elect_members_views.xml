@@ -68,12 +68,26 @@
             </field>
       </record>
 
+      <!-- My Admission Pipeline -->
+      <record id="action_elect_member_pipeline" model="ir.actions.act_window">
+            <field name="name">Pipeline</field>
+            <field name="res_model">vote.elect.member</field>
+            <field name="view_mode">kanban,tree,form,calendar,pivot,graph,activity</field>
+            <field name="search_view_id" ref="elect_search_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No application found. Let's create one!
+                </p>
+                
+            </field>
+        </record>
+      
       <menuitem
         id="menu_main_members_pipeline"
         name="Members"
         parent="menu_main_members"
-        action="kde_vote.action_elect_member"
-        sequence="1"/>
+        action="de_vote.action_elect_member"
+        sequence="0"/>
       
   </data>
 </odoo>
