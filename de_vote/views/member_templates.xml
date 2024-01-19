@@ -5,77 +5,28 @@
         <template id="website_candidate" inherit_id="website.layout" name="Header Candidate" priority="17">
             <xpath expr="//t[@t-foreach='website.menu_id.child_id']" position="after">
                 <t t-set="lnk" t-value="'/'+ request.httprequest.url.replace( request.httprequest.host_url,'')"/>
-                <li id="web_faq" t-attf-class="nav-item #{'active' if lnk == '/web/faq' else ''}">
-                    <a role="menuitem" href="/candidate/form" class="nav-link">Candidate</a>
+                <li id="candidate_form" >
+                    <a role="menuitem" href="/search/candidate" class="nav-link">Candidate</a>
                 </li>
             </xpath>
         </template>
         
-        <template id="find_candidate_form" name="Find a Candidate">
+        <template id="search_candidate_form" name="search_candidate_form">
              <t t-call="website.layout">
-                <div id="wrap" class="oe_structure oe_empty">
-                    <section class="s_text_block pt40 pb40 o_colored_level" data-snippet="s_text_block" data-name="Text" style="background-image: none;">
-                        <div class="container s_allow_columns">
-                            <div class="row">
-                                <h3>Select Constituency</h3>
-                                <div class="o_colored_level col-lg-6">
-                                    <section class="s_website_form pt16 pb16" data-vcss="001" data-snippet="s_website_form" data-name="Form">
-                                        <div class="container">
-                                            <t t-set="const_ids" t-value="request.env['vote.const'].sudo().search([('const_type_id','=',1)])"/>
-                                            <form action="/search/candidate" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
-
-                                                <div class="s_website_form_rows row s_col_no_bgcolor">
-                                                    <div class="s_website_form_field mb-3 col-12 s_website_form_custom " data-type="char" data-name="Field" data-visibility-condition="" data-visibility-between="">
-                                                        <div class="row s_col_no_resize s_col_no_bgcolor">
-                                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="o5xrpmorzot8">
-                                                                <span class="s_website_form_label_content">National Assembly</span>
-                                                            </label>
-                                                            <div class="col-sm">
-                                                                <select name="select_const" id="select_const" class="selection-search form-control" >
-                                                                    <option value="1">One1</option>
-                                                                    <!--
-                                                                    <t t-foreach="const_ids" t-as="const_id">
-                                                                        <option t-att-value="const_id.id">
-                                                                            <t t-esc="const_id.name"  />
-                                                                        </option>
-                                                                    </t>
-                                                                    -->
-                                                                </select>
-                                                                
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="mb-0 py-2 col-12 s_website_form_submit" data-name="Submit Button">
-                                                        <div style="width: 200px;" class="s_website_form_label"/>
-                                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                                        <span id="s_website_form_result"/>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </section>
-                                    <p class="o_default_snippet_text">
-                                        <br/>
-                                    </p>
-                                </div>
-                                <div class="o_colored_level col-lg-6">
-                                    <section class="s_website_form pt16 pb16" data-vcss="001" data-snippet="s_website_form" data-name="Form">
-                                        <div class="container">
-                                            <t t-set="const_ids" t-value="request.env['vote.const'].sudo().search([('const_type_id','=',2)])"/>
-                                            
-                                        </div>
-                                    </section>
-                                    <p class="o_default_snippet_text">
-                                        <br/>
-                                    </p>
-                                </div>
-                            </div>
+                <form action="/search/candidate/list" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="s_website_form_rows container mb64 s_col_no_bgcolor">
+                        <div class="form-group s_website_form_field col-12 " data-type="char" data-name="Field">
+                            <t t-raw="search_form_code"/>
                         </div>
-                    </section>
-                </div>
+                    </div>
+                </form> 
             </t>
         </template>
-        
+        <template id="candidate_list" name="candidate_list">
+             <t t-call="website.layout">
+                 <h3>Candidate List</h3>
+             </t>
+        </template>
     </data>
 </odoo>
