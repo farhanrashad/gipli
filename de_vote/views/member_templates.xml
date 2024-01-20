@@ -26,11 +26,42 @@
         <template id="candidate_list" name="candidate_list">
              <t t-call="website.layout">
                  <t t-raw="search_form_code"/>
-                <img t-attf-src="data:image/jpg;base64,{{ member_image }}" style="width:95px; height:95px;margin-left:55px;"/>
 
+                 <!-- Section Start -->
+                <section class="pt16">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <h3>Member's List of <span t-esc="const_name"/></h3>
+                            <t t-foreach="members" t-as="member">
+                                <div class="col-lg-6 o_colored_level" style="border:1px solid #ebebeb;">
+                                    <div class="container">
+                                        <div class="row align-items-center">
+                                            <div class="col-lg-5 pt0 pb0" style="padding:0px;vertical-align: text-top;">
+                                                <img t-attf-src="data:image/jpg;base64,{{ member.image_1920 }}" style="width:200px;height:auto;"/>
+                                            </div>
+                                            <div class="col-lg-7 ">
+                                                <h4>
+                                                    <span t-esc="member.contact_name"/>
+                                                </h4>
+                                                <h5><span t-esc="member.pol_partner_id.name"/></h5>
+                                                <p>
+                                                    <img t-attf-src="data:image/jpg;base64,{{ member.pol_partner_id.image_1920 }}" style="width:95px;height:auto;"/>
+
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+                 <!-- Section End -->
+                 <!--
                  <t t-foreach="members" t-as="member">
                      <img t-attf-src="data:image/jpg;base64,{{ member.image_1920 }}" style="width:95px; height:95px;margin-left:55px;"/>
                  </t>
+                 -->
              </t>
         </template>
     </data>
