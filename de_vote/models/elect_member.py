@@ -30,6 +30,7 @@ class VoteElectMember(models.Model):
         'mail.activity.mixin',
         'utm.mixin',
         'format.address.mixin',
+        'avatar.mixin',
     ]
     
     @api.model
@@ -139,14 +140,6 @@ class VoteElectMember(models.Model):
 
     member_ref_line = fields.One2many('vote.elect.member.ref', 'elect_member_id', 'Reference')
     
-    proposer_partner_id = fields.Many2one('res.partner', string='Proposer', 
-                                     domain="['&',('is_pol_party','=',False),('is_member','=',False)]",
-                                     required=True
-                                    )
-    seconder_partner_id = fields.Many2one('res.partner', string='Seconder', 
-                                     domain="['&',('is_pol_party','=',False),('is_member','=',False)]",
-                                     required=True
-                                    )
 
     # Proposer
     prop_name = fields.Char('Proposer Name')

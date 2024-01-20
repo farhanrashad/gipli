@@ -25,7 +25,12 @@
         </template>
         <template id="candidate_list" name="candidate_list">
              <t t-call="website.layout">
-                 <h3>Candidate List</h3>
+                 <t t-raw="search_form_code"/>
+                <img t-attf-src="data:image/jpg;base64,{{ member_image }}" style="width:95px; height:95px;margin-left:55px;"/>
+
+                 <t t-foreach="members" t-as="member">
+                     <img t-attf-src="data:image/jpg;base64,{{ member.image_1920 }}" style="width:95px; height:95px;margin-left:55px;"/>
+                 </t>
              </t>
         </template>
     </data>
