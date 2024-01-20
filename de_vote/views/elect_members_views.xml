@@ -115,7 +115,10 @@
                 <tree string="Elections" sample="1" multi_edit="1">
                     <field name="company_id" invisible="1"/>
                     <field name="create_date" optional="hide"/>
-                    <field name="name" string="Opportunity" readonly="1"/>
+                    <field name="name" string="Reference" readonly="1"/>
+                    <field name="contact_name" string="candidate" readonly="1"/>
+                    <field name="const_id" readonly="1"/>
+                    <field name="pol_partner_id" readonly="1"/>
                     <field name="partner_id" optional="hide"/>
                     <field name="elect_year_id" optional="hide"/>
                     <field name="company_id" groups="base.group_multi_company" optional="show"/>
@@ -168,37 +171,23 @@
                                         <ul class="oe_kanban_colorpicker" data-field="color"/>
                                     </div>
                                 </div>
+
                                 <!-- Kanban Content -->
                                 <div class="oe_kanban_content flex-grow-1">
                                     <div class="o_kanban_record_title oe_kanban_details">
                                         <strong><field name="contact_name"/></strong>
-                                        
                                     </div>
                                     <div>
                                         <strong><field name="name"/></strong>
                                     </div>
-                                    
                                     <div>
                                         <field name="const_code" options="{'color_field': 'color'}"/> / <field name="const_id" />
                                     </div>
                                     <div>
                                         <field name="elect_year_id"/>
                                     </div>
-                                    <div>
-                                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
-                                    </div>
                                 </div>
-                                <div class="oe_kanban_footer">
-                                    <div class="o_kanban_record_bottom">
-                                        <div class="oe_kanban_bottom_left">
-                                            <field name="activity_ids" widget="kanban_activity"/>
-                                        </div>
-                                        <div class="oe_kanban_bottom_right">
-                                            <field name="user_id" widget="many2one_avatar_user"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="clearfix"/>
+                                
                             </div>
                         </t>
                     </templates>
@@ -257,6 +246,11 @@
             <field name="name">Pipeline</field>
             <field name="res_model">vote.elect.member</field>
             <field name="view_mode">kanban,tree,form,calendar,pivot,graph,activity</field>
+          <field name="view_ids"
+				eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('vote_elect_member_kanban_view')}),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('elect_member_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('elect_member_form_view')})]" />
             <field name="search_view_id" ref="elect_search_view"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
