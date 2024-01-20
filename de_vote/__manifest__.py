@@ -30,6 +30,7 @@
         'security/ir.model.access.csv',
         'data/vote_data.xml',
         'data/ir_action_data.xml',
+        'data/ir_sequence_data.xml',
         'views/menu_views.xml',
         'views/res_partner_views.xml',
         'views/contact_views.xml',

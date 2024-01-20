@@ -72,6 +72,9 @@ class VoteElectMember(models.Model):
         ('green', 'Next activity is planned')], string='Kanban State',
         compute='_compute_kanban_state')
 
+    tag_ids = fields.Many2many(
+        'vote.elect.member.tag', 'vote_elect_member_tag_rel', 'member_id', 'tag_id', string='Tags',
+        help="Classify and analyze your lead/opportunity categories like: Training, Service")
     color = fields.Integer('Color Index', default=0)
     
     # Customer / contact
@@ -132,6 +135,8 @@ class VoteElectMember(models.Model):
                                     domain="[('const_type_id','=',const_type_id)]",
                                     required=True
                                    )
+    const_code = fields.Char(related='const_id.code')
+    
     pol_partner_id = fields.Many2one('res.partner', string='Political Party', 
                                      domain="[('is_pol_party','=',True)]",
                                      required=True
@@ -150,6 +155,20 @@ class VoteElectMember(models.Model):
     # Seconder
     scndr_name = fields.Char('Seconder Name')
 
+    # ----------------------------------------------------
+    # ------------------- CRUD ---------------------
+    # ----------------------------------------------------
+    @api.model
+    def create(self, vals):
+        if 'company_id' in vals:
+            self = self.with_company(vals['company_id'])
+        if vals.get('name', _('New')) == _('New'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('vote.elect.member') or _('New')
+
+        result = super(VoteElectMember, self).create(vals)
+        return result
+
+    
     @api.depends('pol_partner_id')
     def _compute_sign(self):
         for record in self:
