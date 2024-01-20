@@ -17,6 +17,7 @@ class Constituency(models.Model):
     _name = 'vote.const'
     _description = 'constituency'
     _order = 'name'
+    _rec_names_search = ['name', 'code']
     
     def _default_color(self):
         return randint(1, 11)

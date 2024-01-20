@@ -32,6 +32,7 @@ class VoteElectMember(models.Model):
         'format.address.mixin',
         'avatar.mixin',
     ]
+    _rec_names_search = ['name', 'email', 'ref', 'contact_name']
     
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -148,12 +149,6 @@ class VoteElectMember(models.Model):
     
     member_ref_line = fields.One2many('vote.elect.member.ref', 'elect_member_id', 'Reference')
     
-
-    # Proposer
-    prop_name = fields.Char('Proposer Name')
-    
-    # Seconder
-    scndr_name = fields.Char('Seconder Name')
 
     # ----------------------------------------------------
     # ------------------- CRUD ---------------------
