@@ -52,6 +52,8 @@
                             </group>
                             <group name="additional_info">
                                 <field name="elect_year_id" />
+                                <field name="vote_sign_id" options="{'no_create_edit': True}"/>
+                            <field name="vote_sign_image" nolabel="1" widget='image' class="oe_avatar" options='{"preview_image": "avatar_128"}'/>
                             </group>
                         </group>
                         <notebook>

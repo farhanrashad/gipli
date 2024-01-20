@@ -26,53 +26,76 @@ class CustomerPortal(http.Controller):
     
     
     def _prepare_search_form_page(self):
-        html_code = ""
-        const_ids = request.env['vote.const'].sudo().search([('const_type_id','=',1)])
-        html_code += "<div class='container pt32'>"
-        html_code += "<div class='row'>"
-        html_code += "<div class='col-12 ' ><h3>Select Constituency</h3></div>"
-        html_code += "<div class='col-6 ' >"
-        html_code += "<select name='select_const' id='select_const' class='selection-search form-control' >"
+        na_code = pa_code = ""
+        const_ids = request.env['vote.const'].sudo().search([('const_type_id.code','=','NA')])
+        pa_const_ids = request.env['vote.const'].sudo().search([('const_type_id.code','=','PA')])
+
+
+        #National Constituency
+        na_code += "<div class='container pt32'>"
+        #na_code += "<div class='row'>"
+        na_code += "<div class='col-lg-10 ' >"
+        na_code += "<h4>National Constituency</h4>"
+        na_code += "<div class='s_col_no_resize s_col_no_bgcolor pt8 pb8' >"
+        #na_code += '<label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="studio1"><span class="s_website_form_label_content">National Constituency</span></label>'
+        #na_code += "<div class='col-sm'>"
+        na_code += "<select name='select_const' id='select_const' class='selection-search form-control' >"
         for const_id in const_ids:
-            html_code += "<option value='" + str(const_id.id) + "'>" + const_id.name
-            html_code += "</option>"
-        html_code += "</select>"
-        html_code += '<button type="submit" class="btn btn-primary">Submit</button>'
-        html_code += '<span id="s_website_form_result"/>'
-        html_code += "</div>"
-        html_code += "</div>"
-        html_code += "</div>"
+            na_code += "<option value='" + str(const_id.id) + "'>" + const_id.name
+            na_code += "</option>"
+        na_code += "</select>"
+        na_code += '<div style="width: 200px;" class="s_website_form_label pt16"></div>'
+        na_code += '<button type="submit" class="btn btn-primary">Search</button>'
+        na_code += "</div>"
+        #na_code += "</div>"
+        na_code += '<span id="s_website_form_result"/>'
+        na_code += "</div>"
+        na_code += "</div>"
+        #na_code += "</div>"
+
+        # Provincial Constituency
+        pa_code += "<div class='container pt32'>"
+        #pa_code += "<div class='row'>"
+        pa_code += "<div class='col-lg-10' >"
+        pa_code += "<h4>Provincial Constituency</h4>"        
+        pa_code += "<div class='s_col_no_resize s_col_no_bgcolor pt8 pb8' >"
+        #pa_code += '<label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="studio1"><span class="s_website_form_label_content">Provincial Constituency</span></label>'
+        #pa_code += "<div class='col-sm'>"
+        pa_code += "<select name='select_const' id='select_const' class='selection-search form-control' >"
+        for const_id in pa_const_ids:
+            pa_code += "<option value='" + str(const_id.id) + "'>" + const_id.name
+            pa_code += "</option>"
+        pa_code += "</select>"
+        pa_code += '<div style="width: 200px;" class="s_website_form_label pt16"></div>'
+        pa_code += '<button type="submit" class="btn btn-primary">Search</button>'
+        pa_code += "</div>"
+        #pa_code += "</div>"
+        pa_code += '<span id="s_website_form_result"/>'
+        pa_code += "</div>"
+        #html_code += '</form>'
+        
+        pa_code += "</div>"
+        #pa_code += "</div>"
         
         return {
-            'search_form_code': html_code,
+            'na_search_form_code': na_code,
+            'pa_search_form_code': pa_code,
         }
 
     def _prepare_candidate_list_page(self, const_id):
-        html_code = ""
         const = request.env['vote.const'].sudo().search([('id','=',const_id)])
         member_ids = request.env['vote.elect.member'].sudo().search([('const_id','=',const.id)])
-        #html_code += "<h3> Member's List of " + const.name + "</h3>"
-        #html_code += "<h3> Member's List of " + str(const_id) + str(member_ids) + "</h3>"
 
-        # Candidate List
-        #for member in member_ids:
-        #    html_code += "<h3>  " + str(member.contact_name) + "</h3>"
-
-
-            
-
-        #    if member.pol_partner_id.image_1920:
-        #        image_base64 = base64.b64encode(member.pol_partner_id.image_1920).decode('utf-8')
-                # Include the image in the HTML code
-                #html_code += '<img src="data:image/png;base64,' + image_base64 + '" alt="' + member.contact_name + '"/>'
-                #html_code += '<img src="' + image_base64 + '" t-options="{"widget": "image"}"/>'
-                #html_code += '<img name="profile" t-att-src="image_data_uri(member.pol_partner_id.image_1920)" class="card-img-top" alt="" width="10%" data-mimetype="image/png"/>'
-                #html_code += "<img t-att-src=" + "'" + "/web/image/vote.elect.member/%s/image" + "'" + "%" + str(member.id) + " alt='Student'/>"
-
+        if const.const_type_id.code == 'NA':
+            related_const_ids = request.env['vote.const'].sudo().search([('parent_id','=',const.id)])
+            related_const_member_ids = request.env['vote.elect.member'].sudo().search([('const_id','in',related_const_ids.ids)])
+        elif const.const_type_id.code == 'PA':
+            related_const_id = request.env['vote.const'].sudo().search([('id','=',const.id)])
+            related_const_member_ids = request.env['vote.elect.member'].sudo().search([('const_id','=',related_const_id.parent_id.id)])
         
         return {
-            'search_form_code': html_code,
             'const_name': const.name,
             'members': member_ids,
+            'related_const_members': related_const_member_ids,
         }
     

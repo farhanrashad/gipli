@@ -12,15 +12,38 @@
         </template>
         
         <template id="search_candidate_form" name="search_candidate_form">
-             <t t-call="website.layout">
-                <form action="/search/candidate/list" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
-                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                    <div class="s_website_form_rows container mb64 s_col_no_bgcolor">
-                        <div class="form-group s_website_form_field col-12 " data-type="char" data-name="Field">
-                            <t t-raw="search_form_code"/>
+            <t t-call="website.layout">
+                <section class="pt16">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-5 o_colored_level" style="">
+                                <form action="/search/candidate/list" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <div class="s_website_form_rows container mb64 s_col_no_bgcolor">
+                                        <div class="form-group s_website_form_field col-12 " data-type="char" data-name="Field">
+                                            <t t-raw="na_search_form_code"/>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- Seperator -->
+                            <div class="col-lg-2 o_colored_level" style="">
+                                <h3>OR</h3>
+                            </div>
+                            <!-- Provincial -->
+                            <div class="col-lg-5 o_colored_level" style="">
+                                <form action="/search/candidate/list" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <div class="s_website_form_rows container mb64 s_col_no_bgcolor">
+                                        <div class="form-group s_website_form_field col-12 " data-type="char" data-name="Field">
+                                            <t t-raw="pa_search_form_code"/>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </form> 
+                </section>
             </t>
         </template>
         <template id="candidate_list" name="candidate_list">
@@ -37,15 +60,25 @@
                                     <div class="container">
                                         <div class="row align-items-center">
                                             <div class="col-lg-5 pt0 pb0" style="padding:0px;vertical-align: text-top;">
+                                                <t t-if="member.image_1920">
                                                 <img t-attf-src="data:image/jpg;base64,{{ member.image_1920 }}" style="width:200px;height:auto;"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <img src="/de_vote/static/description/no-image-icon.png" style="width:200px;height:auto;"/>
+                                                </t>
                                             </div>
-                                            <div class="col-lg-7 ">
+                                            <div class="col-lg-7 pt8 pb8 ">
                                                 <h4>
                                                     <span t-esc="member.contact_name"/>
                                                 </h4>
                                                 <h5><span t-esc="member.pol_partner_id.name"/></h5>
                                                 <p>
-                                                    <img t-attf-src="data:image/jpg;base64,{{ member.pol_partner_id.image_1920 }}" style="width:95px;height:auto;"/>
+                                                    <t t-if="member.vote_sign_id.image_1920">
+                                                        <img t-attf-src="data:image/jpg;base64,{{ member.vote_sign_id.image_1920 }}" style="width:100px;height:auto;"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <img src="/de_vote/static/description/no-image-icon.png" style="width:100px;height:auto;"/>
+                                                    </t>
 
                                                 </p>
                                             </div>
@@ -57,11 +90,50 @@
                     </div>
                 </section>
                  <!-- Section End -->
-                 <!--
-                 <t t-foreach="members" t-as="member">
-                     <img t-attf-src="data:image/jpg;base64,{{ member.image_1920 }}" style="width:95px; height:95px;margin-left:55px;"/>
-                 </t>
-                 -->
+
+                
+                 <!-- Related Constituency Members Section Start -->
+                <section class="pt16">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <h3>Related Constituency Member's List</h3>
+                            <t t-foreach="related_const_members" t-as="member">
+                                <div class="col-lg-6 o_colored_level" style="border:1px solid #ebebeb;">
+                                    <div class="container">
+                                        <div class="row align-items-center">
+                                            <div class="col-lg-5 pt0 pb0" style="padding:0px;vertical-align: text-top;">
+                                                <t t-if="member.image_1920">
+                                                <img t-attf-src="data:image/jpg;base64,{{ member.image_1920 }}" style="width:200px;height:auto;"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <img src="/de_vote/static/description/no-image-icon.png" style="width:200px;height:auto;"/>
+                                                </t>
+                                            </div>
+                                            <div class="col-lg-7 pt8 pb8 ">
+                                                <h4>
+                                                    <span t-esc="member.contact_name"/>
+                                                </h4>
+                                                <h5><span t-esc="member.pol_partner_id.name"/></h5>
+                                                <h6><span t-esc="member.const_id.name"/></h6>
+                                                <p>
+                                                    <t t-if="member.vote_sign_id.image_1920">
+                                                        <img t-attf-src="data:image/jpg;base64,{{ member.vote_sign_id.image_1920 }}" style="width:100px;height:auto;"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <img src="/de_vote/static/description/no-image-icon.png" style="width:100px;height:auto;"/>
+                                                    </t>
+
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+                <!-- Section End -->
+         
              </t>
         </template>
     </data>

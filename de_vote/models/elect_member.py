@@ -137,7 +137,10 @@ class VoteElectMember(models.Model):
                                      required=True
                                     )
 
+    vote_sign_id = fields.Many2one('vote.sign', string='Sign', store=True, readonly=False, compute="_compute_sign")
+    vote_sign_image = fields.Binary('vote_sign_id.image_1920', readonly=True)
 
+    
     member_ref_line = fields.One2many('vote.elect.member.ref', 'elect_member_id', 'Reference')
     
 
@@ -146,6 +149,11 @@ class VoteElectMember(models.Model):
     
     # Seconder
     scndr_name = fields.Char('Seconder Name')
+
+    @api.depends('pol_partner_id')
+    def _compute_sign(self):
+        for record in self:
+            record.vote_sign_id = record.pol_partner_id.vote_sign_id.id
         
     @api.depends('elect_year_id')
     def _compute_stage_id(self):

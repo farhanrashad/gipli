@@ -9,7 +9,8 @@ from random import randint
 class ConstituencyType(models.Model):
     _name = 'vote.const.type'
     _description = 'Constituency Type'
-    name = fields.Char(string='Type', required=True, index=True, translate=True) 
+    name = fields.Char(string='Type', required=True, index=True, translate=True)
+    code = fields.Char(string='Code', required=True)
 
     
 class Constituency(models.Model):

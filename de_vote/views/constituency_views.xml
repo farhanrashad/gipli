@@ -8,7 +8,7 @@
 			<field name="arch" type="xml">
 				<tree string="Constituency Type" editable="bottom" edit="1">
                     <field name="name"/>
-                    
+                    <field name="code" />
 				</tree>
 			</field>
 		</record>
