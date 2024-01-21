@@ -14,7 +14,7 @@
     'website': "https://www.dynexcel.com",
 
     'category': 'Sales',
-    'version': '16.0.0.3',
+    'version': '16.0.0.4',
 
     'depends': [
         'base',
