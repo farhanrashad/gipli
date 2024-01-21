@@ -84,7 +84,7 @@ class VoteElectMember(models.Model):
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
 
-    contact_name = fields.Char('Contact Name', tracking=30,compute='_compute_contact_name', copy=False, readonly=False, store=True)
+    contact_name = fields.Char('Candidate Name', tracking=30,compute='_compute_contact_name', copy=False, readonly=False, store=True)
     partner_name = fields.Char(
         'Company Name', tracking=20, index=True,
         compute='_compute_partner_name', readonly=False, store=True,copy=False,
@@ -118,7 +118,7 @@ class VoteElectMember(models.Model):
         'res.country', string='Country',
         compute='_compute_partner_address_values', readonly=False, store=True)
     user_id = fields.Many2one(
-        'res.users', string='Admission Officer', default=lambda self: self.env.user,
+        'res.users', string='Officer', default=lambda self: self.env.user,
         domain="['&', ('share', '=', False), ('company_ids', 'in', user_company_ids)]",
         check_company=True, index=True, tracking=True)
     user_company_ids = fields.Many2many(
@@ -144,8 +144,8 @@ class VoteElectMember(models.Model):
                                     )
 
     vote_sign_id = fields.Many2one('vote.sign', string='Sign', store=True, readonly=False, compute="_compute_sign")
-    vote_sign_image = fields.Binary('vote_sign_id.image_1920', readonly=True)
-
+    #vote_sign_image = fields.Binary('vote_sign_id.image_1920', readonly=True)
+    vote_sn = fields.Char('Vote Serial')
     
     member_ref_line = fields.One2many('vote.elect.member.ref', 'elect_member_id', 'Reference')
     

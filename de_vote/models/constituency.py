@@ -16,7 +16,7 @@ class ConstituencyType(models.Model):
 class Constituency(models.Model):
     _name = 'vote.const'
     _description = 'constituency'
-    _order = 'name'
+    _order = 'sequence, id'
     _rec_names_search = ['name', 'code']
     
     def _default_color(self):
@@ -29,7 +29,8 @@ class Constituency(models.Model):
     active = fields.Boolean('Active', default=True)
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
 
-    color = fields.Integer(default=_default_color)    
+    color = fields.Integer(default=_default_color) 
+    sequence = fields.Integer(string='Sequence', default=10)
 
     const_type_id = fields.Many2one('vote.const.type', string='Constituency Type', required=True)
     

@@ -53,7 +53,7 @@
                             <group name="additional_info">
                                 <field name="elect_year_id" />
                                 <field name="vote_sign_id" options="{'no_create_edit': True}"/>
-                            <field name="vote_sign_image" nolabel="1" widget='image' class="oe_avatar" options='{"preview_image": "avatar_128"}'/>
+                                <field name="vote_sn" />
                             </group>
                         </group>
                         <notebook>
@@ -116,13 +116,13 @@
                     <field name="company_id" invisible="1"/>
                     <field name="create_date" optional="hide"/>
                     <field name="name" string="Reference" readonly="1"/>
-                    <field name="contact_name" string="candidate" readonly="1"/>
+                    <field name="contact_name" string="Candidate" readonly="1"/>
                     <field name="const_id" readonly="1"/>
                     <field name="pol_partner_id" readonly="1"/>
                     <field name="partner_id" optional="hide"/>
                     <field name="elect_year_id" optional="hide"/>
                     <field name="company_id" groups="base.group_multi_company" optional="show"/>
-                    <field name="user_id" widget="many2one_avatar_user" optional="show"
+                    <field name="user_id" widget="many2one_avatar_user" optional="hide"
                         domain="[('share', '=', False)]"/>
                     <field name="activity_ids" widget="list_activity"/>
                     <field name="activity_user_id" optional="hide" string="Activity by" widget="many2one_avatar_user"/>
@@ -237,6 +237,38 @@
             <field name="priority">15</field>
             <field name="arch" type="xml">
                 <search string="Search Members">
+                    <field name="name" string="Candidate" filter_domain="[
+                        '|', '|', '|', '|',
+                        ('partner_id', 'ilike', self),
+                        ('partner_name', 'ilike', self),
+                        ('email_from', 'ilike', self),
+                        ('name', 'ilike', self),
+                        ('vote_sn', 'ilike', self),
+                        ('ref', 'ilike', self),
+                        ('contact_name', 'ilike', self)]"/>
+                    <field name="partner_id" operator="child_of" string="Member" filter_domain="[
+                        '|', '|', '|',
+                        ('partner_id', 'ilike', self),
+                        ('partner_name', 'ilike', self),
+                        ('email_from', 'ilike', self),
+                        ('contact_name', 'ilike', self)]"/>
+                    <field name="tag_ids" string="Tag" filter_domain="[('tag_ids', 'ilike', self)]"/>
+                    <field name="const_id"/>
+                    <field name="elect_year_id"/>
+                    <field name="stage_id" domain="[]"/>
+                    <field name="country_id"/>
+                    <field name="city"/>
+                    <field name="activity_state"/>
+                    <separator/>
+                    <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By" colspan="16">
+                        <filter string="Election Year" name="elect_year" context="{'group_by':'elect_year_id'}"/>
+                        <filter string="Constituency Type" name="const_type_id" context="{'group_by':'const_type_id'}"/>
+                        <filter name="stage" string="Stage" context="{'group_by':'stage_id'}"/>
+                        <filter name="city" string="City" context="{'group_by': 'city'}"/>
+                        <filter string="Country" name="country" context="{'group_by':'country_id'}" />
+                        <filter string="Company" name="company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
                 </search>
             </field>
       </record>

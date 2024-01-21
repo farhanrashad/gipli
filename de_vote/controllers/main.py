@@ -27,8 +27,8 @@ class CustomerPortal(http.Controller):
     
     def _prepare_search_form_page(self):
         na_code = pa_code = ""
-        const_ids = request.env['vote.const'].sudo().search([('const_type_id.code','=','NA')],order='const_id')
-        pa_const_ids = request.env['vote.const'].sudo().search([('const_type_id.code','=','PA')],order='const_id')
+        const_ids = request.env['vote.const'].sudo().search([('const_type_id.code','=','NA')],order='sequence')
+        pa_const_ids = request.env['vote.const'].sudo().search([('const_type_id.code','=','PA')],order='sequence')
 
 
         #National Constituency
