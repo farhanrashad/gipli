@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="hr_service_field_variant_form_view">
+            <field name="name">hr.service.field.variant.form.view</field>
+            <field name="model">hr.service.field.variant</field>
+            <field name="arch" type="xml">
+                <form string="HR Service Field Variant">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="Entry Type Name"/>
+                            </h1>
+
+                        </div>
+
+                        <notebook>
+                            <page string="Groups" name="group">
+                                <field name="field_variant_line_ids" >
+                                    <tree string="Groups" editable="bottom">
+                                        <field name="name" />
+                                        <field name="description" />
+                                        <field name="display_column" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="hr_service_field_variant_tree_view">
+            <field name="name">hr.service.field.variant.tree.view</field>
+            <field name="model">hr.service.field.variant</field>
+            <field name="arch" type="xml">
+                <tree string="HR Service Field Variants">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="action_service_field_variant" model="ir.actions.act_window">
+            <field name="name">Field Variant</field>
+            <field name="res_model">hr.service.field.variant</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                No field variant found. Let's create one!
+                </p>
+            </field>
+        </record>
+
+        <menuitem action="action_service_field_variant" name="Field Variant" id="hr_service_field_variant" parent="hr_service_config_menu" sequence="2"/>
+
+    </data>
+</odoo>

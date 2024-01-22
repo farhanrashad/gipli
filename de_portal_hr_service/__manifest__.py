@@ -15,7 +15,7 @@ Employee Self Service
     # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Uncategorized',
-    'version': '0.1',
+    'version': '17.0.0.1',
 
     # any module necessary for this one to work correctly
     'depends': ['base','portal','hr','web'],
@@ -26,6 +26,10 @@ Employee Self Service
         'security/ir.model.access.csv',
         'views/hr_service_menu.xml',
         'views/hr_service_views.xml',
+        'views/hr_employee_views.xml',
+        'views/field_variant_views.xml',
+        'views/hr_services_templates.xml',
+        'views/hr_service_web_templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
