@@ -64,7 +64,7 @@
                                                 <img t-attf-src="data:image/jpg;base64,{{ member.image_1920 }}" style="width:200px;height:auto;"/>
                                                 </t>
                                                 <t t-else="">
-                                                    <img src="/de_vote/static/description/no-image-icon.png" style="width:200px;height:auto;"/>
+                                                    <img src="/de_vote/static/description/no_profile.png" style="width:200px;height:auto;"/>
                                                 </t>
                                             </div>
                                             <div class="col-lg-7 pt8 pb8 ">
@@ -77,7 +77,7 @@
                                                         <img t-attf-src="data:image/jpg;base64,{{ member.vote_sign_id.image_1920 }}" style="width:100px;height:auto;"/> - <span t-esc="member.vote_sign_id.name"/>
                                                     </t>
                                                     <t t-else="">
-                                                        <img src="/de_vote/static/description/no-image-icon.png" style="width:100px;height:auto;"/>
+                                                        <img src="/de_vote/static/description/na.png" style="width:100px;height:auto;"/>
                                                     </t>
 
                                                 </p>
@@ -106,7 +106,7 @@
                                                 <img t-attf-src="data:image/jpg;base64,{{ member.image_1920 }}" style="width:200px;height:auto;"/>
                                                 </t>
                                                 <t t-else="">
-                                                    <img src="/de_vote/static/description/no-image-icon.png" style="width:200px;height:auto;"/>
+                                                    <img src="/de_vote/static/description/no_profile.png" style="width:200px;height:auto;"/>
                                                 </t>
                                             </div>
                                             <div class="col-lg-7 pt8 pb8 ">
@@ -117,10 +117,10 @@
                                                 <h6><span t-esc="member.const_id.name"/></h6>
                                                 <p>
                                                     <t t-if="member.vote_sign_id.image_1920">
-                                                        <img t-attf-src="data:image/jpg;base64,{{ member.vote_sign_id.image_1920 }}" style="width:100px;height:auto;"/>
+                                                        <img t-attf-src="data:image/jpg;base64,{{ member.vote_sign_id.image_1920 }}" style="width:100px;height:auto;"/> - <span t-esc="member.vote_sign_id.name"/>
                                                     </t>
                                                     <t t-else="">
-                                                        <img src="/de_vote/static/description/no-image-icon.png" style="width:100px;height:auto;"/>
+                                                        <img src="/de_vote/static/description/na.png" style="width:100px;height:auto;"/>
                                                     </t>
 
                                                 </p>

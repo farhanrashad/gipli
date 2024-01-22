@@ -238,13 +238,12 @@
             <field name="arch" type="xml">
                 <search string="Search Members">
                     <field name="name" string="Candidate" filter_domain="[
-                        '|', '|', '|', '|',
+                        '|', '|', '|', '|','|',
                         ('partner_id', 'ilike', self),
                         ('partner_name', 'ilike', self),
                         ('email_from', 'ilike', self),
                         ('name', 'ilike', self),
                         ('vote_sn', 'ilike', self),
-                        ('ref', 'ilike', self),
                         ('contact_name', 'ilike', self)]"/>
                     <field name="partner_id" operator="child_of" string="Member" filter_domain="[
                         '|', '|', '|',
