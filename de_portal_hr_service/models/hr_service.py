@@ -6,11 +6,9 @@ import json
 
 from odoo import api, fields, models, tools, _
 from random import randint
-from odoo.exceptions import UserError
-from odoo.exceptions import Warning
 from odoo import models, fields, exceptions, api, _
 from odoo.tools import safe_eval
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, AccessError
 
 from lxml import etree
     

@@ -18,13 +18,14 @@ Employee Self Service
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base','portal','hr','web'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/views.xml',
-        'views/templates.xml',
+        'security/service_security.xml',
+        'security/ir.model.access.csv',
+        'views/hr_service_menu.xml',
+        'views/hr_service_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
