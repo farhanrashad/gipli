@@ -91,17 +91,14 @@ class CustomerPortal(CustomerPortal):
         }
         return self._get_page_view_values(service, access_token, values, 'my_services_history', False, **kwargs)
     
-    @http.route(['/my/<int:service_id>',
-                 '/my/<int:service_id>/page/<int:page>'
+    @http.route(['/my/service/<int:service_id>',
+                 '/my/service/<int:service_id>/page/<int:page>'
                 ], type='http', auth="public", website=True)
-    # @http.route(['/my/service/<int:service_id>',
-    #              '/my/service/<int:service_id>/page/<int:page>'
-    #             ], type='http', auth="public", website=True)
     def portal_my_hr_service(self, service_id=None, access_token=None, **kw):
-        try:
-            service_sudo = self._document_check_access('hr.service', service_id, access_token)
-        except (AccessError, MissingError):
-            return request.redirect('/my')
+        #try:
+        service_sudo = self._document_check_access('hr.service', service_id, access_token)
+        #except (AccessError, MissingError):
+        #    return request.redirect('/my')
         
         #raise UserError(str(service_sudo.name))
         values = self._service_records_get_page_view_values(service_sudo, access_token, **kw)
@@ -115,9 +112,9 @@ class CustomerPortal(CustomerPortal):
         # Check if the user belongs to the group using the group ID
         user = request.env.user
         user_groups = user.groups_id.ids  # This will give you a list of group IDs the user belongs to
-        if group_id not in user_groups:
+        #if group_id not in user_groups:
             # If the user doesn't belong to the group, redirect them to another page (e.g., the home page)
-            return request.redirect('/my')
+            #return request.redirect('/my')
             
         return request.render("de_portal_hr_service.portal_my_hr_service", values)
     
@@ -140,10 +137,10 @@ class CustomerPortal(CustomerPortal):
     
     @http.route('/my/model/record/<int:service_id>/<int:model_id>/<int:record_id>', type='http', auth='public', website=True)
     def portal_my_hr_service_record(self, page=1, service_id=None, model_id=None, record_id=None, access_token=None, **kw):
-        try:
-            service_sudo = self._document_check_access('hr.service', service_id, access_token)
-        except (AccessError, MissingError):
-            return request.redirect('/my')
+        #try:
+        service_sudo = self._document_check_access('hr.service', service_id, access_token)
+        #except (AccessError, MissingError):
+            #return request.redirect('/my')
         Record = request.env[service_sudo.header_model_id.model]
         if access_token:
             Record = Record.sudo()
@@ -195,9 +192,9 @@ class CustomerPortal(CustomerPortal):
         # Check if the user belongs to the group using the group ID
         user = request.env.user
         user_groups = user.groups_id.ids  # This will give you a list of group IDs the user belongs to
-        if group_id not in user_groups:
+        #if group_id not in user_groups:
             # If the user doesn't belong to the group, redirect them to another page (e.g., the home page)
-            return request.redirect('/my')
+            #return request.redirect('/my')
             
         # find editable record option
         record_editable = False
