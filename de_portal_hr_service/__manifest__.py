@@ -16,7 +16,7 @@ Employee Self Service
     'category': 'Human Resources',
     'version': '17.0.1.1',
     'license': 'LGPL-3',
-    'live_test_url': 'https://youtu.be/f_uSGd3qJNU',
+    'live_test_url': 'https://youtu.be/T3ZI7eh0qbg',
     'price': 149,
     'currency': 'USD',
     
