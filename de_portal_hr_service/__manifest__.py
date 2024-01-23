@@ -11,13 +11,15 @@ Employee Self Service
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
 
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '17.0.0.1',
-
-    # any module necessary for this one to work correctly
+    'author': "dynexcel",
+    'website': "https://www.dynexcel.com",
+    'category': 'Human Resources',
+    'version': '17.0.1.1',
+    'license': 'LGPL-3',
+    'live_test_url': 'https://youtu.be/f_uSGd3qJNU',
+    'price': 149,
+    'currency': 'USD',
+    
     'depends': ['base','portal','hr','web'],
 
     # always loaded
@@ -31,9 +33,9 @@ Employee Self Service
         'views/hr_services_templates.xml',
         'views/hr_service_web_templates.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'images': ['static/description/banner.png'],
 }
 
