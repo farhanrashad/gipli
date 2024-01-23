@@ -10,6 +10,8 @@ from odoo.http import request
 #from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager, get_records_pager
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 
+
+
 from odoo.tools import groupby as groupbyelem
 from odoo.tools import safe_eval
 

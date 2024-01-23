@@ -1,7 +1,5 @@
 <odoo>
     <data>
-        <!-- <a t-if="service" t-attf-href="/my/services?{{ keep_query() }}">Services</a> -->
-
         <template id="portal_layout" name="Portal layout: project menu entry" inherit_id="portal.portal_breadcrumbs" priority="40">
             <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
                 <t t-if="service">
@@ -15,14 +13,11 @@
                     </li>
                 </t>
                 <t t-if="record_id">
-                    <li class="breadcrumb-item active text-truncate">
-                        
+                    <li class="breadcrumb-item active text-truncate">    
                             <span t-esc="record_id.name" />
-                        
                     </li>
                 </t>
             </xpath>
-
         </template>
 
         <!-- --> 
