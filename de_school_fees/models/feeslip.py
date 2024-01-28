@@ -94,7 +94,7 @@ class FeeSlip(models.Model):
     country_code = fields.Char(related='country_id.code', readonly=True)
     enrol_order_line_ids = fields.One2many(
         'oe.feeslip.enrol.order.line', 'feeslip_id', string='feeslip Contract Lines', copy=True,
-        compute='_compute_enrol_order_line_ids', store=True, readonly=False,
+        compute='_compute_enrol_order_line_ids', store=True, readonly=True,
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
     input_line_ids = fields.One2many(
         'oe.feeslip.input.line', 'feeslip_id', string='Feeslip Inputs', store=True,
@@ -741,11 +741,15 @@ class FeeSlip(models.Model):
                 'sequence': 10,
                 'product_id': line.product_id.id,
                 'code': line.product_id.default_code,
-                'amount': line.price_total,
+                'amount': line.price_subtotal,
                 'quantity': line.product_uom_qty,
                 'price_unit': line.price_unit,
                 'qty_invoiced': line.qty_invoiced,
                 'qty_to_invoice': line.qty_to_invoice,
+                'untaxed_amount_invoiced': line.untaxed_amount_invoiced,
+                'untaxed_amount_to_invoice': line.untaxed_amount_to_invoice,
+                'taxed_amount_invoiced': line.taxed_amount_invoiced,
+                'taxed_amount_to_invoice': line.taxed_amount_to_invoice,
                 'order_line_id': line.id,
             }) for line in sale_order_lines]
 

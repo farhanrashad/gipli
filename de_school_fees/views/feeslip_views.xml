@@ -138,6 +138,11 @@
                                     <field name="amount" />
                                     <field name="qty_invoiced" optional="hide" />
                                     <field name="qty_to_invoice" optional="hide" />
+                                    <field name="untaxed_amount_invoiced" optional="hide" />
+                                    <field name="untaxed_amount_to_invoice" optional="hide" />
+                                    <field name="taxed_amount_invoiced" optional="hide" />
+                                    <field name="taxed_amount_to_invoice" optional="hide" />
+                                    
                                     <field name="currency_id" invisible="1" />
                                     <field name="order_line_id" invisible="1" />
                                 </tree>
