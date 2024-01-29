@@ -84,7 +84,12 @@ result = rules.NET > categories.NET * 0.10''',
         help="Eventual third party involved in the fee payment of the employees.")
     note = fields.Html(string='Description')
 
-    product_id = fields.Many2one('product.product', string='Fee Product', domain="[('type','=','service'),('fee_product','=',True)]")
+    analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', company_dependent=True)
+    account_debit = fields.Many2one('account.account', 'Debit Account', company_dependent=True, domain=[('deprecated', '=', False)])
+    account_credit = fields.Many2one('account.account', 'Credit Account', company_dependent=True, domain=[('deprecated', '=', False)])
+    not_computed_in_net = fields.Boolean(
+        string="Not computed in net accountably", default=False,
+        help='This field allows you to delete the value of this rule in the "Net Salary" rule at the accounting level to explicitly display the value of this rule in the accounting. For example, if you want to display the value of your representation fees, you can check this field.')
 
     def _raise_error(self, localdict, error_type, e):
         raise UserError(_("""%s:

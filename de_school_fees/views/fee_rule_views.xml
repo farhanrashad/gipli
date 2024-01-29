@@ -98,10 +98,15 @@
                     <page name="description" string="Description">
                         <field name="note"/>
                     </page>
-                    <page name="billing" string="Billing">
+                    <page name="account" string="Accounting">
                         <group>
                             <group>
+                                <!--
                                 <field name="product_id" options="{'no_create': True}" context="{'form_view_ref':'de_school_enrollment.enrollment_fee_product_form_view'}"/>
+                                -->
+                                <field name="account_debit" />
+                                <field name="account_credit"/>
+                                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
                             </group>
                         </group>
                     </page>

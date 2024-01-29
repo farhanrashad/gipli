@@ -334,61 +334,69 @@ class FeeSlip(models.Model):
     
         # Map all feeslips by structure journal
         # {'journal_id': [slip_ids]}
-        slip_mapped_data = defaultdict(list)
+        #slip_mapped_data = defaultdict(list)
+        slip_mapped_data = defaultdict(lambda: defaultdict(lambda: self.env['oe.feeslip']))
         for slip in feeslips_to_post:
             # Append slip to the list for the specific journal_id.
-            slip_mapped_data[slip.fee_struct_id.journal_id.id].append(slip)
+            #slip_mapped_data[slip.fee_struct_id.journal_id.id].append(slip)
+            slip_mapped_data[slip.fee_struct_id.journal_id.id][slip.date or fields.Date().end_of(slip.date_to, 'month')] |= slip
     
         for journal_id in slip_mapped_data:
-            line_ids = []
-            #debit_sum = 0.0
-            #credit_sum = 0.0
-            date = fields.Date().end_of(slip.date_to, 'month')
-            move_dict = {
-                'narration': '',
-                'ref': date.strftime('%B %Y'),
-                'journal_id': journal_id,
-                'move_type': 'out_invoice',
-                'date': date,
-                'invoice_date': date,
-                'partner_id': self.student_id.id,
-            }
-            for slip in slip_mapped_data[journal_id]:
-                move_dict['narration'] += plaintext2html(slip.number or '' + ' - ' + slip.student_id.name or '')
-                move_dict['narration'] += Markup('<br/>')
-                slip_lines = slip._prepare_slip_lines(date, line_ids)
-                line_ids.extend(slip_lines)
+            for slip_date in slip_mapped_data[journal_id]:
+                line_ids = []
+                debit_sum = 0.0
+                credit_sum = 0.0
+                date = fields.Date().end_of(slip.date_to, 'month')
+                move_dict = {
+                    'narration': '',
+                    'ref': date.strftime('%B %Y'),
+                    'journal_id': journal_id,
+                    'date': slip_date,
+                }
+            
+                for slip in slip_mapped_data[journal_id][slip_date]:
+                    move_dict['narration'] += plaintext2html(slip.number or '' + ' - ' + slip.student_id.name or '')
+                    move_dict['narration'] += Markup('<br/>')
+                    slip_lines = slip._prepare_slip_lines(date, line_ids)
+                    line_ids.extend(slip_lines)
     
-            #for line_id in line_ids:
-            #    debit_sum += line_id['debit']
-            #    credit_sum += line_id['credit']
+                for line_id in line_ids:
+                    debit_sum += line_id['debit']
+                    credit_sum += line_id['credit']
     
-            # Add accounting lines in the move
-            move_dict['line_ids'] = [(0, 0, line_vals) for line_vals in line_ids]
-            #raise UserError(move_dict)
-            move = self._create_account_move(move_dict)
-            for slip in slip_mapped_data[journal_id]:
-                slip.write({'account_move_id': move.id, 'date': date})
+                # The code below is called if there is an error in the balance between credit and debit sum.
+                if float_compare(credit_sum, debit_sum, precision_digits=precision) == -1:
+                    slip._prepare_adjust_line(line_ids, 'credit', debit_sum, credit_sum, date)
+                elif float_compare(debit_sum, credit_sum, precision_digits=precision) == -1:
+                    slip._prepare_adjust_line(line_ids, 'debit', debit_sum, credit_sum, date)
+
+                # for testing purpose
+                move_dict['line_ids'] = [(0, 0, line_vals) for line_vals in line_ids]
+                move_dict_str = '\n'.join([f"{key}: {value}" for key, value in move_dict.items()])
+                #raise UserError(move_dict_str)
+            
+                # Add accounting lines in the move
+                move_dict['line_ids'] = [(0, 0, line_vals) for line_vals in line_ids]
+                move = self._create_account_move(move_dict)
+                for slip in slip_mapped_data[journal_id][slip_date]:
+                    slip.write({'account_move_id': move.id, 'date': date})
         return True
 
 
-    def _prepare_line_values(self, line, product_id, date, quantity, price_unit):
-        feeslip_order_lines = self.env['oe.feeslip.enrol.order.line'].search([('feeslip_id','=',line.feeslip_id.id),('product_id', '=', line.fee_rule_id.product_id.id)])
-        sale_line_ids = [(4, order_line.id) for order_line in feeslip_order_lines.order_line_id]
+    def _prepare_line_values(self, line, account_id, date, debit, credit):
         return {
             'name': line.name,
             'partner_id': line.partner_id.id,
-            'product_id': product_id,
+            'account_id': account_id,
             'journal_id': line.feeslip_id.fee_struct_id.journal_id.id,
             'date': date,
-            'quantity': quantity,
-            'price_unit': price_unit,
-            'sale_line_ids': sale_line_ids,
-            #'analytic_distribution': (line.salary_rule_id.analytic_account_id and {line.salary_rule_id.analytic_account_id.id: 100}) or
-            #                         (line.slip_id.contract_id.analytic_account_id.id and {line.slip_id.contract_id.analytic_account_id.id: 100})
+            'debit': debit,
+            'credit': credit,
+            'analytic_distribution': (line.fee_rule_id.analytic_account_id and {line.fee_rule_id.analytic_account_id.id: 100}) or
+                                     (line.feeslip_id.enrol_order_id.analytic_account_id.id and {line.feeslip_id.enrol_order_id.analytic_account_id.id: 100})
         }
         
-    def _prepare_slip_lines(self, date, line_ids):
+    def _prepare_slip_lines11111(self, date, line_ids):
         self.ensure_one()
         precision = self.env['decimal.precision'].precision_get('FEE')
         new_lines = []
@@ -401,6 +409,71 @@ class FeeSlip(models.Model):
             new_lines.append(fee_line)
         return new_lines
 
+    def _prepare_slip_lines(self, date, line_ids):
+        self.ensure_one()
+        precision = self.env['decimal.precision'].precision_get('FEE')
+        new_lines = []
+        for line in self.line_ids.filtered(lambda line: line.category_id):
+            amount = line.total
+            if line.code == 'NET': # Check if the line is the 'Net Salary'.
+                for tmp_line in self.line_ids.filtered(lambda line: line.category_id):
+                    if tmp_line.fee_rule_id.not_computed_in_net: # Check if the rule must be computed in the 'Net Salary' or not.
+                        if amount > 0:
+                            amount -= abs(tmp_line.total)
+                        elif amount < 0:
+                            amount += abs(tmp_line.total)
+            if float_is_zero(amount, precision_digits=precision):
+                continue
+            debit_account_id = line.fee_rule_id.account_debit.id
+            credit_account_id = line.fee_rule_id.account_credit.id
+            if debit_account_id: # If the rule has a debit account.
+                debit = amount if amount > 0.0 else 0.0
+                credit = -amount if amount < 0.0 else 0.0
+
+                debit_line = self._get_existing_lines(
+                    line_ids + new_lines, line, debit_account_id, debit, credit)
+
+                if not debit_line:
+                    debit_line = self._prepare_line_values(line, debit_account_id, date, debit, credit)
+                    debit_line['tax_ids'] = [(4, tax_id) for tax_id in line.fee_rule_id.account_debit.tax_ids.ids]
+                    new_lines.append(debit_line)
+                else:
+                    debit_line['debit'] += debit
+                    debit_line['credit'] += credit
+
+            if credit_account_id: # If the rule has a credit account.
+                debit = -amount if amount < 0.0 else 0.0
+                credit = amount if amount > 0.0 else 0.0
+                credit_line = self._get_existing_lines(
+                    line_ids + new_lines, line, credit_account_id, debit, credit)
+
+                if not credit_line:
+                    credit_line = self._prepare_line_values(line, credit_account_id, date, debit, credit)
+                    credit_line['tax_ids'] = [(4, tax_id) for tax_id in line.fee_rule_id.account_credit.tax_ids.ids]
+                    new_lines.append(credit_line)
+                else:
+                    credit_line['debit'] += debit
+                    credit_line['credit'] += credit
+        return new_lines
+
+    def _get_existing_lines(self, line_ids, line, account_id, debit, credit):
+        existing_lines = (
+            line_id for line_id in line_ids if
+            line_id['name'] == line.name
+            and line_id['account_id'] == account_id
+            and ((line_id['debit'] > 0 and credit <= 0) or (line_id['credit'] > 0 and debit <= 0))
+            and (
+                    (
+                        not line_id['analytic_distribution'] and
+                        not line.fee_rule_id.analytic_account_id.id and
+                        not line.feeslip_id.contract_id.analytic_account_id.id
+                    )
+                    or line_id['analytic_distribution'] and line.fee_rule_id.analytic_account_id.id in line_id['analytic_distribution']
+                    or line_id['analytic_distribution'] and line.feeslip_id.contract_id.analytic_account_id.id in line_id['analytic_distribution']
+
+                )
+        )
+        return next(existing_lines, False)
     def _create_account_move(self, values):
         return self.env['account.move'].sudo().create(values)
         
@@ -850,7 +923,7 @@ class FeeSlip(models.Model):
                 'code': line.code,
                 'name': line.name,
                 'note': line.note,
-                'salary_rule_id': line.salary_rule_id.id,
+                'fee_rule_id': line.fee_rule_id.id,
                 'enrol_order_id': line.enrol_order_id.id,
                 'student_id': line.student_id.id,
                 'amount': line.amount,
