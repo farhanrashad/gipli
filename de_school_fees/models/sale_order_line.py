@@ -14,6 +14,8 @@ from odoo.tools import float_is_zero, float_compare, float_round
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    feeslip_id = fields.Many2one('oe.feeslip', string='Fee Slip')
+    
     taxed_amount_invoiced = fields.Monetary(
         string="taxed Invoiced Amount",
         compute='_compute_taxed_amount_invoiced',

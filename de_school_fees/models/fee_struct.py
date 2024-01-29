@@ -43,6 +43,10 @@ class FeeStructure(models.Model):
         default=lambda self: self.env['account.journal'].sudo().search([
             ('type', '=', 'sale'), ('company_id', '=', self.env.company.id)], limit=1))
 
+    deposit_product_id = fields.Many2one('product.product', string='Product',
+                                         domain="[('type','=','service')]"
+                                        )
+    
     @api.constrains('journal_id')
     def _check_journal_id(self):
         for record_sudo in self.sudo():

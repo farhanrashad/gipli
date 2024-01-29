@@ -96,6 +96,7 @@ class FeeSlip(models.Model):
         'oe.feeslip.enrol.order.line', 'feeslip_id', string='feeslip Contract Lines', copy=True,
         compute='_compute_enrol_order_line_ids', store=True, readonly=True,
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+    
     input_line_ids = fields.One2many(
         'oe.feeslip.input.line', 'feeslip_id', string='Feeslip Inputs', store=True,
         compute='_compute_input_line_ids', 
@@ -309,8 +310,63 @@ class FeeSlip(models.Model):
                 if feeslip_cron:
                     feeslip_cron._trigger()
 
+        #self._create_so_line()
+        # Create Fee Depiost section if necessary
+        if not any(line.display_type and line.is_downpayment for line in self.enrol_order_id.order_line):
+            self.env['sale.order.line'].create(
+                self._prepare_feeslip_payment_section_values(self.enrol_order_id)
+            )
+        # Create Fee Depiost line
+        down_payment_so_line = self.env['sale.order.line'].create(
+            self._prepare_so_line_values(self.enrol_order_id)
+        )
+        
         self._action_create_fee_invoice()
-    
+
+    def _prepare_feeslip_payment_section_values(self, order):
+        context = {'lang': order.partner_id.lang}
+        so_values = {
+            'name': _('Feeslips Payments'),
+            'product_uom_qty': 0.0,
+            'order_id': order.id,
+            'display_type': 'line_section',
+            'is_downpayment': True,
+            'sequence': order.order_line and order.order_line[-1].sequence + 1 or 10,
+            'feeslip_id': self.id,
+        }
+
+        del context
+        return so_values
+
+    def _prepare_so_line_values(self, order):
+        self.ensure_one()
+        analytic_distribution = {}
+        amount_total = sum(order.order_line.mapped("price_total"))
+        if not float_is_zero(amount_total, precision_rounding=self.currency_id.rounding):
+            for line in order.order_line:
+                distrib_dict = line.analytic_distribution or {}
+                for account, distribution in distrib_dict.items():
+                    analytic_distribution[account] = distribution * line.price_total + analytic_distribution.get(account, 0)
+            for account, distribution_amount in analytic_distribution.items():
+                analytic_distribution[account] = distribution_amount/amount_total
+        context = {'lang': order.partner_id.lang}
+        so_values = {
+            'name': self.name,
+            'price_unit': self.amount_total,
+            'price_subtotal': self.amount_total * -1,
+            'price_total': self.amount_total * -1,
+            'product_uom_qty': 0.0,
+            'order_id': order.id,
+            'discount': 0.0,
+            'product_id': self.fee_struct_id.deposit_product_id.id,
+            'analytic_distribution': analytic_distribution,
+            'is_downpayment': True,
+            'sequence': order.order_line and order.order_line[-1].sequence + 1 or 10,
+            'feeslip_id': self.id,
+        }
+        del context
+        return so_values
+        
     def _action_create_fee_invoice(self):
         precision = self.env['decimal.precision'].precision_get('Fee')
     
@@ -396,19 +452,6 @@ class FeeSlip(models.Model):
                                      (line.feeslip_id.enrol_order_id.analytic_account_id.id and {line.feeslip_id.enrol_order_id.analytic_account_id.id: 100})
         }
         
-    def _prepare_slip_lines11111(self, date, line_ids):
-        self.ensure_one()
-        precision = self.env['decimal.precision'].precision_get('FEE')
-        new_lines = []
-        for line in self.line_ids:
-            product_id = line.fee_rule_id.product_id.id
-            quantity = line.quantity
-            price_unit = line.total
-            fee_line = self._prepare_line_values(line, product_id, date, quantity, price_unit)
-            fee_line['tax_ids'] = [(4, tax_id) for tax_id in line.fee_rule_id.product_id.taxes_id.ids]
-            new_lines.append(fee_line)
-        return new_lines
-
     def _prepare_slip_lines(self, date, line_ids):
         self.ensure_one()
         precision = self.env['decimal.precision'].precision_get('FEE')
@@ -482,6 +525,9 @@ class FeeSlip(models.Model):
         if not self.env.user._is_system() and self.filtered(lambda slip: slip.state == 'done'):
             raise UserError(_("Cannot cancel a feeslip that is done."))
         self.write({'state': 'cancel'})
+        self.account_move_id.unlink()
+        self.enrol_order_id.order_line.filtered(lambda x: x.is_downpayment and x.feeslip_id == self.id).unlink()
+        raise UserError(self.enrol_order_id.order_line.filtered(lambda x: x.feeslip_id == self.id))
         self.mapped('feeslip_run_id').action_close()
 
     def action_feeslip_paid(self):
@@ -800,10 +846,18 @@ class FeeSlip(models.Model):
 
     def _get_new_enrol_order_lines(self):
         # Retrieve the related sale.order
-        sale_order = self.enrol_order_id
-        if sale_order:
+        so = self.enrol_order_id
+        #move_ids = self.env['account.move'].search([('sale_id','=',so.id)])
+        if so:
+            enrol_order_data = [(0, 0, {
+                'name': so.name,
+                'code': 'ENRL',
+                'sequence': 10,
+                'amount': so.amount_total,
+            })]
+            return enrol_order_data
             # Get the sale.order lines related to the sale.order
-            sale_order_lines = sale_order.order_line
+            sale_order_lines = so.order_line
 
             # You may want to filter or modify the sale_order_lines based on your specific criteria
             # In this example, we're including all lines.
@@ -826,7 +880,7 @@ class FeeSlip(models.Model):
                 'order_line_id': line.id,
             }) for line in sale_order_lines]
 
-            return enrol_order_line_data
+            #return enrol_order_line_data
         return []
 
         
