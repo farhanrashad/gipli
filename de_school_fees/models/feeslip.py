@@ -386,7 +386,7 @@ class FeeSlip(models.Model):
     def _prepare_line_values(self, line, account_id, date, debit, credit):
         return {
             'name': line.name,
-            'partner_id': line.partner_id.id,
+            'partner_id': line.partner_id.id or self.student_id.id,
             'account_id': account_id,
             'journal_id': line.feeslip_id.fee_struct_id.journal_id.id,
             'date': date,
