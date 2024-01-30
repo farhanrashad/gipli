@@ -239,6 +239,10 @@
                     <field name="avatar_128"/>
                     <field name="type"/>
                     <field name="active"/>
+                    <field name="course_id" />
+                    <field name="batch_id" />
+                    <field name="roll_no" />
+                    <field name="admission_no" />
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_res_partner_kanban">
@@ -271,6 +275,16 @@
                                                 <t t-if="record.country_id.raw_value"><field name="country_id"/></t>
                                             </li>
                                             <li t-if="record.email.raw_value" class="o_text_overflow"><field name="email"/></li>
+                                            <li>
+                                                <t t-if="record.course_id.raw_value"><field name="course_id"/></t>
+                                            </li>
+                                            <li>
+                                                <t t-if="record.batch_id.raw_value"><field name="batch_id"/></t>
+                                            </li>
+                                            <li>
+                                                <t t-if="record.roll_no.raw_value"><field name="roll_no"/></t>
+                                                <t t-if="record.admission_no.raw_value"> / <field name="admission_no"/></t>
+                                            </li>
                                         </ul>
                                     </div>
                                     <div class="o_kanban_record_bottom">
