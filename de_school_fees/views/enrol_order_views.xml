@@ -8,6 +8,9 @@
             <xpath expr="//group[1]" position="inside">
                 <field name="fee_struct_id" />
             </xpath>
+            <xpath expr="//notebook/page[@name='order_lines']/field/tree[1]" position="inside">
+                <field name="feeslip_id" invisible="1" />
+            </xpath>
         </field>
     </record>
 </odoo>
