@@ -33,6 +33,7 @@
         'views/fee_struct_views.xml',
         'views/feeslip_input_type_views.xml',
         'views/feeslip_views.xml',
+        'views/enrol_order_views.xml',
         'wizard/feeslip_by_students_views.xml',
         'views/feeslip_run_views.xml',
         'reports/feeslip_report_template.xml',
@@ -42,6 +43,7 @@
         'views/feeslip_schedule_views.xml',
         'wizard/save_xlsx_views.xml',
         'wizard/feeslip_schedule_wizard_views.xml',
+        
     ],
     # only loaded in demonstration mode
     'demo': [

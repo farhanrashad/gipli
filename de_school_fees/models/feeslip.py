@@ -20,6 +20,8 @@ from odoo.tools.float_utils import float_compare
 from odoo.tools.misc import format_date
 from odoo.tools.safe_eval import safe_eval
 
+from odoo.osv import expression
+
 _logger = logging.getLogger(__name__)
 
 
@@ -55,17 +57,21 @@ class FeeSlip(models.Model):
     
     enrol_order_id = fields.Many2one(
         'sale.order', string='Enrol Contract',
-        #domain=lambda self: self._compute_enrol_order_domain(),
-        domain="[('partner_id', '=', student_id), ('enrol_status', '=', 'open'), ('is_enrol_order', '=', True)]",
+        domain="[('id', 'in', enrol_order_domain_ids)]",
+        compute='_compute_enrol_order',
         store=True, readonly=False,
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+    enrol_order_domain_ids = fields.Many2many('sale.order', compute='_compute_enrol_order_domain_ids')
     
     date_from = fields.Date(
         string='From', readonly=True, required=True,
+        default=lambda self: fields.Date.to_string(date.today().replace(day=1)),
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     date_to = fields.Date(
-        string='To', readonly=True, required=True,
+        string='To', readonly=False, required=True,
+        precompute=True, compute="_compute_date_to", store=True,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
+    
     state = fields.Selection([
         ('draft', 'Draft'),
         ('verify', 'Waiting'),
@@ -126,75 +132,46 @@ class FeeSlip(models.Model):
     date = fields.Date('Date Account', states={'draft': [('readonly', False)], 'verify': [('readonly', False)]}, readonly=True, help="Keep empty to use the period of the validation(Feeslip) date.")
 
     
+    # ================================================================
+    # ====================== Computed Methods ========================
+    # ================================================================
+
+    @api.depends('date_from','fee_struct_id')
+    def _compute_date_to(self):
+        for feeslip in self:
+            mons = feeslip.fee_struct_id.schedule_pay_duration or 1
+            next_month = relativedelta(months=+mons, day=1, days=-1)
+            feeslip.date_to = feeslip.date_from and feeslip.date_from + next_month
+
+    @api.depends('company_id', 'student_id', 'date_from', 'date_to')
+    def _compute_enrol_order_domain_ids(self):
+        for feeslip in self:
+            feeslip.enrol_order_domain_ids = self.env['sale.order'].search([
+                ('company_id', '=', feeslip.company_id.id),
+                ('partner_id', '=', feeslip.student_id.id),
+                ('state', '!=', 'cancel'),
+                ('date_enrol_start', '<=', feeslip.date_to),
+                '|',
+                ('date_enrol_end', '>=', feeslip.date_from),
+                ('date_enrol_end', '=', False)])
+
+    @api.depends('student_id', 'date_from', 'date_to')
+    def _compute_enrol_order(self):
+        for slip in self:
+            if not slip.student_id or not slip.date_from or not slip.date_to:
+                slip.enrol_order_id = False
+                continue
+            # Add a default contract if not already defined or invalid
+            if slip.enrol_order_id: #and slip.student_id == slip.contract_id.employee_id:
+                continue
+            enrol_orders = slip.student_id._get_enrol_orders(slip.date_from, slip.date_to)
+            slip.enrol_order_id = enrol_orders[0] if enrol_orders else False
     
-    #salary_attachment_ids = fields.Many2many(
-    #    'hr.salary.attachment',
-    #    relation='hr_feeslip_hr_salary_attachment_rel',
-    #    string='Salary Attachments',
-    #    compute='_compute_salary_attachment_ids',
-    #    store=True,
-    #    readonly=False,
-    #)
-    #salary_attachment_count = fields.Integer('Salary Attachment count', compute='_compute_salary_attachment_count')
-
-    #@api.depends('course_id','batch_id','fee_struct_id')
-    @api.onchange('course_id','batch_id','fee_struct_id')
-    # Method to retrieve oe.feeslip.schedule records without generated oe.feeslip
-    def _find_fee_dates(self):
-        # Check if this is an existing record
-        domain = [('student_id', '=', self.student_id.id)]
-        if self._origin and self._origin.id:
-            domain.append(('id', '!=', self._origin.id))
-        
-        slip_id = self.env['oe.feeslip'].search(domain, limit=1, order="date_from desc")
-
-        #raise UserError(slip_id.name)
-        # Ensure that there is a current slip
-        if self: #slip_id:
-            for record in self:
-                date_from = record.date_from
-                date_to = record.date_to
-                fee_schedule_id = record.env['oe.feeslip.schedule'].search([
-                        ('batch_id', '=', record.batch_id.id),
-                        ('course_id', '=', record.course_id.id),
-                        ('fee_struct_id', '=', record.fee_struct_id.id),
-                        ('date_from', '>', slip_id.date_to),
-                ], limit=1)
-                #raise UserError(fee_schedule_id.date_from)
-                if not fee_schedule_id:
-                    fee_schedule_id = record.env['oe.feeslip.schedule'].search([
-                            ('batch_id', '=', record.batch_id.id),
-                            ('course_id', '=', record.course_id.id),
-                            ('fee_struct_id', '=', record.fee_struct_id.id)
-                    ], limit=1)
-
-                #raise UserError(fee_schedule_id)
-                record.write({
-                        'date_from': fee_schedule_id.date_from,
-                        'date_to': fee_schedule_id.date_to
-                })
-        else:
-            # Handle the case where there is no current slip
-            pass
-
             
     @api.depends('line_ids','line_ids.total')
     def _compute_amount_total(self):
         for record in self:
             record.amount_total = sum(record.line_ids.mapped('total'))
-            
-    @api.depends('company_id', 'student_id')
-    def _compute_enrol_order_domain(self):
-        # Define the domain criteria here
-        for feeslip in self:
-        # Define the domain criteria here
-            domain = [
-                ('partner_id', '=', feeslip.student_id.id),
-                ('enrol_status', '=', 'open'),
-                ('is_enrol_order', '=', True),
-            ]
-            enrol_order_ids = self.env['sale.order'].search(domain)
-            feeslip.enrol_order_id = enrol_order_ids
             
 
     def _is_invalid(self):
@@ -522,7 +499,10 @@ class FeeSlip(models.Model):
     def _create_account_move(self, values):
         return self.env['account.move'].sudo().create(values)
         
-        
+    # ==============================================================
+    # ====================== Action Methods ========================
+    # ==============================================================
+    
     def action_feeslip_cancel(self):
         if not self.env.user._is_system() and self.filtered(lambda slip: slip.state == 'done'):
             raise UserError(_("Cannot cancel a feeslip that is done."))
@@ -728,10 +708,16 @@ class FeeSlip(models.Model):
             enrol_orders = False #slip.student_id._get_enrol_orders(slip.date_from, slip.date_to)
             slip.enrol_order_id = enrol_orders[0] if enrol_orders else False
 
-    @api.depends('enrol_order_id','student_id')
+    @api.depends('course_id')
     def _compute_struct_id(self):
-        for slip in self.filtered(lambda p: not p.fee_struct_id):
-            slip.fee_struct_id = False #slip.enrol_order_id.structure_type_id.default_struct_id
+        for slip in self:
+            struct_id = self.env['oe.fee.struct'].search([
+                ('active','=',True),
+                '|',
+                ('course_id','=',slip.course_id.id),
+                ('course_id','=',False),
+            ],limit=1)
+            slip.fee_struct_id = struct_id.id
 
     @api.depends('student_id', 'fee_struct_id', 'date_from','date_to')
     def _compute_name(self):

@@ -13,3 +13,5 @@ from . import feeslip_run
 from . import feeslip_schedule
 from . import account_journal
 from . import sale_order_line
+from . import sale_order
+from . import student

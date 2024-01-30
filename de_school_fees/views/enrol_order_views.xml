@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="enrol_order_form_view_inherit_fee_struct" model="ir.ui.view">
+        <field name="name">enrol.order.form.view.inherit.fee.struct</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="de_school_enrollment.enrollment_order_form_view"></field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[1]" position="inside">
+                <field name="fee_struct_id" />
+            </xpath>
+        </field>
+    </record>
+</odoo>
