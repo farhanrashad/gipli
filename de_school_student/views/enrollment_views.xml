@@ -1,0 +1,15 @@
+<odoo>
+  <data>
+    <record id="enrollment_order_action" model="ir.actions.act_window">
+		<field name="name">Enrollment Order</field>
+		<field name="res_model">sale.order</field>
+        <field name="view_mode">kanban,tree,form</field>
+		<field name="domain">[('is_enrol_order', '=', True)]</field>
+        <field name="context">{'default_is_enrol_order': 1}</field>
+    	
+	</record>
+
+      <menuitem id="menu_school_student_main_student_enrol_contract" name="Contracts" parent="menu_school_student_main" sequence="2" action="enrollment_order_action"/>
+    
+  </data>
+</odoo>

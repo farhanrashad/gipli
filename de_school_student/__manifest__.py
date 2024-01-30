@@ -18,12 +18,16 @@
     'auto_install': False,
     'application': True,
     'license': 'OPL-1',
-    'depends': ['de_school'],
+    'depends': [
+        'de_school',
+        'de_school_enrollment',
+    ],
     'data': [
         'security/student_security.xml',
         # 'security/ir.model.access.csv',
         'views/school_student_menu.xml',
         'views/student_views.xml',
+        'views/enrollment_views.xml',
     ],
     'demo': [
         'demo/demo.xml',

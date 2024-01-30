@@ -15,6 +15,7 @@
         
         <menuitem name="Students" id="menu_school_student_main_student"
 			parent="menu_school_student_main" action="action_res_partner_student"
-			groups="group_school_student" />
+            sequence="1"
+			 />
   </data>
 </odoo>
