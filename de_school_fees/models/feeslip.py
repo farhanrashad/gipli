@@ -317,11 +317,11 @@ class FeeSlip(models.Model):
                 self._prepare_feeslip_payment_section_values(self.enrol_order_id)
             )
         # Create Fee Depiost line
-        down_payment_so_line = self.env['sale.order.line'].create(
+        fee_payment_so_line = self.env['sale.order.line'].create(
             self._prepare_so_line_values(self.enrol_order_id)
         )
         
-        self._action_create_fee_invoice()
+        self._action_create_fee_invoice(fee_payment_so_line)
 
     def _prepare_feeslip_payment_section_values(self, order):
         context = {'lang': order.partner_id.lang}
@@ -358,6 +358,7 @@ class FeeSlip(models.Model):
             'product_uom_qty': 0.0,
             'order_id': order.id,
             'discount': 0.0,
+            'qty_invoiced': 1,
             'product_id': self.fee_struct_id.deposit_product_id.id,
             'analytic_distribution': analytic_distribution,
             'is_downpayment': True,
@@ -367,7 +368,7 @@ class FeeSlip(models.Model):
         del context
         return so_values
         
-    def _action_create_fee_invoice(self):
+    def _action_create_fee_invoice(self,sale_line_id):
         precision = self.env['decimal.precision'].precision_get('Fee')
     
         # Add feeslip without run
@@ -413,7 +414,7 @@ class FeeSlip(models.Model):
                 for slip in slip_mapped_data[journal_id][slip_date]:
                     move_dict['narration'] += plaintext2html(slip.number or '' + ' - ' + slip.student_id.name or '')
                     move_dict['narration'] += Markup('<br/>')
-                    slip_lines = slip._prepare_slip_lines(date, line_ids)
+                    slip_lines = slip._prepare_slip_lines(date, line_ids, sale_line_id)
                     line_ids.extend(slip_lines)
     
                 for line_id in line_ids:
@@ -439,7 +440,7 @@ class FeeSlip(models.Model):
         return True
 
 
-    def _prepare_line_values(self, line, account_id, date, debit, credit):
+    def _prepare_line_values(self, line, account_id, date, debit, credit,sale_line_id):
         return {
             'name': line.name,
             'partner_id': line.partner_id.id or self.student_id.id,
@@ -448,11 +449,12 @@ class FeeSlip(models.Model):
             'date': date,
             'debit': debit,
             'credit': credit,
+            'sale_line_ids': [(6, 0, [sale_line_id.id])],
             'analytic_distribution': (line.fee_rule_id.analytic_account_id and {line.fee_rule_id.analytic_account_id.id: 100}) or
                                      (line.feeslip_id.enrol_order_id.analytic_account_id.id and {line.feeslip_id.enrol_order_id.analytic_account_id.id: 100})
         }
         
-    def _prepare_slip_lines(self, date, line_ids):
+    def _prepare_slip_lines(self, date, line_ids, sale_line_id):
         self.ensure_one()
         precision = self.env['decimal.precision'].precision_get('FEE')
         new_lines = []
@@ -477,7 +479,7 @@ class FeeSlip(models.Model):
                     line_ids + new_lines, line, debit_account_id, debit, credit)
 
                 if not debit_line:
-                    debit_line = self._prepare_line_values(line, debit_account_id, date, debit, credit)
+                    debit_line = self._prepare_line_values(line, debit_account_id, date, debit, credit, sale_line_id)
                     debit_line['tax_ids'] = [(4, tax_id) for tax_id in line.fee_rule_id.account_debit.tax_ids.ids]
                     new_lines.append(debit_line)
                 else:
@@ -491,7 +493,7 @@ class FeeSlip(models.Model):
                     line_ids + new_lines, line, credit_account_id, debit, credit)
 
                 if not credit_line:
-                    credit_line = self._prepare_line_values(line, credit_account_id, date, debit, credit)
+                    credit_line = self._prepare_line_values(line, credit_account_id, date, debit, credit, sale_line_id)
                     credit_line['tax_ids'] = [(4, tax_id) for tax_id in line.fee_rule_id.account_credit.tax_ids.ids]
                     new_lines.append(credit_line)
                 else:
@@ -526,8 +528,8 @@ class FeeSlip(models.Model):
             raise UserError(_("Cannot cancel a feeslip that is done."))
         self.write({'state': 'cancel'})
         self.account_move_id.unlink()
-        self.enrol_order_id.order_line.filtered(lambda x: x.is_downpayment and x.feeslip_id == self.id).unlink()
-        raise UserError(self.enrol_order_id.order_line.filtered(lambda x: x.feeslip_id == self.id))
+        self.enrol_order_id.order_line.filtered(lambda x: x.is_downpayment and x.feeslip_id.id == self.id).unlink()
+        #raise UserError(self.enrol_order_id.order_line.filtered(lambda x: x.feeslip_id.id == self.id))
         self.mapped('feeslip_run_id').action_close()
 
     def action_feeslip_paid(self):
@@ -594,15 +596,7 @@ class FeeSlip(models.Model):
             feeslip.write({'line_ids': lines, 'number': number, 'state': 'verify', 'compute_date': fields.Date.today()})
         return True
 
-    def action_refresh_from_work_entries(self):
-        # Refresh the whole feeslip in case the HR has modified some work entries
-        # after the feeslip generation
-        if any(p.state not in ['draft', 'verify'] for p in self):
-            raise UserError(_('The feeslips should be in Draft or Waiting state.'))
-        self.mapped('worked_days_line_ids').unlink()
-        self.mapped('line_ids').unlink()
-        self._compute_worked_days_line_ids()
-        self.compute_sheet()
+    
 
     def _round_days(self, work_entry_type, days):
         if work_entry_type.round_days != 'NO':
@@ -618,79 +612,6 @@ class FeeSlip(models.Model):
             'assignment': self.env.ref('hr_payroll.input_assignment_salary'),
             'child_support': self.env.ref('hr_payroll.input_child_support'),
         }
-
-    def _get_worked_day_lines_hours_per_day(self):
-        self.ensure_one()
-        return self.enrol_order_id.resource_calendar_id.hours_per_day
-
-    def _get_out_of_enrol_order_calendar(self):
-        self.ensure_one()
-        return self.enrol_order_id.resource_calendar_id
-
-    def _get_worked_day_lines_values(self, domain=None):
-        self.ensure_one()
-        res = []
-        hours_per_day = self._get_worked_day_lines_hours_per_day()
-        work_hours = self.enrol_order_id._get_work_hours(self.date_from, self.date_to, domain=domain)
-        work_hours_ordered = sorted(work_hours.items(), key=lambda x: x[1])
-        biggest_work = work_hours_ordered[-1][0] if work_hours_ordered else 0
-        add_days_rounding = 0
-        for work_entry_type_id, hours in work_hours_ordered:
-            work_entry_type = self.env['hr.work.entry.type'].browse(work_entry_type_id)
-            days = round(hours / hours_per_day, 5) if hours_per_day else 0
-            if work_entry_type_id == biggest_work:
-                days += add_days_rounding
-            day_rounded = self._round_days(work_entry_type, days)
-            add_days_rounding += (days - day_rounded)
-            attendance_line = {
-                'sequence': work_entry_type.sequence,
-                'work_entry_type_id': work_entry_type_id,
-                'number_of_days': day_rounded,
-                'number_of_hours': hours,
-            }
-            res.append(attendance_line)
-        return res
-
-    def _get_worked_day_lines(self, domain=None, check_out_of_enrol_order=True):
-        """
-        :returns: a list of dict containing the worked days values that should be applied for the given feeslip
-        """
-        res = []
-        # fill only if the Enrol Order as a working schedule linked
-        self.ensure_one()
-        if self:
-            enrol_order = self.enrol_order_id
-        #if enrol_order.resource_calendar_id:
-        #    res = self._get_worked_day_lines_values(domain=domain)
-        #    if not check_out_of_enrol_order:
-        #        return res
-
-            # If the Enrol Order doesn't cover the whole month, create
-            # worked_days lines to adapt the wage accordingly
-            out_days, out_hours = 0, 0
-            reference_calendar = self._get_out_of_enrol_order_calendar()
-            if self.date_from < enrol_order.date_start:
-                start = fields.Datetime.to_datetime(self.date_from)
-                stop = fields.Datetime.to_datetime(enrol_order.date_start) + relativedelta(days=-1, hour=23, minute=59)
-                out_time = reference_lm96y6y8b ;calendar.get_work_duration_data(start, stop, compute_leaves=False, domain=['|', ('work_entry_type_id', '=', False), ('work_entry_type_id.is_leave', '=', False)])
-                out_days += out_time['days']
-                out_hours += out_time['hours']
-            if enrol_order.date_end and enrol_order.date_end < self.date_to:
-                start = fields.Datetime.to_datetime(enrol_order.date_end) + relativedelta(days=1)
-                stop = fields.Datetime.to_datetime(self.date_to) + relativedelta(hour=23, minute=59)
-                out_time = reference_calendar.get_work_duration_data(start, stop, compute_leaves=False, domain=['|', ('work_entry_type_id', '=', False), ('work_entry_type_id.is_leave', '=', False)])
-                out_days += out_time['days']
-                out_hours += out_time['hours']
-
-            if out_days or out_hours:
-                work_entry_type = self.env.ref('hr_payroll.hr_work_entry_type_out_of_enrol_order')
-                res.append({
-                    'sequence': work_entry_type.sequence,
-                    'work_entry_type_id': work_entry_type.id,
-                    'number_of_days': out_days,
-                    'number_of_hours': out_hours,
-                })
-        return res
 
     def _get_base_local_dict(self):
         return {
@@ -963,48 +884,6 @@ class FeeSlip(models.Model):
         for module_name, files_to_update in data_to_update:
             for file_to_update in files_to_update:
                 convert_file(self.env.cr, module_name, file_to_update, idref)
-
-    def action_edit_feeslip_lines(self):
-        self.ensure_one()
-        if not self.user_has_groups('de_school_fees.group_hr_payroll_manager'):
-            raise UserError(_('This action is restricted to payroll managers only.'))
-        if self.state == 'done':
-            raise UserError(_('This action is forbidden on validated feeslips.'))
-        wizard = self.env['hr.payroll.edit.feeslip.lines.wizard'].create({
-            'feeslip_id': self.id,
-            'line_ids': [(0, 0, {
-                'sequence': line.sequence,
-                'code': line.code,
-                'name': line.name,
-                'note': line.note,
-                'fee_rule_id': line.fee_rule_id.id,
-                'enrol_order_id': line.enrol_order_id.id,
-                'student_id': line.student_id.id,
-                'amount': line.amount,
-                'quantity': line.quantity,
-                'rate': line.rate,
-                'feeslip_id': self.id}) for line in self.line_ids],
-            'worked_days_line_ids': [(0, 0, {
-                'name': line.name,
-                'sequence': line.sequence,
-                'code': line.code,
-                'work_entry_type_id': line.work_entry_type_id.id,
-                'number_of_days': line.number_of_days,
-                'number_of_hours': line.number_of_hours,
-                'amount': line.amount,
-                'feeslip_id': self.id}) for line in self.worked_days_line_ids]
-        })
-
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Edit Feeslip Lines'),
-            'res_model': 'hr.payroll.edit.feeslip.lines.wizard',
-            'view_mode': 'form',
-            'target': 'new',
-            'binding_model_id': self.env['ir.model.data']._xmlid_to_res_id('hr_payroll.model_hr_feeslip'),
-            'binding_view_types': 'form',
-            'res_id': wizard.id
-        }
 
     @api.model
     def _cron_generate_pdf(self):
