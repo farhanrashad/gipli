@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_de_chatgpt_de_chatgpt,de_chatgpt.de_chatgpt,model_de_chatgpt_de_chatgpt,base.group_user,1,1,1,1
+access_gpt_model,access.gpt.model,model_gpt_model,base.group_user,1,1,1,1

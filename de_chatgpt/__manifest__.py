@@ -8,7 +8,7 @@
 Chat GPT Integration
     """,
 
-    'author': "My Company",
+    'author': "Dynexcel",
     'website': "https://www.yourcompany.com",
 
     # Categories can be used to filter modules in modules listing
@@ -22,9 +22,10 @@ Chat GPT Integration
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
+        'data/gpt_data.xml',
         'views/views.xml',
-        'views/templates.xml',
+        'views/res_config_settings.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
