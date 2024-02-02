@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="res_config_settings_view_form_inherit" model="ir.ui.view">
+        <field name="name">res_config_settings_view_form_inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="55"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app
+                     data-string="Services"
+                     string="Services"
+                     name="de_portal_hr_service"
+                     groups="de_portal_hr_service.group_hr_service_manager">
+                    <block title="Services">
+                        <setting title="Those values are applied here for company specific" name="portal_user" string="Assign Portal User" help="Assign portal user to the employees. This grants them access to the online portal's features and functionalities.">
+                            <field name="allow_portal_user"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'de_portal_hr_service'}</field>
+    </record>
+
+    <menuitem id="services_settings_menu" name="Settings" parent="hr_service_config_menu" action="settings_action" sequence="0"/>
+</odoo>
