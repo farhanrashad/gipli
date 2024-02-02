@@ -7,4 +7,4 @@ from odoo.exceptions import UserError
 
 
 class Channel(models.Model):
-    _inherit = 'mail.channel'
+    _inherit = 'discuss.channel'
