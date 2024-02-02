@@ -16,6 +16,7 @@ class FeeEnrolOrderLine(models.Model):
     code = fields.Char(string='Code')
     amount = fields.Monetary(string='Amount',)
     currency_id = fields.Many2one('res.currency', related='feeslip_id.currency_id')
+    amount_residual = fields.Monetary(string='Residual',)
     #order_line_id = fields.Many2one('sale.order.line', string="Order Line")
 
     #@api.depends('work_entry_type_id')

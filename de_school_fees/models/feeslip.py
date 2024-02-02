@@ -754,41 +754,35 @@ class FeeSlip(models.Model):
     def _get_new_enrol_order_lines(self):
         # Retrieve the related sale.order
         so = self.enrol_order_id
-        #move_ids = self.env['account.move'].search([('sale_id','=',so.id)])
+        move_ids = self.env['account.move.line'].search([
+            ('sale_line_ids','in',so.order_line.ids),
+            ('account_id.account_type','=', 'asset_receivable'),
+        ])
+        enrol_order_data = []
+        #raise UserError(move_ids)
         if so:
-            enrol_order_data = [(0, 0, {
-                'name': so.name,
-                'code': 'ENRL',
-                'sequence': 10,
-                'amount': so.amount_total,
-            })]
-            return enrol_order_data
-            # Get the sale.order lines related to the sale.order
+            enrol_order_data.append(
+                (0, 0, {
+                    'name': so.name,
+                    'code': 'ENRL',
+                    'sequence': 10,
+                    'amount': so.amount_total,
+                })
+            )
             sale_order_lines = so.order_line
-
-            # You may want to filter or modify the sale_order_lines based on your specific criteria
-            # In this example, we're including all lines.
-            
-            # Create a list of tuples for updating the enrol_order_line_ids field
-            enrol_order_line_data = [(0, 0, {
-                'name': line.name,
-                'sequence': 10,
-                'product_id': line.product_id.id,
-                'code': line.product_id.default_code,
-                'amount': line.price_subtotal,
-                'quantity': line.product_uom_qty,
-                'price_unit': line.price_unit,
-                'qty_invoiced': line.qty_invoiced,
-                'qty_to_invoice': line.qty_to_invoice,
-                'untaxed_amount_invoiced': line.untaxed_amount_invoiced,
-                'untaxed_amount_to_invoice': line.untaxed_amount_to_invoice,
-                'taxed_amount_invoiced': line.taxed_amount_invoiced,
-                'taxed_amount_to_invoice': line.taxed_amount_to_invoice,
-                'order_line_id': line.id,
-            }) for line in sale_order_lines]
-
-            #return enrol_order_line_data
-        return []
+    
+        if len(move_ids):
+            enrol_order_data.append(
+                (0, 0, {
+                    'name': so.name,
+                    'code': 'INV',
+                    'sequence': 20,
+                    'amount': sum(move_ids.mapped('debit')),
+                    'amount_residual': sum(move_ids.mapped('amount_residual')),
+                })
+            )
+    
+        return enrol_order_data
 
         
     @api.depends('student_id', 'fee_struct_id')
