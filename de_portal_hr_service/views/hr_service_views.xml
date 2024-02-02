@@ -89,10 +89,10 @@
             <field name="arch" type="xml">
                 <form string="HR Service">
                     <header>
-                        <button name="button_validate" type="object" invisible="state == 'draft'" string="Validate" class="oe_highlight" id="validate" data-hotkey="v"/>
-                        <button name="button_publish" type="object" invisible="state == 'validate'" string="Publish" class="oe_highlight" id="validate" data-hotkey="p"/>
-                        <button name="button_draft" invisible="state in ['validate','publish','cancel']" string="Set to Draft" type="object" data-hotkey="o"/>
-                        <button name="button_cancel" invisible="state in ['draft','validate','publish']" string="Cancel" type="object" data-hotkey="x" />
+                        <button name="button_validate" type="object" invisible="state != 'draft'" string="Validate" class="oe_highlight" id="validate" data-hotkey="v"/>
+                        <button name="button_publish" type="object" invisible="state != 'validate'" string="Publish" class="oe_highlight" id="validate" data-hotkey="p"/>
+                        <button name="button_draft" invisible="state != 'cancel'" string="Set to Draft" type="object" data-hotkey="o"/>
+                        <button name="button_cancel" invisible="state != 'publish' and state != 'validate'" string="Cancel" type="object" data-hotkey="x" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,validate,publish" readonly="1"/>
                     </header>
                     <sheet>                  
