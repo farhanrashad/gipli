@@ -13,6 +13,7 @@
                             </setting>
                             <setting id="gpt_model" help="OpenAI GPT Model">
                                 <field name="gpt_model_id" />
+                                <field name="gpt_model" />
                             </setting>
                         </block>
                 </block>
