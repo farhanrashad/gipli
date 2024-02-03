@@ -105,6 +105,7 @@
                     </div>
                     <group>
                         <field name="description" placeholder="Define instructions for your team about service."/>
+                        <field name="web_icon_data"/>
                     </group>
                     <group>
                         <group name="model" string="Header">
@@ -113,8 +114,8 @@
                             <field name="title_field_id" domain="[('model_id', '=', header_model_id),('ttype','!=','one2many')]"/>
                             <field name="state_field_id" domain="[('model_id', '=', header_model_id),('ttype','!=','one2many')]"/>
                             <field name="filter_field_id" domain="[('model_id', '=', header_model_id),('relation','=','res.partner')]"/>
-                            <field name="group_id"/>
-                            <field name="field_variant_id" string="Field Variant" />
+                            <field name="group_id" required="1"/>
+                            <field name="field_variant_id" required="1" string="Field Variant" />
                         </group>
                         <group string="Operations">
                             <field name="filter_domain" widget="domain" string="Filter Domain" options="{'model': 'header_model_name', 'in_dialog': True}"/>
