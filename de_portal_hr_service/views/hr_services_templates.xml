@@ -22,9 +22,43 @@
 
         <!-- --> 
         <template id="portal_my_home" name="Show Types / Services" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+                <t t-set="portal_client_category_enable" t-value="True"/>
+                <t t-set="portal_alert_category_enable" t-value="True"/>
+            </xpath>
+            
+            
             <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
                 <t t-set="services" t-value="request.env['hr.service'].sudo().search([('state','=','publish')])"/>
                 <t t-foreach="services" t-as="service">
+
+                    <div id="portal_common_category" position="inside">
+                        <t t-call="portal.portal_docs_entry">
+                            <t t-set="icon" t-value="'/de_portal_hr_service/static/description/icon.png'"/>
+                            <t t-set="title">New Link</t>
+                            <t t-set="url" t-value="'/my/service'"/>
+                            <t t-set="text">Follow, view or pay your orders</t>
+                        </t>
+                    </div>
+
+
+                    <div class="o_portal_index_card col-md-6 order-2">
+                        <a t-attf-href="/my/service/{{service.id}}" t-attf-title="{{service.name}}" class="d-flex justify-content-start gap-2 gap-md-3 align-items-center py-3 pe-2 px-md-3 h-100 rounded text-decoration-none text-reset text-bg-light" previewlistener="true">
+                            <div class="o_portal_icon align-self-start">
+                                <img src="/portal/static/src/img/portal-addresses.svg"/>
+                            </div>
+                            <div>
+                                <h5 class="mt-0 mb-1 ">
+                                    <span t-esc="service.name" />
+                                </h5>
+                                <p class="m-0 text-600">
+                                    <span t-esc="service.description" />
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    
                     <t t-set="service_count" t-value="request.env[service.header_model_id.model].search_count([(service.filter_field_id.name, 'child_of', [request.env.user.partner_id.id]),(service.filter_field_id.name, '=', [request.env.user.partner_id.id])])"/>
                     <t t-set="group" t-value="service.group_id"/>
                     <t t-if="group  &amp;  request.env.user.groups_id">
@@ -58,10 +92,6 @@
                     </t>
                 </t>
             </xpath>
-         
-
-
-
         </template>
 
 
