@@ -29,8 +29,7 @@ class HRService(models.Model):
     name = fields.Char(string='Name', required=True, translate=True, states=READONLY_STATES,)
     active = fields.Boolean(default=True)
     description = fields.Char(string='Description')    
-    web_icon_data = fields.Binary(string='Web Icon Image', attachment=True)
-    
+    web_icon_data = fields.Binary(string='Web Icon Image', attachment=True) 
     header_model_id = fields.Many2one('ir.model', ondelete='cascade', string='Model', states=READONLY_STATES, required=True)
     header_model_name = fields.Char(related='header_model_id.model', string='Model Name')
     filter_domain = fields.Char(string='Domain', help="If present, this domain would apply to filter records.")
@@ -43,9 +42,6 @@ class HRService(models.Model):
     is_create = fields.Boolean(string='Create', help='Allow record creation', states=READONLY_STATES,)
     is_edit = fields.Boolean(string='Edit', help='Allow record edition', states=READONLY_STATES,)
     allow_messages = fields.Boolean(string='Allow Messages', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='Allow messages to user on portal')
-
-            
-            
     @api.onchange('allow_messages')
     def _onchange_allow_messages(self):
         partner_id = self.env.user.partner_id

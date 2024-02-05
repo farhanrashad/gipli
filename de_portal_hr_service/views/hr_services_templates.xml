@@ -22,6 +22,7 @@
 
         <!-- --> 
         <template id="portal_my_home" name="Show Types / Services" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
+
             <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
                 <t t-set="portal_client_category_enable" t-value="True"/>
                 <t t-set="portal_alert_category_enable" t-value="True"/>
@@ -53,6 +54,7 @@
                                 </div>
                             </a>
                         </div>
+
                     </t>
                     <t t-if="not group">
                         <t t-call="portal.portal_docs_entry">
@@ -71,6 +73,8 @@
                     </t>
                 </t>
             </xpath>
+
+
         </template>
 
 
@@ -158,15 +162,15 @@
                                     </div>
                                 </div>
                                 <div class="col-1 col-md-1 d-flex align-items-center justify-content-end">
-                                   <t t-if="record_id.sudo().state">
+                                   <t t-if="state">
                                         <div class="ribbon ribbon-primary">
-                                            <span t-field="record_id.sudo().state"/>
+                                            <span t-esc="state"/>
                                         </div>
                                    </t>
                                 </div>
 
-                                <div t-if="record_id.sudo().state" class="col-1 col-md-1 d-flex align-items-center  text-center">
-                                    <span t-esc="record_id.sudo().state" class=" badge badge-pill badge-info" title="Current stage of this entry"/>
+                                <div t-if="state" class="col-1 col-md-1 d-flex align-items-center  text-center">
+                                    <span t-esc="state" class=" badge badge-pill badge-info" title="Current stage of this entry"/>
                                 </div>
                             </div>
                         </div>
