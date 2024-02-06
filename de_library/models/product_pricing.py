@@ -23,13 +23,13 @@ PERIOD_RATIO = {
 
 class ProductLibraryFees(models.Model):
     """ Library Fees """
-    _name = 'oe.library.product.fees'
+    _name = 'lib.product.fees'
     _description = 'Library Pricing'
     _order = 'product_template_id,price,pricelist_id,library_fee_period_id'
 
     name = fields.Char(compute='_compute_name')
     description = fields.Char(compute='_compute_description')
-    library_fee_period_id = fields.Many2one('oe.library.fees.period', string='Recurrency', required=True)
+    library_fee_period_id = fields.Many2one('lib.fees.period', string='Recurrency', required=True)
     price = fields.Monetary(string="Price", required=True, default=1.0)
     currency_id = fields.Many2one('res.currency', 'Currency', compute='_compute_currency_id', store=True)
     product_template_id = fields.Many2one('product.template', string="Product Templates", ondelete='cascade',
@@ -72,7 +72,7 @@ class ProductLibraryFees(models.Model):
             if self.library_fee_period_id.unit in singular_labels:
                 return singular_labels[self.library_fee_period_id.unit]
         return dict(
-            self.env['oe.library.fees.period']._fields['unit']._description_selection(self.env)
+            self.env['lib.fees.period']._fields['unit']._description_selection(self.env)
         )[self.library_fee_period_id.unit]
     
     def _compute_description(self):
@@ -133,7 +133,7 @@ class ProductLibraryFees(models.Model):
         Note: model method
         """
         is_product_template = product._name == "product.template"
-        available_pricings = self.env['oe.library.product.fees']
+        available_pricings = self.env['lib.product.fees']
         if pricelist:
             for pricing in product.product_fees_ids:
                 if pricing.pricelist_id == pricelist\

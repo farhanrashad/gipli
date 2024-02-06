@@ -9,6 +9,7 @@
                 <xpath expr="//group[1]/group[2]" position='inside'>
                     <field name="is_publisher" invisible="1"/>
                     <field name="is_author" invisible="1"/>
+                    <field name="is_member" invisible="1"/>
                 </xpath>
             </field>
         </record>

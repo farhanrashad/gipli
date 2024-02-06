@@ -5,6 +5,6 @@
             name="Teachers" 
             parent="menu_library_patron_main" 
             sequence="20" 
-            action="de_school.action_hr_employees_teachers"
+            action="de_library.action_hr_employees_teachers"
         />
 </odoo>

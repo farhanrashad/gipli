@@ -6,9 +6,9 @@ from odoo.tools import get_timedelta
 from odoo.tools import float_compare, float_is_zero
 
 
-class FeePeriod(models.Model):
-    _name = 'oe.library.fees.period'
-    _description = 'Fee Period'
+class LibraryPeriod(models.Model):
+    _name = 'lib.fees.period'
+    _description = 'Library Period'
     _order = 'unit,duration'
 
     active = fields.Boolean(default=True)

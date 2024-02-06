@@ -27,7 +27,7 @@ class SaleOrderLine(models.Model):
     duration_unit = fields.Selection([("hour", "Hours"), ("day", "Days"), ("week", "Weeks"), ("month", "Months"), ('year', "Years")],
                                      string="Unit", required=True, compute="_compute_book_duration")
 
-    book_pricing_id = fields.Many2one('oe.library.product.fees', compute="_compute_book_pricing",
+    book_pricing_id = fields.Many2one('lib.product.fees', compute="_compute_book_pricing",
         string="Pricing", help="Best Pricing Rule based on duration")
 
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
@@ -63,7 +63,7 @@ class SaleOrderLine(models.Model):
                 'duration': 1.0,
             }
             if wizard.book_issue_date and wizard.book_return_date:
-                duration_dict = self.env['oe.library.product.fees']._compute_duration_vals(wizard.book_issue_date, wizard.book_return_date)
+                duration_dict = self.env['lib.product.fees']._compute_duration_vals(wizard.book_issue_date, wizard.book_return_date)
                 if wizard.book_pricing_id:
                     values = {
                         'duration_unit': wizard.book_pricing_id.library_fee_period_id.unit,

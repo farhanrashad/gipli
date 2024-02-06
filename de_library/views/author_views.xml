@@ -4,30 +4,25 @@
         <record id="author_primary_form_view" model="ir.ui.view">
             <field name="name">author.form.view</field>
             <field name="model">res.partner</field>
-            <field name="inherit_id" ref="de_school_library.view_partner_form_inherit_library"/>
+            <field name="inherit_id" ref="de_library.view_partner_form_inherit_library"/>
             <field name="mode">primary</field>
             <field name="priority">999</field>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='company_type']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='type']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 
                 
                 <xpath expr="//field[@name='vat']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='function']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='website']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//form[1]/sheet[1]/group[1]/group[1]" position="attributes">
@@ -38,23 +33,19 @@
                 </xpath>
                 
                 <xpath expr="//field[@name='title']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
               
                 <xpath expr="//field[@name='child_ids']/form[1]/sheet[1]//field[@name='type']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 
                  <xpath expr="//field[@name='child_ids']/form[1]/sheet[1]//div[1]" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 
                 
                 <xpath expr="//page[@name='sales_purchases']" position="attributes">
-                    <attribute name="attrs">{}</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                
@@ -70,10 +61,6 @@
                 <tree string="Author" sample="1" multi_edit="1">
                     <field name="display_name" string="Name"/>
                     <field name="function" invisible="1"/>
-                    <field name="course_id" />
-                    <field name="batch_id" />
-                    <field name="roll_no" />
-                    <field name="admission_no" />
                     <field name="ref" optional="hide" />
                     <field name="phone" class="o_force_ltr" optional="show"/>
                     <field name="email" optional="show"/>

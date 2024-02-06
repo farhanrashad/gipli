@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+        <record id="action_res_partner_member" model="ir.actions.act_window">
+            <field name="name">Member</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{'default_is_author':'True','default_company_type':'person','default_type':'contact'}</field>
+            <field name="domain">[('is_publisher','=','True')]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a member
+                  </p><p>
+                
+                </p>
+            </field>
+        </record>
+    
+        <menuitem 
+            id="menu_library_patron_main_member" 
+            name="Members" 
+            parent="menu_library_patron_main" 
+            sequence="10" 
+            action="de_library.action_res_partner_member"
+        />
+</odoo>

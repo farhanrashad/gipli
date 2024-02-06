@@ -7,7 +7,7 @@ import math
 from odoo.exceptions import UserError
 
 class LibraryFeeWizard(models.TransientModel):
-    _name = 'oe.library.fee.config.wizard'
+    _name = 'lib.fee.config.wizard'
     _description = 'Configure the Library Fee'
 
     def _default_uom_id(self):
@@ -24,7 +24,7 @@ class LibraryFeeWizard(models.TransientModel):
     currency_id = fields.Many2one('res.currency', string="Currency", compute='_compute_currency_id')
 
     pricing_id = fields.Many2one(
-        'oe.library.product.fees', compute="_compute_pricing",
+        'lib.product.fees', compute="_compute_pricing",
         string="Pricing", help="Best Pricing Rule based on duration")
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
 
@@ -91,7 +91,7 @@ class LibraryFeeWizard(models.TransientModel):
                 'duration': 1.0,
             }
             if wizard.issue_date and wizard.return_date:
-                duration_dict = self.env['oe.library.product.fees']._compute_duration_vals(wizard.issue_date, wizard.return_date)
+                duration_dict = self.env['lib.product.fees']._compute_duration_vals(wizard.issue_date, wizard.return_date)
                 if wizard.pricing_id:
                     values = {
                         'duration_unit': wizard.pricing_id.library_fee_period_id.unit,

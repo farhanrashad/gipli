@@ -12,7 +12,7 @@ class ProductTemplate(models.Model):
                          )
     edition_book = fields.Char('Book Edition')
     genre_id = fields.Many2one(
-        comodel_name='oe.library.genre',
+        comodel_name='lib.genre',
         string="Genre",
         ondelete='restrict')
     book_lang_id = fields.Many2one('res.lang', string='Language')
@@ -29,7 +29,7 @@ class ProductTemplate(models.Model):
         string="Author",
         change_default=True, ondelete='restrict')
     date_publish = fields.Date('Publication Date')
-    product_fees_ids = fields.One2many('oe.library.product.fees', 'product_template_id', string="Library Fees", auto_join=True, copy=True)
+    product_fees_ids = fields.One2many('lib.product.fees', 'product_template_id', string="Library Fees", auto_join=True, copy=True)
 
     book_charge_hourly = fields.Float("Charge Hour", help="Fine by hour overdue", company_dependent=True)
     book_charge_daily = fields.Float("Charge Day", help="Fine by day overdue", company_dependent=True)
@@ -47,7 +47,7 @@ class ProductTemplate(models.Model):
         :return: least expensive pricing rule for given duration
         """
         self.ensure_one()
-        best_pricing_rule = self.env['oe.library.product.fees']
+        best_pricing_rule = self.env['lib.product.fees']
         if not self.product_fees_ids:
             return best_pricing_rule
         # Two possibilities: start_date and end_date are provided or the duration with its unit.
@@ -56,11 +56,11 @@ class ProductTemplate(models.Model):
         company = kwargs.get('company', self.env.company)
         duration_dict = {}
         if start_date and end_date:
-            duration_dict = self.env['oe.library.product.fees']._compute_duration_vals(start_date, end_date)
+            duration_dict = self.env['lib.product.fees']._compute_duration_vals(start_date, end_date)
         elif not (duration and unit):
             return best_pricing_rule  # no valid input to compute duration.
         min_price = float("inf")  # positive infinity
-        Pricing = self.env['oe.library.product.fees']
+        Pricing = self.env['lib.product.fees']
         available_pricings = Pricing._get_suitable_pricings(product or self, pricelist=pricelist)
         for pricing in available_pricings:
             if duration and unit:

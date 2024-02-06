@@ -10,11 +10,11 @@ from odoo.exceptions import ValidationError, UserError
 
 
 class LibraryProcessing(models.TransientModel):
-    _name = 'oe.library.process.wizard'
+    _name = 'lib.process.wizard'
     _description = 'Pick-up/Return products'
 
     order_id = fields.Many2one('sale.order', required=True, ondelete='cascade')
-    wizard_line_ids = fields.One2many('oe.library.process.wizard.line', 'order_wizard_id')
+    wizard_line_ids = fields.One2many('lib.process.wizard.line', 'order_wizard_id')
     status = fields.Selection(
         selection=[
             ('issue', 'Issued'),
@@ -51,7 +51,7 @@ class LibraryProcessing(models.TransientModel):
         if order_lines:
             lines_values = []
             for line in order_lines:
-                lines_values.append(self.env['oe.library.process.wizard.line']._default_wizard_line_vals(line, self.status))
+                lines_values.append(self.env['lib.process.wizard.line']._default_wizard_line_vals(line, self.status))
 
             self.wizard_line_ids = [(6, 0, [])] + [(0, 0, vals) for vals in lines_values]
 
@@ -80,7 +80,7 @@ class LibraryProcessing(models.TransientModel):
 
 
 class LibraryProcessingLine(models.TransientModel):
-    _name = 'oe.library.process.wizard.line'
+    _name = 'lib.process.wizard.line'
     _description = 'Library Order Processing transient representation'
 
     @api.model
@@ -95,7 +95,7 @@ class LibraryProcessingLine(models.TransientModel):
             'is_book_late': line.is_book_late #and delay_price > 0
         }
 
-    order_wizard_id = fields.Many2one('oe.library.process.wizard', 'Order Wizard', required=True, ondelete='cascade')
+    order_wizard_id = fields.Many2one('lib.process.wizard', 'Order Wizard', required=True, ondelete='cascade')
     status = fields.Selection(related='order_wizard_id.status')
 
     order_line_id = fields.Many2one('sale.order.line', required=True, ondelete='cascade')

@@ -92,7 +92,7 @@ class CirculationAgreement(models.Model):
         return {
             'name': _('Validate a issue') if status == 'confirm' else _('Validate a return'),
             'view_mode': 'form',
-            'res_model': 'oe.library.process.wizard',
+            'res_model': 'lib.process.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
             'context': context
@@ -115,7 +115,7 @@ class CirculationAgreement(models.Model):
         return {
             'name': _('Validate a issue') if status == 'confirm' else _('Validate a return'),
             'view_mode': 'form',
-            'res_model': 'oe.library.process.wizard',
+            'res_model': 'lib.process.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
             'context': context

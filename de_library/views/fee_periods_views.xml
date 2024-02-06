@@ -4,7 +4,7 @@
         <!-- Fee Period -->
         <record id="library_fees_period" model="ir.ui.view">
 			<field name="name">library.fees.period.tree.view</field>
-			<field name="model">oe.library.fees.period</field>
+			<field name="model">lib.fees.period</field>
 			<field name="arch" type="xml">
 				<tree string="Fees Period" editable="bottom">
 					<field name="name"/>
@@ -16,7 +16,7 @@
         
         <record id="library_fees_period_search_view" model="ir.ui.view">
             <field name="name">library.fees.period.search.view</field>
-            <field name="model">oe.library.fees.period</field>
+            <field name="model">lib.fees.period</field>
             <field name="arch" type="xml">
                 <search string="Fees Period">
                     <field name="name" string="Period"/>
@@ -26,7 +26,7 @@
         
         <record id="action_library_fees_period" model="ir.actions.act_window">
             <field name="name">Period</field>
-            <field name="res_model">oe.library.fees.period</field>
+            <field name="res_model">lib.fees.period</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="library_fees_period_search_view"/>
             <field name="help" type="html">
@@ -39,7 +39,7 @@
         <menuitem name="Fee Period" id="menu_library_menu_config_fees_period"
             parent="menu_library_menu_config" 
             action="action_library_fees_period"
-            groups="de_school_library.group_library_manager" 
+            groups="de_library.group_library_manager" 
             sequence="20"
         />
         

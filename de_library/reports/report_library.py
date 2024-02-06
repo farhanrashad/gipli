@@ -4,7 +4,7 @@ from odoo import fields, models, tools
 
 
 class LibraryReport(models.Model):
-    _name = "oe.library.report"
+    _name = "lib.report"
     _description = "Library Analysis Report"
     _auto = False
 

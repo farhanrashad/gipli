@@ -4,24 +4,25 @@
     <record id="circulation_agreement_form_view" model="ir.ui.view">
         <field name="name">circulation.agreement.form.view</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="de_school_library.sale_order_form_view_inherit_library"/>
+        <field name="inherit_id" ref="de_library.sale_order_form_view_inherit_library"/>
         <field name="mode">primary</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
             <xpath expr="//form[1]/header[1]/field[@name='state']" position="attributes">
-                <attribute name="attrs">{}</attribute>
                 <attribute name="invisible">1</attribute>
             </xpath>
             
             <xpath expr="//header" position='inside'>
+                <field name="is_borrow_order" invisible="1"/>
+                  <field name="borrow_status" invisible="1"/>
                 <field name="borrow_status" widget="statusbar" statusbar_visible="draft,confirm,issue,return"/>
             </xpath>
             
             <button name="action_quotation_send" position="before">
                 <button name="open_issue_form" type="object" class="btn-primary" string="ISSUE" data-hotkey="y"
-                    attrs="{'invisible':[('borrow_status', 'not in', ['confirm'])]}"/>
+                    invisible="borrow_status not in ['confirm']"/>
                 <button name="open_return_form" type="object" class="btn-primary" string="RETURN" data-hotkey="k"
-                    attrs="{'invisible':[('borrow_status', 'not in', ['issue'])]}"/>
+                    invisible=" borrow_status not in ['issue']"/>
                 
             </button>
             
@@ -30,7 +31,7 @@
             </xpath>
             
             <xpath expr="//field[@name='partner_id']" position="attributes">
-                <attribute name="domain">[('is_student', '=', True)]</attribute>
+                <attribute name="domain">[('is_member', '=', True)]</attribute>
             </xpath>
 
             <xpath expr="//notebook/page[@name='order_lines']/field/tree" position="inside">
@@ -39,7 +40,7 @@
             
             <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']" position="attributes">
                 <attribute name="context">{
-                    'form_view_ref': 'de_school_library.sale_order_line_form_view'
+                    'form_view_ref': 'de_library.sale_order_line_form_view'
                 }
                 </attribute>
             </xpath>
@@ -62,7 +63,7 @@
             />
             <button name="schedule_product" type="object" class="" 
                 icon="fa-calendar" help="Edit Configuration"
-                attrs="{'invisible': [('borrow_status', '!=', 'draft')]}" 
+                invisible="borrow_status !='draft'" 
             />
         </xpath>
         
@@ -100,7 +101,7 @@
                 <attribute name="string">Student Signature</attribute>
             </xpath>
         <xpath expr="//field[@name='user_id']" position="after">
-            <field name="team_id" options='{"no_open": True, "no_create": True}' attrs="{'invisible':[('is_borrow_order','=',False)]}"/>
+            <field name="team_id" options='{"no_open": True, "no_create": True}' invisible='is_borrow_order =False'/>
         </xpath>
         </field>
       </record>
@@ -108,12 +109,12 @@
     <record id="circulation_agreement_form_view_inherit" model="ir.ui.view">
         <field name="name">circulation.agreement.form.view</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="de_school_library.circulation_agreement_form_view"/>
+        <field name="inherit_id" ref="de_library.circulation_agreement_form_view"/>
         <field name="mode">primary</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='qty_delivered']" position="after">
-            <field name="book_returned" attrs="{'column_invisible': [('parent.is_borrow_order', '!=', True)]}"/>
+            <field name="book_returned" column_invisible="parent.is_borrow_order !=True"/>
                 
         </xpath>
         </field>

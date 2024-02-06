@@ -22,10 +22,10 @@
                                         <span class="o_stat_value">
                                             <field name="pricelist_item_count"/>
                                         </span>
-                                        <span attrs="{'invisible': [('pricelist_item_count', '=', 1)]}">
+                                        <span invisible= "pricelist_item_count ==1">
                                             Extra Prices
                                         </span>
-                                        <span attrs="{'invisible': [('pricelist_item_count', '!=', 1)]}">
+                                        <span invisible= "pricelist_item_count != 1">
                                             Extra Price
                                         </span>
                                    </div>
@@ -35,7 +35,7 @@
                                 <field name="tracking" invisible="1"/>
                                 <field name="show_on_hand_qty_status_button" invisible="1"/>
                                 <field name="show_forecasted_qty_status_button" invisible="1"/>
-                                <button type="object" name="action_open_quants" attrs="{'invisible':[('show_on_hand_qty_status_button', '=', False)]}" class="oe_stat_button" icon="fa-cubes">
+                                <button type="object" name="action_open_quants" invisible="show_on_hand_qty_status_button == False" class="oe_stat_button" icon="fa-cubes">
                                     <div class="o_field_widget o_stat_info">
                                         <span class="o_stat_value" widget="statinfo">
                                             <field name="qty_available" widget="statinfo" nolabel="1" class="mr4"/>
@@ -44,7 +44,7 @@
                                         <span class="o_stat_text">On Hand</span>
                                     </div>
                                 </button>
-                                <button type="object" name="action_product_tmpl_forecast_report" attrs="{'invisible':[('show_forecasted_qty_status_button', '=', False)]}" context="{'default_product_tmpl_id': id}" class="oe_stat_button" icon="fa-cubes">
+                                <button type="object" name="action_product_tmpl_forecast_report" invisible="show_forecasted_qty_status_button == False" context="{'default_product_tmpl_id': id}" class="oe_stat_button" icon="fa-cubes">
                                     <div class="o_field_widget o_stat_info">
                                         <span class="o_stat_value">
                                             <field name="virtual_available" widget="statinfo" nolabel="1" class="mr4"/>
@@ -53,7 +53,7 @@
                                         <span class="o_stat_text">Forecasted</span>
                                     </div>
                                 </button>
-                                <button type="object" name="action_view_stock_move_lines" attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}" class="oe_stat_button" icon="fa-exchange" groups="stock.group_stock_user">
+                                <button type="object" name="action_view_stock_move_lines" invisible="type not in ('product', 'consu')" class="oe_stat_button" icon="fa-exchange" groups="stock.group_stock_user">
                                     <div class="o_field_widget o_stat_info mr4">
                                         <span class="o_stat_text">In:</span>
                                         <span class="o_stat_text">Out:</span>
@@ -63,7 +63,7 @@
                                         <span class="o_stat_value"><field name="nbr_moves_out"/></span>
                                     </div>
                                 </button>
-                                <button type="object" name="action_view_orderpoints" attrs="{'invisible':['|',('type', '!=', 'product'),('nbr_reordering_rules', '!=', 1)]}" class="oe_stat_button" icon="fa-refresh">
+                                <button type="object" name="action_view_orderpoints" invisible="type != 'product' or nbr_reordering_rules != 1" class="oe_stat_button" icon="fa-refresh">
                                     <div class="o_field_widget o_stat_info mr4">
                                         <span class="o_stat_text">Min:</span>
                                         <span class="o_stat_text">Max:</span>
@@ -73,16 +73,16 @@
                                         <span class="o_stat_value"><field name="reordering_max_qty"/></span>
                                     </div>
                                 </button>
-                                <button type="object" name="action_view_orderpoints" attrs="{'invisible':['|',('type', '!=', 'product'),('nbr_reordering_rules', '==', 1)]}" class="oe_stat_button" icon="fa-refresh">
+                                <button type="object" name="action_view_orderpoints" invisible="type != 'product' or nbr_reordering_rules == 1" class="oe_stat_button" icon="fa-refresh">
                                     <field name="nbr_reordering_rules" widget="statinfo"/>
                                 </button>
-                                <button string="Lot/Serial Numbers" type="object" name="action_open_product_lot" attrs="{'invisible': [('tracking', '=', 'none')]}" class="oe_stat_button" icon="fa-bars" groups="stock.group_production_lot"/>
-                                <button string="Putaway Rules" type="object" name="action_view_related_putaway_rules" class="oe_stat_button" icon="fa-random" groups="stock.group_stock_multi_locations" attrs="{'invisible': [('type', '=', 'service')]}" context="{                                     'invisible_handle': True,                                     'single_product': product_variant_count == 1,                                 }"/>
-                                <button type="object" string="Storage Capacities" name="action_view_storage_category_capacity" groups="stock.group_stock_storage_categories" attrs="{'invisible':[('type', '=', 'service')]}" class="oe_stat_button" icon="fa-cubes"/>
+                                <button string="Lot/Serial Numbers" type="object" name="action_open_product_lot" invisible="tracking == 'none'" class="oe_stat_button" icon="fa-bars" groups="stock.group_production_lot"/>
+                                <button string="Putaway Rules" type="object" name="action_view_related_putaway_rules" class="oe_stat_button" icon="fa-random" groups="stock.group_stock_multi_locations" invisible="type == 'service'" context="{                                     'invisible_handle': True,                                     'single_product': product_variant_count == 1,                                 }"/>
+                                <button type="object" string="Storage Capacities" name="action_view_storage_category_capacity" groups="stock.group_stock_storage_categories" invisible="type == 'service'" class="oe_stat_button" icon="fa-cubes"/>
                             </t>
                         </div>
                         
-                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active == True"/>
                         
                         <field name="image_1920" widget="image" class="oe_avatar" options="{'image_preview': 'image_128'}"/>
                         
@@ -124,7 +124,7 @@
                             <page string="Internal Note" name="internal_note">
                                 <field name="description" placeholder="This note will be shown to users when they select this expense product."/>
                             </page>
-                            <page string="Library Fees" name="library_fees" attrs="{'invisible': [('is_book','=',False)]}">
+                            <page string="Library Fees" name="library_fees" invisible="is_book == False">
                               <group>
                                 <group name="pricing">
                                     <field name="product_fees_ids" nolabel="1" colspan="2">
@@ -135,7 +135,7 @@
                                         <field name="product_variant_ids" widget="many2many_tags"
                                           groups="product.group_product_variant"
                                           domain="[('product_tmpl_id', '=', parent.id)]"
-                                          attrs="{'column_invisible': [('parent.product_variant_count', '&lt;', 2)]}"/>
+                                          column_invisible="parent.product_variant_count &lt; 2"/>
                                         <field name="library_fee_period_id" string="Period"/>
                                         <field name="pricelist_id" groups="product.group_product_pricelist"/>
                                         <field name="currency_id" invisible="1"/>
@@ -152,20 +152,20 @@
                             </page>
                             <page name="inventory" string="Inventory">
                                 <group>
-                                    <group name="group_lots_and_weight" string="Logistics" attrs="{'invisible': [('type', 'not in', ['product', 'consu'])]}">
-                                        <label for="weight" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
-                                        <div class="o_row" name="weight" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
+                                    <group name="group_lots_and_weight" string="Logistics" invisible="type not in ['product', 'consu']">
+                                        <label for="weight" invisible="product_variant_count &gt; 1 and is_product_variant == False"/>
+                                        <div class="o_row" name="weight" invisible="product_variant_count &gt; 1 and is_product_variant ==False">
                                             <field name="weight" class="oe_inline"/>
                                             <field name="weight_uom_name"/>
                                         </div>
-                                        <label for="volume" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
-                                        <div class="o_row" name="volume" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
+                                        <label for="volume" invisible="product_variant_count &gt; 1 and is_product_variant ==False"/>
+                                        <div class="o_row" name="volume" invisible="product_variant_count &gt; 1 and is_product_variant ==False">
                                             <field name="volume" string="Volume" class="oe_inline"/>
                                             <field name="volume_uom_name"/>
                                         </div>
                                     </group>
-                                    <group string="Traceability" name="traceability" groups="stock.group_production_lot" attrs="{'invisible': [('type', '=', 'consu')]}">
-                                        <field name="tracking" widget="radio" attrs="{'invisible': [('type', '=', 'service')]}"/>
+                                    <group string="Traceability" name="traceability" groups="stock.group_production_lot" invisible="type =='consu'">
+                                        <field name="tracking" widget="radio" invisible="type=='service'"/>
                                     </group>
                                     <group string="Description for Receipts">
                                         <field name="description_pickingin" colspan="2" nolabel="1" placeholder="This note is added to receipt orders (e.g. where to store the product in the warehouse)."/>

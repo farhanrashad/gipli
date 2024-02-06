@@ -8,3 +8,4 @@ class ResPartner(models.Model):
     
     is_publisher = fields.Boolean('Is Publisher')
     is_author = fields.Boolean('Is Author')
+    is_member = fields.Boolean('Is Member')
