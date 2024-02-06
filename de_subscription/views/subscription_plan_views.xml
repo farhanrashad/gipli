@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_recurring_plan_view_form" model="ir.ui.view">
+        <field name="name">sale.recurring.plan.view.form</field>
+        <field name="model">sale.recur.plan</field>
+        <field name="arch" type="xml">
+            <form string="Recurring Plan">
+                <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Monthly" class="d-block"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <label for="recurring_interval" string="Recurring Cycle"/>
+                            <div>
+                                <field name="recurring_interval" style="width: 3rem;"/>
+                                <field name="recurring_interval_type" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_recurring_plan" model="ir.actions.act_window">
+        <field name="name">Recurring Plan</field>
+        <field name="res_model">sale.recur.plan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new recurring plan
+            </p><p>
+                Create subscriptions plan
+            </p><p>
+                Subscription plans are used to configure the recurring, invoicing, and self-service behavior of subscriptions.
+            </p>
+        </field>
+    </record>
+
+    <menuitem name="Recurring Plan" id="menu_subscription_config_sub_plan"
+                    parent="menu_subscription_config" action="action_recurring_plan"
+                    groups="sales_team.group_sale_manager" sequence="2"/>
+    
+</odoo>
