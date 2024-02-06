@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Circulation Agreement Form View -->
-    <record id="library_order_form_view" model="ir.ui.view">
-        <field name="name">library.order.form.view</field>
+    <record id="circulation_agreement_form_view" model="ir.ui.view">
+        <field name="name">circulation.agreement.form.view</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="inherit_id" ref="de_library.sale_order_form_view_inherit_library"/>
+        <field name="mode">primary</field>
+        <field name="priority">999</field>
         <field name="arch" type="xml">
-            <header position="inside">
-                <field name="is_borrow_order" invisible="1"/>
-                <field name="borrow_status" invisible="1"/>
-                <field name="borrow_status" widget="statusbar" statusbar_visible="draft,confirm,issue,return"/>
-            </header>
             <xpath expr="//form[1]/header[1]/field[@name='state']" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <xpath expr="//header" position='inside'>
+                <field name="is_borrow_order" invisible="1"/>
+                  <field name="borrow_status" invisible="1"/>
+                <field name="borrow_status" widget="statusbar" statusbar_visible="draft,confirm,issue,return"/>
             </xpath>
             
             <button name="action_quotation_send" position="before">
@@ -56,7 +59,7 @@
                 }"
                 domain="[('is_book', '=', True)]"
                 options="{'no_open':True}" 
-                readonly="borrow_status != 'draft'"
+                attrs="{'readonly': [('borrow_status', '!=', 'draft')]}"
             />
             <button name="schedule_product" type="object" class="" 
                 icon="fa-calendar" help="Edit Configuration"
@@ -66,12 +69,12 @@
         
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_uom_qty']" position="replace">
             <field name="product_uom_qty"  
-                readonly="borrow_status != 'draft'" 
+                attrs="{'readonly': [('borrow_status', '!=', 'draft')]}" 
             />
         </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='price_unit']" position="replace">
             <field name="price_unit"  
-                readonly="borrow_status != 'draft'"
+                attrs="{'readonly': [('borrow_status', '!=', 'draft')]}"
             />
         </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='tax_id']" position="replace">
@@ -81,7 +84,7 @@
                 options="{'no_create': True}"
                 domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id), ('country_id', '=', parent.tax_country_id)]"
                 context="{'active_test': True}"
-                readonly="qty_invoiced &gt; 0 or borrow_status != 'draft'"
+                attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0),('borrow_status', '!=', 'draft')]}"
                 optional="show"
             />
         </xpath>
@@ -98,15 +101,15 @@
                 <attribute name="string">Student Signature</attribute>
             </xpath>
         <xpath expr="//field[@name='user_id']" position="after">
-            <field name="team_id" options='{"no_open": True, "no_create": True}' invisible="is_borrow_order ==False" />
+            <field name="team_id" options='{"no_open": True, "no_create": True}' invisible='is_borrow_order =False'/>
         </xpath>
         </field>
       </record>
 
-    <record id="library_order_form_view_inherit" model="ir.ui.view">
+    <record id="circulation_agreement_form_view_inherit" model="ir.ui.view">
         <field name="name">circulation.agreement.form.view</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="de_library.library_order_form_view"/>
+        <field name="inherit_id" ref="de_library.circulation_agreement_form_view"/>
         <field name="mode">primary</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
@@ -156,12 +159,13 @@
                 <field name="borrow_next_action_date"/>
             </field>
             <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/field[@name='state']" position="attributes">
-                <attribute name="invisible">state == 'sale' and borrow_status</attribute>
+                <attribute name="attrs">
+                    {'invisible': [('state', '=', 'sale'), ('borrow_status', '!=', False)]}
+                </attribute>
             </xpath>
-            
             <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/field[@name='state']" position="after">
                 <field name="borrow_status" widget="label_selection"
-                    invisible="state != 'sale' or borrow_status == False"
+                    attrs="{'invisible': ['|', ('state', '!=', 'sale'), ('borrow_status', '=', False)]}"
                     options="{'classes': {'issue': 'info', 'return': 'warning', 'returned': 'success'}}"/>
             </xpath>
         </field>
@@ -238,10 +242,10 @@ You will be able to issue and return books to patron.
         <field name="view_id" ref="circulation_agreement_tree_view"/>
         <field name="act_window_id" ref="action_circulation_agreement"/>
     </record>
-    <record id="librarycirculation_agreement_form" model="ir.actions.act_window.view">
+    <record id="circulation_agreement_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="library_order_form_view"/>
+        <field name="view_id" ref="circulation_agreement_form_view"/>
         <field name="act_window_id" ref="action_circulation_agreement"/>
     </record>
     
@@ -297,7 +301,7 @@ or create a new circulation agreement.
     <record id="circulation_agreement_issue_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="library_order_form_view"/>
+        <field name="view_id" ref="circulation_agreement_form_view"/>
         <field name="act_window_id" ref="action_circulation_agreement_issue"/>
     </record>
     
@@ -343,7 +347,7 @@ or create a new circulation agreement.
     <record id="circulation_agreement_return_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="library_order_form_view"/>
+        <field name="view_id" ref="circulation_agreement_form_view"/>
         <field name="act_window_id" ref="action_circulation_agreement_return"/>
     </record>
     

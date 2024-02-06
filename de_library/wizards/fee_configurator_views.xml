@@ -3,7 +3,7 @@
 
     <record id="library_fee_config_wizard_view_form" model="ir.ui.view">
         <field name="name">library.fee.config.wizard.view.form</field>
-        <field name="model">oe.library.fee.config.wizard</field>
+        <field name="model">lib.fee.config.wizard</field>
         <field name="arch" type="xml">
             <form js_class="library_configurator_form">
                 <sheet>
@@ -64,7 +64,7 @@
 
     <record id="action_library_fee_config_wizard" model="ir.actions.act_window">
         <field name="name">Library Fee</field>
-        <field name="res_model">oe.library.fee.config.wizard</field>
+        <field name="res_model">lib.fee.config.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
         <field name="view_id" ref="library_fee_config_wizard_view_form"/>

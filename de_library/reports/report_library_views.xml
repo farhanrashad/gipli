@@ -3,7 +3,7 @@
 
     <record id="rental_report_pivot_view" model="ir.ui.view">
         <field name="name">library.report.pivot</field>
-        <field name="model">oe.library.report</field>
+        <field name="model">lib.report</field>
         <field name="arch" type="xml">
             <pivot string="Rental Analysis" sample="1">
                 <field name="date" type="row" interval="day"/>
@@ -17,7 +17,7 @@
 
     <record id="rental_report_graph_view" model="ir.ui.view">
         <field name="name">library.report.graph</field>
-        <field name="model">oe.library.report</field>
+        <field name="model">lib.report</field>
         <field name="arch" type="xml">
             <graph string="Rental Analysis" type="line" sample="1">
                 <field name="date" interval="day"/>
@@ -28,7 +28,7 @@
 
     <record id="sale_rental_report_view_tree" model="ir.ui.view">
         <field name="name">library.report.view.tree</field>
-        <field name="model">oe.library.report</field>
+        <field name="model">lib.report</field>
         <field name="arch" type="xml">
             <tree string="Rental Analysis">
                 <field name="date"/>
@@ -50,7 +50,7 @@
 
     <record id="rental_report_search_view" model="ir.ui.view">
         <field name="name">library.report.search</field>
-        <field name="model">oe.library.report</field>
+        <field name="model">lib.report</field>
         <field name="arch" type="xml">
             <search string="Rental Analysis">
                 <field name="date"/>
@@ -82,7 +82,7 @@
 
     <record id="action_library_report" model="ir.actions.act_window">
         <field name="name">Catalog Analysis</field>
-        <field name="res_model">oe.library.report</field>
+        <field name="res_model">lib.report</field>
         <field name="view_mode">graph,pivot</field>
         <field name="search_view_id" ref="rental_report_search_view"/>
         <field name="context">{
