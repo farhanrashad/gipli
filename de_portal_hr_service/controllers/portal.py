@@ -789,10 +789,14 @@ $(document).ready(function() {
                         field.field_name: int(kw.get(field.field_name))
                     })
                 elif field.field_type in ('datetime'):
-                    vals.update({
-                        field.field_name: datetime.datetime.strptime(kw.get(field.field_name),'%Y-%m-%dT%H:%M')
-                        #(kw.get(field.field_name))
-                    })
+                    if 'T' in kw.get(field.field_name):
+                        vals.update({
+                            field.field_name: datetime.datetime.strptime(kw.get(field.field_name),'%Y-%m-%dT%H:%M')
+                        })
+                    else:
+                        vals.update({
+                            field.field_name: datetime.datetime.strptime(kw.get(field.field_name),'%Y-%m-%d')
+                        })
                 else:
                     vals.update({
                         field.field_name: kw.get(field.field_name)

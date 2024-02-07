@@ -8,13 +8,13 @@
             <field name="priority">1000</field>
             <field name="arch" type="xml">
                 <tree editable="bottom" >
-                    <field name="field_store" invisible="1"/>
-                    <field name="field_readonly" invisible="1"/>
-                    <field name="is_model_selected" invisible="1"/>
-                    <field name="ref_populate_field_ids" invisible="1" />
+                    <field name="field_store" column_invisible="1"/>
+                    <field name="field_readonly" column_invisible="1"/>
+                    <field name="is_model_selected" column_invisible="1"/>
+                    <field name="ref_populate_field_ids" column_invisible="1" />
                     
-                    <field name="hr_service_id" invisible="1" force_save="1"/>
-                    <field name="hr_service_record_line_id" invisible="1" force_save="1"/>
+                    <field name="hr_service_id" column_invisible="1" force_save="1"/>
+                    <field name="hr_service_record_line_id" column_invisible="1" force_save="1"/>
                     <field name="sequence" widget="handle" />
                     <field name="field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" />
                     <field name="field_name" />
@@ -34,14 +34,11 @@
        readonly="is_model_selected == False" 
        optional="hide" 
        widget="many2many_tags" />
-
-
-                    
                     <field name="field_type" optional="hide"/>
                     <field name="field_model" optional="hide"/>
                     <field name="is_required" readonly="field_store == False"/>
                     <field name="operation_mode" readonly="field_store == False"/>
-                    <field name="field_variant_id"  invisible="1"/>
+                    <field name="field_variant_id"  column_invisible="1"/>
                     <field name="field_variant_line_id" domain="[('field_variant_id','=',field_variant_id)]"  />
                     
                     <field name="ref_field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" optional="hide" />
@@ -134,24 +131,14 @@
                         <notebook>
                             <page string="Service Item Fields" name="header_fields">
                                 <field name="hr_service_items" >
-                                    <form>
-                                        <!-- <field name="display_type" invisible="1"/> -->
-                                        <field name="sequence" invisible="1"/>
-                                        <group>
-                                            <group>
-                                            </group>
-                                        </group>
-                                       
-                                    </form>
                                     <tree string="Service Items" editable="bottom">
                                         <control>
                                             <create name="add_product_control" string="Add a field"/>
                                            
                                         </control>
                                 
-                                        <!-- <field name="display_type" invisible="1"/> -->
                                         <field name="sequence" widget="handle" />
-                                        <field name="hr_service_id" invisible="1" />
+                                        <field name="hr_service_id" column_invisible="1" />
                                         <field
                                             name="field_id"
             
@@ -169,7 +156,7 @@
                                          <field name="link_record" />
                                         <field name="field_domain" optional="hide" 
                                             readonly="field_type != 'many2one'"/>
-                                        <field name="is_model_selected" invisible="1"/>
+                                        <field name="is_model_selected" column_invisible="1"/>
                                         <field name="search_fields_ids" 
        domain="[('model', '=', field_model), ('store', '=', True), ('ttype', 'in', ['char','integer','text','selection'])]" 
        readonly="is_model_selected == False" 
@@ -189,11 +176,11 @@
                                         <field name="display_option" />
                                         <field name="field_variant_line_id" domain="[('field_variant_id','=',parent.field_variant_id)]" readonly="field_store ==False"/>
 
-                                        <field name="ref_populate_field_ids" invisible="1" />
+                                        <field name="ref_populate_field_ids" column_invisible="1" />
                                         <field name="ref_populate_field_id" />
 
-                                        <field name="field_store" invisible="1"/>
-                                        <field name="field_readonly" invisible="1"/>
+                                        <field name="field_store" column_invisible="1"/>
+                                        <field name="field_readonly" column_invisible="1"/>
                                         
                                         <field name="ref_field_id" domain="[('model_id', '=', parent.header_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                                     </tree>
@@ -203,7 +190,7 @@
                         <field name="hr_service_record_line" >
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle" />
-                                <field name="header_model_id" invisible="1"/>
+                                <field name="header_model_id" column_invisible="1"/>
                                 <field name="relational_field_id" domain="[('model_id', '=', header_model_id),('ttype','=','one2many')]"/>
                                 <field name="line_model_id" string="Model" readonly="1"/>
                                 <field name="parent_relational_field_id" domain="[('model_id', '=', line_model_id),('ttype','=','many2one')]"/>

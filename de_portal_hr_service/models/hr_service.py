@@ -201,8 +201,7 @@ class HRServiceItems(models.Model):
     _order = 'sequence, id'
         
     sequence = fields.Integer(string='Sequence', default=10)
-    hr_service_id = fields.Many2one('hr.service', string='HR Service')
-    # hr_service_id = fields.Many2one('hr.service', string='HR Service', readonly=True,)
+    hr_service_id = fields.Many2one('hr.service', string='HR Service', required=True, ondelete='cascade', index=True, copy=False)
     name = fields.Text(string='Description', )
     
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True)
@@ -304,7 +303,7 @@ class HRServiceItemsLine(models.Model):
     _description = 'Service Record Line'
     _order = 'sequence, id'
     
-    hr_service_id = fields.Many2one('hr.service', string='HR Service', readonly=True,)
+    hr_service_id = fields.Many2one('hr.service', string='HR Service', required=True, ondelete='cascade', index=True, copy=False)
     header_model_id = fields.Many2one('ir.model', related='hr_service_id.header_model_id')
     relational_field_id = fields.Many2one('ir.model.fields', string='Line records Field', ondelete="cascade", required=True)
     
@@ -359,8 +358,8 @@ class HRServiceItemsLine(models.Model):
     _description = 'Service Record Line Items'
     _order = 'id'
 
-    hr_service_id = fields.Many2one('hr.service', string='HR Service', readonly=True,)
-    hr_service_record_line_id = fields.Many2one('hr.service.record.line', string='Service Record Line', readonly=True,)
+    hr_service_id = fields.Many2one('hr.service', string='HR Service', required=True, ondelete='cascade', index=True, copy=False)
+    hr_service_record_line_id = fields.Many2one('hr.service.record.line', string='Service Record Line', readonly=True,required=True, ondelete='cascade', index=True, copy=False)
     
     sequence = fields.Integer(string='Sequence', default=10)
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True, )
