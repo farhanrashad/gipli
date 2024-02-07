@@ -158,15 +158,15 @@
                                     </div>
                                 </div>
                                 <div class="col-1 col-md-1 d-flex align-items-center justify-content-end">
-                                   <t t-if="record_id.sudo().state">
+                                   <t t-if="state">
                                         <div class="ribbon ribbon-primary">
-                                            <span t-field="record_id.sudo().state"/>
+                                            <span t-esc="state"/>
                                         </div>
                                    </t>
                                 </div>
 
-                                <div t-if="record_id.sudo().state" class="col-1 col-md-1 d-flex align-items-center  text-center">
-                                    <span t-esc="record_id.sudo().state" class=" badge badge-pill badge-info" title="Current stage of this entry"/>
+                                <div t-if="state" class="col-1 col-md-1 d-flex align-items-center  text-center">
+                                    <span t-esc="state" class=" badge badge-pill badge-info" title="Current stage of this entry"/>
                                 </div>
                             </div>
                         </div>
