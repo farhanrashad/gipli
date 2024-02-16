@@ -4,7 +4,7 @@
     <record id="library_order_form_view" model="ir.ui.view">
         <field name="name">library.order.form.view</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="inherit_id" ref="de_library.sale_order_form_view_inherit_library"/>
         <field name="arch" type="xml">
             <header position="inside">
                 <field name="is_borrow_order" invisible="1"/>

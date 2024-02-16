@@ -28,7 +28,7 @@
         'views/res_partner_views.xml',
         'views/publisher_views.xml',
         'views/author_views.xml',
-        #'views/sale_order_views.xml',
+        'views/sale_order_views.xml',
         'views/sale_order_line_views.xml',
         'views/member_views.xml',
         #'views/teacher_views.xml',
