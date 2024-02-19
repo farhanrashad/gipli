@@ -25,11 +25,37 @@ class CirculationAgreement(models.Model):
         string="Next Action", compute='_compute_next_action_date', store=True)
     is_late = fields.Boolean('Is Late')
 
+    is_book_late = fields.Boolean(
+        string="Is overdue",
+        help="The products haven't been picked-up or returned in time",
+        compute='_compute_is_late',
+    )
+    
     #has_pickable_lines = fields.Boolean(compute="_compute_rental_status", store=True)
     #has_late_lines = fields.Boolean(compute="_compute_has_late_lines")
 
-    # compute Method
-    #@api.depends('state', 'order_line', 'order_line.product_uom_qty', 'order_line.qty_delivered', 'order_line.qty_returned')
+    # ============================================
+    # ============= compute Methods ==============
+    # ============================================
+    @api.depends('is_borrow_order', 'borrow_next_action_date', 'borrow_status')
+    def _compute_is_late(self):
+        now = fields.Datetime.now()
+        for order in self:
+            tolerance_delay = relativedelta(hours=order.company_id.min_extra_hour)
+            order.is_late = (
+                order.is_borrow_order
+                and order.borrow_status in ['issue', 'return']  # has_pickable_lines or has_returnable_lines
+                and order.next_action_date
+                and order.next_action_date + tolerance_delay < now
+            )
+            
+    @api.depends(
+        'state', 
+        'order_line', 
+        'order_line.product_uom_qty', 
+        'order_line.qty_delivered', 
+        'order_line.book_returned'
+    )
     def _compute_next_action_date(self):
         for order in self:
             if order.state in ['sale', 'done'] and order.is_borrow_order:
@@ -46,7 +72,7 @@ class CirculationAgreement(models.Model):
                     order.borrow_next_action_date = min_return_date
                 else:
                     order.borrow_status = 'return'
-                    order.next_action_date = False
+                    order.borrow_next_action_date = False
                 #order.has_pickable_lines = bool(pickeable_lines)
                 #order.has_returnable_lines = bool(returnable_lines)
             else:
@@ -107,7 +133,6 @@ class CirculationAgreement(models.Model):
         context = {
             'active_model': 'sale.order',
             'active_id': self.id,
-            
             'order_line_ids': order_line_ids,
             'status': 'return',
             'default_status': status,
