@@ -23,6 +23,7 @@ class CirculationAgreement(models.Model):
 
     borrow_next_action_date = fields.Datetime(
         string="Next Action", compute='_compute_next_action_date', store=True)
+    is_late = fields.Boolean('Is Late')
 
     #has_pickable_lines = fields.Boolean(compute="_compute_rental_status", store=True)
     #has_late_lines = fields.Boolean(compute="_compute_has_late_lines")
