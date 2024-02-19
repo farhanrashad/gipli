@@ -171,15 +171,36 @@
             </xpath>
             <field name="state" position="after">
                 <field name="borrow_next_action_date"/>
+                <field name="is_book_late"/>
             </field>
             <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/field[@name='state']" position="attributes">
                 <attribute name="invisible">state == 'sale' and borrow_status</attribute>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="replace">
+                <div class="oe_kanban_bottom_left text-muted">
+                    <span>
+                    <t t-out="record.name.value"/>
+                    <br/>
+                    <span t-if="record.borrow_next_action_date.value" t-attf-class="#{record.is_book_late.raw_value ? 'text-danger' : 'text-muted'}">
+                        <t t-if="record.is_book_late.raw_value">
+                        <i class="fa fa-warning"/> Late
+                        </t>
+                        <t t-if="record.rental_status.raw_value=='pickup'">
+                        Issue:
+                        </t>
+                        <t t-elif="record.rental_status.raw_value=='return'">
+                        Return:
+                        </t>
+                    </span>
+                    <t t-out="record.borrow_next_action_date.value"/>
+                    </span>
+                </div>
             </xpath>
             
             <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/field[@name='state']" position="after">
                 <field name="borrow_status" widget="label_selection"
                     invisible="state != 'sale' or borrow_status == False"
-                    options="{'classes': {'issue': 'info', 'return': 'warning', 'returned': 'success'}}"/>
+                    options="{'classes': {'issue': 'info', 'return': 'warning', 'done': 'success', 'confirm': 'default'}}"/>
             </xpath>
         </field>
     </record>
@@ -206,8 +227,8 @@
                     domain="[('borrow_status', 'in', ['issue', 'return']), ('borrow_next_action_date', '&lt;', (datetime.datetime.now() + relativedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <separator/>
                 <filter string="Reserved" domain="[('borrow_status', 'in', ['reserve'])]" name="reserve_agreement"/>
-                <filter string="Issued" domain="[('borrow_status', 'in', ['issue'])]" name="filter_to_issue"/>
-                <filter string="Returned" domain="[('borrow_status', 'in', ['return'])]" name="filter_to_return"/>
+                <filter string="To Issue" domain="[('borrow_status', 'in', ['confirm'])]" name="filter_to_issue"/>
+                <filter string="To Return" domain="[('borrow_status', 'in', ['issue'])]" name="filter_to_return"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Status" name="groupby_status" context="{'group_by': 'borrow_status'}"/>
