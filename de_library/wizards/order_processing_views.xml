@@ -13,8 +13,8 @@
                     <field name="wizard_line_ids">
                         <tree create="false" editable="top">
                             <field name="product_id" readonly="1" force_save="1" options="{'no_open': True}"/>
-                            <field name="order_line_id" invisible="1"/>
-                            <field name="order_wizard_id" invisible="1"/>
+                            <field name="order_line_id" column_invisible="1"/>
+                            <field name="order_wizard_id" column_invisible="1"/>
                             <field name="issue_lot_ids" widget="many2many_tags" force_save="1" options="{'no_open': True}"
                                 attrs="{'column_invisible':[('parent.status', '!=', 'issue')]}"
                                 />
@@ -25,8 +25,8 @@
                             <field name="qty_reserved" readonly="1" attrs="{'column_invisible':[('parent.status', '=', 'return')]}"/>
                             <field name="qty_delivered" attrs="{'readonly':[('parent.status', '=', 'return')]}" force_save="1"/>
                             <field name="book_returned" attrs="{'column_invisible':[('parent.status', '=', 'issue')]}"/>
-                            <field name="is_book_late" invisible="1"/>
-                            <field name="status" invisible="1"/>
+                            <field name="is_book_late" column_invisible="1"/>
+                            <field name="status" />
                             <button icon="fa-clock-o" attrs="{
                                 'column_invisible': ['|', ('parent.has_late_lines', '=', False), ('parent.status', '=', 'pickup')],
                                 'invisible': [('is_book_late', '=', False)]}"

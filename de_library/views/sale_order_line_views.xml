@@ -56,7 +56,7 @@
   </record>
 
     <record id="action_sale_order_line" model="ir.actions.act_window">
-        <field name="name">Rent a product</field>
+        <field name="name">Borrow a book</field>
         <field name="res_model">sale.order.line</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>

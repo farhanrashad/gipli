@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import timedelta, date
-from odoo import api, fields, models, _
-from odoo.tools import float_compare, format_datetime, format_time
-from pytz import timezone, UTC
+from dateutil.relativedelta import relativedelta
+from math import ceil
 
+from odoo import _, api, fields, models
+from odoo.osv import expression
+from odoo.tools import float_compare
 
 class CirculationAgreement(models.Model):
     _inherit = 'sale.order'
@@ -23,7 +24,6 @@ class CirculationAgreement(models.Model):
 
     borrow_next_action_date = fields.Datetime(
         string="Next Action", compute='_compute_next_action_date', store=True)
-    is_late = fields.Boolean('Is Late')
 
     is_book_late = fields.Boolean(
         string="Is overdue",
@@ -41,12 +41,12 @@ class CirculationAgreement(models.Model):
     def _compute_is_late(self):
         now = fields.Datetime.now()
         for order in self:
-            tolerance_delay = relativedelta(hours=order.company_id.min_extra_hour)
-            order.is_late = (
+            tolerance_delay = relativedelta(hours=1)
+            order.is_book_late = (
                 order.is_borrow_order
                 and order.borrow_status in ['issue', 'return']  # has_pickable_lines or has_returnable_lines
-                and order.next_action_date
-                and order.next_action_date + tolerance_delay < now
+                and order.borrow_next_action_date
+                and order.borrow_next_action_date + tolerance_delay < now
             )
             
     @api.depends(
@@ -59,19 +59,19 @@ class CirculationAgreement(models.Model):
     def _compute_next_action_date(self):
         for order in self:
             if order.state in ['sale', 'done'] and order.is_borrow_order:
-                rental_order_lines = order.order_line.filtered(lambda l: l.is_rental and l.start_date and l.return_date)
+                rental_order_lines = order.order_line.filtered(lambda l: l.is_borrow_order and l.book_issue_date and l.book_return_date)
                 pickeable_lines = rental_order_lines.filtered(lambda sol: sol.qty_delivered < sol.product_uom_qty)
-                returnable_lines = rental_order_lines.filtered(lambda sol: sol.qty_returned < sol.qty_delivered)
-                min_pickup_date = min(pickeable_lines.mapped('start_date')) if pickeable_lines else 0
-                min_return_date = min(returnable_lines.mapped('return_date')) if returnable_lines else 0
-                if min_pickup_date and pickeable_lines and (not returnable_lines or min_pickup_date <= min_return_date):
-                    order.borrow_status = 'pickup'
-                    order.borrow_next_action_date = min_pickup_date
+                returnable_lines = rental_order_lines.filtered(lambda sol: sol.book_returned < sol.qty_delivered)
+                min_issue_date = min(pickeable_lines.mapped('book_issue_date')) if pickeable_lines else 0
+                min_return_date = min(returnable_lines.mapped('book_return_date')) if returnable_lines else 0
+                if min_issue_date and pickeable_lines and (not returnable_lines or min_issue_date <= min_return_date):
+                    #order.borrow_status = 'issue'
+                    order.borrow_next_action_date = min_issue_date
                 elif returnable_lines:
-                    order.borrow_status = 'return'
+                    #order.borrow_status = 'return'
                     order.borrow_next_action_date = min_return_date
                 else:
-                    order.borrow_status = 'return'
+                    #order.borrow_status = 'return'
                     order.borrow_next_action_date = False
                 #order.has_pickable_lines = bool(pickeable_lines)
                 #order.has_returnable_lines = bool(returnable_lines)

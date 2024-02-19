@@ -138,12 +138,12 @@
                                           column_invisible="parent.product_variant_count &lt; 2"/>
                                         <field name="library_fee_period_id" string="Period"/>
                                         <field name="pricelist_id" groups="product.group_product_pricelist"/>
-                                        <field name="currency_id" invisible="1"/>
+                                        <field name="currency_id" column_invisible="1"/>
                                         <field name="price"/>
                                       </tree>
                                     </field>
                                 </group>
-                                  <group string="RESERVATIONS">
+                                  <group string="Late Charges" name="late_charges">
                                        <field name="book_charge_hourly" widget="monetary"/>
                                         <field name="book_charge_daily" widget="monetary"/>
                                         <field name="currency_id" invisible="1"/>

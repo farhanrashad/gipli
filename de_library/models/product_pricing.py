@@ -39,6 +39,20 @@ class ProductLibraryFees(models.Model):
     pricelist_id = fields.Many2one('product.pricelist', ondelete='cascade')
     company_id = fields.Many2one('res.company', related='pricelist_id.company_id')
 
+    # =========================================
+    # Computed Methods 
+    # =========================================
+    @api.depends(
+        'pricelist_id', 
+        'pricelist_id.currency_id',
+        'product_template_id',
+        'price',
+    )
+    def _compute_currency_id(self):
+        for pricing in self:
+            pricing.currency_id = pricing.pricelist_id.currency_id or self.env.company.currency_id
+
+    
     #@api.depends('duration', 'unit')
     def _compute_name(self):
         for record in self:

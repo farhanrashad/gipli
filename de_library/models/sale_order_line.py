@@ -258,7 +258,7 @@ class SaleOrderLine(models.Model):
         })
 
     def schedule_product(self):
-        action = self.env['ir.actions.actions']._for_xml_id('de_school_library.action_sale_order_line')
+        action = self.env['ir.actions.actions']._for_xml_id('de_library.action_sale_order_line')
         context = {
             'active_model': 'sale.order.line',
             'active_ids': self.ids,

@@ -232,7 +232,7 @@ class LibraryProcessingLine(models.TransientModel):
             'location_dest_id': library_location.id,
             'company_id': line.order_id.company_id.id,
             'product_id': line.product_id.id,
-            'qty_done': 1,
+            'quantity': 1,
             #'warehouse_id': line.order_id.warehouse_id.id,
             'lot_id': lot.id,
             'move_id': stock_move_id.id,
