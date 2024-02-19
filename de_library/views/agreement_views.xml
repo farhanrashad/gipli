@@ -42,20 +42,11 @@
                 <field name="book_returned" column_invisible="parent.is_borrow_order !=True"/>
             </xpath>
             
-        <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_id']" position="after">
-            <button name="schedule_product" type="object" class="" 
-                icon="fa-calendar" help="Edit Configuration"
-                invisible="borrow_status !='draft'" 
-            />
-        </xpath>
+        
             <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
                 <field name="invoice_lines" widget="many2many_tags" optional="hide"/>
                 <field name="invoice_status" optional="hide"/>
                 <field name="is_book_late" invisible="0"/>
-            </xpath>
-                
-            <xpath expr="//field[@name='user_id']" position="after">
-                <field name="team_id" options='{"no_open": True, "no_create": True}' invisible="is_borrow_order ==False" />
             </xpath>
         </field>
     </record>
@@ -99,7 +90,7 @@
                 }
                 </attribute>
                 <attribute name="domain">
-                    ['|', ('sale_ok', '=', True), ('is_book', '=', True),
+                    [('is_book', '=', True),
                         '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]
                 </attribute>
                 <attribute name="options">{
@@ -120,7 +111,7 @@
                 }
                 </attribute>
                 <attribute name="domain">
-                    ['|', ('sale_ok', '=', True), ('is_book', '=', True),
+                    [('is_book', '=', True),
                         '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]
                 </attribute>
                 <attribute name="options">{
@@ -130,11 +121,16 @@
             </xpath>
             <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position='attributes'>
                 <attribute name="domain">
-                    ['|', ('sale_ok', '=', True), ('is_book', '=', True),
+                    [('is_book', '=', True),
                         '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]
                 </attribute>
             </xpath>
-            
+            <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='name']" position="before">
+                <button name="schedule_product" type="object" class="" 
+                    icon="fa-calendar" help="Edit Configuration"
+                    invisible="borrow_status !='draft'" 
+                />
+            </xpath>
             
         </field>
     </record>
