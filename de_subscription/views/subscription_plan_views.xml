@@ -16,10 +16,14 @@
                     </div>
                     <group>
                         <group>
-                            <label for="recurring_interval" string="Recurring Cycle"/>
+                            <label for="recurring_interval" string="Recurring Every"/>
                             <div>
                                 <field name="recurring_interval" style="width: 3rem;"/>
                                 <field name="recurring_interval_type" class="oe_inline"/>
+                            </div>
+                            <label for="intervals_total" string="Recurring Intervals"/>
+                            <div>
+                                <field name="intervals_total" style="width: 3rem;"/>
                             </div>
                         </group>
                         <group>

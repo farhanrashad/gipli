@@ -10,7 +10,11 @@
                 <field name="subscription_order" invisible="1"/>
                 <field name="subscription_status" invisible="1"/>
             </xpath>
-            
+
+            <button name="action_cancel" position="after">
+                <button string="New Subscription" name="button_new_subscription" type="object"
+                        invisible="not subscription_order or subscription_status not in ['progress'] or state != 'sale'" data-hotkey="z"/>
+            </button>
             <xpath expr="//div[@name='button_box']" position="after">
                 <field name="subscription_status" class="float-end fs-6"
                        invisible="subscription_status not in ['progress', 'close'] or state == 'cancel'"
@@ -21,12 +25,26 @@
             </xpath>
 
             <xpath expr="//group[1]/group[2]" position="inside">
-                <field name="subscription_plan_id" 
-                    required="subscription_order == True"
-                    readonly="subscription_status not in ['draft']"
-                    invisible="subscription_order != True"
-                />
-                <field name="subscription_status" />
+                <label name="subscription_plan" for="subscription_plan_id" invisible="not subscription_order"/>
+                <div name="subscription_plan" class="o_row" invisible="not subscription_order">
+                    <field name="subscription_plan_id" 
+                        required="subscription_order == True"
+                           readonly="subscription_status in ['progress', ',close']"
+                           options="{'no_create': True}"/>
+                    <span invisible="not subscription_order ">until</span>
+                    <field name="date_end" invisible="not subscription_order"/>
+                </div>
+            </xpath>
+
+            <!-- Add Subscription fields -->
+            <xpath expr="//notebook/page[@name='other_information']/group[1]" position="inside">
+                <group string="Subsription" invisible="not subscription_order">
+                    <field name="date_last_invoice" />
+                    <field name="date_next_invoice" />
+                    <field name="date_first_contract" />
+                    <field name="date_start" />
+                    <field name="date_end" />
+                </group>
             </xpath>
                 
         </field>
@@ -39,16 +57,7 @@
         <field name="mode">primary</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
-            <!-- Add Subscription fields -->
-            <xpath expr="//group[1]" position="inside">
-                <group string="Subsription">
-                    <field name="date_last_invoice" />
-                    <field name="date_next_invoice" />
-                    <field name="date_first_contract" />
-                    <field name="date_start" />
-                    <field name="date_end" />
-                </group>
-            </xpath>
+            
             <!-- options key for library app knowledge in the configurator -->
             <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_id']" position='attributes'>
                 <attribute name="context">{

@@ -5,6 +5,8 @@ from datetime import timedelta, date
 from odoo import api, fields, models, _
 from odoo.tools import float_compare, format_datetime, format_time
 from pytz import timezone, UTC
+from odoo.exceptions import UserError, ValidationError
+from dateutil.relativedelta import relativedelta
 
 
 class SubscriptionOrder(models.Model):
@@ -43,13 +45,16 @@ class SubscriptionOrder(models.Model):
         tracking=True,
         help="The next invoice will be created on this date then the period will be extended.")
     date_start = fields.Date(string='Start Date',
-                             compute='_compute_start_date',
+                             compute='_compute_date_start',
                              readonly=False,
                              store=True,
                              tracking=True,
                              help="The start date indicate when the subscription periods begin.")
     
     date_end = fields.Date(string='End Date', tracking=True,
+                           compute='_compute_date_end',
+                           readonly=False,
+                           store=True,
                            help="If set in advance, the subscription will be set to renew 1 month before the date and will be closed on the date set in this field.")
     date_first_contract = fields.Date(
         compute='_compute_contact_start_date',
@@ -83,14 +88,14 @@ class SubscriptionOrder(models.Model):
     @api.depends('date_start', 'state', 'date_next_invoice')
     def _compute_last_invoice_date(self):
         for order in self:
-            last_date = order.next_invoice_date and order.plan_id.billing_period and order.next_invoice_date - order.plan_id.billing_period
-            start_date = order.start_date or fields.Date.today()
-            if order.state == 'sale' and last_date and last_date >= start_date:
+            last_date = order.date_next_invoice and order.subscription_plan_id.billing_period and order.date_next_invoice - order.subscription_plan_id.billing_period
+            date_start = order.date_start or fields.Date.today()
+            if order.state == 'sale' and last_date and last_date >= date_start:
                 # we use get_timedelta and not the effective invoice date because
                 # we don't want gaps. Invoicing date could be shifted because of technical issues.
-                order.last_invoice_date = last_date
+                order.date_last_invoice = last_date
             else:
-                order.last_invoice_date = False
+                order.date_last_invoice = False
 
     @api.depends('subscription_order', 'state', 'date_start', 'subscription_status')
     def _compute_next_invoice_date(self):
@@ -98,12 +103,23 @@ class SubscriptionOrder(models.Model):
            if not so.date_next_invoice and so.state == 'sale':
                 so.date_next_invoice = so.date_start or fields.Date.today()
 
-    def _compute_start_date(self):
+    @api.depends('subscription_order', 'state', 'subscription_status','subscription_plan_id')
+    def _compute_date_start(self):
         for so in self:
             if not so.subscription_order:
                 so.date_start = False
             elif not so.date_start:
-                so.date_start = fields.Date.today()
+                    so.date_start = fields.Date.today()
+
+    @api.depends('date_start','subscription_plan_id')
+    def _compute_date_end(self):
+        for so in self:
+            if not so.subscription_order:
+                so.date_end = False
+            elif not so.date_end:
+                    kwargs = {so.subscription_plan_id.recurring_interval_type+"s": so.subscription_plan_id.intervals_total}
+                    date_end = so.date_start + relativedelta(**kwargs)
+                    so.date_end = date_end
                 
     @api.depends('date_start')
     def _compute_contact_start_date(self):
@@ -123,5 +139,12 @@ class SubscriptionOrder(models.Model):
             })
 
         return res_sub
+
+    def button_new_subscription(self):
+        for order in self:
+            kwargs = {order.subscription_plan_id.recurring_interval_type+"s": order.subscription_plan_id.intervals_total}
+            date_end = order.date_start + relativedelta(**kwargs)
+            raise UserError(test)
+            #raise UserError(order.date_start + relativedelta(months=order.subscription_plan_id.intervals_total))
         
     

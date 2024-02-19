@@ -11,12 +11,19 @@ class SubscriptionPlan(models.Model):
     active = fields.Boolean(default=True)
     name = fields.Char(translate=True, required=True, default="Monthly")
     recurring_interval_type = fields.Selection([
-        ('daily', 'Days'), ('weekly', 'Weeks'),
-        ('monthly', 'Months'), ('yearly', 'Years'), ],
+        ('day', 'Days'), ('week', 'Weeks'),
+        ('month', 'Months'), ('year', 'Years'), ],
         string='Recurrence', required=True,
         help="Invoice automatically repeat at specified interval",
-        default='monthly')
+        default='month')
 
-    recurring_interval = fields.Integer(string="Internal", help="Repeat every (Days/Week/Month/Year)", required=True, default=1)
+    recurring_interval = fields.Integer(string="Interval", help="Repeat every (Days/Week/Month/Year)", required=True, default=1)
+    intervals_total = fields.Integer(string="Recurring Intervals", help="No of Recurring Periods", required=True, default=1)
 
     company_id = fields.Many2one('res.company')
+
+    @property
+    def billing_period(self):
+        if not self.recurring_interval_type or not self.recurring_interval:
+            return False
+        return get_timedelta(self.recurring_interval, self.recurring_interval_type)
