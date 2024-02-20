@@ -37,6 +37,7 @@
                     <span invisible="not subscription_order ">until</span>
                     <field name="date_end" invisible="not subscription_order"/>
                 </div>
+                <field name="date_next_invoice" invisible="not subscription_order"/>
             </xpath>
 
             <!-- Add Subscription fields -->

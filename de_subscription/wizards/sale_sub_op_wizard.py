@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import fields, models, _, api, Command, SUPERUSER_ID, modules
 from odoo.exceptions import UserError, ValidationError
 
 class OperationWizard(models.TransientModel):
@@ -22,10 +22,10 @@ class OperationWizard(models.TransientModel):
         self.ensure_one()
         active_id = self.env.context.get('active_id', [])
         subscription_id = self.env['sale.order'].browse(active_id)
-        if self.op_type == 'renew':
+        if self.op_type == 'renewal':
             lang = subscription_id.partner_id.lang or self.env.user.lang
             renew_msg_body = self._get_order_digest(subscription_id, origin='renewal', lang=lang)
-            action = self._prepare_new_subscription_order(self.op_type, renew_msg_body)
+            action = self._prepare_new_subscription_order(subscription_id, self.op_type, renew_msg_body)
         
         #raise UserError(active_id)
 
@@ -41,76 +41,76 @@ class OperationWizard(models.TransientModel):
                  } # see if we don't want plan instead
         return self.env['ir.qweb'].with_context(lang=lang)._render(template, values)
         
-    def _prepare_new_subscription_order(self, subscription_state, message_body):
-        order = self._create_new_subscription_order(subscription_state, message_body)
+    def _prepare_new_subscription_order(self, subscription, subscription_state, message_body):
+        order = self._create_new_subscription_order(subscription, subscription_state, message_body)
         action = self._get_associated_so_action()
         action['name'] = _('Upsell') if subscription_state == '7_upsell' else _('Renew')
-        action['views'] = [(self.env.ref('sale_subscription.sale_subscription_primary_form_view').id, 'form')]
+        action['views'] = [(self.env.ref('de_subscription.subscription_order_primary_form_view').id, 'form')]
         action['res_id'] = order.id
         return action
 
-    def _create_new_subscription_order(self, subscription_state, message_body):
+    def _create_new_subscription_order(self, subscription, subscription_state, message_body):
         self.ensure_one()
-        if self.date_start == self.date_next_invoice:
+        if subscription.date_start == subscription.date_next_invoice:
             raise ValidationError(_("You can not upsell or renew a subscription that has not been invoiced yet. "
-                                    "Please, update directly the %s contract or invoice it first.", self.name))
-        values = self._prepare_new_subscription_order_values(subscription_state)
+                                    "Please, update directly the %s contract or invoice it first.", subscription.name))
+        values = self._prepare_new_subscription_order_values(subscription, subscription_state)
         order = self.env['sale.order'].create(values)
-        self.subscription_line_ids = [Command.link(order.id)]
+        subscription.subscription_line_ids = [Command.link(order.id)]
         order.message_post(body=message_body)
         if subscription_state == '7_upsell':
             parent_message_body = _("An upsell quotation %s has been created", order._get_html_link())
         else:
             parent_message_body = _("A renewal quotation %s has been created", order._get_html_link())
-        self.message_post(body=parent_message_body)
+        subscription.message_post(body=parent_message_body)
         order.order_line._compute_tax_id()
         return order
 
-    def _prepare_new_subscription_order_values(self, subscription_state):
+    def _prepare_new_subscription_order_values(self, subscription_id, subscription_state):
         """
         Create a new draft order with the same lines as the parent subscription. All recurring lines are linked to their parent lines
         :return: dict of new sale order values
         """
         self.ensure_one()
         today = fields.Date.today()
-        if subscription_state == '7_upsell' and self.next_invoice_date <= max(self.first_contract_date or today, today):
+        if subscription_state == '7_upsell' and subscription_id.date_next_invoice <= max(self.first_contract_date or today, today):
             raise UserError(_('You cannot create an upsell for this subscription because it :\n'
                               ' - Has not started yet.\n'
                               ' - Has no invoiced period in the future.'))
-        subscription = self.with_company(self.company_id)
-        order_lines = self.order_line._get_renew_upsell_values(subscription_state, period_end=self.next_invoice_date)
+        subscription = subscription_id #self.with_company(subscription.company_id)
+        order_lines = subscription.order_line._get_renew_order_values(subscription_state, period_end=subscription_id.date_next_invoice)
         is_subscription = subscription_state == '2_renewal'
         option_lines_data = [Command.link(option.copy().id) for option in subscription.sale_order_option_ids]
         if subscription_state == '7_upsell':
-            start_date = fields.Date.today()
-            next_invoice_date = self.next_invoice_date
+            date_start = fields.Date.today()
+            date_next_invoice = subscription_id.date_next_invoice
         else:
             # renewal
-            start_date = self.next_invoice_date
-            next_invoice_date = self.next_invoice_date # the next invoice date is the start_date for new contract
+            date_start = subscription.date_next_invoice
+            date_next_invoice = subscription.date_next_invoice # the next invoice date is the start_date for new contract
         return {
-            'is_subscription': is_subscription,
-            'subscription_id': subscription.id,
+            'subscription_order': is_subscription,
+            'new_subscription_id': subscription.id,
             'pricelist_id': subscription.pricelist_id.id,
             'partner_id': subscription.partner_id.id,
             'partner_invoice_id': subscription.partner_invoice_id.id,
             'partner_shipping_id': subscription.partner_shipping_id.id,
             'order_line': order_lines,
             'analytic_account_id': subscription.analytic_account_id.id,
-            'subscription_state': subscription_state,
+            #'subscription_status': subscription_state,
             'origin': subscription.client_order_ref,
             'client_order_ref': subscription.client_order_ref,
-            'origin_order_id': subscription.origin_order_id.id,
+            #'origin_order_id': subscription.origin_order_id.id,
             'note': subscription.note,
             'user_id': subscription.user_id.id,
             'payment_term_id': subscription.payment_term_id.id,
             'company_id': subscription.company_id.id,
-            'sale_order_template_id': self.sale_order_template_id.id,
+            #'sale_order_template_id': self.sale_order_template_id.id,
             'sale_order_option_ids': option_lines_data,
-            'payment_token_id': False,
-            'start_date': start_date,
-            'next_invoice_date': next_invoice_date,
-            'plan_id': subscription.plan_id.id,
+            #'payment_token_id': False,
+            'date_start': date_start,
+            'date_next_invoice': date_next_invoice,
+            'subscription_plan_id': subscription.subscription_plan_id.id,
         }
         
     @api.model
@@ -118,7 +118,7 @@ class OperationWizard(models.TransientModel):
         return {
             "type": "ir.actions.act_window",
             "res_model": "sale.order",
-            "views": [[self.env.ref('sale_subscription.sale_subscription_view_tree').id, "tree"],
-                      [self.env.ref('sale_subscription.sale_subscription_primary_form_view').id, "form"],
+            "views": [[self.env.ref('de_subscription.subscription_order_tree_view').id, "tree"],
+                      [self.env.ref('de_subscription.subscription_order_primary_form_view').id, "form"],
                       [False, "kanban"], [False, "calendar"], [False, "pivot"], [False, "graph"]],
         }
