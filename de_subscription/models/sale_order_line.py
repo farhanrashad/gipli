@@ -22,16 +22,16 @@ class SubscriptionOrderLine(models.Model):
         on purpose because '_compute_price_unit' depends on 'parent_line_id' and it triggered side effects
         when we added these dependencies.
         """
-        parent_line_ids = self.order_id.new_subscription_id.order_line
+        parent_line_ids = self.order_id.parent_subscription_id.order_line
         for line in self:
-            if not line.order_id.new_subscription_id: #or not line.product_id.recurring_invoice:
+            if not line.order_id.parent_subscription_id: #or not line.product_id.recurring_invoice:
                 continue
             # We use a rounding to avoid -326.40000000000003 != -326.4 for new records.
             matching_line_ids = parent_line_ids.filtered(
                 lambda l:
                 (l.order_id, l.product_id, l.product_uom, l.order_id.currency_id, l.order_id.subscription_plan_id,
                  l.order_id.currency_id.round(l.price_unit) if l.order_id.currency_id else round(l.price_unit, 2)) ==
-                (line.order_id.new_subscription_id, line.product_id, line.product_uom, line.order_id.currency_id, line.order_id.subscription_plan_id,
+                (line.order_id.parent_subscription_id, line.product_id, line.product_uom, line.order_id.currency_id, line.order_id.subscription_plan_id,
                  line.order_id.currency_id.round(line.price_unit) if line.order_id.currency_id else round(line.price_unit, 2)
                  )
             )

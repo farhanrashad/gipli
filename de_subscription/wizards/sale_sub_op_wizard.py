@@ -90,7 +90,7 @@ class OperationWizard(models.TransientModel):
             date_next_invoice = subscription.date_next_invoice # the next invoice date is the start_date for new contract
         return {
             'subscription_order': is_subscription,
-            'new_subscription_id': subscription.id,
+            'parent_subscription_id': subscription.id,
             'pricelist_id': subscription.pricelist_id.id,
             'partner_id': subscription.partner_id.id,
             'partner_invoice_id': subscription.partner_invoice_id.id,
