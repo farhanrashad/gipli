@@ -12,7 +12,7 @@
             </xpath>
 
             <button name="action_cancel" position="after">
-                <button string="New Subscription" name="button_new_subscription" type="object"
+                <button string="Operations" name="button_operations" type="object"
                         invisible="not subscription_order or subscription_status not in ['progress'] or state != 'sale'" data-hotkey="z"/>
             </button>
             <xpath expr="//div[@name='button_box']" position="after">

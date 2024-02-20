@@ -140,7 +140,19 @@ class SubscriptionOrder(models.Model):
 
         return res_sub
 
-    def button_new_subscription(self):
+    def button_operations(self):
+        return {
+            'name': _('Operations'),
+            'res_model': 'sale.sub.op.wizard',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'sale.order',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
+        
         for order in self:
             kwargs = {order.subscription_plan_id.recurring_interval_type+"s": order.subscription_plan_id.intervals_total}
             date_end = order.date_start + relativedelta(**kwargs)
