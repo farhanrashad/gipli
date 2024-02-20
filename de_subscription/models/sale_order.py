@@ -186,12 +186,6 @@ class SubscriptionOrder(models.Model):
             'target': 'new',
             #'context': context,
         }
-        
-        for order in self:
-            kwargs = {order.subscription_plan_id.recurring_interval_type+"s": order.subscription_plan_id.intervals_total}
-            date_end = order.date_start + relativedelta(**kwargs)
-            raise UserError(test)
-            #raise UserError(order.date_start + relativedelta(months=order.subscription_plan_id.intervals_total))
 
     def open_subscription_renewal(self):
         #active_id = self.env.context.get('subscription_id')

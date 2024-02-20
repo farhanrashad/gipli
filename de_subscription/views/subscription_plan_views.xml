@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="sale_recurring_plan_view_form" model="ir.ui.view">
-        <field name="name">sale.recurring.plan.view.form</field>
+    <record id="sale_recurring_plan_form_view" model="ir.ui.view">
+        <field name="name">sale.recurring.plan.form.view</field>
         <field name="model">sale.recur.plan</field>
         <field name="arch" type="xml">
             <form string="Recurring Plan">
@@ -36,6 +36,19 @@
         </field>
     </record>
 
+    <record id="sale_recurring_plan_tree_view" model="ir.ui.view">
+      <field name="name">sale.recurring.plan.tree.view</field>
+      <field name="model">sale.recur.plan</field>
+      <field name="arch" type="xml">
+        <tree sample="1" >
+          <field name="name" readonly="1" decoration-bf="1"/>
+          <field name="recurring_interval_type" readonly="1"/>
+            <field name="recurring_interval" readonly="1"/>
+            <field name="company_id" groups="base.group_multi_company"/>
+        </tree>
+      </field>
+    </record>
+    
     <record id="action_recurring_plan" model="ir.actions.act_window">
         <field name="name">Recurring Plan</field>
         <field name="res_model">sale.recur.plan</field>

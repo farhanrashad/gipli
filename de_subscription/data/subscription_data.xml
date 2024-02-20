@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <!-- Standard Closing Reason -->
+    <record id="close_reason_1" model="sale.sub.close.reason">
+        <field name="name">Subscription is too expensive</field>
+    </record>
+    <record id="close_reason_2" model="sale.sub.close.reason">
+        <field name="name">Subscription does not meet my requirements</field>
+    </record>
+    <record id="close_reason_3" model="sale.sub.close.reason">
+        <field name="name">Subscription reached its end date</field>
+    </record>
+    <record id="close_reason_cancel" model="sale.sub.close.reason">
+        <field name="name">Cancelled</field>
+    </record>
+    <record id="close_reason_4" model="sale.sub.close.reason">
+        <field name="name">I don't use it</field>
+    </record>
+    <record id="close_reason_5" model="sale.sub.close.reason">
+        <field name="name">Other</field>
+    </record>
+
+    <data noupdate="1">
+        <!-- Protected close reasons -->
+        <record id="close_reason_renew" model="sale.sub.close.reason">
+            <field name="name">The subscription was renewed with a new plan</field>
+        </record>
+
+        <record id="close_reason_end_of_contract" model="sale.sub.close.reason">
+            <field name="name">End of contract</field>
+        </record>
+
+        <record id="close_reason_auto_close_limit_reached" model="sale.sub.close.reason">
+            <field name="name">Automatic renewal failed</field>
+        </record>
+
+        <record id="close_reason_unpaid_subscription" model="sale.sub.close.reason">
+            <field name="name">Unpaid subscription</field>
+        </record>
+
+        <record id="close_reason_unknown" model="sale.sub.close.reason">
+            <field name="name">Unknown</field>
+        </record>
+
+        
+
+        <!-- Subscription Plan -->
+        <record id="sale_subscription_plan_month" model="sale.recur.plan" forcecreate="0">
+            <field name="name">Monthly</field>
+            <field name="recurring_interval">1</field>
+            <field name="recurring_interval_type">month</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="sale_subscription_plan_year" model="sale.recur.plan" forcecreate="0">
+            <field name="name">Yearly</field>
+            <field name="recurring_interval">1</field>
+            <field name="recurring_interval_type">year</field>
+            <field name="active">True</field>
+        </record>
+
+    </data>
+
+</odoo>
