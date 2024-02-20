@@ -20,6 +20,11 @@ class SubscriptionPlan(models.Model):
     recurring_interval = fields.Integer(string="Interval", help="Repeat every (Days/Week/Month/Year)", required=True, default=1)
     intervals_total = fields.Integer(string="Recurring Intervals", help="No of Recurring Periods", required=True, default=1)
 
+    invoice_mail_template_id = fields.Many2one('mail.template', string='Invoice Email Template',
+                                               domain=[('model', '=', 'account.move')],
+                                               default=lambda self: self.env.ref('account.email_template_edi_invoice', raise_if_not_found=False),
+                                               help="Email template used to send invoicing email automatically.\n"
+                                                    "Leave it empty if you don't want to send email automatically.")
     company_id = fields.Many2one('res.company')
 
     @property

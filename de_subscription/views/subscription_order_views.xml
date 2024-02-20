@@ -9,6 +9,8 @@
             <xpath expr="//header" position="inside">
                 <field name="subscription_order" invisible="1"/>
                 <field name="subscription_status" invisible="1"/>
+                <field name="new_subscription_id" invisible="1"/>
+                <field name="subscription_line_ids" invisible="1"/>
             </xpath>
 
             <button name="action_cancel" position="after">

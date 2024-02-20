@@ -62,7 +62,7 @@ class SubscriptionOrder(models.Model):
         help="The first contract date is the start date of the first contract of the sequence. It is common across a subscription and its renewals.")
 
     new_subscription_id = fields.Many2one('sale.order', string='Parent Contract', ondelete='restrict', copy=False)
-    ubscription_child_ids = fields.One2many('sale.order', 'new_subscription_id')
+    subscription_line_ids = fields.One2many('sale.order', 'new_subscription_id')
     # =======================================================================
     # ========================== Computed Mehtods ===========================
     # =======================================================================
