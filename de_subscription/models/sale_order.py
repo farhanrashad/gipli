@@ -8,15 +8,19 @@ from pytz import timezone, UTC
 from odoo.exceptions import UserError, ValidationError
 from dateutil.relativedelta import relativedelta
 
+SUBSCRIPTION_DRAFT_STAtus = ['draft']
+SUBSCRIPTION_PROGRESS_STATUS = ['progress']
+SUBSCRIPTION_CLOSED_STATUS = ['CLOSE']
+
+SUBSCRIPTION_STATUSES = [
+    ('draft', 'Quotation'),  # Quotation for a new subscription
+    ('progress', 'In Progress'),  # Active Subscription or confirmed renewal for active subscription
+    ('close', 'Close'),  # Closed or ended subscription
+]
+
 
 class SubscriptionOrder(models.Model):
     _inherit = 'sale.order'
-
-    SUB_READONLY_STATES = {
-        'progress': [('readonly', True)],
-        'close': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    }
 
     def _get_default_subscription_plan(self):
         plan_id = self.env['sale.recur.plan'].search([('active','=',True)],limit=1)
@@ -24,6 +28,13 @@ class SubscriptionOrder(models.Model):
 
     
     subscription_order = fields.Boolean("Subscription")
+    subscription_status = fields.Selection(
+        string='Subscription Status',
+        selection=SUBSCRIPTION_STATUSES,
+        compute='_compute_subscription_status', store=True, index='btree_not_null', tracking=True, group_expand='_group_expand_states',
+    )
+
+    """
     subscription_status = fields.Selection([
         ('draft', 'Quotation'),  # Quotation for a new subscription
         ('progress', 'In Progress'),  # Active Subscription or confirmed renewal for active subscription
@@ -31,7 +42,7 @@ class SubscriptionOrder(models.Model):
     ], 
         string='Subscription Status', compute='_compute_subscription_status', store=True, index='btree_not_null', tracking=True, group_expand='_group_expand_states',
     )
-
+    """
     subscription_type = fields.Selection([
         ('normal', 'Normal'),
         ('renewal', 'Renewal'),  
@@ -76,6 +87,8 @@ class SubscriptionOrder(models.Model):
     parent_subscription_id = fields.Many2one('sale.order', string='Parent Contract', ondelete='restrict', copy=False)
     subscription_line_ids = fields.One2many('sale.order', 'parent_subscription_id')
 
+    close_reason_id = fields.Many2one("sale.sub.close.reason", string="Close Reason", copy=False, tracking=True)
+    
     # Count Fields
     count_past_subscriptions = fields.Integer(compute='_compute_past_subscriptions')
     count_upselling_subscriptions = fields.Integer(compute='_compute_upselling_count')
