@@ -80,6 +80,7 @@ class SubscriptionOrder(models.Model):
     count_past_subscriptions = fields.Integer(compute='_compute_past_subscriptions')
     count_upselling_subscriptions = fields.Integer(compute='_compute_upselling_count')
     count_renewal_subscriptions = fields.Integer(compute="_compute_renewal_count")
+    count_revised_subscriptions = fields.Integer(compute="_compute_revised_count")
 
     
     # =======================================================================
@@ -87,13 +88,18 @@ class SubscriptionOrder(models.Model):
     # =======================================================================
 
     def _compute_past_subscriptions(self):
-        self.count_past_subscriptions = 2
+        for order in self:
+            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id)])
+            order.count_past_subscriptions = len(subscription_ids)
 
     def _compute_upselling_count(self):
         self.count_upselling_subscriptions = 2
 
     def _compute_renewal_count(self):
         self.count_renewal_subscriptions = 2
+
+    def _compute_revised_count(self):
+        self.count_revised_subscriptions = 2
         
     @api.depends('subscription_order')
     def _compute_subscription_status(self):
@@ -172,35 +178,23 @@ class SubscriptionOrder(models.Model):
 
     def button_operations(self):
         self.ensure_one()
-        active_id = self.env.context.get('subscription_id')
-        context = {
-            'default_type': 'opportunity',
-        }
-        if active_id:
-            context['default_subscription_id'] = active_id
         return {
             'name': 'Operations',
             'view_mode': 'form',
             'res_model': 'sale.sub.op.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
-            #'context': context,
+            
         }
 
     def open_subscription_renewal(self):
-        #active_id = self.env.context.get('subscription_id')
-        #context = {
-        #    'default_type': 'opportunity',
-        #}
-        #if active_id:
-        #    context['default_subscription_id'] = active_id
         return {
             'name': 'Renewed Subscriptions',
             'view_mode': 'tree',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
-            #'target': 'new',
-            #'context': context,
+            'domain': [('parent_subscription_id','=',self.id),('subscription_type','==','renewal')],
+            'action_id': self.env.ref('de_subscription.action_subscription_order').id,
         }
 
     def open_subscription_upsell(self):
@@ -209,8 +203,8 @@ class SubscriptionOrder(models.Model):
             'view_mode': 'tree',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
-            #'target': 'new',
-            #'context': context,
+            'domain': [('parent_subscription_id','=',self.id),('subscription_type','==','upsell')],
+            'action_id': self.env.ref('de_subscription.action_subscription_order').id,
         }
 
     def open_past_subscriptions(self):
@@ -219,8 +213,18 @@ class SubscriptionOrder(models.Model):
             'view_mode': 'tree',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
-            #'target': 'new',
-            #'context': context,
+            'domain': [('parent_subscription_id','=',self.id)],
+            'action_id': self.env.ref('de_subscription.action_subscription_order').id,
+        }
+
+    def open_revised_subscriptions(self):
+        return {
+            'name': 'Upselling Subscriptions',
+            'view_mode': 'tree',
+            'res_model': 'sale.order',
+            'type': 'ir.actions.act_window',
+            'domain': [('parent_subscription_id','=',self.id),('subscription_type','==','revised')],
+            'action_id': self.env.ref('de_subscription.action_subscription_order').id,
         }
         
     

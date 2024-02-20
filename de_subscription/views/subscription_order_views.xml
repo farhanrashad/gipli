@@ -20,21 +20,30 @@
             </button>
 
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-                <button invisible="not subscription_type == 'renewal'"
+                <button invisible="count_renewal_subscriptions &lt; 1"
                     name="open_subscription_renewal"
                     class="oe_stat_button"
                     icon="fa-repeat"
                     type="object">
                     <field name="count_renewal_subscriptions" widget="statinfo" string="Renewal Quote"/>
                 </button>
-                <button invisible="not subscription_type == 'upsell'"
+                <button invisible="count_upselling_subscriptions &lt; 1"
                     name="open_subscription_upsell"
                     class="oe_stat_button"
                     icon="fa-arrow-circle-o-up"
                     type="object">
                     <field name="count_upselling_subscriptions" widget="statinfo" string="Upsell Quote"/>
                 </button>
-                <button invisible="count_past_subscriptions &lt; 2"
+
+                <button invisible="count_upselling_subscriptions &lt; 1"
+                    name="open_revised_subscriptions"
+                    class="oe_stat_button"
+                    icon="fa-arrow-circle-o-up"
+                    type="object">
+                    <field name="count_revised_subscriptions" widget="statinfo" string="Revised Quote"/>
+                </button>
+                
+                <button invisible="count_past_subscriptions &lt; 1"
                     name="open_past_subscriptions"
                     class="oe_stat_button"
                     icon="fa-dollar"
@@ -64,6 +73,7 @@
                     <field name="date_end" invisible="not subscription_order"/>
                 </div>
                 <field name="date_next_invoice" invisible="not subscription_order"/>
+                <field name="subscription_type" />
             </xpath>
 
             <!-- Add Subscription fields -->
