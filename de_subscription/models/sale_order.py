@@ -93,13 +93,19 @@ class SubscriptionOrder(models.Model):
             order.count_past_subscriptions = len(subscription_ids)
 
     def _compute_upselling_count(self):
-        self.count_upselling_subscriptions = 2
+        for order in self:
+            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','==','upsell')])
+            order.count_upselling_subscriptions = len(subscription_ids)
 
     def _compute_renewal_count(self):
-        self.count_renewal_subscriptions = 2
+        for order in self:
+            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','==','renewal')])
+            order.count_renewal_subscriptions = len(subscription_ids)
 
     def _compute_revised_count(self):
-        self.count_revised_subscriptions = 2
+        for order in self:
+            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','==','revised')])
+            order.count_revised_subscriptions = len(subscription_ids)
         
     @api.depends('subscription_order')
     def _compute_subscription_status(self):
