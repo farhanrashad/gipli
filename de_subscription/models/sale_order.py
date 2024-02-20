@@ -32,10 +32,22 @@ class SubscriptionOrder(models.Model):
         string='Subscription Status', compute='_compute_subscription_status', store=True, index='btree_not_null', tracking=True, group_expand='_group_expand_states',
     )
 
+    subscription_type = fields.Selection([
+        ('normal', 'Normal'),
+        ('renewal', 'Renewal'),  
+        ('upsell', 'Upsell'),  
+        ('revised', 'Revision'),
+        ('close', 'Close'),
+    ], 
+        string='Subscription Type', default="normal",
+    )
+    
+
     subscription_plan_id = fields.Many2one('sale.recur.plan', string='Recurring Plan',
                             default=lambda s: s._get_default_subscription_plan(),
                               ondelete='restrict', readonly=False, store=True, index='btree_not_null')
 
+    
     date_last_invoice = fields.Date(string='Last invoice date', compute='_compute_last_invoice_date')
     date_next_invoice = fields.Date(
         string='Date of Next Invoice',
@@ -63,10 +75,26 @@ class SubscriptionOrder(models.Model):
 
     new_subscription_id = fields.Many2one('sale.order', string='Parent Contract', ondelete='restrict', copy=False)
     subscription_line_ids = fields.One2many('sale.order', 'new_subscription_id')
+
+    # Count Fields
+    count_past_subscriptions = fields.Integer(compute='_compute_past_subscriptions')
+    count_upselling_subscriptions = fields.Integer(compute='_compute_upselling_count')
+    count_renewal_subscriptions = fields.Integer(compute="_compute_renewal_count")
+
+    
     # =======================================================================
     # ========================== Computed Mehtods ===========================
     # =======================================================================
-    
+
+    def _compute_past_subscriptions(self):
+        self.count_past_subscriptions = 2
+
+    def _compute_upselling_count(self):
+        self.count_upselling_subscriptions = 2
+
+    def _compute_renewal_count(self):
+        self.count_renewal_subscriptions = 2
+        
     @api.depends('subscription_order')
     def _compute_subscription_status(self):
         
@@ -164,5 +192,41 @@ class SubscriptionOrder(models.Model):
             date_end = order.date_start + relativedelta(**kwargs)
             raise UserError(test)
             #raise UserError(order.date_start + relativedelta(months=order.subscription_plan_id.intervals_total))
+
+    def open_subscription_renewal(self):
+        #active_id = self.env.context.get('subscription_id')
+        #context = {
+        #    'default_type': 'opportunity',
+        #}
+        #if active_id:
+        #    context['default_subscription_id'] = active_id
+        return {
+            'name': 'Renewed Subscriptions',
+            'view_mode': 'tree',
+            'res_model': 'sale.order',
+            'type': 'ir.actions.act_window',
+            #'target': 'new',
+            #'context': context,
+        }
+
+    def open_subscription_upsell(self):
+        return {
+            'name': 'Upselling Subscriptions',
+            'view_mode': 'tree',
+            'res_model': 'sale.order',
+            'type': 'ir.actions.act_window',
+            #'target': 'new',
+            #'context': context,
+        }
+
+    def open_past_subscriptions(self):
+        return {
+            'name': 'Upselling Subscriptions',
+            'view_mode': 'tree',
+            'res_model': 'sale.order',
+            'type': 'ir.actions.act_window',
+            #'target': 'new',
+            #'context': context,
+        }
         
     

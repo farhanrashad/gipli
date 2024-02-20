@@ -9,6 +9,7 @@
             <xpath expr="//header" position="inside">
                 <field name="subscription_order" invisible="1"/>
                 <field name="subscription_status" invisible="1"/>
+                <field name="subscription_type" invisible="1"/>
                 <field name="new_subscription_id" invisible="1"/>
                 <field name="subscription_line_ids" invisible="1"/>
             </xpath>
@@ -17,6 +18,31 @@
                 <button string="Operations" name="button_operations" type="object"
                         invisible="not subscription_order or subscription_status not in ['progress'] or state != 'sale'" data-hotkey="z"/>
             </button>
+
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button invisible="not subscription_type == 'renewal'"
+                    name="open_subscription_renewal"
+                    class="oe_stat_button"
+                    icon="fa-repeat"
+                    type="object">
+                    <field name="count_renewal_subscriptions" widget="statinfo" string="Renewal Quote"/>
+                </button>
+                <button invisible="not subscription_type == 'upsell'"
+                    name="open_subscription_upsell"
+                    class="oe_stat_button"
+                    icon="fa-arrow-circle-o-up"
+                    type="object">
+                    <field name="count_upselling_subscriptions" widget="statinfo" string="Upsell Quote"/>
+                </button>
+                <button invisible="count_past_subscriptions &lt; 2"
+                    name="open_past_subscriptions"
+                    class="oe_stat_button"
+                    icon="fa-dollar"
+                    type="object">
+                    <field name="count_past_subscriptions" widget="statinfo" string="Sales History"/>
+                </button>
+                
+            </xpath>
             
             <xpath expr="//div[@name='button_box']" position="after">
                 <field name="subscription_status" class="float-end fs-6"

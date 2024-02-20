@@ -10,7 +10,7 @@ class OperationWizard(models.TransientModel):
     op_type = fields.Selection([
         ('renewal', 'Renewal'),  
         ('upsell', 'Upsell'),  
-        ('revise', 'Revision'),
+        ('revised', 'Revision'),
         ('close', 'Close'),
     ], 
         string='Operation', required=True, default="renewal",
@@ -98,6 +98,7 @@ class OperationWizard(models.TransientModel):
             'order_line': order_lines,
             'analytic_account_id': subscription.analytic_account_id.id,
             #'subscription_status': subscription_state,
+            'subscription_type': self.op_type,
             'origin': subscription.client_order_ref,
             'client_order_ref': subscription.client_order_ref,
             #'origin_order_id': subscription.origin_order_id.id,
