@@ -94,17 +94,17 @@ class SubscriptionOrder(models.Model):
 
     def _compute_upselling_count(self):
         for order in self:
-            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','==','upsell')])
+            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','=','upsell')])
             order.count_upselling_subscriptions = len(subscription_ids)
 
     def _compute_renewal_count(self):
         for order in self:
-            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','==','renewal')])
+            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','=','renewal')])
             order.count_renewal_subscriptions = len(subscription_ids)
 
     def _compute_revised_count(self):
         for order in self:
-            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','==','revised')])
+            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','=','revised')])
             order.count_revised_subscriptions = len(subscription_ids)
         
     @api.depends('subscription_order')
@@ -199,7 +199,7 @@ class SubscriptionOrder(models.Model):
             'view_mode': 'tree',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
-            'domain': [('parent_subscription_id','=',self.id),('subscription_type','==','renewal')],
+            'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','renewal')],
             'action_id': self.env.ref('de_subscription.action_subscription_order').id,
         }
 
@@ -209,7 +209,7 @@ class SubscriptionOrder(models.Model):
             'view_mode': 'tree',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
-            'domain': [('parent_subscription_id','=',self.id),('subscription_type','==','upsell')],
+            'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','upsell')],
             'action_id': self.env.ref('de_subscription.action_subscription_order').id,
         }
 
@@ -229,7 +229,7 @@ class SubscriptionOrder(models.Model):
             'view_mode': 'tree',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
-            'domain': [('parent_subscription_id','=',self.id),('subscription_type','==','revised')],
+            'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','revised')],
             'action_id': self.env.ref('de_subscription.action_subscription_order').id,
         }
         
