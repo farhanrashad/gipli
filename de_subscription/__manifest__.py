@@ -19,6 +19,8 @@ Subscription Management
         'views/product_template_views.xml',
         'views/sale_order_views.xml',
         'views/subscription_order_views.xml',
+        'views/subscription_close_reason_views.xml',
+        'wizards/sale_sub_op_wizard_views.xml',
     ],
     'demo': [
         'demo/demo.xml',

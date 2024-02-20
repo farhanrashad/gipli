@@ -15,6 +15,7 @@
                 <button string="Operations" name="button_operations" type="object"
                         invisible="not subscription_order or subscription_status not in ['progress'] or state != 'sale'" data-hotkey="z"/>
             </button>
+            
             <xpath expr="//div[@name='button_box']" position="after">
                 <field name="subscription_status" class="float-end fs-6"
                        invisible="subscription_status not in ['progress', 'close'] or state == 'cancel'"

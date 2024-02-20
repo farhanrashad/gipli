@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Close reasons -->
+    <record id="sale_subscription_close_reason_view_tree" model="ir.ui.view">
+        <field name="name">sale.sub.close.reason.list</field>
+        <field name="model">sale.sub.close.reason</field>
+        <field name="arch" type="xml">
+            <tree string="Close Reasons" editable="bottom">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_sale_subscription_close_reason" model="ir.actions.act_window">
+        <field name="name">Close Reasons</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.sub.close.reason</field>
+        <field name="view_mode">tree</field>
+    </record>
+        
+        <menuitem action="action_sale_subscription_close_reason" name="Close Reasons" id="menu_subscription_config_close_reason" parent="menu_subscription_config" sequence="10"/>
+        
+    </data>
+</odoo>

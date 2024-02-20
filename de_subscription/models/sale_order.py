@@ -60,7 +60,9 @@ class SubscriptionOrder(models.Model):
         compute='_compute_contact_start_date',
         store=True,
         help="The first contract date is the start date of the first contract of the sequence. It is common across a subscription and its renewals.")
-    
+
+    new_subscription_id = fields.Many2one('sale.order', string='Parent Contract', ondelete='restrict', copy=False)
+    ubscription_child_ids = fields.One2many('sale.order', 'new_subscription_id')
     # =======================================================================
     # ========================== Computed Mehtods ===========================
     # =======================================================================
@@ -141,16 +143,20 @@ class SubscriptionOrder(models.Model):
         return res_sub
 
     def button_operations(self):
+        self.ensure_one()
+        active_id = self.env.context.get('subscription_id')
+        context = {
+            'default_type': 'opportunity',
+        }
+        if active_id:
+            context['default_subscription_id'] = active_id
         return {
-            'name': _('Operations'),
-            'res_model': 'sale.sub.op.wizard',
+            'name': 'Operations',
             'view_mode': 'form',
-            'context': {
-                'active_model': 'sale.order',
-                'active_ids': self.ids,
-            },
-            'target': 'new',
+            'res_model': 'sale.sub.op.wizard',
             'type': 'ir.actions.act_window',
+            'target': 'new',
+            #'context': context,
         }
         
         for order in self:

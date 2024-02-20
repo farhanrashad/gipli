@@ -1,30 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_apl_ops_wizard_form" model="ir.ui.view">
-        <field name="name">apl.ops.wizard.form</field>
-        <field name="model">apl.ops.wizard</field>
+    <record id="sale_subscription_operations_wizard_form_view" model="ir.ui.view">
+        <field name="name">sale.sub.op.wizard.form</field>
+        <field name="model">sale.sub.op.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <div class="o_td_label">
-                        <label for="page_start" />
-                    </div>
-                    <div name="page_start">
-                        <field name="page_start" nolabel="1" style="width: 8rem;" />
-                        <span class="ml8" > <strong> To Page: </strong><field name="page_last" nolabel="1" style="width: 8rem;" /></span>
+                    <label for="op_type"/>
+                    <div id="operation">
+                        <field name="op_type" class="oe_inline"/>
                     </div>
                 </group>
-                <div class="oe_form_field">
-                    <div class="">
-                        <div class="text-muted">
-                            Enter the number of records you want to import:
-                        </div>
-                    </div>
-                </div>
+                
                 <group>
-                    <field name="duplicate_records" />
-                    <field name="op_name" invisible="1"/>
-                    <field name="type" widget="radio" attrs="{'invisible': [('op_name', '!=', 'leads')]}"/>
+                   <group>
+                       <field name="subscription_close" />
+                   </group>
+                    <group>
+                    </group>
+                    <div name="close_reason">
+                        <span class="ml8">
+                            <field name="sub_close_reason_id" nolabel="1" />
+                        </span>
+                    </div>
                 </group>
                 <footer>
                     <button name="run_process" string="Process" type="object" class="btn-primary"/>
