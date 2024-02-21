@@ -86,7 +86,7 @@ class SubscriptionOrder(models.Model):
     count_renewal_subscriptions = fields.Integer(compute="_compute_renewal_count")
     count_revised_subscriptions = fields.Integer(compute="_compute_revised_count")
 
-    amount_total_subscription = fields.Monetary(compute='_compute_subscription_total', string="Total Recurring", store=True)
+    amount_total_subscription = fields.Monetary(compute='_compute_subscription_total', string="Total Subscription", store=True)
     amount_monthly_subscription = fields.Monetary(compute='_compute_monthly_subsccription', string="Monthly Subscription",
                                         store=True, tracking=True)
     non_recurring_total = fields.Monetary(compute='_compute_non_recurring_total', string="Total Non Recurring Revenue")
@@ -169,9 +169,14 @@ class SubscriptionOrder(models.Model):
 
     @api.depends('subscription_order', 'state', 'date_start', 'subscription_status')
     def _compute_next_invoice_date(self):
-        for so in self:
-           if not so.date_next_invoice and so.state == 'sale':
+         for so in self:
+            if not so.subscription_order and so.subscription_type != 'upsell':
+                so.date_next_invoice = False
+            elif not so.date_next_invoice and so.state == 'sale':
+                # Define a default next invoice date.
+                # It is increased by _update_next_invoice_date or when posting a invoice when when necessary
                 so.date_next_invoice = so.date_start or fields.Date.today()
+                
 
     @api.depends('subscription_order', 'state', 'subscription_status','subscription_plan_id')
     def _compute_date_start(self):
@@ -271,27 +276,6 @@ class SubscriptionOrder(models.Model):
                 order.parent_subscription_id.message_post(body=cancel_message_body)
             elif (order.subscription_status in SUBSCRIPTION_PROGRESS_STATUS + SUBSCRIPTION_DRAFT_STATUS
                   and not any(state in ['draft', 'posted'] for state in order.order_line.invoice_lines.move_id.mapped('state'))):
-                #order.order_log_ids.sudo().unlink()
-                #parent_transfer_log = order.subscription_id.order_log_ids.filtered(lambda log: log.event_type == '3_transfer' and log.amount_signed < 0)
-                if parent_transfer_log and parent_transfer_log == order.subscription_id.order_log_ids[:1]:
-                    # Delete the parent transfer log if it is the last log of the parent.
-                    parent_transfer_log.sudo().unlink()
-                    # Reopen the parent order and avoid recreating logs
-                    order.subscription_id.with_context(tracking_disable=True).set_open()
-                    parent_link = order.subscription_id._get_html_link()
-                    cancel_activity_body = _("""Subscription %s has been canceled. The parent order %s has been reopened.
-                                                You should close %s if the customer churned, or renew it if the customer continue the service.
-                                                Note: if you already created a new subscription instead of renewing it, please cancel your newly
-                                                created subscription and renew %s instead""", order._get_html_link(),
-                                                                                                parent_link,
-                                                                                                parent_link,
-                                                                                                parent_link)
-                    order.activity_schedule(
-                        'mail.mail_activity_data_todo',
-                        summary=_("Check reopened subscription"),
-                        note=cancel_activity_body,
-                        user_id=order.subscription_id.user_id.id
-                    )
                 order.subscription_status = False
             elif order.subscription_status in SUBSCRIPTION_PROGRESS_STATUS:
                 raise ValidationError(_('You cannot cancel a subscription that has been invoiced.'))
@@ -302,4 +286,282 @@ class SubscriptionOrder(models.Model):
 
     def resume_subscription(self):
         self.filtered(lambda so: so.subscription_status == 'paused').write({'subscription_status': 'progress'})
+
+    def _create_invoices(self, grouped=False, final=False, date=None):
+        """ Override to increment periods when needed """
+        order_already_invoiced = self.env['sale.order']
+        for order in self:
+            if not order.subscription_order:
+                continue
+            if order.order_line.invoice_lines.move_id.filtered(lambda r: r.move_type in ('out_invoice', 'out_refund') and r.state == 'draft'):
+                order_already_invoiced |= order
+
+        
+        if order_already_invoiced:
+            order_error = ", ".join(order_already_invoiced.mapped('name'))
+            raise ValidationError(_("The following recurring orders have draft invoices. Please Confirm them or cancel them "
+                                    "before creating new invoices. %s.", order_error))
+        invoices = super()._create_invoices(grouped=grouped, final=final, date=date)
+        #invoices = self._create_invoices2(grouped=grouped, final=final, date=date)
+        return invoices
+
+    # ========================================================================
+    def _get_invoiceable_lines(self, final=False):
+        date_from = fields.Date.today()
+        res = super()._get_invoiceable_lines(final=final)
+        res = res.filtered(lambda l: not l.is_recurring or l.order_id.subscription_type == 'upsell')
+        automatic_invoice = self.env.context.get('recurring_automatic')
+
+        invoiceable_line_ids = []
+        downpayment_line_ids = []
+        pending_section = None
+        for line in self.order_line:
+            if line.display_type == 'line_section':
+                # Only add section if one of its lines is invoiceable
+                pending_section = line
+                continue
+
+            if line.state != 'sale':
+                continue
+
+            if automatic_invoice:
+                # We don't invoice line before their SO's next_invoice_date
+                line_condition = line.order_id.date_next_invoice and line.order_id.date_next_invoice <= date_from and line.order_id.date_start and line.order_id.date_start <= date_from
+            else:
+                # We don't invoice line past their SO's date_end
+                line_condition = not line.order_id.date_end or (line.order_id.date_next_invoice and line.order_id.date_next_invoice < line.order_id.date_end)
+
+            line_to_invoice = False
+            if line in res:
+                # Line was already marked as to be invoiced
+                line_to_invoice = True
+            elif line.order_id.subscription_type == 'upsell':
+                # Super() already select everything that is needed for upsells
+                line_to_invoice = False
+            elif line.display_type or not line.is_recurring:
+                # Avoid invoicing section/notes or lines starting in the future or not starting at all
+                line_to_invoice = False
+            elif line_condition:
+                if(
+                    line.product_id.invoice_policy == 'order'
+                    and line.order_id.subscription_type != 'renewed'
+                ):
+                    # Invoice due lines
+                    line_to_invoice = True
+                elif (
+                    line.product_id.invoice_policy == 'delivery'
+                    and not float_is_zero(
+                        line.qty_delivered,
+                        precision_rounding=line.product_id.uom_id.rounding,
+                    )
+                ):
+                    line_to_invoice = True
+
+            if line_to_invoice:
+                if line.is_downpayment:
+                    # downpayment line must be kept at the end in its dedicated section
+                    downpayment_line_ids.append(line.id)
+                    continue
+                if pending_section:
+                    invoiceable_line_ids.append(pending_section.id)
+                    pending_section = False
+                invoiceable_line_ids.append(line.id)
+
+        return self.env["sale.order.line"].browse(invoiceable_line_ids + downpayment_line_ids)
+
+    @api.model
+    def _process_invoices_to_send(self, account_moves):
+        for invoice in account_moves:
+            if not invoice.is_move_sent and invoice._is_ready_to_be_sent() and invoice.state == 'posted':
+                subscription = invoice.line_ids.subscription_id
+                subscription.validate_and_send_invoice(invoice)
+                invoice.message_subscribe(subscription.user_id.partner_id.ids)
+            elif invoice.line_ids.subscription_id:
+                invoice.message_subscribe(invoice.line_ids.subscription_id.user_id.partner_id.ids)
+                
+    def _create_invoices2(self, grouped=False, final=False, date=None):
+        """ Create invoice(s) for the given Sales Order(s).
+
+        :param bool grouped: if True, invoices are grouped by SO id.
+            If False, invoices are grouped by keys returned by :meth:`_get_invoice_grouping_keys`
+        :param bool final: if True, refunds will be generated if necessary
+        :param date: unused parameter
+        :returns: created invoices
+        :rtype: `account.move` recordset
+        :raises: UserError if one of the orders has no invoiceable lines.
+        """
+        if not self.env['account.move'].check_access_rights('create', False):
+            try:
+                self.check_access_rights('write')
+                self.check_access_rule('write')
+            except AccessError:
+                return self.env['account.move']
+
+        # 1) Create invoices.
+        invoice_vals_list = []
+        invoice_item_sequence = 0 # Incremental sequencing to keep the lines order on the invoice.
+        for order in self:
+            order = order.with_company(order.company_id).with_context(lang=order.partner_invoice_id.lang)
+
+            invoice_vals = order._prepare_invoice()
+            invoiceable_lines = order._get_invoiceable_lines(final)
+
+            #raise UserError(invoiceable_lines)
+            if not any(not line.display_type for line in invoiceable_lines):
+                continue
+
+            invoice_line_vals = []
+            down_payment_section_added = False
+            for line in invoiceable_lines:
+                if not down_payment_section_added and line.is_downpayment:
+                    # Create a dedicated section for the down payments
+                    # (put at the end of the invoiceable_lines)
+                    invoice_line_vals.append(
+                        Command.create(
+                            order._prepare_down_payment_section_line(sequence=invoice_item_sequence)
+                        ),
+                    )
+                    down_payment_section_added = True
+                    invoice_item_sequence += 1
+                invoice_line_vals.append(
+                    Command.create(
+                        line._prepare_invoice_line(sequence=invoice_item_sequence)
+                    ),
+                )
+                invoice_item_sequence += 1
+
+            invoice_vals['invoice_line_ids'] += invoice_line_vals
+            invoice_vals_list.append(invoice_vals)
+
+        #raise UserError(invoice_vals_list)
+        if not invoice_vals_list: # and self._context.get('raise_if_nothing_to_invoice', True):
+            raise UserError(self._nothing_to_invoice_error_message())
+
+        # 2) Manage 'grouped' parameter: group by (partner_id, currency_id).
+        if not grouped:
+            new_invoice_vals_list = []
+            invoice_grouping_keys = self._get_invoice_grouping_keys()
+            invoice_vals_list = sorted(
+                invoice_vals_list,
+                key=lambda x: [
+                    x.get(grouping_key) for grouping_key in invoice_grouping_keys
+                ]
+            )
+            for _grouping_keys, invoices in groupby(invoice_vals_list, key=lambda x: [x.get(grouping_key) for grouping_key in invoice_grouping_keys]):
+                origins = set()
+                payment_refs = set()
+                refs = set()
+                ref_invoice_vals = None
+                for invoice_vals in invoices:
+                    if not ref_invoice_vals:
+                        ref_invoice_vals = invoice_vals
+                    else:
+                        ref_invoice_vals['invoice_line_ids'] += invoice_vals['invoice_line_ids']
+                    origins.add(invoice_vals['invoice_origin'])
+                    payment_refs.add(invoice_vals['payment_reference'])
+                    refs.add(invoice_vals['ref'])
+                ref_invoice_vals.update({
+                    'ref': ', '.join(refs)[:2000],
+                    'invoice_origin': ', '.join(origins),
+                    'payment_reference': len(payment_refs) == 1 and payment_refs.pop() or False,
+                })
+                new_invoice_vals_list.append(ref_invoice_vals)
+            invoice_vals_list = new_invoice_vals_list
+
+        # 3) Create invoices.
+
+        # As part of the invoice creation, we make sure the sequence of multiple SO do not interfere
+        # in a single invoice. Example:
+        # SO 1:
+        # - Section A (sequence: 10)
+        # - Product A (sequence: 11)
+        # SO 2:
+        # - Section B (sequence: 10)
+        # - Product B (sequence: 11)
+        #
+        # If SO 1 & 2 are grouped in the same invoice, the result will be:
+        # - Section A (sequence: 10)
+        # - Section B (sequence: 10)
+        # - Product A (sequence: 11)
+        # - Product B (sequence: 11)
+        #
+        # Resequencing should be safe, however we resequence only if there are less invoices than
+        # orders, meaning a grouping might have been done. This could also mean that only a part
+        # of the selected SO are invoiceable, but resequencing in this case shouldn't be an issue.
+        if len(invoice_vals_list) < len(self):
+            SaleOrderLine = self.env['sale.order.line']
+            for invoice in invoice_vals_list:
+                sequence = 1
+                for line in invoice['invoice_line_ids']:
+                    line[2]['sequence'] = SaleOrderLine._get_invoice_line_sequence(new=sequence, old=line[2]['sequence'])
+                    sequence += 1
+
+        # Manage the creation of invoices in sudo because a salesperson must be able to generate an invoice from a
+        # sale order without "billing" access rights. However, he should not be able to create an invoice from scratch.
+        moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list)
+
+        # 4) Some moves might actually be refunds: convert them if the total amount is negative
+        # We do this after the moves have been created since we need taxes, etc. to know if the total
+        # is actually negative or not
+        if final:
+            moves.sudo().filtered(lambda m: m.amount_total < 0).action_switch_move_type()
+        for move in moves:
+            if final:
+                # Downpayment might have been determined by a fixed amount set by the user.
+                # This amount is tax included. This can lead to rounding issues.
+                # E.g. a user wants a 100€ DP on a product with 21% tax.
+                # 100 / 1.21 = 82.64, 82.64 * 1,21 = 99.99
+                # This is already corrected by adding/removing the missing cents on the DP invoice,
+                # but must also be accounted for on the final invoice.
+
+                delta_amount = 0
+                for order_line in self.order_line:
+                    if not order_line.is_downpayment:
+                        continue
+                    inv_amt = order_amt = 0
+                    for invoice_line in order_line.invoice_lines:
+                        if invoice_line.move_id == move:
+                            inv_amt += invoice_line.price_total
+                        elif invoice_line.move_id.state != 'cancel':  # filter out canceled dp lines
+                            order_amt += invoice_line.price_total
+                    if inv_amt and order_amt:
+                        # if not inv_amt, this order line is not related to current move
+                        # if no order_amt, dp order line was not invoiced
+                        delta_amount += (inv_amt * (1 if move.is_inbound() else -1)) + order_amt
+
+                if not move.currency_id.is_zero(delta_amount):
+                    receivable_line = move.line_ids.filtered(
+                        lambda aml: aml.account_id.account_type == 'asset_receivable')[:1]
+                    product_lines = move.line_ids.filtered(
+                        lambda aml: aml.display_type == 'product' and aml.is_downpayment)
+                    tax_lines = move.line_ids.filtered(
+                        lambda aml: aml.tax_line_id.amount_type not in (False, 'fixed'))
+                    if tax_lines and product_lines and receivable_line:
+                        line_commands = [Command.update(receivable_line.id, {
+                            'amount_currency': receivable_line.amount_currency + delta_amount,
+                        })]
+                        delta_sign = 1 if delta_amount > 0 else -1
+                        for lines, attr, sign in (
+                            (product_lines, 'price_total', -1 if move.is_inbound() else 1),
+                            (tax_lines, 'amount_currency', 1),
+                        ):
+                            remaining = delta_amount
+                            lines_len = len(lines)
+                            for line in lines:
+                                if move.currency_id.compare_amounts(remaining, 0) != delta_sign:
+                                    break
+                                amt = delta_sign * max(
+                                    move.currency_id.rounding,
+                                    abs(move.currency_id.round(remaining / lines_len)),
+                                )
+                                remaining -= amt
+                                line_commands.append(Command.update(line.id, {attr: line[attr] + amt * sign}))
+                        move.line_ids = line_commands
+
+            move.message_post_with_source(
+                'mail.message_origin_link',
+                render_values={'self': move, 'origin': move.line_ids.sale_line_ids.order_id},
+                subtype_xmlid='mail.mt_note',
+            )
+        return moves
     

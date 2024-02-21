@@ -6,5 +6,5 @@ class product_template(models.Model):
     _inherit = "product.template"
 
     is_recurring = fields.Boolean(
-        'Subscription Product',
+        'Can be Subscription',
         help='If set, confirming a sale order with this product will create a subscription')

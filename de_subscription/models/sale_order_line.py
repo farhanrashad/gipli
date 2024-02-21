@@ -96,3 +96,13 @@ class SubscriptionOrderLine(models.Model):
             ))
 
         return order_lines
+
+    def _reset_subscription_qty_to_invoice(self):
+        """ Define the qty to invoice on subscription lines equal to product_uom_qty for recurring lines
+            It allows avoiding using the _compute_qty_to_invoice with a context_today
+        """
+        today = fields.Date.today()
+        for line in self:
+            if not line.is_recurring or line.product_id.invoice_policy == 'delivery' or line.order_id.date_start and line.order_id.date_start > today:
+                continue
+            line.qty_to_invoice = line.product_uom_qty
