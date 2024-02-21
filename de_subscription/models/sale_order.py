@@ -15,6 +15,7 @@ SUBSCRIPTION_CLOSED_STATUS = ['CLOSE']
 SUBSCRIPTION_STATUSES = [
     ('draft', 'Quotation'),  # Quotation for a new subscription
     ('progress', 'In Progress'),  # Active Subscription or confirmed renewal for active subscription
+    ('paused', 'Paused'),
     ('close', 'Close'),  # Closed or ended subscription
 ]
 

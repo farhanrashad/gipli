@@ -25,10 +25,6 @@ class SaleSubscriptionReport(models.Model):
     close_reason_id = fields.Many2one('sale.sub.close.reason', 'Close Reason', readonly=True)
     margin = fields.Float() # not used but we want to avoid creating a bridge module for nothing
     subscription_status = fields.Selection(SUBSCRIPTION_STATUSES, readonly=True)
-    health = fields.Selection([
-        ('normal', 'Neutral'),
-        ('done', 'Good'),
-        ('bad', 'Bad')], string="Health", readonly=True)
     date_next_invoice = fields.Date('Next Invoice Date', readonly=True)
     subscription_plan_id = fields.Many2one('sale.recur.plan', 'Recurring Plan', readonly=True)
 
@@ -38,7 +34,6 @@ class SaleSubscriptionReport(models.Model):
         res['subscription_status'] = "s.subscription_status"
         res['date_end'] = "s.date_end"
         res['date_first_contract'] = "s.date_first_contract"
-        res['health'] = "s.health"
         res['template_id'] = "s.sale_order_template_id"
         res['close_reason_id'] = "s.close_reason_id"
         res['date_next_invoice'] = "s.date_next_invoice"
@@ -69,7 +64,7 @@ class SaleSubscriptionReport(models.Model):
             * {self._case_value_or_one('currency_table.rate') }
         """
         res['recurring_total'] = f"""
-                s.recurring_total
+                s.amount_total_subscription
                 / {self._case_value_or_one('s.currency_rate') }
                 * {self._case_value_or_one('currency_table.rate') }  
         """
@@ -86,7 +81,7 @@ class SaleSubscriptionReport(models.Model):
         where = super()._where_sale()
         return f"""
             {where}
-            AND s.subscription_state IS NOT NULL
+            AND s.subscription_status IS NOT NULL
         """
 
     def _group_by_sale(self):
@@ -94,7 +89,6 @@ class SaleSubscriptionReport(models.Model):
         group_by_str = f"""{group_by_str},
                     s.subscription_status,
                     s.date_end,
-                    s.health,
                     s.subscription_status,
                     s.sale_order_template_id,
                     partner.industry_id,
@@ -113,7 +107,7 @@ class SaleSubscriptionReport(models.Model):
         self.ensure_one()
         if self.order_reference._name == 'sale.order':
             action = self.order_reference._get_associated_so_action()
-            action['views'] = [(self.env.ref('sale_subscription.sale_subscription_primary_form_view').id, 'form')]
+            action['views'] = [(self.env.ref('de_subscription.subscription_order_primary_form_view').id, 'form')]
             action['res_id'] = self.order_reference.id
             return action
         return {

@@ -5,7 +5,7 @@
         <field name="name">Subscriptions Analysis</field>
         <field name="res_model">sale.subs.report</field>
         <field name="view_mode">graph,tree,pivot</field>
-        <field name="domain">[('subscription_order', '=', True), ('subscription_status', 'not in', ['progress'] )]</field>
+        <field name="domain">[('subscription_order', '=', True)]</field>
         <field name="context">{
             'search_default_filter_progress': 1,
             'search_default_filter_paused': 1,
@@ -97,7 +97,7 @@
                 <field name="team_id" optional="show"/>
                 <field name="company_id" optional="show" groups="base.group_multi_company"/>
                 <field name="recurring_monthly" optional="show" sum="Sum of Monthly Recurring"/>
-                <field name="amount_total_subscription" optional="hide"/>
+                <field name="recurring_total" optional="hide"/>
                 <field name="recurring_yearly" optional="hide" sum="Sum of Yearly Recurring Revenue"/>
                 <field name="subscription_status" widget="badge"
                    decoration-success="subscription_status == '3_progress'"
@@ -139,7 +139,7 @@
                 <field name="amount_total" invisible="1"/>
                 <field name="amount_untaxed" invisible="1"/>
                 <field name="amount_tax" invisible="1"/>
-                <field name="recurring_monthly" invisible="1"/>
+                <field name="amount_monthly_subscription" invisible="1"/>
             </cohort>
         </field>
     </record>
@@ -168,18 +168,18 @@
                 <field name="partner_id" operator="child_of"/>
                 <filter name="filter_my_subscriptions" string="My Subscriptions" domain="[('user_id','=',uid)]"/>
                 <separator/>
-                <filter name="filter_quotations" string="Quotations" domain="[('subscription_status', '=', '1_draft')]"/>
-                <filter name="filter_progress" string="In Progress" domain="[('subscription_status', '=', '3_progress')]"/>
-                <filter name="filter_paused" string="Paused" domain="[('msubscription_status', '=', '4_paused')]"/>
-                <filter name="filter_churn" string="Churned" domain="[('subscription_status', '=', '6_churn')]" help="Closed subscriptions"/>
+                <filter name="filter_quotations" string="Quotations" domain="[('subscription_status', '=', 'draft')]"/>
+                <filter name="filter_progress" string="In Progress" domain="[('subscription_status', '=', 'progress')]"/>
+                <filter name="filter_paused" string="Paused" domain="[('subscription_status', '=', 'paused')]"/>
+                <filter name="filter_close" string="Closed" domain="[('subscription_status', '=', 'close')]" help="Closed subscriptions"/>
                 <separator/>
-                <filter name="filter_to_renew" string="To renew" domain="[('next_invoice_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_to_renew" string="To renew" domain="[('date_next_invoice', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
                 <separator/>
-                <filter string="Recurring" name="recurring" domain="[('product_tmpl_id.recurring_invoice', '=', True)]"/>
-                <filter string="Non-recurring" name="non_recurring" domain="[('product_tmpl_id.recurring_invoice', '!=', True)]"/>
+                <filter string="Recurring" name="recurring" domain="[('product_tmpl_id.is_recurring', '=', True)]"/>
+                <filter string="Non-recurring" name="non_recurring" domain="[('product_tmpl_id.is_recurring', '!=', True)]"/>
                 <separator/>
                 <filter name="filter_date_first_contract" date="date_first_contract"/>
-                <filter name="filter_next_invoice_date" date="next_invoice_date"/>
+                <filter name="filter_date_next_invoice" date="date_next_invoice"/>
                 <filter name="filter_date_end" date="date_end"/>
                 <group expand="1" string="Group By">
                     <filter string="Subscription State" name="group_by_subscription_status" domain="[]" context="{'group_by': 'subscription_status'}"/>
@@ -188,10 +188,10 @@
                     <filter string="Customer" name="group_by_customer" domain="[]" context="{'group_by': 'partner_id'}"/>
                     <filter string="Country" name="group_by_country" domain="[]" context="{'group_by': 'country_id'}"/>
                     <filter string="Template" name="group_by_template" domain="[]" context="{'group_by': 'template_id'}"/>
-                    <filter string="Plan" name="group_by_plan_id" domain="[]" context="{'group_by': 'plan_id'}"/>
+                    <filter string="Plan" name="group_by_subscription_plan_id" domain="[]" context="{'group_by': 'subscription_plan_id'}"/>
                     <filter string="Product" name="group_by_product" domain="[]" context="{'group_by': 'product_id'}"/>
                     <filter string="First Contract Date" name="group_by_date_first_contract" domain="[]" context="{'group_by': 'date_first_contract'}"/>
-                    <filter string="Next Invoice Date" name="group_by_next_invoice_date" domain="[]" context="{'group_by': 'next_invoice_date'}"/>
+                    <filter string="Next Invoice Date" name="group_by_date_next_invoice" domain="[]" context="{'group_by': 'date_next_invoice'}"/>
                     <filter string="End Date" name="group_by_end_month" domain="[]" context="{'group_by': 'date_end'}"/>
                 </group>
             </search>
@@ -205,8 +205,8 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='Sales']" position='after'>
                 <separator/>
-                <filter string="Recurring" name="recurring" domain="[('product_tmpl_id.recurring_invoice', '=', True)]"/>
-                <filter string="Non-recurring" name="non_recurring" domain="[('product_tmpl_id.recurring_invoice', '!=', True)]"/>
+                <filter string="Recurring" name="recurring" domain="[('product_tmpl_id.is_recurring', '=', True)]"/>
+                <filter string="Non-recurring" name="non_recurring" domain="[('product_tmpl_id.is_recurring', '!=', True)]"/>
             </xpath>
         </field>
     </record>
