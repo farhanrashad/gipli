@@ -15,6 +15,7 @@ Subscription Management
     'data': [
         'security/ir.model.access.csv',
         'data/subscription_data.xml',
+        'data/ir_actions_data.xml',
         'views/subscription_menu.xml',
         'views/subscription_templates.xml',
         'views/subscription_plan_views.xml',

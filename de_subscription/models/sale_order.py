@@ -8,7 +8,7 @@ from pytz import timezone, UTC
 from odoo.exceptions import UserError, ValidationError
 from dateutil.relativedelta import relativedelta
 
-SUBSCRIPTION_DRAFT_STAtus = ['draft']
+SUBSCRIPTION_DRAFT_STATUS = ['draft']
 SUBSCRIPTION_PROGRESS_STATUS = ['progress']
 SUBSCRIPTION_CLOSED_STATUS = ['CLOSE']
 
@@ -34,16 +34,6 @@ class SubscriptionOrder(models.Model):
         selection=SUBSCRIPTION_STATUSES,
         compute='_compute_subscription_status', store=True, index='btree_not_null', tracking=True, group_expand='_group_expand_states',
     )
-
-    """
-    subscription_status = fields.Selection([
-        ('draft', 'Quotation'),  # Quotation for a new subscription
-        ('progress', 'In Progress'),  # Active Subscription or confirmed renewal for active subscription
-        ('close', 'Close'),  # Closed or ended subscription
-    ], 
-        string='Subscription Status', compute='_compute_subscription_status', store=True, index='btree_not_null', tracking=True, group_expand='_group_expand_states',
-    )
-    """
     subscription_type = fields.Selection([
         ('normal', 'Normal'),
         ('renewal', 'Renewal'),  
@@ -270,5 +260,43 @@ class SubscriptionOrder(models.Model):
             'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','revised')],
             'action_id': self.env.ref('de_subscription.action_subscription_order').id,
         }
-        
+
+    def _action_subscription_cancel(self):
+        for order in self:
+            if order.subscription_type == 'upsell':
+                cancel_message_body = _("The upsell %s has been canceled.", order._get_html_link())
+                order.parent_subscription_id.message_post(body=cancel_message_body)
+            elif order.subscription_type == 'renewal':
+                cancel_message_body = _("The renewal %s has been canceled.", order._get_html_link())
+                order.parent_subscription_id.message_post(body=cancel_message_body)
+            elif (order.subscription_status in SUBSCRIPTION_PROGRESS_STATUS + SUBSCRIPTION_DRAFT_STATUS
+                  and not any(state in ['draft', 'posted'] for state in order.order_line.invoice_lines.move_id.mapped('state'))):
+                #order.order_log_ids.sudo().unlink()
+                #parent_transfer_log = order.subscription_id.order_log_ids.filtered(lambda log: log.event_type == '3_transfer' and log.amount_signed < 0)
+                if parent_transfer_log and parent_transfer_log == order.subscription_id.order_log_ids[:1]:
+                    # Delete the parent transfer log if it is the last log of the parent.
+                    parent_transfer_log.sudo().unlink()
+                    # Reopen the parent order and avoid recreating logs
+                    order.subscription_id.with_context(tracking_disable=True).set_open()
+                    parent_link = order.subscription_id._get_html_link()
+                    cancel_activity_body = _("""Subscription %s has been canceled. The parent order %s has been reopened.
+                                                You should close %s if the customer churned, or renew it if the customer continue the service.
+                                                Note: if you already created a new subscription instead of renewing it, please cancel your newly
+                                                created subscription and renew %s instead""", order._get_html_link(),
+                                                                                                parent_link,
+                                                                                                parent_link,
+                                                                                                parent_link)
+                    order.activity_schedule(
+                        'mail.mail_activity_data_todo',
+                        summary=_("Check reopened subscription"),
+                        note=cancel_activity_body,
+                        user_id=order.subscription_id.user_id.id
+                    )
+                order.subscription_status = False
+            elif order.subscription_status in SUBSCRIPTION_PROGRESS_STATE:
+                raise ValidationError(_('You cannot cancel a subscription that has been invoiced.'))
+        return super()._action_subscription_cancel()
+
+    def action_subscription_pause(self):
+        self.filtered(lambda so: so.subscription_status == 'progress').write({'subscription_status': 'paused'})
     
