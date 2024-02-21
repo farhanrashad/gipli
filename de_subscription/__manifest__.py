@@ -15,7 +15,7 @@ Subscription Management
     'data': [
         'security/ir.model.access.csv',
         'data/subscription_data.xml',
-        'views/menuitems.xml',
+        'views/subscription_menu.xml',
         'views/subscription_templates.xml',
         'views/subscription_plan_views.xml',
         'views/product_template_views.xml',
@@ -23,6 +23,7 @@ Subscription Management
         'views/subscription_order_views.xml',
         'views/subscription_close_reason_views.xml',
         'wizards/sale_sub_op_wizard_views.xml',
+        'reports/sale_subscription_report_views.xml',
     ],
     'demo': [
         'demo/demo.xml',

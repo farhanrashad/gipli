@@ -8,13 +8,28 @@ from pytz import timezone, UTC
 from odoo.exceptions import UserError, ValidationError
 from dateutil.relativedelta import relativedelta
 
+INTERVAL_FACTOR = {
+    'day': 30.437,  # average number of days per month over the year,
+    'week': 30.437 / 7.0,
+    'month': 1.0,
+    'year': 1.0 / 12.0,
+}
 
 class SubscriptionOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-
+    is_recurring = fields.Boolean(related="product_template_id.is_recurring")
+    amount_monthly_subscription = fields.Monetary(compute='_compute_monthly_subscription', string="Monthly Subscription")
     parent_subscription_line_id = fields.Many2one('sale.order.line', compute='_compute_parent_line_id', store=True, precompute=True)
 
+    @api.depends('is_recurring', 'price_subtotal')
+    def _compute_monthly_subscription(self):
+        for line in self:
+            if not line.is_recurring or not line.order_id.subscription_plan_id.billing_period:
+                line.amount_monthly_subscription = 0
+            else:
+                line.amount_monthly_subscription = line.price_subtotal * INTERVAL_FACTOR[line.order_id.subscription_plan_id.recurring_interval_type] / line.order_id.subscription_plan_id.recurring_interval
+                
     def _compute_parent_line_id(self):
         """
         Compute the link between a SOL and the line in the parent order. The matching is done based on several

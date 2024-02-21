@@ -3,5 +3,8 @@ access_sale_recur_plan_user,access.sale.recur.plan.user,model_sale_recur_plan,sa
 access_sale_recur_plan_manager,access.sale.recur.plan.manager,model_sale_recur_plan,sales_team.group_sale_manager,1,1,1,1
 
 access_sale_sub_op_wizard,access.sale.sub.op.wizard,model_sale_sub_op_wizard,,1,1,1,1
+
 access_sale_sub_close_reason_user,access.sale.sub.close.reason.user,model_sale_sub_close_reason,sales_team.group_sale_salesman,1,0,0,0
 access_sale_sub_close_reason_manager,access.sale.sub.close.reason.manager,model_sale_sub_close_reason,sales_team.group_sale_manager,1,1,1,1
+
+access_sale_subs_report,access.sale.subs.report,model_sale_subs_report,,1,1,1,1

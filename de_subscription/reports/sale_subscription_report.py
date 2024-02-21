@@ -7,8 +7,8 @@ from odoo.addons.de_subscription.models.sale_order import SUBSCRIPTION_STATUSES
 
 class SaleSubscriptionReport(models.Model):
     _inherit = "sale.report"
-    _name = "sale.subscription.report"
-    _description = "Subscription Analysis"
+    _name = "sale.subs.report"
+    _description = "Sale Subscription Analysis"
     _auto = False
 
     client_order_ref = fields.Char(string="Customer Reference", readonly=False)

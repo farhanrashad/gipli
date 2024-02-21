@@ -95,11 +95,35 @@ class SubscriptionOrder(models.Model):
     count_renewal_subscriptions = fields.Integer(compute="_compute_renewal_count")
     count_revised_subscriptions = fields.Integer(compute="_compute_revised_count")
 
+    amount_total_subscription = fields.Monetary(compute='_compute_subscription_total', string="Total Recurring", store=True)
+    amount_monthly_subscription = fields.Monetary(compute='_compute_monthly_subsccription', string="Monthly Subscription",
+                                        store=True, tracking=True)
+    non_recurring_total = fields.Monetary(compute='_compute_non_recurring_total', string="Total Non Recurring Revenue")
     
     # =======================================================================
     # ========================== Computed Mehtods ===========================
     # =======================================================================
 
+    @api.depends('subscription_status', 'state', 'subscription_order', 'amount_untaxed')
+    def _compute_subscription_total(self):
+        for order in self:
+            if order.subscription_order:
+                order.amount_total_subscription = sum(order.order_line.filtered(lambda l: l.product_id.is_recurring).mapped('price_subtotal'))
+                continue
+            order.amount_total_subscription = 0
+
+    @api.depends('subscription_status', 'state', 'subscription_order', 'amount_untaxed')
+    def _compute_monthly_subsccription(self):
+        """ Compute the amount monthly recurring revenue. When a subscription has a parent still ongoing.
+        Depending on invoice_ids force the recurring monthly to be recomputed regularly, even for the first invoice
+        where confirmation is set the next_invoice_date and first invoice do not update it (in automatic mode).
+        """
+        for order in self:
+            if order.subscription_order:
+                order.amount_monthly_subscription = sum(order.order_line.mapped('amount_monthly_subscription'))
+                continue
+            order.amount_monthly_subscription = 0
+            
     def _compute_past_subscriptions(self):
         for order in self:
             subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id)])
