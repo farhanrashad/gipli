@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top menu item -->
+    <menuitem name="GYM"
+        id="menu_gym_root"
+        groups="sales_team.group_sale_salesman"
+        web_icon="de_gym,static/description/icon.png"
+        sequence="40" />
+
+    <menuitem id="menu_subscription_main" name="Membership" parent="menu_gym_root" sequence="5"/>
+    <menuitem id="menu_subscription_members" name="Members" parent="menu_gym_root" sequence="10"/>
+    <menuitem id="menu_subscription_services" name="Services" parent="menu_gym_root" sequence="20"/>
+    <menuitem id="menu_subscription_reports" name="Reports" parent="menu_gym_root" sequence="90"/>
+    <menuitem id="menu_subscription_config" name="Configuration" parent="menu_gym_root" sequence="100"/>
+    
+</odoo>
