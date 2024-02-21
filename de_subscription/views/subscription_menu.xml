@@ -8,7 +8,8 @@
         sequence="40" />
 
     <menuitem id="menu_subscription_main" name="Subscriptions" parent="menu_subscription_root" sequence="5"/>
-    <menuitem id="menu_subscription_products" name="Products" parent="menu_subscription_root" sequence="10"/>
+    <menuitem id="menu_subscription_customers" name="Customers" parent="menu_subscription_root" sequence="10"/>
+    <menuitem id="menu_subscription_products" name="Products" parent="menu_subscription_root" sequence="20"/>
     <menuitem id="menu_subscription_reports" name="Reports" parent="menu_subscription_root" sequence="90"/>
     <menuitem id="menu_subscription_config" name="Configuration" parent="menu_subscription_root" sequence="90"/>
     

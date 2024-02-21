@@ -8,7 +8,7 @@
         <field name="binding_view_types">form,list</field>
         <field name="state">code</field>
         <field name="code">
-records.filtered('subscription_order')._action_subscription_cancel()
+records.filtered('subscription_order')._action_cancel()
         </field>
     </record>
 

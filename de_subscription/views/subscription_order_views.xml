@@ -19,6 +19,12 @@
                         invisible="not subscription_order or subscription_status not in ['progress'] or state != 'sale'" data-hotkey="z"/>
             </button>
 
+            <button id="create_invoice" position="before">
+                <button string="Resume" name="resume_subscription" type="object" data-hotkey="r"
+                        class="btn-primary"
+                        invisible="subscription_status != 'paused'"/>
+            </button>
+            
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button invisible="count_renewal_subscriptions &lt; 1"
                     name="open_subscription_renewal"
@@ -55,11 +61,13 @@
             
             <xpath expr="//div[@name='button_box']" position="after">
                 <field name="subscription_status" class="float-end fs-6"
-                       invisible="subscription_status not in ['progress', 'close'] or state == 'cancel'"
-                       widget="badge"
-                       decoration-info="subscription_status in ['draft']"
-                       decoration-success="subscription_status in ['progress']"
-                       decoration-danger="subscription_status in ['close']"/>
+                    invisible="subscription_status not in ['draft','progress','close','paused'] or state == 'cancel'"
+                    widget="badge"
+                    decoration-info="subscription_status in ['draft']"
+                    decoration-danger="subscription_status in ['progress']"
+                    decoration-success="subscription_status in ['close']"
+                    decoration-warning="subscription_status in ['paused']"
+                />
             </xpath>
 
             <xpath expr="//group[1]/group[2]" position="inside">

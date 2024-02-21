@@ -261,7 +261,7 @@ class SubscriptionOrder(models.Model):
             'action_id': self.env.ref('de_subscription.action_subscription_order').id,
         }
 
-    def _action_subscription_cancel(self):
+    def _action_cancel(self):
         for order in self:
             if order.subscription_type == 'upsell':
                 cancel_message_body = _("The upsell %s has been canceled.", order._get_html_link())
@@ -293,10 +293,13 @@ class SubscriptionOrder(models.Model):
                         user_id=order.subscription_id.user_id.id
                     )
                 order.subscription_status = False
-            elif order.subscription_status in SUBSCRIPTION_PROGRESS_STATE:
+            elif order.subscription_status in SUBSCRIPTION_PROGRESS_STATUS:
                 raise ValidationError(_('You cannot cancel a subscription that has been invoiced.'))
-        return super()._action_subscription_cancel()
+        return super()._action_cancel()
 
     def action_subscription_pause(self):
         self.filtered(lambda so: so.subscription_status == 'progress').write({'subscription_status': 'paused'})
+
+    def resume_subscription(self):
+        self.filtered(lambda so: so.subscription_status == 'paused').write({'subscription_status': 'progress'})
     

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+
+    <menuitem name="Customers" id="menu_subscription_customers_customers"
+                    parent="menu_subscription_customers" action="account.res_partner_action_customer"
+                    groups="sales_team.group_sale_salesman" sequence="2"/>
+    
+</odoo>
