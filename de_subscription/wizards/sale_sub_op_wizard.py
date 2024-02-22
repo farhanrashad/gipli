@@ -40,21 +40,7 @@ class OperationWizard(models.TransientModel):
             lang = subscription_id.partner_id.lang or self.env.user.lang
             renew_msg_body = self._get_order_digest(origin='renewal', lang=lang)
             action = self._prepare_new_subscription_order(renew_msg_body)
-            #raise UserError(action['res_id'])
-            return {
-                'name': 'Renewal',
-                'view_mode': 'form',
-                'res_model': 'sale.order',
-                'res_id': action['res_id'],
-                'type': 'ir.actions.act_window',
-                #'target': 'new',
-                'context': {
-                    'subscription_id': action['res_id'],
-                },
-            }
-            
-        
-        #raise UserError(active_id)
+            return action
 
     def _get_order_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
         self.ensure_one()
@@ -70,7 +56,7 @@ class OperationWizard(models.TransientModel):
         
     def _prepare_new_subscription_order(self, message_body):
         order = self._create_new_subscription_order(message_body)
-        action = self._get_associated_so_action()
+        action = self._get_associated_so_action(order)
         action['name'] = _('Upsell') if self.subscription_id.subscription_type == 'upsell' else _('Renew')
         action['views'] = [(self.env.ref('de_subscription.subscription_order_primary_form_view').id, 'form')]
         action['res_id'] = order.id
@@ -142,11 +128,11 @@ class OperationWizard(models.TransientModel):
         }
         
     @api.model
-    def _get_associated_so_action(self):
+    def _get_associated_so_action(self, order):
         return {
-            "type": "ir.actions.act_window",
-            "res_model": "sale.order",
-            "views": [[self.env.ref('de_subscription.subscription_order_tree_view').id, "tree"],
-                      [self.env.ref('de_subscription.subscription_order_primary_form_view').id, "form"],
-                      [False, "kanban"], [False, "calendar"], [False, "pivot"], [False, "graph"]],
-        }
+                'name': 'Renewal',
+                'view_mode': 'form',
+                'res_model': 'sale.order',
+                'res_id': order.id,
+                'type': 'ir.actions.act_window',
+            }
