@@ -23,6 +23,10 @@ class OperationWizard(models.TransientModel):
         active_id = self.env.context.get('active_id', [])
         subscription_id = self.env['sale.order'].browse(active_id)
         if self.op_type == 'renewal':
+            if subscription_id.date_start == subscription_id.date_next_invoice:
+                raise ValidationError(_("You can not upsell or renew a subscription that has not been invoiced yet. "
+                                    "Please, update directly the %s contract or invoice it first.", subscription_id.name))
+            
             lang = subscription_id.partner_id.lang or self.env.user.lang
             renew_msg_body = self._get_order_digest(subscription_id, origin='renewal', lang=lang)
             action = self._prepare_new_subscription_order(subscription_id, self.op_type, renew_msg_body)

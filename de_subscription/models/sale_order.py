@@ -179,16 +179,15 @@ class SubscriptionOrder(models.Model):
     )
     def _compute_next_invoice_date(self):
          for so in self:
-            invoices_dates = so.order_line.mapped('invoice_lines').filtered(lambda line: line.move_id.state == 'posted').mapped('date')
+            invoices = so.order_line.invoice_lines.mapped('move_id')
             if not so.subscription_order and so.subscription_type != 'upsell':
                 so.date_next_invoice = False
             elif not so.date_next_invoice and so.state == 'sale':
-                # Define a default next invoice date.
-                # It is increased by _update_next_invoice_date or when posting a invoice when when necessary
                 so.date_next_invoice = so.date_start or fields.Date.today()
             else:
-                #raise UserError(max(invoices_dates))
-                so.date_next_invoice = max(invoices_dates) if invoices_dates else False
+                if invoices or len(invoices):
+                    kwargs = {so.subscription_plan_id.recurring_interval_type+"s": len(invoices)}
+                    so.date_next_invoice = so.date_start + relativedelta(**kwargs)
 
                 
 
