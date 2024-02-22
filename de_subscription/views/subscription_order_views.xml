@@ -71,9 +71,8 @@
                 <field name="subscription_status" class="float-end fs-6"
                     invisible="subscription_status not in ['draft','progress','close','paused'] or state == 'cancel'"
                     widget="badge"
-                    decoration-info="subscription_status in ['draft']"
-                    decoration-danger="subscription_status in ['progress']"
-                    decoration-success="subscription_status in ['close']"
+                    decoration-info="subscription_status in ['draft','close']"
+                    decoration-success="subscription_status in ['progress']"
                     decoration-warning="subscription_status in ['paused']"
                 />
             </xpath>

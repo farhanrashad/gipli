@@ -78,7 +78,7 @@ class SubscriptionOrder(models.Model):
     parent_subscription_id = fields.Many2one('sale.order', string='Parent Contract', ondelete='restrict', copy=False)
     subscription_line_ids = fields.One2many('sale.order', 'parent_subscription_id')
 
-    close_reason_id = fields.Many2one("sale.sub.close.reason", string="Close Reason", copy=False, tracking=True)
+    sub_close_reason_id = fields.Many2one("sale.sub.close.reason", string="Close Reason", copy=False, tracking=True)
     
     # Count Fields
     count_past_subscriptions = fields.Integer(compute='_compute_past_subscriptions')
@@ -244,7 +244,7 @@ class SubscriptionOrder(models.Model):
     def open_subscription_renewal(self):
         return {
             'name': 'Renewed Subscriptions',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','renewal')],
@@ -254,7 +254,7 @@ class SubscriptionOrder(models.Model):
     def open_subscription_upsell(self):
         return {
             'name': 'Upselling Subscriptions',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','upsell')],
@@ -264,7 +264,7 @@ class SubscriptionOrder(models.Model):
     def open_past_subscriptions(self):
         return {
             'name': 'Upselling Subscriptions',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'domain': [('parent_subscription_id','=',self.id)],
@@ -274,7 +274,7 @@ class SubscriptionOrder(models.Model):
     def open_revised_subscriptions(self):
         return {
             'name': 'Upselling Subscriptions',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','revised')],

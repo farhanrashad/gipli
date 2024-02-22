@@ -48,6 +48,10 @@ class OperationWizard(models.TransientModel):
             lang = subscription_id.partner_id.lang or self.env.user.lang
             renew_msg_body = self._get_order_digest(origin='renewal', lang=lang)
             action = self._prepare_new_subscription_order(renew_msg_body)
+            subscription_id.write({
+                'subscription_status': 'close',
+                'sub_close_reason_id': self.sub_close_reason_id.id,
+            })
             return action
 
     def _get_order_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
