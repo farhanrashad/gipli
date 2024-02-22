@@ -32,6 +32,14 @@ class OperationWizard(models.TransientModel):
         self.ensure_one()
         active_id = self.env.context.get('active_id', [])
         subscription_id = self.env['sale.order'].browse(active_id)
+        related_subscription_ids = self.env['sale.order'].search([
+            ('parent_subscription_id','=',self.subscription_id.id),
+            ('state','!=','cancel'),
+        ])
+        if related_subscription_ids or len(related_subscription_ids):
+            raise UserError(_('You can not create multiple upsell or renew subscriptions. \n'
+                              'Please process the existing contract first.'))
+            
         if self.op_type == 'renewal':
             if subscription_id.date_start == subscription_id.date_next_invoice:
                 raise ValidationError(_("You can not upsell or renew a subscription that has not been invoiced yet. "
@@ -86,6 +94,7 @@ class OperationWizard(models.TransientModel):
         """
         self.ensure_one()
         today = fields.Date.today()
+            
         if self.subscription_id.subscription_type == 'upsell' and self.subscription_id.date_next_invoice <= max(self.subscription_id.date_first_contract or today, today):
             raise UserError(_('You cannot create an upsell for this subscription because it :\n'
                               ' - Has not started yet.\n'
