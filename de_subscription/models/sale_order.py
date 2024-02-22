@@ -236,7 +236,9 @@ class SubscriptionOrder(models.Model):
             'res_model': 'sale.sub.op.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
-            
+            'context': {
+                'subscription_id': self.id,
+            },
         }
 
     def open_subscription_renewal(self):
