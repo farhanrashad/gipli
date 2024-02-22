@@ -39,7 +39,7 @@ class OperationWizard(models.TransientModel):
             
             lang = subscription_id.partner_id.lang or self.env.user.lang
             renew_msg_body = self._get_order_digest(origin='renewal', lang=lang)
-            action = self._prepare_new_subscription_order(self.op_type, renew_msg_body)
+            action = self._prepare_new_subscription_order(renew_msg_body)
         
         #raise UserError(active_id)
 
@@ -92,10 +92,10 @@ class OperationWizard(models.TransientModel):
                               ' - Has not started yet.\n'
                               ' - Has no invoiced period in the future.'))
         subscription = self.subscription_id
-        order_lines = subscription.order_line._get_renew_order_values(subscription_state, period_end=subscription_id.date_next_invoice)
-        is_subscription = subscription_state == '2_renewal'
+        order_lines = subscription.order_line._get_renew_order_values(self.subscription_id, period_end=self.subscription_id.date_next_invoice)
+        is_subscription = self.subscription_id.subscription_type == 'renewal'
         option_lines_data = [Command.link(option.copy().id) for option in subscription.sale_order_option_ids]
-        if subscription_state == '7_upsell':
+        if self.subscription_id.subscription_type == 'upsell':
             date_start = fields.Date.today()
             date_next_invoice = subscription_id.date_next_invoice
         else:

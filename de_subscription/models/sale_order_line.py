@@ -56,7 +56,7 @@ class SubscriptionOrderLine(models.Model):
                 line.parent_subscription_line_id = False
                 
 
-    def _get_renew_order_values(self, subscription_state, period_end=None):
+    def _get_renew_order_values(self, subscription_id, period_end=None):
         order_lines = []
         description_needed = False #self._need_renew_discount_info()
         today = fields.Date.today()
@@ -71,12 +71,12 @@ class SubscriptionOrderLine(models.Model):
                 'name': line.name,
                 'product_id': product.id,
                 'product_uom': line.product_uom.id,
-                'product_uom_qty': 0 if subscription_state == '7_upsell' else line.product_uom_qty,
+                'product_uom_qty': 0 if subscription_id.subscription_type == 'upsell' else line.product_uom_qty,
                 'price_unit': line.price_unit,
             }))
             description_needed = True
 
-        if subscription_state == '7_upsell' and description_needed and period_end:
+        if subscription_id.subscription_type == 'upsell' and description_needed and period_end:
             start_date = max(today, line.order_id.first_contract_date or today)
             end_date = period_end - relativedelta(days=1)  # the period ends the day before the next invoice
             if start_date >= end_date:
