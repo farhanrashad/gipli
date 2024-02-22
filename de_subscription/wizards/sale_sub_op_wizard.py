@@ -36,23 +36,27 @@ class OperationWizard(models.TransientModel):
             ('parent_subscription_id','=',self.subscription_id.id),
             ('state','!=','cancel'),
         ])
-        if related_subscription_ids or len(related_subscription_ids):
-            raise UserError(_('You can not create multiple upsell or renew subscriptions. \n'
+            
+        if self.op_type == 'renewal':            
+            if related_subscription_ids or len(related_subscription_ids):
+                raise UserError(_('You can not create multiple upsell or renew subscriptions. \n'
                               'Please process the existing contract first.'))
             
-        if self.op_type == 'renewal':
+        if self.op_type != 'close':
             if subscription_id.date_start == subscription_id.date_next_invoice:
                 raise ValidationError(_("You can not upsell or renew a subscription that has not been invoiced yet. "
                                     "Please, update directly the %s contract or invoice it first.", subscription_id.name))
-            
+                
             lang = subscription_id.partner_id.lang or self.env.user.lang
-            renew_msg_body = self._get_order_digest(origin='renewal', lang=lang)
+            renew_msg_body = self._get_order_digest(origin=self.op_type, lang=lang)
             action = self._prepare_new_subscription_order(renew_msg_body)
+
+        if self.op_type == 'renewal':
             subscription_id.write({
                 'subscription_status': 'close',
                 'sub_close_reason_id': self.sub_close_reason_id.id,
             })
-            return action
+        return action
 
     def _get_order_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
         self.ensure_one()
@@ -69,7 +73,7 @@ class OperationWizard(models.TransientModel):
     def _prepare_new_subscription_order(self, message_body):
         order = self._create_new_subscription_order(message_body)
         action = self._get_associated_so_action(order)
-        action['name'] = _('Upsell') if self.subscription_id.subscription_type == 'upsell' else _('Renew')
+        action['name'] = self.op_type
         action['views'] = [(self.env.ref('de_subscription.subscription_order_primary_form_view').id, 'form')]
         action['res_id'] = order.id
         return action
@@ -83,10 +87,15 @@ class OperationWizard(models.TransientModel):
         order = self.env['sale.order'].create(values)
         self.subscription_id.subscription_line_ids = [Command.link(order.id)]
         order.message_post(body=message_body)
-        if self.subscription_id.subscription_type == 'upsell':
+        if self.op_type == 'upsell':
             parent_message_body = _("An upsell quotation %s has been created", order._get_html_link())
-        else:
+        elif self.op_type == 'revised':
+            parent_message_body = _("An revised quotation %s has been created", order._get_html_link())
+        elif self.op_type == 'renewal':
             parent_message_body = _("A renewal quotation %s has been created", order._get_html_link())
+        else:
+            parent_message_body = _("A subscription %s has been closed", order._get_html_link())
+            
         self.subscription_id.message_post(body=parent_message_body)
         order.order_line._compute_tax_id()
         return order
@@ -105,7 +114,7 @@ class OperationWizard(models.TransientModel):
                               ' - Has no invoiced period in the future.'))
         subscription = self.subscription_id
         order_lines = subscription.order_line._get_renew_order_values(self.subscription_id, period_end=self.subscription_id.date_next_invoice)
-        is_subscription = self.subscription_id.subscription_type == 'renewal'
+        #is_subscription = self.subscription_id.subscription_type == 'renewal'
         option_lines_data = [Command.link(option.copy().id) for option in subscription.sale_order_option_ids]
         if self.subscription_id.subscription_type == 'upsell':
             date_start = fields.Date.today()
@@ -143,7 +152,7 @@ class OperationWizard(models.TransientModel):
     @api.model
     def _get_associated_so_action(self, order):
         return {
-                'name': 'Renewal',
+                'name': order.subscription_type,
                 'view_mode': 'form',
                 'res_model': 'sale.order',
                 'res_id': order.id,
