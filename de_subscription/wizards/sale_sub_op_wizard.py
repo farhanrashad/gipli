@@ -40,6 +40,19 @@ class OperationWizard(models.TransientModel):
             lang = subscription_id.partner_id.lang or self.env.user.lang
             renew_msg_body = self._get_order_digest(origin='renewal', lang=lang)
             action = self._prepare_new_subscription_order(renew_msg_body)
+            #raise UserError(action['res_id'])
+            return {
+                'name': 'Renewal',
+                'view_mode': 'form',
+                'res_model': 'sale.order',
+                'res_id': action['res_id'],
+                'type': 'ir.actions.act_window',
+                #'target': 'new',
+                'context': {
+                    'subscription_id': action['res_id'],
+                },
+            }
+            
         
         #raise UserError(active_id)
 
