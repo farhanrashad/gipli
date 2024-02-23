@@ -398,8 +398,106 @@ class SubscriptionOrder(models.Model):
             elif invoice.line_ids.subscription_id:
                 invoice.message_subscribe(invoice.line_ids.subscription_id.user_id.partner_id.ids)
 
+    # ==========================================================
+    # =================== Create Invoice =======================
+    # ==========================================================
+
+    def _get_order_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
+        self.ensure_one()
+        values = {'origin': origin,
+                  'record_url': self._get_html_link(),
+                  'date_start': self.date_start,
+                  'date_next_invoice': self.date_next_invoice,
+                  'amount_monthly_subscription': self.amount_monthly_subscription,
+                  'untaxed_amount': self.amount_untaxed,
+                 }
+        return self.env['ir.qweb'].with_context(lang=lang)._render(template, values)
+        
+    def _prepare_new_subscription_order(self, subscription_type, message_body):
+        order = self._create_new_subscription_order(subscription_type, message_body)
+        action = self._get_associated_so_action(order)
+        action['name'] = subscription_type
+        action['views'] = [(self.env.ref('de_subscription.subscription_order_primary_form_view').id, 'form')]
+        action['res_id'] = order.id
+        return action
+
+    def _create_new_subscription_order(self, subscription_type, message_body):
+        self.ensure_one()
+        subscription = self
+        
+        if subscription.date_start == subscription.date_next_invoice:
+            raise ValidationError("You cannot perform an upsell or renewal on a subscription that has not yet been invoiced. "
+                      "Please ensure that the subscription '%s' is invoiced before proceeding." % subscription.name)
+    
+        new_order_values = self._prepare_new_subscription_order_values(subscription_type)
+        new_order = self.env['sale.order'].create(new_order_values)
+        subscription.subscription_line_ids = [(4, new_order.id)]
+        new_order.message_post(body=message_body)
+    
+        if subscription_type == 'upsell':
+            parent_message_body = _("An upsell quotation %s has been created", new_order._get_html_link())
+        elif subscription_type == 'revised':
+            parent_message_body = _("An revised quotation %s has been created", new_order._get_html_link())
+        elif subscription_type == 'renewal':
+            parent_message_body = _("A renewal quotation %s has been created", new_order._get_html_link())
+        else:
+            parent_message_body = _("A subscription %s has been closed", new_order._get_html_link())
+        
+        subscription.message_post(body=parent_message_body)
+        new_order.order_line._compute_tax_id()
+        
+        return new_order
+
+    def _prepare_new_subscription_order_values(self, subscription_type):
+        self.ensure_one()
+        today = fields.Date.today()
+        subscription = self
+    
+        if subscription.subscription_type == 'upsell' and subscription.date_next_invoice <= max(subscription.date_first_contract or today, today):
+            raise UserError("You cannot create an upsell for this subscription because it:\n"
+                            "- Has not started yet.\n"
+                            "- Has no invoiced period in the future.")
+    
+        order_lines = subscription.order_line._get_renew_order_values(subscription, period_end=subscription.date_next_invoice)    
+        if subscription.subscription_type == 'upsell':
+            date_start = today
+            date_next_invoice = subscription.date_next_invoice
+        else:
+            date_start = subscription.date_next_invoice
+            date_next_invoice = subscription.date_next_invoice  # The next invoice date is the start_date for new contract
+    
+        return {
+            'subscription_order': True,
+            'parent_subscription_id': subscription.id,
+            'pricelist_id': subscription.pricelist_id.id,
+            'partner_id': subscription.partner_id.id,
+            'partner_invoice_id': subscription.partner_invoice_id.id,
+            'partner_shipping_id': subscription.partner_shipping_id.id,
+            'order_line': order_lines,
+            'analytic_account_id': subscription.analytic_account_id.id,
+            'subscription_type': subscription_type,
+            'origin': subscription.client_order_ref,
+            'client_order_ref': subscription.client_order_ref,
+            'note': subscription.note,
+            'user_id': subscription.user_id.id,
+            'payment_term_id': subscription.payment_term_id.id,
+            'company_id': subscription.company_id.id,
+            'date_start': date_start,
+            'date_next_invoice': date_next_invoice,
+            'subscription_plan_id': subscription.subscription_plan_id.id,
+        }
+
+    @api.model
+    def _get_associated_so_action(self, order):
+        return {
+                'name': order.subscription_type,
+                'view_mode': 'form',
+                'res_model': 'sale.order',
+                'res_id': order.id,
+                'type': 'ir.actions.act_window',
+            }
     # =========================================================
-    # Crone Jobs =========================
+    # ==================== Crone Jobs =========================
     # =========================================================
     def _cron_expire_subscription_orders(self):
         # Flush models according to following SQL requests
@@ -451,158 +549,4 @@ class SubscriptionOrder(models.Model):
 
     def _create_recurring_invoice(self, batch_size=30):
         today = fields.Date.today()
-        #auto_commit = not bool(config['test_enable'] or config['test_file'])
-        grouped_invoice = True #self.env['ir.config_parameter'].get_param('sale_subscription.invoice_consolidation', False)
-        all_subscriptions, need_cron_trigger = self._recurring_invoice_get_subscriptions(grouped=grouped_invoice, batch_size=batch_size)
-        if not all_subscriptions:
-            return self.env['account.move']
-
-        # We mark current batch as having been seen by the cron
-        all_invoiceable_lines = self.env['sale.order.line']
-        for subscription in all_subscriptions:
-            #subscription.is_invoice_cron = True
-            # Don't spam sale with assigned emails.
-            subscription = subscription.with_context(mail_auto_subscribe_no_notify=True)
-            # Close ending subscriptions
-            auto_close_subscription = subscription.filtered_domain([('date_end', '!=', False)])
-            #closed_contract = auto_close_subscription._subscription_auto_close()
-            #subscription -= closed_contract
-            all_invoiceable_lines += subscription.with_context(recurring_automatic=True)._get_invoiceable_lines()
-
-        lines_to_reset_qty = self.env['sale.order.line']
-        account_moves = self.env['account.move']
-        move_to_send_ids = []
-        # Set quantity to invoice before the invoice creation. If something goes wrong, the line will appear as "to invoice"
-        # It prevents the use of _compute method and compare the today date and the next_invoice_date in the compute which would be bad for perfs
-        all_invoiceable_lines._reset_subscription_qty_to_invoice()
-        #self._subscription_commit_cursor(auto_commit)
-        for subscription in all_subscriptions:
-            if len(subscription) == 1:
-                subscription = subscription[0]  # Trick to not prefetch other subscriptions is all_subscription is recordset, as the cache is currently invalidated at each iteration
-
-            # We check that the subscription should not be processed or that it has not already been set to "in exception" by previous cron failure
-            # We only invoice contract in sale state. Locked contracts are invoiced in advance. They are frozen.
-            subscription = subscription.filtered(lambda sub: sub.subscription_status == 'progress')
-            if not subscription:
-                continue
-            try:
-                self._subscription_commit_cursor(auto_commit)  # To avoid a rollback in case something is wrong, we create the invoices one by one
-                draft_invoices = subscription.invoice_ids.filtered(lambda am: am.state == 'draft')
-                if subscription.payment_token_id and draft_invoices:
-                    draft_invoices.button_cancel()
-                elif draft_invoices:
-                    # Skip subscription if no payment_token, and it has a draft invoice
-                    continue
-                invoiceable_lines = all_invoiceable_lines.filtered(lambda l: l.order_id.id in subscription.ids)
-                invoice_is_free, is_exception = subscription._invoice_is_considered_free(invoiceable_lines)
-                if not invoiceable_lines or invoice_is_free:
-                    if is_exception:
-                        for sub in subscription:
-                            # Mix between recurring and non-recurring lines. We let the contract in exception, it should be
-                            # handled manually
-                            msg_body = _(
-                                "Mix of negative recurring lines and non-recurring line. The contract should be fixed manually",
-                                inv=sub.next_invoice_date
-                            )
-                            sub.message_post(body=msg_body)
-                        subscription.payment_exception = True
-                    # We still update the next_invoice_date if it is due
-                    elif subscription.next_invoice_date and subscription.next_invoice_date <= today:
-                        subscription._update_next_invoice_date()
-                        if invoice_is_free:
-                            for line in invoiceable_lines:
-                                line.qty_invoiced = line.product_uom_qty
-                            subscription._subscription_post_success_free_renewal()
-                    continue
-
-                try:
-                    invoice = subscription.with_context(recurring_automatic=True)._create_invoices(final=True)
-                    lines_to_reset_qty |= invoiceable_lines
-                except Exception as e:
-                    # We only raise the error in test, if the transaction is broken we should raise the exception
-                    #if not auto_commit and isinstance(e, TransactionRollbackError):
-                    #    raise
-                    # we suppose that the payment is run only once a day
-                    #self._subscription_rollback_cursor(auto_commit)
-                    for sub in subscription:
-                        email_context = sub._get_subscription_mail_payment_context()
-                        error_message = _("Error during renewal of contract %s (Payment not recorded)", sub.name)
-                        _logger.exception(error_message)
-                        body = self._get_traceback_body(e, error_message)
-                        mail = self.env['mail.mail'].sudo().create(
-                            {'body_html': body, 'subject': error_message,
-                             'email_to': email_context['responsible_email'], 'auto_delete': True})
-                        mail.send()
-                    continue
-                self._subscription_commit_cursor(auto_commit)
-                # Handle automatic payment or invoice posting
-
-                #existing_invoices = subscription.with_context(recurring_automatic=True)._handle_automatic_invoices(invoice, auto_commit) or self.env['account.move']
-                account_moves |= existing_invoices
-                #subscription.with_context(mail_notrack=True).payment_exception = False
-                if not subscription.mapped('payment_token_id'): # _get_auto_invoice_grouping_keys groups by token too
-                    move_to_send_ids += existing_invoices.ids
-            except Exception:
-                name_list = [f"{sub.name} {sub.client_order_ref}" for sub in subscription]
-                _logger.exception("Error during renewal of contract %s", "; ".join(name_list))
-                #self._subscription_rollback_cursor(auto_commit)
-        #self._subscription_commit_cursor(auto_commit)
-        self._process_invoices_to_send(self.env['account.move'].browse(move_to_send_ids))
-        # There is still some subscriptions to process. Then, make sure the CRON will be triggered again asap.
-        if need_cron_trigger:
-            self._subscription_launch_cron_parallel(batch_size)
-        else:
-            self.env['sale.order']._post_invoice_hook()
-            #failing_subscriptions = self.search([('is_batch', '=', True)])
-            #failing_subscriptions.write({'is_batch': False})
-
-        return account_moves
-
-    def _recurring_invoice_get_subscriptions(self, grouped=False, batch_size=30):
-        """ Return a boolean and an iterable of recordsets.
-        The boolean is true if batch_size is smaller than the number of remaining records
-        If grouped, each recordset contains SO with the same grouping keys.
-        """
-        need_cron_trigger = False
-        if self:
-            domain = [('id', 'in', self.ids), ('subscription_status', 'in', SUBSCRIPTION_PROGRESS_STATUS)]
-            batch_size = False
-        else:
-            domain = self._recurring_invoice_domain()
-            batch_size = batch_size and batch_size + 1
-
-        #if grouped:
-        #    all_subscriptions = self.read_group(
-        #        domain,
-        #        ['id:array_agg'],
-        #        self._get_auto_invoice_grouping_keys(),
-        #        limit=batch_size, lazy=False)
-        #    all_subscriptions = [self.browse(res['id']) for res in all_subscriptions]
-        #else:
-        all_subscriptions = self.search(domain, limit=batch_size)
-    
-        if batch_size:
-            need_cron_trigger = len(all_subscriptions) > batch_size
-            all_subscriptions = all_subscriptions[:batch_size]
-
-        return all_subscriptions, need_cron_trigger
-    
-    def _recurring_invoice_domain(self, extra_domain=None):
-        if not extra_domain:
-            extra_domain = []
-        current_date = fields.Date.today()
-        search_domain = [
-                        
-                         ('subscription_order', '=', True),
-                         ('subscription_status', '=', 'progress'),
-                         '|', ('date_next_invoice', '<=', current_date), ('date_end', '<=', current_date)]
-        if extra_domain:
-            search_domain = expression.AND([search_domain, extra_domain])
-        return search_domain
-
-    def _subscription_commit_cursor(self, auto_commit):
-        if auto_commit:
-            self.env.cr.commit()
-        else:
-            self.env.flush_all()
-            self.env.cr.flush()
+        
