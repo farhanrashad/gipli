@@ -51,7 +51,7 @@ class OperationWizard(models.TransientModel):
             renew_msg_body = self._get_order_digest(origin=self.op_type, lang=lang)
             action = self._prepare_new_subscription_order(renew_msg_body)
 
-        if self.op_type == 'renewal':
+        if self.op_type in ('renewal','revised'):
             subscription_id.write({
                 'subscription_status': 'close',
                 'sub_close_reason_id': self.sub_close_reason_id.id,
