@@ -7,6 +7,8 @@ from odoo.tools import float_compare, format_datetime, format_time
 from pytz import timezone, UTC
 from odoo.exceptions import UserError, ValidationError
 from dateutil.relativedelta import relativedelta
+from odoo.tools import relativedelta, format_date
+
 
 INTERVAL_FACTOR = {
     'day': 30.437,  # average number of days per month over the year,
@@ -56,7 +58,47 @@ class SubscriptionOrderLine(models.Model):
                 line.parent_subscription_line_id = False
                 
 
+
     def _get_renew_order_values(self, subscription_id, period_end=None):
+        order_lines = []
+        description_needed = False
+        today = fields.Date.today()
+    
+        for line in self:
+            partner_lang = line.order_id.partner_id.lang
+            line = line.with_context(lang=partner_lang) if partner_lang else line
+            product = line.product_id
+            order_lines.append((0, 0, {
+                'parent_subscription_line_id': line.id,
+                'name': line.name,
+                'product_id': product.id,
+                'product_uom': line.product_uom.id,
+                'product_uom_qty': 0 if subscription_id.subscription_type == 'upsell' else line.product_uom_qty,
+                'price_unit': line.price_unit,
+            }))
+            description_needed = True
+    
+        if subscription_id.subscription_type == 'upsell' and description_needed and period_end:
+            start_date = max(today, line.order_id.first_contract_date or today)
+            end_date = period_end - relativedelta(days=1)
+            if start_date >= end_date:
+                line_name = _('Recurring products are entirely discounted as the next period has not been invoiced yet.')
+            else:
+                format_start = format_date(self.env, start_date)
+                format_end = format_date(self.env, end_date)
+                line_name = _('Recurring products are discounted according to the prorated period from %s to %s') % (format_start, format_end)
+    
+            order_lines.append((0, 0, {
+                'display_type': 'line_note',
+                'sequence': 999,
+                'name': line_name,
+                'product_uom_qty': 0
+            }))
+    
+        return order_lines
+
+    
+    def _get_renew_order_values1(self, subscription_id, period_end=None):
         order_lines = []
         description_needed = False #self._need_renew_discount_info()
         today = fields.Date.today()
