@@ -15,7 +15,6 @@ class OperationWizard(models.TransientModel):
     ], 
         string='Operation', required=True, default="renewal",
     )
-    subscription_close = fields.Boolean('Close', default=True)
     sub_close_reason_id = fields.Many2one('sale.sub.close.reason', string='Close Reason', ondelete='restrict', copy=False)
 
     subscription_id = fields.Many2one('sale.order', string='Subscription', copy=False, readonly=True)
@@ -51,12 +50,19 @@ class OperationWizard(models.TransientModel):
             renew_msg_body = self._get_order_digest(origin=self.op_type, lang=lang)
             action = self._prepare_new_subscription_order(renew_msg_body)
 
-        if self.op_type in ('renewal','revised'):
+            if self.op_type in ('renewal','revised'):
+                subscription_id.write({
+                    'subscription_status': 'close',
+                    'sub_close_reason_id': self.sub_close_reason_id.id,
+                })
+            return action
+            
+        else:
             subscription_id.write({
-                'subscription_status': 'close',
-                'sub_close_reason_id': self.sub_close_reason_id.id,
-            })
-        return action
+                    'subscription_status': 'close',
+                    'sub_close_reason_id': self.sub_close_reason_id.id,
+                })
+        
 
     def _get_order_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
         self.ensure_one()

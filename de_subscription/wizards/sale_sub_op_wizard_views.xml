@@ -6,24 +6,36 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <label for="op_type"/>
-                    <div id="operation">
-                        <field name="op_type" class="oe_inline"/>
-                    </div>
-                </group>
-                
-                <group>
                    <group>
-                       <field name="subscription_id" />
-                       <field name="subscription_close" />
+                       <label for="op_type"/>
+                        <div id="operation">
+                            <field name="op_type" />
+                        </div>
+                       
+                       <field name="subscription_id" invisible="1"/>
                    </group>
                     <group>
                     </group>
-                    <div name="close_reason">
-                        <span class="ml8">
-                            <field name="sub_close_reason_id" nolabel="1" />
-                        </span>
-                    </div>
+                        <label for="sub_close_reason_id" 
+                            string="Renewal Reason"
+                            invisible="op_type != 'renewal'"
+                        />
+                        <label for="sub_close_reason_id" 
+                            string="Closed Reason"
+                            invisible="op_type != 'close'"
+                        />
+                        <label for="sub_close_reason_id" 
+                            string="Revised Reason"
+                            invisible="op_type != 'revised'"
+                        />
+                        <div name="close_reason">
+                            <span class="ml8">
+                                <field name="sub_close_reason_id" 
+                                    nolabel="1"
+                                    required="op_type in ('renewal','close','revised')"
+                                />
+                            </span>
+                        </div>
                 </group>
                 <footer>
                     <button name="run_process" string="Process" type="object" class="btn-primary"/>
