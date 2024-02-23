@@ -7,6 +7,10 @@ from odoo.tools import float_compare, format_datetime, format_time
 from pytz import timezone, UTC
 from odoo.exceptions import UserError, ValidationError
 from dateutil.relativedelta import relativedelta
+import logging
+
+_logger = logging.getLogger(__name__)
+
 
 SUBSCRIPTION_DRAFT_STATUS = ['draft']
 SUBSCRIPTION_PROGRESS_STATUS = ['progress']
@@ -417,7 +421,7 @@ class SubscriptionOrder(models.Model):
         expired_result = self._get_expired_subscriptions()
         expired_ids = [r['so_id'] for r in expired_result]
         subscriptions_close |= self.env['sale.order'].browse(unpaid_ids) | self.env['sale.order'].browse(expired_ids)
-        auto_commit = not bool(config['test_enable'] or config['test_file'])
+        #auto_commit = not bool(config['test_enable'] or config['test_file'])
         #expired_close_reason = self.env.ref('de_subscription.close_reason_auto_close_limit_reached')
         unpaid_close_reason = self.env.ref('de_subscription.close_reason_unpaid_subscription')
         for batched_to_close in split_every(30, subscriptions_close.ids, self.env['sale.order'].browse):
@@ -438,21 +442,17 @@ class SubscriptionOrder(models.Model):
             unpaid_so.set_close(close_reason_id=unpaid_close_reason.id)
             expired_so.set_close(close_reason_id=expired_close_reason.id)
             (batched_to_close - unpaid_so - expired_so).set_close()
-            if auto_commit:
-                self.env.cr.commit()
+            #if auto_commit:
+            #    self.env.cr.commit()
         return dict(closed=subscriptions_close.ids)
 
     def _cron_create_subscription_invoice(self):
-        deferred_account = self.env.company.deferred_revenue_account_id
-        deferred_journal = self.env.company.deferred_journal_id
-        if not deferred_account or not deferred_journal:
-            raise ValidationError(_("The deferred settings are not properly set. Please complete them to generate subscription deferred revenues"))
         return self._create_recurring_invoice()
 
     def _create_recurring_invoice(self, batch_size=30):
         today = fields.Date.today()
-        auto_commit = not bool(config['test_enable'] or config['test_file'])
-        grouped_invoice = self.env['ir.config_parameter'].get_param('sale_subscription.invoice_consolidation', False)
+        #auto_commit = not bool(config['test_enable'] or config['test_file'])
+        grouped_invoice = True #self.env['ir.config_parameter'].get_param('sale_subscription.invoice_consolidation', False)
         all_subscriptions, need_cron_trigger = self._recurring_invoice_get_subscriptions(grouped=grouped_invoice, batch_size=batch_size)
         if not all_subscriptions:
             return self.env['account.move']
@@ -460,13 +460,13 @@ class SubscriptionOrder(models.Model):
         # We mark current batch as having been seen by the cron
         all_invoiceable_lines = self.env['sale.order.line']
         for subscription in all_subscriptions:
-            subscription.is_invoice_cron = True
+            #subscription.is_invoice_cron = True
             # Don't spam sale with assigned emails.
             subscription = subscription.with_context(mail_auto_subscribe_no_notify=True)
             # Close ending subscriptions
-            auto_close_subscription = subscription.filtered_domain([('end_date', '!=', False)])
-            closed_contract = auto_close_subscription._subscription_auto_close()
-            subscription -= closed_contract
+            auto_close_subscription = subscription.filtered_domain([('date_end', '!=', False)])
+            #closed_contract = auto_close_subscription._subscription_auto_close()
+            #subscription -= closed_contract
             all_invoiceable_lines += subscription.with_context(recurring_automatic=True)._get_invoiceable_lines()
 
         lines_to_reset_qty = self.env['sale.order.line']
@@ -475,14 +475,14 @@ class SubscriptionOrder(models.Model):
         # Set quantity to invoice before the invoice creation. If something goes wrong, the line will appear as "to invoice"
         # It prevents the use of _compute method and compare the today date and the next_invoice_date in the compute which would be bad for perfs
         all_invoiceable_lines._reset_subscription_qty_to_invoice()
-        self._subscription_commit_cursor(auto_commit)
+        #self._subscription_commit_cursor(auto_commit)
         for subscription in all_subscriptions:
             if len(subscription) == 1:
                 subscription = subscription[0]  # Trick to not prefetch other subscriptions is all_subscription is recordset, as the cache is currently invalidated at each iteration
 
             # We check that the subscription should not be processed or that it has not already been set to "in exception" by previous cron failure
             # We only invoice contract in sale state. Locked contracts are invoiced in advance. They are frozen.
-            subscription = subscription.filtered(lambda sub: sub.subscription_state == '3_progress' and not sub.payment_exception)
+            subscription = subscription.filtered(lambda sub: sub.subscription_status == 'progress')
             if not subscription:
                 continue
             try:
@@ -520,10 +520,10 @@ class SubscriptionOrder(models.Model):
                     lines_to_reset_qty |= invoiceable_lines
                 except Exception as e:
                     # We only raise the error in test, if the transaction is broken we should raise the exception
-                    if not auto_commit and isinstance(e, TransactionRollbackError):
-                        raise
+                    #if not auto_commit and isinstance(e, TransactionRollbackError):
+                    #    raise
                     # we suppose that the payment is run only once a day
-                    self._subscription_rollback_cursor(auto_commit)
+                    #self._subscription_rollback_cursor(auto_commit)
                     for sub in subscription:
                         email_context = sub._get_subscription_mail_payment_context()
                         error_message = _("Error during renewal of contract %s (Payment not recorded)", sub.name)
@@ -537,23 +537,72 @@ class SubscriptionOrder(models.Model):
                 self._subscription_commit_cursor(auto_commit)
                 # Handle automatic payment or invoice posting
 
-                existing_invoices = subscription.with_context(recurring_automatic=True)._handle_automatic_invoices(invoice, auto_commit) or self.env['account.move']
+                #existing_invoices = subscription.with_context(recurring_automatic=True)._handle_automatic_invoices(invoice, auto_commit) or self.env['account.move']
                 account_moves |= existing_invoices
-                subscription.with_context(mail_notrack=True).payment_exception = False
+                #subscription.with_context(mail_notrack=True).payment_exception = False
                 if not subscription.mapped('payment_token_id'): # _get_auto_invoice_grouping_keys groups by token too
                     move_to_send_ids += existing_invoices.ids
             except Exception:
                 name_list = [f"{sub.name} {sub.client_order_ref}" for sub in subscription]
                 _logger.exception("Error during renewal of contract %s", "; ".join(name_list))
-                self._subscription_rollback_cursor(auto_commit)
-        self._subscription_commit_cursor(auto_commit)
+                #self._subscription_rollback_cursor(auto_commit)
+        #self._subscription_commit_cursor(auto_commit)
         self._process_invoices_to_send(self.env['account.move'].browse(move_to_send_ids))
         # There is still some subscriptions to process. Then, make sure the CRON will be triggered again asap.
         if need_cron_trigger:
             self._subscription_launch_cron_parallel(batch_size)
         else:
             self.env['sale.order']._post_invoice_hook()
-            failing_subscriptions = self.search([('is_batch', '=', True)])
-            failing_subscriptions.write({'is_batch': False})
+            #failing_subscriptions = self.search([('is_batch', '=', True)])
+            #failing_subscriptions.write({'is_batch': False})
 
         return account_moves
+
+    def _recurring_invoice_get_subscriptions(self, grouped=False, batch_size=30):
+        """ Return a boolean and an iterable of recordsets.
+        The boolean is true if batch_size is smaller than the number of remaining records
+        If grouped, each recordset contains SO with the same grouping keys.
+        """
+        need_cron_trigger = False
+        if self:
+            domain = [('id', 'in', self.ids), ('subscription_status', 'in', SUBSCRIPTION_PROGRESS_STATUS)]
+            batch_size = False
+        else:
+            domain = self._recurring_invoice_domain()
+            batch_size = batch_size and batch_size + 1
+
+        #if grouped:
+        #    all_subscriptions = self.read_group(
+        #        domain,
+        #        ['id:array_agg'],
+        #        self._get_auto_invoice_grouping_keys(),
+        #        limit=batch_size, lazy=False)
+        #    all_subscriptions = [self.browse(res['id']) for res in all_subscriptions]
+        #else:
+        all_subscriptions = self.search(domain, limit=batch_size)
+    
+        if batch_size:
+            need_cron_trigger = len(all_subscriptions) > batch_size
+            all_subscriptions = all_subscriptions[:batch_size]
+
+        return all_subscriptions, need_cron_trigger
+    
+    def _recurring_invoice_domain(self, extra_domain=None):
+        if not extra_domain:
+            extra_domain = []
+        current_date = fields.Date.today()
+        search_domain = [
+                        
+                         ('subscription_order', '=', True),
+                         ('subscription_status', '=', 'progress'),
+                         '|', ('date_next_invoice', '<=', current_date), ('date_end', '<=', current_date)]
+        if extra_domain:
+            search_domain = expression.AND([search_domain, extra_domain])
+        return search_domain
+
+    def _subscription_commit_cursor(self, auto_commit):
+        if auto_commit:
+            self.env.cr.commit()
+        else:
+            self.env.flush_all()
+            self.env.cr.flush()
