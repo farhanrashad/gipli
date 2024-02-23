@@ -393,3 +393,54 @@ class SubscriptionOrder(models.Model):
                 invoice.message_subscribe(subscription.user_id.partner_id.ids)
             elif invoice.line_ids.subscription_id:
                 invoice.message_subscribe(invoice.line_ids.subscription_id.user_id.partner_id.ids)
+
+    # =========================================================
+    # Crone Jobs =========================
+    # =========================================================
+    def _cron_expire_subscription_orders(self):
+        # Flush models according to following SQL requests
+        self.env['sale.order'].flush_model(
+            fnames=['order_line', 'subscription_plan_id', 'state', 'subscription_status', 'date_next_invoice'])
+        self.env['account.move'].flush_model(fnames=['payment_state', 'line_ids'])
+        self.env['account.move.line'].flush_model(fnames=['move_id', 'sale_line_ids'])
+        self.env['sale.subscription.plan'].flush_model(fnames=['auto_close_limit'])
+        today = fields.Date.today()
+        # set to close if date is passed or if renewed sale order passed
+        domain_close = [
+            ('subscription_order', '=', True),
+            ('date_end', '<', today),
+            ('state', '=', 'sale'),
+            ('subscription_status', 'in', SUBSCRIPTION_PROGRESS_STATUS)]
+        subscriptions_close = self.search(domain_close)
+        unpaid_results = self._handle_unpaid_subscriptions()
+        unpaid_ids = unpaid_results.keys()
+        expired_result = self._get_expired_subscriptions()
+        expired_ids = [r['so_id'] for r in expired_result]
+        subscriptions_close |= self.env['sale.order'].browse(unpaid_ids) | self.env['sale.order'].browse(expired_ids)
+        auto_commit = not bool(config['test_enable'] or config['test_file'])
+        expired_close_reason = self.env.ref('de_subscription.close_reason_auto_close_limit_reached')
+        unpaid_close_reason = self.env.ref('de_subscription.close_reason_unpaid_subscription')
+        for batched_to_close in split_every(30, subscriptions_close.ids, self.env['sale.order'].browse):
+            unpaid_so = self.env['sale.order']
+            expired_so = self.env['sale.order']
+            for so in batched_to_close:
+                if so.id in unpaid_ids:
+                    unpaid_so |= so
+                    account_move = self.env['account.move'].browse(unpaid_results[so.id])
+                    so.message_post(
+                        body=_("The last invoice (%s) of this subscription is unpaid after the due date.",
+                               account_move._get_html_link()),
+                        partner_ids=so.team_user_id.partner_id.ids,
+                    )
+                elif so.id in expired_ids:
+                    expired_so |= so
+
+            unpaid_so.set_close(close_reason_id=unpaid_close_reason.id)
+            expired_so.set_close(close_reason_id=expired_close_reason.id)
+            (batched_to_close - unpaid_so - expired_so).set_close()
+            if auto_commit:
+                self.env.cr.commit()
+        return dict(closed=subscriptions_close.ids)
+
+    def _cron_create_subscription_invoice(self):
+        pass
