@@ -35,6 +35,9 @@ class SocialPost(models.Model):
     channel_allowed_ids = fields.Many2many('sm.channel', string='Allowed Accounts', compute='_compute_channels',
                                            help='List of the channels which can be selected for this post.')
 
+    social_media_ids = fields.Many2many('sm.media', compute='_compute_media_ids', store=True,
+        help="The social medias linked to the selected social accounts.")
+    
     date_scheduled = fields.Datetime('Scheduled Date')
     date_published = fields.Datetime('Published Date', readonly=True,
         help="When the global post was published. The actual sub-posts published dates may be different depending on the media.")
@@ -58,6 +61,11 @@ class SocialPost(models.Model):
             post.channel_allowed_ids = all_channel_ids
 
 
+    @api.depends('channel_ids.social_media_id')
+    def _compute_media_ids(self):
+        for post in self:
+            post.social_media_ids = post.with_context(active_test=False).channel_ids.mapped('social_media_id')
+            
     # Action Buttons
     def action_post(self):
         pass
