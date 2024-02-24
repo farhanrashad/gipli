@@ -38,10 +38,6 @@ class SocialPost(models.Model):
 
     social_media_ids = fields.Many2many('sm.media', compute='_compute_media_ids', store=True,
         help="The social medias linked to the selected social accounts.")
-    
-    date_scheduled = fields.Datetime('Scheduled Date')
-    date_published = fields.Datetime('Published Date', readonly=True,
-        help="When the global post was published. The actual sub-posts published dates may be different depending on the media.")
 
     method_publish = fields.Selection([
         ('now', 'Publish now'),
@@ -49,6 +45,12 @@ class SocialPost(models.Model):
         ('pipeline', 'Pipeline'),
     ], string="When", default='now', required=True,
         help="Publish your post immediately or schedule it at a later time.")
+    
+    date_scheduled = fields.Datetime('Scheduled Date')
+    date_published = fields.Datetime('Published Date', readonly=True,
+        help="When the global post was published. The actual sub-posts published dates may be different depending on the media.")
+
+    
     
     @api.depends('company_id')
     def _compute_channels(self):

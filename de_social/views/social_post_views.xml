@@ -7,10 +7,10 @@
             <form string="Social Post">
                 <header>
                     <button name="action_post" string="Post Now" type="object" class="oe_highlight"
-                            invisible="state != 'draft'"
+                            invisible="state != 'draft' or method_publish != 'now' "
                     />
                     <button name="action_schedule" string="Schedule" type="object" class="oe_highlight"
-                            invisible="state != 'draft' "
+                            invisible="state != 'draft' or method_publish != 'scheduled'"
                             data-hotkey="q" 
                     />
                     <field name="state" widget="statusbar"/>
@@ -24,20 +24,31 @@
                                 options="{'no_create': True}" 
                                 string="Post on" 
                                 widget="many2many_checkboxes"
+                                readonly="state != 'draft'"
                             />
-                            <field name="message" widget="text_emojis" class="o_social_post_message_wrapper"
-                                onchange_on_keydown="True" force_save="1" default_focus="1"
-                                   required="True">
-                            </field>
-                            <field name="image_ids" widget="many2many_binary" class="o_social_post_form_attachments"/>
-                            <field name="method_publish" widget="radio" invisible="state != 'draft'"/>
+                            <field name="message" widget="text_emojis" 
+                                readonly="state != 'draft'"
+                            />
+                            <field name="image_ids" 
+                                widget="many2many_binary" 
+                                class="o_social_post_form_attachments"
+                                readonly="state != 'draft'"
+                            />
+                            <field name="method_publish" widget="radio" 
+                                readonly="state != 'draft'"
+                            />
                             <field name="date_scheduled"
                                 invisible="method_publish != 'scheduled'"
                                 required="method_publish == 'scheduled'"
                             />
+                            <field name="company_id" 
+                                options="{'no_create': True}" 
+                                groups="base.group_multi_company"
+                                readonly="state != 'draft'"
+                            />
                         </group>
                         <group>
-                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                            
                         </group>
                     </group>
                 </sheet>
@@ -96,6 +107,8 @@
                                     </t>
                                 </div>
                                 <div>
+                                    <field name="state" widget="label_selection" options="{'classes': {'draft': 'info', 'scheduled': 'primary', 'posted': 'success'}}"/>
+
                                 </div>
                             </div>
 
