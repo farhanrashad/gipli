@@ -32,6 +32,7 @@ Social Media Management
         'views/social_menu.xml',
         'views/social_media_views.xml',
         'views/social_channel_views.xml',
+        'views/social_post_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

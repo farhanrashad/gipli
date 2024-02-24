@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="social_post_form_view" model="ir.ui.view">
+        <field name="name">sm.post.form.view</field>
+        <field name="model">sm.post</field>
+        <field name="arch" type="xml">
+            <form string="Social Post">
+                <header>
+                    <button name="action_post" string="Post Now" type="object" class="oe_highlight"
+                            invisible="state != 'draft'"
+                    />
+                    <button name="action_schedule" string="Schedule" type="object" class="oe_highlight"
+                            invisible="state != 'draft' "
+                            data-hotkey="q" 
+                    />
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <field name="channel_allowed_ids" invisible="1" />
+                    
+                    <group>
+                        <group>
+                            <field name="channel_ids" 
+                                options="{'no_create': True}" 
+                                string="Post on" 
+                                widget="many2many_checkboxes"
+                            />
+                            <field name="message" widget="text_emojis" class="o_social_post_message_wrapper"
+                                onchange_on_keydown="True" force_save="1" default_focus="1"
+                                   required="True">
+                            </field>
+                            <field name="image_ids" widget="many2many_binary" class="o_social_post_form_attachments"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="social_post_tree_view" model="ir.ui.view">
+      <field name="name">social.post.tree.view</field>
+      <field name="model">sm.post</field>
+      <field name="arch" type="xml">
+        <tree sample="1" >
+            <field name="state" />
+        </tree>
+      </field>
+    </record>
+    
+    
+    
+    <record id="action_social_post" model="ir.actions.act_window">
+        <field name="name">Social Post</field>
+        <field name="res_model">sm.post</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new social post
+            </p>
+        </field>
+    </record>
+
+    <menuitem name="Posts" id="menu_social_publishing_posts"
+                    parent="menu_social_publishing" action="action_social_post"
+                   sequence="1"/>
+    
+</odoo>
