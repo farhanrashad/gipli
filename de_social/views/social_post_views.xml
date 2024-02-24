@@ -79,7 +79,7 @@
         <field name="name">social.post.calendar.view</field>
         <field name="model">sm.post</field>
         <field name="arch" type="xml">
-            <calendar string="Social Posts" date_start="date_scheduled" color="channel_ids" quick_create="1" mode="month">
+            <calendar string="Social Posts" date_start="date_scheduled" color="channel_ids" quick_create="0" mode="month">
                 <field name="message"/>
             </calendar>
         </field>

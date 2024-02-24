@@ -35,7 +35,10 @@
       <field name="model">sm.channel</field>
       <field name="arch" type="xml">
         <tree sample="1" >
-          <field name="name" />
+            <field name="name" />
+            <field name="name_handle" />
+            <field name="social_media_id" options="{'no_create': True}" />
+            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
         </tree>
       </field>
     </record>

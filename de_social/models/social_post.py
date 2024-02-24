@@ -56,7 +56,18 @@ class SocialPost(models.Model):
     date_published = fields.Datetime('Published Date', readonly=True,
         help="When the global post was published. The actual sub-posts published dates may be different depending on the media.")
 
-    
+
+    @api.model
+    def default_get(self, fields):
+        result = super(SocialPost, self).default_get(fields)
+        default_date_scheduled = self.env.context.get('default_date_scheduled')
+        if default_date_scheduled and ('method_publish' in fields or 'date_scheduled' in fields):
+            result.update({
+                'method_publish': 'scheduled',
+                'date_scheduled': default_date_scheduled
+            })
+        return result
+        
     
     @api.depends('company_id')
     def _compute_channels(self):
