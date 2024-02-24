@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError, ValidationError
 
 SOCIAL_STATE = [
     ('draft', 'Draft'), 
@@ -67,10 +68,21 @@ class SocialPost(models.Model):
             post.social_media_ids = post.with_context(active_test=False).channel_ids.mapped('social_media_id')
             
     # Action Buttons
+    def unlink(self):
+        for post in self:
+            if post.state != 'draft':
+                raise UserError("You can only delete posts in draft stage.")
     def action_post(self):
-        pass
+        self.write({
+            'method_publish': 'now',
+            'date_scheduled': False,
+            'state': 'posted',
+        })
 
     def action_schedule(self):
+        self.write({'state': 'scheduled'})
+        
+    def action_schedule1(self):
         self.ensure_one()
         return {
             'name': 'Schedule Post',

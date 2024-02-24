@@ -106,25 +106,7 @@
                                     <field name="message" widget="social_post_formatter"/>
                                 </div>
 
-                                <div t-if="has_attachments"
-                                    class="o_social_stream_post_image d-flex mx-n3 overflow-hidden"
-                                    t-att-data-images="record.image_urls.raw_value">
-                                    <t t-set="image_urls_json" t-value="JSON.parse(record.image_urls.raw_value || '[]')"/>  <!-- fallback on '[]' necessary as unset in sample mode -->
-
-                                    <t t-foreach="image_urls_json.length > 2 ? image_urls_json.slice(0, 2) : image_urls_json" t-as="image_url" t-key="image_url_index">
-                                        <t t-if="image_url_index == 1 &amp; record.image_ids.raw_value.length > 2">
-                                            <a class="o_social_stream_post_image_more position-relative d-flex ms-1"
-                                               t-att-data-index="image_url_index" t-att-data-image-urls="image_urls_json">
-                                                <img t-att-src="image_urls_json[1]" alt="Post Image" />
-                                                <div class="o_social_stream_post_image_more_overlay d-flex align-items-center h-100 w-100 text-white justify-content-center position-absolute h1 m-0" style="user-select: none;">
-                                                    +<t t-esc="image_urls_json.length - 2"/>
-                                                </div>
-                                            </a>
-                                        </t>
-                                        <img t-else="" class="o_social_stream_post_image_more" t-att-src="image_url" alt="Post Image"
-                                             t-att-data-index="image_url_index" t-att-data-image-urls="image_urls_json"/>
-                                    </t>
-                                </div>
+                                
                             </div>
                             <div id="post-stats" class="bg-100 px-3 py-1 border-bottom">
                                 
@@ -150,6 +132,28 @@
             </kanban>
         </field>
     </record>
+
+    <record id="social_post_search_view" model="ir.ui.view">
+        <field name="name">social.post.search.view</field>
+        <field name="model">sm.post</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="message" string="Post Message"/>
+                <field name="create_uid" string="Published By"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <filter name="filter_my_posts" string="My Posts" domain="[('create_uid','=',uid)]"/>
+                <searchpanel>
+                    <field name="state" icon="fa-tasks" enable_counters="1"/>
+                    <field name="channel_ids" select="multi" icon="fa-share-alt" enable_counters="1"/>
+                </searchpanel>
+                <group expand="1" string="Group By">
+                    <filter string="Publish Date" name="filter_publish_date" context="{'group_by':'date_published'}"/>
+                    <filter string="Company" name="filter_company_id" groups="base.group_multi_company" context="{'group_by':'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
     <record id="action_social_post" model="ir.actions.act_window">
         <field name="name">Social Post</field>
         <field name="res_model">sm.post</field>
