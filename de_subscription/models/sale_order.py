@@ -399,7 +399,7 @@ class SubscriptionOrder(models.Model):
                 invoice.message_subscribe(invoice.line_ids.subscription_id.user_id.partner_id.ids)
 
     # ==========================================================
-    # =================== Create Invoice =======================
+    # =================== Create Orders ========================
     # ==========================================================
 
     def _get_order_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
@@ -549,4 +549,13 @@ class SubscriptionOrder(models.Model):
 
     def _create_recurring_invoice(self, batch_size=30):
         today = fields.Date.today()
+        domain = [
+            ('subscription_order', '=', True),
+            ('date_next_invoice', '<=', today),
+            ('state', '=', 'sale'),
+            ('subscription_status', 'in', SUBSCRIPTION_PROGRESS_STATUS)]
+        subscriptions = self.env['sale.order'].search(domain)
+        #subscriptions = self.env['sale.order'].browse(328)
+        for order in subscriptions:
+            order._create_invoices()
         
