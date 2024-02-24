@@ -8,10 +8,10 @@ class SocialMedia(models.Model):
     _description = 'Social Media'
     _inherit = ['mail.thread']
 
-    name = fields.Char('Name', readonly=True, required=True, translate=True)
-    media_description = fields.Char('Description', readonly=True)
+    name = fields.Char('Name', required=True, translate=True)
+    description = fields.Char('Description', readonly=True)
     image = fields.Binary('Image', readonly=True)
-    active = fields.Boolean('Active')
+    active = fields.Boolean(default=True)
 
     def action_add_channel(self):
         pass

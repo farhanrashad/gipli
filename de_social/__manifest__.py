@@ -28,6 +28,7 @@ Social Media Management
     'data': [
         'security/social_security.xml',
         'security/ir.model.access.csv',
+        'data/social_data.xml',
         'views/social_menu.xml',
         'views/social_media_views.xml',
     ],

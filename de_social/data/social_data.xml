@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <data noupdate="1">
+        <record id="social_x" model="sm.media">
+            <field name="name">Twitter (X)</field>
+            <field name="active">True</field>
+            <field name="description">Manage your X channels and schedule tweets</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/x.png"/>
+        </record>
+
+        <record id="social_facebook" model="sm.media">
+            <field name="name">Facebook</field>
+            <field name="active">True</field>
+            <field name="description">Manage your facebook channels and schedule posts</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/facebook.png"/>
+        </record>
+
+        <record id="social_instagram" model="sm.media">
+            <field name="name">Instagram</field>
+            <field name="active">True</field>
+            <field name="description">Manage your instagram business channels and schedule posts</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/instagram.png"/>
+        </record>
+
+        <record id="social_threads" model="sm.media">
+            <field name="name">Threads</field>
+            <field name="active">True</field>
+            <field name="description">Manage your thread channels and schedule posts</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/threads.png"/>
+        </record>
+
+        <record id="social_linkedin" model="sm.media">
+            <field name="name">LinkedIn</field>
+            <field name="active">True</field>
+            <field name="description">Manage your LinkedIn channels and schedule posts</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/linkedin.png"/>
+        </record>
+
+        <record id="social_youtube" model="sm.media">
+            <field name="name">Youtube</field>
+            <field name="active">True</field>
+            <field name="description">Manage your youtube channels and schedule videos</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/youtube.png"/>
+        </record>
+
+        <record id="social_tiktok" model="sm.media">
+            <field name="name">TIK TOK</field>
+            <field name="active">True</field>
+            <field name="description">Manage your tiktok channels and schedule videos</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/tiktok.png"/>
+        </record>
+
+        <record id="social_pintrest" model="sm.media">
+            <field name="name">Pintrest</field>
+            <field name="active">True</field>
+            <field name="description">Manage your pintrest channels and schedule posts</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/pintrest.png"/>
+        </record>
+
+        <record id="social_mastodon" model="sm.media">
+            <field name="name">Mastodon</field>
+            <field name="active">True</field>
+            <field name="description">Manage your mastodon channels and schedule posts</field>
+            <field name="image" type="base64" file="de_social/static/description/icons/mastodon.png"/>
+        </record>
+        
+    </data>
+</odoo>
