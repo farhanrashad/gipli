@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top menu item -->
+    <menuitem name="Social"
+        id="menu_social_root"
+        groups="sales_team.group_sale_salesman"
+        web_icon="de_social,static/description/icon.png"
+        sequence="40" />
+
+    <menuitem id="menu_social_dashboard" name="Dashboard" parent="menu_social_root" sequence="1"/>
+    <menuitem id="menu_social_publishing" name="Publishing" parent="menu_social_root" sequence="5"/>
+    <menuitem id="menu_social_reports" name="Reports" parent="menu_social_root" sequence="90"/>
+    <menuitem id="menu_social_config" name="Configuration" parent="menu_social_root" sequence="90"/>
+    
+</odoo>
