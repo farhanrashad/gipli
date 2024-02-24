@@ -78,11 +78,14 @@ class SocialPost(models.Model):
         self.write({
             'method_publish': 'now',
             'date_scheduled': False,
+            'date_published': fields.datetime.now(),
             'state': 'posted',
         })
 
     def action_schedule(self):
-        self.write({'state': 'scheduled'})
+        self.write({
+            'state': 'scheduled'
+        })
         
     def action_schedule1(self):
         self.ensure_one()
