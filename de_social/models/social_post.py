@@ -16,6 +16,7 @@ class SocialPost(models.Model):
     ]
     _description = 'Social Post'
     _order = 'create_date desc'
+    _rec_name = 'message'
 
     message = fields.Text("Message")
     image_ids = fields.Many2many(

@@ -18,7 +18,8 @@
                     </div>
                     <group>
                         <group>
-                            
+                            <field name="name_handle" />
+                            <field name="social_media_id" options="{'no_create': True}" />
                         </group>
                         <group>
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
@@ -38,6 +39,7 @@
         </tree>
       </field>
     </record>
+
     
     <record id="action_social_channel" model="ir.actions.act_window">
         <field name="name">Social Channel</field>
