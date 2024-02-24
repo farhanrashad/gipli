@@ -14,7 +14,7 @@ class SocialMedia(models.Model):
     active = fields.Boolean(default=True)
 
     channel_ids = fields.One2many('sm.channel', 'social_media_id', string='Channels')
-    max_post_length = fields.Integer('Max Post Length',
+    limit_post_length = fields.Integer('Limit Post Length',
         help="Set a maximum number of characters can be posted in post. 0 for no limit.")
     
     def action_add_channel(self):
