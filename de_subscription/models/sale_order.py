@@ -555,6 +555,8 @@ class SubscriptionOrder(models.Model):
             ('state', '=', 'sale'),
             ('subscription_status', 'in', SUBSCRIPTION_PROGRESS_STATUS)]
         subscriptions = self.env['sale.order'].search(domain)
+        
+        #raise UserError(len(subscriptions))
         #subscriptions = self.env['sale.order'].browse(328)
         for order in subscriptions:
             order._create_invoices()
