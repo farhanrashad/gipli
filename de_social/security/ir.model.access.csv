@@ -7,3 +7,7 @@ access_social_channel_user,access.social.channel.user,model_sm_channel,group_sm_
 
 access_social_post_manager,access.social.post.manager,model_sm_post,group_sm_manager,1,1,1,1
 access_social_post_user,access.social.post.user,model_sm_post,group_sm_user,1,1,1,1
+
+
+access_sm_schedule_post_wizard_manager,access.sm.schedule.post.wizard.manager,model_sm_schedule_post_wizard,group_sm_manager,1,1,1,1
+access_sm_schedule_post_wizard_user,access.sm.schedule.post.wizard.user,model_sm_schedule_post_wizard,group_sm_user,1,1,1,1

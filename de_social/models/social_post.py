@@ -56,4 +56,14 @@ class SocialPost(models.Model):
         pass
 
     def action_schedule(self):
-        pass
+        self.ensure_one()
+        return {
+            'name': 'Schedule Post',
+            'view_mode': 'form',
+            'res_model': 'sm.schedule.post.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'post_id': self.id,
+            },
+        }

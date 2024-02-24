@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="social_schedule_post_wizard_form_view" model="ir.ui.view">
+        <field name="name">social.schedule.post.wizard.form</field>
+        <field name="model">sm.schedule.post.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="date_scheduled" />   
+                    </group>
+                    <group>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_schedule" string="Schedule" type="object" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record> 
+</odoo>
