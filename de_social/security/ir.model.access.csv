@@ -2,3 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_social_media_manager,access.social.media.manager,model_sm_media,group_sm_manager,1,1,1,1
 access_social_media_user,access.social.media.user,model_sm_media,group_sm_user,1,0,0,0
 
+access_social_channel_manager,access.social.channel.manager,model_sm_channel,group_sm_manager,1,1,1,1
+access_social_channel_user,access.social.channel.user,model_sm_channel,group_sm_user,1,0,0,0
+

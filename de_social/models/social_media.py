@@ -13,5 +13,7 @@ class SocialMedia(models.Model):
     image = fields.Binary('Image', readonly=True)
     active = fields.Boolean(default=True)
 
+    channel_ids = fields.One2many('sm.channel', 'social_media_id', string='Channels')
+    
     def action_add_channel(self):
         pass
