@@ -36,7 +36,9 @@ class SocialPost(models.Model):
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env.company,
                                  domain=lambda self: [('id', 'in', self.env.companies.ids)])
-    channel_ids = fields.Many2many('sm.channel',domain="[('id', 'in', channel_allowed_ids)]")
+    channel_ids = fields.Many2many('sm.channel', string="Channels", 
+                                   domain="[('id', 'in', channel_allowed_ids)]"
+                                  )
     channel_allowed_ids = fields.Many2many('sm.channel', string='Allowed Accounts', compute='_compute_channels',
                                            help='List of the channels which can be selected for this post.')
 

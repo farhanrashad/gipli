@@ -55,6 +55,7 @@
                 <field name="id"/>
                 <field name="name"/>
                 <field name="description"/>
+                <field name="channel_ids"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_color_5">
@@ -65,7 +66,23 @@
                                 <h3 class="mt4"><t t-esc="record.name.value"/></h3>
                                 <t t-esc="record.description.value"/>
                             </div>
-                            <button type="object" class="btn btn-primary" name="action_add_channel">Add Channel</button>
+                            <div class="oe_kanban_footer">
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <button type="object" class="btn btn-primary" name="action_add_channel">Add Channel</button>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <t t-foreach="record.channel_ids.raw_value" t-as="channel_id" t-key="channel_id_index">
+                                            <t>
+                                                <img class="img me-1" height="20" t-att-title="title" t-attf-src="/web/image/sm.channel/#{channel_id}/image/20x20" alt="Media"/>
+                                            </t>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                                <div class="clearfix"/>
+
+                            
                         </div>
                     </t>
                 </templates>
