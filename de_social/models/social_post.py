@@ -37,6 +37,13 @@ class SocialPost(models.Model):
     date_scheduled = fields.Datetime('Scheduled Date')
     date_published = fields.Datetime('Published Date', readonly=True,
         help="When the global post was published. The actual sub-posts published dates may be different depending on the media.")
+
+    method_publish = fields.Selection([
+        ('now', 'Publish now'),
+        ('scheduled', 'Schedule'),
+        ('pipeline', 'Pipeline'),
+    ], string="When", default='now', required=True,
+        help="Publish your post immediately or schedule it at a later time.")
     
     @api.depends('company_id')
     def _compute_channels(self):

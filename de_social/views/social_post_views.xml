@@ -30,6 +30,11 @@
                                    required="True">
                             </field>
                             <field name="image_ids" widget="many2many_binary" class="o_social_post_form_attachments"/>
+                            <field name="method_publish" widget="radio" invisible="state != 'draft'"/>
+                            <field name="date_scheduled"
+                                invisible="method_publish != 'scheduled'"
+                                required="method_publish == 'scheduled'"
+                            />
                         </group>
                         <group>
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
