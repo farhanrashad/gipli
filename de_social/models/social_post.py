@@ -3,6 +3,10 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
 
+import logging
+_logger = logging.getLogger(__name__)
+
+
 SOCIAL_STATE = [
     ('draft', 'Draft'), 
     ('scheduled', 'scheduled'),  
@@ -74,18 +78,48 @@ class SocialPost(models.Model):
         for post in self:
             if post.state != 'draft':
                 raise UserError("You can only delete posts in draft stage.")
+
+    def action_draft(self):
+        self.write({
+            'state': 'draft',
+            'date_scheduled': False,
+            'date_published': False,
+        })
+        
     def action_post(self):
+        self._action_post()
+        
+
+    def action_schedule(self):
+        self.write({
+            'state': 'scheduled'
+        })
+
+    def _action_post(self):
         self.write({
             'method_publish': 'now',
             'date_scheduled': False,
             'date_published': fields.datetime.now(),
             'state': 'posted',
         })
-
-    def action_schedule(self):
-        self.write({
-            'state': 'scheduled'
-        })
+        
+    # Cron Job Action
+    @api.model
+    def _cron_publish_scheduled_posts(self):
+        domain = [
+            ('method_publish', '=', 'scheduled'),
+            ('state', '=', 'scheduled'),
+            ('date_scheduled', '<=', fields.Datetime.now())
+        ]
+        posts = self.env['sm.post'].search(domain)
+        for post in posts:
+            try:
+                post._action_post()
+            except Exception as e:
+                # Log the exception
+                _logger.exception("Error occurred while publishing post %s: %s", str(post.id), str(e))
+                post.message_post(body=f"Error occurred while publishing post: {str(e)}")
+                
         
     def action_schedule1(self):
         self.ensure_one()

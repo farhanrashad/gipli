@@ -9,9 +9,13 @@
                     <button name="action_post" string="Post Now" type="object" class="oe_highlight"
                             invisible="state != 'draft' or method_publish != 'now' "
                     />
+                    
                     <button name="action_schedule" string="Schedule" type="object" class="oe_highlight"
                             invisible="state != 'draft' or method_publish != 'scheduled'"
                             data-hotkey="q" 
+                    />
+                    <button name="action_draft" string="Set to Draft" type="object" 
+                            invisible="state != 'scheduled' "
                     />
                     <field name="state" widget="statusbar"/>
                 </header>
