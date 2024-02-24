@@ -4,6 +4,44 @@
 
     <menuitem name="Customers" id="menu_subscription_customers_customers"
                     parent="menu_subscription_customers" action="account.res_partner_action_customer"
-                    groups="sales_team.group_sale_salesman" sequence="2"/>
+                    groups="sales_team.group_sale_salesman" sequence="1"/>
+
+    <!-- Subscription to Invoice -->
+    <record id="action_subscription_to_invoice" model="ir.actions.act_window">
+        <field name="name">subscription</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="subscription_order_search_view"/>
+        <field name="domain">[
+            ('subscription_order', '=', True),
+            ('date_next_invoice', '&lt;', context_today().strftime('%Y-%m-%d'))
+            ]
+        </field>
+        <field name="context">{
+            'create': False,
+            'default_subscription_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No subscriptions to invoice found
+            </p><p>
+            You can select all subscriptions and invoice them in batch,<br/>
+            or check every subscription and invoice them one by one.
+            </p>
+        </field>
+    </record>
+    
+    <menuitem 
+        id="menu_subscription_main_subscription_to_invoice" 
+        name="To Invoice" 
+        parent="menu_subscription_customers" 
+        sequence="2" 
+        action="action_subscription_to_invoice"
+    />
     
 </odoo>

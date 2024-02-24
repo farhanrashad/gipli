@@ -88,12 +88,10 @@
                     <field name="date_end" invisible="not subscription_order"/>
                 </div>
                 <field name="date_next_invoice" 
-                    invisible="not subscription_order"
+                    invisible="not subscription_order or not date_next_invoice"
                     required="subscription_order and state == 'sale'"
                 />
-                <field name="subscription_type" 
-                    invisible="not subscription_order"
-                />
+                
             </xpath>
 
             <!-- Add Subscription fields -->
@@ -104,6 +102,10 @@
                     <field name="date_first_contract" />
                     <field name="date_start" />
                     <field name="date_end" />
+                    <field name="subscription_type" 
+                        invisible="not subscription_order"
+                        readonly="1"
+                    />
                 </group>
             </xpath>
 
@@ -262,16 +264,20 @@
                 <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
                 <filter string="My Orders" domain="[('user_id','=',uid)]" name="my_subscription_orders"/>
                 <separator/>
-                <filter string="Circulation Agreement" domain="[('subscription_order', '=', True)]" name="from_circulation_agreement"/>
+                <filter string="My Subscriptions" domain="[('subscription_order', '=', True),('user_id','=',uid)]" name="my_subscriptions"/>
                 <separator/>
-                    
-                <filter string="In Progress" domain="[('subscription_order', 'in', ['progress'])]" name="progress_order"/>
-                <filter string="Closed" domain="[('subscription_order', 'in', ['close'])]" name="closed_order"/>
+                <filter string="In Progress" domain="[('subscription_status', 'in', ['progress'])]" name="progress_subscription"/>
+                <filter string="Paused" domain="[('subscription_status', 'in', ['paused'])]" name="paused_subscription"/>
+                <filter string="Closed" domain="[('subscription_status', 'in', ['close'])]" name="closed_subscription"/>
+                <separator/>
+                <filter string="Renewal" domain="[('subscription_type', 'in', ['renewal'])]" name="renewal_subscription"/>
+                <filter string="Upsell" domain="[('subscription_type', 'in', ['upsell'])]" name="upsell_subscription"/>
+                <filter string="Revision" domain="[('subscription_type', 'in', ['revised'])]" name="revised_subscription"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Status" name="groupby_status" context="{'group_by': 'subscription_status'}"/>
                     <separator/>
-                    <filter string="Library Officer" name="user_id" domain="[]" context="{'group_by': 'user_id'}"/>
+                    <filter string="Salesperson" name="user_id" domain="[]" context="{'group_by': 'user_id'}"/>
                     <separator/>
                     <filter string="Customer" name="groupby_customer" domain="[]" context="{'group_by': 'partner_id'}"/>
                 </group>
@@ -291,7 +297,13 @@
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
         <field name="domain">[('subscription_order', '=', True)]</field>
-        <field name="context">{'default_subscription_order': 1}</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create a new subscription!
@@ -339,7 +351,13 @@ Subscriptions can be automatically generated from sales orders in Sales or eComm
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
         <field name="domain">[('subscription_order', '=', True),('subscription_status', '=', 'draft')]</field>
-        <field name="context">{'default_subscription_order': 1}</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create a subscription quotation!
@@ -366,7 +384,13 @@ Subscriptions have the capability to be automatically generated from sales order
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
         <field name="domain">[('subscription_order', '=', True),('subscription_type', '=', 'renewal')]</field>
-        <field name="context">{'default_subscription_order': 1}</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Define a new subscription
@@ -397,7 +421,13 @@ Send a renewal quotation to the customer. Once confirmed, the subscription resum
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
         <field name="domain">[('subscription_order', '=', True),('subscription_type', '=', 'upsell')]</field>
-        <field name="context">{'default_subscription_order': 1}</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create a new subscription
@@ -423,7 +453,13 @@ Send a renewal quotation to the customer. Once confirmed, the subscription resum
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
         <field name="domain">[('subscription_order', '=', True),('subscription_type', '=', 'revised')]</field>
-        <field name="context">{'default_subscription_order': 1}</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create a new subscription.

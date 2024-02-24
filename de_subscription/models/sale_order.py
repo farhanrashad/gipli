@@ -71,12 +71,13 @@ class SubscriptionOrder(models.Model):
     
     date_end = fields.Date(string='End Date', tracking=True,
                            compute='_compute_date_end',
-                           readonly=False,
+                           readonly=True,
                            store=True,
                            help="If set in advance, the subscription will be set to renew 1 month before the date and will be closed on the date set in this field.")
     date_first_contract = fields.Date(
         compute='_compute_contact_start_date',
         store=True,
+        readonly=True,
         help="The first contract date is the start date of the first contract of the sequence. It is common across a subscription and its renewals.")
 
     parent_subscription_id = fields.Many2one('sale.order', string='Parent Contract', ondelete='restrict', copy=False)
@@ -556,8 +557,11 @@ class SubscriptionOrder(models.Model):
             ('subscription_status', 'in', SUBSCRIPTION_PROGRESS_STATUS)]
         subscriptions = self.env['sale.order'].search(domain)
         
-        #raise UserError(len(subscriptions))
-        #subscriptions = self.env['sale.order'].browse(328)
         for order in subscriptions:
-            order._create_invoices()
+            try:
+                order._create_invoices()
+            except Exception as e:
+                # Log the exception
+                _logger.exception("Error occurred while creating invoices for order %s: %s", order.name, str(e))
+                order.message_post(body=f"Error occurred while creating invoices: {str(e)}")
         
