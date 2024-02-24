@@ -350,12 +350,16 @@ Subscriptions can be automatically generated from sales orders in Sales or eComm
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('de_subscription.subscription_order_tree_view'), 'sequence': 1}),
+                (0, 0, {'view_mode': 'kanban', 'sequence': 2}),
+                (0, 0, {'view_mode': 'form'}),
+            ]"/>
         <field name="domain">[('subscription_order', '=', True),('subscription_status', '=', 'draft')]</field>
         <field name="context">{
             'default_subscription_order': 1,
             'default_subscription_type': 'normal',
             'search_default_my_subscriptions': 1,
-            'search_default_progress_subscription': 1,
             }
         </field>
         <field name="help" type="html">
