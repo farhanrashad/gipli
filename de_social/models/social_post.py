@@ -13,7 +13,6 @@ class SocialPost(models.Model):
     _inherit = [
         'mail.thread', 
         'mail.activity.mixin', 
-        'utm.source.mixin',
     ]
     _description = 'Social Post'
     _order = 'create_date desc'

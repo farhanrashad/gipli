@@ -17,4 +17,8 @@ class SocialChannel(models.Model):
 
     social_media_id = fields.Many2one('sm.media', string="Social Media", required=True, readonly=True,
         help="Related Social Media (Facebook, Twitter, ...).", ondelete='cascade')
+
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company,
+                                 domain=lambda self: [('id', 'in', self.env.companies.ids)],
+                                 help="Link an account to a company to restrict its usage or keep empty to let all companies use it.")
     
