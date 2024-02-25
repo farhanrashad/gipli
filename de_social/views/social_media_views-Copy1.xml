@@ -49,50 +49,27 @@
     
     <record id="social_media_kanban_view" model="ir.ui.view">
         <field name="name">social.media.kanban.view</field>
-            <field name="model">sm.media</field>
-            <field name="arch" type="xml">
-                <kanban create="false">
-                    <field name="id"/>
-                    <field name="name"/>
-                    <field name="description"/>
-                    <field name="channel_ids"/>
-                    <field name="color"/>
-                    <templates>
-                        <!-- Kanban menu -->
-                        <t t-name="kanban-menu" groups="base.group_user">
-                            <div class="container">
-                                <div class="o_kanban_card_manage_settings row">
-                                    <div role="menuitem" aria-haspopup="true" class="col-6" groups="de_social.group_sm_manager">
-                                        <ul class="oe_kanban_colorpicker" data-field="color" role="popup"/>
-                                    </div>
-                                    <div role="menuitem" class="col-6" groups="de_social.group_sm_manager">
-                                        <a class="dropdown-item" role="menuitem" type="edit">Settings</a>
-                                    </div>
-                                    
-                                </div>
+        <field name="model">sm.media</field>
+        <field name="arch" type="xml">
+            <kanban create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="channel_ids"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_color_5">
+                            <div class="o_kanban_image">
+                                <img type="open" t-att-src="kanban_image('sm.media', 'image', record.id.raw_value)" alt="Social Media"/>
                             </div>
-                        </t>
-                        <!-- end Kanban menu -->
-                        <!-- Kanban box -->
-                        <t t-name="kanban-box">
-                            <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click o_has_icon oe_kanban_content oe_kanban_card">
-                                <div class="o_social_kanban_main d-flex align-items-baseline gap-1">
-                                    <div class="o_kanban_card_content">
-                                        <div class="o_kanban_image">
-                                            <img type="open" t-att-src="kanban_image('sm.media', 'image', record.id.raw_value)" alt="Social Media"/>
-                                        </div>
-                                        <div class="mb-2">
-                                            <h3 class="mt4"><t t-esc="record.name.value"/></h3>
-                                            <t t-esc="record.description.value"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Footer/bottom -->
-                                <div class="o_kanban_record_bottom mt-3">
+                            <div class="mb-2">
+                                <h3 class="mt4"><t t-esc="record.name.value"/></h3>
+                                <t t-esc="record.description.value"/>
+                            </div>
+                            <div class="oe_kanban_footer">
+                                <div class="o_kanban_record_bottom">
                                     <div class="oe_kanban_bottom_left">
-                                        <div class="o_project_kanban_boxes d-flex align-items-baseline">
-                                            <button type="object" class="btn btn-primary" name="action_add_channel">Add Channel</button>
-                                        </div>
+                                        <button type="object" class="btn btn-primary" name="action_add_channel">Add Channel</button>
                                     </div>
                                     <div class="oe_kanban_bottom_right">
                                         <t t-foreach="record.channel_ids.raw_value" t-as="channel_id" t-key="channel_id_index">
@@ -103,13 +80,17 @@
                                     </div>
                                 </div>
                             </div>
-                        </t>
-                        <!-- end Kanban box -->
-                        
-                    </templates>
-                </kanban>
-            </field>
-        </record>
+                            <div class="clearfix"/>
+                            <div class="container o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                <div class="row">
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
     
     <record id="action_social_media" model="ir.actions.act_window">
         <field name="name">Social Media</field>
