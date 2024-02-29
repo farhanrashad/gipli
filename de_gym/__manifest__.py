@@ -18,13 +18,15 @@ GYM Manager
     'version': '17.0.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','sale','account'],
+    'depends': ['de_subscription'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/gym_menu.xml',
         'views/res_partner_views.xml',
+        #'views/sale_order_views.mxl',
+        'views/gym_order_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

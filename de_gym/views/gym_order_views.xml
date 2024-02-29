@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- GYM Subscription Form View -->
+    <record id="gym_subscription_order_form_view" model="ir.ui.view">
+        <field name="name">gym.subscription.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="gym_order" invisible="1"/>
+                <field name="subscription_order" invisible="1"/>
+                <field name="subscription_status" invisible="1"/>
+                <field name="subscription_type" invisible="1"/>
+                <field name="parent_subscription_id" invisible="1"/>
+                <field name="subscription_line_ids" invisible="1"/>
+            </xpath>
+
+            <button name="action_cancel" position="after">
+                <button string="Operations" name="button_operations" type="object"
+                        invisible="not gym_order or subscription_status not in ['progress'] or state != 'sale'" data-hotkey="z"/>
+            </button>
+
+            <button id="create_invoice" position="before">
+                <button string="Resume" name="resume_subscription" type="object" data-hotkey="r"
+                        class="btn-primary"
+                        invisible="subscription_status != 'paused'"/>
+            </button>
+            <button id="create_invoice" position="attributes">
+                <attribute name="invisible">gym_order and state != 'sale' or invoice_status != 'to invoice'</attribute>
+            </button>
+            <button id="create_invoice" position="after">
+                <button id="create_invoice_sub" name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
+                    type="action" class="btn-secondary" data-hotkey="q"
+                    invisible="not gym_order or state != 'sale' or invoice_status == 'to invoice'"/>
+            </button>
+            
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button invisible="count_renewal_subscriptions &lt; 1"
+                    name="open_subscription_renewal"
+                    class="oe_stat_button"
+                    icon="fa-repeat"
+                    type="object">
+                    <field name="count_renewal_subscriptions" widget="statinfo" string="Renewal Quote"/>
+                </button>
+                <button invisible="count_upselling_subscriptions &lt; 1"
+                    name="open_subscription_upsell"
+                    class="oe_stat_button"
+                    icon="fa-arrow-circle-o-up"
+                    type="object">
+                    <field name="count_upselling_subscriptions" widget="statinfo" string="Upsell Quote"/>
+                </button>
+
+                <button invisible="count_upselling_subscriptions &lt; 1"
+                    name="open_revised_subscriptions"
+                    class="oe_stat_button"
+                    icon="fa-arrow-circle-o-up"
+                    type="object">
+                    <field name="count_revised_subscriptions" widget="statinfo" string="Revised Quote"/>
+                </button>
+                
+                <button invisible="count_past_subscriptions &lt; 1"
+                    name="open_past_subscriptions"
+                    class="oe_stat_button"
+                    icon="fa-dollar"
+                    type="object">
+                    <field name="count_past_subscriptions" widget="statinfo" string="Sales History"/>
+                </button>
+                
+            </xpath>
+            
+            <xpath expr="//div[@name='button_box']" position="after">
+                <field name="subscription_status" class="float-end fs-6"
+                    invisible="subscription_status not in ['draft','progress','close','paused'] or state == 'cancel'"
+                    widget="badge"
+                    decoration-info="subscription_status in ['draft','close']"
+                    decoration-success="subscription_status in ['progress']"
+                    decoration-warning="subscription_status in ['paused']"
+                />
+            </xpath>
+
+            <xpath expr="//group[1]/group[2]" position="inside">
+                <label name="subscription_plan" for="subscription_plan_id" invisible="not gym_order"/>
+                <div name="subscription_plan" class="o_row" invisible="not gym_order">
+                    <field name="subscription_plan_id" 
+                        required="gym_order == True"
+                           readonly="subscription_status in ['progress', ',close']"
+                           options="{'no_create': True}"/>
+                    <span invisible="not gym_order ">until</span>
+                    <field name="date_end" invisible="not gym_order"/>
+                </div>
+                <field name="date_next_invoice" 
+                    invisible="not gym_order or not date_next_invoice"
+                    required="gym_order and state == 'sale'"
+                />
+                
+            </xpath>
+
+            <!-- Add Subscription fields -->
+            <xpath expr="//notebook/page[@name='other_information']/group[1]" position="inside">
+                <group string="Subsription" invisible="not gym_order">
+                    <field name="date_last_invoice" />
+                    <field name="date_next_invoice" invisible="1"/>
+                    <field name="date_first_contract" />
+                    <field name="date_start" />
+                    <field name="date_end" />
+                    <field name="subscription_type" 
+                        invisible="not gym_order"
+                        readonly="1"
+                    />
+                </group>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='order_lines']/field/tree/control/button[@name='action_add_from_catalog']" position="attributes">
+                <attribute name="column_invisible">parent.gym_order</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[@name='order_lines']/field/kanban/control/button[@name='action_add_from_catalog']" position="attributes">
+                <attribute name="column_invisible">parent.gym_order</attribute>
+            </xpath>
+        </field>
+      </record>
+
+    <record id="gym_subscription_order_primary_form_view" model="ir.ui.view">
+        <field name="name">subscription.order.primary.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="gym_subscription_order_form_view"/>
+        <field name="mode">primary</field>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='order_lines']/field/tree" position="inside">
+                <field name="qty_to_invoice" />
+            </xpath>
+            <!-- options key for library app knowledge in the configurator -->
+            <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_id']" position='attributes'>
+                <attribute name="context">{
+                    'partner_id': parent.partner_id,
+                    'quantity': product_uom_qty,
+                    'pricelist': parent.pricelist_id,
+                    'uom':product_uom,
+                    'company_id': parent.company_id,
+                    'default_lst_price': price_unit,
+                    'default_description_sale': name,
+                    'is_recurring': True,
+                }
+                </attribute>
+                <attribute name="domain">
+                    [('is_recurring', '=', True),
+                        '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]
+                </attribute>
+                <attribute name="options">{
+                    'no_open': True,
+                }</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[@name='order_lines']/field/tree/field[@name='product_template_id']" position='attributes'>
+                <attribute name="context">{
+                    'partner_id': parent.partner_id,
+                    'quantity': product_uom_qty,
+                    'pricelist': parent.pricelist_id,
+                    'uom':product_uom,
+                    'company_id': parent.company_id,
+                    'default_list_price': price_unit,
+                    'default_description_sale': name,
+                    'is_recurring': True,
+                }
+                </attribute>
+                <attribute name="domain">
+                    [('is_recurring', '=', True),
+                        '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]
+                </attribute>
+                <attribute name="options">{
+                    'no_open': True,
+                }</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position='attributes'>
+                <attribute name="domain">
+                    [('is_recurring', '=', True),
+                        '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]
+                </attribute>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='order_lines']/field/kanban/field[@name='product_id']" position='attributes'>
+                <attribute name="context">{
+                    'partner_id': parent.partner_id,
+                    'quantity': product_uom_qty,
+                    'pricelist': parent.pricelist_id,
+                    'uom':product_uom,
+                    'company_id': parent.company_id,
+                    'default_lst_price': price_unit,
+                    'default_description_sale': name,
+                    'is_recurring': True,
+                }
+                </attribute>
+                <attribute name="domain">
+                    [('is_recurring', '=', True),
+                        '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]
+                </attribute>
+                <attribute name="options">{
+                    'no_open': True,
+                }</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="gym_subscription_order_tree_view" model="ir.ui.view">
+        <field name="name">gym.subscription.order.tree.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-warning">subscription_status == 'paused'</attribute>
+            </xpath>
+            <field name="state" position="after">
+                <field name="subscription_status" widget="badge"
+                   decoration-success="subscription_status == 'progress'"
+                   decoration-warning="subscription_status == 'paused'"
+                   decoration-danger="subscription_status == 'close'"
+                   decoration-info="subscription_status in ['draft']"
+                   readonly="1" optional="hide"/>
+                <field name="subscription_type" optional="hide"/>
+                <field name="amount_total_subscription" optional="hide"/>
+                <field name="amount_monthly_subscription" optional="hide"/>
+                <field name="subscription_plan_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Kanban view -->
+    <record id="gym_subscription_order_kanban_view" model="ir.ui.view">
+        <field name="name">gym.subscription.order.kanban.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="mode">primary</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="quick_create">false</attribute>
+                <attribute name="class">o_kanban_mobile align-content-start</attribute>
+            </xpath>
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="quick_create">false</attribute>
+                <attribute name="class">o_kanban_mobile align-content-start</attribute>
+            </xpath>
+            
+            <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/field[@name='state']" position="attributes">
+                <attribute name="invisible">state == 'sale' and subscription_status</attribute>
+            </xpath>
+            
+            <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/field[@name='state']" position="after">
+                <field name="subscription_status" widget="label_selection"
+                    invisible="state != 'sale' or subscription_status == False"
+                    options="{'classes': {'draft': 'default', 'progress': 'warning', 'close': 'success'}}"/>
+            </xpath>
+        </field>
+    </record>
+    <!-- Search view -->
+    
+    <record id="gym_subscription_order_search_view" model="ir.ui.view">
+        <field name="name">gym.subscription.order.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Order" filter_domain="['|', '|', ('name', 'ilike', self), ('client_order_ref', 'ilike', self), ('partner_id', 'child_of', self)]"/>
+                <field name="partner_id" operator="child_of"/>
+                <field name="user_id"/>
+                <field name="order_line" string="Product" filter_domain="[('order_line.product_id', 'ilike', self)]"/>
+                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+                <filter string="My Orders" domain="[('user_id','=',uid)]" name="my_subscription_orders"/>
+                <separator/>
+                <filter string="My Subscriptions" domain="[('subscription_order', '=', True),('user_id','=',uid)]" name="my_subscriptions"/>
+                <separator/>
+                <filter string="In Progress" domain="[('subscription_status', 'in', ['progress'])]" name="progress_subscription"/>
+                <filter string="Paused" domain="[('subscription_status', 'in', ['paused'])]" name="paused_subscription"/>
+                <filter string="Closed" domain="[('subscription_status', 'in', ['close'])]" name="closed_subscription"/>
+                <separator/>
+                <filter string="Renewal" domain="[('subscription_type', 'in', ['renewal'])]" name="renewal_subscription"/>
+                <filter string="Upsell" domain="[('subscription_type', 'in', ['upsell'])]" name="upsell_subscription"/>
+                <filter string="Revision" domain="[('subscription_type', 'in', ['revised'])]" name="revised_subscription"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="groupby_status" context="{'group_by': 'subscription_status'}"/>
+                    <separator/>
+                    <filter string="Salesperson" name="user_id" domain="[]" context="{'group_by': 'user_id'}"/>
+                    <separator/>
+                    <filter string="Customer" name="groupby_customer" domain="[]" context="{'group_by': 'partner_id'}"/>
+                </group>
+                <searchpanel>
+                    <field name="subscription_status" icon="fa-folder-open-o" enable_counters="1"/>
+                    <field name="subscription_type" icon="fa-folder-o" enable_counters="1"/>
+                    <field name="invoice_status" icon="fa-file-text" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+    
+    <record id="gym_subscription_order_search_view" model="ir.ui.view">
+        <field name="name">gym.subscription.order.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Order" filter_domain="['|', '|', ('name', 'ilike', self), ('client_order_ref', 'ilike', self), ('partner_id', 'child_of', self)]"/>
+                <field name="partner_id" operator="child_of"/>
+                <field name="user_id"/>
+                <field name="order_line" string="Product" filter_domain="[('order_line.product_id', 'ilike', self)]"/>
+                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+                <separator/>
+                <filter string="My Subscriptions" domain="[('gym_order', '=', True),('user_id','=',uid)]" name="my_gym_subscription_orders"/>
+                <separator/>
+                <filter string="In Progress" domain="[('subscription_status', 'in', ['progress'])]" name="progress_subscription"/>
+                <filter string="Paused" domain="[('subscription_status', 'in', ['paused'])]" name="paused_subscription"/>
+                <filter string="Closed" domain="[('subscription_status', 'in', ['close'])]" name="closed_subscription"/>
+                <separator/>
+                <filter string="Renewal" domain="[('subscription_type', 'in', ['renewal'])]" name="renewal_subscription"/>
+                <filter string="Upsell" domain="[('subscription_type', 'in', ['upsell'])]" name="upsell_subscription"/>
+                <filter string="Revision" domain="[('subscription_type', 'in', ['revised'])]" name="revised_subscription"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="groupby_status" context="{'group_by': 'subscription_status'}"/>
+                    <separator/>
+                    <filter string="Salesperson" name="user_id" domain="[]" context="{'group_by': 'user_id'}"/>
+                    <separator/>
+                    <filter string="Customer" name="groupby_customer" domain="[]" context="{'group_by': 'partner_id'}"/>
+                </group>
+                <searchpanel>
+                    <field name="subscription_status" icon="fa-folder-open-o" enable_counters="1"/>
+                    <field name="subscription_type" icon="fa-folder-o" enable_counters="1"/>
+                    <field name="invoice_status" icon="fa-file-text" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+    
+    <record id="action_gym_subscription_order" model="ir.actions.act_window">
+        <field name="name">subscription</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="gym_subscription_order_search_view"/>
+        <field name="domain">[('subscription_order', '=', True),('gym_order', '=', True)]</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_gym_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new subscription!
+            </p><p>
+                Create subscriptions to manage recurring invoicing and payments. Subscriptions can be time-bounded or not. In case of a limited period, they are flagged as to be renewed one month from the end date.</p>
+                <p>
+Subscriptions can be automatically generated from sales orders in Sales or eCommerce apps.
+            </p>
+        </field>
+    </record>
+
+
+    <record id="gym_subscription_order_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="gym_subscription_order_kanban_view"/>
+        <field name="act_window_id" ref="action_gym_subscription_order"/>
+    </record>
+    <record id="gym_subscription_order_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="gym_subscription_order_tree_view"/>
+        <field name="act_window_id" ref="action_gym_subscription_order"/>
+    </record>
+    <record id="gym_subscription_order_primary_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="gym_subscription_order_primary_form_view"/>
+        <field name="act_window_id" ref="action_gym_subscription_order"/>
+    </record>
+    
+    <menuitem 
+        id="menu_gym_subscription_main_subscription" 
+        name="Subscriptions" 
+        parent="menu_gym_subscription_main" 
+        sequence="1" 
+        action="action_gym_subscription_order"
+    />
+
+    <!-- Quotations -->
+    <record id="action_gym_subscription_quotation" model="ir.actions.act_window">
+        <field name="name">subscription</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="gym_subscription_order_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('de_gym.gym_subscription_order_tree_view'), 'sequence': 1}),
+                (0, 0, {'view_mode': 'kanban', 'sequence': 2}),
+                (0, 0, {'view_mode': 'form'}),
+            ]"/>
+        <field name="domain">[('subscription_order', '=', True),('gym_order', '=', True), ('subscription_status', '=', 'draft')]</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_gym_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a subscription quotation!
+            </p><p>
+                Establish subscriptions to oversee recurring invoicing and payments. Subscriptions may have a defined duration or be indefinite. If they are time-limited, they are marked for renewal one month after the end date.</p>
+<p>
+Subscriptions have the capability to be automatically generated from sales orders within Sales or eCommerce applications.
+            </p>
+        </field>
+    </record>
+    
+    <menuitem 
+        id="menu_gym_subscription_main_subscription_quotation" 
+        name="Quotations" 
+        parent="menu_gym_subscription_main" 
+        sequence="2" 
+        action="action_gym_subscription_quotation"
+    />
+    <!-- Upselling -->
+    <record id="action_gym_subscription_to_new" model="ir.actions.act_window">
+        <field name="name">subscription</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="gym_subscription_order_search_view"/>
+        <field name="domain">[('subscription_order', '=', True),('gym_order', '=', True), ('subscription_type', '=', 'renewal')]</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_gym_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define a new subscription
+            </p>
+            <p>
+                Here are the subscriptions that require renewal as their end date is approaching or has passed
+            </p>
+            <p>
+                Odoo automatically designates subscriptions to be renewed in a pending state. Following negotiation, the salesman is responsible for either closing or renewing pending subscriptions.
+            </p>
+            <p>
+Send a renewal quotation to the customer. Once confirmed, the subscription resumes and is active again.            </p>
+        </field>
+    </record>
+    
+    <menuitem 
+        id="menu_gym_subscription_main_subscription_to_renew" 
+        name="To Renew" 
+        parent="menu_gym_subscription_main" 
+        sequence="3" 
+        action="action_gym_subscription_to_new"
+    />
+    <!-- Renewals -->
+    <record id="action_gym_subscription_upsells" model="ir.actions.act_window">
+        <field name="name">subscription</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="gym_subscription_order_search_view"/>
+        <field name="domain">[('subscription_order', '=', True),('gym_order', '=', True), ('subscription_type', '=', 'upsell')]</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_gym_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new subscription
+            </p>
+            <p>
+                Encourage customers to upgrade their subscription by offering additional features or services. Upselling subscriptions involves presenting enticing options that enhance the value of the existing subscription plan. Once the customer agrees to the upgraded subscription, the new features or services are added, providing an improved experience.
+            </p>
+        </field>
+    </record>
+    
+    <menuitem 
+        id="menu_gym_subscription_main_subscription_upsells" 
+        name="Upsells" 
+        parent="menu_gym_subscription_main" 
+        sequence="4" 
+        action="action_gym_subscription_upsells"
+    />
+    <!-- Revision -->
+    <record id="action_gym_subscription_revision" model="ir.actions.act_window">
+        <field name="name">subscription</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="gym_subscription_order_search_view"/>
+        <field name="domain">[('subscription_order', '=', True),('gym_order', '=', True), ('subscription_type', '=', 'revised')]</field>
+        <field name="context">{
+            'default_subscription_order': 1,
+            'default_gym_order': 1,
+            'default_subscription_type': 'normal',
+            'search_default_my_subscriptions': 1,
+            'search_default_progress_subscription': 1,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new subscription.
+            </p>
+            <p>
+                Revise subscriptions to accommodate changes in customer needs or preferences. Revised subscriptions involve updating existing plans to better align with evolving requirements. Once the revisions are finalized and agreed upon, the subscription is updated accordingly, ensuring that it continues to meet the customer's expectations effectively.
+            </p>
+        </field>
+    </record>
+    
+    <menuitem 
+        id="menu_gym_subscription_main_subscription_revision" 
+        name="Revision" 
+        parent="menu_gym_subscription_main" 
+        sequence="4" 
+        action="action_gym_subscription_revision"
+    />
+</odoo>

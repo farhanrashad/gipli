@@ -2,8 +2,8 @@
 <odoo>
     
 
-    <menuitem name="Members" id="menu_subscription_members_members"
-                    parent="menu_subscription_members" action="account.res_partner_action_customer"
+    <menuitem name="Members" id="menu_gym_subscription_members_members"
+                    parent="menu_gym_subscription_members" action="account.res_partner_action_customer"
                     groups="sales_team.group_sale_salesman" sequence="2"/>
     
 </odoo>
