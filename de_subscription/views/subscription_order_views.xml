@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Circulation Agreement Form View -->
+    <!-- Subscription Order Form View -->
     <record id="subscription_order_form_view" model="ir.ui.view">
         <field name="name">subscription.form.view</field>
         <field name="model">sale.order</field>
@@ -252,7 +252,7 @@
     </record>
     <!-- Search view -->
     <record id="subscription_order_search_view" model="ir.ui.view">
-        <field name="name">circulation.agreement.search.view</field>
+        <field name="name">subscription.order.search.view</field>
         <field name="model">sale.order</field>
         <field name="priority">100</field>
         <field name="arch" type="xml">
