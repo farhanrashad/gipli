@@ -12,7 +12,7 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
-        <field name="search_view_id" ref="subscription_order_search_view"/>
+        <field name="search_view_id" ref="de_subscription.subscription_order_search_view"/>
         <field name="domain">[
             ('subscription_order', '=', True),
             ('date_next_invoice', '&lt;', context_today().strftime('%Y-%m-%d'))
