@@ -9,7 +9,8 @@ from odoo.exceptions import UserError, ValidationError
 from dateutil.relativedelta import relativedelta
 
 
-class GYMOrder(models.Model):
-    _inherit = 'sale.order'
+class GYMNutrients(models.Model):
+    _name = 'gym.nutrients'
+    _description = 'Nutrients'
 
-    gym_order = fields.Boolean("GYM Subscription")
+    name = fields.Char(string='Name', required=True)

@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_de_gym_de_gym,de_gym.de_gym,model_de_gym_de_gym,base.group_user,1,1,1,1
+access_gym_nutrition_user,access.gym.nutrition.user,model_gym_nutrients,group_gym_user,1,1,1,0
+access_gym_nutrition_manager,access.gym.nutrition.manager,model_gym_nutrients,group_gym_manager,1,1,1,1

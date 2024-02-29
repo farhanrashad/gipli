@@ -22,15 +22,14 @@ GYM Manager
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/gym_security.xml',
+        'security/ir.model.access.csv',
         'views/gym_menu.xml',
         'views/res_partner_views.xml',
         #'views/sale_order_views.mxl',
         'views/gym_order_views.xml',
+        'views/nutrition_views.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'application':True,
 }
 
