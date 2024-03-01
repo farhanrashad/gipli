@@ -11,9 +11,20 @@ class ScheduleNuitrition(models.Model):
 
     name = fields.Text('Note', compute='_compute_name', store=True, required=True)
     member_id = fields.Many2one('res.partner', 'Member', store=True, required=True)
-    nutr_schedule_line = fields.One2many('gym.schedule.nutr.line', 'food_item_id', string='Food Item Line')
+    company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
+    nutr_schedule_line = fields.One2many('gym.schedule.nutr.line', 'nutr_schedule_id', string='Nuitrition Schedule Line')
+    date = fields.Date('Date', required=True)
+
+    # All Week Days
+    day_sun = fields.Boolean('Sunday')
+    day_mon = fields.Boolean('Monday')
+    day_tue = fields.Boolean('Tuesday')
+    day_wed = fields.Boolean('Wednesday')
+    day_thu = fields.Boolean('Thursday')
+    day_fir = fields.Boolean('Friday')
+    day_sat = fields.Boolean('Saturday')
     
-    @api.depends('course_id','batch_id','subject_id','company_id')
+    @api.depends('member_id')
     def _compute_name(self):
         for record in self:
             record.name = record.member_id.name
