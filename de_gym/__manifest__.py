@@ -24,12 +24,15 @@ GYM Manager
     'data': [
         'security/gym_security.xml',
         'security/ir.model.access.csv',
+        'data/gym_data.xml',
         'views/gym_menu.xml',
         'views/res_partner_views.xml',
         #'views/sale_order_views.mxl',
         'views/gym_order_views.xml',
         'views/nutrition_views.xml',
         'views/food_item_views.xml',
+        'views/activity_type_views.xml',
+        'views/meal_type_views.xml',
     ],
     'application':True,
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <!-- Meal Type -->
+        <record id="meal_type_tree_view" model="ir.ui.view">
+			<field name="name">meal.type.tree.view</field>
+			<field name="model">gym.nutr.meal.type</field>
+			<field name="arch" type="xml">
+				<tree string="Meal Type" editable="bottom">
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+        
+        <record id="meal_type_search_view" model="ir.ui.view">
+            <field name="name">meal.type.search.view</field>
+            <field name="model">gym.nutr.meal.type</field>
+            <field name="arch" type="xml">
+                <search string="Meal Type">
+                    <field name="name" string="Meal Type"/>
+                </search>
+             </field>
+        </record>
+        
+        <record id="action_meal_type" model="ir.actions.act_window">
+            <field name="name">Meal Type</field>
+            <field name="res_model">gym.nutr.meal.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="meal_type_search_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new meal type
+                </p>
+            </field>
+        </record>
+        
+        <menuitem name="Meal Type" id="menu_gym_subscription_nutrition_meal_type"
+            parent="menu_gym_subscription_config_nutr" 
+            action="action_meal_type"
+            groups="de_gym.group_gym_manager" 
+            sequence="20"
+        />
+        
+    </data>
+</odoo>

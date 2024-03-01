@@ -2,10 +2,9 @@
 
 from odoo import api, fields, models, _
 
-
-class GYMNutrients(models.Model):
-    _name = 'gym.nutrients'
-    _description = 'Nutrients'
+class GYMActivityType(models.Model):
+    _name = 'gym.activity.type'
+    _description = 'Activity Type'
 
     name = fields.Char(string='Name', required=True)
 

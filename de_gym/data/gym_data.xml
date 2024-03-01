@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Meal Type -->
+        <record model="gym.nutr.meal.type" id="meal_type_breakfast">
+          <field name="name">Breakfast</field>
+        </record>
+        <record model="gym.nutr.meal.type" id="meal_type_brunch">
+          <field name="name">Brunch</field>
+        </record>
+        <record model="gym.nutr.meal.type" id="meal_type_lunch">
+          <field name="name">Lunch</field>
+        </record>
+        <record model="gym.nutr.meal.type" id="meal_type_snack">
+          <field name="name">Snack</field>
+        </record>
+        <record model="gym.nutr.meal.type" id="meal_type_dinner">
+          <field name="name">Dinner</field>
+        </record>
+        <record model="gym.nutr.meal.type" id="meal_type_supper">
+          <field name="name">Supper</field>
+        </record>
+        <record model="gym.nutr.meal.type" id="meal_type_midnight_snack">
+          <field name="name">Midnight Snack</field>
+        </record>
+    </data>
+</odoo>
