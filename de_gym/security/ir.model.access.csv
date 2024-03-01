@@ -1,3 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_gym_nutrition_user,access.gym.nutrition.user,model_gym_nutrients,group_gym_user,1,1,1,0
 access_gym_nutrition_manager,access.gym.nutrition.manager,model_gym_nutrients,group_gym_manager,1,1,1,1
+
+access_gym_food_item_user,access.gym.food.item.user,model_gym_food_item,group_gym_user,1,1,1,0
+access_gym_food_item_manager,access.gym.food.item.manager,model_gym_food_item,group_gym_manager,1,1,1,1
+
+access_gym_food_item_line_user,access.gym.food.item.line.user,model_gym_food_item_line,group_gym_user,1,1,1,0
+access_gym_food_item_line_manager,access.gym.food.item.line.manager,model_gym_food_item_line,group_gym_manager,1,1,1,1

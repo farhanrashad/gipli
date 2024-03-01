@@ -29,6 +29,7 @@ GYM Manager
         #'views/sale_order_views.mxl',
         'views/gym_order_views.xml',
         'views/nutrition_views.xml',
+        'views/food_item_views.xml',
     ],
     'application':True,
 }

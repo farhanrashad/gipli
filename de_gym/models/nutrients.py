@@ -14,3 +14,5 @@ class GYMNutrients(models.Model):
     _description = 'Nutrients'
 
     name = fields.Char(string='Name', required=True)
+
+    
