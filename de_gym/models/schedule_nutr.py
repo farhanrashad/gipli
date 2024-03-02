@@ -29,7 +29,12 @@ class ScheduleNuitrition(models.Model):
         selection=DAY_SELECTION,
         compute='_compute_day_of_week', store=True, 
     )
-    
+
+    _sql_constraints = [
+        ('unique_member_date', 'UNIQUE(member_id, date)', 'Nutrition cannot be scheduled twice for the same member on the same date.')
+    ]
+
+
     @api.depends('date')
     def _compute_day_of_week(self):
         for record in self:

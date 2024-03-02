@@ -25,7 +25,8 @@ class NutrScheduleWizard(models.TransientModel):
     day_sun = fields.Boolean('Sunday')
 
     schedule_wizard_line = fields.One2many('gym.nutr.schedule.wizard.line', 'schedule_wizard_id', string='Schedule Wizard Line')
-    
+
+    @api.onchange('member_id')
     def _compute_datetime(self):
         for record in self:
             record.date_start = fields.Date.today()
@@ -62,8 +63,11 @@ class NutrScheduleWizard(models.TransientModel):
                         schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                     
                     current_date += timedelta(days=1)
-                    
-                self.env['gym.schedule.nutr'].create(schedule_data)
+
+                try:
+                    self.env['gym.schedule.nutr'].create(schedule_data)
+                except:
+                    pass
 
     def _prepare_schedule_values(self, date, weekday):
         schedule_line = []
