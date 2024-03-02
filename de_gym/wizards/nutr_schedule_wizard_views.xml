@@ -72,7 +72,7 @@
             <field name="view_id" ref="nutr_schedule_wizard_form_view"/>
         </record>
 
-        <menuitem name="Schedule Nuitrition" id="menu_gym_subscription_schedule_nuitrition_wizard"
+        <menuitem name="Nuitrition" id="menu_gym_subscription_schedule_nuitrition_wizard"
             parent="menu_gym_subscription_schedule" 
             action="action_nutr_schedule_wizard"
             sequence="1"

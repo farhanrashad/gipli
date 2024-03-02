@@ -94,7 +94,7 @@
         </record>
         
         <menuitem name="Nuitrition" id="menu_gym_subscription_schedule_nuitrition"
-            parent="menu_gym_subscription_schedule" 
+            parent="menu_gym_subscription_nutrition" 
             action="action_schedule_nuitrition"
             sequence="10"
         />

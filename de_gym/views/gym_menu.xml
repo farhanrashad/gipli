@@ -16,5 +16,6 @@
     <menuitem id="menu_gym_subscription_config" name="Configuration" parent="menu_gym_root" sequence="100"/>
         <menuitem id="menu_gym_subscription_config_nutr" name="Nuitrition" parent="menu_gym_subscription_config" sequence="10"/>
         <menuitem id="menu_gym_subscription_config_activity" name="Activity" parent="menu_gym_subscription_config" sequence="20"/>
+        <menuitem id="menu_gym_subscription_config_class" name="Classes" parent="menu_gym_subscription_config" sequence="30"/>
     
 </odoo>

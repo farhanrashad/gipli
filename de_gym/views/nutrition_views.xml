@@ -35,7 +35,7 @@
         </record>
         
         <menuitem name="Nutrients" id="menu_gym_subscription_nutrition_nutrition"
-            parent="menu_gym_subscription_nutrition" 
+            parent="menu_gym_subscription_config_nutr" 
             action="action_nutrition"
             groups="de_gym.group_gym_manager" 
             sequence="10"

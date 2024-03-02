@@ -23,5 +23,19 @@
         <record model="gym.nutr.meal.type" id="meal_type_midnight_snack">
           <field name="name">Midnight Snack</field>
         </record>
+
+        <!-- Closs Type -->
+        <record model="gym.class.type" id="class_type_yoga">
+          <field name="name">Yoga</field>
+        </record>
+        <record model="gym.class.type" id="class_type_zumba">
+          <field name="name">Zumba</field>
+        </record>
+        <record model="gym.class.type" id="class_type_pilates">
+          <field name="name">Pilates</field>
+        </record>
+        <record model="gym.class.type" id="class_type_hiit">
+          <field name="name">HIIT</field>
+        </record>
     </data>
 </odoo>
