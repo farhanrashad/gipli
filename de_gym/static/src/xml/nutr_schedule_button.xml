@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-extend="ListView.buttons" t-name="de_gym.nutr_schedule_button_tree">
+        <t t-jquery=".o_list_button_add" t-operation="after">
+                <button type="button" class="btn btn-primary open_wizard_action_timetable" style="margin-right: 10px; margin-left: 10px;">
+                    Schedule
+                </button>
+        </t>
+    </t>
+</templates>

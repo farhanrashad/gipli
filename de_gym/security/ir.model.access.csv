@@ -11,6 +11,12 @@ access_gym_nutr_meal_type_manager,access.gym.nutr.meal.type.manager,model_gym_nu
 access_model_gym_schedule_nutr_user,access.gym.schedule.nutr.user,model_gym_schedule_nutr,group_gym_user,1,1,1,0
 access_model_gym_schedule_nutr_manager,access.gym.schedule.nutr.manager,model_gym_schedule_nutr,group_gym_manager,1,1,1,1
 
+access_model_gym_schedule_nutr_line_user,access.gym.schedule.nutr.line.user,model_gym_schedule_nutr_line,group_gym_user,1,1,1,0
+access_model_gym_schedule_nutr_line_manager,access.gym.schedule.nutr.line.manager,model_gym_schedule_nutr_line,group_gym_manager,1,1,1,1
+
+access_model_gym_nutr_schedule_wizard,access.gym.nutr.schedule.wizard,model_gym_nutr_schedule_wizard,,1,1,1,1
+access_model_gym_nutr_schedule_wizard_line,access.gym.nutr.schedule.wizard.line,model_gym_nutr_schedule_wizard_line,,1,1,1,1
+
 
 access_gym_food_item_user,access.gym.food.item.user,model_gym_food_item,group_gym_user,1,1,1,0
 access_gym_food_item_manager,access.gym.food.item.manager,model_gym_food_item,group_gym_manager,1,1,1,1

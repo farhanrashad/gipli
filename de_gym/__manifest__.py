@@ -18,7 +18,7 @@ GYM Manager
     'version': '17.0.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['de_subscription'],
+    'depends': ['de_subscription','web'],
 
     # always loaded
     'data': [
@@ -34,7 +34,15 @@ GYM Manager
         'views/activity_type_views.xml',
         'views/meal_type_views.xml',
         'views/nutr_schedule_views.xml',
+        'wizards/nutr_schedule_wizard_views.xml',
+        
     ],
+    #'assets': {
+    #    'web.assets_backend': [
+    #        'de_gym/static/src/js/nutr_schedule_button_calendar.js',
+    #        'de_gym/static/src/xml/nutr_schedule_button.xml',
+    #    ],
+    #},
     'application':True,
 }
 
