@@ -18,7 +18,7 @@ GYM Manager
     'version': '17.0.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['de_subscription','web'],
+    'depends': ['de_subscription','hr'],
 
     # always loaded
     'data': [

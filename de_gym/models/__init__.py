@@ -8,4 +8,4 @@ from . import gym_activity_type
 from . import meal_type
 from . import schedule_nutr
 from . import class_type
-from . import gym_class
+from . import class_planning
