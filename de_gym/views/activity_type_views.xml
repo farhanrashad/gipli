@@ -34,8 +34,8 @@
             </field>
         </record>
         
-        <menuitem name="Activity Type" id="menu_gym_subscription_config_activity_type"
-            parent="menu_gym_subscription_config_activity" 
+        <menuitem name="Activity Type" id="menu_gym_subscription_config_workout_activity_type"
+            parent="menu_gym_subscription_config_workout" 
             action="action_activity_type"
             groups="de_gym.group_gym_manager" 
             sequence="10"

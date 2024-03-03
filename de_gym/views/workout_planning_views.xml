@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <!-- Workout Planning form view -->
+        <record id="gym_workout_planning_form_view" model="ir.ui.view">
+            <field name="name">gym.workout.planning.form.view</field>
+            <field name="model">gym.workout.planning</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form string="GYM Workout Planning">
+                    <header>
+                        <button name="button_plan" 
+                            string="Plan" 
+                            type="object" 
+                            class="oe_highlight" 
+                            data-hotkey="o"
+                            invisible="state != 'draft'"
+                        />
+                        <button name="button_draft" 
+                            string="Set to Draft" 
+                            type="object" 
+                            invisible="state not in ('draft','review')"
+                        />
+                        <button name="button_confirm" 
+                            string="Confirm" 
+                            type="object" 
+                            class="oe_highlight" 
+                            data-hotkey="C"
+                            invisible="state != 'review'"
+                        />
+                        <button name="button_cancel" 
+                            string="Cancel" 
+                            type="object" 
+                            invisible="state in ('cancel','close')"
+                        />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,review,progress,close"/>
+                    </header>
+                    <sheet>
+                        
+                        <field name="company_id" invisible="1" />
+                        <field name="date_start" invisible="1" />
+                        <field name="date_end" invisible="1" />
+
+                        <div class="oe_button_box" name="button_box">
+                            <button
+                                name="open_schedule_lines"
+                                class="oe_stat_button"
+                                icon="fa-calendar"
+                                type="object"
+                            >
+                                <span class="o_stat_text">Schedule</span>
+                            </button>
+                            <button
+                                name="open_member_booking"
+                                class="oe_stat_button"
+                                icon="fa-ticket"
+                                type="object"
+                            >
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="member_id"/>
+                            <h1>
+                                <field name="member_id" 
+                                    readonly="state not in ('draft','review')"
+                                    options="{'no_create':True,'no_edit':True,'no_open':True}"
+                                />
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date_start" 
+                                    string="Planned Date" 
+                                    widget="daterange" 
+                                    options="{&quot;end_date_field&quot;: &quot;date_end&quot;, &quot;always_range&quot;: &quot;1&quot;}" 
+                                    required="date_start or date_end"
+                                    readonly="state not in ('draft','review')"
+                                />
+                            </group>
+                            <group>
+                                <field name="company_id" readonly="state not in ('draft','review')" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <separator string="Add Workout Activities"/>
+                        <div>
+                                <field name="day_mon" nolabel="1" class="oe_inline" style="padding-left:0px;padding-right:2px;" readonly="state not in ('draft','review')"/>
+                                <span class="oe_inline" >Monday</span>
+                                
+                                <field name="day_tue" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
+                                <span class="oe_inline" >Tuesday</span>
+                                
+                                <field name="day_wed" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
+                                <span class="oe_inline" >Wednesday</span>
+
+                                <field name="day_thu" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
+                                <span class="oe_inline" >Thursday</span>
+
+                                <field name="day_fri" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
+                                <span class="oe_inline" >Friday</span>
+
+                                <field name="day_sat" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
+                                <span class="oe_inline" >Saturday</span>
+
+                                <field name="day_sun" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
+                                <span class="oe_inline" >Sunday</span>
+                            </div>
+                       <group >
+                           
+                           <group>
+                               <field name="wo_activity_type_id" />
+                               <field name="workout_sets" />
+                               <field name="workout_reps" />
+                               
+                           </group>
+                           <group>
+                               
+                               <field name="workout_weight" />
+                               <field name="workout_rest" />
+                           </group>
+                           <button name="button_plan" 
+                                    string="Add Workout" 
+                                    type="object" 
+                                    class="oe_highlight" 
+                                    data-hotkey="o"
+                                    invisible="state != 'draft'"
+                                   style="width: 15rem;" 
+                                />
+                       </group>
+                        <notebook>
+                            <page string="Workout Details" name="workout_details" >
+                                <field name="workout_planning_line" readonly="state not in ('draft','review')">
+                                    <tree editable="bottom">
+                                        <field name="date" />
+                                        <field name="day_of_week" />
+                                        <field name="wo_activity_type_id" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+        <record id="workout_planning_tree_view" model="ir.ui.view">
+			<field name="name">workout.planning.tree.view</field>
+			<field name="model">gym.workout.planning</field>
+			<field name="arch" type="xml">
+				<tree string="Workout Planning">
+					<field name="member_id"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <field name="state"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+				</tree>
+			</field>
+		</record>
+        
+        <record id="workout_planning_search_view" model="ir.ui.view">
+            <field name="name">gym.workout.planning.search.view</field>
+            <field name="model">gym.workout.planning</field>
+            <field name="arch" type="xml">
+                <search string="Workout Planning">
+                    <field name="member_id" />
+                </search>
+             </field>
+        </record>
+        
+        <record id="action_workout_planning" model="ir.actions.act_window">
+            <field name="name">Workout Planning</field>
+            <field name="res_model">gym.workout.planning</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="workout_planning_search_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Plan a new workout.
+                </p>
+            </field>
+        </record>
+        
+        <menuitem name="Planning" id="menu_gym_subscription_workout_planning"
+            parent="menu_gym_subscription_workout" 
+            action="action_workout_planning"
+            sequence="10"
+        />
+        
+    </data>
+</odoo>

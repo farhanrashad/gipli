@@ -5,6 +5,10 @@ access_gym_nutrition_manager,access.gym.nutrition.manager,model_gym_nutrients,gr
 access_gym_activity_type_user,access.gym.activity.type.user,model_gym_activity_type,group_gym_user,1,1,1,0
 access_gym_activity_type_manager,access.gym.activity.type.manager,model_gym_activity_type,group_gym_manager,1,1,1,1
 
+access_gym_workout_level_user,access.gym.workout.level.user,model_gym_workout_level,group_gym_user,1,1,1,0
+access_gym_workout_level_manager,access.gym.workout.level.manager,model_gym_workout_level,group_gym_manager,1,1,1,1
+
+
 access_gym_nutr_meal_type_user,access.gym.nutr.meal.type.user,model_gym_nutr_meal_type,group_gym_user,1,1,1,0
 access_gym_nutr_meal_type_manager,access.gym.nutr.meal.type.manager,model_gym_nutr_meal_type,group_gym_manager,1,1,1,1
 
@@ -28,6 +32,12 @@ access_gym_class_planning_line_manager,access.gym.class.planning.line.manager,mo
 
 access_gym_class_booking_user,access.gym.class.booking.user,model_gym_class_booking,group_gym_user,1,1,1,0
 access_gym_class_booking_manager,access.gym.class.booking.line.manager,model_gym_class_booking,group_gym_manager,1,1,1,1
+
+access_gym_workout_planning_user,access.gym.workout.planning.user,model_gym_workout_planning,group_gym_user,1,1,1,0
+access_gym_workout_planning_manager,access.gym.workout.planning.manager,model_gym_workout_planning,group_gym_manager,1,1,1,1
+
+access_gym_workout_planning_line_user,access.gym.workout.planning.line.user,model_gym_workout_planning_line,group_gym_user,1,1,1,0
+access_gym_workout_planning_line_manager,access.gym.workout.planning.line.manager,model_gym_workout_planning_line,group_gym_manager,1,1,1,1
 
 
 access_gym_food_item_user,access.gym.food.item.user,model_gym_food_item,group_gym_user,1,1,1,0
