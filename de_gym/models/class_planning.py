@@ -28,6 +28,7 @@ STATES = [
 
 class GYMClassPlanning(models.Model):
     _name = 'gym.class.planning'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'GYM Class'
     _order = 'trainer_id, date_start desc'
     _rec_name = 'trainer_id'
@@ -71,6 +72,33 @@ class GYMClassPlanning(models.Model):
         default='draft',
         store=True, index='btree_not_null', tracking=True,
     )
+
+    # Constrains
+    @api.constrains('day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun')
+    def _check_at_least_one_selected(self):
+        if not any([self.day_mon, self.day_tue, self.day_wed, self.day_thu, self.day_fri, self.day_sat, self.day_sun]):
+            raise ValidationError("At least one day must be selected.")
+
+    @api.constrains('date_start', 'date_end', 'day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun')
+    def _check_no_overlapping_records(self):
+        for record in self:
+            overlapping_records = self.env['gym.class.planning'].search([
+                ('id', '!=', record.id),
+                ('company_id', '=', record.company_id.id),
+                ('class_type_id', '=', record.class_type_id.id),
+                ('date_start', '<=', record.date_end),
+                ('date_end', '>=', record.date_start),
+                '|', '|', '|',
+                ('day_mon', '=', record.day_mon),
+                ('day_tue', '=', record.day_tue),
+                ('day_wed', '=', record.day_wed),
+                ('day_thu', '=', record.day_thu),
+                ('day_fri', '=', record.day_fri),
+                ('day_sat', '=', record.day_sat),
+                ('day_sun', '=', record.day_sun),
+            ])
+            if overlapping_records:
+                raise ValidationError("The '%s' class already planned on the same day(s) between %s and %s." % (record.class_type_id.name, record.date_start, record.date_end))
 
 
     # Compute Methods
@@ -127,6 +155,16 @@ class GYMClassPlanning(models.Model):
                 'state': 'draft',
             })
 
+    def button_confirm(self):
+        for plan in self:
+            plan.write({
+                'state': 'progress',
+            })
+    def button_cancel(self):
+        for plan in self:
+            plan.write({
+                'state': 'cancel',
+            })
     def _prepare_schedule_values(self, date, weekday, time_from, time_to):
         return {
             'date': date,
@@ -158,12 +196,13 @@ class GYMClassPlanningLine(models.Model):
         default=10.0,
         required=True,
     )
-
-    _sql_constraints = [
-        ('unique_member_date', 'UNIQUE(class_planning_id, date, time_from)', 'Class timing cannot overlapped.')
-    ]
-
-
+    parent_state = fields.Selection(
+        string='Status',
+        selection=STATES,
+        store=True,
+        compute='_compute_state',
+    )
+    
     @api.depends('date')
     def _compute_day_of_week(self):
         for record in self:
@@ -171,3 +210,8 @@ class GYMClassPlanningLine(models.Model):
                 record.day_of_week = str(record.date.weekday())
             else:
                 record.day_of_week = False
+
+    @api.depends('class_planning_id','class_planning_id.state')
+    def _compute_state(self):
+        for line in self:
+            line.parent_state = line.class_planning_id.state

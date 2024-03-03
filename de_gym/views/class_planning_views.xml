@@ -20,7 +20,19 @@
                         <button name="button_draft" 
                             string="Set to Draft" 
                             type="object" 
-                            invisible="state in ('draft')"
+                            invisible="state not in ('draft','review')"
+                        />
+                        <button name="button_confirm" 
+                            string="Confirm" 
+                            type="object" 
+                            class="oe_highlight" 
+                            data-hotkey="C"
+                            invisible="state != 'review'"
+                        />
+                        <button name="button_cancel" 
+                            string="Cancel" 
+                            type="object" 
+                            invisible="state in ('cancel','close')"
                         />
                         <field name="state" widget="statusbar" statusbar_visible="draft,review,progress,close"/>
                     </header>
@@ -89,6 +101,11 @@
                             </page>
                         </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </form>
             </field>
         </record>
