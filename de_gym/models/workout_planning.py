@@ -81,7 +81,7 @@ class WorkoutPlanning(models.Model):
     @api.constrains('date_start', 'date_end', 'day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun')
     def _check_no_overlapping_records(self):
         for record in self:
-            overlapping_records = self.env['gym.class.planning'].search([
+            overlapping_records = self.env['gym.workout.planning'].search([
                 ('id', '!=', record.id),
                 ('company_id', '=', record.company_id.id),
                 ('date_start', '<=', record.date_end),
@@ -96,7 +96,7 @@ class WorkoutPlanning(models.Model):
                 ('day_sun', '=', record.day_sun),
             ])
             if overlapping_records:
-                raise ValidationError("The '%s' workout already planned on the same day(s) between %s and %s." % (record.class_type_id.name, record.date_start, record.date_end))
+                raise ValidationError("The '%s' workout already planned on the same day(s) between %s and %s." % ('test', record.date_start, record.date_end))
 
 
     # Compute Methods
@@ -112,34 +112,31 @@ class WorkoutPlanning(models.Model):
     # Actions
     def button_plan(self):
         for plan in self:
-            #raise UserError(plan.time_from)
-            if plan.time_from <= 0 or plan.time_to <=0 :
-                raise UserError('Please define the correct class time.')
-
+            
             schedule_data = []
             if plan.date_start and plan.date_end:
                 current_date = plan.date_start
 
                 while current_date <= plan.date_end:
                     if current_date.weekday() == 0 and plan.day_mon:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
+                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                     if current_date.weekday() == 1 and plan.day_tue:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
+                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                     if current_date.weekday() == 2 and plan.day_wed:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
+                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                     if current_date.weekday() == 3 and plan.day_thu:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
+                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                     if current_date.weekday() == 4 and plan.day_fri:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
+                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                     if current_date.weekday() == 5 and plan.day_sat:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
+                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                     if current_date.weekday() == 6 and plan.day_sun:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
+                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                     
                     current_date += timedelta(days=1)
 
                 try:
-                    self.env['gym.class.planning.line'].create(schedule_data)
+                    self.env['gym.workout.planning.line'].create(schedule_data)
                     plan.write({
                         'state': 'review',
                     })
@@ -164,15 +161,13 @@ class WorkoutPlanning(models.Model):
             plan.write({
                 'state': 'cancel',
             })
-    def _prepare_schedule_values(self, date, weekday, time_from, time_to):
+    def _prepare_schedule_values(self, date, weekday):
         return {
             'date': date,
             'day_of_week': str(date.weekday()),
-            'time_from': time_from,
-            'time_to': time_to,
-            'trainer_id': self.trainer_id.id,
-            'class_type_id': self.class_type_id.id,
-            'class_planning_id': self.id,
+            'member_id': self.member_id.id,
+            'workout_planning_id': self.id,
+            'wo_activity_type_id': self.wo_activity_type_id.id,
         }
 
     def open_schedule_lines(self):
@@ -181,7 +176,7 @@ class WorkoutPlanning(models.Model):
             'view_mode': 'tree,calendar',
             'res_model': 'gym.class.planning.line',
             'type': 'ir.actions.act_window',
-            'domain': [('class_planning_id','=',self.id)],
+            'domain': [('workout_planning_id','=',self.id)],
             'action_id': self.env.ref('de_gym.action_class_planning_line').id,
         }
 
@@ -192,10 +187,9 @@ class WorkoutPlanning(models.Model):
             'view_mode': 'tree,form',
             'res_model': 'gym.class.booking',
             'type': 'ir.actions.act_window',
-            'domain': [('class_planning_id', '=', self.id)],
+            'domain': [('workout_planning_id', '=', self.id)],
             'context': {
-                'default_class_type_id': self.class_type_id.id,
-                'default_class_planning_id': self.id,
+                'default_workout_planning_id': self.id,
             },
         })
         return action
@@ -252,7 +246,7 @@ class WorkoutPlanningLine(models.Model):
     )
     def _compute_all_from_planning(self):
         for line in self:
-            line.member_id = line.class_planning_id.trainer_id.id
+            line.member_id = line.workout_planning_id.member_id.id
 
     @api.model
     def _search_status(self, operator, value):

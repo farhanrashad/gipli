@@ -122,7 +122,7 @@
                                     type="object" 
                                     class="oe_highlight" 
                                     data-hotkey="o"
-                                    invisible="state != 'draft'"
+                                    invisible="state not in ('draft','review')"
                                    style="width: 15rem;" 
                                 />
                        </group>
