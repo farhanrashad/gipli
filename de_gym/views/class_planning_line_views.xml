@@ -11,11 +11,23 @@
 					<field name="trainer_id"/>
                     <field name="date"/>
                     <field name="day_of_week"/>
-                    <field name="status" decoration-success="status == 'completed'" decoration-info="status == 'session'" decoration-primary="status == 'upcoming'" widget="badge" optional="hide"/>
+                    <field name="status" decoration-success="status == 'completed'" decoration-info="status == 'session'" decoration-primary="status == 'upcoming'" widget="badge"/>
 
 				</tree>
 			</field>
 		</record>
+
+        <record id="class_planning_line_calendar_view" model="ir.ui.view">
+        <field name="name">class.planning.line.calendar.view</field>
+        <field name="model">gym.class.planning.line</field>
+        <field name="arch" type="xml">
+            <calendar string="Class Planning" create="0" mode="month" date_start="date" quick_create="0">
+                <field name="trainer_id" />
+                <field name="class_type_id"/>
+                <field name="date"/>
+            </calendar>
+        </field>
+    </record>
         
         <record id="class_planning_line_search_view" model="ir.ui.view">
             <field name="name">gym.class.planning.search.view</field>
@@ -51,7 +63,7 @@
         <record id="action_class_planning_line" model="ir.actions.act_window">
             <field name="name">Class Schedules</field>
             <field name="res_model">gym.class.planning.line</field>
-            <field name="view_mode">tree</field>
+            <field name="view_mode">tree,calendar</field>
             <field name="search_view_id" ref="class_planning_line_search_view"/>
             <field name="context">{
                 'create': False,

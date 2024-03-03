@@ -37,9 +37,21 @@
                         <field name="state" widget="statusbar" statusbar_visible="draft,review,progress,close"/>
                     </header>
                     <sheet>
+                        
                         <field name="company_id" invisible="1" />
                         <field name="date_start" invisible="1" />
                         <field name="date_end" invisible="1" />
+
+                        <div class="oe_button_box" name="button_box">
+                            <button
+                                name="open_schedule_lines"
+                                class="oe_stat_button"
+                                icon="fa-calendar"
+                                type="object"
+                            >
+                                <span class="o_stat_text">Schedule</span>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <label for="class_type_id"/>
                             <h1>

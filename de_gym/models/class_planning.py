@@ -183,9 +183,21 @@ class GYMClassPlanning(models.Model):
             'class_type_id': self.class_type_id.id,
             'class_planning_id': self.id,
         }
+
+    def open_schedule_lines(self):
+        return {
+            'name': 'Schedule Lines',
+            'view_mode': 'tree,calendar',
+            'res_model': 'gym.class.planning.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('class_planning_id','=',self.id)],
+            'action_id': self.env.ref('de_gym.action_class_planning_line').id,
+        }
+        
 class GYMClassPlanningLine(models.Model):
     _name = 'gym.class.planning.line'
     _description = 'Schedule Class'
+    _rec_name = 'class_type_id'
 
     class_planning_id = fields.Many2one('gym.class.planning', string='Class', 
                                    required=True, ondelete='cascade')
