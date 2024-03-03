@@ -36,6 +36,7 @@ GYM Manager
         'views/class_type_views.xml',
         'views/nutr_schedule_views.xml',
         'wizards/nutr_schedule_wizard_views.xml',
+        'views/class_planning_views.xml',
         
     ],
     #'assets': {

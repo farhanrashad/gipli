@@ -11,7 +11,8 @@
     <menuitem id="menu_gym_subscription_members" name="Members" parent="menu_gym_root" sequence="10"/>
     <menuitem id="menu_gym_subscription_services" name="Services" parent="menu_gym_root" sequence="20"/>
     <menuitem id="menu_gym_subscription_schedule" name="Schedule" parent="menu_gym_root" sequence="30"/>
-    <menuitem id="menu_gym_subscription_nutrition" name="Nutrition" parent="menu_gym_root" sequence="40"/>
+    <menuitem id="menu_gym_subscription_classes" name="Classes" parent="menu_gym_root" sequence="40"/>
+    <menuitem id="menu_gym_subscription_nutrition" name="Nutrition" parent="menu_gym_root" sequence="50"/>
     <menuitem id="menu_gym_subscription_reports" name="Reports" parent="menu_gym_root" sequence="90"/>
     <menuitem id="menu_gym_subscription_config" name="Configuration" parent="menu_gym_root" sequence="100"/>
         <menuitem id="menu_gym_subscription_config_nutr" name="Nuitrition" parent="menu_gym_subscription_config" sequence="10"/>
