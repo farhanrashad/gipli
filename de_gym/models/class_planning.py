@@ -180,6 +180,10 @@ class GYMClassPlanningLine(models.Model):
     class_planning_id = fields.Many2one('gym.class.planning', string='Class', 
                                    required=True, ondelete='cascade')
 
+    trainer_id = fields.Many2one('hr.employee',
+                                 compute='_compute_all_from_planning', 
+                                 search='_search_trainer',
+                                )
     date = fields.Date('Date', required=True)
     day_of_week = fields.Selection(
         string='Day of Week',
@@ -211,7 +215,16 @@ class GYMClassPlanningLine(models.Model):
             else:
                 record.day_of_week = False
 
-    @api.depends('class_planning_id','class_planning_id.state')
-    def _compute_state(self):
+    @api.depends('class_planning_id','class_planning_id.state','class_planning_id.trainer_id')
+    def _compute_all_from_planning(self):
         for line in self:
             line.parent_state = line.class_planning_id.state
+            line.trainer_id = line.class_planning_id.trainer_id.id
+
+    def _search_trainer_id(self):
+        return self.class_planning_id.trainer_id.id
+
+    def _search_trainer(self, operator, value):
+        return [
+                ('class_planning_id.trainer_id', '=', value),
+            ]

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        
+        <record id="class_planning_line_tree_view" model="ir.ui.view">
+			<field name="name">gym.class.planning.line.tree.view</field>
+			<field name="model">gym.class.planning.line</field>
+			<field name="arch" type="xml">
+				<tree string="Class Planning">
+					<field name="trainer_id"/>
+                    <field name="date"/>
+                    <field name="parent_state"/>
+				</tree>
+			</field>
+		</record>
+        
+        <record id="class_planning_line_search_view" model="ir.ui.view">
+            <field name="name">gym.class.planning.search.view</field>
+            <field name="model">gym.class.planning.line</field>
+            <field name="arch" type="xml">
+                <search string="Class Planning">
+                    <field name="trainer_id" />
+                </search>
+             </field>
+        </record>
+        
+        <record id="action_class_planning_line" model="ir.actions.act_window">
+            <field name="name">Class Schedules</field>
+            <field name="res_model">gym.class.planning.line</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="class_planning_line_search_view"/>
+            <field name="context">{
+                'create': False,
+                'edit': False,
+                }
+            </field>
+        </record>
+        
+        <menuitem name="Class Schedules" id="menu_gym_subscription_classes_planning_line"
+            parent="menu_gym_subscription_classes" 
+            action="action_class_planning_line"
+            sequence="20"
+        />
+        
+    </data>
+</odoo>
