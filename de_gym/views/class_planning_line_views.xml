@@ -21,10 +21,11 @@
         <field name="name">class.planning.line.calendar.view</field>
         <field name="model">gym.class.planning.line</field>
         <field name="arch" type="xml">
-            <calendar string="Class Planning" create="0" mode="month" date_start="date" quick_create="0">
-                <field name="trainer_id" />
+            <calendar string="Class Planning" create="0" mode="month" date_start="date" color="status"  quick_create="0">
                 <field name="class_type_id"/>
                 <field name="date"/>
+                <field name="status" filters="1" invisible="1"/>
+                <field name="trainer_id" filters="2" invisible="1" />
             </calendar>
         </field>
     </record>
@@ -63,7 +64,7 @@
         <record id="action_class_planning_line" model="ir.actions.act_window">
             <field name="name">Class Schedules</field>
             <field name="res_model">gym.class.planning.line</field>
-            <field name="view_mode">tree,calendar</field>
+            <field name="view_mode">calendar,tree</field>
             <field name="search_view_id" ref="class_planning_line_search_view"/>
             <field name="context">{
                 'create': False,
