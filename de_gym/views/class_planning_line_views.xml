@@ -7,9 +7,12 @@
 			<field name="model">gym.class.planning.line</field>
 			<field name="arch" type="xml">
 				<tree string="Class Planning">
+                    <field name="class_type_id"/>
 					<field name="trainer_id"/>
                     <field name="date"/>
-                    <field name="parent_state"/>
+                    <field name="day_of_week"/>
+                    <field name="status" decoration-success="status == 'completed'" decoration-info="status == 'session'" decoration-primary="status == 'upcoming'" widget="badge" optional="hide"/>
+
 				</tree>
 			</field>
 		</record>
@@ -20,6 +23,27 @@
             <field name="arch" type="xml">
                 <search string="Class Planning">
                     <field name="trainer_id" />
+                    <field name="class_type_id" />
+                    <field name="date" />
+                    <field name="day_of_week" />
+                    <field name="status" />
+
+                    <filter string="Today Classes" name="today_classes"
+                        domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all session which has date is today"/>
+
+                    <filter string="Upcoming" name="upcoming_classes"
+                        domain="[('date', '&gt;', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all session which has date is after today"/>
+                    
+                    <separator/>
+                    
+                    <group expand="0" string="Group By">
+                        <filter string="Class" name="groupby_class_type" context="{'group_by': 'class_type_id'}"/>
+                        <filter string="Trainer" name="groupby_trainer" context="{'group_by': 'trainer_id'}"/>
+                        <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date'}"/>
+                    <separator/>
+                    </group>
                 </search>
              </field>
         </record>
@@ -32,6 +56,7 @@
             <field name="context">{
                 'create': False,
                 'edit': False,
+                'search_default_upcoming_classes': 1,
                 }
             </field>
         </record>

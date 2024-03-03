@@ -26,6 +26,13 @@ STATES = [
     ('cancel', 'Cancel'),
 ]
 
+CLASS_STATUS = [
+    ('upcoming', 'Upcoming'),
+    ('session', 'In session'),
+    ('completed', 'Completed'),
+    ('cancel', 'Cancel')
+]
+
 class GYMClassPlanning(models.Model):
     _name = 'gym.class.planning'
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -151,6 +158,7 @@ class GYMClassPlanning(models.Model):
                 
     def button_draft(self):
         for plan in self:
+            plan.class_line.unlink()
             plan.write({
                 'state': 'draft',
             })
@@ -171,6 +179,8 @@ class GYMClassPlanning(models.Model):
             'day_of_week': str(date.weekday()),
             'time_from': time_from,
             'time_to': time_to,
+            'trainer_id': self.trainer_id.id,
+            'class_type_id': self.class_type_id.id,
             'class_planning_id': self.id,
         }
 class GYMClassPlanningLine(models.Model):
@@ -182,8 +192,14 @@ class GYMClassPlanningLine(models.Model):
 
     trainer_id = fields.Many2one('hr.employee',
                                  compute='_compute_all_from_planning', 
-                                 search='_search_trainer',
+                                 store=True,
                                 )
+
+    class_type_id = fields.Many2one('gym.class.type',
+                                 compute='_compute_all_from_planning', 
+                                 store=True,
+                                )
+    
     date = fields.Date('Date', required=True)
     day_of_week = fields.Selection(
         string='Day of Week',
@@ -200,11 +216,13 @@ class GYMClassPlanningLine(models.Model):
         default=10.0,
         required=True,
     )
-    parent_state = fields.Selection(
+    
+    status = fields.Selection(
         string='Status',
-        selection=STATES,
-        store=True,
-        compute='_compute_state',
+        selection=CLASS_STATUS,
+        compute='_compute_status',
+        search='_search_status',
+        group_expand='_group_expand_states',
     )
     
     @api.depends('date')
@@ -215,16 +233,33 @@ class GYMClassPlanningLine(models.Model):
             else:
                 record.day_of_week = False
 
-    @api.depends('class_planning_id','class_planning_id.state','class_planning_id.trainer_id')
+    @api.depends('date', 'time_from', 'time_to')
+    def _compute_status(self):
+        current_datetime = fields.Datetime.now()
+        for record in self:
+            if record.date > current_datetime.date():
+                record.status = 'upcoming'
+            elif record.date == current_datetime.date() and record.time_from <= current_datetime.hour and record.time_to > current_datetime.hour:
+                record.status = 'session'
+            else:
+                record.status = 'completed'
+                
+    @api.depends(
+        'class_planning_id',
+        'class_planning_id.trainer_id',
+        'class_planning_id.class_type_id',
+    )
     def _compute_all_from_planning(self):
         for line in self:
-            line.parent_state = line.class_planning_id.state
             line.trainer_id = line.class_planning_id.trainer_id.id
+            line.class_type_id = line.class_planning_id.class_type_id.id
 
-    def _search_trainer_id(self):
-        return self.class_planning_id.trainer_id.id
+    @api.model
+    def _search_status(self, operator, value):
+        if operator == '=':
+            return [('status', '=', value)]
+        else:
+            return []
 
-    def _search_trainer(self, operator, value):
-        return [
-                ('class_planning_id.trainer_id', '=', value),
-            ]
+    def _group_expand_states(self, states, domain, order):
+        return ['upcoming', 'session','completed']
