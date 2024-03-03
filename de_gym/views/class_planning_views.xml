@@ -51,58 +51,90 @@
                             >
                                 <span class="o_stat_text">Schedule</span>
                             </button>
+                            <button
+                                name="open_member_booking"
+                                class="oe_stat_button"
+                                icon="fa-ticket"
+                                type="object"
+                            >
+                                <field name="booking_count" widget="statinfo" string="Booking"/>
+                            </button>
                         </div>
                         <div class="oe_title">
                             <label for="class_type_id"/>
                             <h1>
-                                <field name="class_type_id" options="{'no_create':True,'no_edit':True,'no_open':True}"/>
+                                <field name="class_type_id" 
+                                    readonly="state not in ('draft','review')"
+                                    options="{'no_create':True,'no_edit':True,'no_open':True}"
+                                />
                             </h1>
                         </div>
                         <group>
                             <group>
-                                <field name="trainer_id" options="{'no_create':True,'no_edit':True}" />
-                                <field name="sub_trainer_id" options="{'no_create':True,'no_edit':True}" />
+                                <field name="trainer_id" 
+                                    readonly="state not in ('draft','review')"
+                                    options="{'no_create':True,'no_edit':True}" 
+                                />
+                                <field name="sub_trainer_id" 
+                                    readonly="state not in ('draft','review')"
+                                    options="{'no_create':True,'no_edit':True}" 
+                                />
 
-                                <field name="date_start" string="Planned Date" widget="daterange" options="{&quot;end_date_field&quot;: &quot;date_end&quot;, &quot;always_range&quot;: &quot;1&quot;}" required="date_start or date_end"/>
+                                <field name="date_start" 
+                                    string="Planned Date" 
+                                    widget="daterange" 
+                                    options="{&quot;end_date_field&quot;: &quot;date_end&quot;, &quot;always_range&quot;: &quot;1&quot;}" 
+                                    required="date_start or date_end"
+                                    readonly="state not in ('draft','review')"
+                                />
                                 
                                 <label for="time_from" string="Timing"/>
                                 <div>
-                                    <field name="time_from" style="width: 5rem;" widget="float_time"/>
+                                    <field name="time_from" 
+                                        style="width: 5rem;" 
+                                        widget="float_time"
+                                        readonly="state not in ('draft','review')"
+                                    />
                                     <span> - </span>
-                                    <field name="time_to" style="width: 5rem;" widget="float_time"/>
+                                    <field name="time_to" 
+                                        style="width: 5rem;" 
+                                        widget="float_time"
+                                        readonly="state not in ('draft','review')"
+                                    />
                                 </div>
                             </group>
                             <group>
-                                <field name="location" />
-                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="location" readonly="state not in ('draft','review')"/>
+                                <field name="limit_seat" readonly="state not in ('draft','review')"/>
+                                <field name="company_id" readonly="state not in ('draft','review')" groups="base.group_multi_company"/>
                             </group>
                         </group>
                         <div>
-                                <field name="day_mon" nolabel="1" class="oe_inline" style="padding-left:0px;padding-right:2px;" />
+                                <field name="day_mon" nolabel="1" class="oe_inline" style="padding-left:0px;padding-right:2px;" readonly="state not in ('draft','review')"/>
                                 <span class="oe_inline" >Monday</span>
                                 
-                                <field name="day_tue" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <field name="day_tue" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
                                 <span class="oe_inline" >Tuesday</span>
                                 
-                                <field name="day_wed" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <field name="day_wed" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
                                 <span class="oe_inline" >Wednesday</span>
 
-                                <field name="day_thu" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <field name="day_thu" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
                                 <span class="oe_inline" >Thursday</span>
 
-                                <field name="day_fri" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <field name="day_fri" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
                                 <span class="oe_inline" >Friday</span>
 
-                                <field name="day_sat" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <field name="day_sat" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
                                 <span class="oe_inline" >Saturday</span>
 
-                                <field name="day_sun" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <field name="day_sun" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
                                 <span class="oe_inline" >Sunday</span>
                         </div>
                        
                         <notebook>
                             <page string="Schedule" name="schedule" >
-                                <field name="class_line">
+                                <field name="class_line" readonly="state not in ('draft','review')">
                                     <tree editable="bottom">
                                         <field name="date" />
                                         <field name="day_of_week" />

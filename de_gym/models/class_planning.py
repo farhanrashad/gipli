@@ -79,7 +79,10 @@ class GYMClassPlanning(models.Model):
         default='draft',
         store=True, index='btree_not_null', tracking=True,
     )
-
+    limit_seat = fields.Integer('Seat Limit', default=10, required=True)
+    class_booking_line = fields.One2many('gym.class.booking', 'class_planning_id', string='Class booking Line')
+    booking_count = fields.Integer(string="Booking Count", compute='_compute_booking_count')
+    
     # Constrains
     @api.constrains('day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun')
     def _check_at_least_one_selected(self):
@@ -118,6 +121,9 @@ class GYMClassPlanning(models.Model):
             end_of_month = date_start.replace(day=1) + relativedelta(months=1, days=-1)
             record.date_end = end_of_month.strftime('%Y-%m-%d')
 
+    def _compute_booking_count(self):
+        for plan in self:
+            plan.booking_count = len(plan.class_booking_line)
     # Actions
     def button_plan(self):
         for plan in self:
@@ -193,6 +199,21 @@ class GYMClassPlanning(models.Model):
             'domain': [('class_planning_id','=',self.id)],
             'action_id': self.env.ref('de_gym.action_class_planning_line').id,
         }
+
+    def open_member_booking(self):
+        action = self.env.ref('de_gym.action_class_booking').read()[0]
+        action.update({
+            'name': 'Booking',
+            'view_mode': 'tree,form',
+            'res_model': 'gym.class.booking',
+            'type': 'ir.actions.act_window',
+            'domain': [('class_planning_id', '=', self.id)],
+            'context': {
+                'default_class_type_id': self.class_type_id.id,
+                'default_class_planning_id': self.id,
+            },
+        })
+        return action
         
 class GYMClassPlanningLine(models.Model):
     _name = 'gym.class.planning.line'
@@ -275,3 +296,17 @@ class GYMClassPlanningLine(models.Model):
 
     def _group_expand_states(self, states, domain, order):
         return ['upcoming', 'session','completed']
+
+
+class GYMClassbooking(models.Model):
+    _name = 'gym.class.booking'
+    _description = 'Class Class'
+    _rec_name = 'class_type_id'
+
+    class_planning_id = fields.Many2one('gym.class.planning', string='Class', 
+                                   ondelete='cascade')
+    class_type_id = fields.Many2one('gym.class.type',related='class_planning_id.class_type_id')
+    member_id = fields.Many2one('res.partner',
+                                 required=True,
+                                domain="[('is_gym_member','=',True)]"
+                                )
