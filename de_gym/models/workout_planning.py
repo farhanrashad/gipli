@@ -113,40 +113,6 @@ class WorkoutPlanning(models.Model):
         })
         return action
         
-    def button_plan1(self):
-        for plan in self:
-            
-            schedule_data = []
-            if plan.date_start and plan.date_end:
-                current_date = plan.date_start
-
-                while current_date <= plan.date_end:
-                    if current_date.weekday() == 0 and plan.day_mon:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
-                    if current_date.weekday() == 1 and plan.day_tue:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
-                    if current_date.weekday() == 2 and plan.day_wed:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
-                    if current_date.weekday() == 3 and plan.day_thu:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
-                    if current_date.weekday() == 4 and plan.day_fri:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
-                    if current_date.weekday() == 5 and plan.day_sat:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
-                    if current_date.weekday() == 6 and plan.day_sun:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
-                    
-                    current_date += timedelta(days=1)
-
-                try:
-                    self.env['gym.workout.planning.line'].create(schedule_data)
-                    plan.write({
-                        'state': 'review',
-                    })
-                except:
-                    pass
-                
-                
     def button_draft(self):
         for plan in self:
             plan.workout_planning_line.unlink()
@@ -164,14 +130,7 @@ class WorkoutPlanning(models.Model):
             plan.write({
                 'state': 'cancel',
             })
-    def _prepare_schedule_values(self, date, weekday):
-        return {
-            'date': date,
-            'day_of_week': str(date.weekday()),
-            'member_id': self.member_id.id,
-            'workout_planning_id': self.id,
-            'wo_activity_type_id': self.wo_activity_type_id.id,
-        }
+    
 
     def open_weekly_plan(self):
         action = self.env.ref('de_gym.action_workout_planning_line_weekly').read()[0]
@@ -180,9 +139,14 @@ class WorkoutPlanning(models.Model):
             'view_mode': 'tree,form',
             'res_model': 'gym.workout.planning.line',
             'type': 'ir.actions.act_window',
-            'domain': [('workout_planning_id', '=', self.id)],
+            'domain': [('workout_planning_id', '=', self.id),('plan_mode', '=', 'week')],
             'context': {
+                'create': 0,
+                'edit': 1,
                 'default_workout_planning_id': self.id,
+                'default_order': 'sequence asc',
+                #'search_default_groupby_day_of_week': 1,
+                #'search_default_groupby_actvity_type': 1,
             },
         })
         return action
@@ -194,9 +158,12 @@ class WorkoutPlanning(models.Model):
             'view_mode': 'tree,form',
             'res_model': 'gym.workout.planning.line',
             'type': 'ir.actions.act_window',
-            'domain': [('workout_planning_id', '=', self.id)],
+            'domain': [('workout_planning_id', '=', self.id),('plan_mode', '=', 'day')],
             'context': {
-                'default_workout_planning_id': self.id,
+                'create': 0,
+                'edit': 1,
+                #'default_workout_planning_id': self.id,
+                #'search_default_groupby_actvity_type': 1,
             },
         })
         return action
@@ -213,14 +180,21 @@ class WorkoutPlanningLine(models.Model):
                                  store=True,
                                 )
     
-    date = fields.Date('Date')
+    date = fields.Date('Date', readonly=True)
     day_of_week = fields.Selection(
         string='Day of Week',
         selection=DAY_SELECTION,
-        compute='_compute_day_of_week', store=True, 
+        store=True, readonly=True,
     )
-    wo_activity_type_id = fields.Many2one('gym.activity.type', string='Activity Type')
-    workout_activity_id = fields.Many2one('gym.workout.activity', string='Activity')
+    wo_activity_type_id = fields.Many2one('gym.activity.type', string='Activity Type', readonly=True)
+    workout_activity_id = fields.Many2one('gym.workout.activity', string='Activity', readonly=True)
+
+    workout_sets = fields.Integer('Sets', default=1)
+    workout_reps = fields.Integer('Reps', default=1)
+    workout_weight = fields.Integer('Weight (kg)', default=1)
+    workout_rest = fields.Float('Rest Time')
+
+    
     plan_mode = fields.Selection([
         ('day', 'Daily'),  
         ('week', 'Weekly'), 
@@ -247,12 +221,15 @@ class WorkoutPlanningLine(models.Model):
     def _compute_status(self):
         current_datetime = fields.Datetime.now()
         for record in self:
-            if record.date > current_datetime.date():
-                record.status = 'upcoming'
-            elif record.date == current_datetime.date():
-                record.status = 'session'
+            if record.date:
+                if record.date > current_datetime.date():
+                    record.status = 'upcoming'
+                elif record.date == current_datetime.date():
+                    record.status = 'session'
+                else:
+                    record.status = 'completed'
             else:
-                record.status = 'completed'
+                record.status = False
                 
     @api.depends(
         'workout_planning_id',
