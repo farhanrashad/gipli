@@ -186,7 +186,7 @@
         <menuitem name="Planning" id="menu_gym_subscription_workout_planning"
             parent="menu_gym_subscription_workout" 
             action="action_workout_planning"
-            sequence="10"
+            sequence="20"
         />
         
     </data>

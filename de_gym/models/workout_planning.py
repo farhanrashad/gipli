@@ -111,6 +111,20 @@ class WorkoutPlanning(models.Model):
 
     # Actions
     def button_plan(self):
+        action = self.env.ref('de_gym.action_workout_plan_wizard').read()[0]
+        action.update({
+            'name': 'Workout',
+            'view_mode': 'form',
+            'res_model': 'gym.workout.plan.wizard',
+            'type': 'ir.actions.act_window',
+            'domain': [('workout_planning_id', '=', self.id)],
+            'context': {
+                'default_workout_planning_id': self.id,
+            },
+        })
+        return action
+        
+    def button_plan1(self):
         for plan in self:
             
             schedule_data = []
@@ -146,7 +160,7 @@ class WorkoutPlanning(models.Model):
                 
     def button_draft(self):
         for plan in self:
-            plan.class_line.unlink()
+            plan.workout_planning_line.unlink()
             plan.write({
                 'state': 'draft',
             })

@@ -41,6 +41,8 @@ GYM Manager
         'views/class_planning_line_views.xml',
         'views/class_booking_views.xml',
         'views/workout_planning_views.xml',
+        'wizards/workout_plan_wizard_views.xml',
+        'views/workout_activity_views.xml',
     ],
     #'assets': {
     #    'web.assets_backend': [
