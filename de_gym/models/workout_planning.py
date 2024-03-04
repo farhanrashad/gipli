@@ -48,20 +48,9 @@ class WorkoutPlanning(models.Model):
                              readonly=False, store=True, required=True, copy=True)
     date_end = fields.Date("End Date", compute='_compute_datetime', 
                            readonly=False, store=True, required=True, copy=True)
-    
-    day_mon = fields.Boolean('Monday')
-    day_tue = fields.Boolean('Tuesday')
-    day_wed = fields.Boolean('Wednesday')
-    day_thu = fields.Boolean('Thursday')
-    day_fri = fields.Boolean('Friday')
-    day_sat = fields.Boolean('Saturday')
-    day_sun = fields.Boolean('Sunday')
+    date = fields.Date('Date',required=True, default=fields.Date.today())
 
-    wo_activity_type_id = fields.Many2one('gym.activity.type', string='Activity Type')
-    workout_sets = fields.Integer('Sets', default=1)
-    workout_reps = fields.Integer('Reps', default=1)
-    workout_weight = fields.Integer('Weight (kg)', default=1)
-    workout_rest = fields.Float('Rest Time')
+    workout_level_id = fields.Many2one('gym.workout.level', string='Level')
     
     workout_planning_line = fields.One2many('gym.workout.planning.line', 'workout_planning_id', string='Workout Planning Line')
 
@@ -184,22 +173,26 @@ class WorkoutPlanning(models.Model):
             'wo_activity_type_id': self.wo_activity_type_id.id,
         }
 
-    def open_schedule_lines(self):
-        return {
-            'name': 'Schedule Lines',
-            'view_mode': 'tree,calendar',
-            'res_model': 'gym.class.planning.line',
-            'type': 'ir.actions.act_window',
-            'domain': [('workout_planning_id','=',self.id)],
-            'action_id': self.env.ref('de_gym.action_class_planning_line').id,
-        }
-
-    def open_member_booking(self):
-        action = self.env.ref('de_gym.action_class_booking').read()[0]
+    def open_weekly_plan(self):
+        action = self.env.ref('de_gym.action_workout_planning_line_weekly').read()[0]
         action.update({
-            'name': 'Booking',
+            'name': 'Weekly Workout Plan',
             'view_mode': 'tree,form',
-            'res_model': 'gym.class.booking',
+            'res_model': 'gym.workout.planning.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('workout_planning_id', '=', self.id)],
+            'context': {
+                'default_workout_planning_id': self.id,
+            },
+        })
+        return action
+
+    def open_daily_plan(self):
+        action = self.env.ref('de_gym.action_workout_planning_line_daily').read()[0]
+        action.update({
+            'name': 'Weekly Workout Plan',
+            'view_mode': 'tree,form',
+            'res_model': 'gym.workout.planning.line',
             'type': 'ir.actions.act_window',
             'domain': [('workout_planning_id', '=', self.id)],
             'context': {
@@ -220,13 +213,20 @@ class WorkoutPlanningLine(models.Model):
                                  store=True,
                                 )
     
-    date = fields.Date('Date', required=True)
+    date = fields.Date('Date')
     day_of_week = fields.Selection(
         string='Day of Week',
         selection=DAY_SELECTION,
         compute='_compute_day_of_week', store=True, 
     )
     wo_activity_type_id = fields.Many2one('gym.activity.type', string='Activity Type')
+    workout_activity_id = fields.Many2one('gym.workout.activity', string='Activity')
+    plan_mode = fields.Selection([
+        ('day', 'Daily'),  
+        ('week', 'Weekly'), 
+    ], 
+        string='Mode', required=True, default="week",
+    )
     status = fields.Selection(
         string='Status',
         selection=CLASS_STATUS,

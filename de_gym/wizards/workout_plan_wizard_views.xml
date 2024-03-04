@@ -16,13 +16,13 @@
                         </div>
                         <group>
                             <group>
-                               
+                               <field name="plan_mode" widget="radio" />
                             </group>
                             <group>
                                 
                             </group>
                         </group>
-                            <div>
+                            <div style="padding:10px 0px;">
                                 <field name="day_mon" nolabel="1" class="oe_inline" style="padding-left:0px;padding-right:2px;" />
                                 <span class="oe_inline" >Monday</span>
                                 

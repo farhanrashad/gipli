@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        
+        <record id="workout_planning_line_weekly_tree_view" model="ir.ui.view">
+			<field name="name">gym.workout.planning.line.weekly.tree.view</field>
+			<field name="model">gym.workout.planning.line</field>
+			<field name="arch" type="xml">
+				<tree string="Workout Planning">
+                    <field name="day_of_week"/>
+					<field name="wo_activity_type_id" options="{'no_create':True,'no_edit':True,'no_open':True}" />
+                    <field name="workout_activity_id" options="{'no_create':True,'no_edit':True,'no_open':True}"/>
+				</tree>
+			</field>
+		</record>
+
+        <record id="workout_planning_line_daily_tree_view" model="ir.ui.view">
+			<field name="name">gym.workout.planning.line.daily.tree.view</field>
+			<field name="model">gym.workout.planning.line</field>
+			<field name="arch" type="xml">
+				<tree string="Workout Planning">
+                    <field name="date"/>
+                    <field name="day_of_week"/>
+					<field name="wo_activity_type_id" options="{'no_create':True,'no_edit':True,'no_open':True}"/>
+                    <field name="workout_activity_id" options="{'no_create':True,'no_edit':True,'no_open':True}"/>
+                    <field name="day_of_week"/>
+                    <field name="status" decoration-success="status == 'completed'" decoration-info="status == 'session'" decoration-primary="status == 'upcoming'" widget="badge"/>
+
+				</tree>
+			</field>
+		</record>
+
+        <record id="workout_planning_line_calendar_view" model="ir.ui.view">
+        <field name="name">workout.planning.line.calendar.view</field>
+        <field name="model">gym.workout.planning.line</field>
+        <field name="arch" type="xml">
+            <calendar string="Wrokout Planning" create="0" mode="month" date_start="date" color="status"  quick_create="0">
+                <field name="day_of_week"/>
+                <field name="date"/>
+                <field name="status" filters="1" invisible="1"/>
+                <field name="member_id" filters="2" invisible="1" />
+            </calendar>
+        </field>
+    </record>
+        
+        <record id="workout_planning_line_search_view" model="ir.ui.view">
+            <field name="name">gym.workout.planning.search.view</field>
+            <field name="model">gym.workout.planning.line</field>
+            <field name="arch" type="xml">
+                <search string="Workout Planning">
+                    <field name="member_id" />
+                    <field name="wo_activity_type_id" />
+                    <field name="workout_activity_id" />
+                    <field name="date" />
+                    <field name="day_of_week" />
+                    <field name="status" />
+
+                    <filter string="Today Classes" name="today_classes"
+                        domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all session which has date is today"/>
+
+                    <filter string="Upcoming" name="upcoming_classes"
+                        domain="[('date', '&gt;', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all session which has date is after today"/>
+                    
+                    <separator/>
+                    
+                    <group expand="0" string="Group By">
+                        <filter string="Type" name="groupby_actvity_type" context="{'group_by': 'wo_activity_type_id'}"/>
+                        <filter string="Activity" name="groupby_activity" context="{'group_by': 'workout_activity_id'}"/>
+                        <filter string="Member" name="groupby_member" context="{'group_by': 'member_id'}"/>
+                        <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date'}"/>
+                    <separator/>
+                    </group>
+                </search>
+             </field>
+        </record>
+        
+        <record id="action_workout_planning_line_daily" model="ir.actions.act_window">
+            <field name="name">Wrokout Schedules</field>
+            <field name="res_model">gym.workout.planning.line</field>
+            <field name="view_mode">calendar,tree</field>
+            <field name="search_view_id" ref="workout_planning_line_search_view"/>
+            <field name="view_id" ref="workout_planning_line_daily_tree_view"/>
+            <field name="context">{
+                'create': False,
+                'edit': False,
+                'search_default_upcoming_classes': 1,
+                }
+            </field>
+        </record>
+
+        <record id="action_workout_planning_line_weekly" model="ir.actions.act_window">
+            <field name="name">Wrokout Schedules</field>
+            <field name="res_model">gym.workout.planning.line</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="workout_planning_line_search_view"/>
+            <field name="view_id" ref="workout_planning_line_weekly_tree_view"/>
+            <field name="context">{
+                'create': False,
+                'edit': False,
+                'search_default_upcoming_classes': 1,
+                }
+            </field>
+        </record>
+        
+        
+    </data>
+</odoo>
