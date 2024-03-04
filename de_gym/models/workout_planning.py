@@ -60,6 +60,9 @@ class WorkoutPlanning(models.Model):
         default='draft',
         store=True, index='btree_not_null', tracking=True,
     )
+
+    day_plan_count = fields.Integer(string='Daily Plan', compute='_compute_daily_plan_count')
+    week_plan_count = fields.Integer(string='Daily Plan', compute='_compute_weekly_plan_count')
     
     # Constrains
     @api.constrains('day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun')
@@ -98,17 +101,26 @@ class WorkoutPlanning(models.Model):
             end_of_month = date_start.replace(day=1) + relativedelta(months=1, days=-1)
             record.date_end = end_of_month.strftime('%Y-%m-%d')
 
+    def _compute_daily_plan_count(self):
+        for plan in self:
+            plan.day_plan_count = len(self.workout_planning_line.filtered(lambda x: x.plan_mode == 'day'))
+
+    def _compute_weekly_plan_count(self):
+        for plan in self:
+            plan.week_plan_count = len(self.workout_planning_line.filtered(lambda x: x.plan_mode == 'week'))
     # Actions
     def button_plan(self):
-        action = self.env.ref('de_gym.action_workout_plan_wizard').read()[0]
+        action = self.env.ref('de_gym.action_plan_wizard').read()[0]
         action.update({
             'name': 'Workout',
             'view_mode': 'form',
-            'res_model': 'gym.workout.plan.wizard',
+            'res_model': 'gym.plan.wizard',
             'type': 'ir.actions.act_window',
-            'domain': [('workout_planning_id', '=', self.id)],
+            #'domain': [('workout_planning_id', '=', self.id)],
             'context': {
-                'default_workout_planning_id': self.id,
+                #'default_workout_planning_id': self.id,
+                'model_id': self._name,
+                'res_id': self.id,
             },
         })
         return action
