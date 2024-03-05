@@ -1,0 +1,9 @@
+<odoo>
+  <data>
+    <menuitem name="Helpdesk Teams" id="menu_helpdesk_config_teams"
+            parent="menu_helpdesk_config" 
+            action="project.open_view_project_all"
+            sequence="20"
+        />
+  </data>
+</odoo>

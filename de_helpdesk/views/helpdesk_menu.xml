@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Application Menu -->
+    <menuitem name="Helpdesk"
+        id="menu_helpdesk_root"
+        groups="sales_team.group_sale_salesman"
+        web_icon="de_helpdesk,static/description/icon.png"
+        sequence="40" />
+
+    <menuitem id="menu_helpdesk_main" name="Helpdesk" parent="menu_helpdesk_root" sequence="5"/>
+    <menuitem id="menu_helpdesk_reports" name="Reports" parent="menu_helpdesk_root" sequence="90"/>
+    <menuitem id="menu_helpdesk_config" name="Configuration" parent="menu_helpdesk_root" sequence="100"/>
+    
+</odoo>
