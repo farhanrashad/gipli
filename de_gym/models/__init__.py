@@ -8,7 +8,7 @@ from . import activity_type
 from . import workout_activity
 from . import workout_level
 from . import meal_type
-from . import schedule_nutr
 from . import class_type
 from . import class_planning
 from . import workout_planning
+from . import nutr_planning

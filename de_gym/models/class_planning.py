@@ -130,6 +130,12 @@ class GYMClassPlanning(models.Model):
     def _compute_booking_count(self):
         for plan in self:
             plan.booking_count = len(plan.class_booking_line)
+    
+    # CRUD Methods
+    def unlink(self):
+        if self.state != 'draft':
+            raise UserError('You cannot delete submitted record.')
+        
     # Actions
     def button_plan(self):
         action = self.env.ref('de_gym.action_class_plan_wizard').read()[0]
@@ -142,44 +148,7 @@ class GYMClassPlanning(models.Model):
                 'default_class_planning_id': self.id,
             },
         })
-        return action
-        
-    def button_plan1(self):
-        for plan in self:
-            #raise UserError(plan.time_from)
-            if plan.time_from <= 0 or plan.time_to <=0 :
-                raise UserError('Please define the correct class time.')
-
-            schedule_data = []
-            if plan.date_start and plan.date_end:
-                current_date = plan.date_start
-
-                while current_date <= plan.date_end:
-                    if current_date.weekday() == 0 and plan.day_mon:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
-                    if current_date.weekday() == 1 and plan.day_tue:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
-                    if current_date.weekday() == 2 and plan.day_wed:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
-                    if current_date.weekday() == 3 and plan.day_thu:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
-                    if current_date.weekday() == 4 and plan.day_fri:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
-                    if current_date.weekday() == 5 and plan.day_sat:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
-                    if current_date.weekday() == 6 and plan.day_sun:
-                        schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday(), plan.time_from, plan.time_to))
-                    
-                    current_date += timedelta(days=1)
-
-                try:
-                    self.env['gym.class.planning.line'].create(schedule_data)
-                    plan.write({
-                        'state': 'review',
-                    })
-                except:
-                    pass
-                
+        return action            
                 
     def button_draft(self):
         for plan in self:

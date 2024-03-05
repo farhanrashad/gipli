@@ -35,8 +35,6 @@ GYM Manager
         'views/workout_level_views.xml',
         'views/meal_type_views.xml',
         'views/class_type_views.xml',
-        'views/nutr_schedule_views.xml',
-        'wizards/nutr_schedule_wizard_views.xml',
         'views/class_planning_views.xml',
         'views/class_planning_line_views.xml',
         'views/class_booking_views.xml',
@@ -46,6 +44,8 @@ GYM Manager
         'views/workout_planning_line_views.xml',
         'wizards/plan_wizard_views.xml',
         'wizards/class_plan_wizard_views.xml',
+        'views/nutr_planning_views.xml',
+        'wizards/nutr_plan_wizard_views.xml',
     ],
     #'assets': {
     #    'web.assets_backend': [

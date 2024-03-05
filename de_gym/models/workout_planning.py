@@ -108,6 +108,12 @@ class WorkoutPlanning(models.Model):
     def _compute_weekly_plan_count(self):
         for plan in self:
             plan.week_plan_count = len(self.workout_planning_line.filtered(lambda x: x.plan_mode == 'week'))
+    
+    # CRUD Methods
+    def unlink(self):
+        if self.state != 'draft':
+            raise UserError('You cannot delete submitted record.')
+            
     # Actions
     def button_plan(self):
         action = self.env.ref('de_gym.action_workout_plan_wizard').read()[0]
