@@ -42,7 +42,8 @@ class NutrPlanning(models.Model):
     member_id = fields.Many2one('res.partner', 'Member', store=True, required=True)
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
     nutr_planning_line = fields.One2many('gym.nutr.planning.line', 'nutr_planning_id', string='Nuitrition Plan Line')
-    date = fields.Date('Date', required=True)    
+    date = fields.Date('Date',required=True, default=fields.Date.today())
+    
     date_start = fields.Date("Start Date", compute='_compute_datetime', 
                              readonly=False, store=True, required=True, copy=True)
     date_end = fields.Date("End Date", compute='_compute_datetime', 
@@ -112,7 +113,7 @@ class NutrPlanning(models.Model):
     
 
     def open_weekly_plan(self):
-        action = self.env.ref('de_gym.action_workout_planning_line_weekly').read()[0]
+        action = self.env.ref('de_gym.action_nutr_planning_line_weekly').read()[0]
         action.update({
             'name': 'Weekly Nuitrition Plan',
             'view_mode': 'tree,form',
@@ -127,7 +128,7 @@ class NutrPlanning(models.Model):
         return action
 
     def open_daily_plan(self):
-        action = self.env.ref('de_gym.action_workout_planning_line_daily').read()[0]
+        action = self.env.ref('de_gym.action_nutr_planning_line_daily').read()[0]
         action.update({
             'name': 'Weekly Nuitrition Plan',
             'view_mode': 'tree,form',
@@ -148,6 +149,11 @@ class NutrPlanningLine(models.Model):
     nutr_planning_id = fields.Many2one('gym.nutr.planning', string='Nuitrition Plan', 
                                    required=True, ondelete='cascade')
 
+    member_id = fields.Many2one('res.partner',
+                                 compute='_compute_all_from_planning', 
+                                 store=True,
+                                )
+    
     nutr_meal_type_id = fields.Many2one("gym.nutr.meal.type", string="Meal Type", required=True,
                             )
     nutr_meal_note = fields.Text("Note", required=True)
@@ -174,6 +180,14 @@ class NutrPlanningLine(models.Model):
         group_expand='_group_expand_states',
     )
 
+    @api.depends(
+        'nutr_planning_id',
+        'nutr_planning_id.member_id',
+    )
+    def _compute_all_from_planning(self):
+        for line in self:
+            line.member_id = line.nutr_planning_id.member_id.id
+            
     @api.depends('date')
     def _compute_day_of_week(self):
         for record in self:

@@ -44,6 +44,7 @@ access_model_gym_workout_plan_wizard,access.gym.workout.plan.wizard,model_gym_wo
 access_model_gym_class_plan_wizard,access.gym.class.plan.wizard,model_gym_class_plan_wizard,,1,1,1,1
 
 access_model_gym_nutr_plan_wizard,access.gym.nutr.plan.wizard,model_gym_nutr_plan_wizard,,1,1,1,1
+access_model_gym_nutr_plan_wizard_line,access.gym.nutr.plan.wizard.line,model_gym_nutr_plan_wizard_line,,1,1,1,1
 
 access_model_gym_plan_wizard,access.gym.plan.wizard,model_gym_plan_wizard,,1,1,1,1
 
