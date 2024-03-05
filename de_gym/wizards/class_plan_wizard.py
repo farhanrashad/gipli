@@ -96,8 +96,10 @@ class ClassPlanWizard(models.TransientModel):
             if self.plan_mode == 'week':
                 self.open_weekly_plan()
             else:
-                self.open_daily_plan
-                
+                self.open_daily_plan()
+            self.class_planning_id.write({
+                'state': 'review',
+            })
             #except:
             #    pass
 
