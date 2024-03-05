@@ -110,17 +110,17 @@ class WorkoutPlanning(models.Model):
             plan.week_plan_count = len(self.workout_planning_line.filtered(lambda x: x.plan_mode == 'week'))
     # Actions
     def button_plan(self):
-        action = self.env.ref('de_gym.action_plan_wizard').read()[0]
+        action = self.env.ref('de_gym.action_workout_plan_wizard').read()[0]
         action.update({
             'name': 'Workout',
             'view_mode': 'form',
-            'res_model': 'gym.plan.wizard',
+            'res_model': 'gym.workout.plan.wizard',
             'type': 'ir.actions.act_window',
             #'domain': [('workout_planning_id', '=', self.id)],
             'context': {
-                #'default_workout_planning_id': self.id,
-                'model_id': self._name,
-                'res_id': self.id,
+                'default_workout_planning_id': self.id,
+                #'model_id': self._name,
+                #'res_id': self.id,
             },
         })
         return action

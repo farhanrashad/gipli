@@ -2,15 +2,31 @@
 <odoo>
 	<data>
         
-        <record id="class_planning_line_tree_view" model="ir.ui.view">
+        <record id="class_planning_line_weekly_tree_view" model="ir.ui.view">
 			<field name="name">gym.class.planning.line.tree.view</field>
 			<field name="model">gym.class.planning.line</field>
 			<field name="arch" type="xml">
-				<tree string="Class Planning">
+				<tree string="Class Planning" editable="bottom">
+                    <field name="day_of_week"/>
+                    <field name="class_type_id"/>
+					<field name="trainer_id"/>
+                    <field name="time_from" />
+                    <field name="time_to" />
+				</tree>
+			</field>
+		</record>
+
+        <record id="class_planning_line_daily_tree_view" model="ir.ui.view">
+			<field name="name">gym.class.planning.line.daily.tree.view</field>
+			<field name="model">gym.class.planning.line</field>
+			<field name="arch" type="xml">
+				<tree string="Class Planning" editable="bottom">
                     <field name="class_type_id"/>
 					<field name="trainer_id"/>
                     <field name="date"/>
                     <field name="day_of_week"/>
+                    <field name="time_from" />
+                    <field name="time_to" />
                     <field name="status" decoration-success="status == 'completed'" decoration-info="status == 'session'" decoration-primary="status == 'upcoming'" widget="badge"/>
 
 				</tree>
@@ -61,24 +77,20 @@
              </field>
         </record>
         
-        <record id="action_class_planning_line" model="ir.actions.act_window">
+        <record id="action_class_planning_line_weekly" model="ir.actions.act_window">
+            <field name="name">Class Schedules</field>
+            <field name="res_model">gym.class.planning.line</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="class_planning_line_search_view"/>
+            <field name="view_id" ref="class_planning_line_daily_tree_view"/>
+        </record>
+
+        <record id="action_class_planning_line_daily" model="ir.actions.act_window">
             <field name="name">Class Schedules</field>
             <field name="res_model">gym.class.planning.line</field>
             <field name="view_mode">calendar,tree</field>
             <field name="search_view_id" ref="class_planning_line_search_view"/>
-            <field name="context">{
-                'create': False,
-                'edit': False,
-                'search_default_upcoming_classes': 1,
-                }
-            </field>
+            <field name="view_id" ref="class_planning_line_daily_tree_view"/>
         </record>
-        
-        <menuitem name="Class Schedules" id="menu_gym_subscription_classes_planning_line"
-            parent="menu_gym_subscription_classes" 
-            action="action_class_planning_line"
-            sequence="20"
-        />
-        
     </data>
 </odoo>

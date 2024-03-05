@@ -1,0 +1,87 @@
+<odoo>
+    <data>
+        <!-- Define a form view for class plan Wizard -->
+        <record id="class_plan_wizard_form_view" model="ir.ui.view">
+            <field name="name">class.plan.wizard.form</field>
+            <field name="model">gym.class.plan.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        
+                        <div class="oe_title">
+                            <label for="class_planning_id" string="Class plan for"/>
+                            <h2>
+                                <field name="class_planning_id" />
+                            </h2>
+                        </div>
+                        <group>
+                            <group>
+                               <field name="plan_mode" widget="radio" />
+                            </group>
+                            <group>
+                                
+                            </group>
+                        </group>
+                            <div style="padding:10px 0px;">
+                                <field name="day_mon" nolabel="1" class="oe_inline" style="padding-left:0px;padding-right:2px;" />
+                                <span class="oe_inline" >Monday</span>
+                                
+                                <field name="day_tue" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <span class="oe_inline" >Tuesday</span>
+                                
+                                <field name="day_wed" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <span class="oe_inline" >Wednesday</span>
+
+                                <field name="day_thu" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <span class="oe_inline" >Thursday</span>
+
+                                <field name="day_fri" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <span class="oe_inline" >Friday</span>
+
+                                <field name="day_sat" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <span class="oe_inline" >Saturday</span>
+
+                                <field name="day_sun" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" />
+                                <span class="oe_inline" >Sunday</span>
+                            </div>
+                            <group>
+                               <group>
+                                  <label for="time_from" string="Timing"/>
+                                    <div>
+                                        <field name="time_from" 
+                                            style="width: 5rem;" 
+                                            widget="float_time"
+                                            
+                                        />
+                                        <span> - </span>
+                                        <field name="time_to" 
+                                            style="width: 5rem;" 
+                                            widget="float_time"
+                                            
+                                        />
+                                    </div>
+                                   
+                               </group>
+                               <group>
+                                   
+                               </group>
+                            </group>
+                        <footer>
+                            <button name="action_create_schedule" string="Schedule" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Define an action to open the form view -->
+        <record id="action_class_plan_wizard" model="ir.actions.act_window">
+            <field name="name">Class Plan</field>
+            <field name="res_model">gym.class.plan.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="class_plan_wizard_form_view"/>
+        </record>
+    </data>
+</odoo>

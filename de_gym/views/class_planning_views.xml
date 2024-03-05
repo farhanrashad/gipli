@@ -44,13 +44,24 @@
 
                         <div class="oe_button_box" name="button_box">
                             <button
-                                name="open_schedule_lines"
+                                name="open_weekly_plan"
                                 class="oe_stat_button"
                                 icon="fa-calendar"
                                 type="object"
+                                invisible="week_plan_count == 0"
                             >
-                                <span class="o_stat_text">Schedule</span>
+                                <field name="week_plan_count" widget="statinfo" string="Weekly Plan"/>
                             </button>
+                            <button
+                                name="open_daily_plan"
+                                class="oe_stat_button"
+                                icon="fa-calendar-o"
+                                type="object"
+                                invisible="day_plan_count == 0"
+                            >
+                                <field name="day_plan_count" widget="statinfo" string="Daily Plan"/>
+                            </button>
+                            
                             <button
                                 name="open_member_booking"
                                 class="oe_stat_button"
@@ -87,21 +98,6 @@
                                     required="date_start or date_end"
                                     readonly="state not in ('draft','review')"
                                 />
-                                
-                                <label for="time_from" string="Timing"/>
-                                <div>
-                                    <field name="time_from" 
-                                        style="width: 5rem;" 
-                                        widget="float_time"
-                                        readonly="state not in ('draft','review')"
-                                    />
-                                    <span> - </span>
-                                    <field name="time_to" 
-                                        style="width: 5rem;" 
-                                        widget="float_time"
-                                        readonly="state not in ('draft','review')"
-                                    />
-                                </div>
                             </group>
                             <group>
                                 <field name="location" readonly="state not in ('draft','review')"/>
@@ -109,41 +105,6 @@
                                 <field name="company_id" readonly="state not in ('draft','review')" groups="base.group_multi_company"/>
                             </group>
                         </group>
-                        <div>
-                                <field name="day_mon" nolabel="1" class="oe_inline" style="padding-left:0px;padding-right:2px;" readonly="state not in ('draft','review')"/>
-                                <span class="oe_inline" >Monday</span>
-                                
-                                <field name="day_tue" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
-                                <span class="oe_inline" >Tuesday</span>
-                                
-                                <field name="day_wed" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
-                                <span class="oe_inline" >Wednesday</span>
-
-                                <field name="day_thu" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
-                                <span class="oe_inline" >Thursday</span>
-
-                                <field name="day_fri" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
-                                <span class="oe_inline" >Friday</span>
-
-                                <field name="day_sat" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
-                                <span class="oe_inline" >Saturday</span>
-
-                                <field name="day_sun" nolabel="1" class="oe_inline" style="padding-left:30px;padding-right:2px;" readonly="state not in ('draft','review')"/>
-                                <span class="oe_inline" >Sunday</span>
-                        </div>
-                       
-                        <notebook>
-                            <page string="Schedule" name="schedule" >
-                                <field name="class_line" readonly="state not in ('draft','review')">
-                                    <tree editable="bottom">
-                                        <field name="date" />
-                                        <field name="day_of_week" />
-                                        <field name="time_from" widget="float_time"/>
-                                        <field name="time_to" widget="float_time"/>
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids"/>

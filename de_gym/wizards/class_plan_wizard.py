@@ -8,10 +8,11 @@ from datetime import timedelta
 
 from odoo.exceptions import UserError, ValidationError
 
-class PlanWizard(models.TransientModel):
-    _name = "gym.plan.wizard"
-    _description = 'Plan Wizard'
-    
+class ClassPlanWizard(models.TransientModel):
+    _name = "gym.class.plan.wizard"
+    _description = 'Class Plan Wizard'
+
+    class_planning_id = fields.Many2one('gym.class.planning', string='Class Plan', copy=False, readonly=True)
     plan_mode = fields.Selection([
         ('day', 'Daily'),  
         ('week', 'Weekly'), 
@@ -25,38 +26,37 @@ class PlanWizard(models.TransientModel):
     day_thu = fields.Boolean('Thursday')
     day_fri = fields.Boolean('Friday')
     day_sat = fields.Boolean('Saturday')
-    day_sun = fields.Boolean('Sunday')
+    day_sun = fields.Boolean('Sunday')    
 
-    wo_activity_type_id = fields.Many2one('gym.activity.type', string='Activity Type', required=True)
-    workout_activity_id = fields.Many2one('gym.workout.activity', 
-                                          string='Activity', required=True,
-                                          domain="[('wo_activity_type_id','=',wo_activity_type_id)]"
-                                         )
-    
-    workout_sets = fields.Integer('Sets', default=1)
-    workout_reps = fields.Integer('Reps', default=1)
-    workout_weight = fields.Integer('Weight (kg)', default=1)
-    workout_rest = fields.Float('Rest Time')
+    time_from = fields.Float(
+        'From Time',
+        default=9.0,
+        required=True,
+    )
+    time_to = fields.Float(
+        'To Time',
+        default=10.0,
+        required=True,
+    )
 
-    #@api.model
-    #def default_get(self, fields):
-    #    res = super(WrokoutPlanWizard, self).default_get(fields)
-    #    if 'workout_planning_id' in self._context:
-    #        res['workout_planning_id'] = self._context.get('workout_planning_id')
-    #    return res
+    @api.model
+    def default_get(self, fields):
+        res = super(ClassPlanWizard, self).default_get(fields)
+        if 'class_planning_id' in self._context:
+            res['class_planning_id'] = self._context.get('class_planning_id')
+        return res
         
     
 
     def action_create_schedule(self):
-        #raise UserError(self._context.get('res_id'))
         for schedule in self:
             
             schedule_data = []
-            current_date = schedule.date_start
+            current_date = schedule.class_planning_id.date_start
                 
             if schedule.plan_mode == 'day':
-                if schedule.date_start and schedule.date_end:
-                    while current_date <= schedule.date_end:
+                if schedule.class_planning_id.date_start and schedule.class_planning_id.date_end:
+                    while current_date <= schedule.class_planning_id.date_end:
                         if current_date.weekday() == 0 and schedule.day_mon:
                             schedule_data.append(self._prepare_schedule_values(current_date,current_date.weekday()))
                         if current_date.weekday() == 1 and schedule.day_tue:
@@ -92,26 +92,17 @@ class PlanWizard(models.TransientModel):
 
             #raise UserError(schedule_data)
             #try:
-            if self._context.get('res_id') == 'gym.workout.planning':
-                self.env['gym.workout.planning.line'].create(schedule_data)
+            self.env['gym.class.planning.line'].create(schedule_data)
             #except:
             #    pass
 
     def _prepare_schedule_values(self, date, weekday):
-        record = self.env[self._context.get('model_id')].brose(self._context.get('res_id'))
-        data = {
+        return {
             'date': date,
             'day_of_week': str(weekday),
-            #'member_id': self.workout_planning_id.member_id.id,
-            #'wo_activity_type_id': self.wo_activity_type_id.id,
-            #'workout_activity_id': self.workout_activity_id.id,
+            'trainer_id': self.class_planning_id.trainer_id.id,
             'plan_mode': self.plan_mode,
-            #'workout_planning_id': self.workout_planning_id.id,
+            'class_planning_id': self.class_planning_id.id,
+            'time_from': self.time_from,
+            'time_to': self.time_to,
         }
-        if self._context.get('model_id') == 'gym.workout.planning':
-            data['workout_planning_id'] = self._context.get('res_id')
-            data['member_id'] = record.member_id.id
-            data['wo_activity_type_id'] = record.wo_activity_type_id.id
-            data['workout_activity_id'] = record.member_id.id
-            
-        return data

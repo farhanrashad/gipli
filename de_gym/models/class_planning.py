@@ -38,9 +38,11 @@ class GYMClassPlanning(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'GYM Class'
     _order = 'trainer_id, date_start desc'
-    _rec_name = 'trainer_id'
+    #_rec_name = 'class_type_id'
     _check_company_auto = True
 
+    name = fields.Char(string='Reference', compute='_compute_name')
+    
     class_type_id = fields.Many2one('gym.class.type', 'Class Type', store=True, required=True)
     trainer_id = fields.Many2one('hr.employee', 'Trainer', store=True, required=True)
     sub_trainer_id = fields.Many2one('hr.employee', 'Sub Trainer', store=True)
@@ -51,17 +53,6 @@ class GYMClassPlanning(models.Model):
                              readonly=False, store=True, required=True, copy=True)
     date_end = fields.Date("End Date", compute='_compute_datetime', 
                            readonly=False, store=True, required=True, copy=True)
-
-    time_from = fields.Float(
-        'From Time',
-        default=9.0,
-        required=True,
-    )
-    time_to = fields.Float(
-        'To Time',
-        default=10.0,
-        required=True,
-    )
     
     day_mon = fields.Boolean('Monday')
     day_tue = fields.Boolean('Tuesday')
@@ -70,8 +61,11 @@ class GYMClassPlanning(models.Model):
     day_fri = fields.Boolean('Friday')
     day_sat = fields.Boolean('Saturday')
     day_sun = fields.Boolean('Sunday')
+
+    day_plan_count = fields.Integer(string='Daily Plan', compute='_compute_daily_plan_count')
+    week_plan_count = fields.Integer(string='Daily Plan', compute='_compute_weekly_plan_count')
     
-    class_line = fields.One2many('gym.class.planning.line', 'class_planning_id', string='Class Line')
+    class_planning_line = fields.One2many('gym.class.planning.line', 'class_planning_id', string='Class Line')
 
     state = fields.Selection(
         string='Status',
@@ -112,6 +106,18 @@ class GYMClassPlanning(models.Model):
 
 
     # Compute Methods
+    def _compute_name(self):
+        for record in self:
+            record.name = record.class_type_id.name + '/' + record.trainer_id.name + ' (' + str(record.date_start) + ' to ' + str(record.date_end) + ')'
+
+    def _compute_daily_plan_count(self):
+        for plan in self:
+            plan.day_plan_count = len(self.class_planning_line.filtered(lambda x: x.plan_mode == 'day'))
+
+    def _compute_weekly_plan_count(self):
+        for plan in self:
+            plan.week_plan_count = len(self.class_planning_line.filtered(lambda x: x.plan_mode == 'week'))
+            
     @api.depends('class_type_id')
     def _compute_datetime(self):
         for record in self:
@@ -126,6 +132,19 @@ class GYMClassPlanning(models.Model):
             plan.booking_count = len(plan.class_booking_line)
     # Actions
     def button_plan(self):
+        action = self.env.ref('de_gym.action_class_plan_wizard').read()[0]
+        action.update({
+            'name': 'Class Planning',
+            'view_mode': 'form',
+            'res_model': 'gym.class.plan.wizard',
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_class_planning_id': self.id,
+            },
+        })
+        return action
+        
+    def button_plan1(self):
         for plan in self:
             #raise UserError(plan.time_from)
             if plan.time_from <= 0 or plan.time_to <=0 :
@@ -164,7 +183,7 @@ class GYMClassPlanning(models.Model):
                 
     def button_draft(self):
         for plan in self:
-            plan.class_line.unlink()
+            plan.class_planning_line.unlink()
             plan.write({
                 'state': 'draft',
             })
@@ -190,15 +209,37 @@ class GYMClassPlanning(models.Model):
             'class_planning_id': self.id,
         }
 
-    def open_schedule_lines(self):
-        return {
-            'name': 'Schedule Lines',
-            'view_mode': 'tree,calendar',
+    def open_weekly_plan(self):
+        action = self.env.ref('de_gym.action_class_planning_line_weekly').read()[0]
+        action.update({
+            'name': 'Weekly Class Plan',
+            'view_mode': 'tree,form',
             'res_model': 'gym.class.planning.line',
             'type': 'ir.actions.act_window',
-            'domain': [('class_planning_id','=',self.id)],
-            'action_id': self.env.ref('de_gym.action_class_planning_line').id,
-        }
+            'domain': [('class_planning_id', '=', self.id),('plan_mode', '=', 'week')],
+            'context': {
+                'create': 0,
+                'edit': 1,
+                'default_class_planning_id': self.id,
+            },
+        })
+        return action
+
+    def open_daily_plan(self):
+        action = self.env.ref('de_gym.action_class_planning_line_daily').read()[0]
+        action.update({
+            'name': 'Weekly Class Plan',
+            'view_mode': 'tree,form',
+            'res_model': 'gym.class.planning.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('class_planning_id', '=', self.id),('plan_mode', '=', 'day')],
+            'context': {
+                'create': 0,
+                'edit': 1,
+                'default_class_planning_id': self.id,
+            },
+        })
+        return action
 
     def open_member_booking(self):
         action = self.env.ref('de_gym.action_class_booking').read()[0]
@@ -233,7 +274,7 @@ class GYMClassPlanningLine(models.Model):
                                  store=True,
                                 )
     
-    date = fields.Date('Date', required=True)
+    date = fields.Date('Date')
     day_of_week = fields.Selection(
         string='Day of Week',
         selection=DAY_SELECTION,
@@ -248,6 +289,13 @@ class GYMClassPlanningLine(models.Model):
         'To Time',
         default=10.0,
         required=True,
+    )
+
+    plan_mode = fields.Selection([
+        ('day', 'Daily'),  
+        ('week', 'Weekly'), 
+    ], 
+        string='Mode', required=True, default="week",
     )
     
     status = fields.Selection(
@@ -270,12 +318,15 @@ class GYMClassPlanningLine(models.Model):
     def _compute_status(self):
         current_datetime = fields.Datetime.now()
         for record in self:
-            if record.date > current_datetime.date():
-                record.status = 'upcoming'
-            elif record.date == current_datetime.date() and record.time_from <= current_datetime.hour and record.time_to > current_datetime.hour:
-                record.status = 'session'
+            if record.date:
+                if record.date > current_datetime.date():
+                    record.status = 'upcoming'
+                elif record.date == current_datetime.date() and record.time_from <= current_datetime.hour and record.time_to > current_datetime.hour:
+                    record.status = 'session'
+                else:
+                    record.status = 'completed'
             else:
-                record.status = 'completed'
+                record.status = False
                 
     @api.depends(
         'class_planning_id',

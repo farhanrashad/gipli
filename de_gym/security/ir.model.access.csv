@@ -44,6 +44,8 @@ access_gym_workout_planning_line_manager,access.gym.workout.planning.line.manage
 
 access_model_gym_workout_plan_wizard,access.gym.workout.plan.wizard,model_gym_workout_plan_wizard,,1,1,1,1
 
+access_model_gym_class_plan_wizard,access.gym.class.plan.wizard,model_gym_class_plan_wizard,,1,1,1,1
+
 access_model_gym_plan_wizard,access.gym.plan.wizard,model_gym_plan_wizard,,1,1,1,1
 
 access_gym_food_item_user,access.gym.food.item.user,model_gym_food_item,group_gym_user,1,1,1,0
