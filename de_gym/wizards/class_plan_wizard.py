@@ -93,6 +93,11 @@ class ClassPlanWizard(models.TransientModel):
             #raise UserError(schedule_data)
             #try:
             self.env['gym.class.planning.line'].create(schedule_data)
+            if self.plan_mode == 'week':
+                self.open_weekly_plan()
+            else:
+                self.open_daily_plan
+                
             #except:
             #    pass
 
@@ -106,3 +111,35 @@ class ClassPlanWizard(models.TransientModel):
             'time_from': self.time_from,
             'time_to': self.time_to,
         }
+
+    def open_weekly_plan(self):
+        action = self.env.ref('de_gym.action_class_planning_line_weekly').read()[0]
+        action.update({
+            'name': 'Weekly Class Plan',
+            'view_mode': 'tree,form',
+            'res_model': 'gym.class.planning.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('class_planning_id', '=', self.class_planning_id.id),('plan_mode', '=', 'week')],
+            'context': {
+                'create': 0,
+                'edit': 1,
+                'default_class_planning_id': self.class_planning_id.id,
+            },
+        })
+        return action
+        
+    def open_daily_plan(self):
+        action = self.env.ref('de_gym.action_class_planning_line_daily').read()[0]
+        action.update({
+            'name': 'Weekly Class Plan',
+            'view_mode': 'tree,form',
+            'res_model': 'gym.class.planning.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('class_planning_id', '=', self.class_planning_id.id),('plan_mode', '=', 'day')],
+            'context': {
+                'create': 0,
+                'edit': 1,
+                'default_class_planning_id': self.class_planning_id.id,
+            },
+        })
+        return action

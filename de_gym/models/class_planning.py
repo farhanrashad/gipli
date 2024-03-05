@@ -311,8 +311,6 @@ class GYMClassPlanningLine(models.Model):
         for record in self:
             if record.date:
                 record.day_of_week = str(record.date.weekday())
-            else:
-                record.day_of_week = False
 
     @api.depends('date', 'time_from', 'time_to')
     def _compute_status(self):
