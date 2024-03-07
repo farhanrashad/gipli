@@ -2,9 +2,9 @@
   <data>
 
       <!-- Form view -->
-    <record id="helpdesk_team_form_view" model="ir.ui.view">
-        <field name="name">helpdesk.team.form</field>
-        <field name="model">helpdesk.team</field>
+    <record id="helpdesk_project_team_form_view" model="ir.ui.view">
+        <field name="name">helpdesk.project.team.form.view</field>
+        <field name="model">project.project</field>
         <field name="arch" type="xml">
             <form string="team search" class="oe_form_configuration">
                 <sheet>
@@ -61,6 +61,21 @@
                     <div class="row mt16 o_settings_container" id="channels">
                         <setting id="alias_channels" help="Create tickets by sending an email to an alias"
                             documentation="/applications/services/helpdesk/overview/receiving_tickets.html">
+                            <div class="mt16">
+                                <div class="oe_edit_only">
+                                    <div class="text-muted">
+                                       Create tickets by sending an email to an alias
+                                    </div>
+                                    <strong>Alias </strong>
+                                    <field name="alias_name" class="w-25"/>@
+                                    <field name="alias_domain_id" class="oe_inline" placeholder="e.g. domain.com"
+                                           options="{'no_create': True, 'no_open': True}"/>
+
+                                    <p invisible="alias_domain_id">
+                                        <button name="%(base_setup.action_general_configuration)d" type="action" string="Set an Alias Domain" icon="oi-arrow-right" class="btn-link mt-2"/>
+                                    </p>
+                                </div>
+                            </div>
                         </setting>
                         <setting>
                         </setting>
@@ -85,15 +100,31 @@
                     <div class="row mt16 o_settings_container" id="website_form_channel">
                         <setting help="Get tickets through an online form">
                         </setting>
-                        <setting>
+                        <setting help="Close inactive tickets automatically">
+                            <field name="allow_ticket_auto_close"/>
+                            <div class="content-group" invisible="not allow_ticket_auto_close">
+                                <field name="stage_ids" invisible="1"/>
+                                <div class="mt16">
+                                    <label for="to_stage_id"/>
+                                    <field name="to_stage_id" class="ms-2 oe_inline" required="auto_close_ticket" context="{'default_project_id': id}"/>
+                                </div>
+                                <div class="mt8">
+                                    <strong>After</strong><field name="auto_close_day" class="mx-2 oe_inline text-center" required="1"/><span>days of inactivity</span>
+                                </div>
+                                <div class="mt8">
+                                    <label for="from_stage_ids"/>
+                                    <field name="from_stage_ids" widget="many2many_tags" class="ms-2" context="{'default_project_id': id}"/>
+                                </div>
+                            </div>
                         </setting>
                     </div>
 
                     <h2>Self Service</h2>
                     <div class="row mt16 o_settings_container" id="website_form_channel">
-                        <setting help="Get tickets through an online form">
+                        <setting help="Allow your customers to close their own tickets" documentation="/applications/services/helpdesk/advanced/close_tickets.html">
+                            <field name="allow_portal_user_close_ticket"/>
                         </setting>
-                        <setting>
+                        <setting help="Close inactive tickets automatically">
                         </setting>
                     </div>
 
@@ -125,7 +156,15 @@
         <field name="name">Helpdesk Teams</field>
         <field name="res_model">project.project</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_use_sla': True}</field>
+        <field name="domain">[
+            ('is_helpdesk_team', '=', True),
+            ]
+        </field>
+        <field name="context">{
+            'default_use_sla': True,
+            'default_is_helpdesk_team': True
+            }
+        </field>
         <field name="help" type="html">
           <p class="o_view_nocontent_smiling_face">
                 No teams found. Let's create one!
@@ -143,10 +182,10 @@
         <field name="act_window_id" ref="action_project_helpdesk_team"/>
     </record>
       
-    <record id="helpdesk_team_form" model="ir.actions.act_window.view">
+    <record id="helpdesk_project_team_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="helpdesk_team_form_view"/>
+        <field name="view_id" ref="helpdesk_project_team_form_view"/>
         <field name="act_window_id" ref="action_project_helpdesk_team"/>
     </record>
       

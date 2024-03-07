@@ -27,8 +27,11 @@ class Project(models.Model):
     unassigned_ticket_count = fields.Integer(string='Unassigned Tickets', compute='_compute_unassigned_tickets')
     urgent_ticket_count = fields.Integer(string='# Urgent Ticket', compute='_compute_urgent_ticket')
     sla_failed_ticket_count = fields.Integer(string='Failed SLA Ticket', compute='_compute_sla_failed')
-
     sla_success_rate = fields.Float(string='Success Rate', compute='_compute_sla_success_rate', groups="de_helpdesk.group_project_helpdesk_user")
+
+
+    allow_portal_user_close_ticket = fields.Boolean('Closure by Customers')
+    allow_ticket_auto_close = fields.Boolean('Ticket Auto Clsoe')
 
 
 

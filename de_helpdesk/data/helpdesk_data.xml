@@ -8,5 +8,15 @@
         <record model="project.ticket.type" id="project_ticket_type_issue">
           <field name="name">Issue</field>
         </record>
+
+        <!-- Support Desk Project -->
+        <record id="helpdesk_project_support_desk" model="project.project">
+            <field name="name">Support Desk</field>
+            <field name="label_tasks">Tickets</field>
+            <field name="alias_name">support</field>
+            <field name="is_sla" eval="True"/>
+            <field name="is_helpdesk_team" eval="True"/>
+        </record>
+        
     </data>
 </odoo>
