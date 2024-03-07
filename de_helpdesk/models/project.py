@@ -33,6 +33,19 @@ class Project(models.Model):
     allow_portal_user_close_ticket = fields.Boolean('Closure by Customers')
     allow_ticket_auto_close = fields.Boolean('Ticket Auto Clsoe')
 
+    from_stage_ids = fields.Many2many('project.task.type', 
+        relation='project_ticket_stage_auto_close_from_rel',
+        string='In Stages',
+        domain="[('project_ids,'in',id)]",
+    )
+    close_stage_id = fields.Many2one('project.task.type',
+        string='Close to Stage',
+        readonly=False, store=True,
+        domain="[('project_ids,'in',id)]",
+    )
+    day_to_close = fields.Integer('Inactive Period(days)',
+        default=7,
+        help="Period of inactivity after which tickets will be automatically closed.")
 
 
     # Compute Methods

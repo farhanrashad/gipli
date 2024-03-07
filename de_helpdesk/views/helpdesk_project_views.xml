@@ -103,13 +103,12 @@
                         <setting help="Close inactive tickets automatically">
                             <field name="allow_ticket_auto_close"/>
                             <div class="content-group" invisible="not allow_ticket_auto_close">
-                                <field name="stage_ids" invisible="1"/>
                                 <div class="mt16">
-                                    <label for="to_stage_id"/>
-                                    <field name="to_stage_id" class="ms-2 oe_inline" required="auto_close_ticket" context="{'default_project_id': id}"/>
+                                    <label for="close_stage_id"/>
+                                    <field name="close_stage_id" class="ms-2 oe_inline" required="allow_ticket_auto_close" context="{'default_project_id': id}"/>
                                 </div>
                                 <div class="mt8">
-                                    <strong>After</strong><field name="auto_close_day" class="mx-2 oe_inline text-center" required="1"/><span>days of inactivity</span>
+                                    <strong>After</strong><field name="day_to_close" class="mx-2 oe_inline text-center" required="1"/><span>days of inactivity</span>
                                 </div>
                                 <div class="mt8">
                                     <label for="from_stage_ids"/>
