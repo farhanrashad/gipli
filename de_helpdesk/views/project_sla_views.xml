@@ -70,12 +70,12 @@
                              </div>
 
                             <separator colspan="2" string="Target" class="mt32"/>
-                            <field name="stage_id" string="Reach Stage" domain="[('project_id', '=', project_id), ('id', 'not in', exclude_stage_ids)]" required="1" context="{'default_project_id': project_id and [(6, 0, [project_id])]}"/>
+                            <field name="stage_id" string="Reach Stage" domain="[('project_ids', 'in', project_id), ('id', 'not in', exclude_stage_ids)]" required="1" />
                             <label for="time"/>
                             <div class="o_row">
                                 <field name="time" widget="float_time" class="oe_inline"/><span class="o_field_widget o_readonly_modifier">Working Hours</span>
                             </div>
-                            <field name="exclude_stage_ids" widget="many2many_tags" domain="[('id', '!=', stage_id), ('project_id', '=', project_id)]" context="{'default_project_id': project_id and [(6, 0, [project_id])]}"/>
+                            <field name="exclude_stage_ids" widget="many2many_tags" domain="[('id', '!=', stage_id), ('project_ids', 'in', project_id)]" />
                         </group>
                     </group>
                 </sheet>
