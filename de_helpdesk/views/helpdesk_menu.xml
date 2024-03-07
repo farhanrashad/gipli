@@ -7,7 +7,7 @@
         web_icon="de_helpdesk,static/description/icon.png"
         sequence="40" />
 
-    <menuitem id="menu_helpdesk_main" name="Helpdesk" parent="menu_helpdesk_root" sequence="5"/>
+    <menuitem id="menu_helpdesk_tickets" name="Tickets" parent="menu_helpdesk_root" sequence="20"/>
     <menuitem id="menu_helpdesk_reports" name="Reports" parent="menu_helpdesk_root" sequence="90"/>
     <menuitem id="menu_helpdesk_config" name="Configuration" parent="menu_helpdesk_root" sequence="100"/>
     
