@@ -5,10 +5,7 @@
         <field name="model">project.project</field>
         <field name="priority">200</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_dashboard"
-                    group_create="0" create="0" js_class="" sample="1"
-                    action="action_view_ticket" type="object"
-            >
+            <kanban class="oe_background_grey o_kanban_dashboard o_crm_team_kanban" create="0" sample="1">
                 <field name="name"/>
                 <field name="sequence" widget="handle"/>
                 <field name="color"/>
@@ -22,6 +19,7 @@
                                         <span>View</span>
                                     </h5>
                                     <div role="menuitem">
+                                        <a name="action_view_ticket" type="object">Tickets</a>
                                     </div>
                                 </div>
                                 <div class="col-auto o_kanban_card_manage_section o_kanban_manage_reporting">
@@ -29,8 +27,10 @@
                                         <span>Reporting</span>
                                     </h5>
                                     <div role="menuitem" class="text-nowrap">
+                                        <a name="%(helpdesk.helpdesk_ticket_analysis_dashboard_action)d" type="action" context="{'search_default_team_id': id}">Tickets Analysis</a>
                                     </div>
                                     <div role="menuitem" class="text-nowrap">
+                                        <a name="%(helpdesk.helpdesk_sla_report_analysis_dashboard_action)d" type="action" context="{'search_default_team_id': id}">SLA Status Analysis</a>
                                     </div>
                                 </div>
                             </div>
@@ -39,61 +39,61 @@
                                     <ul class="oe_kanban_colorpicker" data-field="color" role="menu"/>
                                 </div>
                                 <div role="menuitem" class="col-4">
+                                    <a class="dropdown-item" role="menuitem" type="edit">Settings</a>
                                 </div>
                             </div>
                         </div>
                     </t>
                     <t t-name="kanban-box">
-                        <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''} oe_kanban_global_click">
-                            <div class="o_kanban_card_header">
+                        <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}">
+                            <div t-attf-class="o_kanban_card_header">
                                 <div class="o_kanban_card_header_title">
                                     <div class="o_primary"><field name="display_name"/></div>
-                                    
                                 </div>
-                            </div>
-
+                                
+                            </div> <!-- end card header -->
+                            <!-- Content -->
                             <div class="container o_kanban_card_content">
-                                <div class="row">
-                                    <div class="col o_kanban_primary_left">
-                                        <button class="btn btn-primary o_helpdesk_ticket_btn" name="action_project_tickets" type="object" context="{'default_project_id': id}">Tickets</button>
+                                <div class="row o_kanban_card_upper_content">
+                                    <div class="col-6 o_kanban_primary_left" name="open_tickets">
+                                        <button type="object" class="btn btn-primary" name="action_project_tickets" context="{'default_project_id': active_id}" >TICKETS</button>
                                     </div>
-                                    <div class="col o_kanban_primary_right">
+                                    <div class="col-6 o_kanban_primary_right">
                                         <div class="mb4">
-                                            <a name="action_project_closed_tickets" type="object" title="Number of tickets closed in the past 7 days." class="justify-content-between flex-nowrap d-inline-flex w-100">
-                                                <span>Tickets Closed</span>
-                                                <span class="ms-3">
-                                                    <field name="close_ticket_count"/>
-                                                </span>
+                                            <a name="action_project_closed_tickets" type="object" >
+                                                <field name="close_ticket_count" class="me-1"/>
+                                                <t t-if="record.close_ticket_count.raw_value == 1">Closed Ticket</t>
+                                                <t t-else="">Closed Tickets</t>
                                             </a>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Footer links -->
-                                <div class="row pt-5">
-                                    <div class="col">
+                            </div> <!-- end contents -->
+                            <!-- Footer -->
+                            <div class="row pt-5">
+                                <div class="col">
                                         <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
                                             <span class="fw-bold"><field name="open_ticket_count"/></span>
                                             <span class="text-muted">Open</span>
                                         </a>
-                                    </div>
-                                    <div class="col">
+                                </div>
+                                <div class="col">
                                         <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
                                             <span class="fw-bold"><field name="open_ticket_count"/></span>
                                             <span class="text-muted">Unassigned</span>
                                         </a>
-                                    </div>
-                                    <div class="col">
+                                </div>
+                                <div class="col">
                                         <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
                                             <span class="fw-bold"><field name="open_ticket_count"/></span>
                                             <span class="text-muted">Urgent</span>
                                         </a>
-                                    </div>
-                                    <div class="col">
+                                </div>
+                                <div class="col">
                                         <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
                                             <span class="fw-bold"><field name="open_ticket_count"/></span>
                                             <span class="text-muted">Failed</span>
                                         </a>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -102,6 +102,7 @@
             </kanban>
         </field>
     </record>
+    
     <record id="action_project_helpdesk_dashboard" model="ir.actions.act_window">
         <field name="name">Overview</field>
         <field name="res_model">project.project</field>
