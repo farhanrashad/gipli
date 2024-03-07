@@ -61,9 +61,33 @@
                                     <div class="col-6 o_kanban_primary_right">
                                         <div class="mb4">
                                             <a name="action_project_closed_tickets" type="object" >
-                                                <field name="close_ticket_count" class="me-1"/>
-                                                <t t-if="record.close_ticket_count.raw_value == 1">Closed Ticket</t>
-                                                <t t-else="">Closed Tickets</t>
+                                                <span>Tickets Closed</span>
+                                                <span class="ms-3">
+                                                    <field name="close_ticket_count"/>
+                                                </span>
+                                            </a>
+                                        </div>
+
+                                        <div class="mb4">
+                                            <a name="action_project_closed_tickets" type="object" >
+                                                <span>SLA Success Rate</span>
+                                                <span class="ms-3">
+                                                    <field name="sla_success_rate"/> %
+                                                </span>
+                                            </a>
+                                        </div>
+
+                                        <div class="mb4">
+                                            <a name="action_project_closed_tickets" type="object" >
+                                                <span>Average Rating</span>
+                                                <span class="ms-3">
+                                                    <b>
+                                                        <strong class="fa fa-fw mt4 fa-smile-o text-success fw-bolder" t-if="record.rating_avg.raw_value &gt;= 3.66" title="Average Rating: Satisfied" role="img" aria-label="Happy face"/>
+                                                        <strong class="fa fa-fw mt4 fa-meh-o text-warning fw-bolder" t-elif="record.rating_avg.raw_value &gt;= 2.33" title="Average Rating: Okay" role="img" aria-label="Neutral face"/>
+                                                        <strong class="fa fa-fw mt4 fa-frown-o text-danger fw-bolder" t-else="" title="Average Rating: Dissatisfied" role="img" aria-label="Sad face"/>
+                                                    </b>
+                                                    <field name="rating_avg" nolabel="1" widget="float" digits="[1, 1]"/> / 5
+                                                </span>
                                             </a>
                                         </div>
                                     </div>
@@ -79,19 +103,19 @@
                                 </div>
                                 <div class="col">
                                         <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
-                                            <span class="fw-bold"><field name="open_ticket_count"/></span>
+                                            <span class="fw-bold"><field name="unassigned_ticket_count"/></span>
                                             <span class="text-muted">Unassigned</span>
                                         </a>
                                 </div>
                                 <div class="col">
                                         <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
-                                            <span class="fw-bold"><field name="open_ticket_count"/></span>
+                                            <span class="fw-bold"><field name="urgent_ticket_count"/></span>
                                             <span class="text-muted">Urgent</span>
                                         </a>
                                 </div>
                                 <div class="col">
                                         <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
-                                            <span class="fw-bold"><field name="open_ticket_count"/></span>
+                                            <span class="fw-bold"><field name="sla_failed_ticket_count"/></span>
                                             <span class="text-muted">Failed</span>
                                         </a>
                                 </div>

@@ -24,17 +24,38 @@ class Project(models.Model):
 
     close_ticket_count = fields.Integer(string='Ticket Closed', compute='_compute_close_ticket_count')
     open_ticket_count = fields.Integer(string='Ticket Closed', compute='_compute_open_ticket_count')
+    unassigned_ticket_count = fields.Integer(string='Unassigned Tickets', compute='_compute_unassigned_tickets')
+    urgent_ticket_count = fields.Integer(string='# Urgent Ticket', compute='_compute_urgent_ticket')
+    sla_failed_ticket_count = fields.Integer(string='Failed SLA Ticket', compute='_compute_sla_failed')
+
+    sla_success_rate = fields.Float(string='Success Rate', compute='_compute_sla_success_rate', groups="de_helpdesk.group_project_helpdesk_user")
+
 
 
     # Compute Methods
     def _compute_close_ticket_count(self):
         for prj in self:
-            prj.close_ticket_count = 1
+            prj.close_ticket_count = len(prj.task_ids.filtered(lambda x: x.stage_id.fold))
             
     def _compute_open_ticket_count(self):
         for prj in self:
-            prj.open_ticket_count = 1
-            
+            prj.open_ticket_count = len(prj.task_ids.filtered(lambda x: not x.stage_id.fold))
+
+    def _compute_unassigned_tickets(self):
+        for prj in self:
+            prj.unassigned_ticket_count = len(prj.task_ids.filtered(lambda x: not x.user_ids))
+
+    def _compute_urgent_ticket(self):
+        for prj in self:
+            prj.urgent_ticket_count = len(prj.task_ids.filtered(lambda x: not x.priority == 3))
+
+    def _compute_sla_failed(self):
+        for prj in self:
+            prj.sla_failed_ticket_count = len(prj.task_ids.filtered(lambda x: not x.priority == 3))
+
+    def _compute_sla_success_rate(self):
+        for prj in self:
+            prj.sla_success_rate = 33.45    
     # Actions
     def action_project_tickets(self):
         pass
