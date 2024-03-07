@@ -15,14 +15,11 @@
                      <field name="company_id" invisible="1"/>
                     <field name="active" invisible="1"/>
                     <field name="is_sla" invisible="1"/>
+                    <field name="domain_user_ids" invisible="1"/>
                     
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
-                    <div class="d-flex justify-content-end o_state_container" invisible="not active">
-                        <field name="state" widget="project_task_state_selection" class="o_task_state_widget" />
-                    </div>
-                    <div class="d-flex justify-content-start o_state_container w-100 w-md-50 w-lg-25" invisible="active">
-                        <field name="state" widget="project_task_state_selection" class="o_task_state_widget" />
-                    </div>
+                    <field name="state" widget="state_selection"/>
+
 
                     <div class="oe_title">
                         <h1><field name="name" options="{'line_breaks': False}" widget="text" class="field_name" placeholder="e.g. Product arrived damaged"/></h1>
@@ -33,7 +30,37 @@
                             <field name="sla_date_deadline" class="mb-0" widget="remaining_days"/>
                         </div>
                     </div>
-                    
+                    <group>
+                        <group>
+                            <field name="project_id" required="1" string="Helpdesk Team" context="{'kanban_view_ref': 'helpdesk.helpdesk_team_view_kanban_mobile', 'default_use_sla': True}"/>
+                            <field name="user_ids" domain="['&amp;', ('id', 'in', domain_user_ids), ('share', '=', False)]" widget="many2many_avatar_user"/>
+                            
+                            <field name="priority" widget="priority"/>
+                            <field name="prj_ticket_type_id" options="{'no_open': True}"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="partner_id" class="field_partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one" context="{'default_phone': partner_phone}"/>
+                            <field name="is_update_partner_phone" invisible="1"/>
+                            <label for="partner_phone" string="Phone"/>
+                            <div class="o_row o_row_readonly">
+                                <field name="partner_phone" widget="phone" string="Phone"/>
+                                <span class="fa fa-exclamation-triangle text-warning oe_edit_only"
+                                title="By saving this change, the customer phone number will also be updated." invisible="not is_update_partner_phone"/>
+                            </div>
+                            <field name="email_cc" groups="base.group_no_one"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="description" string="Description">
+                            <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Add details about issue..."/>
+                        </page>
+                        <page string="Extra Info" name="extra_info">
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company" context="{'create': False}"/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
