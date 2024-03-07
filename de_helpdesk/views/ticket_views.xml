@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Form view -->
+    <record id="project_helpdesk_ticket_form_view" model="ir.ui.view">
+        <field name="name">project.helpdesk.ticket.form.view</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <form string="Project Ticket">
+                <header>
+                    <field name="stage_id" widget="statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}"/>
+                </header>
+                <sheet>
+                    <field name="project_id" invisible="1"/>
+                     <field name="company_id" invisible="1"/>
+                    <field name="active" invisible="1"/>
+                    <field name="is_sla" invisible="1"/>
+                    
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="d-flex justify-content-end o_state_container" invisible="not active">
+                        <field name="state" widget="project_task_state_selection" class="o_task_state_widget" />
+                    </div>
+                    <div class="d-flex justify-content-start o_state_container w-100 w-md-50 w-lg-25" invisible="active">
+                        <field name="state" widget="project_task_state_selection" class="o_task_state_widget" />
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" options="{'line_breaks': False}" widget="text" class="field_name" placeholder="e.g. Product arrived damaged"/></h1>
+                    </div>
+                    <div class="d-flex mb-4" >
+                        <div invisible="not sla_date_deadline or not is_sla"  class="mx-2 text-muted d-inline-flex align-items-center h-100">
+                            <i class="fa fa-lg fa-clock-o me-2 mt-1" aria-label="Sla Deadline" title="Sla Deadline"/>
+                            <field name="sla_date_deadline" class="mb-0" widget="remaining_days"/>
+                        </div>
+                    </div>
+                    
+                </sheet>
+            </form>
+        </field>
+    </record>
     <!-- Tree view -->
     <record id="project_helpdesk_tickets_tree_view" model="ir.ui.view">
         <field name="name">project.helpdesk.ticket.tree.view</field>
@@ -42,7 +79,7 @@
                 <filter string="Closed Tickets" domain="[('stage_id.fold', '=', True)]" name="is_close"/>
                 <separator/>
                 <filter name="filter_create_date" date="create_date"/>
-                <filter name="filter_sla_deadline" date="sla_date_deadline"/>
+                <filter name="filter_sla_date_deadline" date="sla_date_deadline"/>
                 <separator/>
                 <separator/>
                 <filter string="Archived" domain="[('active','=',False)]" name="archive"/>
@@ -81,6 +118,13 @@
         <field name="view_id" ref="project_helpdesk_tickets_tree_view"/>
         <field name="act_window_id" ref="action_project_helpdesk_my_task"/>
     </record>
+
+    <record id="project_helpdesk_my_ticket_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="project_helpdesk_ticket_form_view"/>
+        <field name="act_window_id" ref="action_project_helpdesk_my_task"/>
+    </record>
     
     <!-- All Tickets -->
     <record id="action_project_helpdesk_all_task" model="ir.actions.act_window">
@@ -107,6 +151,13 @@
         <field name="sequence" eval="2"/>
         <field name="view_mode">tree</field>
         <field name="view_id" ref="project_helpdesk_tickets_tree_view"/>
+        <field name="act_window_id" ref="action_project_helpdesk_all_task"/>
+    </record>
+
+    <record id="project_helpdesk_all_ticket_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="project_helpdesk_ticket_form_view"/>
         <field name="act_window_id" ref="action_project_helpdesk_all_task"/>
     </record>
 </odoo>
