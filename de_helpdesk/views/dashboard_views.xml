@@ -1,9 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="helpdesk_project_kanban_view" model="ir.ui.view" >
+        <field name="name">helpdesk.project.kanban.view</field>
+        <field name="model">project.project</field>
+        <field name="priority">200</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard"
+                    group_create="0" create="0" js_class="" sample="1"
+                    action="action_view_ticket" type="object"
+            >
+                <field name="name"/>
+                <field name="sequence" widget="handle"/>
+                <field name="color"/>
+
+                <templates>
+                    <t t-name="kanban-menu">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-6 o_kanban_card_manage_section o_kanban_manage_view">
+                                    <h5 role="menuitem" class="o_kanban_card_manage_title">
+                                        <span>View</span>
+                                    </h5>
+                                    <div role="menuitem">
+                                    </div>
+                                </div>
+                                <div class="col-auto o_kanban_card_manage_section o_kanban_manage_reporting">
+                                    <h5 role="menuitem" class="o_kanban_card_manage_title">
+                                        <span>Reporting</span>
+                                    </h5>
+                                    <div role="menuitem" class="text-nowrap">
+                                    </div>
+                                    <div role="menuitem" class="text-nowrap">
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="widget.editable" class="o_kanban_card_manage_settings row">
+                                <div role="menuitem" aria-haspopup="true" class="col-8">
+                                    <ul class="oe_kanban_colorpicker" data-field="color" role="menu"/>
+                                </div>
+                                <div role="menuitem" class="col-4">
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''} oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary"><field name="display_name"/></div>
+                                    
+                                </div>
+                            </div>
+
+                            <div class="container o_kanban_card_content">
+                                <div class="row">
+                                    <div class="col o_kanban_primary_left">
+                                        <button class="btn btn-primary o_helpdesk_ticket_btn" name="action_project_tickets" type="object" context="{'default_project_id': id}">Tickets</button>
+                                    </div>
+                                    <div class="col o_kanban_primary_right">
+                                        <div class="mb4">
+                                            <a name="action_project_closed_tickets" type="object" title="Number of tickets closed in the past 7 days." class="justify-content-between flex-nowrap d-inline-flex w-100">
+                                                <span>Tickets Closed</span>
+                                                <span class="ms-3">
+                                                    <field name="close_ticket_count"/>
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Footer links -->
+                                <div class="row pt-5">
+                                    <div class="col">
+                                        <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
+                                            <span class="fw-bold"><field name="open_ticket_count"/></span>
+                                            <span class="text-muted">Open</span>
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
+                                            <span class="fw-bold"><field name="open_ticket_count"/></span>
+                                            <span class="text-muted">Unassigned</span>
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
+                                            <span class="fw-bold"><field name="open_ticket_count"/></span>
+                                            <span class="text-muted">Urgent</span>
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
+                                            <span class="fw-bold"><field name="open_ticket_count"/></span>
+                                            <span class="text-muted">Failed</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
     <record id="action_project_helpdesk_dashboard" model="ir.actions.act_window">
         <field name="name">Overview</field>
         <field name="res_model">project.project</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="context">{'default_use_sla': True}</field>
         <field name="help" type="html">
           <p class="o_view_nocontent_smiling_face">
@@ -20,4 +122,11 @@
             action="action_project_helpdesk_dashboard"
             sequence="10"
         />
+
+    <record id="helpdesk_project_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="helpdesk_project_kanban_view"/>
+        <field name="act_window_id" ref="action_project_helpdesk_dashboard"/>
+    </record>
 </odoo>

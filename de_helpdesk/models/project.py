@@ -21,3 +21,26 @@ class Project(models.Model):
 
     is_sla = fields.Boolean('SLA Policies', default=True)
     is_helpdesk_team = fields.Boolean('Helpdesk Team', default=False)
+
+    close_ticket_count = fields.Integer(string='Ticket Closed', compute='_compute_close_ticket_count')
+    open_ticket_count = fields.Integer(string='Ticket Closed', compute='_compute_open_ticket_count')
+
+
+    # Compute Methods
+    def _compute_close_ticket_count(self):
+        for prj in self:
+            prj.close_ticket_count = 1
+            
+    def _compute_open_ticket_count(self):
+        for prj in self:
+            prj.open_ticket_count = 1
+            
+    # Actions
+    def action_project_tickets(self):
+        pass
+
+    def action_project_closed_tickets(self):
+        pass
+
+    def action_project_open_tickets(self):
+        pass
