@@ -1,2 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_de_helpdesk_de_helpdesk,de_helpdesk.de_helpdesk,model_de_helpdesk_de_helpdesk,base.group_user,1,1,1,1
+access_project_helpdesk_sla_internal_user,access.project.helpdesk.sla.internal.user,model_project_sla,base.group_user,1,0,0,0
+access_project_helpdesk_sla_manager,access.project.helpdesk.sla.manager,model_project_sla,group_project_helpdesk_manager,1,1,1,1
+
+access_project_ticket_type_internal_user,access.project.ticket.type.internal.user,model_project_ticket_type,base.group_user,1,0,0,0
+access_project_ticket_type_manager,access.project.ticket.type.manager,model_project_ticket_type,group_project_helpdesk_manager,1,1,1,1

@@ -61,7 +61,6 @@
                     <div class="row mt16 o_settings_container" id="channels">
                         <setting id="alias_channels" help="Create tickets by sending an email to an alias"
                             documentation="/applications/services/helpdesk/overview/receiving_tickets.html">
-                            <field name="use_alias" string="Email Alias"/>
                         </setting>
                         <setting>
                         </setting>

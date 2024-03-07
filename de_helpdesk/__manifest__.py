@@ -22,9 +22,13 @@ Helpdesk
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/project_helpdesk_security.xml',
+        'security/ir.model.access.csv',
+        'data/helpdesk_data.xml',
         'views/helpdesk_menu.xml',
-        'views/helpdesk_teams.xml',
+        'views/helpdesk_project_views.xml',
+        'views/project_sla_views.xml',
+        'views/project_ticket_type_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
