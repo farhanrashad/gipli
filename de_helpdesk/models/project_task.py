@@ -6,6 +6,8 @@ class ProjectTask(models.Model):
     _inherit = 'project.task'
 
     is_sla = fields.Boolean(related='project_id.is_sla')
+    is_ticket = fields.Boolean('Ticket', default=False,)
+    
     sla_date_deadline = fields.Datetime("SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     sla_hours_deadline = fields.Float("Hours to SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
 

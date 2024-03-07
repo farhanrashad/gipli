@@ -20,3 +20,4 @@ class Project(models.Model):
         help="New tickets will automatically be assigned to the team members that are available, according to their working hours and their time off.")
 
     is_sla = fields.Boolean('SLA Policies', default=True)
+    is_helpdesk_team = fields.Boolean('Helpdesk Team', default=False)
