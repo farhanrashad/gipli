@@ -33,6 +33,8 @@ class Project(models.Model):
         default=lambda self: self.env.company.resource_calendar_id, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Working hours used to determine the deadline of SLA Policies.")
 
+    allow_submit_ticket_from_web = fields.Boolean('Website Form', readonly=False, store=True)
+
 
     allow_customer_rating = fields.Boolean('Customer Ratings')
     publish_rating = fields.Boolean('Publish Ratings')
