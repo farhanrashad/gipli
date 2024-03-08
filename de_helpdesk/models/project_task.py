@@ -96,7 +96,7 @@ class ProjectTask(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         tasks = super(ProjectTask, self).create(vals_list)
-        created_sla_lines = self._create_sla_lines(tasks)
+        created_sla_lines = self._prepare_sla_lines(tasks)
         return tasks
         
     def _prepare_sla_lines(self, tasks):
@@ -104,7 +104,7 @@ class ProjectTask(models.Model):
         current_date = datetime.now()
         
         for task in tasks:
-            if task.is_sla and task.is_helpdesk_team:
+            if task.is_sla and task.project_id.is_helpdesk_team:
                 sla_ids = self.env['project.sla'].search([('project_id','=',task.project_id.id)])
                 for sla in sla_ids:
                     sla_line = self.env['project.task.sla.line'].create({
@@ -118,7 +118,7 @@ class ProjectTask(models.Model):
 class ProjectTaskSLALine(models.Model):
     _name = 'project.task.sla.line'
     _description = "Task SLA Line"
-    _order = 'deadline ASC, sla_stage_id'
+    _order = 'date_deadline ASC'
     _rec_name = 'prj_sla_id'
 
     task_id = fields.Many2one('project.task', string='Ticket', required=True, ondelete='cascade', index=True)

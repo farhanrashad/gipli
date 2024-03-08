@@ -102,13 +102,13 @@
                                         </a>
                                 </div>
                                 <div class="col">
-                                        <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
+                                        <a name="action_project_unassigned_tickets" type="object" class="d-flex flex-column align-items-center">
                                             <span class="fw-bold"><field name="unassigned_ticket_count"/></span>
                                             <span class="text-muted">Unassigned</span>
                                         </a>
                                 </div>
                                 <div class="col">
-                                        <a name="action_project_open_tickets" type="object" class="d-flex flex-column align-items-center">
+                                        <a name="action_project_urgent_tickets" type="object" class="d-flex flex-column align-items-center">
                                             <span class="fw-bold"><field name="urgent_ticket_count"/></span>
                                             <span class="text-muted">Urgent</span>
                                         </a>

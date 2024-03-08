@@ -32,7 +32,16 @@
                     </div>
                     <group>
                         <group>
-                            <field name="project_id" required="1" string="Helpdesk Team" context="{'kanban_view_ref': 'helpdesk.helpdesk_team_view_kanban_mobile', 'default_use_sla': True}"/>
+                            <field name="project_id" 
+                                required="1" 
+                                string="Helpdesk Team" 
+                                domain="[('is_helpdesk_team','=',True)]"
+                                context="{
+                                'kanban_view_ref': 'helpdesk.helpdesk_team_view_kanban_mobile', 
+                                'default_is_sla': True, 
+                                'default_is_helpdesk_team': True
+                                }"
+                            />
                             <field name="user_ids" domain="['&amp;', ('id', 'in', domain_user_ids), ('share', '=', False)]" widget="many2many_avatar_user"/>
                             
                             <field name="priority" widget="priority"/>
@@ -70,6 +79,11 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}"/>
+                </div>
             </form>
         </field>
     </record>

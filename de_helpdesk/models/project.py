@@ -85,14 +85,80 @@ class Project(models.Model):
             prj.sla_success_rate = 33.45    
     # Actions
     def action_project_tickets(self):
-        pass
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action.update({
+            'name': 'Tickets',
+            'view_mode': 'tree,form',
+            'res_model': 'project.task',
+            'type': 'ir.actions.act_window',
+            'domain': [('project_id', '=', self.id)],
+            'context': {
+                'default_project_id': self.id,
+                'search_default_my_ticket': 1,
+            },
+        })
+        return action
 
     def action_project_closed_tickets(self):
-        pass
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action.update({
+            'name': 'Closed Tickets',
+            'view_mode': 'tree,form',
+            'res_model': 'project.task',
+            'type': 'ir.actions.act_window',
+            'domain': [('project_id', '=', self.id),('stage_id.fold', '=', True)],
+            'context': {
+                'default_project_id': self.id,
+                'search_default_my_ticket': 1,
+            },
+        })
+        return action
 
     def action_project_open_tickets(self):
-        pass
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action.update({
+            'name': 'Closed Tickets',
+            'view_mode': 'tree,form',
+            'res_model': 'project.task',
+            'type': 'ir.actions.act_window',
+            'domain': [('project_id', '=', self.id),('stage_id.fold', '=', False)],
+            'context': {
+                'default_project_id': self.id,
+                'search_default_my_ticket': 1,
+            },
+        })
+        return action
 
+    def action_project_unassigned_tickets(self):
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action.update({
+            'name': 'Unassigned Tickets',
+            'view_mode': 'tree,form',
+            'res_model': 'project.task',
+            'type': 'ir.actions.act_window',
+            'domain': [('project_id', '=', self.id),('user_ids', '=', False)],
+            'context': {
+                'default_project_id': self.id,
+                'search_default_my_ticket': 1,
+            },
+        })
+        return action
+
+    def action_project_urgent_tickets(self):
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action.update({
+            'name': 'Urgent Tickets',
+            'view_mode': 'tree,form',
+            'res_model': 'project.task',
+            'type': 'ir.actions.act_window',
+            'domain': [('project_id', '=', self.id),('priority', '=', 3)],
+            'context': {
+                'default_project_id': self.id,
+                'search_default_my_ticket': 1,
+            },
+        })
+        return action
+        
     def action_view_tickets(self):
         pass
 
