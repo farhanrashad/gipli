@@ -29,6 +29,9 @@ class SubscriptionPlan(models.Model):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     allow_portal_closing = fields.Boolean('Closure by Customers')
 
+    allow_portal_upsell = fields.Boolean('Upsell by Customers')
+    allow_portal_renewal = fields.Boolean('Renewal by Customers')
+
 
     @property
     def billing_period(self):

@@ -42,7 +42,11 @@
                         <setting help="Allow your customers to close their subscription.">
                             <field name="allow_portal_closing" />
                         </setting>
-                        <setting>
+                        <setting help="Allow your customers to create upsell quotation.">
+                            <field name="allow_portal_upsell" />
+                        </setting>
+                        <setting help="Allow your customers to renew their subscription.">
+                            <field name="allow_portal_renewal" />
                         </setting>
                     </div>
                 </sheet>
