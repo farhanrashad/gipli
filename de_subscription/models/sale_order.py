@@ -31,12 +31,11 @@ class SubscriptionOrder(models.Model):
         plan_id = self.env['sale.recur.plan'].search([('active','=',True)],limit=1)
         return plan_id
 
-    
     subscription_order = fields.Boolean("Subscription")
     subscription_status = fields.Selection(
         string='Subscription Status',
         selection=SUBSCRIPTION_STATUSES,
-        compute='_compute_subscription_status', store=True, index='btree_not_null', tracking=True, group_expand='_group_expand_states',
+        compute='_compute_subscription_status', store=True, index='btree_not_null', tracking=True, group_expand='_group_expand_subscription_status',
     )
     subscription_type = fields.Selection([
         ('normal', 'Normal'),
@@ -54,7 +53,7 @@ class SubscriptionOrder(models.Model):
                               ondelete='restrict', readonly=False, store=True, index='btree_not_null')
 
     
-    date_last_invoice = fields.Date(string='Last invoice date', compute='_compute_last_invoice_date')
+    date_last_invoice = fields.Date(string='Last invoice date', compute='_compute_date_last_invoice')
     date_next_invoice = fields.Date(
         string='Date of Next Invoice',
         compute='_compute_next_invoice_date',
@@ -80,7 +79,7 @@ class SubscriptionOrder(models.Model):
         readonly=True,
         help="The first contract date is the start date of the first contract of the sequence. It is common across a subscription and its renewals.")
 
-    parent_subscription_id = fields.Many2one('sale.order', string='Parent Contract', ondelete='restrict', copy=False)
+    parent_subscription_id = fields.Many2one('sale.order', string='Parent Contract', copy=False)
     subscription_line_ids = fields.One2many('sale.order', 'parent_subscription_id')
 
     sub_close_reason_id = fields.Many2one("sale.sub.close.reason", string="Close Reason", copy=False, tracking=True)
@@ -88,7 +87,7 @@ class SubscriptionOrder(models.Model):
     # Count Fields
     count_past_subscriptions = fields.Integer(compute='_compute_past_subscriptions')
     count_upselling_subscriptions = fields.Integer(compute='_compute_upselling_count')
-    count_renewal_subscriptions = fields.Integer(compute="_compute_renewal_count")
+    count_renewal_subscriptions = fields.Integer(compute="_compute_renewal_subscription_count")
     count_revised_subscriptions = fields.Integer(compute="_compute_revised_count")
 
     amount_total_subscription = fields.Monetary(compute='_compute_subscription_total', string="Total Subscription", store=True)
@@ -130,10 +129,17 @@ class SubscriptionOrder(models.Model):
             subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','=','upsell')])
             order.count_upselling_subscriptions = len(subscription_ids)
 
-    def _compute_renewal_count(self):
+    def _compute_renewal_subscription_count(self):
         for order in self:
-            subscription_ids = self.env['sale.order'].search([('parent_subscription_id', '=', order.id),('subscription_type','=','renewal')])
-            order.count_renewal_subscriptions = len(subscription_ids)
+            order.count_renewal_subscriptions = len(order.subscription_line_ids.filtered(lambda x: x.subscription_type == 'renewal'))
+            #subscription_ids = self.env['sale.order'].search([
+            #    ('parent_subscription_id', '=', order.id),
+            #    ('subscription_type','=','renewal'),
+            #])
+            #if len(subscription_ids):
+            #    order.count_renewal_subscriptions = len(subscription_ids)
+            #else:
+            #    order.count_renewal_subscriptions = 0
 
     def _compute_revised_count(self):
         for order in self:
@@ -156,20 +162,28 @@ class SubscriptionOrder(models.Model):
             else:
                 order.subscription_status = False
                 
-    def _group_expand_states(self, states, domain, order):
+    def _group_expand_subscription_status(self, states, domain, order):
         return ['progress', 'close']
 
 
-    @api.depends('date_start', 'state', 'date_next_invoice')
-    def _compute_last_invoice_date(self):
+    @api.depends(
+        'date_start', 
+        'state', 
+        'date_next_invoice', 
+        'subscription_plan_id', 
+    )
+    def _compute_date_last_invoice(self):
         for order in self:
-            last_date = order.date_next_invoice and order.subscription_plan_id.billing_period and order.date_next_invoice - order.subscription_plan_id.billing_period
-            date_start = order.date_start or fields.Date.today()
-            if order.state == 'sale' and last_date and last_date >= date_start:
-                # we use get_timedelta and not the effective invoice date because
-                # we don't want gaps. Invoicing date could be shifted because of technical issues.
-                order.date_last_invoice = last_date
-            else:
+            try:
+                last_date = False
+                if order.date_next_invoice and order.subscription_plan_id:
+                    last_date = order.date_next_invoice - order.subscription_plan_id.billing_period
+                date_start = order.date_start or fields.Date.today()
+                if order.state == 'sale' and last_date and last_date >= date_start:
+                    order.date_last_invoice = last_date
+                else:
+                    order.date_last_invoice = False
+            except:
                 order.date_last_invoice = False
 
     @api.depends(

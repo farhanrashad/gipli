@@ -8,7 +8,7 @@ Subscription Management
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Sales',
-    'version': '17.0.0.2',
+    'version': '17.0.0.3',
     'depends': [
         'sale_management',
     ],
