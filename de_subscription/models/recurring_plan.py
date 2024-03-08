@@ -10,6 +10,7 @@ class SubscriptionPlan(models.Model):
 
     active = fields.Boolean(default=True)
     name = fields.Char(translate=True, required=True, default="Monthly")
+    description = fields.Html('About Recurring Plan', translate=True)
     recurring_interval_type = fields.Selection([
         ('day', 'Days'), ('week', 'Weeks'),
         ('month', 'Months'), ('year', 'Years'), ],
@@ -25,7 +26,9 @@ class SubscriptionPlan(models.Model):
                                                default=lambda self: self.env.ref('account.email_template_edi_invoice', raise_if_not_found=False),
                                                help="Email template used to send invoicing email automatically.\n"
                                                     "Leave it empty if you don't want to send email automatically.")
-    company_id = fields.Many2one('res.company')
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
+    allow_portal_closing = fields.Boolean('Closure by Customers')
+
 
     @property
     def billing_period(self):

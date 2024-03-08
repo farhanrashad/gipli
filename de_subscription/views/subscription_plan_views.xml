@@ -4,7 +4,7 @@
         <field name="name">sale.recurring.plan.form.view</field>
         <field name="model">sale.recur.plan</field>
         <field name="arch" type="xml">
-            <form string="Recurring Plan">
+            <form string="Recurring Plan" class="oe_form_configuration">
                 <sheet>
                     <field name="active" invisible="1"/>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
@@ -14,23 +14,37 @@
                             <field name="name" placeholder="Monthly" class="d-block"/>
                         </h1>
                     </div>
-                    <group>
-                        <group>
-                            <label for="recurring_interval" string="Recurring Every"/>
-                            <div>
-                                <field name="recurring_interval" style="width: 3rem;"/>
-                                <field name="recurring_interval_type" class="oe_inline"/>
+                    <field name="description" placeholder="Describe the recurring plan..."/>
+                    <field name="company_id" groups="base.group_multi_company" required="1" nolabel="1" context="{'create': False}"/>
+                    <h2>Recurring Details </h2>
+                    <div class="row mt16 o_settings_container" id="recurring">
+                        <setting help="Effortlessly plan subscription renewals with recurring intervals.">
+                            <span class="text-muted">
+                                       Effortlessly plan subscription renewals with recurring intervals.
+                            </span>
+                            <div class="oe_edit_only">
+                                <strong>Recurring Every </strong>
+                                <field name="recurring_interval" class="w-25"/>
+                                <field name="recurring_interval_type" class="w-25"/>
                             </div>
-                            <label for="intervals_total" string="Recurring Intervals"/>
-                            <div>
-                                <field name="intervals_total" style="width: 3rem;"/>
+                            <div class="oe_edit_only">
+                                <strong>For </strong>
+                                <field name="intervals_total" class="w-25"/>
+                                <strong> Intervals</strong>
                             </div>
-                        </group>
-                        <group>
+                        </setting>
+                        <setting>
                             <field name="invoice_mail_template_id" context="{'default_model': 'sale.order'}" placeholder="No automatic mail"/>
-                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
-                        </group>
-                    </group>
+                        </setting>
+                    </div>
+                    <h2>Self Service</h2>
+                    <div class="row mt16 o_settings_container" id="recurring">
+                        <setting help="Allow your customers to close their subscription.">
+                            <field name="allow_portal_closing" />
+                        </setting>
+                        <setting>
+                        </setting>
+                    </div>
                 </sheet>
             </form>
         </field>
