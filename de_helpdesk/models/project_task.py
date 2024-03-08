@@ -3,12 +3,22 @@
 from odoo import api, Command, fields, models, tools, _
 from datetime import datetime, timedelta
 
+TICKET_PRIORITY = [
+    ('0', 'Low priority'),
+    ('1', 'Medium priority'),
+    ('2', 'High priority'),
+    ('3', 'Urgent'),
+]
+
 class ProjectTask(models.Model):
     _inherit = 'project.task'
 
     is_sla = fields.Boolean(related='project_id.is_sla')
     is_ticket = fields.Boolean('Ticket', default=False,)
 
+    
+    ticket_priority = fields.Selection(TICKET_PRIORITY, string='Priority', default='0', tracking=True)
+    
     # SLA fields
     sla_date_deadline = fields.Datetime("SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     sla_hours_deadline = fields.Float("Hours to SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
@@ -26,6 +36,14 @@ class ProjectTask(models.Model):
 
 
     # Computed Methods
+    @api.model
+    def _compute_task_priority(self):
+        if self._context.get('default_is_ticket') or self.project_id.is_helpdesk_team:
+            return TICKET_PRIORITY
+        else:
+            return PROJECT_PRIORITY
+
+    
     #@api.depends('sla_status_ids.deadline', 'sla_status_ids.reached_datetime')
     def _compute_all_sla_deadline(self):
         for record in self:
@@ -122,7 +140,7 @@ class ProjectTaskSLALine(models.Model):
     _rec_name = 'prj_sla_id'
 
     task_id = fields.Many2one('project.task', string='Ticket', required=True, ondelete='cascade', index=True)
-    prj_sla_id = fields.Many2one('project.sla', required=True, ondelete='cascade')
+    prj_sla_id = fields.Many2one('project.sla', string='SLA', required=True, ondelete='cascade')
     date_deadline = fields.Datetime("Deadline", compute='_compute_deadline', compute_sudo=True, store=True)
     
     status = fields.Selection([
