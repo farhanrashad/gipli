@@ -55,7 +55,7 @@
                             <field name="company_id" invisible="1"/>
                             <separator colspan="2" string="Criteria"/>
                             <div class="text-muted mb32" colspan="2">This SLA Policy will apply to tickets matching ALL of the following criteria:</div>
-                            <field name="project_id" domain="[('is_sla', '=', True)]"/>
+                            <field name="project_id" domain="[('is_helpdesk_team', '=', True),('is_sla', '=', True)]"/>
                              <field name="priority" widget="priority"/>
                             <field name="prj_ticket_type_ids" options="{'no_open': True, 'no_create_edit': True}" widget="many2many_tags"/>
                             <label for="tag_ids"/>

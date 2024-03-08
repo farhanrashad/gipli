@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, Command, fields, models, tools, _
+from datetime import datetime, timedelta
 
 class ProjectTask(models.Model):
     _inherit = 'project.task'
@@ -90,6 +91,30 @@ class ProjectTask(models.Model):
         return False
 
 
+    # Action Methods
+    # CRUD 
+    @api.model_create_multi
+    def create(self, vals_list):
+        tasks = super(ProjectTask, self).create(vals_list)
+        created_sla_lines = self._create_sla_lines(tasks)
+        return tasks
+        
+    def _prepare_sla_lines(self, tasks):
+        sla_lines = self.env['project.task.sla.line']
+        current_date = datetime.now()
+        
+        for task in tasks:
+            if task.is_sla and task.is_helpdesk_team:
+                sla_ids = self.env['project.sla'].search([('project_id','=',task.project_id.id)])
+                for sla in sla_ids:
+                    sla_line = self.env['project.task.sla.line'].create({
+                        'task_id': task.id,
+                        'prj_sla_id': sla.id,
+                        'date_deadline': current_date + timedelta(days=sla.time)  # Assuming time is in days
+                    })
+                    sla_lines |= sla_line
+        return sla_lines
+        
 class ProjectTaskSLALine(models.Model):
     _name = 'project.task.sla.line'
     _description = "Task SLA Line"
@@ -98,3 +123,34 @@ class ProjectTaskSLALine(models.Model):
 
     task_id = fields.Many2one('project.task', string='Ticket', required=True, ondelete='cascade', index=True)
     prj_sla_id = fields.Many2one('project.sla', required=True, ondelete='cascade')
+    date_deadline = fields.Datetime("Deadline", compute='_compute_deadline', compute_sudo=True, store=True)
+    
+    status = fields.Selection([
+        ('failed', 'Failed'), 
+        ('reached', 'Reached'), 
+        ('ongoing', 'Ongoing')
+    ], string="Status", 
+        compute='_compute_status', compute_sudo=True, search='_search_status')
+    
+    exceeded_hours = fields.Float("Exceeded Working Hours", compute='_compute_exceeded_hours', compute_sudo=True, store=True, help="Working hours exceeded for reached SLAs compared with deadline. Positive number means the SLA was reached after the deadline.")
+
+    @api.model
+    def _search_status(self, operator, value):
+        """ Supported operators: '=', 'in' and their negative form. """
+        # constants
+        datetime_now = fields.Datetime.now()
+        positive_domain = {
+            'failed': ['|', '&', ('reached_datetime', '=', True), ('deadline', '<=', 'reached_datetime'), '&', ('reached_datetime', '=', False), ('deadline', '<=', fields.Datetime.to_string(datetime_now))],
+            'reached': ['&', ('reached_datetime', '=', True), ('reached_datetime', '<', 'deadline')],
+            'ongoing': ['|', ('deadline', '=', False), '&', ('reached_datetime', '=', False), ('deadline', '>', fields.Datetime.to_string(datetime_now))]
+        }
+        # in/not in case: we treat value as a list of selection item
+        if not isinstance(value, list):
+            value = [value]
+        # transform domains
+        if operator in expression.NEGATIVE_TERM_OPERATORS:
+            # "('status', 'not in', [A, B])" tranformed into "('status', '=', C) OR ('status', '=', D)"
+            domains_to_keep = [dom for key, dom in positive_domain if key not in value]
+            return expression.OR(domains_to_keep)
+        else:
+            return expression.OR(positive_domain[value_item] for value_item in value)
