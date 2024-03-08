@@ -29,19 +29,28 @@ class Project(models.Model):
     sla_failed_ticket_count = fields.Integer(string='Failed SLA Ticket', compute='_compute_sla_failed')
     sla_success_rate = fields.Float(string='Success Rate', compute='_compute_sla_success_rate', groups="de_helpdesk.group_project_helpdesk_user")
 
+    resource_calendar_id = fields.Many2one('resource.calendar', 'Working Hours',
+        default=lambda self: self.env.company.resource_calendar_id, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
+        help="Working hours used to determine the deadline of SLA Policies.")
+
+
+    allow_customer_rating = fields.Boolean('Customer Ratings')
+    publish_rating = fields.Boolean('Publish Ratings')
 
     allow_portal_user_close_ticket = fields.Boolean('Closure by Customers')
     allow_ticket_auto_close = fields.Boolean('Ticket Auto Clsoe')
 
+    allow_stock_returns = fields.Boolean('Returns')
+    
     from_stage_ids = fields.Many2many('project.task.type', 
         relation='project_ticket_stage_auto_close_from_rel',
         string='In Stages',
-        domain="[('project_ids,'in',id)]",
+        domain="[('project_ids','in',id)]",
     )
     close_stage_id = fields.Many2one('project.task.type',
         string='Close to Stage',
         readonly=False, store=True,
-        domain="[('project_ids,'in',id)]",
+        domain="[('project_ids','in',id)]",
     )
     day_to_close = fields.Integer('Inactive Period(days)',
         default=7,
