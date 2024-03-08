@@ -7,10 +7,13 @@ class ProjectTask(models.Model):
 
     is_sla = fields.Boolean(related='project_id.is_sla')
     is_ticket = fields.Boolean('Ticket', default=False,)
-    
+
+    # SLA fields
     sla_date_deadline = fields.Datetime("SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     sla_hours_deadline = fields.Float("Hours to SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
-
+    prj_task_sla_line = fields.One2many('project.task.sla.line', 'task_id', string="SLA Line")
+    
+    
     domain_user_ids = fields.Many2many('res.users', compute='_compute_domain_from_project')
     prj_ticket_type_id = fields.Many2one('project.ticket.type', string="Type", tracking=True)
 
@@ -85,3 +88,13 @@ class ProjectTask(models.Model):
             partner_phone_formatted = self.partner_id.phone or False
             return ticket_phone_formatted != partner_phone_formatted
         return False
+
+
+class ProjectTaskSLALine(models.Model):
+    _name = 'project.task.sla.line'
+    _description = "Task SLA Line"
+    _order = 'deadline ASC, sla_stage_id'
+    _rec_name = 'prj_sla_id'
+
+    task_id = fields.Many2one('project.task', string='Ticket', required=True, ondelete='cascade', index=True)
+    prj_sla_id = fields.Many2one('project.sla', required=True, ondelete='cascade')
