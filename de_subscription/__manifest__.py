@@ -3,12 +3,14 @@
     'name': "Subscription",
     'summary': "Subscription Management",
     'description': """
-Subscription Management
+Streamline subscription management with our Odoo module. Effortlessly handle subscriber acquisition, billing cycles, renewals, and more. Optimize revenue streams and enhance customer satisfaction with automated processes and comprehensive tracking. Simplify your subscription-based business operations with Odoo.
     """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-    'category': 'Sales',
+    'support': "info@dynexcel.com",
+    'category': 'Sales/Subscriptions',
     'version': '17.0.0.3',
+    'live_test_url': 'https://youtu.be/_qKgJmMrVq4',
     'depends': [
         'sale_management',
     ],
@@ -27,8 +29,12 @@ Subscription Management
         'wizards/sale_sub_op_wizard_views.xml',
         'reports/sale_subscription_report_views.xml',
     ],
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'license': 'OPL-1',
+    'price': 50,
+    'currency': 'USD',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
 
