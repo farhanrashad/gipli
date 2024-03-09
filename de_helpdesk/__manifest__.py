@@ -1,23 +1,29 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Helpdesk",
-
-    'summary': "Helpdesk",
-
+    'summary': "Monitor, track, and resolve customer issues",
     'description': """
-Helpdesk
+Helpdesk - Ticket Management App
+================================
+
+Features:
+
+    - Efficiently resolve customer issues with our comprehensive helpdesk solution
+    - Streamline ticket management to prioritize and address inquiries promptly
+    - Track the status of customer tickets from submission to resolution
+    - Assign tickets to appropriate team members for swift handling
+    - Centralize communication channels for seamless interaction with customers
+    - Generate reports to analyze performance and identify areas for improvement
+    - Integrate with other systems for a holistic approach to customer support management.
+    - Install additional features easily.
 """,
 
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
 
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
+    'category': 'Services/Helpdesk',
     'version': '0.1',
 
-    # any module necessary for this one to work correctly
     'depends': ['project'],
 
     # always loaded
@@ -39,5 +45,12 @@ Helpdesk
     'demo': [
         'demo/demo.xml',
     ],
+    'license': 'OPL-1',
+    'price': 50,
+    'currency': 'USD',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
 
