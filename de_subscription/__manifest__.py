@@ -3,8 +3,21 @@
     'name': "Subscription",
     'summary': "Subscription Management",
     'description': """
-Streamline subscription management with our Odoo module. Effortlessly handle subscriber acquisition, billing cycles, renewals, and more. Optimize revenue streams and enhance customer satisfaction with automated processes and comprehensive tracking. Simplify your subscription-based business operations with Odoo.
-    """,
+Subscription Management App
+================================
+
+Features:
+
+    - Seamlessly manage subscriptions for products or services
+    - Automate subscription renewals and billing processes
+    - Track subscriber metrics and analyze subscription trends
+    - Offer flexible subscription plans to cater to varying customer needs
+    - Provide a user-friendly interface for subscribers to manage their accounts
+    - Integrate with payment gateways for secure and convenient transactions
+    - Customize pricing and discount options to attract and retain customers
+    - Generate reports to assess subscription performance and optimize revenue streams.
+
+""",
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'support': "info@dynexcel.com",
