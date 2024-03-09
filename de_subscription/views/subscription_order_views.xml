@@ -4,7 +4,7 @@
     <record id="subscription_order_form_view" model="ir.ui.view">
         <field name="name">subscription.form.view</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale_order_form_view_inherit_subscription"/>
+        <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
                 <field name="subscription_order" invisible="1"/>
@@ -77,21 +77,59 @@
                 />
             </xpath>
 
-            <xpath expr="//group[1]/group[2]" position="inside">
-                <label name="subscription_plan" for="subscription_plan_id" invisible="not subscription_order"/>
-                <div name="subscription_plan" class="o_row" invisible="not subscription_order">
-                    <field name="subscription_plan_id" 
-                        required="subscription_order == True"
-                           readonly="subscription_status in ['progress', ',close']"
-                           options="{'no_create': True}"/>
-                    <span invisible="not subscription_order ">until</span>
-                    <field name="date_end" invisible="not subscription_order"/>
-                </div>
-                <field name="date_next_invoice" 
-                    invisible="not subscription_order or not date_next_invoice"
-                    required="subscription_order and state == 'sale'"
-                />
-                
+            <xpath expr="//group[@name='order_details']" position="attributes">
+                <attribute name="invisible">subscription_order</attribute>
+            </xpath>
+            <xpath expr="//group[1]" position="inside">
+                <group invisible="not subscription_order" name="subscription_detail">
+                    <field name="validity_date" invisible="state == 'sale'" readonly="state in ['cancel', 'sale']"/>
+                        <div class="o_td_label" groups="base.group_no_one" invisible="state in ['sale', 'cancel']">
+                            <label for="date_order" string="Quotation Date"/>
+                        </div>
+                        <field name="date_order" nolabel="1" groups="base.group_no_one" invisible="state in ['sale', 'cancel']" readonly="state in ['cancel', 'sale']"/>
+                        <div class="o_td_label" invisible="state in ['draft', 'sent']">
+                            <label for="date_order" string="Order Date"/>
+                        </div>
+                        <field name="date_order" invisible="state in ['draft', 'sent']" readonly="state in ['cancel', 'sale']" nolabel="1"/>
+                        <field name="has_active_pricelist" invisible="1"/>
+                        <field name="show_update_pricelist" invisible="1"/>
+                        <label for="pricelist_id"
+                               groups="product.group_product_pricelist"
+                               invisible="not has_active_pricelist"/>
+
+                    <div groups="product.group_product_pricelist"
+                             class="o_row"
+                             invisible="not has_active_pricelist">
+                            <field name="pricelist_id" options="{'no_open':True,'no_create': True}" readonly="state in ['cancel', 'sale']"/>
+                            <button name="action_update_prices" type="object"
+                                string=" Update Prices"
+                                help="Recompute all prices based on this pricelist"
+                                class="btn-link mb-1 px-0" icon="fa-refresh"
+                                confirm="This will update the unit price of all products based on the new pricelist."
+                                invisible="not show_update_pricelist or state in ['sale', 'cancel']"/>
+                        </div>
+                        <field name="country_code" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="pricelist_id" invisible="1" readonly="state in ['cancel', 'sale']" groups="!product.group_product_pricelist"/>
+                        <field name="tax_country_id" invisible="1"/>
+                        <field name="tax_calculation_rounding_method" invisible="1"/>
+                        <field name="payment_term_id" options="{'no_open': True, 'no_create': True}"/>
+                    
+                    <label name="subscription_plan" for="subscription_plan_id" invisible="not subscription_order"/>
+                    <div name="subscription_plan" class="o_row" invisible="not subscription_order">
+                        <field name="subscription_plan_id" 
+                            required="subscription_order == True"
+                               readonly="subscription_status in ['progress', ',close']"
+                               options="{'no_create': True}"/>
+                        <span invisible="not subscription_order ">until</span>
+                        <field name="date_end" invisible="not subscription_order"/>
+                    </div>
+                    <field name="date_next_invoice" 
+                        invisible="not subscription_order or not date_next_invoice"
+                        required="subscription_order and state == 'sale'"
+                    />
+                </group>
             </xpath>
 
             <!-- Add Subscription fields -->
@@ -270,6 +308,8 @@
                 <filter string="Paused" domain="[('subscription_status', 'in', ['paused'])]" name="paused_subscription"/>
                 <filter string="Closed" domain="[('subscription_status', 'in', ['close'])]" name="closed_subscription"/>
                 <separator/>
+                <filter name="to_renew" string="To Renew" domain="[('date_next_invoice', '&lt;=', context_today().strftime('%Y-%m-%d')), ('subscription_status', 'in', ('progress', 'paused'))]"/>
+
                 <filter string="Renewal" domain="[('subscription_type', 'in', ['renewal'])]" name="renewal_subscription"/>
                 <filter string="Upsell" domain="[('subscription_type', 'in', ['upsell'])]" name="upsell_subscription"/>
                 <filter string="Revision" domain="[('subscription_type', 'in', ['revised'])]" name="revised_subscription"/>
@@ -358,7 +398,6 @@ Subscriptions can be automatically generated from sales orders in Sales or eComm
         <field name="domain">[('subscription_order', '=', True),('subscription_status', '=', 'draft')]</field>
         <field name="context">{
             'default_subscription_order': 1,
-            'default_subscription_type': 'normal',
             'search_default_my_subscriptions': 1,
             }
         </field>
@@ -392,7 +431,7 @@ Subscriptions have the capability to be automatically generated from sales order
             'default_subscription_order': 1,
             'default_subscription_type': 'normal',
             'search_default_my_subscriptions': 1,
-            'search_default_progress_subscription': 1,
+            'search_default_to_renew': 1,
             }
         </field>
         <field name="help" type="html">
@@ -429,7 +468,6 @@ Send a renewal quotation to the customer. Once confirmed, the subscription resum
             'default_subscription_order': 1,
             'default_subscription_type': 'normal',
             'search_default_my_subscriptions': 1,
-            'search_default_progress_subscription': 1,
             }
         </field>
         <field name="help" type="html">
@@ -461,7 +499,6 @@ Send a renewal quotation to the customer. Once confirmed, the subscription resum
             'default_subscription_order': 1,
             'default_subscription_type': 'normal',
             'search_default_my_subscriptions': 1,
-            'search_default_progress_subscription': 1,
             }
         </field>
         <field name="help" type="html">
