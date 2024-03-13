@@ -4,13 +4,13 @@
     <!-- Add Breadcrumb -->
     <template id="subscription_portal_layout" name="Portal layout: subscription menu entry" inherit_id="portal.portal_breadcrumbs" priority="40">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-            <li t-elif="page_name == 'subscription_order' or sale_order and sale_order.state not in ('sent', 'cancel')" t-attf-class="breadcrumb-item #{'active ' if not sale_order else ''}">
-                <a t-if="sale_order" t-attf-href="/my/suborders?{{ keep_query() }}">Subscription Orders</a>
+            <li t-elif="page_name == 'subscription_order' or subscription_order and subscription_order.state not in ('sent', 'cancel')" t-attf-class="breadcrumb-item #{'active ' if not subscription_order else ''}">
+                <a t-if="subscription_order" t-attf-href="/my/suborders?{{ keep_query() }}">Subscription Orders</a>
                 <t t-else="">Subscription Orders</t>
             </li>
-            <li t-if="sale_order" class="breadcrumb-item active">
-                <span t-field="sale_order.type_name"/>
-                <t t-out="sale_order.name"/>
+            <li t-if="subscription_order" class="breadcrumb-item active">
+                <span t-field="subscription_order.type_name"/>
+                <t t-out="subscription_order.name"/>
             </li>
             
         </xpath>
@@ -20,16 +20,16 @@
     <template id="portal_my_home_sale_subscription_orer" name="Show Subscription Orders" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
             <t t-set="portal_client_category_enable" t-value="True"/>
-            this is test
+            <t t-set="portal_alert_category_enable" t-value="True"/>
         </xpath>
 
         <div id="portal_client_category" position="inside">
             <t t-call="portal.portal_docs_entry">
-                <t t-set="icon" t-value="'/de_subscription/static/description/portal-icon.svg'"/>
+                <t t-set="icon" t-value="'/de_subscription/static/description/portal_icon.svg'"/>
                 <t t-set="title">Subscription Orders</t>
                 <t t-set="url" t-value="'/my/suborders'"/>
                 <t t-set="text">Manage Your Subscription Orders</t>
-                <t t-set="placeholder_count" t-value="'subscription_count'"/>
+                <t t-set="placeholder_count" t-value="'subscription_order_count'"/>
             </t>
         </div>
     </template>

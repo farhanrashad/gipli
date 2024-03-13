@@ -240,12 +240,12 @@ class SubscriptionOrder(models.Model):
         """Update and/or create subscriptions on order confirmation."""
         recurring_order = self.env['sale.order']
         for order in self:
-            res_sub = super(SubscriptionOrder, self).action_confirm()
+            #res_sub = super(SubscriptionOrder, self).action_confirm()
+            res = super(SubscriptionOrder, self).action_confirm()
             order.write({
                 'subscription_status': 'progress',
             })
-
-        return res_sub
+            return res
 
     def button_operations(self):
         self.ensure_one()
