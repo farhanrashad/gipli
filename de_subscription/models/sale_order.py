@@ -56,7 +56,7 @@ class SubscriptionOrder(models.Model):
     date_last_invoice = fields.Date(string='Last invoice date', compute='_compute_date_last_invoice')
     date_next_invoice = fields.Date(
         string='Date of Next Invoice',
-        compute='_compute_next_invoice_date',
+        compute='_compute_date_next_invoice',
         store=True, copy=False,
         readonly=False,
         tracking=True,
@@ -70,7 +70,7 @@ class SubscriptionOrder(models.Model):
     
     date_end = fields.Date(string='End Date', tracking=True,
                            compute='_compute_date_end',
-                           readonly=True,
+                           readonly=False,
                            store=True,
                            help="If set in advance, the subscription will be set to renew 1 month before the date and will be closed on the date set in this field.")
     date_first_contract = fields.Date(
@@ -196,9 +196,9 @@ class SubscriptionOrder(models.Model):
         'order_line.invoice_lines.parent_state',
         'order_line.invoice_lines.move_id.state',
     )
-    def _compute_next_invoice_date(self):
+    def _compute_date_next_invoice(self):
          for so in self:
-            invoices = so.order_line.invoice_lines.mapped('move_id')
+            invoices = so.order_line.invoice_lines.mapped('move_id').filtered(lambda x:x.state != 'cancel')
             if not so.subscription_order and so.subscription_type != 'upsell':
                 so.date_next_invoice = False
             elif not so.date_next_invoice and so.state == 'sale':

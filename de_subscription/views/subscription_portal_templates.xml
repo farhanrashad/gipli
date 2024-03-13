@@ -5,11 +5,10 @@
     <template id="subscription_portal_layout" name="Portal layout: subscription menu entry" inherit_id="portal.portal_breadcrumbs" priority="40">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
             <li t-elif="page_name == 'subscription_order' or subscription_order and subscription_order.state not in ('sent', 'cancel')" t-attf-class="breadcrumb-item #{'active ' if not subscription_order else ''}">
-                <a t-if="subscription_order" t-attf-href="/my/suborders?{{ keep_query() }}">Subscription Orders</a>
-                <t t-else="">Subscription Orders</t>
+                <a t-if="subscription_order" t-attf-href="/my/suborders?{{ keep_query() }}">Subscriptions</a>
+                <t t-else="">Subscriptions</t>
             </li>
             <li t-if="subscription_order" class="breadcrumb-item active">
-                <span t-field="subscription_order.type_name"/>
                 <t t-out="subscription_order.name"/>
             </li>
             
@@ -26,9 +25,9 @@
         <div id="portal_client_category" position="inside">
             <t t-call="portal.portal_docs_entry">
                 <t t-set="icon" t-value="'/de_subscription/static/description/portal_icon.svg'"/>
-                <t t-set="title">Subscription Orders</t>
+                <t t-set="title">Subscriptions</t>
                 <t t-set="url" t-value="'/my/suborders'"/>
-                <t t-set="text">Manage Your Subscription Orders</t>
+                <t t-set="text">Manage Your Subscriptions</t>
                 <t t-set="placeholder_count" t-value="'subscription_order_count'"/>
             </t>
         </div>
@@ -71,10 +70,8 @@
                         <td class="text-center"><span t-field="subscription.date_next_invoice"/></td>
                         <td class="text-end"><span t-out ="subscription.amount_total" t-options="{'widget': 'monetary', 'display_currency': subscription.currency_id}"/></td>
                         <td class="text-center" id="subscription_status">
-                            <t t-if="subscription.date_next_invoice" >
-                                <t t-if="subscription.subscription_status == 'progress' and subscription.date_next_invoice &lt; datetime.date.today()">
-                                    <span class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
-                                </t>
+                            <t t-if="subscription.subscription_status == 'progress' and subscription.date_next_invoice &lt; datetime.date.today()">
+                                <span class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
                             </t>
                             <t t-elif="subscription.subscription_status == 'progress'">
                                 <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> In Progress</span>

@@ -24,7 +24,8 @@ class SubscriptionCustomerPortal(CustomerPortal):
     def _prepare_subscription_orders_domain(self, partner):
         return [
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
-            ('state', '=', 'sale'),
+            ('subscription_status', 'in', ['progress', 'paused', 'close']),
+            ('subscription_order', '=', True)
         ]
 
     def _prepare_sale_subscription_portal_rendering_values(
