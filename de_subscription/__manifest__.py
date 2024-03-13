@@ -41,6 +41,7 @@ Features:
         'views/subscription_close_reason_views.xml',
         'wizards/sale_sub_op_wizard_views.xml',
         'reports/sale_subscription_report_views.xml',
+        'views/subscription_portal_templates.xml',
     ],
     'license': 'OPL-1',
     'price': 50,
