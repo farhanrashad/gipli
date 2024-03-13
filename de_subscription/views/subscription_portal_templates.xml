@@ -48,32 +48,66 @@
             <t t-if="subscription_orders" t-call="portal.portal_table">
                 <thead>
                     <tr class="active">
-                        <th>
-                            <span class='d-none d-md-inline'>Sales Order #</span>
-                            <span class='d-block d-md-none'>Ref.</span>
-                        </th>
-                        <th class="text-end">Order Date</th>
-                        <th class="text-center"/>
+                        <th class="">Subscription</th>
+                        <th class="text-center">Recurring Plan</th>
+                        <th class="text-center">Next Invoice Date</th>
                         <th class="text-end">Total</th>
+                        <th class="text-center">Type</th>
+                        <th class="text-center">Status</th>
                     </tr>
                 </thead>
-                <t t-foreach="subscription_orders" t-as="order">
+                <t t-foreach="subscription_orders" t-as="subscription">
                     <tr>
-                        <td><a t-att-href="order.get_portal_url()"><t t-out="order.name"/></a></td>
-                        <td class="text-end">
-                            <span t-field="order.date_order" t-options="{'widget': 'date'}"/>&amp;nbsp;
-                            <span class='d-none d-md-inline' t-field="order.date_order" t-options="{'time_only': True}"/>
+                        <td>
+<!--
+                            <a t-att-href="subscription.get_portal_url()"><t t-out="subscription.name"/></a>
+                            -->
+                            <a t-attf-href="/my/suborders/#{subscription.id}?access_token=#{subscription.access_token}">
+    <span t-field="subscription.name"/>
+</a>
+
                         </td>
-                        <td class="text-center">
-                            <span t-if="order.locked"  class="badge rounded-pill text-bg-success">
-                                <i class="fa fa-fw fa-check" role="img" aria-label="Done" title="Done"/>Done
-                            </span>
+                        <td class="text-center"><span t-field="subscription.subscription_plan_id.sudo().name"/></td>
+                        <td class="text-center"><span t-field="subscription.date_next_invoice"/></td>
+                        <td class="text-end"><span t-out ="subscription.amount_total" t-options="{'widget': 'monetary', 'display_currency': subscription.currency_id}"/></td>
+                        <td class="text-center" id="subscription_status">
+                            <t t-if="subscription.date_next_invoice" >
+                                <t t-if="subscription.subscription_status == 'progress' and subscription.date_next_invoice &lt; datetime.date.today()">
+                                    <span class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
+                                </t>
+                            </t>
+                            <t t-elif="subscription.subscription_status == 'progress'">
+                                <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> In Progress</span>
+                            </t>
+                            <t t-elif="subscription.subscription_status == 'paused'">
+                                <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> Paused</span>
+                            </t>
+                            <t t-elif="subscription.subscription_status == 'close'">
+                                <span class="badge rounded-pill text-bg-dark"><i class="fa fa-fw fa-remove"/> Closed</span>
+                            </t>
                         </td>
-                        <td class="text-end"><span t-field="order.amount_total"/></td>
+                        <td class="text-center"><span t-field="subscription.subscription_type"/></td>
                     </tr>
                 </t>
             </t>
             <p t-else="">There are currently no subscriptions for your account.</p>
         </t>
+    </template>
+
+    <!-- Subscription Order Page -->
+    <template id="sale_subscription_order_portal_template" name="Subscriptions Order" inherit_id="portal.portal_sidebar" primary="True">
+        <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+            <div class="row o_portal_sale_sidebar">
+                <t t-call="portal.portal_record_sidebar" id="sale_subscription_order_portal_sidebar">
+                    <t t-set="classes" t-value="'d-print-none col-lg-3 col-xl-4'"/>
+                    <t t-set="title">
+                        <h2 t-field="subscription_order.amount_total" data-id="total_amount"/>
+
+                        <h2 t-out ="subscription_order.amount_total" t-options="{'widget': 'monetary', 'display_currency': subscription_order.currency_id}"/>
+
+                    </t>
+                </t>
+            </div>
+        </xpath>
     </template>
 </odoo>
