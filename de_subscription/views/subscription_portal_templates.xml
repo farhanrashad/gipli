@@ -99,6 +99,8 @@
         <xpath expr="//div[hasclass('o_portal_sale_sidebar')]/t/t/div/div" position="inside">
             <t t-call="de_subscription.sale_subscription_order_portal_sidebar"/>
         </xpath>
+
+        
     </template>
 
     
@@ -230,5 +232,22 @@
                 </tbody>
             </table>
         </xpath>
+
+        <xpath expr="//table[@id='sales_order_table']/thead/tr" position="inside">
+            <th/>
+        </xpath>
+        <xpath expr="//table[@id='sales_order_table']/tbody/t/tr" position="inside">
+            <td class="text-end" style="width:10px;">
+                <a role="button" class="btn btn-primary" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#modal-close-sale_subscription" 
+                    href="#"
+                    style="padding:0px 3px !important;"
+                >
+                    <i class="fa fa-1x fa-pencil-square-o"/>
+                </a>
+            </td>
+        </xpath>
+        
     </template>
 </odoo>
