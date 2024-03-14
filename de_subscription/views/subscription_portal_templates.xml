@@ -111,28 +111,21 @@
                                 Close Subscription <span t-field="sale_order.display_name" class="text-primary"/>
                             </h4>
                         </header>
-                        <main class="modal-body">
-                            <p class="fst-italic text-muted">You are about to permanently close a subscription that is valid until <span t-field="sale_order.next_invoice_date"/>.</p>
-                            <t t-foreach="close_reasons" t-as="close_reason">
-                                <t t-if="close_reason.visible_in_portal and not (close_reason.empty_retention_message or close_reason.retention_button_text == False or close_reason.retention_button_link == False)">
-                                    <div t-att-data-id="close_reason.id" class="subscription-close-message" t-field="close_reason.retention_message"></div>
-                                </t>
-                            </t>
-                        </main>
-                        <footer class="modal-footer">
-                            <t t-foreach="close_reasons" t-as="close_reason">
-                                <t t-if="close_reason.visible_in_portal and not (close_reason.empty_retention_message or close_reason.retention_button_text == False or close_reason.retention_button_link == False)">
-                                    <a
-                                        t-att-data-id="close_reason.id"
-                                        role="button"
-                                        t-att-href="close_reason.retention_button_link"
-                                        class="btn btn-primary subscription-close-link"
-                                        t-field="close_reason.retention_button_text"
-                                    ></a>
-                                </t>
-                            </t>
-                            <button class="btn btn-secondary subscription-close-finish">No thanks, close my account</button>
-                        </footer>
+                        <form method="post" t-attf-action="/my/suborders/close/#{sale_order.id}?access_token=#{sale_order.access_token}">
+                            <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <main class="modal-body">
+                                <t t-set="reason_ids" t-value="request.env['sale.sub.close.reason'].sudo().search([])"/>
+                                <select id="subscription-change-plan-select" required="1" class="form-select" name="close_reason">
+                                    <option value="volvo">Select reason for close</option>
+                                    <t t-foreach="reason_ids" t-as="reason">
+                                        <option t-att-value="reason.id" t-out="reason.name"/>
+                                    </t>
+                                </select>
+                            </main>
+                            <footer class="modal-footer">
+                                <button class="btn btn-primary">Submit</button>
+                            </footer>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -148,12 +141,13 @@
                             </h4>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
                         </header>
-                        <form method="post" t-attf-action="/my/subscriptions/#{sale_order.id}/change_plan?access_token=#{sale_order.access_token}">
+                        <form method="post" t-attf-action="/my/suborders/change_plan/#{sale_order.id}?access_token=#{sale_order.access_token}">
                             <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
                             <main class="modal-body">
+                                <t t-set="plan_ids" t-value="request.env['sale.recur.plan'].sudo().search([('active','=',True)])"/>
                                 <select id="subscription-change-plan-select" class="form-select" name="plan_id">
-                                    <option t-att-value="sale_order.plan_id.id" t-out="sale_order.plan_id.name"/>
-                                    <t t-foreach="sale_order.plan_id.related_plan_id" t-as="plan">
+                                    <option t-att-value="sale_order.subscription_plan_id.id" t-out="sale_order.subscription_plan_id.name"/>
+                                    <t t-foreach="plan_ids" t-as="plan">
                                         <option t-att-value="plan.id" t-out="plan.name"/>
                                     </t>
                                 </select>

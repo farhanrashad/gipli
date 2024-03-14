@@ -171,5 +171,33 @@ class SubscriptionCustomerPortal(CustomerPortal):
         **kw
     ):
         return request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
-        #return request.render("de_portal_hr_service.portal_service_record_form", self._prepare_service_record_page(service_id, model_id, record_id, edit_mode, js_code))
     
+    # Change Subscription Plan
+    @http.route(['/my/suborders/change_plan/<int:order_id>'
+                ], type='http', auth="user", website=True)        
+    def change_subscription_plan(
+        self,
+        order_id,
+        report_type=None,
+        access_token=False,
+        message=False,
+        download=False,
+        downpayment=None,
+        **kw
+    ):
+        return request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
+
+    # Change Subscription Plan
+    @http.route(['/my/suborders/close/<int:order_id>'
+                ], type='http', auth="user", website=True)        
+    def close_subscription(
+        self,
+        order_id,
+        report_type=None,
+        access_token=False,
+        message=False,
+        download=False,
+        downpayment=None,
+        **kw
+    ):
+        return request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
