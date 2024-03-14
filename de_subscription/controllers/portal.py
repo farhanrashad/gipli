@@ -29,7 +29,7 @@ class SubscriptionCustomerPortal(CustomerPortal):
         ]
 
     def _prepare_sale_subscription_portal_rendering_values(
-        self, page=1, date_begin=None, date_end=None, sortby=None, **kwargs
+        self, page=1, date_begin=None, date_end=None, sortby=None,  quotation_page=False, **kwargs
     ):
         SubscriptionOrder = request.env['sale.order']
         if not sortby:
@@ -74,18 +74,18 @@ class SubscriptionCustomerPortal(CustomerPortal):
         '/my/suborder'
     ], type='http', auth="user", website=True)
     def portal_my_subscription_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kwargs):
-        values = self._prepare_sale_subscription_portal_rendering_values(**kwargs)
+        values = self._prepare_sale_subscription_portal_rendering_values(quotation_page=False, **kwargs)
         request.session['my_subscription_orders_history'] = values['subscription_orders'].ids[:100]
         return request.render("de_subscription.portal_my_subscription_orders", values)
 
     # Subscription Page Controller
     @http.route([
-        '/my/suborders/<int:subscription_order_id>',
-        '/my/suborders/<int:subscription_order_id>/<access_token>',
+        '/my/suborders/<int:order_id>',
+        '/my/suborders/<int:order_id>/<access_token>',
     ], type='http', auth="public", website=True)
     def portal_subscription_order_page(
         self,
-        subscription_order_id,
+        order_id,
         report_type=None,
         access_token=None,
         message=False,
@@ -93,7 +93,7 @@ class SubscriptionCustomerPortal(CustomerPortal):
         downpayment=None,
         **kw
     ):
-        subscription_sudo, redirection = self._get_subscription_order(access_token, subscription_order_id)
+        subscription_sudo, redirection = self._get_subscription_order(access_token, order_id)
         if redirection:
             return redirection
         if report_type in ('html', 'pdf', 'text'):
@@ -125,8 +125,8 @@ class SubscriptionCustomerPortal(CustomerPortal):
         values = self._get_page_view_values(
             subscription_sudo, access_token, values, history_session_key, False)
 
-        #return request.render('de_subscription.sale_subscription_order_portal_template', values)
-        return request.render('de_subscription.sale_order_portal_template_inherit_subscription', values)
+        return request.render('de_subscription.sale_subscription_order_portal_template', values)
+        #return request.render('sale.sale_order_portal_template', values)
 
     def _get_subscription_order(self, access_token, order_id):
         logged_in = not request.env.user.sudo()._is_public()
