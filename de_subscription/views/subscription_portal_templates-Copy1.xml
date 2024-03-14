@@ -388,45 +388,4 @@
             </div>
         </div>
     </template>
-
-
-    <!-- Sale order (quotations): display recurrence -->
-    <template id="sale_order_portal_template_inherit_subscription" inherit_id="sale.sale_order_portal_template">
-        This is new template
-    </template>
-
-    <template id="sale_order_portal_content_inherit" inherit_id="sale.sale_order_portal_content">
-        <xpath expr="//div[@id='sale_info']/span[@id='sale_info_title']" position="attributes">
-            <attribute name="t-if">not sale_order.subscription_order</attribute>
-        </xpath>
-        <xpath expr="//div[@id='sale_info']/table[1]" position="attributes">
-            <attribute name="t-if">not sale_order.subscription_order</attribute>
-        </xpath>
-        <xpath expr="//div[@id='sale_info']" position="inside">
-            <span id="subscription_info_title" t-if="sale_order.subscription_order">
-                <h4 class="mb-1">Subscription Information</h4>
-                <hr class="mt-1 mb-2"/>
-            </span>
-            <table class="table table-borderless table-sm" t-if="sale_order.subscription_order">
-                <tbody style="white-space:nowrap" id="sale_info_table">
-                    <tr t-if="sale_order.subscription_plan_id">
-                        <th class="ps-0 pb-0">Recurring Plan:</th>
-                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.subscription_plan_id.name" /></td>
-                    </tr>
-                    <tr t-if="sale_order.date_next_invoice">
-                        <th class="ps-0 pb-0">Next Billing Date:</th>
-                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.date_next_invoice" t-options='{"widget": "date"}'/></td>
-                    </tr>
-                    <tr t-if="sale_order.date_start">
-                        <th class="ps-0 pb-0">Start Date:</th>
-                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.date_start" t-options='{"widget": "date"}'/></td>
-                    </tr>
-                    <tr t-if="sale_order.date_end">
-                        <th class="ps-0 pb-0">End Date:</th>
-                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.date_end" t-options='{"widget": "date"}'/></td>
-                    </tr>
-                </tbody>
-            </table>
-        </xpath>
-    </template>
 </odoo>

@@ -99,6 +99,21 @@ class SubscriptionOrder(models.Model):
     # ========================== Computed Mehtods ===========================
     # =======================================================================
 
+    def _compute_type_name(self):
+        other_orders = self.env['sale.order']
+        for order in self:
+            if order.subscription_order and order.state == 'sale':
+                order.type_name = _('Subscription')
+            #elif order.subscription_state == '7_upsell':
+            #    order.type_name = _('Upsell')
+            #elif order.subscription_state == '2_renewal':
+            #    order.type_name = _('Renewal Quotation')
+            else:
+                other_orders |= order
+
+        super(SubscriptionOrder, other_orders)._compute_type_name()
+
+    
     @api.depends('subscription_status', 'state', 'subscription_order', 'amount_untaxed')
     def _compute_subscription_total(self):
         for order in self:

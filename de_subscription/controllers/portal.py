@@ -104,12 +104,19 @@ class SubscriptionCustomerPortal(CustomerPortal):
                 download=download,
             )
 
+        backend_url = f'/web#model={subscription_sudo._name}'\
+                      f'&id={subscription_sudo.id}'\
+                      f'&action={subscription_sudo._get_portal_return_action().id}'\
+                      f'&view_type=form'
+        
         values = {
             'subscription_order': subscription_sudo,
+            'sale_order': subscription_sudo,
             'product_documents': subscription_sudo._get_product_documents(),
             'message': message,
             'report_type': 'html',
             'default_url': '/my/suborders',
+            'backend_url': backend_url,
             'res_company': subscription_sudo.company_id,  # Used to display correct company logo
         }
 
@@ -118,7 +125,8 @@ class SubscriptionCustomerPortal(CustomerPortal):
         values = self._get_page_view_values(
             subscription_sudo, access_token, values, history_session_key, False)
 
-        return request.render('de_subscription.sale_subscription_order_portal_template', values)
+        #return request.render('de_subscription.sale_subscription_order_portal_template', values)
+        return request.render('de_subscription.sale_order_portal_template_inherit_subscription', values)
 
     def _get_subscription_order(self, access_token, order_id):
         logged_in = not request.env.user.sudo()._is_public()
@@ -134,3 +142,17 @@ class SubscriptionCustomerPortal(CustomerPortal):
         except MissingError:
             return order_sudo, request.redirect('/my')
         return order_sudo, None
+
+    def _prepare_quotations_domain(self, partner):
+        return [
+            ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
+            ('subscription_order','=',False),
+            ('state', '=', 'sent')
+        ]
+
+    def _prepare_orders_domain(self, partner):
+        return [
+            ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
+            ('subscription_order','=',False),
+            ('state', '=', 'sale'),
+        ]
