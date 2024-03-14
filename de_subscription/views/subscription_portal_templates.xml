@@ -171,11 +171,15 @@
         <t t-call="de_subscription.model_sale_subscription_change_plan_template" />
         <div class="d-flex flex-wrap flex-column">
             <div class="flex-grow-1" id="" >
-                <a role="button" class="btn btn-primary w-100 mt8" t-att-href="renewal_url"
-                    t-if="sale_order.subscription_order">
-                    Renew
+
+                <a role="button" 
+                    t-if="sale_order.subscription_order" 
+                    class="btn btn-primary w-100 mt8" 
+                    t-attf-href="/my/suborders/renew/#{sale_order.id}?access_token=#{sale_order.access_token}"
+                >
+                    Renew Subscription
                 </a>
-                        
+    
                 <button role="button" class="mt8 btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#modal-subscription_change-plan" href="#"
                                id="o_change_plan">
                     Change Plan
