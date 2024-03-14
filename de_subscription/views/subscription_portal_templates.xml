@@ -2,20 +2,18 @@
 <odoo>
 
     <!-- Add Breadcrumb -->
-    <!--
-    <template id="subscription_portal_layout" name="Portal layout: subscription menu entry" inherit_id="portal.portal_breadcrumbs" priority="40">
-        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-            <li t-elif="page_name == 'subscription_order' or subscription_order and subscription_order.state not in ('sent', 'cancel')" t-attf-class="breadcrumb-item #{'active ' if not subscription_order else ''}">
-                <a t-if="subscription_order" t-attf-href="/my/suborders?{{ keep_query() }}">Subscriptions</a>
+    <!-- Modify portal templates -->
+    <template id="portal_my_home_menu_sale_subscription" name="Portal layout : subscription menu entry" inherit_id="sale.portal_my_home_menu_sale" priority="10">
+         <li id="portal_breadcrumbs_sale" position="after">
+             <li t-elif="page_name == 'subscription' or sale_order and sale_order.subscription_order" t-attf-class="breadcrumb-item #{'active ' if not sale_order else ''}">
+                <a t-if="sale_order" t-attf-href="/my/suborders?{{ keep_query() }}">Subscriptions</a>
                 <t t-else="">Subscriptions</t>
             </li>
-            <li t-if="subscription_order" class="breadcrumb-item active">
-                <t t-out="subscription_order.name"/>
-            </li>
-            
-        </xpath>
+         </li>
     </template>
-    -->
+
+    
+   
     <!-- Add Menu -->
     <template id="portal_my_home_sale_subscription_orer" name="Show Subscription Orders" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
@@ -184,7 +182,7 @@
                                     </h2>
                                 </td>
                                 <td class="w-100 pb-0 text-wrap">
-                                    <t t-if="subscription_order.subscription_status == '3_progress' and subscription_order.date_next_invoice &lt; datetime.date.today()">
+                                    <t t-if="subscription_order.subscription_status == 'progress' and subscription_order.date_next_invoice &lt; datetime.date.today()">
                                         <span class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
                                     </t>
                                     <t t-elif="subscription_order.subscription_status == 'progress'">
@@ -401,6 +399,14 @@
         </xpath>
         <xpath expr="//div[@id='sale_info']/table[1]" position="attributes">
             <attribute name="t-if">not sale_order.subscription_order</attribute>
+        </xpath>
+        <xpath expr="//div[@id='intro_row']" position="inside">
+            <div class="col-12 col-lg flex-grow-0 text-lg-end mb-1 mb-lg-0" t-if="sale_order.subscription_order">
+                <span t-if="sale_order.subscription_status in ['progress', 'paused'] and sale_order.date_next_invoice &lt; datetime.date.today()" class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
+                <span t-elif="sale_order.subscription_status == 'progress'" class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> In Progress</span>
+                <span t-elif="sale_order.subscription_status == 'paused'" class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> Paused</span>
+                <span t-if="sale_order.subscription_status in ['close']" class="badge rounded-pill text-bg-dark"><i class="fa fa-fw fa-remove"/> Closed</span>
+            </div>
         </xpath>
         <xpath expr="//div[@id='sale_info']" position="inside">
             <span id="subscription_info_title" t-if="sale_order.subscription_order">
