@@ -215,10 +215,21 @@
         
         <xpath expr="//div[@id='intro_row']" position="inside">
             <div class="col-12 col-lg flex-grow-0 text-lg-end mb-1 mb-lg-0" t-if="sale_order.subscription_order">
-                <span t-if="sale_order.subscription_status in ['progress', 'paused'] and sale_order.date_next_invoice &lt; datetime.date.today()" class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
-                <span t-elif="sale_order.subscription_status == 'progress'" class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> In Progress</span>
-                <span t-elif="sale_order.subscription_status == 'paused'" class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> Paused</span>
-                <span t-if="sale_order.subscription_status in ['close']" class="badge rounded-pill text-bg-dark"><i class="fa fa-fw fa-remove"/> Closed</span>
+                <t t-if="sale_order.subscription_status == 'progress' and sale_order.date_next_invoice &lt; datetime.date.today()">
+                    <span class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
+                </t>
+                <t t-elif="sale_order.subscription_status == 'progress'">
+                    <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> In Progress</span>
+                </t>
+                <t t-elif="sale_order.subscription_status == 'paused'">
+                    <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> Paused</span>
+                </t>
+                <t t-elif="sale_order.subscription_status == 'close'">
+                    <span class="badge rounded-pill text-bg-dark"><i class="fa fa-fw fa-remove"/> Closed</span>
+                </t>
+                <t t-else="">
+                    <span class="badge rounded-pill text-bg-info"><span t-field="sale_order.subscription_status"/></span>
+                </t>
             </div>
         </xpath>
         <xpath expr="//div[@id='sale_info']" position="inside">

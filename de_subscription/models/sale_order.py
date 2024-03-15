@@ -388,6 +388,7 @@ class SubscriptionOrder(models.Model):
         return invoices
 
     # ========================================================================
+    # Review
     def _get_invoiceable_lines(self, final=False):
         date_from = fields.Date.today()
         res = super()._get_invoiceable_lines(final=final)
@@ -451,6 +452,7 @@ class SubscriptionOrder(models.Model):
 
         return self.env["sale.order.line"].browse(invoiceable_line_ids + downpayment_line_ids)
 
+    # review
     @api.model
     def _process_invoices_to_send(self, account_moves):
         for invoice in account_moves:
@@ -465,6 +467,7 @@ class SubscriptionOrder(models.Model):
     # =================== Create Orders ========================
     # ==========================================================
 
+    # review
     def _get_order_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
         self.ensure_one()
         values = {'origin': origin,
@@ -478,7 +481,7 @@ class SubscriptionOrder(models.Model):
         
     def _prepare_new_subscription_order(self, subscription_type, message_body):
         order = self._create_new_subscription_order(subscription_type, message_body)
-        action = self._get_associated_so_action(order)
+        action = self._action_open_subscription(order)
         action['name'] = subscription_type
         action['views'] = [(self.env.ref('de_subscription.subscription_order_primary_form_view').id, 'form')]
         action['res_id'] = order.id
@@ -551,7 +554,7 @@ class SubscriptionOrder(models.Model):
         }
 
     @api.model
-    def _get_associated_so_action(self, order):
+    def _action_open_subscription(self, order):
         return {
                 'name': order.subscription_type,
                 'view_mode': 'form',
@@ -608,9 +611,9 @@ class SubscriptionOrder(models.Model):
         return dict(closed=subscriptions_close.ids)
 
     def _cron_create_subscription_invoice(self):
-        return self._create_recurring_invoice()
+        return self._create_subscription_recurring_invoice()
 
-    def _create_recurring_invoice(self, batch_size=30):
+    def _create_subscription_recurring_invoice(self, batch_size=30):
         today = fields.Date.today()
         domain = [
             ('subscription_order', '=', True),
