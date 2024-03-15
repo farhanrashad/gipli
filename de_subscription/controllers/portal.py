@@ -177,7 +177,7 @@ class SubscriptionCustomerPortal(CustomerPortal):
             # Handle the case where _get_subscription returns a tuple (error occurred)
             #return http.request.render('your_module.error_template', {'error_message': 'Failed to retrieve order.'})
             
-        #renew_msg_body = order_sudo._get_order_digest('renewal', lang=lang)
+        renew_msg_body = order_sudo._get_order_digest('renewal', lang=lang)
         renew_order_id = order_sudo._create_new_subscription_order('renewal', 'new order created')
         #except:
         #    request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
