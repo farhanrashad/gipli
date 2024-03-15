@@ -468,7 +468,7 @@ class SubscriptionOrder(models.Model):
     # ==========================================================
 
     # review
-    def _get_order_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
+    def _get_order_subscription_digest(self, origin='', template='de_subscription.subscription_order_digest', lang=None):
         self.ensure_one()
         values = {'origin': origin,
                   'record_url': self._get_html_link(),

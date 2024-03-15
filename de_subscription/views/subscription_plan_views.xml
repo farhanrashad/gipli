@@ -44,9 +44,22 @@
                         </setting>
                         <setting help="Allow your customers to create upsell quotation.">
                             <field name="allow_portal_upsell" />
+                            <span class="text-muted" invisible="not allow_portal_upsell">
+Choose upselling products that are available for customers to generate additional sales through upselling orders.
+                            </span>
+                            <div class="oe_edit_only">
+                                <field name="upsell_portal_product_ids" 
+                                    widget="many2many_tags" 
+                                    options="{'no_edit': True, 'no_create': True, }"
+                                    class="w-50"
+                                    invisible="not allow_portal_upsell"
+                                />
+                            </div>
+                            
                         </setting>
                         <setting help="Allow your customers to renew their subscription.">
                             <field name="allow_portal_renewal" />
+                            
                         </setting>
                     </div>
                 </sheet>
@@ -60,8 +73,8 @@
       <field name="arch" type="xml">
         <tree sample="1" >
           <field name="name" readonly="1" decoration-bf="1"/>
-          <field name="recurring_interval_type" readonly="1"/>
-            <field name="recurring_interval" readonly="1"/>
+          <field name="recurring_interval_display" string="Recurring Every" readonly="1"/>
+            <field name="recurring_period_display" string="Until For" readonly="1"/>
             <field name="company_id" groups="base.group_multi_company"/>
         </tree>
       </field>

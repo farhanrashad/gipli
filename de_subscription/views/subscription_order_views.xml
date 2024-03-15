@@ -307,7 +307,7 @@
                 <field name="subscription_plan_id" optional="show" readonly="1"/>
                 <field name="subscription_type" optional="hide"/>
                 <field name="tag_ids" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}" readonly="1"/>
-                <field name="amount_total_subscription" string="amount" optional="show"/>
+                <field name="amount_total_subscription" string="Amount" optional="show"/>
                 <field name="amount_monthly_subscription" optional="hide"/>
                 <field name="subscription_plan_id" optional="show"/>
                 <field name="state" string="Order Status" decoration-success="state == 'sale'" decoration-info="state == 'draft'" decoration-primary="state == 'sent'" widget="badge" optional="hide"/>            <field name="pricelist_id" readonly="1" column_invisible="True"/>

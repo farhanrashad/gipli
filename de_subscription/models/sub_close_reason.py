@@ -7,3 +7,4 @@ class SaleSubCloseReason(models.Model):
     _description = "Subscription Close Reason"
 
     name = fields.Char('Reason', required=True, translate=True)
+    publish_portal = fields.Boolean(string='Avaiable on Portal', default=False)
