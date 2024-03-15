@@ -94,11 +94,44 @@ class SubscriptionOrder(models.Model):
     amount_monthly_subscription = fields.Monetary(compute='_compute_monthly_subsccription', string="Monthly Subscription",
                                         store=True, tracking=True)
     non_recurring_total = fields.Monetary(compute='_compute_non_recurring_total', string="Total Non Recurring Revenue")
+
+    #boolean flag to manage order operations on portal
+    portal_renew = fields.Boolean(string='Allow Renew', compute='_compute_portal_renewal')
+    portal_change_quantity = fields.Boolean(string='Allow Change Quantity', compute='_compute_portal_change_quantity')
+    portal_change_plan = fields.Boolean(string='Allow Change Plan', compute='_compute_portal_change_plan')
+    portal_close = fields.Boolean(string='Allow Close Order', compute='_compute_portal_close')
     
     # =======================================================================
     # ========================== Computed Mehtods ===========================
     # =======================================================================
+    def _compute_portal_renewal(self):
+        for order in self:
+            if order.subscription_status == 'progress' and order.invoice_count > 0 and order.subscription_plan_id.allow_portal_renewal:
+                order.portal_renew = True
+            else:
+                order.portal_renew = False
 
+    def _compute_portal_change_quantity(self):
+        for order in self:
+            if order.subscription_status == 'draft':
+                order.portal_change_quantity = True
+            else:
+                order.portal_change_quantity = False
+
+    def _compute_portal_change_plan(self):
+        for order in self:
+            if order.subscription_status == 'progress' and order.subscription_plan_id.allow_portal_renewal:
+                order.portal_change_plan = True
+            else:
+                order.portal_change_plan = False
+
+    def _compute_portal_close(self):
+        for order in self:
+            if order.subscription_plan_id.allow_portal_closing:
+                order.portal_close = True
+            else:
+                order.portal_close = False
+                
     def _compute_type_name(self):
         other_orders = self.env['sale.order']
         for order in self:

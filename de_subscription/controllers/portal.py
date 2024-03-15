@@ -24,7 +24,7 @@ class SubscriptionCustomerPortal(CustomerPortal):
     def _prepare_subscription_orders_domain(self, partner):
         return [
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
-            ('subscription_status', 'in', ['progress', 'paused', 'close']),
+            #('subscription_status', 'in', ['progress', 'paused', 'close']),
             ('subscription_order', '=', True)
         ]
 
@@ -170,7 +170,19 @@ class SubscriptionCustomerPortal(CustomerPortal):
         downpayment=None,
         **kw
     ):
-        return request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
+        order_sudo, renew_order_id = self._get_subscription(access_token, order_id)
+        
+        #if isinstance(order_sudo, tuple):
+        #    pass
+            # Handle the case where _get_subscription returns a tuple (error occurred)
+            #return http.request.render('your_module.error_template', {'error_message': 'Failed to retrieve order.'})
+            
+        #renew_msg_body = order_sudo._get_order_digest('renewal', lang=lang)
+        renew_order_id = order_sudo._create_new_subscription_order('renewal', 'new order created')
+        #except:
+        #    request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
+            
+        return request.redirect(f'/my/suborders/{renew_order_id.id}?access_token={access_token}')
     
     # Change Subscription Plan
     @http.route(['/my/suborders/change_plan/<int:order_id>'
