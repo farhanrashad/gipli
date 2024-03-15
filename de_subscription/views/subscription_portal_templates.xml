@@ -51,7 +51,6 @@
                         <th class="text-center">Next Invoice Date</th>
                         <th class="text-end">Total</th>
                         <th class="text-center">Status</th>
-                        <th class="text-center">Type</th>
                     </tr>
                 </thead>
                 <t t-foreach="subscription_orders" t-as="subscription">
@@ -62,12 +61,15 @@
                             -->
                             
                             <a t-attf-href="/my/suborders/#{subscription.id}?access_token=#{subscription.access_token}">
-    <span t-field="subscription.name"/>
-</a>
-                            
-
+                                <span t-field="subscription.name"/>
+                                <span t-if="subscription.subscription_type == 'renewal'"> - Renewed </span>
+                                <span t-if="subscription.subscription_type == 'upsell'"> - Upsell </span>
+                                <span t-if="subscription.subscription_type == 'revised'"> - Revised </span>
+                            </a>
                         </td>
-                        <td class="text-center"><span t-field="subscription.subscription_plan_id.sudo().name"/></td>
+                        <td class="text-center">
+                            <span t-field="subscription.subscription_plan_id.sudo().name"/>
+                        </td>
                         <td class="text-center"><span t-field="subscription.date_next_invoice"/></td>
                         <td class="text-end"><span t-out ="subscription.amount_total" t-options="{'widget': 'monetary', 'display_currency': subscription.currency_id}"/></td>
                         <td class="text-center" id="subscription_status">
@@ -87,7 +89,6 @@
                                 <span class="badge rounded-pill text-bg-info"><span t-field="subscription.subscription_status"/></span>
                             </t>
                         </td>
-                        <td class="text-center"><span t-field="subscription.subscription_type"/></td>
                     </tr>
                 </t>
             </t>
@@ -119,9 +120,9 @@
                         <form method="post" t-attf-action="/my/suborders/close/#{sale_order.id}?access_token=#{sale_order.access_token}">
                             <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
                             <main class="modal-body">
-                                <t t-set="reason_ids" t-value="request.env['sale.sub.close.reason'].sudo().search([])"/>
+                                <t t-set="reason_ids" t-value="request.env['sale.sub.close.reason'].sudo().search([('publish_portal','=',True)])"/>
                                 <select id="subscription-change-plan-select" required="1" class="form-select" name="close_reason">
-                                    <option value="volvo">Select reason for close</option>
+                                    <option value="">Select reason for close</option>
                                     <t t-foreach="reason_ids" t-as="reason">
                                         <option t-att-value="reason.id" t-out="reason.name"/>
                                     </t>
@@ -212,7 +213,12 @@
         <xpath expr="//div[@id='sale_info']/table[1]" position="attributes">
             <attribute name="t-if">not sale_order.subscription_order</attribute>
         </xpath>
-        
+
+        <xpath expr="//div[@id='intro_row']/h2" position="inside">
+            <span t-if="sale_order.subscription_type == 'renewal'"> - Renewed </span>
+            <span t-if="sale_order.subscription_type == 'upsell'"> - Upsell </span>
+            <span t-if="sale_order.subscription_type == 'revised'"> - Revised </span>
+        </xpath>
         <xpath expr="//div[@id='intro_row']" position="inside">
             <div class="col-12 col-lg flex-grow-0 text-lg-end mb-1 mb-lg-0" t-if="sale_order.subscription_order">
                 <t t-if="sale_order.subscription_status == 'progress' and sale_order.date_next_invoice &lt; datetime.date.today()">

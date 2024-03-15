@@ -127,7 +127,7 @@ class SubscriptionOrder(models.Model):
 
     def _compute_portal_close(self):
         for order in self:
-            if order.subscription_plan_id.allow_portal_closing:
+            if order.subscription_plan_id.allow_portal_closing and order.subscription_status != 'close':
                 order.portal_close = True
             else:
                 order.portal_close = False
@@ -380,6 +380,9 @@ class SubscriptionOrder(models.Model):
             elif order.subscription_type == 'renewal':
                 cancel_message_body = _("The renewal %s has been canceled.", order._get_html_link())
                 order.parent_subscription_id.message_post(body=cancel_message_body)
+            elif order.subscription_type == 'revised':
+                cancel_message_body = _("The revised %s has been canceled.", order._get_html_link())
+                order.parent_subscription_id.message_post(body=cancel_message_body)
             elif (order.subscription_status in SUBSCRIPTION_PROGRESS_STATUS + SUBSCRIPTION_DRAFT_STATUS
                   and not any(state in ['draft', 'posted'] for state in order.order_line.invoice_lines.move_id.mapped('state'))):
                 order.subscription_status = False
@@ -387,6 +390,18 @@ class SubscriptionOrder(models.Model):
                 raise ValidationError(_('You cannot cancel a subscription that has been invoiced.'))
         return super()._action_cancel()
 
+    def action_close_subscription(self,close_reason_id=False, subscription_type=False):
+        today = fields.Date.context_today(self)
+        values = {
+            'end_date': today,
+        }
+        if subscription_type != 'upsell':
+            values['subscription_status'] = 'close'
+            
+        if close_reason_id:
+            values['sub_close_reason_id'] = close_reason_id.id
+            self.update(values)
+    
     def action_subscription_pause(self):
         self.filtered(lambda so: so.subscription_status == 'progress').write({'subscription_status': 'paused'})
 

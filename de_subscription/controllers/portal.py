@@ -170,17 +170,11 @@ class SubscriptionCustomerPortal(CustomerPortal):
         downpayment=None,
         **kw
     ):
-        order_sudo, renew_order_id = self._get_subscription(access_token, order_id)
-        
-        #if isinstance(order_sudo, tuple):
-        #    pass
-            # Handle the case where _get_subscription returns a tuple (error occurred)
-            #return http.request.render('your_module.error_template', {'error_message': 'Failed to retrieve order.'})
-            
-        renew_msg_body = order_sudo._get_order_digest('renewal', lang=lang)
-        renew_order_id = order_sudo._create_new_subscription_order('renewal', 'new order created')
-        #except:
-        #    request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
+        order_sudo, redirection = self._get_subscription_order(access_token, order_id)
+        renew_order_id = order_sudo
+        lang = order_sudo.partner_id.lang or self.env.user.lang
+        renew_msg_body = order_sudo._get_order_subscription_digest('renewal', lang=lang)
+        renew_order_id = order_sudo._create_new_subscription_order('renewal', renew_msg_body)
             
         return request.redirect(f'/my/suborders/{renew_order_id.id}?access_token={access_token}')
     
@@ -212,4 +206,9 @@ class SubscriptionCustomerPortal(CustomerPortal):
         downpayment=None,
         **kw
     ):
-        return request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
+        order_sudo, redirection = self._get_subscription_order(access_token, order_id)
+        close_reason_id = request.env['sale.sub.close.reason'].browse(int(kw.get('close_reason')))
+        if close_reason_id:
+            order_sudo.sudo().action_close_subscription(close_reason_id,'close')
+            
+        return request.redirect(f'/my/suborders/{order_sudo.id}?access_token={access_token}')
