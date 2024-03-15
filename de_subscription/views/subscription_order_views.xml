@@ -482,10 +482,8 @@ Subscriptions can be automatically generated from sales orders in Sales or eComm
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
         <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('de_subscription.subscription_order_tree_view'), 'sequence': 1}),
-                (0, 0, {'view_mode': 'kanban', 'sequence': 2}),
-                (0, 0, {'view_mode': 'form'}),
-            ]"/>
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('subscription_order_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('subscription_order_kanban_view')})]"/>
         <field name="domain">[('subscription_order', '=', True),('subscription_status', '=', 'draft')]</field>
         <field name="context">{
             'default_subscription_order': 1,
@@ -517,6 +515,9 @@ Subscriptions have the capability to be automatically generated from sales order
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('subscription_order_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('subscription_order_kanban_view')})]"/>
         <field name="domain">[('subscription_order', '=', True)]</field>
         <field name="context">{
             'default_subscription_order': 1,
@@ -555,6 +556,9 @@ Send a renewal quotation to the customer. Once confirmed, the subscription resum
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('subscription_order_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('subscription_order_kanban_view')})]"/>
         <field name="domain">[('subscription_order', '=', True),('subscription_type', '=', 'upsell')]</field>
         <field name="context">{
             'default_subscription_order': 1,
@@ -586,6 +590,9 @@ Send a renewal quotation to the customer. Once confirmed, the subscription resum
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="subscription_order_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('subscription_order_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('subscription_order_kanban_view')})]"/>
         <field name="domain">[('subscription_order', '=', True),('subscription_type', '=', 'revised')]</field>
         <field name="context">{
             'default_subscription_order': 1,
