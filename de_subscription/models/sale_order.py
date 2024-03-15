@@ -309,44 +309,68 @@ class SubscriptionOrder(models.Model):
         }
 
     def open_subscription_renewal(self):
-        return {
+        action = self.env.ref('de_subscription.action_subscription_all').read()[0]
+        action.update({
             'name': 'Renewed Subscriptions',
             'view_mode': 'tree,form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','renewal')],
-            'action_id': self.env.ref('de_subscription.action_subscription_order').id,
-        }
+            'context': {
+                'create': False,
+                'edit': False,
+            },
+            
+        })
+        return action
 
     def open_subscription_upsell(self):
-        return {
+        action = self.env.ref('de_subscription.action_subscription_all').read()[0]
+        action.update({
             'name': 'Upselling Subscriptions',
             'view_mode': 'tree,form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','upsell')],
-            'action_id': self.env.ref('de_subscription.action_subscription_order').id,
-        }
+            'context': {
+                'create': False,
+                'edit': False,
+            },
+            
+        })
+        return action
 
     def open_past_subscriptions(self):
-        return {
-            'name': 'Upselling Subscriptions',
+        action = self.env.ref('de_subscription.action_subscription_all').read()[0]
+        action.update({
+            'name': 'Subscription History',
             'view_mode': 'tree,form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'domain': [('parent_subscription_id','=',self.id)],
-            'action_id': self.env.ref('de_subscription.action_subscription_order').id,
-        }
+            'context': {
+                'create': False,
+                'edit': False,
+            },
+            
+        })
+        return action
 
     def open_revised_subscriptions(self):
-        return {
-            'name': 'Upselling Subscriptions',
+        action = self.env.ref('de_subscription.action_subscription_all').read()[0]
+        action.update({
+            'name': 'Revised Subscriptions',
             'view_mode': 'tree,form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'domain': [('parent_subscription_id','=',self.id),('subscription_type','=','revised')],
-            'action_id': self.env.ref('de_subscription.action_subscription_order').id,
-        }
+            'context': {
+                'create': False,
+                'edit': False,
+            },
+            
+        })
+        return action
 
     def _action_cancel(self):
         for order in self:

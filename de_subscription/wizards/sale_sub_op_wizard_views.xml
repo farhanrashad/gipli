@@ -33,6 +33,7 @@
                                 <field name="sub_close_reason_id" 
                                     nolabel="1"
                                     required="op_type in ('renewal','close','revised')"
+                                    invisible="op_type in ('upsell')"
                                 />
                             </span>
                         </div>

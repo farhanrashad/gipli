@@ -50,7 +50,7 @@ class OperationWizard(models.TransientModel):
                 
             lang = subscription_id.partner_id.lang or self.env.user.lang
             renew_msg_body = self.subscription_id._get_order_subscription_digest(origin=self.op_type, lang=lang)
-            raise UserError(renew_msg_body)
+            #raise UserError(renew_msg_body)
             action = self.subscription_id._prepare_new_subscription_order(self.op_type, renew_msg_body)
 
             if self.op_type in ('renewal','revised'):

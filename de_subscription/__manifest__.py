@@ -35,7 +35,7 @@ Features:
         'views/subscription_templates.xml',
         'views/subscription_plan_views.xml',
         'views/product_template_views.xml',
-        'views/sale_order_views.xml',
+        #'views/sale_order_views.xml',
         'views/subscription_order_views.xml',
         'views/res_partner_views.xml',
         'views/subscription_close_reason_views.xml',

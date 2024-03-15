@@ -4,6 +4,7 @@
         <div>
             <t t-if="origin== 'renewal'">This subscription is the renewal of subscription <t t-out="record_url"/>.</t>
             <t t-if="origin == 'upsell'">This upsell order has been created from the subscription <t t-out="record_url"/>.</t>
+            <t t-if="origin == 'revised'">This subscription is revised from subscription <t t-out="record_url"/>.</t>
             <ul>
                 <li>Start Date: <t t-out="date_start"/></li>
                 <li>Next Invoice: <t t-out="date_next_invoice"/></li>

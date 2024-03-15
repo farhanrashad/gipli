@@ -93,7 +93,7 @@
                     <field name="count_upselling_subscriptions" widget="statinfo" string="Upsell Quote"/>
                 </button>
 
-                <button invisible="count_upselling_subscriptions &lt; 1"
+                <button invisible="count_revised_subscriptions &lt; 1"
                     name="open_revised_subscriptions"
                     class="oe_stat_button"
                     icon="fa-arrow-circle-o-up"
@@ -110,6 +110,7 @@
                 </button>
                 
             </xpath>
+
             
             <xpath expr="//div[@name='button_box']" position="after">
                 <field name="subscription_status" class="float-end fs-6"
@@ -207,6 +208,7 @@
         <field name="mode">primary</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
+            
             <xpath expr="//notebook/page[@name='order_lines']/field/tree" position="inside">
                 <field name="qty_to_invoice" />
             </xpath>
@@ -316,30 +318,7 @@
             </tree>
         </field>
     </record>
-    <!--
-    <record id="subscription_order_tree_view" model="ir.ui.view">
-        <field name="name">sale.order.tree.view</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_tree"/>
-        <field name="arch" type="xml">
-            <xpath expr="//tree" position="attributes">
-                <attribute name="decoration-warning">subscription_status == 'paused'</attribute>
-            </xpath>
-            <field name="state" position="after">
-                <field name="subscription_status" widget="badge"
-                   decoration-success="subscription_status == 'progress'"
-                   decoration-warning="subscription_status == 'paused'"
-                   decoration-danger="subscription_status == 'close'"
-                   decoration-info="subscription_status in ['draft']"
-                   readonly="1" optional="hide"/>
-                <field name="subscription_type" optional="hide"/>
-                <field name="amount_total_subscription" optional="hide"/>
-                <field name="amount_monthly_subscription" optional="hide"/>
-                <field name="subscription_plan_id" optional="hide"/>
-            </field>
-        </field>
-    </record>
--->
+    
     <!-- Kanban view -->
     <record id="subscription_order_kanban_view" model="ir.ui.view">
         <field name="name">subscription.order.kanban.view</field>
@@ -348,7 +327,6 @@
             <kanban default_group_by="subscription_status" class="o_kanban_mobile o_kanban_order" sample="1" quick_create="false">
                 <field name="user_id"/>
                 <field name="state"/>
-                <field name="subscription_status" />
                 <field name="subscription_status" options="{'group_by_tooltip': {'description': 'Description'}}"/>
                 <field name="currency_id"/>
                 <field name="activity_ids"/>
@@ -386,35 +364,7 @@
         </field>
     </record>
 
-    <!--
-    <record id="subscription_order_kanban_view" model="ir.ui.view">
-        <field name="name">circulation.agreement.kanban.view</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
-        <field name="mode">primary</field>
-        <field name="priority">100</field>
-        <field name="arch" type="xml">
-            <xpath expr="//kanban" position="attributes">
-                <attribute name="quick_create">false</attribute>
-                <attribute name="class">o_kanban_mobile align-content-start</attribute>
-            </xpath>
-            <xpath expr="//kanban" position="attributes">
-                <attribute name="quick_create">false</attribute>
-                <attribute name="class">o_kanban_mobile align-content-start</attribute>
-            </xpath>
-            
-            <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/field[@name='state']" position="attributes">
-                <attribute name="invisible">state == 'sale' and subscription_status</attribute>
-            </xpath>
-            
-            <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/field[@name='state']" position="after">
-                <field name="subscription_status" widget="label_selection"
-                    invisible="state != 'sale' or subscription_status == False"
-                    options="{'classes': {'draft': 'default', 'progress': 'warning', 'close': 'success'}}"/>
-            </xpath>
-        </field>
-    </record>
-    -->
+    
     
     
     <record id="action_subscription_order" model="ir.actions.act_window">
@@ -425,6 +375,7 @@
         <field name="search_view_id" ref="subscription_order_search_view"/>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('subscription_order_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('subscription_order_primary_form_view')}),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('subscription_order_kanban_view')})]"/>
         <field name="domain">[('subscription_order', '=', True)]</field>
         <field name="context">{
@@ -617,4 +568,17 @@ Send a renewal quotation to the customer. Once confirmed, the subscription resum
         sequence="4" 
         action="action_subscription_revision"
     />
+
+
+    <!-- Revision -->
+    <record id="action_subscription_all" model="ir.actions.act_window">
+        <field name="name">subscription</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="subscription_order_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('subscription_order_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('subscription_order_kanban_view')})]"/>
+    </record>
 </odoo>
