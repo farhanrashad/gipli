@@ -191,7 +191,23 @@ class SubscriptionCustomerPortal(CustomerPortal):
         downpayment=None,
         **kw
     ):
-        return request.redirect(f'/my/suborders/{order_id}?access_token={access_token}')
+        order_sudo, redirection = self._get_subscription_order(access_token, order_id)
+        
+        plan_id = request.env['sale.recur.plan'].browse(int(kw.get('plan_id')))
+        if plan_id:
+            renew_order_id = order_sudo
+            lang = order_sudo.partner_id.lang or self.env.user.lang
+            renew_msg_body = order_sudo._get_order_subscription_digest('revised', lang=lang)
+            renew_order_id = order_sudo._create_new_subscription_order('revised', renew_msg_body)
+
+            renew_order_id.write({
+                'subscription_plan_id': plan_id.id,
+                'date_start': order_sudo.date_next_invoice,
+            })
+            renew_order_id._compute_date_next_invoice()
+            renew_order_id._compute_date_end()
+        
+        return request.redirect(f'/my/suborders/{renew_order_id.id}?access_token={access_token}')
 
     # Change Subscription Plan
     @http.route(['/my/suborders/close/<int:order_id>'

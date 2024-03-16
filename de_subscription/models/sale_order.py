@@ -39,7 +39,7 @@ class SubscriptionOrder(models.Model):
     )
     subscription_type = fields.Selection([
         ('normal', 'Normal'),
-        ('renewal', 'Renewal'),  
+        ('renewal', 'Renewal'),
         ('upsell', 'Upsell'),  
         ('revised', 'Revision'),
         ('close', 'Close'),
