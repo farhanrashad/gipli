@@ -228,3 +228,25 @@ class SubscriptionCustomerPortal(CustomerPortal):
             order_sudo.sudo().action_close_subscription(close_reason_id,'close')
             
         return request.redirect(f'/my/suborders/{order_sudo.id}?access_token={access_token}')
+
+    # Upsell Quotation
+    @http.route(['/my/suborders/upsell/<int:order_id>'
+                ], type='http', auth="user", website=True)        
+    def upsell_subscription(
+        self,
+        order_id,
+        report_type=None,
+        access_token=False,
+        message=False,
+        download=False,
+        downpayment=None,
+        **kw
+    ):
+        order_sudo, redirection = self._get_subscription_order(access_token, order_id)
+
+        renew_order_id = order_sudo
+        lang = order_sudo.partner_id.lang or self.env.user.lang
+        upsell_msg_body = order_sudo._get_order_subscription_digest('upsell', lang=lang)
+        upsell_order_id = order_sudo._create_new_upsell_subscription(kw, upsell_msg_body)
+
+        return request.redirect(f'/my/suborders/{upsell_order_id.id}?access_token={access_token}')

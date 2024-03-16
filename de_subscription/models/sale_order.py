@@ -100,6 +100,7 @@ class SubscriptionOrder(models.Model):
     portal_change_quantity = fields.Boolean(string='Allow Change Quantity', compute='_compute_portal_change_quantity')
     portal_change_plan = fields.Boolean(string='Allow Change Plan', compute='_compute_portal_change_plan')
     portal_close = fields.Boolean(string='Allow Close Order', compute='_compute_portal_close')
+    portal_upsell = fields.Boolean(string='Allow Upselling', compute='_compute_portal_upsell')
     
     # =======================================================================
     # ========================== Computed Mehtods ===========================
@@ -131,6 +132,13 @@ class SubscriptionOrder(models.Model):
                 order.portal_close = True
             else:
                 order.portal_close = False
+
+    def _compute_portal_upsell(self):
+        for order in self:
+            if order.subscription_plan_id.allow_portal_upsell and order.subscription_status == 'progress':
+                order.portal_upsell = True
+            else:
+                order.portal_upsell = False
                 
     def _compute_type_name(self):
         other_orders = self.env['sale.order']
@@ -668,4 +676,55 @@ class SubscriptionOrder(models.Model):
                 # Log the exception
                 _logger.exception("Error occurred while creating invoices for order %s: %s", order.name, str(e))
                 order.message_post(body=f"Error occurred while creating invoices: {str(e)}")
+
+    # actions for portal operations
+    def _create_new_upsell_subscription(self, kw, message_body):
+        self.ensure_one()
+        subscription = self
         
+        if subscription.date_start == subscription.date_next_invoice:
+            raise ValidationError("You cannot perform an upsell or renewal on a subscription that has not yet been invoiced. "
+                      "Please ensure that the subscription '%s' is invoiced before proceeding." % subscription.name)
+    
+        new_order_values = self._prepare_upsell_subscription_values(kw)
+        new_order = self.env['sale.order'].create(new_order_values)
+        subscription.subscription_line_ids = [(4, new_order.id)]
+        new_order.message_post(body=message_body)
+    
+        parent_message_body = _("An upsell quotation %s has been created", new_order._get_html_link())
+        
+        subscription.message_post(body=parent_message_body)
+        new_order.order_line._compute_tax_id()
+        
+        return new_order
+        
+    def _prepare_upsell_subscription_values(self, kw):
+        self.ensure_one()
+        today = fields.Date.today()
+        subscription = self
+    
+        order_lines = subscription.order_line._get_upsell_order_lines(kw)    
+            
+        date_start = today
+        date_next_invoice = subscription.date_next_invoice
+    
+        return {
+            'subscription_order': True,
+            'parent_subscription_id': subscription.id,
+            'pricelist_id': subscription.pricelist_id.id,
+            'partner_id': subscription.partner_id.id,
+            'partner_invoice_id': subscription.partner_invoice_id.id,
+            'partner_shipping_id': subscription.partner_shipping_id.id,
+            'order_line': order_lines,
+            'analytic_account_id': subscription.analytic_account_id.id,
+            'subscription_type': 'upsell',
+            'origin': subscription.client_order_ref,
+            'client_order_ref': subscription.client_order_ref,
+            'note': subscription.note,
+            'user_id': subscription.user_id.id,
+            'payment_term_id': subscription.payment_term_id.id,
+            'company_id': subscription.company_id.id,
+            'date_start': date_start,
+            'date_next_invoice': date_next_invoice,
+            'subscription_plan_id': subscription.subscription_plan_id.id,
+        }

@@ -99,3 +99,20 @@ class SubscriptionOrderLine(models.Model):
             if not line.is_recurring or line.product_id.invoice_policy == 'delivery' or line.order_id.date_start and line.order_id.date_start > today:
                 continue
             line.qty_to_invoice = line.product_uom_qty
+
+    # Portal actions
+    def _get_upsell_order_lines(self, kw):
+        order_lines = []
+        for key, value in kw.items():
+            if key.startswith('product_') and value:
+                product_id = int(key.split('_')[1])  # Extract the product ID from the key
+                product = self.env['product.product'].sudo().browse(product_id)
+                upsell_line_vals = {
+                    'product_id': product.id,
+                    'name': product.name,
+                    'product_uom_qty': 1,  # You can modify this as needed
+                    'price_unit': product.list_price,  # Assuming list_price is the price you want to use
+                    'tax_id': [(6, 0, product.taxes_id.ids)],  # Assuming taxes_id is the taxes you want to use
+                }
+                order_lines.append((0, 0, upsell_line_vals))
+        return order_lines

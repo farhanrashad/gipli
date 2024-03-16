@@ -171,6 +171,40 @@
         </div>
     </template>
 
+    <template id="model_sale_subscription_upsell_template">
+        <div role="dialog" t-attf-class="modal fade" id="modal-subscription-upsell" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h4 class="modal-title">
+                                Select Upselling Products <span t-field="sale_order.display_name" class="text-primary"/>
+                            </h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+                        </header>
+                        <form method="post" t-attf-action="/my/suborders/upsell/#{sale_order.id}?access_token=#{sale_order.access_token}">
+                            <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <main class="modal-body">
+                                <t t-set="product_ids" t-value="request.env['product.product'].sudo().search([('active','=',True),('id','in',sale_order.subscription_plan_id.upsell_portal_product_ids.ids)])"/>
+                                <t t-foreach="product_ids" t-as="product">
+                                    <input type="checkbox" 
+                                        class="mr8"
+                                        t-out="product.name" 
+                                        t-att-value="product.id"
+                                        t-att-name="'product_' + str(product.id)"
+                                    /><br/>
+                                </t>
+                            </main>
+                            <footer class="modal-footer">
+                                <button class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            </footer>
+                        </form>
+                    </div>
+                </div>
+        </div>
+    </template>
+
     <!-- Change Quantity Model Template -->
     
      <template id="model_sale_subscription_change_quantity_template">
@@ -213,7 +247,7 @@
     <template id="sale_subscription_order_portal_sidebar" name="Sale Subscription sidebar">
         <t t-call="de_subscription.model_sale_subscription_close_template"/>
         <t t-call="de_subscription.model_sale_subscription_change_plan_template" />
-        
+        <t t-call="de_subscription.model_sale_subscription_upsell_template" />
         <div class="d-flex flex-wrap flex-column">
             <div class="flex-grow-1" id="" >
 
@@ -234,6 +268,17 @@
                     id="o_change_plan"
                 >
                     Change Plan
+                </button>
+
+                <button role="button" 
+                    t-if="sale_order.subscription_order and sale_order.portal_upsell" 
+                    class="mt8 btn btn-primary w-100" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#modal-subscription-upsell" 
+                    href="#"
+                    id="o_subscription_upsell"
+                >
+                    Upsell Quotation
                 </button>
                 
                 <a role="button" 
