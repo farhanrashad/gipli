@@ -128,13 +128,6 @@
                     interval="month"
                     sample="1">
                 <field name="currency_rate" invisible="1"/>
-                <!--
-                <field name="kpi_1month_mrr_delta" invisible="1"/>
-                <field name="kpi_1month_mrr_percentage" invisible="1"/>
-                <field name="kpi_3months_mrr_delta" invisible="1"/>
-                <field name="kpi_3months_mrr_percentage" invisible="1"/>
-                <field name="rating_last_value" invisible="1"/>
-                -->
                 <field name="amount_total_subscription" invisible="1"/>
                 <field name="amount_total" invisible="1"/>
                 <field name="amount_untaxed" invisible="1"/>
