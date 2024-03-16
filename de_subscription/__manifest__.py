@@ -23,7 +23,7 @@ Features:
     'support': "info@dynexcel.com",
     'category': 'Sales/Subscriptions',
     'version': '17.0.0.4',
-    'live_test_url': 'https://youtu.be/_qKgJmMrVq4',
+    'live_test_url': 'https://youtu.be/PJEkGzyCQ2Q',
     'depends': [
         'sale_management',
     ],
@@ -46,7 +46,7 @@ Features:
         'views/subscription_portal_templates.xml',
     ],
     'license': 'OPL-1',
-    'price': 50,
+    'price': 70,
     'currency': 'USD',
     'images': ['static/description/banner.gif'],
     'installable': True,

@@ -175,7 +175,10 @@ class SubscriptionCustomerPortal(CustomerPortal):
         lang = order_sudo.partner_id.lang or self.env.user.lang
         renew_msg_body = order_sudo._get_order_subscription_digest('renewal', lang=lang)
         renew_order_id = order_sudo._create_new_subscription_order('renewal', renew_msg_body)
-            
+
+        current_user_partner_id = request.env.user.partner_id.id
+        renew_order_id.message_subscribe(partner_ids=[current_user_partner_id])
+        
         return request.redirect(f'/my/suborders/{renew_order_id.id}?access_token={access_token}')
     
     # Change Subscription Plan
@@ -206,6 +209,9 @@ class SubscriptionCustomerPortal(CustomerPortal):
             })
             renew_order_id._compute_date_next_invoice()
             renew_order_id._compute_date_end()
+
+            current_user_partner_id = request.env.user.partner_id.id
+            renew_order_id.message_subscribe(partner_ids=[current_user_partner_id])
         
         return request.redirect(f'/my/suborders/{renew_order_id.id}?access_token={access_token}')
 
@@ -248,5 +254,8 @@ class SubscriptionCustomerPortal(CustomerPortal):
         lang = order_sudo.partner_id.lang or self.env.user.lang
         upsell_msg_body = order_sudo._get_order_subscription_digest('upsell', lang=lang)
         upsell_order_id = order_sudo._create_new_upsell_subscription(kw, upsell_msg_body)
+        
+        current_user_partner_id = request.env.user.partner_id.id
+        upsell_order_id.message_subscribe(partner_ids=[current_user_partner_id])
 
         return request.redirect(f'/my/suborders/{upsell_order_id.id}?access_token={access_token}')
