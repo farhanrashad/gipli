@@ -3,7 +3,7 @@
     <!-- Top menu item -->
     <menuitem name="Subscriptions"
         id="menu_subscription_root"
-        groups="sales_team.group_sale_salesman"
+        groups="group_subscription_user"
         web_icon="de_subscription,static/description/icon.png"
         sequence="40" />
 
@@ -11,6 +11,11 @@
     <menuitem id="menu_subscription_customers" name="Customers" parent="menu_subscription_root" sequence="10"/>
     <menuitem id="menu_subscription_products" name="Products" parent="menu_subscription_root" sequence="20"/>
     <menuitem id="menu_subscription_reports" name="Reports" parent="menu_subscription_root" sequence="90"/>
-    <menuitem id="menu_subscription_config" name="Configuration" parent="menu_subscription_root" sequence="90"/>
+    <menuitem id="menu_subscription_config" 
+        name="Configuration" 
+        parent="menu_subscription_root" 
+        groups="group_subscription_manager"
+        sequence="90"
+    />
     
 </odoo>

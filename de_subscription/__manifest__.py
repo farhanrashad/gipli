@@ -28,6 +28,7 @@ Features:
         'sale_management',
     ],
     'data': [
+        'security/subscription_security.xml',
         'security/ir.model.access.csv',
         'data/subscription_data.xml',
         'data/ir_actions_data.xml',
