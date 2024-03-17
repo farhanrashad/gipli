@@ -12,6 +12,7 @@
                 <field name="invoice_date_due" />
                 <field name="journal_id" optional="hide"/>
                 <field name="amount_to_pay" />
+                <field name="exclude_for_payment" />
                 <field name="amount_total_signed" optional="show" />
                 <field name="amount_residual_signed" optional="show" />
                 <field name="amount_total" optional="hide"/>

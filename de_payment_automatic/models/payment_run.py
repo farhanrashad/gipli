@@ -210,6 +210,8 @@ class PaymentRunLine(models.Model):
         readonly=False,
         compute='_compute_to_pay_amount',
     )
+    exclude_for_payment = fields.Boolean('Exclude')
+    
     @api.depends('move_id')
     def _compute_to_pay_amount(self):
         for record in self:
