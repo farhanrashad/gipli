@@ -16,7 +16,7 @@
                         data-hotkey="s"        
                         invisible="state != 'draft'"
                     />
-                    <field name="state" widget="statusbar" statusbar_visible="draft,progress,posted"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,proposal,progress,posted"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">

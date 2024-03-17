@@ -6,18 +6,20 @@
         <field name="model">account.payment.run.line</field>
         <field name="arch" type="xml">
             <tree sample="1" editable="bottom">
+                <field name="company_id" column_invisible="1" />
                 <field name="move_id" readonly="1" string="Number"/>
                 <field name="partner_id" />
                 <field name="invoice_date" />
                 <field name="invoice_date_due" />
-                <field name="journal_id" optional="hide"/>
-                <field name="amount_to_pay" />
+                <field name="payment_journal_id"/>
+                <field name="amount_to_pay" readonly="parent_state not in ('draft','proposal') "/>
                 <field name="exclude_for_payment" />
                 <field name="amount_total_signed" optional="show" />
                 <field name="amount_residual_signed" optional="show" />
                 <field name="amount_total" optional="hide"/>
                 <field name="amount_residual" optional="hide"/>
                 <field name="currency_id" readonly="1" optional="hide"/>
+                <field name="parent_state" optional="hide" />
                 <field name="company_id" readonly="1" groups="base.group_multi_company"/>
                 <button
                     name="open_Journal_entry"

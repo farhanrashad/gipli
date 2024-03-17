@@ -7,7 +7,7 @@ from odoo.exceptions import UserError, ValidationError
 
 STATES = [
     ('draft', 'Draft'), 
-    ('propose', 'Propose'),
+    ('proposal', 'Proposal'),
     ('progress', 'In Progress'),
     ('posted', 'Posted'),
     ('Canceled', 'cancel'),  
@@ -120,6 +120,7 @@ class PaymentRun(models.Model):
             self.env['account.payment.run.line'].create({
                 'payment_run_id': self.id,
                 'move_id': move.id,
+                'payment_journal_id': move.partner_id.pr_journal_id.id or self.company_id.pr_default_journal_id.id
             })
         #raise UserError(self._prepare_domain())
 
@@ -194,7 +195,12 @@ class PaymentRunLine(models.Model):
         check_company=True,
     )
     partner_id = fields.Many2one(related='move_id.partner_id')
-    journal_id = fields.Many2one(related='move_id.journal_id')
+    payment_journal_id = fields.Many2one(
+        comodel_name='account.journal',
+        string="Journal",
+        check_company=True,
+        domain="[('type', 'in', ('bank','cash'))]",
+    )
     invoice_date = fields.Date(related='move_id.invoice_date')
     invoice_date_due = fields.Date(related='move_id.invoice_date_due')
     
@@ -211,6 +217,7 @@ class PaymentRunLine(models.Model):
         compute='_compute_to_pay_amount',
     )
     exclude_for_payment = fields.Boolean('Exclude')
+    parent_state = fields.Selection('payment_run_id.state')
     
     @api.depends('move_id')
     def _compute_to_pay_amount(self):
