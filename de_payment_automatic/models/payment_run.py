@@ -4,6 +4,7 @@ from odoo import api, fields, models, _
 
 STATES = [
     ('draft', 'Draft'), 
+    ('propose', 'Propose'),
     ('progress', 'In Progress'),
     ('posted', 'Posted'),
     ('Canceled', 'cancel'),  
@@ -129,19 +130,28 @@ class PaymentRun(models.Model):
 
     # Actions
     def button_proposal(self):
-        pass
+        move_ids = self.env['account.move'].search([
+            ('move_type','in',('in_invoice','in_refund'))
+        ])
+        self.line_ids.unlink()
+        for move in move_ids:
+            self.env['account.payment.run.line'].create({
+                'payment_run_id': self.id,
+                'move_id': move.id,
+            })
+            
         
     def open_payment_proposal(self):
         action = self.env.ref('de_payment_automatic.action_payment_run_line').read()[0]
         action.update({
             'name': 'Accounting Documents',
             'view_mode': 'tree',
-            'res_model': 'accountpayment.run.line',
+            'res_model': 'account.payment.run.line',
             'type': 'ir.actions.act_window',
             'domain': [('payment_run_id','=',self.id)],
             'context': {
                 'create': False,
-                'edit': False,
+                'edit': True,
             },
             
         })
@@ -166,10 +176,10 @@ class PaymentRunLine(models.Model):
         related='payment_run_id.company_id', store=True, readonly=True, precompute=True,
         index=True,
     )
-    currency_id = fields.Many2one(
-        related='payment_run_id.company_id', store=True, readonly=True, precompute=True,
-        index=True,
-    )
+    #currency_id = fields.Many2one(
+    #    related='payment_run_id.currency_id', store=True, readonly=True, precompute=True,
+    #    index=True,
+    #)
     move_id = fields.Many2one(
         comodel_name='account.move',
         string='Journal Entry',
@@ -180,4 +190,44 @@ class PaymentRunLine(models.Model):
         ondelete="cascade",
         check_company=True,
     )
+    partner_id = fields.Many2one(related='move_id.partner_id')
+    journal_id = fields.Many2one(related='move_id.journal_id')
+    invoice_date = fields.Date(related='move_id.invoice_date')
+    invoice_date_due = fields.Date(related='move_id.invoice_date_due')
+    
+    amount_total_signed = fields.Monetary(related='move_id.amount_total_signed')
+    amount_residual_signed = fields.Monetary(related='move_id.amount_residual_signed')
+    amount_total = fields.Monetary(related='move_id.amount_total')
+    amount_residual = fields.Monetary(related='move_id.amount_residual')
+    currency_id = fields.Many2one(related='move_id.currency_id' )
+    
+    amount_to_pay = fields.Monetary(
+        string='Amount to Pay',
+        store=True,
+        readonly=False,
+        compute='_compute_to_pay_amount',
+    )
+    @api.depends('move_id')
+    def _compute_to_pay_amount(self):
+        for record in self:
+            record.amount_to_pay = record.move_id.amount_residual_signed
+
+    def open_Journal_entry(self):
+        action = self.env.ref('account.action_move_out_invoice_type').read()[0]
+        action.update({
+            'name': 'Accounting Documents',
+            'view_mode': 'form',
+            'res_model': 'account.move',
+            'type': 'ir.actions.act_window',
+            'domain': [('id','=',self.move_id.id)],
+            'context': {
+                'create': False,
+                'edit': False,
+                'active_id': self.move_id.id,  
+                'active_model': 'account.move',
+            },
+            
+        })
+        return action
+    
     

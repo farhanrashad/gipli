@@ -1,100 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="account_payment_run_form_view" model="ir.ui.view">
-        <field name="name">account.payment.run.form.view</field>
-        <field name="model">account.payment.run</field>
+    
+    <record id="account_payment_run_line_tree_view" model="ir.ui.view">
+        <field name="name">account.payment.run.line.tree.view</field>
+        <field name="model">account.payment.run.line</field>
         <field name="arch" type="xml">
-            <form string="Payment Run" class="oe_form_configuration">
-                <field name="partner_type" invisible="1"/>
-                <field name="company_id" invisible="1"/>
-                <header>
-                    <button name="button_proposal" 
-                        string="Proposal" 
-                        type="object" 
-                        groups="account.group_account_invoice" 
-                        data-hotkey="s"        
-                        invisible="state != 'draft'"
-                    />
-                    <field name="state" widget="statusbar" statusbar_visible="draft,progress,posted"/>
-                </header>
-                <sheet>
-                    <div class="oe_title">
-                        <label for="name"/>
-                        <h1>
-                            <field name="name" placeholder="e.g Payment on 01-01-2024" class="d-block"/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="payment_type" widget="radio" options="{'horizontal': True}"
-                                       readonly="state != 'draft'"/>
-                            <field name="date"
-                                       readonly="state != 'draft'"/>
-
-                            <label for="amount"/>
-                                <div name="amount_div" class="o_row">
-                                    <field name="amount"
-                                           readonly="state != 'draft'"/>
-                                    <field name="currency_id"
-                                           options="{'no_create': True, 'no_open': True}"
-                                           required="1"
-                                           readonly="state != 'draft'"
-                                           groups="base.group_multi_currency"/>
-                                </div>
-                        </group>
-                        <group>
-                            <field name="journal_id"
-                                readonly="state != 'draft'"
-                                options="{'no_edit':True,'no_create':True}"
-                            />
-                            <field name="company_id" groups="base.group_multi_company"/>
-                        </group>
-                    </group>
-                    
-                    <notebook>
-                        <page name="exclude_partners" string="Exclude Partners">
-                            <field name="exclude_partner_ids">
-                                <tree>
-                                    <field name="name"/>  
-                                    <field name="email"/> 
-                                </tree>
-                            </field>
-                        </page>
-                        <page name="parameters" string="Parameters">
-                            <group>
-                                <group >
-                                    <field name="date_accounting" />
-                                    <field name="group_payment" />
-                                </group>
-                                <group >
-                                    <field name="date_invoice" />
-                                    <field name="date_due_by" />
-                                </group>
-                            </group>
-                        </page>
-                        <page name="extra_selection" string="Extra Selection">
-                            <group >
-                                <field name="filter_domain" widget="domain" string="Apply On" options="{'model': 'account.move', 'in_dialog': True}"/>
-                            </group>
-                        </page>
-                    </notebook>
-                </sheet>
-                <!-- Chatter -->
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" groups="base.group_user"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
-            </form>
-        </field>
-    </record>
-
-    <record id="account_payment_run_tree_view" model="ir.ui.view">
-        <field name="name">account.payment.run.tree.view</field>
-        <field name="model">account.payment.run</field>
-        <field name="arch" type="xml">
-            <tree sample="1" >
-                <field name="company_id" groups="base.group_multi_company"/>
+            <tree sample="1" editable="bottom">
+                <field name="move_id" readonly="1" string="Number"/>
+                <field name="partner_id" />
+                <field name="invoice_date" />
+                <field name="invoice_date_due" />
+                <field name="journal_id" optional="hide"/>
+                <field name="amount_to_pay" />
+                <field name="amount_total_signed" optional="show" />
+                <field name="amount_residual_signed" optional="show" />
+                <field name="amount_total" optional="hide"/>
+                <field name="amount_residual" optional="hide"/>
+                <field name="currency_id" readonly="1" optional="hide"/>
+                <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                <button
+                    name="open_Journal_entry"
+                    class="oe_stat_button"
+                    icon="fa-file-alt"
+                    string="View"
+                    type="object">
+                </button>
             </tree>
         </field>
     </record>
@@ -110,7 +40,6 @@
             'default_partner_type': 'supplier',
             'default_payment_type': 'outbound',
             'create':False,
-            'edit':False,
             'delete': False,
             }
         </field>

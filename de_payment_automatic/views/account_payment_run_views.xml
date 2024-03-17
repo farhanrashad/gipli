@@ -105,6 +105,16 @@
         <field name="model">account.payment.run</field>
         <field name="arch" type="xml">
             <tree sample="1" >
+                <field name="name" />
+                <field name="partner_type" />
+                <field name="date" />
+                <field name="date_accounting" />
+                <field name="state" string="Status" 
+                    decoration-success="state == 'sale'" 
+                    decoration-info="state == 'draft'" 
+                    decoration-primary="state == 'sent'" 
+                    widget="badge" 
+                />
                 <field name="company_id" groups="base.group_multi_company"/>
             </tree>
         </field>

@@ -1,3 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_account_payment_run_readonly,account.payment.run.readonly,model_account_payment_run,account.group_account_readonly,1,0,0,0
-access_account_payment_run,account.payment.run.user,model_account_payment_run,account.group_account_invoice,1,1,1,1
+access_account_payment_run_user,account.payment.run.user,model_account_payment_run,account.group_account_invoice,1,1,1,1
+
+access_account_payment_run_line_readonly,account.payment.run.line.readonly,model_account_payment_run_line,account.group_account_readonly,1,0,0,0
+access_account_payment_run_line_user,account.payment.run.line.user,model_account_payment_run_line,account.group_account_invoice,1,1,1,1

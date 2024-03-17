@@ -25,6 +25,7 @@ Long description of module's purpose
         'security/ir.model.access.csv',
         'views/account_move_views.xml',
         'views/account_payment_run_views.xml',
+        'views/payment_run_line_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
