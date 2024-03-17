@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
+from datetime import datetime, timedelta
+from odoo.tools import safe_eval
+from odoo.exceptions import UserError, ValidationError
 
 STATES = [
     ('draft', 'Draft'), 
@@ -26,12 +29,20 @@ class PaymentRun(models.Model):
     )
 
     date = fields.Date(
-        string='Date',
+        string='Run Date',
         index=True,
         store=True, required=True, readonly=False,
         default=lambda self: fields.Date.context_today(self),
         copy=False,
         tracking=True,
+    )
+
+    date_next_run = fields.Date(
+        string='Next Run Date',
+        index=True,
+        store=True, required=True, readonly=False,
+        default=lambda self: (datetime.today() + timedelta(days=1)).strftime('%Y-%m-%d'),
+        copy=False,
     )
     
     state = fields.Selection(
@@ -43,13 +54,6 @@ class PaymentRun(models.Model):
         tracking=True,
         default='draft',
     )
-    journal_id = fields.Many2one(
-        comodel_name='account.journal',
-        string='Journal',
-        domain="[('type', 'in', ('bank','cash'))]",
-        check_company=True,
-        required=True,
-    )
     
     payment_type = fields.Selection([
         ('outbound', 'Send'),
@@ -59,19 +63,9 @@ class PaymentRun(models.Model):
         ('customer', 'Customer'),
         ('supplier', 'Vendor'),
     ], default='customer', tracking=True, required=True)
-    amount = fields.Monetary(currency_field='currency_id')
-    currency_id = fields.Many2one(
-        comodel_name='res.currency',
-        string='Currency',
-        compute='_compute_currency_id', store=True, readonly=False, precompute=True,
-        help="The payment's currency.")
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        compute='_compute_company_id', 
-        store=True, readonly=False, precompute=True,
-        index=True,
-    )
+    
+    
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
 
     exclude_partner_ids = fields.Many2many(
         'res.partner',
@@ -116,30 +110,39 @@ class PaymentRun(models.Model):
     def _compute_proposal_count(self):
         for proposal in self:
             proposal.count_proposal = len(proposal.line_ids)
-        
-    @api.depends('journal_id')
-    def _compute_currency_id(self):
-        for pay in self:
-            pay.currency_id = pay.journal_id.currency_id or pay.journal_id.company_id.currency_id
-            
-    @api.depends('journal_id')
-    def _compute_company_id(self):
-        for move in self:
-            if move.journal_id.company_id not in move.company_id.parent_ids:
-                move.company_id = (move.journal_id.company_id or self.env.company)._accessible_branches()[:1]
+
 
     # Actions
     def button_proposal(self):
-        move_ids = self.env['account.move'].search([
-            ('move_type','in',('in_invoice','in_refund'))
-        ])
+        move_ids = self.env['account.move'].search(self._prepare_domain())
         self.line_ids.unlink()
         for move in move_ids:
             self.env['account.payment.run.line'].create({
                 'payment_run_id': self.id,
                 'move_id': move.id,
             })
-            
+        #raise UserError(self._prepare_domain())
+
+    def _prepare_domain(self):
+        search_domain = [
+            ('payment_state','in', ['not_paid','partial']),
+            ('state','=','posted'),
+                        ]
+        if self.filter_domain:
+            search_domain += safe_eval.safe_eval(self.filter_domain)
+        if self.date_due_by:
+            search_domain += [('invoice_date_due', '<=', self.date_due_by)]
+        if self.date_due_by:
+            search_domain += [('invoice_date', '<=', self.date_invoice)]
+        if self.exclude_partner_ids:
+            search_domain += [('partner_id', 'not in', self.exclude_partner_ids.ids)]
+        if self.partner_type == 'supplier':
+            search_domain += [('move_type','in',('in_invoice','in_refund'))]
+        else:
+            search_domain += [('move_type','in',('out_invoice','out_refund'))]
+        
+        return search_domain
+        
         
     def open_payment_proposal(self):
         action = self.env.ref('de_payment_automatic.action_payment_run_line').read()[0]
