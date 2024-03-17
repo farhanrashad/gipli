@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_payment_run_form_view" model="ir.ui.view">
+        <field name="name">account.payment.run.form.view</field>
+        <field name="model">account.payment.run</field>
+        <field name="arch" type="xml">
+            <form string="Payment Run" class="oe_form_configuration">
+                <field name="partner_type" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <field name="count_proposal" invisible="1" />
+                <header>
+                    <button name="button_proposal" 
+                        string="Proposal" 
+                        type="object" 
+                        groups="account.group_account_invoice" 
+                        data-hotkey="s"        
+                        invisible="state != 'draft'"
+                    />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,progress,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button invisible="count_proposal == 0"
+                            name="open_payment_proposal"
+                            class="oe_stat_button"
+                            icon="fa-file-alt"
+                            type="object">
+                            <field name="count_proposal" widget="statinfo" string="Proposal"/>
+                        </button>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g Payment on 01-01-2024" class="d-block"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="payment_type" widget="radio" options="{'horizontal': True}"
+                                       readonly="state != 'draft'"/>
+                            <field name="date"
+                                       readonly="state != 'draft'"/>
+
+                            <label for="amount"/>
+                                <div name="amount_div" class="o_row">
+                                    <field name="amount"
+                                           readonly="state != 'draft'"/>
+                                    <field name="currency_id"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           required="1"
+                                           readonly="state != 'draft'"
+                                           groups="base.group_multi_currency"/>
+                                </div>
+                        </group>
+                        <group>
+                            <field name="journal_id"
+                                readonly="state != 'draft'"
+                                options="{'no_edit':True,'no_create':True}"
+                            />
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page name="exclude_partners" string="Exclude Partners">
+                            <field name="exclude_partner_ids">
+                                <tree>
+                                    <field name="name"/>  
+                                    <field name="email"/> 
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="parameters" string="Parameters">
+                            <group>
+                                <group >
+                                    <field name="date_accounting" />
+                                    <field name="group_payment" />
+                                </group>
+                                <group >
+                                    <field name="date_invoice" />
+                                    <field name="date_due_by" />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="extra_selection" string="Extra Selection">
+                            <group >
+                                <field name="filter_domain" widget="domain" string="Apply On" options="{'model': 'account.move', 'in_dialog': True}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="account_payment_run_tree_view" model="ir.ui.view">
+        <field name="name">account.payment.run.tree.view</field>
+        <field name="model">account.payment.run</field>
+        <field name="arch" type="xml">
+            <tree sample="1" >
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_payable_payment_run" model="ir.actions.act_window">
+        <field name="name">Payment Run</field>
+        <field name="res_model">account.payment.run</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[
+            ('partner_type', '=', 'supplier'),
+        ]</field>
+        <field name="context">{
+            'default_partner_type': 'supplier',
+            'default_payment_type': 'outbound',
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a payment run
+            </p>
+            <p>
+                Automated payment run streamlines payment processing by generating and executing payments automatically based on predefined criteria.
+            </p>
+        </field>
+    </record>
+
+    <menuitem name="Payment Run" 
+        id="menu_finance_payables_payment_run"
+        parent="account.menu_finance_payables" 
+        action="action_payable_payment_run"
+        sequence="50"
+    />
+    
+</odoo>

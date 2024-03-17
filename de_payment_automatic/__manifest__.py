@@ -22,9 +22,9 @@ Long description of module's purpose
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/account_move_views.xml',
-        'views/templates.xml',
+        'views/account_payment_run_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
