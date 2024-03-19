@@ -117,13 +117,58 @@ class PaymentRun(models.Model):
         move_ids = self.env['account.move'].search(self._prepare_domain())
         self.line_ids.unlink()
         for move in move_ids:
-            self.env['account.payment.run.line'].create({
-                'payment_run_id': self.id,
-                'move_id': move.id,
-                'payment_journal_id': move.partner_id.pr_journal_id.id or self.company_id.pr_default_journal_id.id
+            #self.env['account.payment.run.line'].create({
+            #    'payment_run_id': self.id,
+            #    'move_id': move.id,
+            #    'payment_journal_id': move.partner_id.pr_journal_id.id or self.company_id.pr_default_journal_id.id
+            #})
+            self.env['account.payment.run.line'].create(self._prepare_payment_run_line(move))
+            self.write({
+                'state': 'proposal',
             })
         #raise UserError(self._prepare_domain())
 
+    def button_draft(self):
+        self.write({
+            'state': 'draft',
+        })
+    def button_schedule (self):
+        for line in self.line_ids:
+            payment_id = self.env['account.payment'].create(self._prepare_payment(line))
+            payment_id.action_post()
+            line.write({
+                'payment_id': payment_id,
+            })
+            line._reconcile_payment(line.move_id,payment_id.move_id)
+            
+
+    def _prepare_payment(self,line):
+        vals = {
+            'partner_type': self.partner_type,
+            'partner_id': line.partner_id.id,
+            'date': self.date,
+            'ref': line.move_id.name,
+            'journal_id': self.company_id.pr_default_journal_id.id,
+            'amount': abs(line.amount_to_pay),
+        }
+        if line.move_id.move_type == 'in_refund' or line.move_id.move_type == 'out_invoice':
+            vals['payment_type'] = 'inbound'
+        else:
+            vals['payment_type'] = 'outbound'
+            
+        return vals
+
+    def button_execute(self):
+        pass
+        
+
+    def _prepare_payment_run_line(self,move):
+        return {
+            'payment_run_id': self.id,
+            'move_id': move.id,
+            'payment_journal_id': move.partner_id.pr_journal_id.id or self.company_id.pr_default_journal_id.id
+        }
+    
     def _prepare_domain(self):
         search_domain = [
             ('payment_state','in', ['not_paid','partial']),
@@ -217,7 +262,13 @@ class PaymentRunLine(models.Model):
         compute='_compute_to_pay_amount',
     )
     exclude_for_payment = fields.Boolean('Exclude')
-    parent_state = fields.Selection('payment_run_id.state')
+    parent_state = fields.Char('payment_run_id.state')
+
+    payment_id = fields.Many2one(
+        comodel_name='account.payment',
+        string="Payment",
+        readonly=True,
+    )
     
     @api.depends('move_id')
     def _compute_to_pay_amount(self):
@@ -241,5 +292,15 @@ class PaymentRunLine(models.Model):
             
         })
         return action
-    
+        
+    def _reconcile_payment(self,move_id, payment_move_id):
+        move_lines = move_id.line_ids.filtered(lambda line: line.account_id in (self._find_accounts(line)))
+        payment_lines = payment_move_id.line_ids.filtered(lambda line: line.account_id in (self._find_accounts(line)))
+        (move_lines + payment_lines).reconcile()
+        
+    def _find_accounts(self,line):
+        return [
+            line.partner_id.property_account_payable_id,
+            line.partner_id.property_account_receivable_id,
+        ]
     

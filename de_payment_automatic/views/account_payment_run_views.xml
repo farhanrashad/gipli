@@ -12,10 +12,36 @@
                     <button name="button_proposal" 
                         string="Proposal" 
                         type="object" 
+                        class="oe_highlight"
                         groups="account.group_account_invoice" 
-                        data-hotkey="s"        
+                        data-hotkey="p"        
                         invisible="state != 'draft'"
                     />
+                    <button name="button_draft" 
+                        string="Set to Draft" 
+                        type="object" 
+                        groups="account.group_account_invoice" 
+                        data-hotkey="p"        
+                        invisible="state not in ('draft','proposal')"
+                    />
+                    
+                    <button name="button_schedule" 
+                        string="Schedule" 
+                        type="object" 
+                        class="oe_highlight"
+                        groups="account.group_account_invoice" 
+                        data-hotkey="d"        
+                        invisible="state != 'proposal'"
+                    />
+                    <button name="button_execute" 
+                        string="Execute" 
+                        type="object" 
+                        class="oe_highlight"
+                        groups="account.group_account_invoice" 
+                        data-hotkey="e"        
+                        invisible="state != 'progress'"
+                    />
+                    
                     <field name="state" widget="statusbar" statusbar_visible="draft,proposal,progress,posted"/>
                 </header>
                 <sheet>
