@@ -28,6 +28,7 @@ Long description of module's purpose
         'views/account_payment_run_views.xml',
         'views/payment_run_line_views.xml',
         'views/res_partner_views.xml',
+        'reports/report_payment_run_template.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

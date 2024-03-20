@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Report Definition -->
+        <report
+            id="report_account_payment_run"
+            string="Payment Run Report"
+            model="account.payment.run"
+            report_type="qweb-pdf"
+            name="your_module.report_account_payment_run"
+            file="your_module.report_account_payment_run"
+        />
+
+        <!-- Report Template -->
+        <template id="report_account_payment_run">
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <h2>Payment Run Report</h2>
+                    <table class="table table-condensed">
+                        <!-- Header Section -->
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Run Date</th>
+                                <th>Next Run Date</th>
+                                <th>Status</th>
+                                <th>Payment Type</th>
+                                <th>Company</th>
+                                <th>Excluded Partners</th>
+                                <th>Proposals</th>
+                                <th>Payments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="docs" t-as="record">
+                                <!-- Header Fields -->
+                                <td><span t-field="record.name"/></td>
+                                <td><span t-field="record.date"/></td>
+                                <td><span t-field="record.date_next_run"/></td>
+                                <td><span t-field="record.state"/></td>
+                                <td><span t-field="record.payment_type"/></td>
+                                <td><span t-field="record.company_id"/></td>
+                                <td><span t-field="record.exclude_partner_ids"/></td>
+                                <td><span t-field="record.count_proposal"/></td>
+                                <td><span t-field="record.count_payments"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Line Items Section -->
+                    <h3>Payment Run Line Items</h3>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Journal Entry</th>
+                                <th>Partner</th>
+                                <th>Journal</th>
+                                <th>Invoice Date</th>
+                                <th>Invoice Due Date</th>
+                                <th>Amount Total Signed</th>
+                                <th>Amount Residual Signed</th>
+                                <th>Amount Total</th>
+                                <th>Amount Residual</th>
+                                <th>Amount to Pay</th>
+                                <th>Exclude for Payment</th>
+                                <th>Payment ID</th>
+                                <th>Parent State</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="docs.line_ids" t-as="line">
+                                <!-- Line Item Fields -->
+                                <td><span t-field="line.move_id"/></td>
+                                <td><span t-field="line.partner_id"/></td>
+                                <td><span t-field="line.payment_journal_id"/></td>
+                                <td><span t-field="line.invoice_date"/></td>
+                                <td><span t-field="line.invoice_date_due"/></td>
+                                <td><span t-field="line.amount_total_signed"/></td>
+                                <td><span t-field="line.amount_residual_signed"/></td>
+                                <td><span t-field="line.amount_total"/></td>
+                                <td><span t-field="line.amount_residual"/></td>
+                                <td><span t-field="line.amount_to_pay"/></td>
+                                <td><span t-field="line.exclude_for_payment"/></td>
+                                <td><span t-field="line.payment_id"/></td>
+                                <td><span t-field="line.parent_state"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>
