@@ -5,9 +5,9 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//group[1]/group[2]" position="inside">
-                <label for="payment_block_reasons" string="Payment Block" invisible="state != 'posted'"/>
+                <label for="payment_block_reason" string="Payment Block" invisible="state != 'posted'"/>
                 <div class="o_row g-0 d-flex" invisible="state != 'posted'">          
-                    <field name="payment_block_reasons"
+                    <field name="payment_block_reason"
                         invisible="state != 'posted'"
                         />
                     <button name="button_mark_payment_unblock" 
@@ -15,14 +15,14 @@
                         title="Free for Payment" 
                         icon="fa-check-circle" 
                         class="btn btn-success"
-                        invisible="payment_block_reasons == 'P' or state != 'posted' or payment_state in ('in_payment','paid')"
+                        invisible="payment_block_reason == 'P' or state != 'posted' or payment_state in ('in_payment','paid')"
                     />
                     <button name="button_mark_payment_block" 
                         type="object" 
                         title="Mark Payment Block" 
                         icon="fa-ban" 
                         class="btn btn-danger"
-                        invisible="payment_block_reasons == 'B' or state != 'posted' or payment_state in ('in_payment','paid')"
+                        invisible="payment_block_reason == 'B' or state != 'posted' or payment_state in ('in_payment','paid')"
                     />
                 </div>
             </xpath>
@@ -35,11 +35,11 @@
         <field name="inherit_id" ref="account.view_invoice_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//tree" position="inside">
-                <field name="payment_block_reasons"
+                <field name="payment_block_reason"
                     string="Payment Block"
                     widget="badge"
-                    decoration-danger="payment_block_reasons == 'B'"
-                    decoration-success="payment_block_reasons == 'P'"
+                    decoration-danger="payment_block_reason == 'B'"
+                    decoration-success="payment_block_reason == 'P'"
                     optional="hide"
                 />                
             </xpath>
@@ -53,8 +53,8 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='late']" position="after">
                 <separator/>
-                <filter name="block_payment" string="Block For Payment" domain="[('payment_block_reasons', '=', 'B'), ('payment_state', 'not in', ('in_payment', 'paid'))]"/>
-                <filter name="unblock_payment" string="Free For Payment" domain="[('payment_block_reasons', '=', 'F'), ('payment_state', 'not in', ('in_payment', 'paid'))]"/>
+                <filter name="block_payment" string="Block For Payment" domain="[('payment_block_reason', '=', 'B'), ('payment_state', 'not in', ('in_payment', 'paid'))]"/>
+                <filter name="unblock_payment" string="Free For Payment" domain="[('payment_block_reason', '=', 'F'), ('payment_state', 'not in', ('in_payment', 'paid'))]"/>
             </xpath>
         </field>
     </record>

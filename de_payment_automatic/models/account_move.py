@@ -10,7 +10,7 @@ PAYMENT_BLOCK_REASONS = [
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    payment_block_reasons = fields.Selection(
+    payment_block_reason = fields.Selection(
         string='Payment Block',
         selection=PAYMENT_BLOCK_REASONS,
         store=True, index='btree_not_null', tracking=True, 
@@ -26,23 +26,23 @@ class AccountMove(models.Model):
         for move in self:
             if move.payment_state in ('in_payment','paid') or move.state != 'posted':
                move.write({
-                    'payment_block_reasons': False,
+                    'payment_block_reason': False,
                 })
             elif move.state == 'posted':
                 move.write({
-                    'payment_block_reasons': 'P',
+                    'payment_block_reason': 'P',
                 })
                 
     def button_mark_payment_unblock(self):
         for move in self:
             move.write({
-                'payment_block_reasons': 'P'
+                'payment_block_reason': 'P'
             })
 
     def button_mark_payment_block(self):
         for move in self:
             move.write({
-                'payment_block_reasons': 'B'
+                'payment_block_reason': 'B'
             })
 
     

@@ -126,6 +126,14 @@ class PaymentRun(models.Model):
             proposal.count_payments = len(proposal.line_ids.mapped('payment_id'))
 
 
+    # CRUD Methods
+    
+    def unlink(self):
+        for record in self:
+            if record.state != 'draft':
+                raise ValidationError("You can only delete records in draft state.")
+        return super(PaymentRun, self).unlink()
+
     # Actions
     def button_proposal(self):
         move_ids = self.env['account.move'].search(self._prepare_domain())
@@ -224,6 +232,7 @@ class PaymentRun(models.Model):
         search_domain = [
             ('payment_state','in', ['not_paid','partial']),
             ('state','=','posted'),
+            ('payment_block_reason','!=','B'),
                         ]
         if self.filter_domain:
             search_domain += safe_eval.safe_eval(self.filter_domain)
