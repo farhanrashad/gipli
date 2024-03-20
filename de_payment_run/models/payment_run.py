@@ -92,7 +92,6 @@ class PaymentRun(models.Model):
     )
     date_accounting = fields.Date(
         string='Accounting Date',
-        default=lambda self: fields.Date.context_today(self),
         copy=False,
     )
     date_due_by = fields.Date(
@@ -251,7 +250,7 @@ class PaymentRun(models.Model):
         
         
     def open_payment_proposal(self):
-        action = self.env.ref('de_payment_automatic.action_payment_run_line').read()[0]
+        action = self.env.ref('de_payment_run.action_payment_run_line').read()[0]
         action.update({
             'name': 'Accounting Documents',
             'view_mode': 'tree',

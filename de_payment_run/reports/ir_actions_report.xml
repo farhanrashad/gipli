@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_account_payment_run" model="ir.actions.report">
+        <field name="name">Print Proposal</field>
+        <field name="model">account.payment.run</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">de_payment_run.report_payment_run</field>
+        <field name="report_file">de_payment_run.report_payment_run</field>
+        <field name="print_report_name">(object.name)</field>
+        <field name="binding_model_id" ref="model_account_payment_run"/>
+        <field name="binding_type">report</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+</odoo>
