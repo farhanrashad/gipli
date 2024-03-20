@@ -154,7 +154,7 @@ class PaymentRun(models.Model):
             'state': 'scheduled',
         })
          
-    def button_execute (self):
+    def button_execute(self):
         if self.group_payment:
             self._create_payment(self.group_payment)
         else:
@@ -171,6 +171,23 @@ class PaymentRun(models.Model):
                 'state': 'posted',
             })
 
+    @api.model
+    def _cron_execute_scheduled(self):
+        """ Method called by the cron job that searches for account.payment.run that were scheduled and need
+        to be executed and calls _action_post() on them."""
+
+        payment_run_ids = self.search([
+            ('run_method', '=', 'scheduled'),
+            ('state', '=', 'scheduled'),
+            ('date', '<=', fields.Datetime.now())
+        ])
+        for payment in payment_run_ids:
+            if payment.grpup_payment:
+                payment._create_payment(payment.group_payment)
+            else:
+                payment._create_multiple_payments()
+
+    
     def _create_payment(self, group_payment=False):
         if group_payment:
             partner_lines = defaultdict(list)

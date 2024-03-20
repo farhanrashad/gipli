@@ -23,6 +23,7 @@ Payment run program streamlines financial operations by automating the collectio
         'views/account_payment_run_views.xml',
         'views/payment_run_line_views.xml',
         'views/res_partner_views.xml',
+        'data/ir_cron_data.xml',
         'reports/ir_actions_report.xml',
         'reports/ir_actions_report_templates.xml',
     ],
