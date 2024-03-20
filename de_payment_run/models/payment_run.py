@@ -325,6 +325,10 @@ class PaymentRunLine(models.Model):
         check_company=True,
         domain="[('type', 'in', ('bank','cash'))]",
     )
+    currency_id = fields.Many2one('res.currency', 
+                                          compute='_compute_payment_journal_currency',
+                                          store=True, 
+                                         )
     invoice_date = fields.Date(related='move_id.invoice_date')
     invoice_date_due = fields.Date(related='move_id.invoice_date_due')
     
@@ -332,7 +336,7 @@ class PaymentRunLine(models.Model):
     amount_residual_signed = fields.Monetary(related='move_id.amount_residual_signed')
     amount_total = fields.Monetary(related='move_id.amount_total')
     amount_residual = fields.Monetary(related='move_id.amount_residual')
-    currency_id = fields.Many2one(related='move_id.currency_id' )
+    #currency_id = fields.Many2one(related='move_id.currency_id' )
     
     amount_to_pay = fields.Monetary(
         string='Amount to Pay',
@@ -352,6 +356,15 @@ class PaymentRunLine(models.Model):
         store=True
     )
 
+    @api.depends('move_id','payment_journal_id')
+    def _compute_payment_journal_currency(self):
+        for record in self:
+            if record.payment_journal_id.currency_id:
+                record.currency_id = record.payment_journal_id.currency_id
+            else:
+                record.currency_id = record.move_id.currency_id
+                
+                
     @api.depends('payment_id.state')
     def _compute_payment(self):
         for record in self:

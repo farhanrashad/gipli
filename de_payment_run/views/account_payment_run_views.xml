@@ -202,5 +202,34 @@
         action="action_payable_payment_run"
         sequence="50"
     />
+
+    <record id="action_receivable_payment_run" model="ir.actions.act_window">
+        <field name="name">Payment Run</field>
+        <field name="res_model">account.payment.run</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[
+            ('partner_type', '=', 'customer'),
+        ]</field>
+        <field name="context">{
+            'default_partner_type': 'customer',
+            'default_payment_type': 'inbound',
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a payment run
+            </p>
+            <p>
+                Automated payment run streamlines payment processing by generating and executing payments automatically based on predefined criteria.
+            </p>
+        </field>
+    </record>
+
+    <menuitem name="Payment Run" 
+        id="menu_finance_receivables_payment_run"
+        parent="account.menu_finance_receivables" 
+        action="action_receivable_payment_run"
+        sequence="50"
+    />
     
 </odoo>

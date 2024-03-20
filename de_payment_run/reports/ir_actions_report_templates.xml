@@ -77,7 +77,11 @@
                             <td name="td_journal"><span t-field="line.move_id.journal_id.name"/></td>
                             <td name="td_bank"><span t-field="line.payment_journal_id.name"/></td>
                             <td name="td_amount_pay" class="text-end">
-                                <span t-field="line.amount_to_pay">27.00</span>
+                                <span
+                                    t-out="line.amount_to_pay"
+                                    t-options='{"widget": "monetary", "display_currency": line.currency_id}'>31.05
+                                >
+                                </span>                                
                             </td>   
                         </tr>
                     </t>
@@ -87,6 +91,7 @@
                                 <span
                                     t-out="current_subtotal"
                                     t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'>31.05
+                                >
                                 </span>
                             </td>
                     </tr>
@@ -115,8 +120,7 @@
                                         </td>
                                         <td>
                                             <span
-                                                t-out="sum(o.line_ids.filtered(lambda x:x.payment_journal_id.id == bank.id).mapped('amount_to_pay'))"
-                                                t-options='{"widget": "monetary", "display_currency": bank.currency_id}'>31.05
+                                                t-out="sum(o.line_ids.filtered(lambda x:x.payment_journal_id.id == bank.id).mapped('amount_to_pay'))">
                                             </span>
                                             
                                         </td>
