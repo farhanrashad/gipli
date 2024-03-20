@@ -4,6 +4,7 @@ from odoo import api, fields, models, _
 from datetime import datetime, timedelta
 from odoo.tools import safe_eval
 from odoo.exceptions import UserError, ValidationError
+from collections import defaultdict
 
 STATES = [
     ('draft', 'Draft'), 
@@ -102,14 +103,21 @@ class PaymentRun(models.Model):
         string='Propose Accounting Documents',
         copy=True,
     )
-    count_proposal = fields.Integer('Proposal Count',
+    count_proposal = fields.Integer('Proposals',
                                     compute='_compute_proposal_count',
+                                   )
+    count_payments = fields.Integer('Payments',
+                                    compute='_compute_payment_count',
                                    )
     
     # Computed Methods
     def _compute_proposal_count(self):
         for proposal in self:
             proposal.count_proposal = len(proposal.line_ids)
+
+    def _compute_payment_count(self):
+        for proposal in self:
+            proposal.count_payments = len(proposal.line_ids.mapped('payment_id'))
 
 
     # Actions
@@ -133,14 +141,26 @@ class PaymentRun(models.Model):
             'state': 'draft',
         })
     def button_schedule (self):
-        for line in self.line_ids:
-            payment_id = self.env['account.payment'].create(self._prepare_payment(line))
-            payment_id.action_post()
-            line.write({
-                'payment_id': payment_id,
-            })
-            line._reconcile_payment(line.move_id,payment_id.move_id)
+        self._create_payment(self.group_payment)
             
+
+    def _create_payment(self, group_payment=False):
+        if group_payment:
+            partner_lines = defaultdict(list)
+            for move in self.line_ids:
+                partner_lines[move.move_id.partner_id.id].append(move)
+            for partner_id, lines in partner_lines.items():
+                total_amount = sum(line.amount_to_pay for line in lines)
+                payment_vals = self._prepare_payment(lines[0])
+                payment_vals.update({
+                    'amount': abs(total_amount),
+                    'payment_run_id': self.id,
+                })
+                payment_id = self.env['account.payment'].create(payment_vals)
+                payment_id.action_post()
+                for line in lines:
+                    line.write({'payment_id': payment_id.id})
+                    line._reconcile_payment(line.move_id, payment_id.move_id)
 
     def _prepare_payment(self,line):
         vals = {
@@ -149,7 +169,8 @@ class PaymentRun(models.Model):
             'date': self.date,
             'ref': line.move_id.name,
             'journal_id': self.company_id.pr_default_journal_id.id,
-            'amount': abs(line.amount_to_pay),
+            #'amount': abs(line.amount_to_pay),
+            #'payment_run_id': self.id,
         }
         if line.move_id.move_type == 'in_refund' or line.move_id.move_type == 'out_invoice':
             vals['payment_type'] = 'inbound'
@@ -198,6 +219,26 @@ class PaymentRun(models.Model):
             'res_model': 'account.payment.run.line',
             'type': 'ir.actions.act_window',
             'domain': [('payment_run_id','=',self.id)],
+            'context': {
+                'create': False,
+                'edit': True,
+            },
+            
+        })
+        return action
+
+    def open_payments(self):
+        if self.partner_type == 'supplier':
+            action = self.env.ref('account.action_account_payments_payable').read()[0]
+        else:
+            action = self.env.ref('account.action_account_payments').read()[0]
+            
+        action.update({
+            'name': 'Payment',
+            'view_mode': 'tree',
+            'res_model': 'account.payment',
+            'type': 'ir.actions.act_window',
+            'domain': [('payment_run_id','=',self.id),('state','!=','cancel')],
             'context': {
                 'create': False,
                 'edit': True,
@@ -268,8 +309,17 @@ class PaymentRunLine(models.Model):
         comodel_name='account.payment',
         string="Payment",
         readonly=True,
+        compute='_compute_payment',
+        domain="[('state','!=','cancel')]",
+        store=True
     )
-    
+
+    @api.depends('payment_id.state')
+    def _compute_payment(self):
+        for record in self:
+            if record.payment_id.state == 'cancel':
+                record.payment_id = False
+        
     @api.depends('move_id')
     def _compute_to_pay_amount(self):
         for record in self:
