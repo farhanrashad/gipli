@@ -9,7 +9,7 @@ from collections import defaultdict
 STATES = [
     ('draft', 'Draft'), 
     ('proposal', 'Proposal'),
-    ('progress', 'In Progress'),
+    ('scheduled', 'Scheduled'),
     ('posted', 'Posted'),
     ('Canceled', 'cancel'),  
 ]
@@ -29,6 +29,12 @@ class PaymentRun(models.Model):
         index='trigram',
     )
 
+    run_method = fields.Selection([
+        ('now', 'Now'),
+        ('scheduled', 'Schedule Later'),
+    ], string='When', default='now', required=True,
+    )
+    
     date = fields.Date(
         string='Run Date',
         index=True,
@@ -125,24 +131,38 @@ class PaymentRun(models.Model):
         move_ids = self.env['account.move'].search(self._prepare_domain())
         self.line_ids.unlink()
         for move in move_ids:
-            #self.env['account.payment.run.line'].create({
-            #    'payment_run_id': self.id,
-            #    'move_id': move.id,
-            #    'payment_journal_id': move.partner_id.pr_journal_id.id or self.company_id.pr_default_journal_id.id
-            #})
             self.env['account.payment.run.line'].create(self._prepare_payment_run_line(move))
             self.write({
                 'state': 'proposal',
             })
-        #raise UserError(self._prepare_domain())
 
     def button_draft(self):
+        self.line_ids.unlink()
         self.write({
             'state': 'draft',
         })
-    def button_schedule (self):
-        self._create_payment(self.group_payment)
-            
+
+    def button_schedule(self):
+        self.write({
+            'state': 'scheduled',
+        })
+         
+    def button_execute (self):
+        if self.group_payment:
+            self._create_payment(self.group_payment)
+        else:
+            self._create_multiple_payments()
+
+        if self.run_method == 'scheduled':
+            if self.date == fields.Date.today():
+                raise UserError('Run date must be in future')
+            self.write({
+                'state': 'scheduled',
+            })
+        else:
+            self.write({
+                'state': 'posted',
+            })
 
     def _create_payment(self, group_payment=False):
         if group_payment:
@@ -162,6 +182,18 @@ class PaymentRun(models.Model):
                     line.write({'payment_id': payment_id.id})
                     line._reconcile_payment(line.move_id, payment_id.move_id)
 
+    def _create_multiple_payments(self):
+        for move in self.line_ids:
+            payment_vals = self._prepare_payment(move)
+            payment_vals.update({
+                'amount': abs(move.amount_total),
+                'payment_run_id': self.id,
+            })
+            payment_id = self.env['account.payment'].create(payment_vals)
+            payment_id.action_post()
+            move.write({'payment_id': payment_id.id})
+            move._reconcile_payment(move.move_id, payment_id.move_id)
+            
     def _prepare_payment(self,line):
         vals = {
             'partner_type': self.partner_type,
@@ -179,9 +211,7 @@ class PaymentRun(models.Model):
             
         return vals
 
-    def button_execute(self):
-        pass
-        
+    
 
     def _prepare_payment_run_line(self,move):
         return {

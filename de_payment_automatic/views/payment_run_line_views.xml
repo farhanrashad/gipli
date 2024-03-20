@@ -12,12 +12,12 @@
                 <field name="invoice_date" />
                 <field name="invoice_date_due" />
                 <field name="payment_journal_id"/>
-                <field name="amount_to_pay" readonly="parent_state not in ('draft','proposal') "/>
+                <field name="amount_to_pay" sum="Amount to Pay" readonly="parent_state not in ('draft','proposal') "/>
                 <field name="exclude_for_payment" />
-                <field name="amount_total_signed" optional="show" />
-                <field name="amount_residual_signed" optional="show" />
-                <field name="amount_total" optional="hide"/>
-                <field name="amount_residual" optional="hide"/>
+                <field name="amount_total_signed" sum="Total Sign" optional="show" />
+                <field name="amount_residual_signed" sum="Residual Sign" optional="show" />
+                <field name="amount_total" sum="Total" optional="hide"/>
+                <field name="amount_residual" sum="Residual" optional="hide"/>
                 <field name="currency_id" readonly="1" optional="hide"/>
                 <field name="parent_state" optional="hide" />
                 <field name="company_id" readonly="1" groups="base.group_multi_company"/>

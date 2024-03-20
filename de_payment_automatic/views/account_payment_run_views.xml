@@ -17,6 +17,15 @@
                         data-hotkey="p"        
                         invisible="state != 'draft'"
                     />
+
+                    <button name="button_proposal" 
+                        string="Recompute" 
+                        type="object" 
+                        groups="account.group_account_invoice" 
+                        data-hotkey="p"        
+                        invisible="state != 'proposal'"
+                    />
+                    
                     <button name="button_draft" 
                         string="Set to Draft" 
                         type="object" 
@@ -31,7 +40,7 @@
                         class="oe_highlight"
                         groups="account.group_account_invoice" 
                         data-hotkey="d"        
-                        invisible="state != 'proposal'"
+                        invisible="state != 'proposal' or run_method != 'scheduled'"
                     />
                     <button name="button_execute" 
                         string="Execute" 
@@ -39,20 +48,30 @@
                         class="oe_highlight"
                         groups="account.group_account_invoice" 
                         data-hotkey="e"        
-                        invisible="state != 'progress'"
+                        invisible="state != 'proposal' or run_method != 'now'"
                     />
                     
-                    <field name="state" widget="statusbar" statusbar_visible="draft,proposal,progress,posted"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,proposal,scheduled,posted"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button invisible="count_proposal == 0"
                             name="open_payment_proposal"
                             class="oe_stat_button"
-                            icon="fa-file-alt"
+                            icon="fa-file-text-o"
                             type="object">
                             <field name="count_proposal" widget="statinfo" string="Proposal"/>
                         </button>
+
+                        <button invisible="count_payments == 0"
+                                name="open_payments"
+                                class="oe_stat_button"
+                                icon="fa-dollar"
+                                type="object">
+                            <field name="count_payments" widget="statinfo" string="Payments"/>
+                        </button>
+
+                        
                     </div>
                     
                     <div class="oe_title">
@@ -65,8 +84,16 @@
                         <group>
                             <field name="payment_type" widget="radio" options="{'horizontal': True}"
                                        readonly="state != 'draft'"/>
+
+                            <field name="run_method" 
+                                readonly="state != 'draft'"
+                                widget="radio"
+                            />
+                            
                             <field name="date"
-                                       readonly="state != 'draft'"/>
+                                required="run_method == 'scheduled'"
+                                readonly="state != 'draft' or run_method != 'scheduled'"
+                            />
                             <field name="date_next_run"
                                        readonly="state != 'draft'"/>
                         </group>
@@ -78,7 +105,7 @@
                     
                     <notebook>
                         <page name="exclude_partners" string="Exclude Partners">
-                            <field name="exclude_partner_ids">
+                            <field name="exclude_partner_ids" readonly="state not in ('draft','proposal')">
                                 <tree>
                                     <field name="name"/>  
                                     <field name="email"/> 
@@ -88,18 +115,31 @@
                         <page name="parameters" string="Parameters">
                             <group>
                                 <group >
-                                    <field name="date_accounting" />
-                                    <field name="group_payment" />
+                                    <field name="date_accounting" 
+                                        readonly="state not in ('draft','proposal')"
+                                        required="state in ('proposal')"
+                                    />
+                                    <field name="group_payment" 
+                                        readonly="state not in ('draft','proposal')"
+                                    />
                                 </group>
-                                <group >
-                                    <field name="date_invoice" />
-                                    <field name="date_due_by" />
-                                </group>
+                                
                             </group>
                         </page>
                         <page name="extra_selection" string="Extra Selection">
+                            <group>
+                                <group >
+                                    <field name="date_invoice" readonly="state not in ('draft','proposal')"/>
+                                    <field name="date_due_by" readonly="state not in ('draft','proposal')"/>
+                                </group>
+                            </group>
                             <group >
-                                <field name="filter_domain" widget="domain" string="Apply On" options="{'model': 'account.move', 'in_dialog': True}"/>
+                                <field name="filter_domain" 
+                                    widget="domain" 
+                                    string="Apply On" 
+                                    options="{'model': 'account.move', 'in_dialog': True}"
+                                    readonly="state not in ('draft','proposal')"
+                                />
                             </group>
                         </page>
                     </notebook>
