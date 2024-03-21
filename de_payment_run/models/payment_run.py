@@ -42,6 +42,7 @@ class PaymentRun(models.Model):
         default=lambda self: fields.Date.context_today(self),
         copy=False,
         tracking=True,
+        compute='_compute_run_date'
     )
 
     date_next_run = fields.Date(
@@ -115,7 +116,13 @@ class PaymentRun(models.Model):
                                     compute='_compute_payment_count',
                                    )
     
-    # Computed Methods
+    # Computed Methods(self)
+    @api.depends('run_method')
+    def _compute_run_date(self):
+        for record in self:
+            if record.run_method == 'now':
+                record.date = fields.Date.today()
+                
     def _compute_proposal_count(self):
         for proposal in self:
             proposal.count_proposal = len(proposal.line_ids)
@@ -254,7 +261,7 @@ class PaymentRun(models.Model):
             search_domain += safe_eval.safe_eval(self.filter_domain)
         if self.date_due_by:
             search_domain += [('invoice_date_due', '<=', self.date_due_by)]
-        if self.date_due_by:
+        if self.date_invoice:
             search_domain += [('invoice_date', '<=', self.date_invoice)]
         if self.exclude_partner_ids:
             search_domain += [('partner_id', 'not in', self.exclude_partner_ids.ids)]
