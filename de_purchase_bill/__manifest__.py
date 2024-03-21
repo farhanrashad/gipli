@@ -10,7 +10,7 @@
     'author': "Dynexcel",
     'website': "http://www.dynexcel.com",
     'category': 'Purchase',
-    'version': '15.0.0.5',
+    'version': '17.0.0.5',
     'depends': ['base','purchase','account'],
     'data': [
         'security/ir.model.access.csv',

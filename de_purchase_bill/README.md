@@ -1,15 +1,13 @@
 Purchase Downpayment to supplier
 --------------------------------
 
-This module provides easy feature to register down payment against the purchase order. 
-User will be able to register downpayment in percentage 
-and amount that would deduct from vendor bill.   
-
+This module simplifies the process of recording down payments made to suppliers for purchase orders. 
+Users can easily register a down payment as a percentage or a fixed amount, which will then be deducted from the vendor's bill.
 
 Create downpayment
 ------------------------------
 
-Register downpayment with purchase order
-Register advance with Percentage or fixed amount
-Register multiple advances for a purchase order
-Deduct downpayment/advance amount from vendor bill
+Effortlessly register down payments against purchase orders.
+Specify down payments as a percentage or a specific amount.
+Register multiple down payments for a single purchase order.
+Automatically deduct down payment amounts from vendor bills.
