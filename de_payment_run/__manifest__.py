@@ -9,13 +9,11 @@ Payment run program streamlines financial operations by automating the collectio
     """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-    'category': 'Accounting',
-    'version': '0.1',
-
-    # any module necessary for this one to work correctly
+    'support': "info@dynexcel.com",
+    'category': 'Sales/Subscriptions',
+    'version': '17.0.0.4',
+    'live_test_url': 'https://youtu.be/_E8akhA1KXs',
     'depends': ['account'],
-
-    # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/res_config_settings_views.xml',
@@ -27,9 +25,12 @@ Payment run program streamlines financial operations by automating the collectio
         'reports/ir_actions_report.xml',
         'reports/ir_actions_report_templates.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'license': 'OPL-1',
+    'price': 50,
+    'currency': 'USD',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
 
