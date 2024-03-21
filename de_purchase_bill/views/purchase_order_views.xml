@@ -19,11 +19,30 @@
                 
             </xpath>
             <xpath expr="//notebook//field[@name='order_line']//tree" position="inside">
-                <field name="is_downpayment"  invisible="1"/>
+                <field name="is_downpayment" column_invisible="True"/>
             </xpath>
             <xpath expr="//header//button[@name='action_create_invoice']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+
+            <xpath expr="//notebook//field[@name='order_line']//tree//field[@name='product_qty']" position="attributes">
+                <attribute name="readonly">is_downpayment</attribute>
+            </xpath>
+            <xpath expr="//notebook//field[@name='order_line']//tree//field[@name='qty_received']" position="attributes">
+                <attribute name="readonly">is_downpayment</attribute>
+            </xpath>
+            <xpath expr="//notebook//field[@name='order_line']//tree//field[@name='taxes_id']" position="attributes">
+                <attribute name="readonly">is_downpayment</attribute>
+            </xpath>
+            
+
+            <xpath expr="//notebook//field[@name='order_line']//tree//field[@name='price_subtotal']" position="attributes">
+                <attribute name="invisible">is_downpayment</attribute>
+            </xpath>
+            <xpath expr="//notebook//field[@name='order_line']//tree//field[@name='price_total']" position="attributes">
+                <attribute name="invisible">is_downpayment</attribute>
+            </xpath>
+            
 
         </field>
     </record>

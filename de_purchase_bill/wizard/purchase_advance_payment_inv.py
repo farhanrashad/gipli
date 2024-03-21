@@ -81,7 +81,10 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
         readonly=False,
         store=True
     )
-    
+    consolidated_billing = fields.Boolean(
+        string="Consolidated Billing", default=True,
+        help="Create one invoice for all orders related to same customer and same invoicing address"
+    )
     amount = fields.Float('Down Payment Amount', digits='Account', help="The percentage of amount to be invoiced in advance, taxes excluded.")
     currency_id = fields.Many2one('res.currency', string='Currency', default=_default_currency_id)
     fixed_amount = fields.Monetary('Down Payment Amount (Fixed)', help="The fixed amount to be invoiced in advance, taxes excluded.")
@@ -157,7 +160,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
             )
 
             invoice = self.env['account.move'].sudo().create(
-                self._prepare_invoice_values(order, down_payment_lines)
+                self._prepare_bill_values(order, down_payment_lines)
             )
 
             # Ensure the invoice total is exactly the expected fixed amount.
@@ -229,8 +232,8 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
 
         tax_base_line_dicts = [
             line._convert_to_tax_base_line_dict(
-                analytic_distribution=line.analytic_distribution,
-                handle_price_include=False
+                #analytic_distribution=line.analytic_distribution,
+                #handle_price_include=False
             )
             for line in order_lines
         ]
@@ -264,7 +267,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
         downpayment_line_map = {}
         for tax_id, analytic_distribution, price_subtotal in down_payment_values:
             grouping_key = frozendict({
-                'tax_id': tuple(sorted(tax_id.ids)),
+                'taxes_id': tuple(sorted(tax_id.ids)),
                 'analytic_distribution': analytic_distribution,
             })
             downpayment_line_map.setdefault(grouping_key, {
@@ -286,6 +289,7 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
                 'Down Payment: %(date)s (Draft)', date=format_date(self.env, fields.Date.today())
             ),
             'product_uom_qty': 0.0,
+            'product_qty': 0.0,
             'order_id': order.id,
             'discount': 0.0,
             'product_id': self.product_id.id,
@@ -307,7 +311,6 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
         }
     def _prepare_down_payment_section_values(self, order):
         context = {'lang': order.partner_id.lang}
-
         so_values = {
             'name': _('Down Payments'),
             'product_uom_qty': 0.0,
@@ -320,3 +323,25 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
 
         del context
         return so_values
+
+    def _prepare_bill_values(self, order, po_lines):
+        self.ensure_one()
+        return {
+            **order._prepare_invoice(),
+            'invoice_line_ids': [Command.create(
+                line._prepare_invoice_line(
+                    name=self._get_down_payment_description(order),
+                    quantity=1.0,
+                )
+            ) for line in po_lines],
+        }
+        
+    def _get_down_payment_description(self, order):
+        self.ensure_one()
+        context = {'lang': order.partner_id.lang}
+        if self.advance_payment_method == 'percentage':
+            name = _("Down payment of %s%%", self.amount)
+        else:
+            name = _('Down Payment')
+        del context
+        return name
