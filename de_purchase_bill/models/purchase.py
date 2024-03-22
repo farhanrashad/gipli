@@ -53,7 +53,7 @@ class PurchaseOrder(models.Model):
             invoice_line_vals = []
             down_payment_section_added = False
             for line in invoiceable_lines:
-                if not down_payment_section_added and line.v:
+                if not down_payment_section_added and line.is_downpayment:
                     # Create a dedicated section for the down payments
                     # (put at the end of the invoiceable_lines)
                     invoice_line_vals.append(
