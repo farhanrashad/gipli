@@ -1,5 +1,19 @@
 <odoo>
     <data>
+
+        <record id="crm_lead_view_tree_opportunity_inherit_search_button" model="ir.ui.view">
+        <field name="name">crm.lead.view.tree.opportunity.inherit.search.button</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="button_search_people" type="object" 
+                        string="Search Popele" groups="sales_team.group_sale_manager" display="always"
+                        />
+            </xpath>
+        </field>
+    </record>
+        
         <record id="action_appolo_crm_lead_wizard" model="ir.actions.server">
             <field name="name">Send to Apollo</field>
             <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>

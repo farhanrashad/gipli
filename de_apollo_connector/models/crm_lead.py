@@ -45,6 +45,18 @@ class CRMLead(models.Model):
         help="Set to 'True' when this record requires an update in Apollo."
     )
 
+    def button_search_people(self):
+        return {
+            'name': 'Search People',
+            'view_mode': 'form',
+            'res_model': 'apl.people.search.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                #'subscription_id': self.id,
+            },
+        }
+
     def action_send_to_apollo_data(self):
         ''' Open the account.payment.register wizard to pay the selected journal entries.
         :return: An action opening the account.payment.register wizard.

@@ -32,12 +32,12 @@
         'wizards/send_data_wizard_views.xml',
         'wizards/convert_data_wizard_views.xml',
     ],
-    'assets': {
-       'web.assets_backend': [
-           'de_apollo_connector/static/src/js/button_search.js',
-           'de_apollo_connector/static/src/xml/button_search.xml',
-       ],
-    },
+    #'assets': {
+    #   'web.assets_backend': [
+    #      'de_apollo_connector/static/src/js/button_search.js',
+    #      'de_apollo_connector/static/src/xml/button_search.xml',
+    #   ],
+    #},
     'license': 'OPL-1',
     'price': 110,
     'currency': 'USD',
