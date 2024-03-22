@@ -11,7 +11,7 @@ class ResCompany(models.Model):
         string="Downpayment Product",
         domain=[
             ('type', '=', 'service'),
-            ('invoice_policy', '=', 'order'),
+            ('purchase_method', '=', 'purchase'),
         ],
         help="Default product used for down payments",
         check_company=True,

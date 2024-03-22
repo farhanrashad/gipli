@@ -9,7 +9,6 @@
                 <block id="downpayment" title="Down Payment">
                     <setting id="downpayment" title="Allows you to use default journal in payment run." groups="purchase.group_purchase_manager" help="The default product for down payment on purchase orders."
                     >
-                        <field name="deposit_default_journal_id" context="{'default_type': 'purchase'}"/>
                         <field name="purchase_down_payment_product_id" context="{'default_type': 'service'}"/>
                     </setting>
                 </block>

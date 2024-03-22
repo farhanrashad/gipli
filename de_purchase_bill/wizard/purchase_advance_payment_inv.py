@@ -66,8 +66,6 @@ class PurchaseAdvancePaymentInv(models.TransientModel):
         comodel_name='res.company',
         compute='_compute_company_id',
         store=True)
-    product_id = fields.Many2one('product.product', string='Down Payment Product', domain=[('type', '=', 'service')],
-        default=_default_product_id)
     count = fields.Integer(default=_count, string='Order Count')
     purchase_order_ids = fields.Many2many(
         'purchase.order', default=lambda self: self.env.context.get('active_ids'))
