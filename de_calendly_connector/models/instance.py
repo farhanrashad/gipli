@@ -1,286 +1,101 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, Command, models, _
-from odoo.exceptions import UserError, AccessError
-from odoo.tools import html_escape as escape
-
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 import requests
-import json
-
-from urllib.parse import urlparse
-
-
-READONLY_FIELD_STATES = {
-    state: [('readonly', True)]
-    for state in {'verified', 'active'}
-}
+from urllib.parse import urlencode, urlparse
 
 class CalendlyInstance(models.Model):
     _name = 'cal.instance'
     _description = 'Calendly Instance'
 
-    name = fields.Char(string='Name', required=True, readonly=False, states=READONLY_FIELD_STATES)
-    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=False, states=READONLY_FIELD_STATES)
-    url = fields.Char(string='URL', required=True, readonly=False, states=READONLY_FIELD_STATES)
-    url_sample = fields.Char(default='https://api.calendly.io/api/v1/')
-    
-    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states=READONLY_FIELD_STATES, default=lambda self: self.env.company)
-
+    name = fields.Char(string='Name', required=True, readonly=False)
+    client_id = fields.Char(string='Client ID', required=True)
+    client_secret = fields.Char(string='Client secret', required=True)
+    url = fields.Char(string='URL', required=True, readonly=False)
+    url_sample = fields.Char(default='https://api.calendly.com/')
+    access_token = fields.Char(string='Access Token')
+    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, default=lambda self: self.env.company)
 
     state = fields.Selection([
-        ('draft', 'Draft'), 
-        ('verified', 'Verified'), 
-        ('active', 'Active')], 
-        string='Status',default='draft', required=True
+        ('draft', 'Draft'),
+        ('verified', 'Verified'),
+        ('active', 'Active')],
+        string='Status', default='draft', required=True
     )
 
     # operations fields
     cal_date_import_contacts = fields.Datetime(string='Contacts import date')
     cal_date_import_accounts = fields.Datetime(string='Accounts import date')
     cal_date_import_leads = fields.Datetime(string='Leads import date')
-
     cal_date_export_contacts = fields.Datetime(string='Contacts export date')
     cal_date_export_leads = fields.Datetime(string='Leads export date')
 
     def button_draft(self):
-        self.write({
-            'state':'draft'
-        })
+        self.write({'state': 'draft'})
 
     def button_confirm(self):
-        self.write({
-            'state':'active'
-        })
-        
-    def connection_test(self):
-        
-        notification = {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Connection to Calendly successful; explore its capabilities now.'),
-                'type': 'warning',
-                'sticky': False,  #True/False will display for few seconds if false
-            },
+        self.write({'state': 'active'})
+
+    @api.model
+    def _get_base_url(self):
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        return base_url or ''
+
+    @api.model
+    def _generate_redirect_uri(self):
+        base_url = self._get_base_url()
+        return base_url + '/calendly/callback'
+
+    def _get_access_token(self, authorization_code):
+        token_data = {
+            'grant_type': 'authorization_code',
+            'code': authorization_code,
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+            'redirect_uri': self._generate_redirect_uri(),
+        }
+        token_url = 'https://auth.calendly.com/oauth/token'
+        response = requests.post(token_url, data=token_data)
+        if response.status_code == 200:
+            return response.json().get('access_token')
+        else:
+            error_message = response.json().get('error_description', 'Unknown error')
+            raise UserError(error_message)
+
+    def _test_connection(self):
+        authorize_url = 'https://calendly.com/oauth/authorize'
+        params = {
+            'response_type': 'code',
+            'client_id': self.client_id,
+            'redirect_uri': self._generate_redirect_uri(),
+            #'scope': 'read write'
+        }
+        authorization_url = authorize_url + '?' + urlencode(params)
+        return {
+            'type': 'ir.actions.act_url',
+            'url': authorization_url,
+            'target': 'new',
         }
 
-        url = self.url + 'auth/health' #"https://api.calendly.io/v1/auth/health"
-        querystring = {
-            "api_key": self.api_key
+    def connection_test(self):
+        return self._test_connection()
+
+    def _parse_redirect_uri(self, redirect_uri):
+        parsed_uri = urlparse(redirect_uri)
+        return parsed_uri.query.split('code=')[-1]
+
+    def button_confirm_connection(self):
+        authorization_code = self._parse_redirect_uri(self.env.context.get('base_url'))
+        access_token = self._get_access_token(authorization_code)
+        self.write({'state': 'verified'})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
         }
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-        response = requests.request("GET", url, headers=headers, params=querystring)
-        if response.status_code == 200: 
-            self.write({
-                'state': 'verified'
-            })
-            notification['params'].update({
-                'title': _('The connection to Calendly was successful.'),
-                'type': 'success',
-                'next': {'type': 'ir.actions.act_window_close'},
-            })
-            
-        else:
-            # The response indicates an error
-            error_message = "API connection error. Please check the response."
-            raise UserError(error_message)
-        return notification
 
     def unlink(self):
         for record in self:
             if record.state != 'draft':
                 raise UserError("You cannot delete a record with a state other than 'draft'.")
         return super(CalendlyInstance, self).unlink()
-
-        
-    def button_import_labels(self):
-        data = {
-            #'api_key': 'GbYvCle7WbRW0lFKYXlArw',
-        }
-        tags_data = self._get_calendly_data('labels', data)
-        category_id = self.env['res.partner.category']
-        crm_tag_id = self.env['crm.tag']
-        for tag in tags_data:
-            if isinstance(tag, dict):  # Check if 'tag' is a dictionary
-                category_id = self.env['res.partner.category'].search([('cal_id','=',tag.get('id'))],limit=1)
-                crm_tag_id = self.env['crm.tag'].search([('cal_id','=',tag.get('id'))],limit=1)
-                if tag.get('name'):
-                    if category_id:
-                        category_id.write({
-                            'name': tag.get('name'),
-                        })
-                    else:
-                        self.env['res.partner.category'].create({
-                            'name': tag.get('name'),
-                            'cal_id': tag.get('id'),
-                        })
-                    if crm_tag_id:
-                        crm_tag_id.write({
-                            'name': tag.get('name'),
-                        })
-                    else:
-                        self.env['crm.tag'].create({
-                            'name': tag.get('name'),
-                            'cal_id': tag.get('id'),
-                        })
-
-    def button_import_stages(self):
-        data = {}
-        stages_data = self._get_calendly_data('opportunity_stages', data)
-        #raise UserError(stages_data.get('opportunity_stages', []))
-        stage_id = self.env['crm.stage']
-        for stage in stages_data.get('opportunity_stages', []):
-            if isinstance(stage, dict):  # Check if 'tag' is a dictionary
-                stage_id = self.env['crm.stage'].search([('cal_id','=',stage.get('id'))],limit=1)
-                if stage.get('name'):
-                    if stage_id:
-                        stage_id.write({
-                            'name': stage.get('name'),
-                            'requirements': stage.get('description'),
-                            'is_won': stage.get('is_won'),
-                        })
-                    else:
-                        self.env['crm.stage'].create({
-                            'name': stage.get('name'),
-                            'cal_id': stage.get('id'),
-                            'requirements': stage.get('description'),
-                            'is_won': stage.get('is_won'),
-                        })
-
-                        
-    def button_import(self):
-        
-        context = {
-            'default_op_name': self.name,
-        }
-        return {
-            'name': 'Calendly Operations',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'apl.ops.wizard',
-            'type': 'ir.actions.act_window',
-            'target': 'new',
-            'context': context,
-        }
-        #for partner in partners:
-
-    def button_export(self):
-        #partners = self.env['res.partner'].search([('active', '=', True), '|', ('cal_id', '=', False), ('apl_date', '<', fields.Datetime.now())])
-        if self._context.get('op_name') == 'contacts':
-            partner_ids = self.env['res.partner'].search([('active', '=', True),('update_required_for_calendly', '=', True)])
-            for partner in partner_ids:
-                partner._send_to_calendly(self)
-            self.write({
-                'apl_date_export_contacts': self.env.cr.now(),
-            })
-        elif self._context.get('op_name') == 'leads':
-            lead_ids = self.env['crm.lead'].search([('active', '=', True),('update_required_for_calendly', '=', True)])
-            for lead in lead_ids:
-                lead._send_to_calendly(self)
-            self.write({
-                'apl_date_export_leads': self.env.cr.now(),
-            })
-            
-        #for partner in partners:
-
-
-    # ---------------------------------------------------------
-    # ---------------------- Operations for Calendly ------------
-    # ---------------------------------------------------------
-    
-    @api.model
-    def _post_calendly_data(self, api_name, api_data=None):
-        """
-        Fetch JSON data from a given URL with optional data payload.
-        :param url: The URL to send the request to.
-        :param data: Optional data to send with the request.
-        :return: JSON data received in the response.
-        """
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-        try:
-            url = self.url + api_name
-            #raise UserError(url)
-            # Initialize data as an empty dictionary if it's None
-            if api_data is None:
-                api_data = {}
-
-            # Add the api_key field to the data dictionary
-            api_data['api_key'] = self.api_key
-
-            #raise UserError(api_data)
-            
-            response = requests.request("POST", url, headers=headers, json=api_data)   
-            #raise UserError(response.text)
-            json_data = json.loads(response.text)
-            return json_data
-
-        except requests.exceptions.RequestException as e:
-            # Handle any request exceptions
-            raise e
-
-        except json.JSONDecodeError as e:
-            # Handle JSON decoding errors
-            raise e
-
-    @api.model
-    def _get_calendly_data(self, api_name, api_data=None):
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-        try:
-            url = self.url + api_name
-            # Initialize data as an empty dictionary if it's None
-            if api_data is None:
-                api_data = {}
-
-            # Add the api_key field to the data dictionary
-            api_data['api_key'] = self.api_key
-
-            response = requests.request("GET", url, headers=headers, params=api_data)
-            #raise UserError(response.text)
-            json_data = json.loads(response.text)
-            return json_data
-
-        except requests.exceptions.RequestException as e:
-            # Handle any request exceptions
-            raise e
-
-        except json.JSONDecodeError as e:
-            # Handle JSON decoding errors
-            raise e
-
-    @api.model
-    def _put_calendly_data(self, api_name, api_data=None):
-        headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
-        }
-        try:
-            url = self.url + api_name
-            # Initialize data as an empty dictionary if it's None
-            if api_data is None:
-                api_data = {}
-
-            # Add the api_key field to the data dictionary
-            api_data['api_key'] = self.api_key
-
-            response = requests.request("PUT", url, headers=headers, params=api_data)
-            #raise UserError(response.text)
-            json_data = json.loads(response.text)
-            return json_data
-
-        except requests.exceptions.RequestException as e:
-            # Handle any request exceptions
-            raise e
-
-        except json.JSONDecodeError as e:
-            # Handle JSON decoding errors
-            raise e
-

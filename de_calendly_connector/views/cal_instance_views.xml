@@ -30,11 +30,13 @@
                         </div>
                         <group>
                             <group>
+                                <field name="client_id" />
+                                <field name="access_token" />
                                 <field name="url" />
                                 <field name="url_sample" class="text-muted" nolabel="1" readonly="1"/>
                             </group>
                             <group>
-                                <field name="api_key" password="True" string="API Key"/>
+                                <field name="client_secret" password="True" />
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                         </group>
@@ -51,7 +53,7 @@
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_import" context="{'op_name':'contacts'}" icon="fa-arrow-right" type="object" string="Import Contacts" class="btn-primary"/>
+                                                            <button name="button_draft" context="{'op_name':'contacts'}" icon="fa-arrow-right" type="object" string="Import Contacts" class="btn-primary"/>
                                                         </div>
                                                     </div>
                                                     <label for="cal_date_import_contacts" class="fw-bold o_form_label" string="The last contacts were imported on "/>
@@ -68,7 +70,7 @@
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_import" context="{'op_name':'accounts'}" icon="fa-arrow-right" type="object" string="Import Accounts" class="btn-primary"/>
+                                                            <button name="button_draft" context="{'op_name':'accounts'}" icon="fa-arrow-right" type="object" string="Import Accounts" class="btn-primary"/>
                                                         </div>
                                                     </div>
                                                     <label for="cal_date_import_accounts" class="fw-bold o_form_label" string="The last accounts were imported on "/>
@@ -85,7 +87,7 @@
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_import" icon="fa-arrow-right" type="object" string="Import Leads" context="{'op_name':'leads'}" class="btn-primary"/>
+                                                            <button name="button_draft" icon="fa-arrow-right" type="object" string="Import Leads" context="{'op_name':'leads'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
                                                     <label for="cal_date_import_leads" class="fw-bold o_form_label" string="The last leads were imported on "/>
@@ -106,7 +108,7 @@
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Contacts" context="{'op_name':'contacts'}" class="btn-primary"/>
+                                                            <button name="button_draft" icon="fa-arrow-right" type="object" string="Export Contacts" context="{'op_name':'contacts'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
                                                     <label for="cal_date_export_contacts" class="fw-bold o_form_label" string="The last contacts were exported on "/>
@@ -123,7 +125,7 @@
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Leads" context="{'op_name':'leads'}" class="btn-primary"/>
+                                                            <button name="button_draft" icon="fa-arrow-right" type="object" string="Export Leads" context="{'op_name':'leads'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
                                                     <label for="cal_date_export_leads" class="fw-bold o_form_label" string="The last leads were exported on "/>
@@ -166,7 +168,9 @@
         </record>
 
         <!-- Create a menu item for calendly Instance -->
-        <menuitem id="menu_calendly_instance_list" name="Instances" parent="menu_crm_config_calendly" action="action_calendly_instance" sequence="20"/>
+        <menuitem id="calendar_menu_config_calendly" name="Calendly" parent="calendar.calendar_menu_config" sequence="90"/>
+
+        <menuitem id="calendar_menu_config_calendly_instance" name="Instances" parent="calendar_menu_config_calendly" action="action_calendly_instance" sequence="10"/>
 
     </data>
 </odoo>
