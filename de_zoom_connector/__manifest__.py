@@ -8,8 +8,7 @@
     """,
     'category': 'Discuss',
     'author': 'Dynexcel',
-    'maintainer': 'Dynexcel',
-    'version': '13.0.0.2',
+    'version': '17.0.0.1',
     'price': 149,
     'currency': 'USD',
     'website': 'https://www.dynexcel.com',
@@ -30,11 +29,4 @@
     'external_dependencies': {
         'python': ['zoomus'],
     },
-
-    'demo': [],
-    'qweb': [],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-
 }
