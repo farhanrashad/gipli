@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-
+import http.client
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 import requests
 from urllib.parse import urlencode, urlparse
+import base64
+from bs4 import BeautifulSoup
+
 
 class CalendlyInstance(models.Model):
     _name = 'cal.instance'
@@ -63,28 +66,47 @@ class CalendlyInstance(models.Model):
             error_message = response.json().get('error_description', 'Unknown error')
             raise UserError(error_message)
 
-    def _test_connection(self):
-        authorize_url = 'https://calendly.com/oauth/authorize'
-        params = {
-            'response_type': 'code',
-            'client_id': self.client_id,
-            'redirect_uri': self._generate_redirect_uri(),
-            #'scope': 'read write'
-        }
-        authorization_url = authorize_url + '?' + urlencode(params)
-        return {
-            'type': 'ir.actions.act_url',
-            'url': authorization_url,
-            'target': 'new',
-        }
+    def _generate_redirect_uri(self):
+        base_url = self._get_base_url()
+        return base_url + '/calendly/callback'
 
     def connection_test(self):
-        return self._test_connection()
+        client_id = "wYOD6cdRh1ynNgx5g0UZ0hR66Sx8sIJD3Ryy3BNFZD4"
+        client_secret = "EqVvEYk5cvtKK3OiTcVX_ZiFhOED8H9jeYWJn5rcM5Y"
+        redirect_uri = "https://g2020-dev17-12386251.dev.odoo.com/calendly/callback"
 
-    def _parse_redirect_uri(self, redirect_uri):
-        parsed_uri = urlparse(redirect_uri)
-        return parsed_uri.query.split('code=')[-1]
+        # Encode client ID and client secret for Basic Authentication header
+        auth_header = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode('utf-8')
+        
+        # Calendly authorization endpoint
+        authorize_url = f"https://auth.calendly.com/oauth/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}"
 
+        try:
+            # Make GET request using requests library (which handles redirects automatically)
+            response = requests.get(authorize_url, allow_redirects=True)
+
+            # Check the final response status code after handling redirects
+            status_code = response.status_code
+
+            if status_code == 200:
+                # Parse HTML content using BeautifulSoup
+                soup = BeautifulSoup(response.content, 'html.parser')
+
+                # Example: Find JSON data within a specific HTML element (e.g., a div with id="calendly-json-data")
+                json_div = soup.find('div', {'id': 'calendly-json-data'})
+                if json_div:
+                    # Extract JSON data from the HTML element and decode
+                    json_data_str = json_div.text.strip()
+                    json_data = json.loads(json_data_str)
+                    raise UserError(json_data)
+                else:
+                    raise UserError("JSON data not found in HTML response")
+            else:
+                raise UserError(f"Failed to connect. Status code: {status_code}")
+        except Exception as e:
+            raise UserError(f"Error occurred: {e}")
+
+    
     def button_confirm_connection(self):
         authorization_code = self._parse_redirect_uri(self.env.context.get('base_url'))
         access_token = self._get_access_token(authorization_code)
@@ -93,6 +115,11 @@ class CalendlyInstance(models.Model):
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
+
+    def _parse_redirect_uri(self, redirect_uri):
+        parsed_uri = urlparse(redirect_uri)
+        return parsed_uri.query.split('code=')[-1]
+
 
     def unlink(self):
         for record in self:
