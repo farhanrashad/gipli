@@ -35,9 +35,17 @@ class CalendarEvent(models.Model):
                     'duration': event_type['duration'],
                     #'scheduling_url': event_type['scheduling_url'],
                     'uri': event_type_uri,
-                    'location': event_type['locations']['kind'],
+                    #'location': event_type['locations']['kind'],
                     #'company_id': company_id.id,
                 }
+                # Check if 'locations' key exists and is not None
+                if 'locations' in event_type and event_type['locations'] is not None:
+                    # Get the first location from the list and set it as the location for simplicity
+                    # You can modify this logic to handle multiple locations if needed
+                    first_location = event_type['locations'][0]
+                    event_type_data['location'] = first_location['kind']
+                else:
+                    event_type_data['location'] = ''  # Set default location to blank
         
                 if existing_event_type:
                     # Update existing event type if it already exists in Odoo
