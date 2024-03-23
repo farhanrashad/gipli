@@ -1,59 +1,51 @@
 # -*- coding: utf-8 -*-
 
-from odoo import http
-from odoo.http import request
+import base64
+import datetime
 import requests
+from odoo import http, _
+from odoo.http import request
+from odoo.exceptions import UserError
+
 import logging
 
 _logger = logging.getLogger(__name__)
-from odoo.exceptions import UserError
 
 class CalendlyCallbackController(http.Controller):
 
     @http.route('/calendly/callback', type='http', auth='public', website=True)
-    def handle_calendly_callback(self, **kwargs):
-        authorization_code = kwargs.get('code')
+    def handle_calendly_callback(self, **kw):
 
-        # Fetch OAuth credentials from Calendly instance
-        calendly_instance = request.env['cal.instance'].sudo().search([], limit=1)
-        if not calendly_instance:
-            return 'Calendly instance not found'
-
-        client_id = calendly_instance.client_id
-        client_secret = calendly_instance.client_secret
-        redirect_uri = calendly_instance.url + '/calendly/callback'
-
-        # Exchange authorization code for access token
-        token_url = 'https://auth.calendly.com/oauth/token'
-        token_data = {
-            'grant_type': 'authorization_code',
-            'code': authorization_code,
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'redirect_uri': redirect_uri,
-        }
-
+        client_id = "wYOD6cdRh1ynNgx5g0UZ0hR66Sx8sIJD3Ryy3BNFZD4"
+        client_secret = "EqVvEYk5cvtKK3OiTcVX_ZiFhOED8H9jeYWJn5rcM5Y"
+        redirect_uri = "https://g2020-dev17-12386251.dev.odoo.com/calendly/callback"
         
-        response = requests.post(token_url, data=token_data)
-        raise UserError(response)
-        if response.status_code == 200:
-            access_token = response.json().get('access_token')
+        user_id = request.uid
+        company_id = http.request.env['res.users'].sudo().browse(
+            user_id).company_id
 
-            # Update the state and store the access token in Calendly instance
-            calendly_instance.write({'state': 'verified', 'access_token': access_token})
+        instance_id = http.request.env['cal.instance'].sudo().search([])
+        
+        if kw.get('code'):
+            data = {
+                'code': kw.get('code'),
+                'redirect_uri': redirect_uri,
+                'grant_type': 'authorization_code'
+            }
+            b64 = str(
+                client_id + ":" + client_secret).encode(
+                'utf-8')
+            b64 = base64.b64encode(b64).decode('utf-8')
+            response = requests.post(
+                'https://auth.calendly.com/oauth/token', data=data,
+                headers={
+                    'Authorization': 'Basic ' + b64,
+                    'content-type': 'application/x-www-form-urlencoded'})
 
-            # Update the front-end using JavaScript to indicate successful connection
-            return """
-            <html>
-                <body>
-                    <script>
-                        alert('Calendly connection verified!');
-                        window.location.href = '/web#id={}&view_type=form&model=cal.instance';
-                    </script>
-                </body>
-            </html>
-            """.format(calendly_instance.id)
-        else:
-            error_message = response.json().get('error_description', 'Unknown error')
-            _logger.error('Error obtaining access token from Calendly: %s', error_message)
-            return 'Error occurred while obtaining access token: {}'.format(error_message)
+            if response.json() and response.json().get('access_token'):
+                raise UserError(response.json().get('access_token'))
+                
+            #raise UserError(response)
+            
+
+            

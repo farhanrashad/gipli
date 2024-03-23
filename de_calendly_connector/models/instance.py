@@ -71,10 +71,20 @@ class CalendlyInstance(models.Model):
         return base_url + '/calendly/callback'
 
     def connection_test(self):
-        client_id = "wYOD6cdRh1ynNgx5g0UZ0hR66Sx8sIJD3Ryy3BNFZD4"
-        client_secret = "EqVvEYk5cvtKK3OiTcVX_ZiFhOED8H9jeYWJn5rcM5Y"
-        redirect_uri = "https://g2020-dev17-12386251.dev.odoo.com/calendly/callback"
+        client_id = self.client_id #"wYOD6cdRh1ynNgx5g0UZ0hR66Sx8sIJD3Ryy3BNFZD4"
+        client_secret = self.client_secret #"EqVvEYk5cvtKK3OiTcVX_ZiFhOED8H9jeYWJn5rcM5Y"
+        redirect_url = "https://g2020-dev17-12386251.dev.odoo.com/calendly/callback"
 
+        url = (
+            "https://auth.calendly.com/oauth/authorize?response_type=code"
+            "&client_id={}&redirect_uri={}"
+        ).format(client_id, redirect_url)
+        return {
+            "type": 'ir.actions.act_url',
+            "url": url,
+            "target": "current"
+        }
+        
         # Encode client ID and client secret for Basic Authentication header
         auth_header = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode('utf-8')
         
