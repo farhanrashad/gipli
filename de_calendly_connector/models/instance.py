@@ -34,6 +34,9 @@ class CalendlyInstance(models.Model):
     cal_date_export_contacts = fields.Datetime(string='Contacts export date')
     cal_date_export_leads = fields.Datetime(string='Leads export date')
 
+    def test_users(self):
+        pass
+        
     def button_draft(self):
         self.write({'state': 'draft'})
 

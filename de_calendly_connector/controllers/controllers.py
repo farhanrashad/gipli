@@ -42,9 +42,11 @@ class CalendlyCallbackController(http.Controller):
                     'Authorization': 'Basic ' + b64,
                     'content-type': 'application/x-www-form-urlencoded'})
 
+            #raise UserError(response.json())
             if response.json() and response.json().get('access_token'):
                 company_id.write({
                     'calendly_access_token': response.json().get('access_token'),
+                    'calendly_refresh_token':  response.json().get('refresh_token'),
                     'calendly_generated_access_token': True,
                 })
                 return "Authentication Success. You Can Close this window"

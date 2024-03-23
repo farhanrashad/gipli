@@ -20,8 +20,8 @@ Calendly Connector
     'data': [
         'security/ir.model.access.csv',
         'views/res_config_setting_views.xml',
-        #'views/cal_instance_views.xml',
-        #'views/templates.xml',
+        'views/cal_instance_views.xml',
+        'views/calendar_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

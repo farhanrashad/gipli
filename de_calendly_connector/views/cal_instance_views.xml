@@ -12,6 +12,8 @@
                 <form string="Calendly Instance">
                     <header>
                         <!-- Add a button in the header -->
+                        <button name="test_users" type="object" string="User Lists"  />
+                        
                         <button name="connection_test" type="object" string="Test Connection" class="btn-primary" invisible="state != 'draft'"/>
                         <button name="button_draft" type="object" string="Set to Draft" invisible="state not in ('verified','active')"/>
                         <button name="button_confirm" type="object" string="Confirm" class="btn-primary" invisible="state != 'verified'"/> 
