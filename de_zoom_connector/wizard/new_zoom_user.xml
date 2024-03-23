@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="create_user_ref_wiz" model="ir.ui.view">
+		<field name="name">create.zoom.account.view</field>
+		<field name="model">create.zoom.account</field>
+		<field name="arch" type="xml">
+			<form>
+
+				<group>
+					<field name="user_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+
+					<field name="first_name" required="1"/>
+
+					<field name="last_name" required="1"/>
+
+					<field name="email" required="1"/>
+
+					<field name="type_of_user" required="1"/>
+
+
+				</group>
+				<footer>
+
+					<button name="new_user_creation" string="Create User" type="object"  class="oe_highlight" />
+
+					<button string="Cancel" class="oe_link" special="cancel" />
+
+				</footer>
+			</form>
+		</field>
+	</record>
+
+	<record id="create_user_action" model="ir.actions.act_window">
+		<field name="name">Zoom Users</field>
+		<field name="res_model">create.zoom.account</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="view_mode">form</field>
+		<field name="view_id" ref="create_user_ref_wiz"/>
+		<field name="target">new</field>
+	</record>
+
+	 <menuitem id="user_creation_call"
+                  name="Zoom Users"
+                  action="create_user_action"
+                  parent="base.menu_users"
+                  sequence="6"/>
+
+</odoo>
