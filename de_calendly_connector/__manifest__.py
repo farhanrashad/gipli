@@ -19,8 +19,9 @@ Calendly Connector
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/cal_instance_views.xml',
-        'views/templates.xml',
+        'views/res_config_setting_views.xml',
+        #'views/cal_instance_views.xml',
+        #'views/templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -71,6 +71,8 @@ class CalendlyInstance(models.Model):
         return base_url + '/calendly/callback'
 
     def connection_test(self):
+
+        raise UserError(self._generate_redirect_uri())
         client_id = self.client_id #"wYOD6cdRh1ynNgx5g0UZ0hR66Sx8sIJD3Ryy3BNFZD4"
         client_secret = self.client_secret #"EqVvEYk5cvtKK3OiTcVX_ZiFhOED8H9jeYWJn5rcM5Y"
         redirect_url = "https://g2020-dev17-12386251.dev.odoo.com/calendly/callback"

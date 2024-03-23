@@ -43,7 +43,16 @@ class CalendlyCallbackController(http.Controller):
                     'content-type': 'application/x-www-form-urlencoded'})
 
             if response.json() and response.json().get('access_token'):
-                raise UserError(response.json().get('access_token'))
+                company_id.write({
+                    'calendly_access_token': response.json().get('access_token'),
+                    'calendly_generated_access_token': True,
+                })
+                return "Authentication Success. You Can Close this window"
+            else:
+                raise UserError(
+                    _('Something went wrong during the token generation.'
+                      'Maybe your Authorization Code is invalid'))
+                #raise UserError(response.json().get('access_token'))
                 
             #raise UserError(response)
             
