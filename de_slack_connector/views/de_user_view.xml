@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="slack_user">
+            <field name="name">res.user.slack</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="before">
+                    <field name="de_sk_user_name" />
+                </field>
+            </field>
+        </record>
+
+
+    <record id="res_partner_slack_bot" model="res.partner">
+			<field name="name">SlackBot</field>
+			<field name="active">False</field>
+			<field name="employee">False</field>
+			<field name="image_1920" type="base64" file="de_slack_connector/static/description/icon.png"/>
+		</record>
+
+
+
+    <template id="message_slack_notification">
+			<t t-set="x" t-value="1"/><t>
+        <div>
+						<div style="margin-left: 20px;">
+                            <a t-att-href="url" type="button"><t t-esc="file_name"/></a>
+
+						</div>
+        </div>
+
+        </t>
+		</template>
+</odoo>

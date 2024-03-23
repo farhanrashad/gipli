@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="slack_setting">
+            <field name="name">res.config.settings.slack_setting</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Slack" string="Slack" data-key="de_slack_connector">
+                        <div id="slack_setting">
+                            <h2>Slack Account</h2>
+                            <div class="row mt16 o_settings_container">
+                                    <div class="col-12 col-lg-6 o_setting_box">
+                                    <div class="o_setting_left_pane"/>
+                                        <field name="de_sk_check"/>
+                                        <span class="o_form_label">Slack Credentials</span>
+
+                                    <div class="o_setting_right_pane">
+
+                                        <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                                        <div class="content-group" attrs="{'invisible':[('de_sk_check','=',False)]}">
+                                              <div class="row mt16">
+                                                <label for="external_report_layout_id" string="Client ID" class="col-lg-4 o_light_label"/>
+                                                <field name="de_sk_client_id"/>
+                                            </div>
+                                            <div class="row mt10">
+                                                <label for="external_report_layout_id" string="Client Secret" class="col-lg-4 o_light_label"/>
+                                                <field name="de_sk_client_secret" password="1"/>
+                                            </div>
+                                            <br/>
+                                            <div class="mt8">
+                                                    <a href="https://api.slack.com/apps/" target="_new">
+                                                        <i class="fa fa-fw fa-arrow-right"/>How to Get Credentials</a>
+                                                </div>
+                                            <div class="row mt8 ml0">
+
+                                                <button name="test_credentials" string="Test Connection" icon="fa-plug" type="object" class="oe_highlight" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <div id="avalara_actions">
+                            <h2>Import Options</h2>
+                            <div class="row mt16 o_settings_container">
+                                <div class="col-12 col-lg-6 o_setting_box" >
+                                    <div class="o_setting_left_pane">
+<!--                                        <field name="sl_is_import_users"/>-->
+                                    </div>
+                                    <div class="o_setting_right_pane" attrs="{'invisible':[('de_sk_check','=',False)]}">
+                                        <div class="text-muted">
+                                            Import Slack Users.
+                                        </div>
+<!--                                        <div class="content-group" attrs="{'invisible':[('de_sk_check','=',False)]}">-->
+                                        <div class="content-group">
+                                            <div class="row mt16 ml0">
+                                                <button name="de_sk_users_import" string="Import Users" icon="fa-download" type="object" class="oe_highlight" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6 o_setting_box">
+                                    <div class="o_setting_left_pane">
+<!--                                        <field name="sl_is_import_channels"/>-->
+                                    </div>
+                                    <div class="o_setting_right_pane" attrs="{'invisible':[('de_sk_check','=',False)]}">
+                                        <div class="text-muted">
+                                            Import Slack Channels.
+                                        </div>
+<!--                                        <div class="content-group" attrs="{'invisible':[('de_sk_check','=',False)]}">-->
+                                        <div class="content-group">
+                                            <div class="row mt16 ml0">
+                                                <button name="de_sk_channels_import" string="Import Channels" icon="fa-download" type="object" class="oe_highlight" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+</odoo>
