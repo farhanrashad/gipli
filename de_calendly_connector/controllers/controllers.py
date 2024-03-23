@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
 from odoo import http
 from odoo.http import request
 import requests
 import logging
 
 _logger = logging.getLogger(__name__)
+from odoo.exceptions import UserError
 
 class CalendlyCallbackController(http.Controller):
 
@@ -30,7 +33,9 @@ class CalendlyCallbackController(http.Controller):
             'redirect_uri': redirect_uri,
         }
 
+        
         response = requests.post(token_url, data=token_data)
+        raise UserError(response)
         if response.status_code == 200:
             access_token = response.json().get('access_token')
 
