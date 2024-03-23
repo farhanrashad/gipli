@@ -11,10 +11,45 @@ class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
     def test_users(self):
+        CalendlyEventType = self.env['calendly.event.type']
+        
         company_id = self.env.user.company_id
         user_data = company_id.get_current_user()
-        name = user_data['resource']['name']
-        raise UserError(name)
+        user_uri = user_data['resource']['uri']
+
+        #user_data = company_id.get_current_user()
+        #user_uri = user_data['resource']['uri']
+
+        event_types = company_id.get_event_types(organization=False, user=user_uri)
+
+        if event_types:
+            CalendarEventType = self.env['calendly.event.type']
+        
+            for event_type in event_types['collection']:
+                event_type_uri = event_type['uri']
+                existing_event_type = CalendarEventType.search([('uri', '=', event_type_uri)], limit=1)
+        
+                event_type_data = {
+                    'name': event_type['name'],
+                    'description': event_type.get('description_plain', ''),
+                    'duration': event_type['duration'],
+                    #'scheduling_url': event_type['scheduling_url'],
+                    'uri': event_type_uri,
+                    'location': event_type['locations']['kind'],
+                    #'company_id': company_id.id,
+                }
+        
+                if existing_event_type:
+                    # Update existing event type if it already exists in Odoo
+                    existing_event_type.write(event_type_data)
+                else:
+                    # Create new event type if it doesn't exist in Odoo
+                    CalendarEventType.create(event_type_data)
+
+
+    def temp(self):
+        data_str = json.dumps(event_types, indent=4)
+        raise UserError(data_str)
         
         raise UserError(company_id.get_current_user())
 

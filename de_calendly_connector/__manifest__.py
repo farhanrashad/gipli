@@ -22,6 +22,7 @@ Calendly Connector
         'views/res_config_setting_views.xml',
         'views/cal_instance_views.xml',
         'views/calendar_views.xml',
+        'views/calendly_event_type_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

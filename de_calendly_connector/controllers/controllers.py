@@ -6,6 +6,7 @@ import requests
 from odoo import http, _
 from odoo.http import request
 from odoo.exceptions import UserError
+from datetime import datetime, timedelta
 
 import logging
 
@@ -44,10 +45,13 @@ class CalendlyCallbackController(http.Controller):
 
             #raise UserError(response.json())
             if response.json() and response.json().get('access_token'):
+                expires_in = response.json().get('expires_in')
+                new_token_validity = datetime.now() + timedelta(seconds=expires_in)
                 company_id.write({
                     'calendly_access_token': response.json().get('access_token'),
                     'calendly_refresh_token':  response.json().get('refresh_token'),
                     'calendly_generated_access_token': True,
+                    'calendly_token_validity': new_token_validity,
                 })
                 return "Authentication Success. You Can Close this window"
             else:
