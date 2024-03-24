@@ -16,5 +16,39 @@ class ResUsers(models.Model):
     @api.model
     def _sync_all_calendly_events(self):
         """ Cron job """
-        #users = self.env['res.users'].search([('active','=',True)])
-        pass
+        company_id = self.env.user.company_id
+        
+        current_user = company_id.get_current_user()
+        org_uri = current_user['resource']['current_organization']
+
+        self._sync_calendly_users(org_uri)
+        self._sync_calendly_events(org_uri)
+
+    def _sync_calendly_users(self,org_uri):
+        company_id = self.env.user.company_id
+        members = company_id._get_organization_memberships(org_uri,user=False)
+        members_collection_data = members.get('collection', [])
+        if not members_collection_data:
+            raise ValueError('No data found in the collection')
+    
+        users = []
+        for member in members_collection_data:
+            user_info = member.get('user')
+            if user_info:
+                users.append(user_info)
+    
+        if not users:
+            raise ValueError('No user data found in the collection')
+    
+        company_id._update_calendly_memberships(users)
+
+    def _sync_calendly_events(self,org_uri):
+        company_id = self.env.user.company_id
+        events = company_id._get_calendly_scheduled_events(org_uri, user=False)
+        collection_data = events.get('collection', [])
+        if not collection_data:
+            raise ValueError('No data found in the collection')
+        
+        company_id._update_calendly_events(collection_data)
+    
+        

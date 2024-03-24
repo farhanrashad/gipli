@@ -158,9 +158,16 @@ class ResCompany(models.Model):
         description = event_item.get('meeting_notes_html')
 
         # Event Host
-        #event_members = event_item.get('event_memberships', [])
+        event_members = event_item.get('event_memberships', [])
         #host = self._create_update_user(event_members)
         #host.sudo().action_reset_password()
+        users = []
+        for member in event_members:
+            user_info = member.get('user')
+            if user_info:
+                users.append(user_info)
+        host = self.env['res.users'].search([('calendly_uri','in',users)],limit=1)
+                
     
         # Convert start_time and end_time to datetime objects
         start_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -202,7 +209,7 @@ class ResCompany(models.Model):
     
     def _prepare_user_values(self, member):
         user = self.env['res.users'].search(['|', ('email', '=', member.get('email')), ('calendly_uri', '=', member.get('uri'))], limit=1)
-        if user:-
+        if user:
             # Update existing user record if email and uri are found
             user.write({
                 'calendly_uri': member.get('uri'),

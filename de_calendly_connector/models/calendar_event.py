@@ -12,33 +12,10 @@ class CalendarEvent(models.Model):
 
     calendly_uri = fields.Char(string='Calendly URI')
 
+    def action_get_schedule_events2(self):
+        self.env.user.sudo()._sync_all_calendly_events()
+        
     def action_get_schedule_events(self):
-        company_id = self.env.user.company_id
-        
-        current_user = company_id.get_current_user()
-        org_uri = current_user['resource']['current_organization']
-
-        members = company_id._get_organization_memberships(org_uri,user=False)
-        members_collection_data = members.get('collection', [])
-        if not members_collection_data:
-            raise ValueError('No data found in the collection')
-    
-        users = []
-        for member in members_collection_data:
-            user_info = member.get('user')
-            if user_info:
-                users.append(user_info)
-    
-        if not users:
-            raise ValueError('No user data found in the collection')
-    
-        company_id._update_calendly_memberships(users)
-
-        
-        data_str = json.dumps(members_collection_data, indent=4)
-        #raise UserError(data_str)
-        
-    def action_get_schedule_events1(self):
         company_id = self.env.user.company_id
         
         current_user = company_id.get_current_user()
@@ -51,8 +28,15 @@ class CalendarEvent(models.Model):
             raise ValueError('No data found in the collection')
         
         company_id._update_calendly_events(collection_data)
-        
-        data_str = json.dumps(events, indent=4)
+
+        users = []
+        for member in collection_data:
+            user_info = member.get('event_memberships')
+            if user_info:
+                users.append(user_info)
+        #raise UserError(users)
+        member_data = events.get('collection', ['event_memberships'])
+        data_str = json.dumps(users, indent=4)
         #raise UserError(data_str)
         
     
