@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
-from odoo import models, fields
+from odoo import api, fields, models, Command
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 

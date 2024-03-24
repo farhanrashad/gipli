@@ -142,6 +142,17 @@ class ResCompany(models.Model):
         uri = event_item.get('uri')
         start_time_str = event_item.get('start_time')
         end_time_str = event_item.get('end_time')
+        location = event_item.get('location', {}).get('location')  # Extract 'location' from the dictionary
+        description = event_item.get('meeting_notes_html')
+        # Host Details        
+        host_email = event_item.get('event_memberships', [{}])[0].get('user_email')  # Assuming first membership is the host
+        host_name = event_item.get('event_memberships', [{}])[0].get('user_name')
+        host_uri = event_item.get('event_memberships', [{}])[0].get('user')
+
+        host = self.env['res.users'].search(['|',('email', '=', host_email),('calendly_uri', '=', host_uri)], limit=1)
+        if not host:
+            host = self._create_calendly_host(host_email,host_name,host_uri)  # Implement _create_host method to create a new user
+
     
         # Convert start_time and end_time to datetime objects
         start_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -153,7 +164,23 @@ class ResCompany(models.Model):
                 'calendly_uri': uri,
                 'start': start_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'stop': end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'location': location,
+                'description': description,
+                'user_id': host.id,
                 # Add other fields as needed
             }
         else:
             return None
+
+    def _create_calendly_host(self, host_email,host_name, host_uri):
+        # Create a new user in Odoo with the provided email as the host
+        # Example:
+        host = self.env['res.users'].create({
+            'name': host_name,
+            'email': host_email,
+            'calendly_uri': host_uri,
+            'login': host_email,
+            'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])]  # Assign the user to the 'Portal' group
+        })
+        host.sudo().action_reset_password()
+        return host
