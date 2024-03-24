@@ -25,9 +25,11 @@ Calendly Connector
         'views/calendar_views.xml',
         'views/calendly_event_type_views.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'assets': {
+        'web.assets_backend': [
+            'de_calendly_connector/static/src/js/calendly.js',
+            'de_calendly_connector/static/src/xml/calendly.xml',
+        ],
+    },
 }
 
