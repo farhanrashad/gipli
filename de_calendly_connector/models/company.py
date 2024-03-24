@@ -28,7 +28,7 @@ class ResCompany(models.Model):
             }
         elif self.calendly_refresh_token:
             # Access token has expired or is invalid, use refresh token to get a new access token
-            #new_access_token, new_token_validity = self._refresh_access_token(self.calendly_refresh_token)
+            new_access_token, new_token_validity = self._refresh_access_token(self.calendly_refresh_token)
             return {
                 'Authorization': f'Bearer {new_access_token}', 
                 'Accept': 'application/json'
@@ -73,7 +73,48 @@ class ResCompany(models.Model):
         else:
             return response.json()
 
-    def get_scheduled_events(self, organization=None, user=None):
+    
+
+    def get_current_user(self):
+        url = f'{CALENDLY_BASE_URL}/users/me'
+        params = {}
+        headers = self._get_header()
+        response = requests.get(url, params=params, headers=headers)
+        return self._handle_response(response)
+
+    def _get_calendly_users(self, user=None):
+        url = f'{CALENDLY_BASE_URL}/user'
+        params = {}
+        if user:
+            params['user'] = user
+        headers = self._get_header()
+        response = requests.get(url, params=params, headers=headers)
+        return self._handle_response(response)
+        
+    def get_event_types(self, organization=None, user=None):
+        url = f'{CALENDLY_BASE_URL}/event_types'
+        params = {}
+        if organization:
+            params['organization'] = organization
+        if user:
+            params['user'] = user
+        headers = self._get_header()
+        response = requests.get(url, params=params, headers=headers)
+        return self._handle_response(response)
+
+    def _get_organization_memberships(self, organization=None, user=None):
+        url = f'{CALENDLY_BASE_URL}/https://api.calendly.com/organization_memberships'
+        params = {}
+        if organization:
+            params['organization'] = organization
+        if user:
+            params['user'] = user
+        headers = self._get_header()
+        response = requests.get(url, params=params, headers=headers)
+        return self._handle_response(response)
+
+    # Events
+    def _get_calendly_scheduled_events(self, organization=None, user=None):
         url = f'{CALENDLY_BASE_URL}/scheduled_events'
         params = {}
         if organization:
@@ -85,21 +126,34 @@ class ResCompany(models.Model):
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
 
-    def get_current_user(self):
-        url = f'{CALENDLY_BASE_URL}/users/me'
-        params = {}
-        headers = self._get_header()
-        response = requests.get(url, params=params, headers=headers)
-        return self._handle_response(response)
-
-    def get_event_types(self, organization=None, user=None):
-        url = f'{CALENDLY_BASE_URL}/event_types'
-        params = {}
-        if organization:
-            params['organization'] = organization
-        if user:
-            params['user'] = user
-        headers = self._get_header()
-        response = requests.get(url, params=params, headers=headers)
-        return self._handle_response(response)
-        
+    def _update_calendly_events(self, collection_data):
+        calendar_event_obj = self.env['calendar.event']
+        for item in collection_data:
+            event_data = self._prepare_event_values(item)
+            if event_data:
+                existing_event = calendar_event_obj.search([('calendly_uri', '=', event_data['calendly_uri'])])
+                if existing_event:
+                    existing_event.write(event_data)
+                else:
+                    calendar_event_obj.create(event_data)
+    
+    def _prepare_event_values(self, event_item):
+        name = event_item.get('name')
+        uri = event_item.get('uri')
+        start_time_str = event_item.get('start_time')
+        end_time_str = event_item.get('end_time')
+    
+        # Convert start_time and end_time to datetime objects
+        start_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+        end_time = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+    
+        if name and uri and start_time and end_time:
+            return {
+                'name': name,
+                'calendly_uri': uri,
+                'start': start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'stop': end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                # Add other fields as needed
+            }
+        else:
+            return None

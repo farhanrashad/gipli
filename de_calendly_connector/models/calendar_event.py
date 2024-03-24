@@ -10,6 +10,26 @@ import json
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
+    calendly_uri = fields.Char(string='Calendly URI')
+
+    def action_get_schedule_events(self):
+        company_id = self.env.user.company_id
+        
+        current_user = company_id.get_current_user()
+        org_uri = current_user['resource']['current_organization']
+
+        events = company_id._get_calendly_scheduled_events(org_uri, user=False)
+
+        collection_data = events.get('collection', [])
+        if not collection_data:
+            raise ValueError('No data found in the collection')
+        
+        company_id._update_calendly_events(collection_data)
+        
+        data_str = json.dumps(events, indent=4)
+        #raise UserError(data_str)
+        
+    
     def test_users(self):
         CalendlyEventType = self.env['calendly.event.type']
         

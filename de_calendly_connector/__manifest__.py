@@ -14,11 +14,12 @@ Calendly Connector
     'category': 'Productivity/Calendar',
     'version': '17.0.0.1',
 
-    'depends': ['calendar'],
+    'depends': ['calendar','base'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'data/calendly_data.xml',
         'views/res_config_setting_views.xml',
         'views/cal_instance_views.xml',
         'views/calendar_views.xml',

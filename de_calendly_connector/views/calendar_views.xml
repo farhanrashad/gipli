@@ -10,4 +10,17 @@
             </xpath>
         </field>
     </record>
+
+    <record id="view_calendar_event_tree_inherit_calendly" model="ir.ui.view">
+        <field name="name">view.calendar.event.tree.inherit.calendly</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_get_schedule_events" type="object" 
+                        string="Sync. Calendly"  display="always"
+                        />
+            </xpath>
+        </field>
+    </record>
 </odoo>
