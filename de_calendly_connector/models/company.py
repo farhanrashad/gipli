@@ -4,6 +4,8 @@ import requests
 from odoo import models, fields
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
+import json
+
 
 CALENDLY_BASE_URL = 'https://api.calendly.com'
 
@@ -102,8 +104,9 @@ class ResCompany(models.Model):
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
 
+    # Calendly Membership
     def _get_organization_memberships(self, organization=None, user=None):
-        url = f'{CALENDLY_BASE_URL}/https://api.calendly.com/organization_memberships'
+        url = f'{CALENDLY_BASE_URL}/organization_memberships'
         params = {}
         if organization:
             params['organization'] = organization
@@ -113,7 +116,16 @@ class ResCompany(models.Model):
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
 
-    # Events
+    def _update_calendly_memberships(self, collection_data):
+        user_ids = self.env['res.users']
+        data_str = json.dumps(collection_data, indent=4)
+        #raise UserError(data_str)
+        
+        #for item in collection_data:
+        #member = item.get('user', [])
+        users = self._create_update_user(collection_data)
+    
+    # Calendly Event Events
     def _get_calendly_scheduled_events(self, organization=None, user=None):
         url = f'{CALENDLY_BASE_URL}/scheduled_events'
         params = {}
@@ -146,9 +158,9 @@ class ResCompany(models.Model):
         description = event_item.get('meeting_notes_html')
 
         # Event Host
-        event_members = event_item.get('event_memberships', [])
-        host = self._create_update_user(event_members)
-        host.sudo().action_reset_password()
+        #event_members = event_item.get('event_memberships', [])
+        #host = self._create_update_user(event_members)
+        #host.sudo().action_reset_password()
     
         # Convert start_time and end_time to datetime objects
         start_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -178,32 +190,35 @@ class ResCompany(models.Model):
         else:
             return None
 
-    def _create_update_user(self, event_memberships):
+    def _create_update_user(self, members):
         user = self.env['res.users']
-        for member in event_memberships:
-            email = member.get('user_email')
-            name = member.get('user_name')
-            uri = member.get('user')
+        for member in members:
+            email = member.get('email')
+            #name = member.get('user_name')
+            #uri = member.get('user')
             if email:
-                user |= self._prepare_user_values(email, name, uri)
+                user |= self._prepare_user_values(member)
         return user
-
-    def _prepare_user_values(self, email, name, uri):
-        user = self.env['res.users'].search(['|', ('email', '=', email), ('calendly_uri', '=', uri)], limit=1)
-        if user:
+    
+    def _prepare_user_values(self, member):
+        user = self.env['res.users'].search(['|', ('email', '=', member.get('email')), ('calendly_uri', '=', member.get('uri'))], limit=1)
+        if user:-
             # Update existing user record if email and uri are found
             user.write({
-                'calendly_uri': uri,
+                'calendly_uri': member.get('uri'),
+                #'name': member.get('name'),
+                #'login': member.get('name'),
             })
         else:
             # Create new user record if email and uri are not found
             user = self.env['res.users'].create({
-                'name': name,
-                'email': email,
-                'calendly_uri': uri,
-                'login': email,
+                'name': member.get('name'),
+                'email': member.get('email'),
+                'calendly_uri': member.get('uri'),
+                'login': member.get('email'),
                 'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])]
             })
+            user.sudo().action_reset_password()
         return user or False
         
     def _create_update_attendees(self, event_guests):
