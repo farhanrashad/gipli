@@ -144,20 +144,26 @@ class ResCompany(models.Model):
         end_time_str = event_item.get('end_time')
         location = event_item.get('location', {}).get('location')  # Extract 'location' from the dictionary
         description = event_item.get('meeting_notes_html')
-        # Host Details        
-        host_email = event_item.get('event_memberships', [{}])[0].get('user_email')  # Assuming first membership is the host
-        host_name = event_item.get('event_memberships', [{}])[0].get('user_name')
-        host_uri = event_item.get('event_memberships', [{}])[0].get('user')
 
-        host = self.env['res.users'].search(['|',('email', '=', host_email),('calendly_uri', '=', host_uri)], limit=1)
-        if not host:
-            host = self._create_calendly_host(host_email,host_name,host_uri)  # Implement _create_host method to create a new user
-
+        # Event Host
+        event_members = event_item.get('event_memberships', [])
+        host = self._create_update_user(event_members)
+        host.sudo().action_reset_password()
     
         # Convert start_time and end_time to datetime objects
         start_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%S.%fZ')
         end_time = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%S.%fZ')
-    
+
+        # Event Guests
+        event_guests = event_item.get('event_guests', [])
+        attendees_ids = self._create_update_attendees(event_guests)
+        #partner_ids = [(4, attendee.id) for attendee in attendees]
+
+        partner_ids = [(4, host.partner_id.id)]  # Add the host.partner_id.id to the partner_ids list
+        if attendees_ids:
+            partner_ids += [(4, attendee_id) for attendee_id in attendees_ids.ids]
+        
+        
         if name and uri and start_time and end_time:
             return {
                 'name': name,
@@ -167,20 +173,63 @@ class ResCompany(models.Model):
                 'location': location,
                 'description': description,
                 'user_id': host.id,
-                # Add other fields as needed
+                'partner_ids': partner_ids,
             }
         else:
             return None
 
-    def _create_calendly_host(self, host_email,host_name, host_uri):
-        # Create a new user in Odoo with the provided email as the host
-        # Example:
-        host = self.env['res.users'].create({
-            'name': host_name,
-            'email': host_email,
-            'calendly_uri': host_uri,
-            'login': host_email,
-            'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])]  # Assign the user to the 'Portal' group
-        })
-        host.sudo().action_reset_password()
-        return host
+    def _create_update_user(self, event_memberships):
+        user = self.env['res.users']
+        for member in event_memberships:
+            email = member.get('user_email')
+            name = member.get('user_name')
+            uri = member.get('user')
+            if email:
+                user |= self._prepare_user_values(email, name, uri)
+        return user
+
+    def _prepare_user_values(self, email, name, uri):
+        user = self.env['res.users'].search(['|', ('email', '=', email), ('calendly_uri', '=', uri)], limit=1)
+        if user:
+            # Update existing user record if email and uri are found
+            user.write({
+                'calendly_uri': uri,
+            })
+        else:
+            # Create new user record if email and uri are not found
+            user = self.env['res.users'].create({
+                'name': name,
+                'email': email,
+                'calendly_uri': uri,
+                'login': email,
+                'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])]
+            })
+        return user or False
+        
+    def _create_update_attendees(self, event_guests):
+        attendees = self.env['res.partner']
+        for guest in event_guests:
+            email = guest.get('email')
+            if email:
+                attendees |= self._prepare_attendees_values(email)
+        return attendees
+
+    def _prepare_attendees_values(self, email):
+        partner = self.env['res.partner'].search([('email', '=', email)], limit=1)
+        if partner:
+            # Update existing partner record if email is found
+            partner.write({
+                #'email': email,
+                #'calendly_uri': uri,
+                'type': 'contact',
+                'name': email.split('@')[0], 
+            })
+        else:
+            # Create new partner record if email is not found
+            partner = self.env['res.partner'].create({
+                'name': email.split('@')[0], 
+                'email': email,
+                'type': 'contact',
+            })
+        return partner or False  # Return the existing or newly created partner record
+
