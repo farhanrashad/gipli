@@ -18,7 +18,9 @@ class ResCompany(models.Model):
     calendly_refresh_token = fields.Char(string='Refresh Token')
     calendly_generated_access_token = fields.Boolean(string='Access Token Generated')
     calendly_token_validity = fields.Datetime('Token Validity', copy=False)
-    
+    calendly_callback = fields.Char(string='Callback')
+   
+
     def _get_header(self):
         access_token = self.calendly_access_token
         token_validity = self.calendly_token_validity
@@ -30,7 +32,7 @@ class ResCompany(models.Model):
             }
         elif self.calendly_refresh_token:
             # Access token has expired or is invalid, use refresh token to get a new access token
-            new_access_token, new_token_validity = self._refresh_access_token(self.calendly_refresh_token)
+            new_access_token, new_token_validity = self._refresh_access_token()
             return {
                 'Authorization': f'Bearer {new_access_token}', 
                 'Accept': 'application/json'
@@ -38,13 +40,13 @@ class ResCompany(models.Model):
         else:
             raise UserError('Access token or refresh token is not available.')
 
-    def _refresh_access_token(self, refresh_token):
+    def _refresh_access_token(self):
         url = f'{CALENDLY_BASE_URL}/oauth/token'
         data = {
             'client_id': self.calendly_client_id,
             'client_secret': self.calendly_client_secret,
-            'grant_type': 'refresh_token',
-            'refresh_token': refresh_token,
+            'grant_type': 'authorization_code',#'refresh_token',
+            'refresh_token': self.calendly_refresh_token,
         }
         response = requests.post(url, data=data)
         response.raise_for_status()
@@ -61,6 +63,7 @@ class ResCompany(models.Model):
             self.write({
                 'calendly_access_token': new_access_token,
                 'calendly_token_validity': new_token_validity,
+                'calendly_refresh_token': response_json.get('refresh_token')
             })
             return new_access_token, new_token_validity
         else:

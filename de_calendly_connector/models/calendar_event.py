@@ -14,8 +14,13 @@ class CalendarEvent(models.Model):
 
     def action_get_schedule_events2(self):
         self.env.user.sudo()._sync_all_calendly_events()
-        
+
     def action_get_schedule_events(self):
+        company_id = self.env.user.company_id
+        #raise UserError(company_id._get_base_url())
+        #company_id._refresh_access_token()
+        
+    def action_get_schedule_events3(self):
         company_id = self.env.user.company_id
         
         current_user = company_id.get_current_user()

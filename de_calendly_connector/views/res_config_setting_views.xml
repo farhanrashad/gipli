@@ -6,8 +6,12 @@
         <field name="inherit_id" ref="calendar.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//app[@name='calendar']" position="inside">
-                <block id="calendly" title="Calendly">
-                    <setting id="authentication" title="Synchronize your calendar with Calendly Meeting." help="Synchronize your calendar with Calendly Meeting.">
+                <block id="calendly" title="Calendly Settings">
+                    <setting id="authentication" 
+                        title="Calendly" 
+                        string="Calendly"
+                        help="Synchronize your calendar with Calendly Meeting."
+                    >
                         <div class="content-group">
                             <div class="mt16 row">
                                 <label for="calendly_client_id" string="Client ID" class="col-3 col-lg-3 o_light_label"/>
@@ -17,12 +21,22 @@
                                 <label for="calendly_client_secret" string="Client Secret" class="col-3 col-lg-3 o_light_label"/>
                                 <field name="calendly_client_secret" password="True" nolabel="1"/>
                             </div>
-                            <div class="mt16 row">
-                                <field name ="calendly_generated_access_token" invisible="1" />
-                                <button name="action_generate_access_token" type="object" string="Generate Token" class="btn-primary"/>
-                            </div>
                         </div>
-                        
+                    </setting>
+                    <setting/>
+                    <setting string="Callback URI">
+                        <div class="mt16 row" style="text-wrap: nowrap;!important">
+                            <field name ="base_url" style="text-wrap: nowrap;!important"/>
+                            <newline/>
+                            <field name ="calendly_callback" placeholder="e.g oauth/calendly"/>
+                        </div>          
+                    </setting>
+                    <setting/>
+                    <setting>
+                        <div class="mt16 row col-6 col-lg-6">
+                            <field name ="calendly_generated_access_token" invisible="1" />
+                            <button name="action_generate_access_token" type="object" string="Generate Token" class="btn-primary"/>
+                        </div>
                     </setting>
                 </block>
             </xpath>

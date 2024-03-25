@@ -6,12 +6,23 @@ from odoo import api, fields, models
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
+
+    def _get_base_url(self):
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/'
+        return base_url
     
     calendly_client_id = fields.Char(related="company_id.calendly_client_id", readonly=False)
     calendly_client_secret = fields.Char(related="company_id.calendly_client_secret", readonly=False)
-
     calendly_generated_access_token = fields.Boolean(related="company_id.calendly_generated_access_token")
+    calendly_callback = fields.Char(related="company_id.calendly_callback", readonly=False)
+    base_url = fields.Char(string='Base URL', 
+                           default=lambda s: s._get_base_url(),
+                           readonly=True,
+                          )
 
+    
+    
+    
     def action_generate_access_token(self):
 
         client_id = self.calendly_client_id
