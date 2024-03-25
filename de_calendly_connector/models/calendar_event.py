@@ -15,6 +15,7 @@ class CalendarEvent(models.Model):
                                  compute='_compute_calendly',
                                  store=True,
                                 )
+    calendly_cancel_reason = fields.Char('Calendly Cancel Reason', readonly=True)
 
     # Compute Methods
     @api.depends('calendly_uri')
@@ -24,6 +25,25 @@ class CalendarEvent(models.Model):
                 record.is_calendly = True
             else:
                 record.is_calendly = False
+
+    def write(self, values):
+        if 'active' in values and not values.get('active'):
+            for record in self:
+                record.env.user.company_id.sudo()._calendly_cancel_event(record.calendly_uri, 'test reason')
+            values.update({
+                'calendly_uri': False,
+                'is_calendly': False,
+            })
+        return super(CalendarEvent, self).write(values)
+        
+    def action_mass_archive(self, recurrence_update_setting):
+        raise UserError('hello')
+        res = super(CalendarEvent, self).action_mass_archive(recurrence_update_setting)
+        self.env.user.company_id.sudo()._calendly_cancel_event(self.calendly_uri,'test reason')
+        self.write({
+            'calendly_uri': False,
+            'is_calendly': False,
+        })
         
     # Actions
     def button_calendly_cancel(self):
@@ -47,16 +67,16 @@ class CalendarEvent(models.Model):
 
     def action_get_schedule_events(self):
         company_id = self.env.user.company_id
-        #company_id._refresh_calendly_access_token()
+        token = company_id._refresh_calendly_access_token()
         
-        current_user = company_id.get_current_user()
-        org_uri = current_user['resource']['current_organization']
+        #current_user = company_id.get_current_user()
+        #org_uri = current_user['resource']['current_organization']
 
         #subscriptions = company_id._create_calendly_webhook_subscription(org_uri, user=False)
-        subscriptions = company_id._get_calendly_webhook_subscriptions(org_uri, user=False)
+        #subscriptions = company_id._get_calendly_webhook_subscriptions(org_uri, user=False)
         
-        data_str = json.dumps(subscriptions, indent=4)
-        raise UserError(data_str)
+        #data_str = json.dumps(subscriptions, indent=4)
+        #raise UserError(data_str)
         
     
         #raise UserError(company_id._get_base_url())

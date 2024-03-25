@@ -24,4 +24,11 @@ class CalendlyCancelEventWizard(models.TransientModel):
     )
 
     def cancel_calendly_event(self):
-        pass
+        for event in event_ids:
+            if self.cancel_type == 'calendly':
+                self.env.user.company_id.sudo()._calendly_cancel_event(event.calendly_uri,self.reason_cancel)
+                event.message_post(body=f"Event cancelled on calendly due to : {self.reason_cancel}")
+            else:
+                event.message_post(body=f"Event cancelled due to : {self.reason_cancel}")
+                event.action_mass_archive("all_events")
+                

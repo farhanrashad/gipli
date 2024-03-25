@@ -4,7 +4,7 @@ import requests
 from odoo import api, fields, models, Command
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
-
+import json
 CALENDLY_BASE_URL = 'https://api.calendly.com'
 
 class ResUsers(models.Model):
@@ -19,6 +19,8 @@ class ResUsers(models.Model):
         company_id = self.env.user.company_id
         
         current_user = company_id.get_current_user()
+        #data_str = json.dumps(current_user, indent=4)
+        #raise UserError(data_str)
         org_uri = current_user['resource']['current_organization']
 
         self._sync_calendly_users(org_uri)

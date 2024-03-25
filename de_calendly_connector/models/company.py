@@ -45,62 +45,53 @@ class ResCompany(models.Model):
         return self._handle_response(response)
 
     def _refresh_calendly_access_token(self):
-        if self.calendly_token_validity and self.calendly_token_validity > fields.Datetime.now():
-            return False
-        else:
-            # Prepare the request to Calendly's token endpoint to refresh the access token
-            url = 'https://auth.calendly.com/oauth/token'
-            headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-            payload = {
-                'grant_type': 'refresh_token',
-                'refresh_token': self.calendly_refresh_token,
-                'client_id': self.calendly_client_id,
-                'client_secret': self.calendly_client_secret
-            }
-            try:
+        company_ids = self.env['res.company'].search([('active','=',True)])
+        payload = {}
+        url = 'https://auth.calendly.com/oauth/token'
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': "application/json",
+        }
+        for company_id in company_ids:
+            if company_id.calendly_token_validity > fields.Datetime.now():
+                return False
+            else:
+                payload = {
+                    'grant_type': 'refresh_token',
+                    'refresh_token': company_id.calendly_refresh_token,
+                    'client_id': company_id.calendly_client_id,
+                    'client_secret': company_id.calendly_client_secret
+                }
                 response = requests.post(url, headers=headers, data=payload)
                 response.raise_for_status()
                 data = response.json()
-
-                # Update company fields with new token and validity time
-                self.write({
+    
+                company_id.write({
                     'calendly_access_token': data.get('access_token'),
                     'calendly_token_validity': fields.Datetime.now() + timedelta(seconds=data.get('expires_in')),
                 })
-            except requests.exceptions.RequestException as e:
-                # Handle token refresh failure (e.g., log the error)
-                pass
-                
     
     def _get_calendly_api_header(self):
         access_token = self.calendly_access_token
         token_validity = self.calendly_token_validity
-        if access_token and token_validity and datetime.now() < token_validity:
-            # Access token is valid, return the header with access token
-            return {
-                'Authorization': f'Bearer {access_token}', 
-                'Accept': 'application/json'
-            }
-        elif self.calendly_refresh_token:
-            # Access token has expired or is invalid, use refresh token to get a new access token
-            new_access_token, new_token_validity = self._refresh_access_token()
-            return {
-                'Authorization': f'Bearer {new_access_token}', 
-                'Accept': 'application/json'
-            }
-        else:
-            raise UserError('Access token or refresh token is not available.')
+        self.sudo()._refresh_calendly_access_token()
+        return {
+            'Authorization': f'Bearer {access_token}', 
+            'Accept': 'application/json'
+        }
+        
 
     
 
     def _handle_response(self, response):
-        if response.status_code == 401:
+        return response.json()
+        #if response.status_code == 401:
             # Handle token refresh here if needed
-            raise UserError('Unauthorized. Token refresh logic goes here.')
-        elif not response.ok:
-            raise UserError(f'Error: {response.status_code} - {response.text}')
-        else:
-            return response.json()
+        #    raise UserError('Unauthorized. Token refresh logic goes here.')
+        #elif not response.ok:
+        #    raise UserError(f'Error: {response.status_code} - {response.text}')
+        #else:
+        #    return response.json()
 
     
 
