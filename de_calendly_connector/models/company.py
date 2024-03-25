@@ -186,13 +186,14 @@ class ResCompany(models.Model):
     def _update_calendly_events(self, collection_data):
         calendar_event_obj = self.env['calendar.event']
         for item in collection_data:
-            event_data = self._prepare_event_values(item)
-            if event_data:
-                existing_event = calendar_event_obj.search([('calendly_uri', '=', event_data['calendly_uri'])])
-                if existing_event:
-                    existing_event.write(event_data)
-                else:
-                    calendar_event_obj.create(event_data)
+            if item.get('status') == 'active':
+                event_data = self._prepare_event_values(item)
+                if event_data:
+                    existing_event = calendar_event_obj.search([('calendly_uri', '=', event_data['calendly_uri'])])
+                    if existing_event:
+                        existing_event.write(event_data)
+                    else:
+                        calendar_event_obj.create(event_data)
     
     def _prepare_event_values(self, event_item):
         name = event_item.get('name')
@@ -304,14 +305,14 @@ class ResCompany(models.Model):
         return partner or False  # Return the existing or newly created partner record
 
     # Webhook
-    def _create_calendly_webhook_subscription(self, organization=None, user=None):
+    def _create_calendly_webhook_subscription(self, uri, organization=None, user=None, events=[]):
         url = f'{CALENDLY_BASE_URL}/webhook_subscriptions'
         client_id = self.calendly_client_id
         client_secret = self.calendly_client_secret
         conn = http.client.HTTPSConnection("api.calendly.com")
         payload = {
-            "url": self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/calendly/invitee/created',
-            "events": ["invitee.created"],
+            "url": self.env['ir.config_parameter'].sudo().get_param('web.base.url') + uri,
+            "events": events,
             "scope": "organization",
             "signing_key": self.calendly_webhook_signing_key,
         }

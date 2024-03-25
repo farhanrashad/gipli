@@ -79,9 +79,76 @@ class CalendlyCallbackController(http.Controller):
             'calendly_generated_access_token': True,
         }
 
-    @http.route('/calendly/events', type='http', auth='public', website=True)
-    def update_calendly_events(self, **kw):
-        pass
-        
+    @http.route('/calendly/event/create', type='http', auth='public', website=True)
+    def create_calendly_event(self, **kw):
+        # Parse the incoming JSON data from Calendly
+        try:
+            data = json.loads(request.httprequest.data)
+        except ValueError:
+            return json.dumps({'error': 'Invalid JSON data'})
 
+        # Extract relevant information from the Calendly event data
+        event_title = data.get('title')
+        event_start_time = data.get('start_time')
+        event_end_time = data.get('end_time')
+        event_description = data.get('description')
+        # Add more fields as needed
+
+        # Create the calendar.event record in Odoo
+        event_vals = {
+            'name': event_title,
+            'start': event_start_time,
+            'stop': event_end_time,
+            'description': event_description,
+            # Add more fields as needed
+        }
+        new_event = request.env['calendar.event'].sudo().create(event_vals)
+
+        # Return a JSON response indicating success or failure
+        if new_event:
+            return json.dumps({'success': True, 'event_id': new_event.id})
+        else:
+            return json.dumps({'error': 'Failed to create event'})
+        
+    @http.route('/calendly/invitee/created', type='http', auth='public', website=True)
+    def create_invitee_created(self, **kw):
+        try:
+            data = json.loads(request.httprequest.data)
+        except ValueError:
+            return json.dumps({'error': 'Invalid JSON data'})
+
+        scheduled_event_uri = data.get('payload', {}).get('scheduled_event', {}).get('uri')
+        if not scheduled_event_uri:
+            return json.dumps({'error': 'Scheduled event URI not found'})
+
+        # Extract the UUID from the schedule event URI
+        calendly_uri = scheduled_event_uri.split('/')[-1]
+
+        # Check if the event already exists
+        existing_event = request.env['calendar.event'].sudo().search([('calendly_uri', '=', calendly_uri)], limit=1)
+
+        # Prepare data for creating/updating the event
+        event_data = {
+            'calendly_uri': calendly_uri,
+            'name': data.get('payload', {}).get('name', 'Event'),
+            # Add more fields as needed
+        }
+
+        # If the event exists, update the partner_ids with the host from event_memberships
+        if existing_event:
+            host_uri = data.get('payload', {}).get('scheduled_event', {}).get('event_memberships', [{}])[0].get('user')
+            if host_uri:
+                host_email = host_uri.split('/')[-1]
+                host_partner = request.env['res.partner'].sudo().search([('email', '=', host_email)], limit=1)
+                if host_partner:
+                    event_data['partner_ids'] = [(4, host_partner.id)]
+
+            existing_event.write(event_data)
+            return json.dumps({'success': True, 'event_id': existing_event.id})
+        else:
+            new_event = request.env['calendar.event'].sudo().create(event_data)
+            if new_event:
+                return json.dumps({'success': True, 'event_id': new_event.id})
+            else:
+                return json.dumps({'error': 'Failed to create event'})
             
