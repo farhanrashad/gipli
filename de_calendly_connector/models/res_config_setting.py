@@ -14,6 +14,8 @@ class ResConfigSettings(models.TransientModel):
     is_calendly = fields.Boolean(related='company_id.is_calendly', readonly=False)
     calendly_client_id = fields.Char(related="company_id.calendly_client_id", readonly=False)
     calendly_client_secret = fields.Char(related="company_id.calendly_client_secret", readonly=False)
+    calendly_webhook_signing_key = fields.Char(related="company_id.calendly_webhook_signing_key", readonly=False)
+    
     calendly_generated_access_token = fields.Boolean(related="company_id.calendly_generated_access_token")
     calendly_callback = fields.Char(related="company_id.calendly_callback", readonly=False)
     base_url = fields.Char(string='Base URL', 

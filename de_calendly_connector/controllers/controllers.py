@@ -17,13 +17,15 @@ class CalendlyCallbackController(http.Controller):
     @http.route('/calendly/callback', type='http', auth='public', website=True)
     def handle_calendly_callback(self, **kw):
 
-        client_id = "wYOD6cdRh1ynNgx5g0UZ0hR66Sx8sIJD3Ryy3BNFZD4"
-        client_secret = "EqVvEYk5cvtKK3OiTcVX_ZiFhOED8H9jeYWJn5rcM5Y"
+        company_id = request.env.user.company_id or http.request.env['res.users'].sudo().browse(
+            user_id).company_id
+        user_id = request.uid
+        
+        client_id = company_id.client_id
+        client_secret = company_id.client_secret
         redirect_uri = "https://g2020-dev17-12386251.dev.odoo.com/calendly/callback"
         
-        user_id = request.uid
-        company_id = http.request.env['res.users'].sudo().browse(
-            user_id).company_id
+        
 
         instance_id = http.request.env['cal.instance'].sudo().search([])
         
