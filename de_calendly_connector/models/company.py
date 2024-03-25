@@ -5,6 +5,7 @@ from odoo import models, fields
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 import json
+import base64
 
 
 CALENDLY_BASE_URL = 'https://api.calendly.com'
@@ -15,17 +16,34 @@ class ResCompany(models.Model):
     is_calendly = fields.Boolean('Calendly')
     calendly_client_id = fields.Char(string='Client ID')
     calendly_client_secret = fields.Char(string='Client secret')
+    calendly_webhook_signing_key = fields.Char(string='Webhook signing key')
+    calendly_callback = fields.Char(string='Callback')
+    calendly_callback_uri = fields.Char(string='Callback URI')
     
     calendly_access_token = fields.Char(string='Access Token')
     calendly_refresh_token = fields.Char(string='Refresh Token')
-    calendly_webhook_signing_key = fields.Char(string='Webhook signing key')
-
-    calendly_generated_access_token = fields.Boolean(string='Access Token Generated')
     calendly_token_validity = fields.Datetime('Token Validity', copy=False)
-    calendly_callback = fields.Char(string='Callback')
-    calendly_callback_uri = fields.Char(string='Callback URI')
-   
+    calendly_generated_access_token = fields.Boolean(string='Access Token Generated')
 
+    def _generate_calendly_token(self, code):
+        data = {
+            'code': code,
+            'redirect_uri': self.calendly_callback_uri,
+            'grant_type': 'authorization_code'
+        }
+        client_id_secret = str(
+                self.calendly_client_id + ":" + self.calendly_client_secret).encode(
+                'utf-8')
+        client_id_secret = base64.b64encode(client_id_secret).decode('utf-8')
+        response = requests.post(
+                'https://auth.calendly.com/oauth/token', data=data,
+                headers={
+                    'Authorization': 'Basic ' + client_id_secret,
+                    'content-type': 'application/x-www-form-urlencoded'})
+        # self.write(self._prepare_calendly_token_values(response))
+        return self._handle_response(response)
+
+    
     def _get_header(self):
         access_token = self.calendly_access_token
         token_validity = self.calendly_token_validity

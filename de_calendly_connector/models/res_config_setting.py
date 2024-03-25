@@ -2,7 +2,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
-
+import requests
+from odoo.exceptions import UserError
+import json
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
@@ -34,8 +36,13 @@ class ResConfigSettings(models.TransientModel):
             "https://auth.calendly.com/oauth/authorize?response_type=code"
             "&client_id={}&redirect_uri={}"
         ).format(client_id, redirect_url)
+
+        #cb = '/' + self.calendly_callback
+        #response = requests.post(self.base_url + cb, data={'url_string': redirect_url})
+        #raise UserError(response)
+        
         return {
             "type": 'ir.actions.act_url',
             "url": url,
-            "target": "current"
+            #"target": "current"
         }
