@@ -36,14 +36,14 @@ class CalendlyCallbackController(http.Controller):
                 'redirect_uri': redirect_uri,
                 'grant_type': 'authorization_code'
             }
-            b64 = str(
+            cient_id_secret = str(
                 client_id + ":" + client_secret).encode(
                 'utf-8')
-            b64 = base64.b64encode(b64).decode('utf-8')
+            cient_id_secret = base64.b64encode(cient_id_secret).decode('utf-8')
             response = requests.post(
                 'https://auth.calendly.com/oauth/token', data=data,
                 headers={
-                    'Authorization': 'Basic ' + b64,
+                    'Authorization': 'Basic ' + cient_id_secret,
                     'content-type': 'application/x-www-form-urlencoded'})
 
             #raise UserError(response.json())
@@ -78,5 +78,10 @@ class CalendlyCallbackController(http.Controller):
             'calendly_token_validity':token_validity,
             'calendly_generated_access_token': True,
         }
+
+    @http.route('/calendly/events', type='http', auth='public', website=True)
+    def update_calendly_events(self, **kw):
+        pass
+        
 
             

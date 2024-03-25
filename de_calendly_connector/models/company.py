@@ -6,7 +6,9 @@ from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 import json
 import base64
+from urllib.parse import urlencode
 
+import http.client
 
 CALENDLY_BASE_URL = 'https://api.calendly.com'
 
@@ -281,16 +283,53 @@ class ResCompany(models.Model):
         return partner or False  # Return the existing or newly created partner record
 
     # Webhook
-    def _get_calendly_webhook_subscriptions(self, organization=None, user=None):
+    def _create_calendly_webhook_subscription(self, organization=None, user=None):
         url = f'{CALENDLY_BASE_URL}/webhook_subscriptions'
+        client_id = self.calendly_client_id
+        client_secret = self.calendly_client_secret
+        conn = http.client.HTTPSConnection("api.calendly.com")
+        payload = {
+            "url": self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/calendly/invitee/created',
+            "events": ["invitee.created"],
+            "scope": "organization",
+            "signing_key": self.calendly_webhook_signing_key,
+        }
+        if organization:
+            payload['organization'] = organization
+        if user:
+            payload['user'] = user
+        client_id_secret = str(client_id + ":" + client_secret).encode('utf-8')
+        client_id_secret = base64.b64encode(client_id_secret).decode('utf-8')
+        
+        #raise UserError(client_id_secret)
+        headers = {
+            'Authorization': 'Bearer ' + self.calendly_access_token,
+            'Content-Type': 'application/json'  # Changed content type to JSON
+        }
+        json_payload = json.dumps(payload)  # Convert payload to JSON format
+        conn.request("POST", "/webhook_subscriptions", json_payload, headers)  # Send JSON payload
+        res = conn.getresponse()
+        data = res.read()
+        return data.decode("utf-8")
+
+    def _get_calendly_webhook_subscriptions(self, organization=None, user=None):
+        base_url = 'api.calendly.com'
+        endpoint = '/webhook_subscriptions'
+        conn = http.client.HTTPSConnection(base_url)
         params = {}
         if organization:
             params['organization'] = organization
         if user:
             params['user'] = user
         params['scope'] = 'organization'
+        url = f"{endpoint}?{urlencode(params)}"  # Include parameters in the URL
+        conn.request("GET", url, headers=self._get_calendly_api_header())
+        res = conn.getresponse()
+        data = res.read()
+        return data.decode("utf-8")
+
         
-        headers = self._get_calendly_api_header()
-        response = requests.get(url, params=params, headers=headers)
-        return self._handle_response(response)
+        #headers = self._get_calendly_api_header()
+        #response = requests.get(url, params=params, headers=headers)
+        #return self._handle_response(response)
 
