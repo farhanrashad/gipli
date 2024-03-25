@@ -19,11 +19,19 @@ class CalendarEvent(models.Model):
     # Compute Methods
     @api.depends('calendly_uri')
     def _compute_calendly(self):
-        self.is_calendly = self.env.user.company_id.is_calendly
+        for record in self:
+            if record.calendly_uri:
+                record.is_calendly = True
+            else:
+                record.is_calendly = False
         
     # Actions
     def button_calendly_cancel(self):
-        pass
+        #raise UserError(self.user_id.calendly_uri)
+        #event = self.env.user.company_id.sudo()._get_calendly_event(self.calendly_uri)
+        event = self.env.user.company_id.sudo()._calendly_cancel_event(self.calendly_uri,'test reason')
+        data_str = json.dumps(event, indent=4)
+        raise UserError(data_str)
         
     def action_get_schedule_events2(self):
         self.env.user.sudo()._sync_all_calendly_events()

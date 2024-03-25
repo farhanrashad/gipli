@@ -39,7 +39,20 @@
                         />
             </xpath>
             <xpath expr="//tree" position="inside">
-                <field name="is_calendly" invisible="not is_calendly"/>
+                <field name="calendly_uri" invisible="1"/>
+                <field name="is_calendly" invisible="calendly_uri == False"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_calendar_event_search_inherit_calendly" model="ir.ui.view">
+        <field name="name">view.calendar.event.search</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <separator/>
+                <filter string="Calendly Events" name="calendly_events" domain="[('is_calendly', '=', True)]"/>
             </xpath>
         </field>
     </record>

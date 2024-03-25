@@ -152,7 +152,7 @@ class ResCompany(models.Model):
         #member = item.get('user', [])
         users = self._create_update_user(collection_data)
     
-    # Calendly Event Events
+    # Calendly Events
     def _get_calendly_scheduled_events(self, organization=None, user=None):
         url = f'{CALENDLY_BASE_URL}/scheduled_events'
         params = {}
@@ -165,6 +165,33 @@ class ResCompany(models.Model):
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
 
+    def _get_calendly_event(self, uuid=None, user=None):
+        base_url = 'https://api.calendly.com'
+        endpoint = f'/scheduled_events/{uuid}'
+
+        headers = self._get_calendly_api_header()
+        response = requests.get(base_url + endpoint, headers=headers)
+        return self._handle_response(response)
+        
+    def _calendly_cancel_event(self, uuid, reason=False):
+        base_url = 'api.calendly.com'
+        endpoint = f'/scheduled_events/{uuid}/cancellation'
+        conn = http.client.HTTPSConnection(base_url)
+
+        payloads = {}
+        if reason:
+            payloads['reason'] = reason
+
+        url = f"{endpoint}?{urlencode(payloads)}"  # Include parameters in the URL
+        headers = self._get_calendly_api_header()
+        headers['Content-Type'] = 'application/json'  # Set the content type header
+
+        conn.request("POST", url, body='', headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        return data.decode("utf-8")
+
+    # CRUD for Calendly Events
     def _update_calendly_events(self, collection_data):
         calendar_event_obj = self.env['calendar.event']
         for item in collection_data:
@@ -190,7 +217,8 @@ class ResCompany(models.Model):
         #host.sudo().action_reset_password()
         users = []
         for member in event_members:
-            user_info = member.get('user')
+            member_uri = member.get('user')
+            user_info = member_uri.split('/')[-1]
             if user_info:
                 users.append(user_info)
         host = self.env['res.users'].search([('calendly_uri','in',users)],limit=1)
@@ -213,13 +241,14 @@ class ResCompany(models.Model):
         if name and uri and start_time and end_time:
             return {
                 'name': name,
-                'calendly_uri': uri,
+                'calendly_uri': uri.split('/')[-1],
                 'start': start_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'stop': end_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'location': location,
                 'description': description,
                 'user_id': host.id,
                 'partner_ids': partner_ids,
+                'partner_id': self.env.user.partner_id.id,
             }
         else:
             return None
@@ -235,11 +264,12 @@ class ResCompany(models.Model):
         return user
     
     def _prepare_user_values(self, member):
+        url = member.get('uri')
         user = self.env['res.users'].search(['|', ('email', '=', member.get('email')), ('calendly_uri', '=', member.get('uri'))], limit=1)
         if user:
             # Update existing user record if email and uri are found
             user.write({
-                'calendly_uri': member.get('uri'),
+                'calendly_uri': url.split('/')[-1],
                 #'name': member.get('name'),
                 #'login': member.get('name'),
             })
@@ -248,7 +278,7 @@ class ResCompany(models.Model):
             user = self.env['res.users'].create({
                 'name': member.get('name'),
                 'email': member.get('email'),
-                'calendly_uri': member.get('uri'),
+                'calendly_uri': url.split('/')[-1],
                 'login': member.get('email'),
                 'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])]
             })

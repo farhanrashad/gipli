@@ -10,8 +10,8 @@ CALENDLY_BASE_URL = 'https://api.calendly.com'
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    calendly_uri = fields.Char(string='Calendly User URI')
-    calendly_org_uri = fields.Char(string='Calendly Org URI')
+    calendly_uri = fields.Char(string='Calendly User URI', readonly=True)
+    calendly_org_uri = fields.Char(string='Calendly Org URI', readonly=True)
     
     @api.model
     def _sync_all_calendly_events(self):
