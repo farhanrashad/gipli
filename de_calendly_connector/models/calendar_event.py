@@ -10,8 +10,21 @@ import json
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
-    calendly_uri = fields.Char(string='Calendly URI')
+    calendly_uri = fields.Char(string='Calendly URI', readonly=True)
+    is_calendly = fields.Boolean(string='Calendly Event',
+                                 compute='_compute_calendly',
+                                 store=True,
+                                )
 
+    # Compute Methods
+    @api.depends('calendly_uri')
+    def _compute_calendly(self):
+        self.is_calendly = self.env.user.company_id.is_calendly
+        
+    # Actions
+    def button_calendly_cancel(self):
+        pass
+        
     def action_get_schedule_events2(self):
         self.env.user.sudo()._sync_all_calendly_events()
 

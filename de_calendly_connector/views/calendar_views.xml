@@ -8,6 +8,23 @@
             <xpath expr="//button[@name='set_discuss_videocall_location']" position="after">
                 <button name="test_users" type="object" string="User Lists"  />
             </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="calendly" string="Calendly" invisible="not calendly_uri">
+                    <group>
+                        <group>
+                            <field name="is_calendly" invisible="1"/>
+                            <field name="calendly_uri" />
+                        </group>
+                        <group>
+                            <button name="button_calendly_cancel" 
+                                type="object" 
+                                string="Cancel Event"
+                                class="btn-primary"
+                            />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
 
@@ -21,6 +38,11 @@
                         string="Sync. Calendly"  display="always"
                         />
             </xpath>
+            <xpath expr="//tree" position="inside">
+                <field name="is_calendly" invisible="not is_calendly"/>
+            </xpath>
         </field>
     </record>
+
+    
 </odoo>
