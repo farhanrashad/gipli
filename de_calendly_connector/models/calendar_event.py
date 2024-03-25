@@ -17,6 +17,8 @@ class CalendarEvent(models.Model):
 
     def action_get_schedule_events(self):
         company_id = self.env.user.company_id
+        #company_id._refresh_calendly_access_token()
+        
         current_user = company_id.get_current_user()
         org_uri = current_user['resource']['current_organization']
 
