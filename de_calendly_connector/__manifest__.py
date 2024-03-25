@@ -24,6 +24,7 @@ Calendly Connector
         'views/cal_instance_views.xml',
         'views/calendar_views.xml',
         'views/calendly_event_type_views.xml',
+        'wizards/calendly_cancel_event_views.xml',
     ],
     'assets': {
         'web.assets_backend': [

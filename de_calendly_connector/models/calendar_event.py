@@ -27,11 +27,20 @@ class CalendarEvent(models.Model):
         
     # Actions
     def button_calendly_cancel(self):
+        self.ensure_one()
+        return {
+            'name': 'Cancel Events',
+            'view_mode': 'form',
+            'res_model': 'calendly.cancel.event.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+        
         #raise UserError(self.user_id.calendly_uri)
         #event = self.env.user.company_id.sudo()._get_calendly_event(self.calendly_uri)
-        event = self.env.user.company_id.sudo()._calendly_cancel_event(self.calendly_uri,'test reason')
-        data_str = json.dumps(event, indent=4)
-        raise UserError(data_str)
+        #event = self.env.user.company_id.sudo()._calendly_cancel_event(self.calendly_uri,'test reason')
+        #data_str = json.dumps(event, indent=4)
+        #raise UserError(data_str)
         
     def action_get_schedule_events2(self):
         self.env.user.sudo()._sync_all_calendly_events()
