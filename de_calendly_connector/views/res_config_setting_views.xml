@@ -38,7 +38,7 @@
                             </div>
                             <div class="mt8 row" style="text-wrap: nowrap;!important">
                                 <div><strong>Kindly note your Calendly Callback URI</strong></div>
-                                <field name ="calendly_callback_uri" style="text-wrap: nowrap;!important"/>
+                                <field name ="display_calendly_callback_uri" style="text-wrap: nowrap;!important"/>
                             </div>
                             
                         </div>

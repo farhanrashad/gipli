@@ -23,7 +23,7 @@ class CalendlyCallbackController(http.Controller):
         user_id = request.uid
         client_id = company_id.calendly_client_id
         client_secret = company_id.calendly_client_secret
-        redirect_uri = "https://g2020-dev17-12386251.dev.odoo.com/calendly/callback"
+        redirect_uri = request.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/calendly/oauth'
 
         #raise UserError(kw.get('code'))
         
@@ -31,8 +31,6 @@ class CalendlyCallbackController(http.Controller):
             #response = company_id._generate_calendly_token(kw.get('code'))
             #self._prepare_calendly_token_values(response)
             #raise UserError(response)
-            
-            
             data = {
                 'code': kw.get('code'),
                 'redirect_uri': redirect_uri,

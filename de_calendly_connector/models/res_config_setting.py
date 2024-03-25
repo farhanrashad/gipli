@@ -19,23 +19,23 @@ class ResConfigSettings(models.TransientModel):
     calendly_webhook_signing_key = fields.Char(related="company_id.calendly_webhook_signing_key", readonly=False)
     
     calendly_generated_access_token = fields.Boolean(related="company_id.calendly_generated_access_token")
-    calendly_callback_uri = fields.Char(string='Base URL', 
+    
+    display_calendly_callback_uri = fields.Char(string='Base URL', 
                            default=lambda s: s._default_base_url(),
-                           compute='_compute_callback_url',
+                           compute='_compute_calendly_callback_url',
                            readonly=True,
                           )
-    #calendly_callback_uri = fields.Char(related="company_id.calendly_callback_uri")
 
-    def _compute_callback_url(self):
+    @api.depends('calendly_client_id')
+    def _compute_calendly_callback_url(self):
         url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/calendly/oauth'
-        self.write({
-            'calendly_callback_uri': url
-        })
+        self.display_calendly_callback_uri = url
+            
     def action_generate_access_token(self):
         client_id = self.calendly_client_id
         client_secret = self.calendly_client_secret
-        redirect_url = self.base_url + str(self.calendly_callback)
-        #self.calendly_callback_uri = redirect_url
+        redirect_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/calendly/oauth'
+        
 
         url = (
             "https://auth.calendly.com/oauth/authorize?response_type=code"

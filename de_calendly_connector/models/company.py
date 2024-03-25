@@ -17,18 +17,17 @@ class ResCompany(models.Model):
     calendly_client_id = fields.Char(string='Client ID')
     calendly_client_secret = fields.Char(string='Client secret')
     calendly_webhook_signing_key = fields.Char(string='Webhook signing key')
-    calendly_callback = fields.Char(string='Callback')
-    calendly_callback_uri = fields.Char(string='Callback URI')
-    
+        
     calendly_access_token = fields.Char(string='Access Token')
     calendly_refresh_token = fields.Char(string='Refresh Token')
     calendly_token_validity = fields.Datetime('Token Validity', copy=False)
     calendly_generated_access_token = fields.Boolean(string='Access Token Generated')
 
     def _generate_calendly_token(self, code):
+        redirect_uri = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/calendly/oauth'
         data = {
             'code': code,
-            'redirect_uri': self.calendly_callback_uri,
+            'redirect_uri': redirect_uri,
             'grant_type': 'authorization_code'
         }
         client_id_secret = str(
@@ -44,7 +43,7 @@ class ResCompany(models.Model):
         return self._handle_response(response)
 
     
-    def _get_header(self):
+    def _get_calendly_api_header(self):
         access_token = self.calendly_access_token
         token_validity = self.calendly_token_validity
         if access_token and token_validity and datetime.now() < token_validity:
@@ -106,7 +105,7 @@ class ResCompany(models.Model):
     def get_current_user(self):
         url = f'{CALENDLY_BASE_URL}/users/me'
         params = {}
-        headers = self._get_header()
+        headers = self._get_calendly_api_header()
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
 
@@ -115,7 +114,7 @@ class ResCompany(models.Model):
         params = {}
         if user:
             params['user'] = user
-        headers = self._get_header()
+        headers = self._get_calendly_api_header()
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
         
@@ -126,7 +125,7 @@ class ResCompany(models.Model):
             params['organization'] = organization
         if user:
             params['user'] = user
-        headers = self._get_header()
+        headers = self._get_calendly_api_header()
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
 
@@ -138,7 +137,7 @@ class ResCompany(models.Model):
             params['organization'] = organization
         if user:
             params['user'] = user
-        headers = self._get_header()
+        headers = self._get_calendly_api_header()
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
 
@@ -160,7 +159,7 @@ class ResCompany(models.Model):
         if user:
             params['user'] = user
 
-        headers = self._get_header()
+        headers = self._get_calendly_api_header()
         response = requests.get(url, params=params, headers=headers)
         return self._handle_response(response)
 
@@ -280,4 +279,18 @@ class ResCompany(models.Model):
                 'type': 'contact',
             })
         return partner or False  # Return the existing or newly created partner record
+
+    # Webhook
+    def _get_calendly_webhook_subscriptions(self, organization=None, user=None):
+        url = f'{CALENDLY_BASE_URL}/webhook_subscriptions'
+        params = {}
+        if organization:
+            params['organization'] = organization
+        if user:
+            params['user'] = user
+        params['scope'] = 'organization'
+        
+        headers = self._get_calendly_api_header()
+        response = requests.get(url, params=params, headers=headers)
+        return self._handle_response(response)
 
