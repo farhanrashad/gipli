@@ -15,7 +15,7 @@ _logger = logging.getLogger(__name__)
 
 class CalendlyCallbackController(http.Controller):
 
-    @http.route('/calendly/callback', type='http', auth='public', website=True)
+    @http.route('/calendly/oauth', type='http', auth='public', website=True)
     def handle_calendly_callback(self, **kw):
 
         company_id = request.env.user.company_id or http.request.env['res.users'].sudo().browse(

@@ -10,12 +10,16 @@
                     <setting id="is_calendly" 
                         string="Calendly" 
                         help="Synchronize your calendar with Calendly Meetings"
-                        documentation="/applications/finance/accounting/taxation/taxes/avatax.html">
+                        documentation="https://developer.calendly.com/console/apps">
                         <field name="is_calendly" />
-                    </setting>
-                    <setting/>
-                    <setting id="authentication" invisible="not is_calendly">
-                        <div class="content-group">
+
+                        <div class="text-start" style="position:relative;">
+                            <a class="oe_link" href="https://developer.calendly.com/console/apps" target="_blank">
+                                <i class="oi oi-arrow-right"/>
+                                Sign up to MapBox to get a free token
+                            </a>
+                        </div>
+                        <div class="mt0 content-group">
                             <div class="mt16 row">
                                 <label for="calendly_client_id" string="Client ID" class="col-3 col-lg-3 o_light_label"/>
                                 <field name="calendly_client_id" required="is_calendly" nolabel="1"/>
@@ -28,22 +32,17 @@
                                 <label for="calendly_webhook_signing_key" string="Webhook signing key" class="col-3 col-lg-3 o_light_label"/>
                                 <field name="calendly_webhook_signing_key" required="is_calendly" password="True" nolabel="1"/>
                             </div>
+                            <div class="row mt16 col-6 col-lg-6">
+                                <field name ="calendly_generated_access_token" invisible="1" />
+                                <button name="action_generate_access_token" type="object" string="Generate Token" class="btn-primary"/>
+                            </div>
+                            <div class="mt8 row" style="text-wrap: nowrap;!important">
+                                <div><strong>Kindly note your Calendly Callback URI</strong></div>
+                                <field name ="calendly_callback_uri" style="text-wrap: nowrap;!important"/>
+                            </div>
+                            
                         </div>
-                    </setting>
-                    <setting/>
-                    <setting string="Callback URI" invisible="not is_calendly">
-                        <div class="mt16 row" style="text-wrap: nowrap;!important">
-                            <field name ="base_url" style="text-wrap: nowrap;!important"/>
-                            <newline/>
-                            <field name ="calendly_callback" required="is_calendly" placeholder="e.g oauth/calendly"/>
-                        </div>          
-                    </setting>
-                    <setting/>
-                    <setting invisible="not is_calendly">
-                        <div class="mt16 row col-6 col-lg-6">
-                            <field name ="calendly_generated_access_token" invisible="1" />
-                            <button name="action_generate_access_token" type="object" string="Generate Token" class="btn-primary"/>
-                        </div>
+                        
                     </setting>
                 </block>
             </xpath>
