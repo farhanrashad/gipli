@@ -12,6 +12,7 @@ CALENDLY_BASE_URL = 'https://api.calendly.com'
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
+    is_calendly = fields.Boolean('Calendly')
     calendly_client_id = fields.Char(string='Client ID')
     calendly_client_secret = fields.Char(string='Client secret')
     calendly_access_token = fields.Char(string='Access Token')
@@ -19,6 +20,7 @@ class ResCompany(models.Model):
     calendly_generated_access_token = fields.Boolean(string='Access Token Generated')
     calendly_token_validity = fields.Datetime('Token Validity', copy=False)
     calendly_callback = fields.Char(string='Callback')
+    calendly_callback_uri = fields.Char(string='Callback URI')
    
 
     def _get_header(self):
