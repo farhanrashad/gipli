@@ -11,11 +11,16 @@ from urllib.parse import urlencode
 import http.client
 import urllib.parse
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
+
 DISCORD_BASE_URL = 'https://discord.com/api/v10'
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
-
+    
     is_discord = fields.Boolean('Discord')
     discord_client_id = fields.Char(string='Client ID')
     discord_client_secret = fields.Char(string='Client secret')
@@ -71,10 +76,10 @@ class ResCompany(models.Model):
                         'discord_token_validity':token_validity,
                         'discord_refresh_token': response.json().get('refresh_token'),
                     })
-                    # Process the new access token data here
                 except requests.exceptions.HTTPError as err:
                     # Handle HTTP errors
-                    raise UserError(f"Response text: {response.text}")
+                    _logger.error(f"HTTP Error: {err}")
+                    _logger.error(f"Response text: {response.text}")
                 except Exception as e:
                     # Handle other exceptions
-                    raise UserError(f"Error: {e}")
+                    _logger.error(f"Error: {e}")

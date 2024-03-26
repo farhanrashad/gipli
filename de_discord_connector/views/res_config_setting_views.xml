@@ -7,33 +7,28 @@
         <field name="arch" type="xml">
             <xpath expr="//app[@name='general_settings']" position="inside">
                 <block id="discord" title="Discord Settings">
-                    <setting id="is_discord" 
+                    <setting id="group_discord" 
                         string="Discord" 
                         help="Synchronize your messages with Discord"
                         documentation="https://developer.discord.com/console/apps">
-                        <field name="is_discord" />
+                        <field name="group_discord" />
 
-                        <div class="text-start" style="position:relative;" invisible="not is_discord">
+                        <div class="text-start" style="position:relative;" invisible="not group_discord">
                             <a class="oe_link" href="https://discord.com/developers/applications" target="_blank">
                                 <i class="oi oi-arrow-right"/>
                                 Sign up to Discord to get a token
                             </a>
                         </div>
-                        <div class="mt0 content-group" invisible="not is_discord">
+                        <div class="mt0 content-group" invisible="not group_discord">
                             <div class="mt16 row">
                                 <label for="discord_client_id" string="Client ID" class="col-3 col-lg-3 o_light_label"/>
-                                <field name="discord_client_id" required="is_discord" nolabel="1"/>
+                                <field name="discord_client_id" required="group_discord" nolabel="1"/>
                             </div>
                             <div class="mt16 row">
                                 <label for="discord_client_secret" string="Client Secret" class="col-3 col-lg-3 o_light_label"/>
-                                <field name="discord_client_secret" required="is_discord" password="True" nolabel="1"/>
-                            </div>
-                            <div class="mt16 row">
-                                <label for="discord_webhook_signing_key" string="Webhook signing key" class="col-3 col-lg-3 o_light_label"/>
-                                <field name="discord_webhook_signing_key" required="is_discord" password="True" nolabel="1"/>
+                                <field name="discord_client_secret" required="group_discord" password="True" nolabel="1"/>
                             </div>
                             <div class="row mt16 col-6 col-lg-6">
-                                <field name ="discord_generated_access_token" invisible="1" />
                                 <button name="action_discord_generate_access_token" type="object" string="Generate Token" class="btn-primary"/>
                             </div>
                             <div class="mt8 row" style="text-wrap: nowrap;!important">

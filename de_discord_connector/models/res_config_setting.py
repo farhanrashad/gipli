@@ -13,12 +13,13 @@ class ResConfigSettings(models.TransientModel):
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/discord/oauth'
         return base_url
 
-    is_discord = fields.Boolean(related='company_id.is_discord', readonly=False)
-    discord_client_id = fields.Char(related="company_id.discord_client_id", readonly=False)
-    discord_client_secret = fields.Char(related="company_id.discord_client_secret", readonly=False)
-    discord_webhook_signing_key = fields.Char(related="company_id.discord_webhook_signing_key", readonly=False)
-    
-    discord_generated_access_token = fields.Boolean(related="company_id.discord_generated_access_token")
+    group_discord = fields.Boolean(string="Discord", implied_group='de_discord_connector.group_discuss_discord')
+    discord_client_id = fields.Char(
+        string='Discord Client ID',
+        config_parameter='discord.client_id')
+    discord_client_secret = fields.Char(
+        string='Discord Client Secret',
+        config_parameter='discord.client_secret')
     
     display_discord_callback_uri = fields.Char(string='Base URL', 
                            default=lambda s: s._default_base_url(),

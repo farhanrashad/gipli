@@ -19,6 +19,7 @@ Discord Connector
 
     # always loaded
     'data': [
+        'security/discord_security.xml',
         # 'security/ir.model.access.csv',
         'data/res_partner_data.xml',
         'data/res_users_data.xml',
