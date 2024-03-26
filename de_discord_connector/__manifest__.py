@@ -20,8 +20,7 @@ Discord Connector
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'views/views.xml',
-        'views/templates.xml',
+        'views/res_config_setting_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
