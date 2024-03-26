@@ -46,5 +46,5 @@ class ResConfigSettings(models.TransientModel):
         return {
             "type": 'ir.actions.act_url',
             "url": url,
-            #"target": "current"
+            "target": 'self',  # Open in the same window
         }

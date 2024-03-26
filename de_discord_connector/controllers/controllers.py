@@ -39,6 +39,8 @@ class DiscordCallbackController(http.Controller):
             response.raise_for_status()
             #return response.json()
             company_id.write(self._prepare_discord_token_values(response))
+        # Redirect using Python code
+        return request.redirect(request.httprequest.referrer or '/')
             
 
     def _prepare_discord_token_values(self, response):
