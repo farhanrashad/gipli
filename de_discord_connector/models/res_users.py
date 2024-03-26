@@ -132,7 +132,7 @@ class ResUsers(models.Model):
 
     def _get_discord_channels11(self):
         # Replace with your Discord authentication token
-        bot_token = "MTIyMjI3NDgxNTkyNzI1OTE4Ng.GnZNjy.Av35n2jYuxQE7JTANWYo2NkcaJt9bXQqZygPmc"        
+        bot_token = ""        
         guilds_endpoint = "https://discord.com/api/v10/users/@me/guilds"
         # Set headers with authorization token
         headers = {
