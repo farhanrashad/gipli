@@ -23,7 +23,7 @@ class ResConfigSettings(models.TransientModel):
     display_calendly_callback_uri = fields.Char(string='Base URL', 
                            default=lambda s: s._default_base_url(),
                            compute='_compute_calendly_callback_url',
-                           readonly=True,
+                           readonly=True, copy=False,
                           )
 
     @api.depends('calendly_client_id')
@@ -31,7 +31,7 @@ class ResConfigSettings(models.TransientModel):
         url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/calendly/oauth'
         self.display_calendly_callback_uri = url
             
-    def action_generate_access_token(self):
+    def action_calendly_access_token(self):
         client_id = self.calendly_client_id
         client_secret = self.calendly_client_secret
         redirect_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/calendly/oauth'
