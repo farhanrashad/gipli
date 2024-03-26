@@ -348,7 +348,8 @@ class ResCompany(models.Model):
         conn.request("GET", url, headers=self._get_calendly_api_header())
         res = conn.getresponse()
         data = res.read()
-        return data.decode("utf-8")
+        json_data = json.loads(data.decode("utf-8"))
+        return json_data
 
         
         #headers = self._get_calendly_api_header()

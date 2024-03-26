@@ -7,6 +7,11 @@ from odoo import http, _
 from odoo.http import request
 import json
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
+
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
@@ -128,3 +133,17 @@ class CalendarEvent(models.Model):
         subscriptions = company_id._get_calendly_webhook_subscriptions(org_uri, user=False)
         data_str = json.dumps(subscriptions, indent=4)
         raise UserError(data_str)
+
+    # action for calendly 
+    @api.model
+    def handle_webhook_event(self, payload):
+        # Process the incoming payload from Calendly and create calendar.event records
+        _logger.info(f"Processing Calendly Event: {payload}")
+        event_data = payload.get('payload', {})
+        # Extract relevant data from event_data and create calendar.event records
+        # Example: Create a calendar event with a name and start date
+        self.env['calendar.event'].create({
+            'name': event_data.get('event_name', ''),
+            'start': event_data.get('event_time', ''),
+            # Add other fields as needed
+        })
