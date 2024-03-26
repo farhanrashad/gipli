@@ -22,6 +22,7 @@ Discord Connector
         # 'security/ir.model.access.csv',
         'data/res_partner_data.xml',
         'data/res_users_data.xml',
+        'data/ir_actions.xml',
         'views/res_config_setting_views.xml',
     ],
     # only loaded in demonstration mode

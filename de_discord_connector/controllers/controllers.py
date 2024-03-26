@@ -51,4 +51,5 @@ class DiscordCallbackController(http.Controller):
             'discord_refresh_token':response.json().get('refresh_token'),
             'discord_token_validity':token_validity,
             'discord_generated_access_token': True,
+            #'discord_authorization_code':
         }
