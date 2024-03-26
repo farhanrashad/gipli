@@ -10,7 +10,7 @@ from urllib.parse import urlencode
 
 import http.client
 
-DISCORD_BASE_URL = 'https://api.discord.com'
+DISCORD_BASE_URL = 'https://discord.com/api/v10'
 
 class ResCompany(models.Model):
     _inherit = 'res.company'

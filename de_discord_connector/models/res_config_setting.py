@@ -24,6 +24,7 @@ class ResConfigSettings(models.TransientModel):
                            default=lambda s: s._default_base_url(),
                            compute='_compute_discord_callback_url',
                            readonly=True,
+                        copy=False,
                           )
 
     @api.depends('discord_client_id')
@@ -31,16 +32,16 @@ class ResConfigSettings(models.TransientModel):
         url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/discord/oauth'
         self.display_discord_callback_uri = url
             
-    def action_generate_access_token(self):
+    def action_discord_generate_access_token(self):
         client_id = self.discord_client_id
         client_secret = self.discord_client_secret
         redirect_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/discord/oauth'
-        
+        scopes = 'identify'
 
         url = (
-            "https://auth.discord.com/oauth/authorize?response_type=code"
-            "&client_id={}&redirect_uri={}"
-        ).format(client_id, redirect_url)
+            "https://discord.com/oauth2/authorize?response_type=code"
+            "&client_id={}&redirect_uri={}&scope={}"
+        ).format(client_id, redirect_url, scopes)
         
         return {
             "type": 'ir.actions.act_url',

@@ -22,39 +22,24 @@ class DiscordCallbackController(http.Controller):
         client_id = company_id.discord_client_id
         client_secret = company_id.discord_client_secret
         redirect_uri = request.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/discord/oauth'
+        API_ENDPOINT = 'https://discord.com/api/v10'
 
         #raise UserError(kw.get('code'))
         
         if kw.get('code'):
             data = {
+                'grant_type': 'authorization_code',
                 'code': kw.get('code'),
-                'redirect_uri': redirect_uri,
-                'grant_type': 'authorization_code'
+                'redirect_uri': redirect_uri
             }
-            cient_id_secret = str(
-                client_id + ":" + client_secret).encode(
-                'utf-8')
-            cient_id_secret = base64.b64encode(cient_id_secret).decode('utf-8')
-            response = requests.post(
-                'https://auth.discord.com/oauth/token', data=data,
-                headers={
-                    'Authorization': 'Basic ' + cient_id_secret,
-                    'content-type': 'application/x-www-form-urlencoded'})
-
-            #raise UserError(response.json())
-            if response.json() and response.json().get('access_token'):
-                company_id.write(self._prepare_discord_token_values(response))
-                close_script = "<script>window.close();</script>"
-                response_msg = {'success': True, 'close_script': close_script}
-                return json.dumps(response_msg)
-                #return "Authentication Success. You Can Close this window"
-            else:
-                raise UserError(
-                    _('Something went wrong during the token generation.'
-                      'Maybe your Authorization Code is invalid'))
-                raise UserError(response.json().get('access_token'))
-                
-            #raise UserError(response)
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+            response = requests.post('%s/oauth2/token' % API_ENDPOINT, data=data, headers=headers, auth=(client_id, client_secret))
+            response.raise_for_status()
+            #return response.json()
+            company_id.write(self._prepare_discord_token_values(response))
+            
 
     def _prepare_discord_token_values(self, response):
         expires_in = response.json().get('expires_in')

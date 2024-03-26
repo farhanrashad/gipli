@@ -13,13 +13,13 @@
                         documentation="https://developer.discord.com/console/apps">
                         <field name="is_discord" />
 
-                        <div class="text-start" style="position:relative;">
-                            <a class="oe_link" href="https://developer.discord.com/console/apps" target="_blank">
+                        <div class="text-start" style="position:relative;" invisible="not is_discord">
+                            <a class="oe_link" href="https://discord.com/developers/applications" target="_blank">
                                 <i class="oi oi-arrow-right"/>
-                                Sign up to MapBox to get a free token
+                                Sign up to Discord to get a token
                             </a>
                         </div>
-                        <div class="mt0 content-group">
+                        <div class="mt0 content-group" invisible="not is_discord">
                             <div class="mt16 row">
                                 <label for="discord_client_id" string="Client ID" class="col-3 col-lg-3 o_light_label"/>
                                 <field name="discord_client_id" required="is_discord" nolabel="1"/>
@@ -34,7 +34,7 @@
                             </div>
                             <div class="row mt16 col-6 col-lg-6">
                                 <field name ="discord_generated_access_token" invisible="1" />
-                                <button name="action_generate_access_token" type="object" string="Generate Token" class="btn-primary"/>
+                                <button name="action_discord_generate_access_token" type="object" string="Generate Token" class="btn-primary"/>
                             </div>
                             <div class="mt8 row" style="text-wrap: nowrap;!important">
                                 <div><strong>Kindly note your Discord Callback URI</strong></div>
