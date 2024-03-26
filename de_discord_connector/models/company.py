@@ -32,43 +32,49 @@ class ResCompany(models.Model):
         companies = self.env['res.company'].search([('active', '=', True), ('discord_refresh_token', '!=', False)])
         API_ENDPOINT = 'https://discord.com/api/v10/oauth2/token'
 
-        for company in companies:
-            client_id = company.discord_client_id
-            client_secret = company.discord_client_secret
-            refresh_token = company.discord_refresh_token
-
-            data = {
-                'grant_type': 'refresh_token',
-                'refresh_token': refresh_token,
-            }
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-            auth = (client_id, client_secret)
-            
-            try:
-                encoded_data = urllib.parse.urlencode(data)
-                #raise UserError(encoded_data)
-                response = requests.post(API_ENDPOINT, data=encoded_data, headers=headers, auth=auth)
-                response.raise_for_status()
-                token_data = response.json()
-
-                company.write({
-                    'discord_access_token': token_data.get('access_token'),
-                    #'discord_token_type': token_data.get('token_type'),
-                    #'discord_token_expires_in': token_data.get('expires_in'),
-                    'discord_refresh_token': token_data.get('refresh_token'),
-                    #'discord_token_scope': token_data.get('scope'),
-                })
-                # Process the new access token data here
-            except requests.exceptions.HTTPError as err:
-                # Handle HTTP errors
-                raise UserError(f"Response text: {response.text}")
-            except Exception as e:
-                # Handle other exceptions
-                raise UserError(f"Error: {e}")
+        client_id = ''
+        client_secret = ''
+        refresh_token = ''
+        data = {}
+        headers = {}
         
-            #company_id.write({
-            #    'discord_access_token': data.get('access_token'),
-            #    'discord_token_validity': fields.Datetime.now() + timedelta(seconds=data.get('expires_in')),
-            #})
+        for company in companies:
+            if company.discord_token_validity and company.discord_token_validity > fields.Datetime.now():
+                return False
+            else:
+                
+                client_id = company.discord_client_id
+                client_secret = company.discord_client_secret
+                refresh_token = company.discord_refresh_token
+    
+                data = {
+                    'grant_type': 'refresh_token',
+                    'refresh_token': refresh_token,
+                }
+                headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+                auth = (client_id, client_secret)
+                
+                try:
+                    encoded_data = urllib.parse.urlencode(data)
+                    #raise UserError(encoded_data)
+                    response = requests.post(API_ENDPOINT, data=encoded_data, headers=headers, auth=auth)
+                    response.raise_for_status()
+                    #token_data = response.json()
+    
+                    expires_in = response.json().get('expires_in')
+                    token_validity = datetime.now() + timedelta(seconds=expires_in)
+            
+                    company.write({
+                        'discord_access_token': response.json().get('access_token'),
+                        'discord_token_validity':token_validity,
+                        'discord_refresh_token': response.json().get('refresh_token'),
+                    })
+                    # Process the new access token data here
+                except requests.exceptions.HTTPError as err:
+                    # Handle HTTP errors
+                    raise UserError(f"Response text: {response.text}")
+                except Exception as e:
+                    # Handle other exceptions
+                    raise UserError(f"Error: {e}")
