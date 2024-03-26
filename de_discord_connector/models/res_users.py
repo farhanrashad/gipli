@@ -31,6 +31,8 @@ class ResUsers(models.Model):
         token_validity = self.env['ir.config_parameter'].sudo().get_param('discord.token_validity')
         
         api_endpoint = 'https://discord.com/api/v10'
+
+        guild_ids = self.env['ir.config_parameter'].sudo().get_param('discord.guild_ids')
         
         return {
             'api_endpoint': api_endpoint, 
@@ -39,6 +41,7 @@ class ResUsers(models.Model):
             'access_token': access_token, 
             'refresh_token': refresh_token, 
             'token_validity': token_validity,
+            'guild_ids': guild_ids,
         }
 
     @api.model
@@ -93,7 +96,8 @@ class ResUsers(models.Model):
     # -------------------------------------------------------------------
     @api.model
     def _syn_all_discord(self):
-        self._get_discord_guild_ids()
+        #self._get_discord_guild_ids()
+        self._get_discord_channels()
         
     def _get_discord_guild_ids(self):
         discord = self._get_discord_config()
@@ -103,12 +107,13 @@ class ResUsers(models.Model):
         headers = {
             'Authorization': f'Bearer {access_token}'
         }
-
+        
         try:
             response = requests.get(API_ENDPOINT, headers=headers)
             response.raise_for_status()  # Check for HTTP errors
     
             guilds = response.json()
+            
             guild_ids = [guild['id'] for guild in guilds]
             guild_ids_str = ','.join(guild_ids)
             self.env['ir.config_parameter'].sudo().set_param('discord.guild_ids', guild_ids_str)
@@ -124,6 +129,95 @@ class ResUsers(models.Model):
             # Handle other exceptions
             _logger.error(f"Error: {e}")
             return False
+
+    def _get_discord_channels11(self):
+        # Replace with your Discord authentication token
+        bot_token = "MTIyMjI3NDgxNTkyNzI1OTE4Ng.GnZNjy.Av35n2jYuxQE7JTANWYo2NkcaJt9bXQqZygPmc"        
+        guilds_endpoint = "https://discord.com/api/v10/users/@me/guilds"
+        # Set headers with authorization token
+        headers = {
+            "Authorization": f"Bot {bot_token}",
+            'User-Agent': 'odoo-integration-01',
+        }
+        # Send GET request to guilds endpoint
+        response = requests.get(guilds_endpoint, headers=headers)
+        raise UserError(response)
+
+        # Check for successful response
+        if response.status_code == 200:
+            # Parse JSON data
+            data = response.json()
+  
+            # Iterate through guilds and get channels
+            
+            for guild in data:
+                guild_id = guild["id"]
+                channels_endpoint = f"https://discord.com/api/v10/guilds/1222200693545242676/channels"
+                channel_response = requests.get(channels_endpoint, headers=headers)
+              
+                if channel_response.status_code == 200:
+                    channel_data = channel_response.json()
+                    # Process channel data (e.g., print channel names)
+                    for channel in channel_data:
+                        raise UserError(f"Guild: {guild['name']}, Channel: {channel['name']}")
+        else:
+            raise UserError("Error retrieving guilds:", response.text)
+
+
+    def _get_discord_channels(self):
+        discord = self._get_discord_config()
+        
+        API_ENDPOINT = discord['api_endpoint']
+        access_token = self._get_discord_access_token()
+        guild_ids = discord['guild_ids']
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'User-Agent': 'odoo-integration-01',
+        }
+
+        if not guild_ids:
+            return False  # Server IDs are not available
+
+        server_ids = guild_ids.split(',')
+        
+        for server_id in server_ids:
+        
+            api_url = f'{API_ENDPOINT}/guilds/{server_id}/channels'
+            #raise UserError(api_url)
+            response = requests.get(api_url, headers=headers)
+            response.raise_for_status()  # Check for HTTP errors
+            channels = response.json()
+            
+            
+        try:
+            response = requests.get(api_url, headers=headers)
+            response.raise_for_status()  # Check for HTTP errors
+            channels = response.json()
+            raise UserError(channels)
+            for channel in channels:
+                existing_channel = self.env['discuss.channel'].search([
+                    ('discord_channel_id', '=', channel['id'])
+                ], limit=1)
+                if existing_channel:
+                    existing_channel.write(channel_values)
+                else:
+                    self.env['discuss.channel'].create(channel_values)
+        except requests.exceptions.HTTPError as err:
+            # Handle HTTP errors
+            _logger.error(f"HTTP Error: {err}")
+            _logger.error(f"Response text: {response.text}")
+            return False
+
+        except Exception as e:
+            # Handle other exceptions
+            _logger.error(f"Error: {e}")
+            return False
+
+    def _prepare_discuss_channel_values(self, channel):
+        return {
+            'name': channel.get('name'),
+            'discord_channel_id': channel.get('id'),
+        }
 
 
 
