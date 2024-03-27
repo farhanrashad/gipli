@@ -122,7 +122,7 @@
                                 Set an Email Template on Stages
                             </div>
                             <div class="mt-3">
-                                <button name="%(helpdesk.helpdesk_stage_action)d" type="action" string="Set an Email Template on Stages" icon="oi-arrow-right" class="btn-link" context="{'search_default_team_ids': name}"/>
+                                <button name="%(action_ticket_stage)d" type="action" string="Set an Email Template on Stages" icon="oi-arrow-right" class="btn-link" context="{'search_default_team_ids': name}"/>
                             </div>
                         </setting>
                     </div>

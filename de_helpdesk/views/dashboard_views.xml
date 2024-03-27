@@ -27,10 +27,10 @@
                                         <span>Reporting</span>
                                     </h5>
                                     <div role="menuitem" class="text-nowrap">
-                                        <a name="%(helpdesk.helpdesk_ticket_analysis_dashboard_action)d" type="action" context="{'search_default_team_id': id}">Tickets Analysis</a>
+                                        <a name="action_view_ticket_analysis" type="object" context="{'search_default_team_id': id}">Tickets Analysis</a>
                                     </div>
                                     <div role="menuitem" class="text-nowrap">
-                                        <a name="%(helpdesk.helpdesk_sla_report_analysis_dashboard_action)d" type="action" context="{'search_default_team_id': id}">SLA Status Analysis</a>
+                                        <a name="action_view_sla_analysis" type="object" context="{'search_default_team_id': id}">SLA Status Analysis</a>
                                     </div>
                                 </div>
                             </div>

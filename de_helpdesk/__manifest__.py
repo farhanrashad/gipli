@@ -34,12 +34,13 @@ Features:
         'views/helpdesk_menu.xml',
         'views/ticket_tags_views.xml',
         'views/ticket_activity_type_views.xml',
+        'views/ticket_stages_views.xml',
         'views/project_team_views.xml',
         'views/project_sla_views.xml',
         'views/ticket_type_views.xml',
-        'views/ticket_stages_views.xml',
         'views/dashboard_views.xml',
         'views/ticket_views.xml',
+        'views/helpdesk_portal_templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
