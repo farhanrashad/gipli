@@ -232,24 +232,35 @@ class ResUsers(models.Model):
         headers = {
             "Authorization": f"Bot {access_token}"
         }
-        
+
+        discord_partner_id = self.env.ref('de_discord_connector.partner_discord')
         channel_ids = self.env['discuss.channel'].search([('discord_channel_id','!=', False)])
+        old_message_id = self.env['mail.message']
+        
         for channel_id in channel_ids:
             api_url = f'{API_ENDPOINT}/channels/{channel_id.discord_channel_id}/messages'
             response = requests.get(api_url, headers=headers)
             response.raise_for_status()  # Check for HTTP errors
             messages = response.json()
             for message in messages:
-                self.env['mail.message'].create({
-                    'model': 'discuss.channel',
-                    'res_id': channel_id.id,
-                    'record_name': channle_id.name,
-                    'date': message.get('timestamp'),
-                    'message_type': 'comment',
-                    'subtype_id': ,
-                })
+                old_message_id = self.env['mail.message'].search([('discord_message_id','=', message.get('id'))],limit=1)
+                if not old_message_id:
+                    message_id = channel_id.sudo().message_post(
+                        body=message.get('content'), 
+                        subtype_xmlid="mail.mt_comment", 
+                        author_id=discord_partner_id.id,
+                        date = datetime.strptime(message.get('timestamp'), '%Y-%m-%dT%H:%M:%S.%f+00:00'),
+                        message_type="comment",
+                    )
+                    message_id.write({
+                        'discord_message_id': message.get('id'),
+                    })
+                else:
+                    old_message_id.write({
+                        'body': message.get('content'),
+                    })
             data_str = json.dumps(messages, indent=4)
-            raise UserError(data_str)
+            #raise UserError(data_str)
         
         
     
