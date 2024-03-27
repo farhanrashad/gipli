@@ -105,7 +105,8 @@ class ResUsers(models.Model):
     def _syn_all_discord(self):
         #self._get_discord_guild_ids()
         #self._get_discord_channels()
-        self._get_discord_messages()
+        #self._get_discord_messages()
+        self._send_message_to_discord()
         
     def _get_discord_guild_ids(self):
         discord = self._get_discord_config()
@@ -262,5 +263,27 @@ class ResUsers(models.Model):
             data_str = json.dumps(messages, indent=4)
             #raise UserError(data_str)
         
+    # Messages
+    def _send_message_to_discord(self):
+        user_id = self.env.user
+        discord = user_id._get_discord_config()
+        API_ENDPOINT = discord['api_endpoint']
+        access_token = user_id._get_discord_access_token('bot')
+        discord_channel_id = self.env['discuss.channel'].browse(25).discord_channel_id
+        headers = {
+            "Authorization": f"Bot {access_token}",
+            'Content-Type': 'application/json',
+        }
+        message_content = 'Hello, World!'  # Replace with your desired message content
+        tts = False  # Set to True if you want the message to be text-to-speech
+
+        api_url = f'{API_ENDPOINT}/channels/{discord_channel_id}/messages'
+        message_data = {
+            'content': message_content,
+            'tts': tts,
+        }
         
+        # Send the POST request to create the message
+        response = requests.post(api_url, headers=headers, json=message_data)
+
     
