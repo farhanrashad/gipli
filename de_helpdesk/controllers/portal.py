@@ -3,7 +3,7 @@ from operator import itemgetter
 from markupsafe import Markup
 
 from odoo import conf, http, _
-from odoo.exceptions import AccessError, MissingError
+from odoo.exceptions import AccessError, MissingError, UserError
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 #from odoo.tools import groupby as groupbyelem
@@ -20,24 +20,21 @@ class TicketCustomerPortal(CustomerPortal):
                 if request.env['project.task'].check_access_rights('read', raise_exception=False) else 0
         return values
         
-    def _ticket_get_page_view_values(self, ticket, access_token, **kwargs):
-        project = kwargs.get('project')
-        if project:
-            project_accessible = True
-            page_name = 'project_ticket'
-            history = 'my_project_tickets_history'
-        else:
-            page_name = 'ticket'
-            history = 'my_tickets_history'
-            try:
-                project_accessible = bool(ticket.project_id.id and self._document_check_access('project.project', ticket.project_id.id))
-            except (AccessError, MissingError):
-                project_accessible = False
+    def _ticket_get_page_view_values(self, ticket_id, access_token, **kwargs):
+        
+        page_name = 'ticket'
+        history = 'my_tickets_history'
+        #try:
+        #    project_accessible = bool(ticket.project_id.id and self._document_check_access('project.project', ticket.project_id.id))
+        #except (AccessError, MissingError):
+        #    project_accessible = False
+        ticket = request.env['project.task'].browse(ticket_id)
+        #raise UserError(ticket)
         values = {
             'page_name': page_name,
-            'ticket': ticket,
+            'ticket': ticket.sudo(),
             'user': request.env.user,
-            'project_accessible': project_accessible,
+            #'project_accessible': project_accessible,
             'ticket_link_section': [],
             'preview_object': ticket,
         }
@@ -126,7 +123,7 @@ class TicketCustomerPortal(CustomerPortal):
     def _prepare_tickets_values(self, page, date_begin, date_end, sortby, search, search_in, groupby, url="/my/desk/tickets", domain=None, su=False, project=False):
         values = self._prepare_portal_layout_values()
 
-        Ticket = request.env['project.task']
+        Ticket = request.env['project.task'].search([])
         searchbar_sortings = dict(sorted(self._ticket_get_searchbar_sortings(project).items(),
                                          key=lambda item: item[1]["sequence"]))
         searchbar_inputs = self._ticket_get_searchbar_inputs(project)
@@ -134,18 +131,16 @@ class TicketCustomerPortal(CustomerPortal):
 
         if not domain:
             domain = []
-        if not su and Ticket.check_access_rights('read'):
-            domain = AND([domain, request.env['ir.rule']._compute_domain(Ticket._name, 'read')])
+        #if not su and Ticket.check_access_rights('read'):
+        #    domain = AND([domain, request.env['ir.rule']._compute_domain(Ticket._name, 'read')])
         Ticket_sudo = Ticket.sudo()
 
         # default sort by value
-        if not sortby or (sortby == 'milestone' and not milestones_allowed):
-            sortby = 'date'
+       
         order = searchbar_sortings[sortby]['order']
         
         # default group by value
-        if not groupby or (groupby == 'milestone' and not milestones_allowed):
-            groupby = 'project'
+        
 
         if date_begin and date_end:
             domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
@@ -156,42 +151,8 @@ class TicketCustomerPortal(CustomerPortal):
             domain += self._ticket_get_search_domain(search_in, search)
 
         # content according to pager and archive selected
-        #order = self._ticket_get_order(order, groupby)
-
-        def get_grouped_tickets(pager_offset):
-            tickets = Ticket_sudo.search(domain, order=order, limit=self._items_per_page, offset=pager_offset)
-            request.session['my_project_tickets_history' if url.startswith('/my/projects') else 'my_tickets_history'] = tickets.ids[:100]
-
-            
-
-            groupby_mapping = self._ticket_get_groupby_mapping()
-            group = groupby_mapping.get(groupby)
-            if group:
-                if group == 'milestone_id':
-                    grouped_tickets = [Ticket_sudo.concat(*g) for k, g in groupbyelem(tickets_project_allow_milestone, itemgetter(group))]
-
-                    if not grouped_tickets:
-                        if tickets_no_milestone:
-                            grouped_tickets = [tickets_no_milestone]
-                    else:
-                        if grouped_tickets[len(grouped_tickets) - 1][0].milestone_id and tickets_no_milestone:
-                            grouped_tickets.append(tickets_no_milestone)
-                        else:
-                            grouped_tickets[len(grouped_tickets) - 1] |= tickets_no_milestone
-
-                else:
-                    grouped_tickets = [Ticket_sudo.concat(*g) for k, g in groupbyelem(tickets, itemgetter(group))]
-            else:
-                grouped_tickets = [tickets] if tickets else []
-
-
-            ticket_states = dict(Ticket_sudo._fields['state']._description_selection(request.env))
-            if sortby == 'status':
-                if groupby == 'none' and grouped_tickets:
-                    grouped_tickets[0] = grouped_tickets[0].sorted(lambda tickets: tickets_states.get(tickets.state))
-                else:
-                    grouped_tickets.sort(key=lambda tickets: ticket_states.get(tickets[0].state))
-            return grouped_tickets
+        # order = self._ticket_get_order(order, groupby)
+        #raise UserError(len(Ticket_sudo))
 
         values.update({
             'date': date_begin,
@@ -200,6 +161,7 @@ class TicketCustomerPortal(CustomerPortal):
             'page_name': 'tickets',
             'default_url': url,
             'ticket_url': 'tickets',
+            'tickets': Ticket_sudo,
             'pager': {
                 "url": url,
                 "url_args": {'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'groupby': groupby, 'search_in': search_in, 'search': search},
@@ -257,7 +219,7 @@ class TicketCustomerPortal(CustomerPortal):
         '/my/desk/tickets', 
         '/my/desk/tickets/page/<int:page>'
     ], type='http', auth="user", website=True)
-    def portal_my_tickets(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
+    def portal_my_tickets(self, page=1, date_begin=None, date_end=None, sortby='date', filterby=None, search=None, search_in='content', groupby=None, **kw):
         searchbar_filters = self._get_my_tickets_searchbar_filters()
 
         if not filterby:
@@ -278,5 +240,28 @@ class TicketCustomerPortal(CustomerPortal):
             'filterby': filterby,
         })
         return request.render("de_helpdesk.portal_my_tickets", values)
+
+    @http.route([
+        "/my/desk/ticket/<int:ticket_id>",
+        "/my/desk/ticket/<int:ticket_id>/<access_token>",
+    ], type='http', auth="public", website=True)
+    def portal_my_ticket(self, ticket_id, report_type=None, access_token=None, project_sharing=False, **kw):
+        try:
+            ticket_sudo = self._document_check_access('project.task', ticket_id, access_token)
+        except (AccessError, MissingError):
+            return request.redirect('/my')
+    
+        if report_type in ('pdf', 'html', 'text'):
+            return self._show_ticket_report(ticket_sudo, report_type, download=kw.get('download'))
+    
+        # ensure attachment are accessible with access token inside template
+        for attachment in ticket_sudo.attachment_ids:
+            attachment.generate_access_token()
+        
+        # Add 'ticket' to the values dictionary
+        values = self._ticket_get_page_view_values(ticket_sudo, access_token, **kw)
+        
+        request.session['my_tickets_history'] = ticket_sudo.ids
+        return request.render("de_helpdesk.portal_my_ticket", values)
 
     

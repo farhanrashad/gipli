@@ -47,9 +47,9 @@
                 <thead>
                     <tr class="active">
                         <th class="">Ticket</th>
-                        <th class="text-center">Reported On</th>
-                        <th class="text-end">Assigned</th>
-                        <th class="text-center">Status</th>
+                        <th class="">Reported On</th>
+                        <th class="">Agent</th>
+                        <th class="">Status</th>
                     </tr>
                 </thead>
                 <t t-foreach="tickets" t-as="ticket">
@@ -59,14 +59,88 @@
                                 <span t-field="ticket.name"/>
                             </a>
                         </td>
-                       
-                        <td class="text-center" id="ticket_status">
-                            
+                        <td class="">
+                            <span t-field="ticket.create_date"/>
+                        </td>
+                        <td class="">
+                           <t t-set="assignees" t-value="ticket.sudo().user_ids"/>
+                                    <div t-if="assignees" class="row flex-nowrap ps-3">
+                                        <img class="rounded-circle o_portal_contact_img me-2 px-0" t-attf-src="#{image_data_uri(assignees[:1].avatar_128)}" alt="User" style="width: 20px; height: 20px;"/>
+                                        <span t-out="'%s%s' % (assignees[:1].name, ' + %s others' % len(assignees[1:]) if len(assignees.user_ids) > 1 else '')" t-att-title="'\n'.join(assignees.mapped('name'))"/>
+                                    </div>
+                        </td>
+                        <td class="" id="ticket_status">
+                            <span t-field="ticket.stage_id.name"/>
                         </td>
                     </tr>
                 </t>
             </t>
             <p t-else="">There are currently no tickets for your account.</p>
+        </t>
+    </template>
+
+    <!-- Individual Ticket Page -->
+    <template id="portal_my_ticket" name="My Ticket" inherit_id="portal.portal_sidebar" primary="True">
+        <t t-call="portal.portal_layout">
+            <t t-set="title" t-value="ticket.name"/>
+            <t t-set="wrapwrap_classes" t-value="'o_portal_bg_dark'"/>
+
+            <t t-set="o_portal_fullwidth_alert" groups="helpdesk.group_helpdesk_user">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t t-set="backend_url" t-value="'/web#model=project.task&amp;id=%s&amp;view_type=form' % (ticket.id)"/>
+                </t>
+            </t>
+
+            <div class="row mt16 o_project_portal_sidebar">
+                <t t-call="portal.portal_record_sidebar">
+                    <t t-set="classes" t-value="'col-lg-3 col-xl-4 d-print-none'"/>
+                </t>
+                <!-- Main Contents -->
+                <div id="ticket_content" class="o_portal_content col-12 col-lg-9 col-xl-8 mt-5 mt-lg-0">
+                    <div t-if="ticket_closed" class="alert alert-success alert-dismissible d-print-none" role="status">
+                        <span>Your ticket has successfully been closed. Thank you for your collaboration.</span>
+                    </div>
+                    <div id="card">
+                        <div id="card_header" class="container" data-anchor="true">
+                            <div class="row gs-0">
+                                <div class="col-md">
+                                    <h5 class="row justify-content-between">
+                                        <div class="col-md-9 text-truncate">
+                                            <span t-field="ticket.name" class="h3"/>
+                                            <small class="text-muted"> (#<span t-field="ticket.name"/>)</small>
+                                        </div>
+                                        <div class="col col-auto">
+                                            <small class="text-end">Stage:</small>
+                                            <span t-field="ticket.stage_id.name" t-attf-class="badge rounded-pill #{'text-bg-info' if ticket.stage_id.fold else 'text-bg-light bg-200'}" title="Current stage of this ticket"/>
+                                        </div>
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="card_body">
+                            <div class="row mb-4">
+                                <strong class="col-lg-3">Reported on</strong>
+                                <span class="col-lg-9" t-field="ticket.create_date" t-options='{"widget": "datetime", "hide_seconds": True}'/>
+                            </div>
+                            
+                            <div t-if="not is_html_empty(ticket.description)" class="row mt-3" name="description">
+                                <div class="col-lg-12" t-field="ticket.description"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr/>
+                    <div class="o_portal_messages_container" id="ticket_chat" data-anchor="true">
+                        <h3>Communication history</h3>
+                        <t t-call="portal.message_thread">
+                            <t t-set="token" t-value="ticket.access_token"/>
+                            <t t-set="disable_composer" t-value="ticket.stage_id.fold"/>
+                        </t>
+                    </div>
+
+                    
+                </div>
+            </div>
         </t>
     </template>
 </odoo>
