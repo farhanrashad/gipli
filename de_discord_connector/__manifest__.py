@@ -25,6 +25,7 @@ Discord Connector
         'data/res_users_data.xml',
         'data/ir_actions.xml',
         'views/res_config_setting_views.xml',
+        'views/discuss_channel_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

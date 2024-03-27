@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
-from odoo import models, fields, api, _
+from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 import json
@@ -103,8 +103,8 @@ class ResUsers(models.Model):
     # -------------------------------------------------------------------
     @api.model
     def _syn_all_discord(self):
-        self._get_discord_guild_ids()
-        #self._get_discord_channels()
+        #self._get_discord_guild_ids()
+        self._get_discord_channels()
         
     def _get_discord_guild_ids(self):
         discord = self._get_discord_config()
@@ -114,14 +114,6 @@ class ResUsers(models.Model):
         headers = {
             'Authorization': f'Bearer {access_token}'
         }
-
-        response = requests.get(API_ENDPOINT, headers=headers)
-        response.raise_for_status()  # Check for HTTP errors
-    
-        guilds = response.json()
-
-        raise UserError(guilds)
-        
         try:
             response = requests.get(API_ENDPOINT, headers=headers)
             response.raise_for_status()  # Check for HTTP errors
@@ -208,44 +200,49 @@ class ResUsers(models.Model):
             return False  # Server IDs are not available
 
         server_ids = guild_ids.split(',')
-        
         for server_id in server_ids:
-        
             api_url = f'{API_ENDPOINT}/guilds/{server_id}/channels'
-            #raise UserError(api_url)
-            response = requests.get(api_url, headers=headers)
-            response.raise_for_status()  # Check for HTTP errors
-            channels = response.json()
-            
-            
+            #response = requests.get(api_url, headers=headers)
+            #response.raise_for_status()  # Check for HTTP errors
+            #channels = response.json()
+            #data_str = json.dumps(channels, indent=4)
+            #raise UserError(data_str)
         try:
             response = requests.get(api_url, headers=headers)
             response.raise_for_status()  # Check for HTTP errors
             channels = response.json()
-            raise UserError(channels)
+            data_str = json.dumps(channels, indent=4)
             for channel in channels:
-                existing_channel = self.env['discuss.channel'].search([
-                    ('discord_channel_id', '=', channel['id'])
-                ], limit=1)
-                if existing_channel:
-                    existing_channel.write(channel_values)
-                else:
-                    self.env['discuss.channel'].create(channel_values)
+                if channel['parent_id']:
+                    existing_channel = self.env['discuss.channel'].search([
+                        ('discord_channel_id', '=', channel['id'])
+                    ], limit=1)
+                    if existing_channel:
+                        existing_channel.write(self._prepare_discuss_channel_values(channel))
+                    else:
+                        self.env['discuss.channel'].create(self._prepare_discuss_channel_values(channel))
         except requests.exceptions.HTTPError as err:
             # Handle HTTP errors
             _logger.error(f"HTTP Error: {err}")
             _logger.error(f"Response text: {response.text}")
+            raise UserError(f"Response text: {response.text}")
             return False
 
         except Exception as e:
             # Handle other exceptions
             _logger.error(f"Error: {e}")
+            raise UserError(f"Error: {e}")
             return False
 
     def _prepare_discuss_channel_values(self, channel):
+        image_path = 'de_discord_connector/static/description/img/discord.png'
+        img = base64.b64encode(tools.misc.file_open(image_path, 'rb').read())
+        
         return {
             'name': channel.get('name'),
+            'description': channel.get('topic'),
             'discord_channel_id': channel.get('id'),
+            'image_128': img,
         }
 
 
