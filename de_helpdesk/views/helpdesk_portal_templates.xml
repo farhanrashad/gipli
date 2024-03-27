@@ -5,9 +5,12 @@
     <!-- Modify portal templates -->
     <template id="portal_my_home_menu_project_helpdesk" name="Portal layout : Helpdesk menu entry" inherit_id="portal.portal_breadcrumbs" priority="50">
          <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-             <li t-if="page_name == 'project_ticket' or ticket and ticket.is_ticket" t-attf-class="breadcrumb-item #{'active ' if not sale_order else ''}">
-                <a t-if="task_ticket" t-attf-href="/my/desk/tickets?{{ keep_query() }}">Tickets</a>
+             <li t-if="page_name == 'ticket' or ticket" t-attf-class="breadcrumb-item #{'active ' if not sale_order else ''}">
+                <a t-if="ticket" t-attf-href="/my/desk/tickets?{{ keep_query() }}">Tickets</a>
                 <t t-else="">Tickets</t>
+            </li>
+             <li t-if="ticket" class="breadcrumb-item active text-truncate">
+                <span t-field="ticket.name"/> (#<span t-field="ticket.name"/>)
             </li>
          </xpath>
     </template>
@@ -59,6 +62,8 @@
                                 <span t-field="ticket.name"/>
                             </a>
                         </td>
+                                                        <td class="text-start"><a t-attf-href="/my/desk/ticket/#{ticket.id}"><small>#</small><span class="ms-2" t-att-title="ticket.name" t-field="ticket.name"/></a></td>
+
                         <td class="">
                             <span t-field="ticket.create_date"/>
                         </td>
