@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_de_discord_connector_de_discord_connector,de_discord_connector.de_discord_connector,model_de_discord_connector_de_discord_connector,base.group_user,1,1,1,1
+
+access_discord_websocket_handler,access.discord.websocket.handler,model_ddiscord_websocket_handler,,1,1,1,1
