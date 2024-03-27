@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_calendly_user,access.calendly.user,model_cal_instance,base.group_user,1,1,1,1
-access_calendly_event_type_user,access.calendly.event.type.user,model_calendly_event_type,base.group_user,1,1,1,1
-
-access_calendly_cancel_event_wizard,access.calendly.cancel.event.wizard,model_calendly_cancel_event_wizard,,1,1,1,1
