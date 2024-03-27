@@ -104,7 +104,8 @@ class ResUsers(models.Model):
     @api.model
     def _syn_all_discord(self):
         #self._get_discord_guild_ids()
-        self._get_discord_channels()
+        #self._get_discord_channels()
+        self._get_discord_messages()
         
     def _get_discord_guild_ids(self):
         discord = self._get_discord_config()
@@ -136,30 +137,7 @@ class ResUsers(models.Model):
             _logger.error(f"Error: {e}")
             return False
 
-    def _get_discord_channels333(self):
-        discord = self._get_discord_config()
-        
-        API_ENDPOINT = 'https://discord.com/api/v10'
-        CLIENT_ID = discord['client_id']
-        CLIENT_SECRET = discord['client_secret']
-        
-        data = {
-            'grant_type': 'client_credentials',
-            'scope': 'identify connections'
-        }
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-        response = requests.post('%s/oauth2/token' % API_ENDPOINT, data=data, headers=headers, auth=(CLIENT_ID, CLIENT_SECRET))
-        response.raise_for_status()
-        
-        self.env['ir.config_parameter'].sudo().set_param('discord.bot_access_token', response.json().get('access_token'))
-
-        data = response.json()
-        data_str = json.dumps(data, indent=4)
-        #raise UserError(data_str)
-
-    
+    # Channels
     def _get_discord_channels_backup(self):
         discord = self._get_discord_config()
         #discord_api_token = "Manually given bot token"
@@ -245,8 +223,33 @@ class ResUsers(models.Model):
             'image_128': img,
         }
 
-
-
+    # Messages
+    def _get_discord_messages(self):
+        discord = self._get_discord_config()
+        
+        API_ENDPOINT = discord['api_endpoint']
+        access_token = self._get_discord_access_token('bot')
+        headers = {
+            "Authorization": f"Bot {access_token}"
+        }
+        
+        channel_ids = self.env['discuss.channel'].search([('discord_channel_id','!=', False)])
+        for channel_id in channel_ids:
+            api_url = f'{API_ENDPOINT}/channels/{channel_id.discord_channel_id}/messages'
+            response = requests.get(api_url, headers=headers)
+            response.raise_for_status()  # Check for HTTP errors
+            messages = response.json()
+            for message in messages:
+                self.env['mail.message'].create({
+                    'model': 'discuss.channel',
+                    'res_id': channel_id.id,
+                    'record_name': channle_id.name,
+                    'date': message.get('timestamp'),
+                    'message_type': 'comment',
+                    'subtype_id': ,
+                })
+            data_str = json.dumps(messages, indent=4)
+            raise UserError(data_str)
         
         
     
