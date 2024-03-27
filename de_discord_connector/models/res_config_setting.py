@@ -20,6 +20,10 @@ class ResConfigSettings(models.TransientModel):
     discord_client_secret = fields.Char(
         string='Discord Client Secret',
         config_parameter='discord.client_secret')
+
+    discord_bot_access_token = fields.Char(
+        string='Bot Access Token',
+        config_parameter='discord.bot_access_token')
     
     display_discord_callback_uri = fields.Char(string='Base URL', 
                            default=lambda s: s._default_base_url(),

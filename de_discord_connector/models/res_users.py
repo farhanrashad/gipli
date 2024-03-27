@@ -29,6 +29,8 @@ class ResUsers(models.Model):
         access_token = self.env['ir.config_parameter'].sudo().get_param('discord.access_token')
         refresh_token = self.env['ir.config_parameter'].sudo().get_param('discord.refresh_token')
         token_validity = self.env['ir.config_parameter'].sudo().get_param('discord.token_validity')
+
+        bot_access_token = self.env['ir.config_parameter'].sudo().get_param('discord.bot_access_token')
         
         api_endpoint = 'https://discord.com/api/v10'
 
@@ -42,13 +44,18 @@ class ResUsers(models.Model):
             'refresh_token': refresh_token, 
             'token_validity': token_validity,
             'guild_ids': guild_ids,
+            'bot_access_token': bot_access_token,
         }
 
     @api.model
-    def _get_discord_access_token(self):
+    def _get_discord_access_token(self, type):
         discord = self._get_discord_config()
         self._refresh_discord_access_token()
-        return discord['access_token']
+        if type == 'oauth':
+            token = discord['access_token']
+        elif type == 'bot':
+            token = discord['bot_access_token']
+        return token
 
     @api.model
     def _refresh_discord_access_token(self):
@@ -96,17 +103,24 @@ class ResUsers(models.Model):
     # -------------------------------------------------------------------
     @api.model
     def _syn_all_discord(self):
-        #self._get_discord_guild_ids()
-        self._get_discord_channels()
+        self._get_discord_guild_ids()
+        #self._get_discord_channels()
         
     def _get_discord_guild_ids(self):
         discord = self._get_discord_config()
         API_ENDPOINT = discord['api_endpoint'] + '/users/@me/guilds'
-        access_token = self._get_discord_access_token()
+        access_token = self._get_discord_access_token('oauth')
         
         headers = {
             'Authorization': f'Bearer {access_token}'
         }
+
+        response = requests.get(API_ENDPOINT, headers=headers)
+        response.raise_for_status()  # Check for HTTP errors
+    
+        guilds = response.json()
+
+        raise UserError(guilds)
         
         try:
             response = requests.get(API_ENDPOINT, headers=headers)
@@ -130,49 +144,64 @@ class ResUsers(models.Model):
             _logger.error(f"Error: {e}")
             return False
 
-    def _get_discord_channels11(self):
-        # Replace with your Discord authentication token
-        bot_token = ""        
-        guilds_endpoint = "https://discord.com/api/v10/users/@me/guilds"
-        # Set headers with authorization token
-        headers = {
-            "Authorization": f"Bot {bot_token}",
-            'User-Agent': 'odoo-integration-01',
+    def _get_discord_channels333(self):
+        discord = self._get_discord_config()
+        
+        API_ENDPOINT = 'https://discord.com/api/v10'
+        CLIENT_ID = discord['client_id']
+        CLIENT_SECRET = discord['client_secret']
+        
+        data = {
+            'grant_type': 'client_credentials',
+            'scope': 'identify connections'
         }
-        # Send GET request to guilds endpoint
-        response = requests.get(guilds_endpoint, headers=headers)
-        raise UserError(response)
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        response = requests.post('%s/oauth2/token' % API_ENDPOINT, data=data, headers=headers, auth=(CLIENT_ID, CLIENT_SECRET))
+        response.raise_for_status()
+        
+        self.env['ir.config_parameter'].sudo().set_param('discord.bot_access_token', response.json().get('access_token'))
 
-        # Check for successful response
-        if response.status_code == 200:
-            # Parse JSON data
+        data = response.json()
+        data_str = json.dumps(data, indent=4)
+        #raise UserError(data_str)
+
+    
+    def _get_discord_channels_backup(self):
+        discord = self._get_discord_config()
+        #discord_api_token = "Manually given bot token"
+        
+        discord_api_token = discord['bot_access_token']
+        guild_id = "1222329498972852295"  # Replace with the ID of the specific guild
+        
+        headers = {
+            "Authorization": f"Bot {discord_api_token}"
+        }
+        
+        url = f"https://discord.com/api/guilds/{guild_id}/channels"
+        
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  # Raise an exception for non-200 status codes
+        
             data = response.json()
-  
-            # Iterate through guilds and get channels
-            
-            for guild in data:
-                guild_id = guild["id"]
-                channels_endpoint = f"https://discord.com/api/v10/guilds/1222200693545242676/channels"
-                channel_response = requests.get(channels_endpoint, headers=headers)
-              
-                if channel_response.status_code == 200:
-                    channel_data = channel_response.json()
-                    # Process channel data (e.g., print channel names)
-                    for channel in channel_data:
-                        raise UserError(f"Guild: {guild['name']}, Channel: {channel['name']}")
-        else:
-            raise UserError("Error retrieving guilds:", response.text)
-
+            data_str = json.dumps(data, indent=4)
+            raise UserError(data_str)
+            raise UserError(data)  # Guild details will be printed here
+        
+        except requests.exceptions.RequestException as e:
+            raise UserError(f"An error occurred: {e}")
+    
 
     def _get_discord_channels(self):
         discord = self._get_discord_config()
         
         API_ENDPOINT = discord['api_endpoint']
-        access_token = self._get_discord_access_token()
+        access_token = self._get_discord_access_token('bot')
         guild_ids = discord['guild_ids']
         headers = {
-            'Authorization': f'Bearer {access_token}',
-            'User-Agent': 'odoo-integration-01',
+            "Authorization": f"Bot {access_token}"
         }
 
         if not guild_ids:
