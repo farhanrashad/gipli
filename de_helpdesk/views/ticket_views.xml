@@ -22,7 +22,12 @@
 
 
                     <div class="oe_title">
-                        <h1><field name="name" options="{'line_breaks': False}" widget="text" class="field_name" placeholder="e.g. Product arrived damaged"/></h1>
+                        <label for="ticket_no" string="Ticket Ref"/>
+                        <span><field name="ticket_no" readonly="1"/></span>
+                        <label for="name" string="Subject"/>
+                        <h1>
+                            <field name="name" options="{'line_breaks': False}" widget="text" class="field_name" placeholder="e.g. Product arrived damaged"/>
+                        </h1>
                     </div>
                     <div class="d-flex mb-4" >
                         <div invisible="not sla_date_deadline or not is_sla"  class="mx-2 text-muted d-inline-flex align-items-center h-100">

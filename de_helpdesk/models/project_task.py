@@ -34,7 +34,13 @@ class ProjectTask(models.Model):
     is_update_partner_email = fields.Boolean('Partner Email will Update', compute='_compute_is_update_partner_email')
     is_update_partner_phone = fields.Boolean('Partner Phone will Update', compute='_compute_is_update_partner_phone')
 
+    ticket_no = fields.Char(
+        string="Ticket No",
+        copy=False, readonly=False,
+        index='trigram',
+        default=lambda self: _('/'))
 
+    
     # Computed Methods
     @api.model
     def _compute_task_priority(self):
@@ -115,6 +121,9 @@ class ProjectTask(models.Model):
     def create(self, vals_list):
         tasks = super(ProjectTask, self).create(vals_list)
         created_sla_lines = self._prepare_sla_lines(tasks)
+        for task in tasks:
+            if task.is_ticket or (task.project_id and task.project_id.is_helpdesk_team):
+                task.ticket_no = self.env['ir.sequence'].next_by_code('project.task.ticket.no')
         return tasks
         
     def _prepare_sla_lines(self, tasks):

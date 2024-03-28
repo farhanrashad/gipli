@@ -31,6 +31,7 @@ Features:
         'security/project_helpdesk_security.xml',
         'security/ir.model.access.csv',
         'data/helpdesk_data.xml',
+        'data/ir_sequence.xml',
         'views/helpdesk_menu.xml',
         'views/ticket_tags_views.xml',
         'views/ticket_activity_type_views.xml',
