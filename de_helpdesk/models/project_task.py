@@ -2,6 +2,7 @@
 
 from odoo import api, Command, fields, models, tools, _
 from datetime import datetime, timedelta
+from odoo.exceptions import UserError, ValidationError
 
 TICKET_PRIORITY = [
     ('0', 'Low priority'),
@@ -157,7 +158,6 @@ class ProjectTask(models.Model):
         return False
 
 
-    # Action Methods
     # CRUD 
     @api.model_create_multi
     def create(self, vals_list):
@@ -184,6 +184,15 @@ class ProjectTask(models.Model):
                     sla_lines |= sla_line
         return sla_lines
 
+    #actions
+    def _get_ticket_reopen_digest(self, origin='', template='de_helpdesk.project_ticket_reopen_digest', lang=None):
+        self.ensure_one()
+        values = {'origin': origin,
+                  'record_url': self._get_html_link(),
+                  'user': self.env.user.name,
+                 }
+        return self.env['ir.qweb'].with_context(lang=lang)._render(template, values)
+        
     def open_reopen_ticket_reaons(self):
         action = self.env.ref('de_helpdesk.action_ticket_reopen_reason').read()[0]
         action.update({
@@ -201,7 +210,8 @@ class ProjectTask(models.Model):
         return action
         
     def action_reopen_ticket(self):
-        self.ensure_one()
+        ticket_ids = self.env.context.get('active_ids')
+        raise UserError(ticket_ids)
         return {
             'name': 'Reopen Ticket',
             'view_mode': 'form',
@@ -214,11 +224,12 @@ class ProjectTask(models.Model):
         #if self.env.user
         reopen_by = 'user'
         return {
-            'ticket_id': ticket_id.id,
+            'ticket_id': ticket.id,
             'reopen_by': reopen_by,
             'name': reason,
+            'date_reopen': fields.Datetime.now(),
         }
-    def _prepare_ticket_reopen(self, ticket, stage_id):
+    def _prepare_ticket_reopen(self, stage_id):
         return {
             'closed_by': False,
             'stage_id': stage_id.id,
