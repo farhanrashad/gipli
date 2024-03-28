@@ -7,7 +7,10 @@
         <field name="model">project.task</field>
         <field name="arch" type="xml">
             <form string="Project Ticket">
+                <field name="allowed_reopen" invisible="1" />
                 <header>
+                    <button string="Reopen Ticket" name="action_reopen_ticket" type="object"
+                        invisible="not allowed_reopen" />
                     <field name="stage_id" widget="statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}"/>
                 </header>
                 <sheet>
@@ -20,7 +23,16 @@
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <field name="state" widget="state_selection"/>
 
-
+                    <div class="oe_button_box" name="button_box">
+                        <button invisible="count_reopen == 0"
+                            name="open_reopen_ticket_reaons"
+                            class="oe_stat_button"
+                            icon="fa-file-text-o"
+                            type="object">
+                            <field name="count_reopen" widget="statinfo" string="Reopen Reasons"/>
+                        </button>
+                    </div>
+                    
                     <div class="oe_title">
                         <label for="ticket_no" string="Ticket Ref"/>
                         <span><field name="ticket_no" readonly="1"/></span>

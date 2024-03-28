@@ -54,8 +54,21 @@ class ProjectTask(models.Model):
     rating_comment = fields.Text(string='Rating Comment')
     rating_score = fields.Integer(string='Rating Scroe', compute='_compute_customer_rating')
 
+    # Re-open Tickets
+    prj_ticket_reopen_ids = fields.One2many('project.ticket.reopen', 'ticket_id', string="Re-Open Reasons")
+    count_reopen = fields.Integer(string='Reopen Number', compute='_compute_reopen_count')
+    allowed_reopen = fields.Boolean(string='Allow Reopen', compute='_compute_allow_reopen')
+
     
     # Computed Methods
+    def _compute_allow_reopen(self):
+        for record in self:
+            record.allowed_reopen = True
+            
+    def _compute_reopen_count(self):
+        for record in self:
+            record.count_reopen = len(record.prj_ticket_reopen_ids)
+            
     @api.depends('closed_by')
     def _update_stage_on_closed_by(self):
         stage_id = self.env['project.task.type']
@@ -170,7 +183,46 @@ class ProjectTask(models.Model):
                     })
                     sla_lines |= sla_line
         return sla_lines
+
+    def open_reopen_ticket_reaons(self):
+        action = self.env.ref('de_helpdesk.action_ticket_reopen_reason').read()[0]
+        action.update({
+            'name': 'Reopen Reasons',
+            'view_mode': 'tree',
+            'res_model': 'project.ticket.reopen',
+            'type': 'ir.actions.act_window',
+            'domain': [('ticket_id','=',self.id)],
+            'context': {
+                'create': False,
+                'edit': False,
+            },
+            
+        })
+        return action
         
+    def action_reopen_ticket(self):
+        self.ensure_one()
+        return {
+            'name': 'Reopen Ticket',
+            'view_mode': 'form',
+            'res_model': 'project.ticket.reopen.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+
+    def _prepare_ticket_reopen_reason_values(self, ticket, reason):
+        #if self.env.user
+        reopen_by = 'user'
+        return {
+            'ticket_id': ticket_id.id,
+            'reopen_by': reopen_by,
+            'name': reason,
+        }
+    def _prepare_ticket_reopen(self, ticket, stage_id):
+        return {
+            'closed_by': False,
+            'stage_id': stage_id.id,
+        }
 class ProjectTaskSLALine(models.Model):
     _name = 'project.task.sla.line'
     _description = "Task SLA Line"

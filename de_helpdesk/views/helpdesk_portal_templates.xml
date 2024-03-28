@@ -100,14 +100,13 @@
                 <div class="modal-content">
                     <header class="modal-header">
                         <h4 class="modal-title">
-                            Clsoe Ticket 
                             <span t-field="ticket.name" class="text-primary"/>
                         </h4>
                     </header>
                     <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
                         <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
                         <main class="modal-body">
-                            <t t-if="not ticket.allow_customer_rating'">
+                            <t t-if="not ticket.allow_customer_rating">
                                 <div class="row mb-0">
                                     <h3 class="text-center">Closing Ticket Reason</h3>
                                     <p>
@@ -127,7 +126,7 @@
                                     <span class="col-lg-1"/>
                                 </div>
                             </t>
-                            <t t-if="ticket.allow_customer_rating'"> 
+                            <t t-if="ticket.allow_customer_rating"> 
                                 <div class="row mb-0">
                                     <h3 class="text-center">Rate Your Experince</h3>
                                     <p>
@@ -229,7 +228,6 @@
                     <div class="modal-content">
                         <header class="modal-header">
                             <h4 class="modal-title">
-                                Clsoe Ticket 
                                 <span t-field="ticket.name" class="text-primary"/>
                             </h4>
                         </header>

@@ -7,3 +7,6 @@ access_project_ticket_type_manager,access.project.ticket.type.manager,model_proj
 
 access_project_task_sla_line_internal_user,access.project.task.sla.line.internal.user,model_project_task_sla_line,base.group_user,1,0,0,0
 access_project_task_sla_line_manager,access.project.task.sla.line.manager,model_project_task_sla_line,group_project_helpdesk_manager,1,1,1,1
+
+access_project_ticket_reopen,access.project.ticket.reopen,model_project_ticket_reopen,,1,1,1,1
+access_project_ticket_reopen_wizard,access.project.ticket.reopen.wizard,model_project_ticket_reopen_wizard,,1,1,1,1
