@@ -37,6 +37,7 @@ class Project(models.Model):
 
 
     allow_customer_rating = fields.Boolean('Customer Ratings')
+    
     publish_rating = fields.Boolean('Publish Ratings')
 
     allow_portal_user_close_ticket = fields.Boolean('Closure by Customers')

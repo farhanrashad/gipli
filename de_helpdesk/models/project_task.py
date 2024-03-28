@@ -40,8 +40,21 @@ class ProjectTask(models.Model):
         index='trigram',
         default=lambda self: _('/'))
 
+    #Customer Rating
+    allow_customer_rating = fields.Boolean(related='project_id.allow_customer_rating')
+    rating = fields.Selection(
+        [('1', 'Poor'), ('2', 'Fair'), ('3', 'Average'), ('4', 'Good'), ('5', 'Excellent')],
+        string='Rating'
+    )
+    rating_comment = fields.Text(string='Rating Comment')
+    rating_score = fields.Integer(string='Rating Scroe', compute='_compute_customer_rating')
+
     
     # Computed Methods
+    def _compute_customer_rating(self):
+        for record in self:
+            record.rating_score = int(record.rating)
+        
     @api.model
     def _compute_task_priority(self):
         if self._context.get('default_is_ticket') or self.project_id.is_helpdesk_team:

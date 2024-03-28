@@ -96,28 +96,103 @@
     <!-- Popup window models -->
     <template id="model_ticket_close_template">
         <div role="dialog" class="modal fade" id="modal-ticket-close" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <header class="modal-header">
-                            <h4 class="modal-title">
-                                Clsoe Ticket 
-                                <span t-field="ticket.name" class="text-primary"/>
-                            </h4>
-                        </header>
-                        <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
-                            <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
-                            <main class="modal-body">
-                            </main>
-                            <footer class="modal-footer">
-                                <button class="btn btn-primary">Close Ticket</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-
-                            </footer>
-                        </form>
-                    </div>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <header class="modal-header">
+                        <h4 class="modal-title">
+                            Clsoe Ticket 
+                            <span t-field="ticket.name" class="text-primary"/>
+                        </h4>
+                    </header>
+                    <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
+                        <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <main class="modal-body">
+                            <div class="row mb-0">
+                                <h3>Rate Your Experince</h3>
+                                <p>
+                                    Your feedback is essential to us. Please take a moment to rate your experience with our helpdesk services and share any insights or suggestions you may have.
+                                </p>
+                            </div>
+                            <div class="row mb-0">
+                            	<span class="col-lg-1"/>
+                            	<span class="col-lg-2">
+                                	<input type="radio" id="rating_poor" name="rating" value="1"/>
+                                  	<label for="rating_poor">Poor</label>
+                                </span>
+                                <span class="col-lg-2">
+                                	<input type="radio" id="rating_fair" name="rating" value="2"/>
+                                    <label for="rating_fair">Fair</label>
+                                </span>
+                                <span class="col-lg-2">
+                                	<input type="radio" id="rating_average" name="rating" value="3"/>
+                                  	<label for="rating_average">Average</label>
+                                </span>
+                                <span class="col-lg-2">
+                                	<input type="radio" id="rating_good" name="rating" value="4"/>
+                                  	<label for="rating_good">Good</label>
+                                </span>
+                                <span class="col-lg-2">
+                                	<input type="radio" id="rating_excellent" name="rating" value="5"/>
+                                  	<label for="rating_excellent">Excellent</label>
+                                </span>
+                                <span class="col-lg-1"/>
+                            </div>
+                            <div class="row mb-4">
+                                <span class="col-lg-1"/>
+                                <span class="col-lg-2">
+                                    <span class="fa fa-star" style="color:#ffcc33;"/>
+                                    <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                    <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                    <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                    <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                </span>
+                                <span class="col-lg-2">
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                </span>
+                                <span class="col-lg-2">
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                </span>
+                                <span class="col-lg-2">
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                </span>
+                                <span class="col-lg-2">
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                    <span class="fa fa-star"/>
+                                </span>
+                                <span class="col-lg-1"/>
+                            </div>
+                            <div class="row mt-0">
+                                <span class="col-lg-1"/>
+                                <span class="col-lg-10">
+                                    <textarea name="comment" 
+                                        rows="10" 
+                                        cols="30" 
+                                        placeholder="Tell us about your experience!"
+                                        style="width:100%;"
+                                    />                                        
+                                </span>
+                                <span class="col-lg-1"/>
+                            </div>
+                        </main>
+                        <footer class="modal-footer">
+                            <button class="btn btn-primary">Close Ticket</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </footer>
+                    </form>
                 </div>
             </div>
+        </div>
     </template>
+
 
 
     <template id="model_ticket_open_template">
@@ -130,7 +205,7 @@
                                 <span t-field="ticket.name" class="text-primary"/>
                             </h4>
                         </header>
-                        <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
+                        <form method="post" t-attf-action="/my/desk/ticket/reopen/#{ticket.id}?access_token=#{ticket.access_token}">
                             <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
                             <main class="modal-body">
                             </main>
