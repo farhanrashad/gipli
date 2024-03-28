@@ -107,81 +107,109 @@
                     <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
                         <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
                         <main class="modal-body">
-                            <div class="row mb-0">
-                                <h3>Rate Your Experince</h3>
-                                <p>
-                                    Your feedback is essential to us. Please take a moment to rate your experience with our helpdesk services and share any insights or suggestions you may have.
-                                </p>
-                            </div>
-                            <div class="row mb-0">
-                            	<span class="col-lg-1"/>
-                            	<span class="col-lg-2">
-                                	<input type="radio" id="rating_poor" name="rating" value="1"/>
-                                  	<label for="rating_poor">Poor</label>
-                                </span>
-                                <span class="col-lg-2">
-                                	<input type="radio" id="rating_fair" name="rating" value="2"/>
-                                    <label for="rating_fair">Fair</label>
-                                </span>
-                                <span class="col-lg-2">
-                                	<input type="radio" id="rating_average" name="rating" value="3"/>
-                                  	<label for="rating_average">Average</label>
-                                </span>
-                                <span class="col-lg-2">
-                                	<input type="radio" id="rating_good" name="rating" value="4"/>
-                                  	<label for="rating_good">Good</label>
-                                </span>
-                                <span class="col-lg-2">
-                                	<input type="radio" id="rating_excellent" name="rating" value="5"/>
-                                  	<label for="rating_excellent">Excellent</label>
-                                </span>
-                                <span class="col-lg-1"/>
-                            </div>
-                            <div class="row mb-4">
-                                <span class="col-lg-1"/>
-                                <span class="col-lg-2">
-                                    <span class="fa fa-star" style="color:#ffcc33;"/>
-                                    <span class="fa fa-star" style="color:#e5e5e5;"/>
-                                    <span class="fa fa-star" style="color:#e5e5e5;"/>
-                                    <span class="fa fa-star" style="color:#e5e5e5;"/>
-                                    <span class="fa fa-star" style="color:#e5e5e5;"/>
-                                </span>
-                                <span class="col-lg-2">
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                </span>
-                                <span class="col-lg-2">
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                </span>
-                                <span class="col-lg-2">
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                </span>
-                                <span class="col-lg-2">
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                    <span class="fa fa-star"/>
-                                </span>
-                                <span class="col-lg-1"/>
-                            </div>
-                            <div class="row mt-0">
-                                <span class="col-lg-1"/>
-                                <span class="col-lg-10">
-                                    <textarea name="comment" 
-                                        rows="10" 
-                                        cols="30" 
-                                        placeholder="Tell us about your experience!"
-                                        style="width:100%;"
-                                    />                                        
-                                </span>
-                                <span class="col-lg-1"/>
-                            </div>
+                            <t t-if="not ticket.allow_customer_rating'">
+                                <div class="row mb-0">
+                                    <h3 class="text-center">Closing Ticket Reason</h3>
+                                    <p>
+                                        Kindly provide the specific reason for closing this ticket.
+                                    </p>
+                                </div>
+                                <div class="row mt-0">
+                                    <span class="col-lg-1"/>
+                                    <span class="col-lg-10">
+                                        <textarea name="comment" 
+                                            rows="10" 
+                                            cols="30" 
+                                            placeholder="Write the detail reason for closure"
+                                            style="width:100%;"
+                                        />                                        
+                                    </span>
+                                    <span class="col-lg-1"/>
+                                </div>
+                            </t>
+                            <t t-if="ticket.allow_customer_rating'"> 
+                                <div class="row mb-0">
+                                    <h3 class="text-center">Rate Your Experince</h3>
+                                    <p>
+                                        Your feedback is essential to us. Please take a moment to rate your experience with our helpdesk services and share any insights or suggestions you may have.
+                                    </p>
+                                </div>
+                                <div class="row mb-0">
+                                	<span class="col-lg-1"/>
+                                	<span class="col-lg-2">
+                                    	<input type="radio" id="rating_poor" name="rating" value="1"/>
+                                      	<label for="rating_poor">Poor</label>
+                                    </span>
+                                    <span class="col-lg-2">
+                                    	<input type="radio" id="rating_fair" name="rating" value="2"/>
+                                        <label for="rating_fair">Fair</label>
+                                    </span>
+                                    <span class="col-lg-2">
+                                    	<input type="radio" id="rating_average" name="rating" value="3"/>
+                                      	<label for="rating_average">Average</label>
+                                    </span>
+                                    <span class="col-lg-2">
+                                    	<input type="radio" id="rating_good" name="rating" value="4"/>
+                                      	<label for="rating_good">Good</label>
+                                    </span>
+                                    <span class="col-lg-2">
+                                    	<input type="radio" id="rating_excellent" name="rating" value="5"/>
+                                      	<label for="rating_excellent">Excellent</label>
+                                    </span>
+                                    <span class="col-lg-1"/>
+                                </div>
+                                <div class="row mb-4">
+                                    <span class="col-lg-1"/>
+                                    <span class="col-lg-2">
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                    </span>
+                                    <span class="col-lg-2">
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                    </span>
+                                    <span class="col-lg-2">
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                    </span>
+                                    <span class="col-lg-2">
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#e5e5e5;"/>
+                                    </span>
+                                    <span class="col-lg-2">
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                        <span class="fa fa-star" style="color:#ffcc33;"/>
+                                    </span>
+                                    <span class="col-lg-1"/>
+                                </div>
+                                <div class="row mt-0">
+                                    <span class="col-lg-1"/>
+                                    <span class="col-lg-10">
+                                        <textarea name="comment" 
+                                            rows="10" 
+                                            cols="30" 
+                                            placeholder="Tell us about your experience!"
+                                            style="width:100%;"
+                                        />                                        
+                                    </span>
+                                    <span class="col-lg-1"/>
+                                </div>
+                            </t>
                         </main>
                         <footer class="modal-footer">
                             <button class="btn btn-primary">Close Ticket</button>
@@ -231,10 +259,10 @@
                     <t t-set="entries">
                         <div class="d-flex flex-column gap-4">
                             <div class="d-flex flex-column gap-2" id="ticket_close_sidebar_button">
-                                <a role="button" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modal-ticket-close" href="#">
+                                <a role="button" t-if="ticket.closed_by!='customer'" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modal-ticket-close" href="#">
                                     <i class="fa fa-check"/> Close Ticket
                                 </a>
-                                <a role="button" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modal-ticket-open" href="#">
+                                <a role="button" t-if="ticket.closed_by=='customer'" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modal-ticket-open" href="#">
                                     <i class="fa fa-check"/> Re-Open Ticket
                                 </a>
                             </div>
@@ -256,8 +284,9 @@
     <template id="ticket_portal_main_content_template" name="Main Content">
         <!-- Main Contents -->
         <div id="ticket_content" class="o_portal_content col-12 col-lg-9 col-xl-8 mt-5 mt-lg-0">
-            <div t-if="ticket_closed" class="alert alert-success alert-dismissible d-print-none" role="status">
-                <span>Your ticket has successfully been closed. Thank you for your collaboration.</span>
+            <div t-if="ticket.closed_by=='customer'" class="alert alert-success alert-dismissible d-print-none" role="status">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <span>Your support ticket has been successfully resolved and closed. We appreciate your cooperation and assistance throughout the process. Thank you.</span>
             </div>
             <div id="card">
                 <div id="card_header" class="container" data-anchor="true">

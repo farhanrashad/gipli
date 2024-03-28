@@ -88,6 +88,9 @@
                                 <group>
                                     <field name="rating" readonly="1"/>
                                 </group>
+                                <group>
+                                    <field name="closed_by" readonly="1"/>
+                                </group>
                                 <field name="rating_comment" readonly="1" />
                             </group>
                         </page>

@@ -40,6 +40,11 @@ class ProjectTask(models.Model):
         index='trigram',
         default=lambda self: _('/'))
 
+    closed_by = fields.Selection([
+        ('customer', 'Closed by Customer'), 
+        ('user', 'Closed by User')],
+        string='Closed Type',
+    )
     #Customer Rating
     allow_customer_rating = fields.Boolean(related='project_id.allow_customer_rating')
     rating = fields.Selection(
@@ -51,6 +56,17 @@ class ProjectTask(models.Model):
 
     
     # Computed Methods
+    @api.depends('closed_by')
+    def _update_stage_on_closed_by(self):
+        stage_id = self.env['project.task.type']
+        for record in self:
+            stage_id = self.env['project.task.type'].search([
+                ('fold','=',True),
+                ('project_ids','=',self.project_id.id)
+            ],limit=1)
+            record.write({
+                'stage_id': stage_id.id,
+            })
     def _compute_customer_rating(self):
         for record in self:
             record.rating_score = int(record.rating)

@@ -44,7 +44,7 @@ class TicketCustomerPortal(CustomerPortal):
             values['tickets_count'] = request.env['project.task'].search_count([('project_id', '!=', False)]) \
                 if request.env['project.task'].check_access_rights('read', raise_exception=False) else 0
         return values
-        
+    
     def _get_ticket_page_view_values(self, ticket_id, access_token, **kwargs):
         page_name = 'ticket'
         history = 'my_tickets_history'
@@ -314,6 +314,27 @@ class TicketCustomerPortal(CustomerPortal):
         
         #request.session['my_tickets_history'] = ticket_sudo.ids
         return request.render("de_helpdesk.portal_my_ticket", values)
+
+    # Clsoe Ticket
+    @http.route(['/my/desk/ticket/close/<int:ticket_id>'
+                ], type='http', auth="user", website=True)        
+    def close_ticket(
+        self,
+        ticket_id,
+        access_token=False,
+        **kw
+    ):
+        ticket_sudo = request.env['project.task'].browse(ticket_id)
+        comment = kw.get('comment')
+        rating = kw.get('rating')
+        
+        ticket_sudo.write({
+            'rating' : rating,
+            'rating_comment': comment,
+            'closed_by': 'customer',
+        })
+        #raise UserError(comment + rating)
+        return request.redirect(f'/my/desk/ticket/{ticket_id}?access_token={access_token}')
         
 
     
