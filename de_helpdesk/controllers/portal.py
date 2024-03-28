@@ -13,9 +13,30 @@ from odoo.osv.expression import OR, AND
 
 class TicketCustomerPortal(CustomerPortal):
 
-    def _prepare_portal_layout_values(self):
-        values = super(TicketCustomerPortal, self)._prepare_portal_layout_values()
+    def _task_get_page_view_values(self, task, access_token, **kwargs):
+        # Call the parent method to get the initial values
+        values = super(TicketCustomerPortal, self)._task_get_page_view_values(task, access_token, **kwargs)
+
+        # Add or modify values as needed for your customization
+        # For example, set the 'task' key with the provided task object
+        values['task'] = task
+
+        # Ensure other necessary keys are present in the values dictionary
+        values['user'] = request.env.user  # Example: Set the 'user' key
+        values['project_accessible'] = True  # Example: Set the 'project_accessible' key
+
+        values['task_url'] = 'my/desk'
         return values
+
+    def _prepare_tasks_values(self, page, date_begin, date_end, sortby, search, search_in, groupby, url="/my/tasks", domain=None, su=False, project=False):
+        values = super(TicketCustomerPortal, self)._prepare_tasks_values(page, date_begin, date_end, sortby, search, search_in, groupby, url="/my/desk", domain=None, su=False, project=False)
+        values['default_url'] = "/my/desk"
+        return values
+        
+    def _task_get_page_view_values1(self, ticket, access_token, **kwargs):
+        values = super(TicketCustomerPortal, self)._task_get_page_view_values(ticket, access_token, **kwargs)
+        #raise UserError('hello')
+        values['task_url'] = 'my/desk'
         
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
@@ -31,10 +52,25 @@ class TicketCustomerPortal(CustomerPortal):
             'page_name': page_name,
             'ticket': ticket_id,
             'user': request.env.user,
-            'ticket_link_section': [],
-            'preview_object': ticket_id,
-            'object': ticket_id,
+            #'ticket_link_section': [],
+            #'preview_object': ticket_id,
+            #'object': ticket_id,
+            'my_tickets_history': False,
+            'page_name': 'ticket'
         }
+        history = request.session.get('my_tickets_history', [])
+        try:
+            current_ticket_index = history.index(ticket_id.id)
+        except ValueError:
+            return values
+
+        total_ticket = len(history)
+        ticket_url = f"my/desk/ticket/%s?model=project.project&res_id={values['user'].id}&access_token={access_token}"
+
+        values['prev_record'] = current_ticket_index != 0 and ticket_url % history[current_ticket_index - 1]
+        values['next_record'] = current_ticket_index < total_ticket - 1 and ticket_url % history[current_ticket_index + 1]
+        #return values
+        #raise UserError(ticket_url)
         return self._get_page_view_values(ticket_id, access_token, values, 'my_tickets_history', False, **kwargs)
 
     def _ticket_get_searchbar_sortings(self, project=False):
@@ -121,65 +157,7 @@ class TicketCustomerPortal(CustomerPortal):
     def _prepare_tickets_domain(self):
         return []
         
-    def _prepare_tickets_values(self, page, date_begin, date_end, sortby, search, search_in, groupby, url="/my/desk/tickets", domain=None, su=False, project=False):
-        values = self._prepare_portal_layout_values()
-
-        Ticket = request.env['project.task'].search([])
-        searchbar_sortings = dict(sorted(self._ticket_get_searchbar_sortings(project).items(),
-                                         key=lambda item: item[1]["sequence"]))
-        searchbar_inputs = self._ticket_get_searchbar_inputs()
-        #searchbar_groupby = self._ticket_get_searchbar_groupby(project)
-
-        if not domain:
-            domain = []
-        #if not su and Ticket.check_access_rights('read'):
-        #    domain = AND([domain, request.env['ir.rule']._compute_domain(Ticket._name, 'read')])
-        Ticket_sudo = Ticket.sudo()
-
-        # default sort by value
-       
-        order = searchbar_sortings[sortby]['order']
-        
-        # default group by value
-        
-
-        if date_begin and date_end:
-            domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
-
-        
-        # search
-        if search and search_in:
-            domain += self._ticket_get_search_domain(search_in, search)
-
-        # content according to pager and archive selected
-        # order = self._ticket_get_order(order, groupby)
-        #raise UserError(len(Ticket_sudo))
-
-        values.update({
-            'date': date_begin,
-            'date_end': date_end,
-            #'grouped_tickets': get_grouped_tickets,
-            'page_name': 'ticket',
-            'default_url': url,
-            'ticket_url': 'tickets',
-            'tickets': Ticket_sudo,
-            'pager': {
-                "url": url,
-                "url_args": {'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'groupby': groupby, 'search_in': search_in, 'search': search},
-                "total": Ticket_sudo.search_count(domain),
-                "page": page,
-                "step": self._items_per_page
-            },
-            'searchbar_sortings': searchbar_sortings,
-            #'searchbar_groupby': searchbar_groupby,
-            'searchbar_inputs': searchbar_inputs,
-            'search_in': search_in,
-            'search': search,
-            'sortby': sortby,
-            'groupby': groupby,
-        })
-        return values
-
+    
     def _get_my_tickets_searchbar_filters(self):
         searchbar_filters = {
             'all': {'label': _('All'), 'domain': [('prj_ticket_type_id', '!=', False)]},
@@ -200,7 +178,7 @@ class TicketCustomerPortal(CustomerPortal):
             'date': {'label': _('Newest'), 'order': 'create_date desc'},
             #'reference': {'label': _('Reference'), 'order': 'id desc'},
             'name': {'label': _('Subject'), 'order': 'name'},
-            #'user': {'label': _('Assigned to'), 'order': 'user_id'},
+            'user': {'label': _('Assigned to'), 'order': 'user_ids'},
             'stage': {'label': _('Stage'), 'order': 'stage_id'},
             #'update': {'label': _('Last Stage Update'), 'order': 'date_last_stage_update desc'},
         }
@@ -231,6 +209,7 @@ class TicketCustomerPortal(CustomerPortal):
         if not sortby:
             sortby = 'date'
         order = searchbar_sortings[sortby]['order']
+        
         if groupby in searchbar_groupby and groupby != 'none':
             order = f'{searchbar_groupby[groupby]["input"]}, {order}'
 
@@ -250,7 +229,7 @@ class TicketCustomerPortal(CustomerPortal):
                 search_domain = OR([search_domain, ['|', ('name', 'ilike', search), ('description', 'ilike', search)]])
             if search_in == 'user':
                 assignees = request.env['res.users'].sudo()._search([('name', 'ilike', search)])
-                search_domain = OR([search_domain, [('user_id', 'in', assignees)]])
+                search_domain = OR([search_domain, [('user_ids', 'in', assignees)]])
             if search_in == 'message':
                 discussion_subtype_id = request.env.ref('mail.mt_comment').id
                 search_domain = OR([search_domain, [('message_ids.body', 'ilike', search), ('message_ids.subtype_id', '=', discussion_subtype_id)]])
@@ -261,7 +240,7 @@ class TicketCustomerPortal(CustomerPortal):
         # pager
         tickets_count = request.env['project.task'].search_count(domain)
         pager = portal_pager(
-            url="/my/tickets",
+            url="/my/desk/tickets",
             url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'search_in': search_in, 'search': search, 'groupby': groupby, 'filterby': filterby},
             total=tickets_count,
             page=page,
@@ -283,7 +262,7 @@ class TicketCustomerPortal(CustomerPortal):
         values.update({
             'date': date_begin,
             'grouped_tickets': grouped_tickets,
-            'tickets': tickets,
+            #'tickets': tickets,
             'page_name': 'ticket',
             'default_url': '/my/desk/tickets',
             'pager': pager,
@@ -331,5 +310,6 @@ class TicketCustomerPortal(CustomerPortal):
         
         #request.session['my_tickets_history'] = ticket_sudo.ids
         return request.render("de_helpdesk.portal_my_ticket", values)
+        
 
     

@@ -43,44 +43,60 @@
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Your Tickets</t>
             </t>
-            <div t-if="not tickets" class="alert alert-warning" role="alert">
+            <div t-if="not grouped_tickets" class="alert alert-warning" role="alert">
                 There are currently no tickets for your account.
             </div>
-            <t t-if="tickets" t-call="portal.portal_table">
-                <thead>
-                    <tr class="active">
-                        <th class="">Ticket</th>
-                        <th class="">Reported On</th>
-                        <th class="">Agent</th>
-                        <th class="">Status</th>
-                    </tr>
-                </thead>
-                <t t-foreach="tickets" t-as="ticket">
-                    <tr>
-                        <td>
-                            <a t-attf-href="/my/desk/ticket/#{ticket.id}?access_token=#{ticket.access_token}">
-                                <span t-field="ticket.name"/>
-                            </a>
-                        </td>
-                                                        <td class="text-start"><a t-attf-href="/my/desk/ticket/#{ticket.id}"><small>#</small><span class="ms-2" t-att-title="ticket.name" t-field="ticket.name"/></a></td>
+            <t t-else="">
+                <t t-call="portal.portal_table">
+                    <thead>
+                                <tr class="active">
+                                    <th class="">Ticket</th>
+                                    <th class="">Reported On</th>
+                                    <th class="">Agent</th>
+                                    <th class="">Status</th>
+                                </tr>
+                        </thead>
+                    <t t-foreach="grouped_tickets" t-as="tickets">
+                        
+                        <tbody>
+                            <tr t-if="not groupby =='none'" class="table-light">
+                                <th t-if="groupby == 'stage'" colspan="5">
+                                    <span t-field="tickets[0].stage_id.name"/>
+                                </th>
+                                
+                                <th t-if="groupby == 'create_date'" colspan="5">
+                                    <span t-field="tickets[0].create_date"/>
+                                </th>
+                            </tr>
+                
+                            <t t-foreach="tickets" t-as="ticket">
+                                <tr>
+                                    <td>
+                                            <a t-attf-href="/my/desk/ticket/#{ticket.id}?access_token=#{ticket.access_token}">
+                                                <span t-field="ticket.name"/>
+                                            </a>
+                                    </td>
+                                    <td class="text-start"><a t-attf-href="/my/desk/ticket/#{ticket.id}"><small>#</small><span class="ms-2" t-att-title="ticket.name" t-field="ticket.name"/></a></td>
+                                    <td class="">
+                                        <span t-field="ticket.create_date"/>
+                                    </td>
+                                    <td class="">
+                                        <t t-set="assignees" t-value="ticket.sudo().user_ids"/>
+                                        <div t-if="assignees" class="row flex-nowrap ps-3">
+                                            <img class="rounded-circle o_portal_contact_img me-2 px-0" t-attf-src="#{image_data_uri(assignees[:1].avatar_128)}" alt="User" style="width: 20px; height: 20px;"/>
+                                            <span t-out="'%s%s' % (assignees[:1].name, ' + %s others' % len(assignees[1:]) if len(assignees.user_ids) > 1 else '')" t-att-title="'\n'.join(assignees.mapped('name'))"/>
+                                        </div>
+                                    </td>
+                                    <td class="" id="ticket_status">
+                                        <span t-attf-class="badge #{'text-bg-success' if ticket.stage_id.fold else 'text-bg-primary'} fw-normal o_text_overflow" t-attf-title="#{ticket.stage_id.name}" t-esc="ticket.stage_id.name"/>
 
-                        <td class="">
-                            <span t-field="ticket.create_date"/>
-                        </td>
-                        <td class="">
-                           <t t-set="assignees" t-value="ticket.sudo().user_ids"/>
-                                    <div t-if="assignees" class="row flex-nowrap ps-3">
-                                        <img class="rounded-circle o_portal_contact_img me-2 px-0" t-attf-src="#{image_data_uri(assignees[:1].avatar_128)}" alt="User" style="width: 20px; height: 20px;"/>
-                                        <span t-out="'%s%s' % (assignees[:1].name, ' + %s others' % len(assignees[1:]) if len(assignees.user_ids) > 1 else '')" t-att-title="'\n'.join(assignees.mapped('name'))"/>
-                                    </div>
-                        </td>
-                        <td class="" id="ticket_status">
-                            <span t-field="ticket.stage_id.name"/>
-                        </td>
-                    </tr>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </t>
                 </t>
             </t>
-            <p t-else="">There are currently no tickets for your account.</p>
         </t>
     </template>
 
