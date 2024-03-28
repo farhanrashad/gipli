@@ -92,21 +92,75 @@
             </t>
         </t>
     </template>
+
+    <!-- Popup window models -->
+    <template id="model_ticket_close_template">
+        <div role="dialog" class="modal fade" id="modal-ticket-close" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h4 class="modal-title">
+                                Clsoe Ticket 
+                                <span t-field="ticket.name" class="text-primary"/>
+                            </h4>
+                        </header>
+                        <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
+                            <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <main class="modal-body">
+                            </main>
+                            <footer class="modal-footer">
+                                <button class="btn btn-primary">Close Ticket</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            </footer>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </template>
+
+
+    <template id="model_ticket_open_template">
+        <div role="dialog" class="modal fade" id="modal-ticket-open" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h4 class="modal-title">
+                                Clsoe Ticket 
+                                <span t-field="ticket.name" class="text-primary"/>
+                            </h4>
+                        </header>
+                        <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
+                            <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <main class="modal-body">
+                            </main>
+                            <footer class="modal-footer">
+                                <button class="btn btn-primary">Close Ticket</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            </footer>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </template>
     
     <!-- Individual Ticket Page -->
     <template id="portal_my_ticket" name="My Ticket" inherit_id="portal.portal_sidebar" primary="True">
         <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+            <t t-call="de_helpdesk.model_ticket_close_template" />
+            <t t-call="de_helpdesk.model_ticket_open_template" />
             <div class="row o_project_portal_sidebar">
                 <t t-call="portal.portal_record_sidebar">
                     <t t-set="classes" t-value="'col-lg-3 col-xl-4 d-print-none'"/>
                     <t t-set="entries">
                         <div class="d-flex flex-column gap-4">
-                            <div class="d-flex flex-column gap-2" id="sale_order_sidebar_button">
-                                <a role="button" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modalaccept" href="#">
-                                    <i class="fa fa-check"/>Close Ticket
+                            <div class="d-flex flex-column gap-2" id="ticket_close_sidebar_button">
+                                <a role="button" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modal-ticket-close" href="#">
+                                    <i class="fa fa-check"/> Close Ticket
                                 </a>
-                                <a role="button" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modalaccept" href="#">
-                                    <i class="fa fa-check"/>Re-Open Ticket
+                                <a role="button" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modal-ticket-open" href="#">
+                                    <i class="fa fa-check"/> Re-Open Ticket
                                 </a>
                             </div>
                             <div class="d-flex flex-column gap-2" id="sale_order_sidebar_button">
