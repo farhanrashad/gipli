@@ -154,8 +154,11 @@ class TicketCustomerPortal(CustomerPortal):
             search_domain.append([('state', 'ilike', state_dict.get(search, search))])
         return OR(search_domain)
 
-    def _prepare_tickets_domain(self):
-        return []
+    def _prepare_tickets_domain(self, partner):
+        return [
+            ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
+            ('project_id.is_helpdesk_team', '=', True)
+        ]
         
     
     def _get_my_tickets_searchbar_filters(self):
@@ -172,7 +175,8 @@ class TicketCustomerPortal(CustomerPortal):
 
     def _prepare_tickets_values(self, page=1, date_begin=None, date_end=None, sortby=None, filterby='all', search=None, groupby='none', search_in='content'):
         values = self._prepare_portal_layout_values()
-        domain = self._prepare_tickets_domain()
+        partner = request.env.user.partner_id
+        domain = self._prepare_tickets_domain(partner)
 
         searchbar_sortings = {
             'date': {'label': _('Newest'), 'order': 'create_date desc'},

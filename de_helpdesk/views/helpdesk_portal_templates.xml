@@ -71,12 +71,7 @@
                 
                             <t t-foreach="tickets" t-as="ticket">
                                 <tr>
-                                    <td>
-                                            <a t-attf-href="/my/desk/ticket/#{ticket.id}?access_token=#{ticket.access_token}">
-                                                <span t-field="ticket.name"/>
-                                            </a>
-                                    </td>
-                                    <td class="text-start"><a t-attf-href="/my/desk/ticket/#{ticket.id}"><small>#</small><span class="ms-2" t-att-title="ticket.name" t-field="ticket.name"/></a></td>
+                                    <td class="text-start"><a t-attf-href="/my/desk/ticket/#{ticket.id}"><small>#<span t-att-title="ticket.ticket_no" t-field="ticket.ticket_no"/></small><span class="ms-2" t-att-title="ticket.name" t-field="ticket.name"/></a></td>
                                     <td class="">
                                         <span t-field="ticket.create_date"/>
                                     </td>
