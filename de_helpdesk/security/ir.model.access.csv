@@ -11,3 +11,6 @@ access_project_task_sla_line_manager,access.project.task.sla.line.manager,model_
 access_project_ticket_reopen,access.project.ticket.reopen,model_project_ticket_reopen,,1,1,1,1
 access_project_ticket_reopen_wizard,access.project.ticket.reopen.wizard,model_project_ticket_reopen_wizard,,1,1,1,1
 access_project_ticket_merge_wizard,access.project.ticket.merge.wizard,model_project_ticket_merge_wizard,,1,1,1,1
+
+access_project_task_type_approvals_user,access.project.task.type.approvals.user,model_project_task_type_approvals,base.group_user,1,1,1,0
+access_project_task_type_approvals_manager,access.project.task.type.approvals.manager,model_project_task_type_approvals,group_project_helpdesk_manager,1,1,1,1

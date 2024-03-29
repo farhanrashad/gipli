@@ -33,7 +33,8 @@
         <field name="implied_ids" eval="[
             (4, ref('base.group_user')),
             (4, ref('group_project_merge_ticket_enabled')),
-            (4, ref('group_project_ticket_reopen'))
+            (4, ref('group_project_ticket_reopen')),
+            (4, ref('group_project_ticket_approvals')),
             ]"
         />
         <field name="category_id" ref="de_helpdesk.module_category_project_helpdesk"/>

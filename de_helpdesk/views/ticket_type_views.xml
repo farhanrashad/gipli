@@ -11,6 +11,8 @@
 				</tree>
 			</field>
 		</record>
+
+        
         
         <record id="project_ticket_type_search_view" model="ir.ui.view">
             <field name="name">project.ticket.type.search.view</field>
