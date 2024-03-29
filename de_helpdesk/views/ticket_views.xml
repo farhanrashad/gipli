@@ -8,9 +8,10 @@
         <field name="arch" type="xml">
             <form string="Project Ticket">
                 <field name="allowed_reopen" invisible="1" />
+                 <field name="is_ticket" invisible="1" />
                 <header>
                     <button string="Reopen Ticket" name="action_reopen_ticket" type="object"
-                        invisible="not allowed_reopen" />
+                        invisible="not allowed_reopen or not is_ticket" />
                     <field name="stage_id" widget="statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}"/>
                 </header>
                 <sheet>
@@ -125,7 +126,7 @@
                 <field name="company_id" column_invisible="True"/>
                 <field name="project_id" column_invisible="True"/>
                 <field name="is_sla" column_invisible="True"/>
-                <field name="id" />
+                <field name="ticket_no" />
                 <field name="ticket_priority" optional="show" widget="priority"/>
                  <field name="name" string="Name"/>
                 <field name="user_ids" optional="show" widget="many2many_avatar_user"/>

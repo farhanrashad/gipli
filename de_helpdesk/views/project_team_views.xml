@@ -55,6 +55,10 @@
                                     </div>
                                 </div>
                             </setting>
+                            <setting class="col-lg-12" help="Allow users to combine related tickets into one for a more streamlined resolution.">
+                                <field name="is_merge_tickets"/>
+                            </setting>
+                            
                         </div>
                     </div>
                     <h2>Channels</h2>
@@ -147,6 +151,9 @@
                                     <field name="from_stage_ids" widget="many2many_tags" class="ms-2" context="{'default_project_id': id}"/>
                                 </div>
                             </div>
+                        </setting>
+                        <setting help="Allow your customers to reopen their own tickets" documentation="/applications/services/helpdesk/advanced/close_tickets.html">
+                            <field name="allow_portal_user_reopen_ticket"/>
                         </setting>
                     </div>
 

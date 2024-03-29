@@ -22,6 +22,8 @@ class Project(models.Model):
     is_sla = fields.Boolean('SLA Policies', default=False)
     is_helpdesk_team = fields.Boolean('Helpdesk Team', default=False)
 
+    is_merge_tickets = fields.Boolean('Merge Tickets', default=False)
+
     close_ticket_count = fields.Integer(string='Ticket Closed', compute='_compute_close_ticket_count')
     open_ticket_count = fields.Integer(string='Ticket Closed', compute='_compute_open_ticket_count')
     unassigned_ticket_count = fields.Integer(string='Unassigned Tickets', compute='_compute_unassigned_tickets')
@@ -41,6 +43,7 @@ class Project(models.Model):
     publish_rating = fields.Boolean('Publish Ratings')
 
     allow_portal_user_close_ticket = fields.Boolean('Closure by Customers')
+    allow_portal_user_reopen_ticket = fields.Boolean('Re-open by Customers')
     allow_ticket_auto_close = fields.Boolean('Ticket Auto Clsoe')
 
     allow_stock_returns = fields.Boolean('Returns')
