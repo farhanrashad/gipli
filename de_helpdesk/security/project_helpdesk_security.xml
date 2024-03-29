@@ -6,10 +6,36 @@
         <field name="description">Helps you handle your helpdesk needs.</field>
         <field name="sequence">10</field>
     </record>
+
+     <record id="group_project_merge_ticket_enabled" model="res.groups">
+        <field name="name">Enable Merge Tickets</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="group_project_sla_enabled" model="res.groups">
+        <field name="name">Enable Helpdesk SLA</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+    
+    <record id="group_project_ticket_reopen" model="res.groups">
+        <field name="name">Reopen Tickets</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="group_project_ticket_approvals" model="res.groups">
+        <field name="name">Ticket Approvals</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+    
     
     <record id="group_project_helpdesk_user" model="res.groups">
         <field name="name">User</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="implied_ids" eval="[
+            (4, ref('base.group_user')),
+            (4, ref('group_project_merge_ticket_enabled')),
+            (4, ref('group_project_ticket_reopen'))
+            ]"
+        />
         <field name="category_id" ref="de_helpdesk.module_category_project_helpdesk"/>
     </record>
 
@@ -19,26 +45,6 @@
         <field name="implied_ids" eval="[(4, ref('group_project_helpdesk_user')),
             (4, ref('mail.group_mail_template_editor'))]"/>
         <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
-    </record>
-
-    <record id="group_project_sla_enabled" model="res.groups">
-        <field name="name">Enable Helpdesk SLA</field>
-        <field name="category_id" ref="base.module_category_hidden"/>
-    </record>
-    
-    <record id="group_project_ticket_merge" model="res.groups">
-        <field name="name">Merge Tickets</field>
-        <field name="category_id" ref="base.module_category_hidden"/>
-    </record>
-
-    <record id="group_project_ticket_reopen" model="res.groups">
-        <field name="name">Reopen Tickets</field>
-        <field name="category_id" ref="base.module_category_hidden"/>
-    </record>
-
-    <record id="group_project_ticket_approvals" model="res.groups">
-        <field name="name">Ticket Approvals</field>
-        <field name="category_id" ref="base.module_category_hidden"/>
     </record>
     
 </odoo>

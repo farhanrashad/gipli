@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from . import ticket_reopen_wizard
-from . import ticket_merge_wizard
+from . import tickets_reopen_wizard
+from . import tickets_merge_wizard

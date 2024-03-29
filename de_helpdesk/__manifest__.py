@@ -48,7 +48,8 @@ Features:
         'views/ticket_views.xml',
         'views/helpdesk_portal_templates.xml',
         'views/ticket_reopen_reason_views.xml',
-        'wizards/ticket_reopen_wizard_views.xml',
+        'wizards/tickets_reopen_wizard_views.xml',
+        'wizards/tickets_merge_wizard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

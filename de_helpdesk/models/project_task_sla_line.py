@@ -10,7 +10,9 @@ class ProjectTaskSLALine(models.Model):
 
     task_id = fields.Many2one('project.task', string='Ticket', required=True, ondelete='cascade', index=True)
     prj_sla_id = fields.Many2one('project.sla', string='SLA', required=True, ondelete='cascade')
-    date_deadline = fields.Datetime("Deadline", compute='_compute_deadline', compute_sudo=True, store=True)
+    date_deadline = fields.Datetime("Deadline", 
+                                    #compute='_compute_deadline', compute_sudo=True, 
+                                    store=True)
     
     status = fields.Selection([
         ('failed', 'Failed'), 
@@ -21,6 +23,9 @@ class ProjectTaskSLALine(models.Model):
     
     exceeded_hours = fields.Float("Exceeded Working Hours", compute='_compute_exceeded_hours', compute_sudo=True, store=True, help="Working hours exceeded for reached SLAs compared with deadline. Positive number means the SLA was reached after the deadline.")
 
+    def _compute_deadline(self):
+        pass
+        
     @api.model
     def _search_status(self, operator, value):
         """ Supported operators: '=', 'in' and their negative form. """

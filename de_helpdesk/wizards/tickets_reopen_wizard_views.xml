@@ -20,15 +20,4 @@
             </form>
         </field>
     </record>
-
-    <record id="action_tickets_reopen_menu" model="ir.actions.act_window">
-        <field name="name">Reopen Tickets</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">project.ticket.reopen.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <!-- TODO: check if we need this -->
-        <field name="binding_model_id" ref="de_helpdesk.model_project_task" />
-        <field name="binding_view_types">list</field>
-    </record>
 </odoo>

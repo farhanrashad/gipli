@@ -103,14 +103,13 @@ class Project(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         projects = super(Project, self).create(vals_list)
-        projects.sudo()._check_helpdesk_group_sla()
+        projects.sudo()._compute_group_project_sla()
         return projects
 
     def write(self, vals):
         res = super(Project, self).write(vals)
         if 'is_sla' in vals:
-            self.sudo()._check_helpdesk_group_sla()
-                #raise UserError('hello')
+            self.sudo()._compute_group_project_sla()
         return res
         
     # SLA Policies
@@ -124,11 +123,11 @@ class Project(models.Model):
     def _get_group_project_sla_enabled(self):
         return self.env.ref('de_helpdesk.group_project_sla_enabled')
         
-    def _check_helpdesk_group_sla(self):
+    def _compute_group_project_sla(self):
         sla_projects = self.filtered('is_sla')
         non_sla_projects = self - sla_projects
         group_sla_enabled = group_helpdesk_user = None
-        user_has_group_sla_enabled = self.env.user.has_group('helpdesk.group_project_sla_enabled')
+        user_has_group_sla_enabled = self.env.user.has_group('de_helpdesk.group_project_sla_enabled')
 
         if sla_projects:
             if not user_has_group_sla_enabled:
@@ -146,9 +145,42 @@ class Project(models.Model):
             if user_has_group_sla_enabled and not self._check_group_project_sla_enabled():
                 group_sla_enabled = group_sla_enabled or self._get_group_project_sla_enabled()
                 group_helpdesk_user = group_helpdesk_user or self._get_group_project_helpdesk_user()
-                helpdesk_user_group.write({'implied_ids': [(3, group_sla_enabled.id)]})
+                group_helpdesk_user.write({
+                    'implied_ids': [Command.unlink(group_sla_enabled.id)]
+                })
                 group_sla_enabled.write({'users': [(5, 0, 0)]})
                 
+    # Merge Tickets
+    def _check_merge_tickets_feature(self, check_user_has_group=False):
+        user_has_group_sla_enabled = self.user_has_groups('de_helpdesk.group_project_merge_ticket_enabled') if check_user_has_group else True
+        return user_has_group_sla_enabled and self.env['project.project'].search([('is_merge_tickets', '=', True)], limit=1)
+        
+    def _get_group_project_merge_ticket_enabled(self):
+        return self.env.ref('de_helpdesk.group_project_merge_ticket_enabled')
+        
+    def _compute_group_project_merge_ticket(self):
+        merge_tickets_projects = self.filtered('is_merge_tickets')
+        non_mergeable_projects = self - merge_tickets_projects
+        
+        group_merge_tickets_enabled = group_helpdesk_user = None
+        user_has_group_merge_ticket_enabled = self.env.user.has_group('de_helpdesk.group_project_merge_ticket_enabled')
+
+        if merge_tickets_projects:
+            if not user_has_group_merge_ticket_enabled:
+                group_merge_tickets_enabled = self._get_group_project_merge_ticket_enabled()
+                group_helpdesk_user = self._get_group_project_helpdesk_user()
+                group_helpdesk_user.write({
+                    'implied_ids': [Command.link(group_merge_tickets_enabled.id)]
+                })   
+        if non_mergeable_projects:
+            #self.env['project.sla'].search([('project_id', 'in', non_sla_projects.ids)]).write({'active': False})
+            if user_has_group_sla_enabled and not self._check_merge_tickets_feature():
+                group_merge_tickets_enabled = group_sla_enabled or self._get_group_project_merge_ticket_enabled()
+                group_helpdesk_user = group_helpdesk_user or self._get_group_project_helpdesk_user()
+                group_helpdesk_user.write({
+                    'implied_ids': [Command.unlink(group_merge_tickets_enabled.id)]
+                })
+                group_merge_tickets_enabled.write({'users': [(5, 0, 0)]})
     
     # Actions
     def action_project_tickets(self):

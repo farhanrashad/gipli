@@ -192,6 +192,27 @@ class ProjectTask(models.Model):
                   'user': self.env.user.name,
                  }
         return self.env['ir.qweb'].with_context(lang=lang)._render(template, values)
+
+    def _get_ticket_merge_digest(self, ticket, template='de_helpdesk.merge_tickets_digest', lang=None):
+        self.ensure_one()
+        values = {
+            'record_url': ticket._get_html_link(),
+            'assignees': ','.join(user.name for user in ticket.user_ids),
+            'project': ticket.project_id.name
+        }
+        return self.env['ir.qweb'].with_context(lang=lang)._render(template, values)
+
+    def _prepare_new_merge_ticket_values(self, name, description):
+        #user_id = [(4, self.user_id.id)] if self.user_id else False
+        vals = {
+            'name': name,
+            'project_id': self.project_id.id,
+            'user_ids': self.user_ids,
+            'description': description,
+            'is_ticket': True,
+        }
+       
+        return vals
         
     def open_reopen_ticket_reaons(self):
         action = self.env.ref('de_helpdesk.action_ticket_reopen_reason').read()[0]
@@ -208,17 +229,6 @@ class ProjectTask(models.Model):
             
         })
         return action
-        
-    def action_reopen_ticket(self):
-        ticket_ids = self.env.context.get('active_ids')
-        raise UserError(ticket_ids)
-        return {
-            'name': 'Reopen Ticket',
-            'view_mode': 'form',
-            'res_model': 'project.ticket.reopen.wizard',
-            'type': 'ir.actions.act_window',
-            'target': 'new',
-        }
 
     def _prepare_ticket_reopen_reason_values(self, ticket, reason):
         #if self.env.user
@@ -235,9 +245,27 @@ class ProjectTask(models.Model):
             'stage_id': stage_id.id,
         }
 
-    def _open_merge_tickets(self):
-        ticket_ids = self.env.context.get('active_ids')
-        raise UserError(ticket_ids)
+    def _action_merge_tickets(self):
+        active_ids = self.env.context.get('active_ids')
+        ticket_ids = self.env['project.task'].search([('id','in',active_ids)])
+        partner_ids = ticket_ids.mapped('partner_id')
+        if len(partner_ids) != 1:
+            raise UserError('Merging tickets for multiple customers is not allowed.')
+        return {
+            'name': 'Merge Tickets',
+            'view_mode': 'form',
+            'res_model': 'project.ticket.merge.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+    def action_reopen_tickets(self):
+        active_ids = self.env.context.get('active_ids')
+        ticket_ids = self.env['project.task'].search([('id','in',active_ids)]) 
+        project_ids = ticket_ids.mapped('project_id')
+        #raise UserError(ticket_ids)
+        if len(project_ids) > 1:
+            raise UserError('It is not permissible to reopen tickets concurrently across different support groups.')
+        
         return {
             'name': 'Reopen Ticket',
             'view_mode': 'form',

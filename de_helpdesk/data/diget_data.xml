@@ -6,5 +6,15 @@
             <t t-if="origin== 'customer'">The ticket <t t-out="record_url"/> is re-opened by customer <t t-out="user"/></t>
         </div>
     </template>
+
+    <template id="merge_tickets_digest">
+        <div>
+            <t>This ticket has been merged with ticket <t t-out="record_url"/>.</t>
+            <ul>
+                <li>Support Team: <t t-out="project"/></li>
+                <li>Assignees: <t t-out="assignees"/></li>
+            </ul>
+        </div>
+    </template>
     
 </odoo>
