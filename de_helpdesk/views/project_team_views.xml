@@ -169,11 +169,11 @@
 
                     <h2>Self Service</h2>
                     <div class="row mt16 o_settings_container" id="website_form_channel">
-                        <setting help="Allow your customers to close their own tickets" documentation="/applications/services/helpdesk/advanced/close_tickets.html">
+                        <setting help="Allow customers to easily close their tickets through the portal for quick resolutions." documentation="/applications/services/helpdesk/advanced/close_tickets.html">
                             <field name="allow_portal_user_close_ticket"/>
                         </setting>
                         
-                        <setting help="Allow your customers to reopen their own tickets" documentation="/applications/services/helpdesk/advanced/close_tickets.html">
+                        <setting help="Allow customers to conveniently reopen their tickets through the portal for further assistance." documentation="/applications/services/helpdesk/advanced/close_tickets.html">
                             <field name="allow_portal_user_reopen_ticket"/>
                         </setting>
                     </div>

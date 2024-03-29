@@ -16,6 +16,7 @@
             <field name="alias_name">support</field>
             <field name="is_sla" eval="True"/>
             <field name="is_helpdesk_team" eval="True"/>
+            <field name="company_id" ref="base.main_company"/>
         </record>
 
         <!-- Stages for Support Desk Project -->

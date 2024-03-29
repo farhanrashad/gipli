@@ -3,12 +3,17 @@
     <!-- Application Menu -->
     <menuitem name="Helpdesk"
         id="menu_helpdesk_root"
-        groups="sales_team.group_sale_salesman"
+        groups="de_helpdesk.group_project_helpdesk_user"
         web_icon="de_helpdesk,static/description/icon.png"
         sequence="40" />
 
     <menuitem id="menu_helpdesk_tickets" name="Tickets" parent="menu_helpdesk_root" sequence="20"/>
     <menuitem id="menu_helpdesk_reports" name="Reports" parent="menu_helpdesk_root" sequence="90"/>
-    <menuitem id="menu_helpdesk_config" name="Configuration" parent="menu_helpdesk_root" sequence="100"/>
+    <menuitem id="menu_helpdesk_config" 
+        name="Configuration" 
+        parent="menu_helpdesk_root" 
+        groups="de_helpdesk.group_project_helpdesk_manager"
+        sequence="100"
+    />
     
 </odoo>

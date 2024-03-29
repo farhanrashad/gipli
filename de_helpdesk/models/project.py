@@ -53,8 +53,8 @@ class Project(models.Model):
     
     publish_rating = fields.Boolean('Publish Ratings')
 
-    allow_portal_user_close_ticket = fields.Boolean('Closure by Customers')
-    allow_portal_user_reopen_ticket = fields.Boolean('Re-open by Customers')
+    allow_portal_user_close_ticket = fields.Boolean('Close by Customers')
+    allow_portal_user_reopen_ticket = fields.Boolean('Reopen by Customers')
     allow_ticket_auto_close = fields.Boolean('Ticket Auto Clsoe')
 
     allow_stock_returns = fields.Boolean('Returns')
