@@ -61,17 +61,17 @@
                     <div class="row mt16 o_settings_container" id="automation">
                         <div class="col-lg-6">
                             <setting class="col-lg-12" help="Set approval for tickets: By security groups (pre-defined teams) or by individual Users.">
-                                <field name="group_ticket_approvals"/>
-                                <div invisible="not group_ticket_approvals" class="mt16">
+                                <field name="is_ticket_approvals"/>
+                                <div invisible="not is_ticket_approvals" class="mt16">
                                     <field name="ticket_approval_type" 
-                                        required="group_ticket_approvals"
+                                        required="is_ticket_approvals"
                                         class="o_light_label w-100" 
                                         widget="radio"
                                     />
                                 </div>
                             </setting>
                             <setting class="col-lg-12" help="Allow users to combine related tickets into one for a more streamlined resolution.">
-                                <field name="group_merge_tickets"/>
+                                <field name="is_merge_tickets"/>
                             </setting>
                         </div>
                         <div class="col-lg-6">
@@ -92,7 +92,7 @@
                                 </div>
                             </setting>
                             <setting class="col-lg-12" help="Allow users to reopen tickets for a more streamlined resolution.">
-                                <field name="group_reopen_tickets"/>
+                                <field name="is_reopen_tickets"/>
                             </setting>
                         </div>
                         

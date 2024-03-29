@@ -24,7 +24,10 @@ Features:
     'category': 'Services/Helpdesk',
     'version': '0.1',
 
-    'depends': ['project'],
+    'depends': [
+        'project',
+        'diget',
+    ],
 
     # always loaded
     'data': [
