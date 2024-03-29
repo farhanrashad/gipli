@@ -1,6 +1,39 @@
 <?xml version="1.0"?>
 <odoo>
 
+    <record id="project_task_type_form_view_inherit" model="ir.ui.view">
+        <field name="name">project.task.type.form.view.inherit</field>
+        <field name="model">project.task.type</field>
+        <field name="inherit_id" ref="project.task_type_edit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Approvals" name="ticket_approvals" groups="de_helpdesk.group_project_ticket_approvals">
+                        <field name="prj_task_type_approval_line" >
+                            <tree editable="bottom" string="Ticket Approvals">
+                                <field name="ticket_approval_type" column_invisible="1" />
+                                <field name="project_id" 
+                                    options="{'no_edit':True, 'no_create':True}" 
+                                />
+                                <field name="group_ids" widget="many2many_tags"
+                                    options="{'no_edit':True, 'no_create':True}" 
+                                    invisible="ticket_approval_type != 'group' "
+                                />
+                                <field name="user_ids" widget="many2many_tags"
+                                    options="{'no_edit':True, 'no_create':True}" 
+                                    invisible="ticket_approval_type != 'user' "
+                                />
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+    
+
+
+
     <record id="action_ticket_stage" model="ir.actions.act_window">
         <field name="name">Ticket Stages</field>
         <field name="res_model">project.task.type</field>

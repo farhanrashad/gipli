@@ -55,11 +55,47 @@
                                     </div>
                                 </div>
                             </setting>
-                            <setting class="col-lg-12" help="Allow users to combine related tickets into one for a more streamlined resolution.">
-                                <field name="is_merge_tickets"/>
-                            </setting>
-                            
                         </div>
+                    </div>
+                    <h2>Automation</h2>
+                    <div class="row mt16 o_settings_container" id="automation">
+                        <div class="col-lg-6">
+                            <setting class="col-lg-12" help="Set approval for tickets: By security groups (pre-defined teams) or by individual Users.">
+                                <field name="group_ticket_approvals"/>
+                                <div invisible="not group_ticket_approvals" class="mt16">
+                                    <field name="ticket_approval_type" 
+                                        required="group_ticket_approvals"
+                                        class="o_light_label w-100" 
+                                        widget="radio"
+                                    />
+                                </div>
+                            </setting>
+                            <setting class="col-lg-12" help="Allow users to combine related tickets into one for a more streamlined resolution.">
+                                <field name="group_merge_tickets"/>
+                            </setting>
+                        </div>
+                        <div class="col-lg-6">
+                            <setting help="Close inactive tickets automatically">
+                                <field name="allow_ticket_auto_close"/>
+                                <div class="content-group" invisible="not allow_ticket_auto_close">
+                                    <div class="mt16">
+                                        <label for="close_stage_id"/>
+                                        <field name="close_stage_id" class="ms-2 oe_inline" required="allow_ticket_auto_close" context="{'default_project_id': id}"/>
+                                    </div>
+                                    <div class="mt8">
+                                        <strong>After</strong><field name="day_to_close" class="mx-2 oe_inline text-center" required="1"/><span>days of inactivity</span>
+                                    </div>
+                                    <div class="mt8">
+                                        <label for="from_stage_ids"/>
+                                        <field name="from_stage_ids" widget="many2many_tags" class="ms-2" context="{'default_project_id': id}"/>
+                                    </div>
+                                </div>
+                            </setting>
+                            <setting class="col-lg-12" help="Allow users to reopen tickets for a more streamlined resolution.">
+                                <field name="group_reopen_tickets"/>
+                            </setting>
+                        </div>
+                        
                     </div>
                     <h2>Channels</h2>
                     <div class="row mt16 o_settings_container" id="channels">
@@ -136,22 +172,7 @@
                         <setting help="Allow your customers to close their own tickets" documentation="/applications/services/helpdesk/advanced/close_tickets.html">
                             <field name="allow_portal_user_close_ticket"/>
                         </setting>
-                        <setting help="Close inactive tickets automatically">
-                            <field name="allow_ticket_auto_close"/>
-                            <div class="content-group" invisible="not allow_ticket_auto_close">
-                                <div class="mt16">
-                                    <label for="close_stage_id"/>
-                                    <field name="close_stage_id" class="ms-2 oe_inline" required="allow_ticket_auto_close" context="{'default_project_id': id}"/>
-                                </div>
-                                <div class="mt8">
-                                    <strong>After</strong><field name="day_to_close" class="mx-2 oe_inline text-center" required="1"/><span>days of inactivity</span>
-                                </div>
-                                <div class="mt8">
-                                    <label for="from_stage_ids"/>
-                                    <field name="from_stage_ids" widget="many2many_tags" class="ms-2" context="{'default_project_id': id}"/>
-                                </div>
-                            </div>
-                        </setting>
+                        
                         <setting help="Allow your customers to reopen their own tickets" documentation="/applications/services/helpdesk/advanced/close_tickets.html">
                             <field name="allow_portal_user_reopen_ticket"/>
                         </setting>

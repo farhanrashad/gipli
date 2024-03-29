@@ -16,15 +16,26 @@ class Project(models.Model):
     assign_method = fields.Selection([
         ('randomly', 'Each user is assigned an equal number of tickets'),
         ('balanced', 'Each user has an equal number of open tickets')],
-        string='Assignment Method', default='randomly', required=True,
+        string='Assignment Method', default='randomly',
         help="New tickets will automatically be assigned to the team members that are available, according to their working hours and their time off.")
 
     is_sla = fields.Boolean('SLA Policies', default=False)
     is_helpdesk_team = fields.Boolean('Helpdesk Team', default=False)
 
-    is_merge_tickets = fields.Boolean('Merge Tickets', default=False)
-    is_reopen_tickets = fields.Boolean('Reopen Tickets', default=False)
+    group_merge_tickets = fields.Boolean('Merge Tickets', implied_group='de_helpdesk.group_project_ticket_merge')
+    group_reopen_tickets = fields.Boolean('Reopen Tickets', implied_group='de_helpdesk.group_project_ticket_reopen')
 
+    #is_ticket_approvals = fields.Boolean('Approvals', default=False)
+    #is_ticket_approvals = fields.Boolean('Ticket Approvals', config_parameter='de_portal_hr_service.allow_portal_user')
+    group_ticket_approvals = fields.Boolean(string="Ticket Approvals", 
+                    implied_group='de_helpdesk.group_project_ticket_approvals')
+    ticket_approval_type = fields.Selection([
+        ('group', 'By Groups'),
+        ('user', 'By Users')],
+        string='Approval Type', default='group', 
+        help="Select how approvals are granted: by security group or individual user."
+    )
+    
     close_ticket_count = fields.Integer(string='Ticket Closed', compute='_compute_close_ticket_count')
     open_ticket_count = fields.Integer(string='Ticket Closed', compute='_compute_open_ticket_count')
     unassigned_ticket_count = fields.Integer(string='Unassigned Tickets', compute='_compute_unassigned_tickets')
