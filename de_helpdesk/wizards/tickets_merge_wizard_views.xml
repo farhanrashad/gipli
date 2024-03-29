@@ -25,6 +25,7 @@
                             required="merge_method == 'new'"
                         />
                     </group>
+                    
                 </group>
                 <footer>
                     <button name="action_merge_tickets" string="Merge" type="object" class="btn-primary"/>

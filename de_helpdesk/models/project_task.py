@@ -251,6 +251,11 @@ class ProjectTask(models.Model):
         partner_ids = ticket_ids.mapped('partner_id')
         if len(partner_ids) != 1:
             raise UserError('Merging tickets for multiple customers is not allowed.')
+        if any(ticket.stage_id.fold for ticket in ticket_ids):
+            raise UserError(_("One or more tickets are already closed and cannot be merged."))
+        if len(active_ids) == 1:
+            raise UserError(_("Please select two or more tickets to merge."))
+            
         return {
             'name': 'Merge Tickets',
             'view_mode': 'form',

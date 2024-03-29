@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 class TicketMergeWizard(models.TransientModel):
     _name = 'project.ticket.merge.wizard'
     _description = 'Ticket Reopen Wizard'
-
+ 
     ticket_ids = fields.Many2many(
         'project.task', default=lambda self: self.env.context.get('active_ids'))
     
@@ -39,20 +39,22 @@ class TicketMergeWizard(models.TransientModel):
 
         
     def action_merge_tickets(self):
-        tickets_description = '\n'.join(ticket.description for ticket in self.ticket_ids.sorted(key=lambda t: t.create_date))
-        tickets_name = ','.join(ticket.ticket_no for ticket in self.ticket_ids.sorted(key=lambda t: t.create_date))
-        tickets_name = 'Combine tickets ' + tickets_name
         if self.merge_method == 'new':
-            ticket = self._create_ticket(tickets_name, tickets_description)
+            ticket = self._create_ticket()
         elif self.merge_method == 'one':
-            ticket = self._merge_tickets()
-            
+            ticket = self._merge_tickets(self.ticket_ids[0])
+        elif self.merge_method == 'ticket':
+            ticket = self._merge_tickets(self.target_ticket_id)
 
-    def _create_ticket(self, name, description):
+    def _create_ticket(self):
+        description = '\n'.join(ticket.description for ticket in self.ticket_ids.sorted(key=lambda t: t.create_date))
+        name = ','.join(ticket.ticket_no for ticket in self.ticket_ids.sorted(key=lambda t: t.create_date))
+        name = 'Combine tickets ' + name
         ticket = self.env['project.task'].create(self._prepare_ticket_values(name, description))
         lang = ticket.partner_id.lang or self.env.user.lang
         message_body = ticket._get_ticket_merge_digest(ticket, lang=lang)
         self._send_message(self.ticket_ids, message_body)
+        self._close_tickets(self.ticket_ids)
         return ticket
         
     def _prepare_ticket_values(self, name, description):
@@ -68,31 +70,24 @@ class TicketMergeWizard(models.TransientModel):
             vals['partner_id'] = partner_id.id
         return vals
 
-    def _merge_tickets(self):
-        ticket = self.ticket_ids[0]
+    def _merge_tickets(self, ticket_id):
+        ticket = ticket_id
         to_combine_ticket_ids = self.ticket_ids - ticket
-    
         # Convert ticket description to string using prettify()
         ticket_description_str = BeautifulSoup(ticket.description, 'html.parser').prettify()
-    
         # Convert descriptions of to_combine_ticket_ids to strings
         descriptions = []
         for t in to_combine_ticket_ids.sorted(key=lambda t: t.create_date):
             descriptions.append(BeautifulSoup(t.description, 'html.parser').prettify())
-    
         # Join descriptions with newlines
         tickets_description = '\n'.join(descriptions)
-    
         # Combine descriptions
         description = ticket_description_str + '\n' + tickets_description
-    
         ticket.sudo().update(self._prepare_ticket_updated_values(description))
-        
         lang = ticket.partner_id.lang or self.env.user.lang
         message_body = ticket._get_ticket_merge_digest(ticket, lang=lang)
         self._send_message(to_combine_ticket_ids, message_body)
-
-
+        self._close_tickets(to_combine_ticket_ids)
     
     def _prepare_ticket_updated_values(self,description):
         partner_id = self.ticket_ids.filtered(lambda x:x.partner_id).mapped('partner_id')
@@ -107,3 +102,15 @@ class TicketMergeWizard(models.TransientModel):
     def _send_message(self, ticket_ids, message_body):
         for ticket_id in ticket_ids:
             ticket_id.message_post(body=message_body)
+
+    def _close_tickets(self, ticket_ids):
+        close_stage_id = self.env['project.task.type']
+        for ticket in ticket_ids:
+            close_stage_id = self.env['project.task.type'].search([
+                ('project_ids','in',ticket.project_id.id),
+                ('fold','=',True),
+            ],limit=1)
+            ticket_ids.write({
+                'stage_id': close_stage_id.id,
+                'closed_by': 'user',
+            })
