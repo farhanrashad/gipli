@@ -2,6 +2,7 @@
 
 from odoo import fields, models, _, api
 from odoo.exceptions import UserError, ValidationError
+from bs4 import BeautifulSoup
 
 class TicketMergeWizard(models.TransientModel):
     _name = 'project.ticket.merge.wizard'
@@ -44,9 +45,7 @@ class TicketMergeWizard(models.TransientModel):
         if self.merge_method == 'new':
             ticket = self._create_ticket(tickets_name, tickets_description)
         elif self.merge_method == 'one':
-            ticket = self._merge_tickets(tickets_description)
-            #raise UserError(to_combine_ticket_ids)
-            #raise UserError(self.ticket_ids[0])
+            ticket = self._merge_tickets()
             
 
     def _create_ticket(self, name, description):
@@ -69,21 +68,40 @@ class TicketMergeWizard(models.TransientModel):
             vals['partner_id'] = partner_id.id
         return vals
 
-    def _merge_tickets(self, description):
+    def _merge_tickets(self):
         ticket = self.ticket_ids[0]
         to_combine_ticket_ids = self.ticket_ids - ticket
-        
-        ticket.write(self._prepare_ticket_updated_values(description))
+    
+        # Convert ticket description to string using prettify()
+        ticket_description_str = BeautifulSoup(ticket.description, 'html.parser').prettify()
+    
+        # Convert descriptions of to_combine_ticket_ids to strings
+        descriptions = []
+        for t in to_combine_ticket_ids.sorted(key=lambda t: t.create_date):
+            descriptions.append(BeautifulSoup(t.description, 'html.parser').prettify())
+    
+        # Join descriptions with newlines
+        tickets_description = '\n'.join(descriptions)
+    
+        # Combine descriptions
+        description = ticket_description_str + '\n' + tickets_description
+    
+        ticket.sudo().update(self._prepare_ticket_updated_values(description))
         
         lang = ticket.partner_id.lang or self.env.user.lang
         message_body = ticket._get_ticket_merge_digest(ticket, lang=lang)
         self._send_message(to_combine_ticket_ids, message_body)
 
+
     
     def _prepare_ticket_updated_values(self,description):
+        partner_id = self.ticket_ids.filtered(lambda x:x.partner_id).mapped('partner_id')
         vals = {
-            'description': description,
+            'description': BeautifulSoup(description, 'html.parser').prettify(),
+            'partner_id': partner_id.id,
         }
+        if self.user_ids:
+            vals['user_ids'] = self.user_ids.ids
         return vals
         
     def _send_message(self, ticket_ids, message_body):
