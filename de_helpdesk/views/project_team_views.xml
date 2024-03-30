@@ -10,8 +10,24 @@
               <field name="is_helpdesk_team" invisible="1"/>
             </xpath>
 
+            <xpath expr="//div[@name='button_box']" position="attributes">
+                <attribute name="invisible">is_helpdesk_team</attribute>
+            </xpath>
+
+            <!--
+            <xpath expr="//button[@name='action_view_tasks']" position="attributes">
+                <attribute name="invisible">is_helpdesk_team</attribute>
+            </xpath>
+            <xpath expr="//button[@name='project_update_all_action']" position="attributes">
+                <attribute name="invisible">is_helpdesk_team</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_view_tasks']" position="attributes">
+                <attribute name="invisible">is_helpdesk_team</attribute>
+            </xpath>
+            -->
+
             <xpath expr="//header/button" position="attributes">
-                <attribute name="invisible">context.get('is_helpdesk_team')</attribute>
+                <attribute name="invisible">is_helpdesk_team</attribute>
             </xpath>
             
             <xpath expr="//div[hasclass('oe_title')]" position="replace">
@@ -51,6 +67,31 @@
             </xpath>
 
             <!-- Add helpdesk sections -->
+            <xpath expr="//div[hasclass('oe_button_box')]" position="after">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_open_tickets_view" type="object" icon="fa-life-ring" class="oe_stat_button">
+                            <field string="Tickets" name="task_count" widget="statinfo"/>
+                    </button>
+                        <field name="count_tickets_rating" invisible="1"/>
+                        <field name="tickets_rating" invisible="1"/>
+                        <button name="action_open_tickets_rating_view" type="object" class="oe_stat_button" icon="" invisible="not allow_customer_rating or count_tickets_rating == 0" title="Average Rating">
+                            <i class="fa fa-fw o_button_icon fa-smile-o text-success" invisible="tickets_rating &lt; 3.66" title="Satisfied"/>
+                            <i class="fa fa-fw o_button_icon fa-meh-o text-warning" invisible="tickets_rating &lt; 2.33 or tickets_rating &gt;= 3.66" title="Okay"/>
+                            <i class="fa fa-fw o_button_icon fa-frown-o text-danger" invisible="tickets_rating &gt;= 2.33" title="Dissatisfied"/>
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="tickets_rating" nolabel="1" widget="float" digits="[1, 1]"/> / 5
+                                </span>
+                                <span class="o_stat_text">
+                                    Avg. Rating
+                                </span>
+                            </div>
+                        </button>
+                        <button name="action_open_tickets_sla_view" type="object" icon="fa-calendar-check-o" class="oe_stat_button" invisible="not is_sla">
+                            <field name="count_sla" string="SLA Policies" widget="statinfo"/>
+                        </button>
+                    </div>
+            </xpath>
             <xpath expr="//group[1]" position="after">
             <t invisible="not is_helpdesk_team">
                 <h2>Visibility &amp; Assignment </h2>

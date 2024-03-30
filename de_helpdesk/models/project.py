@@ -71,8 +71,24 @@ class Project(models.Model):
         default=7,
         help="Period of inactivity after which tickets will be automatically closed.")
 
+    # smart buttons
+    count_sla = fields.Integer('SLA', compute='_compute_sla_count')
+    count_tickets_rating = fields.Integer('Rating', compute='_compute_customer_rating')
+    tickets_rating = fields.Float('Rating Avg.', compute='_compute_tickets_rating')
 
     # Compute Methods
+    def _compute_tickets_rating(self):
+        for record in self:
+            record.tickets_rating = 1
+            
+    def _compute_sla_count(self):
+        for record in self:
+            record.count_sla = 1
+
+    def _compute_customer_rating(self):
+        for record in self:
+            record.count_tickets_rating = 1
+            
     def _compute_close_ticket_count(self):
         for prj in self:
             prj.close_ticket_count = len(prj.task_ids.filtered(lambda x: x.stage_id.fold))
@@ -199,6 +215,16 @@ class Project(models.Model):
                 group_merge_tickets_enabled.write({'users': [(5, 0, 0)]})
     
     # Actions
+    def action_open_tickets_view(self):
+        pass
+
+    def action_open_tickets_rating_view(self):
+        pass
+
+    def action_open_tickets_sla_view(self):
+        pass
+
+    
     def action_project_tickets(self):
         action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
         action.update({
