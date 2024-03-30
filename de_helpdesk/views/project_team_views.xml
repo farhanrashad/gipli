@@ -29,6 +29,9 @@
             <xpath expr="//header/button" position="attributes">
                 <attribute name="invisible">is_helpdesk_team</attribute>
             </xpath>
+            <xpath expr="//div[hasclass('oe_chatter')]" position="attributes">
+                <attribute name="invisible">is_helpdesk_team</attribute>
+            </xpath>
             
             <xpath expr="//div[hasclass('oe_title')]" position="replace">
                 <div class="oe_title" invisible="is_helpdesk_team">
@@ -66,9 +69,15 @@
                 <attribute name="invisible">is_helpdesk_team</attribute>
             </xpath>
 
+            <xpath expr="//button[@name='project_update_all_action']" position="attributes">
+                <attribute name="invisible">is_helpdesk_team</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_view_tasks']" position="attributes">
+                <attribute name="invisible">is_helpdesk_team</attribute>
+            </xpath>
+            
             <!-- Add helpdesk sections -->
-            <xpath expr="//div[hasclass('oe_button_box')]" position="after">
-                <div class="oe_button_box" name="button_box">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                     <button name="action_open_tickets_view" type="object" icon="fa-life-ring" class="oe_stat_button">
                             <field string="Tickets" name="task_count" widget="statinfo"/>
                     </button>
@@ -90,7 +99,6 @@
                         <button name="action_open_tickets_sla_view" type="object" icon="fa-calendar-check-o" class="oe_stat_button" invisible="not is_sla">
                             <field name="count_sla" string="SLA Policies" widget="statinfo"/>
                         </button>
-                    </div>
             </xpath>
             <xpath expr="//group[1]" position="after">
             <t invisible="not is_helpdesk_team">
@@ -127,6 +135,11 @@
                                 <field name="auto_assignment"/>
                                 <div invisible="not auto_assignment" class="mt16">
                                     <field name="assign_method" class="o_light_label w-100" widget="radio"/>
+                                    <field name="team_member_ids" 
+                                        options="{'no_create':True,'no_edit':True}"
+                                        widget="many2many_tags"
+                                        invisible="not auto_assignment"
+                                    />
                                     <div class="mt16">
                                        
                                     </div>

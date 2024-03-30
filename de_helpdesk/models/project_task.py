@@ -168,6 +168,17 @@ class ProjectTask(models.Model):
         for task in tasks:
             if task.is_ticket or (task.project_id and task.project_id.is_helpdesk_team):
                 task.ticket_no = self.env['ir.sequence'].next_by_code('project.task.ticket.no')
+
+            # Check if automatic assignment is enabled and assign_method is valid
+            if task.project_id.auto_assignment and task.project_id.assign_method in ['balanced', 'randomly']:
+                # Assign users to the task based on the assign_method
+                self._assign_user(task)
+
+             # Check if automatic assignment is enabled and assign_method is valid
+            if task.project_id.auto_assignment and task.project_id.assign_method in ['equal', 'random']:
+                # Assign users to the task based on the assign_method
+                self._assign_user(task)
+            
         return tasks
         
     def _prepare_sla_lines(self, tasks):
@@ -226,6 +237,29 @@ class ProjectTask(models.Model):
         return super(ProjectTask, self).write(vals)
 
 
+    # -----------------------------------------------------------------------
+    # ---------------------------- Business Logics --------------------------
+    # -----------------------------------------------------------------------
+    # Auto Assignment of Tickets
+    def _assign_user(self, ticket):
+        active_users = ticket.project_id.team_member_ids.filtered(lambda user: user.active)
+        if active_users:
+            if ticket.project_id.assign_method == 'equal':
+                self._assign_equal(ticket, active_users)
+            elif ticket.project_id.assign_method == 'random':
+                self._assign_random(ticket, active_users)
+    
+    def _assign_equal(self, ticket, active_users):
+        # Calculate the user index based on the total number of tasks assigned to users
+        user_index = ticket.id % len(active_users)
+        ticket.user_ids = [(4, active_users[user_index].id)]
+    
+    def _assign_random(self, ticket, active_users):
+        # Assign users randomly using round-robin method
+        user_index = len(ticket.project_id.task_ids) % len(active_users)
+        ticket.user_ids = [(4, active_users[user_index].id)]
+
+        
     # ------------------------------------------------------------------------
     # ------------------------------ actions ---------------------------------
     # ------------------------------------------------------------------------

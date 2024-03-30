@@ -15,10 +15,14 @@ class Project(models.Model):
 
     auto_assignment = fields.Boolean("Automatic Assignment")
     assign_method = fields.Selection([
-        ('randomly', 'Each user is assigned an equal number of tickets'),
-        ('balanced', 'Each user has an equal number of open tickets')],
-        string='Assignment Method', default='randomly',
+        ('random', 'Each user is assigned an equal number of tickets'),
+        ('equal', 'Each user has an equal number of open tickets')],
+        string='Assignment Method', default='random',
         help="New tickets will automatically be assigned to the team members that are available, according to their working hours and their time off.")
+
+    team_member_ids = fields.Many2many('res.users', string='Team Members', domain=lambda self: [('groups_id', 'in', self.env.ref('de_helpdesk.group_project_helpdesk_user').id)],
+        default=lambda self: self.env.user, required=True)
+    
 
     is_sla = fields.Boolean('SLA Policies', default=False)
     is_helpdesk_team = fields.Boolean('Helpdesk Team', default=False)
@@ -213,7 +217,7 @@ class Project(models.Model):
                     'implied_ids': [Command.unlink(group_merge_tickets_enabled.id)]
                 })
                 group_merge_tickets_enabled.write({'users': [(5, 0, 0)]})
-    
+        
     # Actions
     def action_open_tickets_view(self):
         pass
