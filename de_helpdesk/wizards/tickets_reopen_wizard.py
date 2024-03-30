@@ -37,9 +37,16 @@ class TicketReopen(models.TransientModel):
     def action_reopen_tickets(self):
         reopen_reason_id = self.env['project.ticket.reopen']
         for ticket in self.ticket_ids:
+            #raise UserError('hello')
             reopen_reason_id.create(ticket._prepare_ticket_reopen_reason_values(ticket,self.reopen_reason))
             ticket._prepare_ticket_reopen(self.stage_id)
-            ticket._get_ticket_reopen_digest(origin='user', lang=lang)
-
-
+    
+            lang = ticket.partner_id.lang or self.env.user.lang
+            message_body = ticket._get_ticket_reopen_digest(self.reopen_reason, lang=lang)
+            ticket.message_post(body=message_body)
+            ticket.write(self._prepare_ticket_reopen_values())
+    def _prepare_ticket_reopen_values(self):
+        return {
+            'stage_id': self.stage_id.id,
+        }
 

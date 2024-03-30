@@ -229,11 +229,10 @@ class ProjectTask(models.Model):
     # ------------------------------------------------------------------------
     # ------------------------------ actions ---------------------------------
     # ------------------------------------------------------------------------
-    def _get_ticket_reopen_digest(self, origin='', template='de_helpdesk.project_ticket_reopen_digest', lang=None):
+    def _get_ticket_reopen_digest(self, reason, template='de_helpdesk.project_ticket_reopen_digest', lang=None):
         self.ensure_one()
-        values = {'origin': origin,
-                  'record_url': self._get_html_link(),
-                  'user': self.env.user.name,
+        values = {
+                  'reason': reason,
                  }
         return self.env['ir.qweb'].with_context(lang=lang)._render(template, values)
 

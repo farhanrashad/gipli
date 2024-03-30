@@ -2,8 +2,8 @@
 <odoo>
     <template id="project_ticket_reopen_digest">
         <div>
-            <t t-if="origin== 'user'">The ticket <t t-out="record_url"/> is re-opened by user <t t-out="user"/></t>
-            <t t-if="origin== 'customer'">The ticket <t t-out="record_url"/> is re-opened by customer <t t-out="user"/></t>
+            <p>This ticket has been re-opened due to following reason:</p>
+            <p t-out="reason"/>
         </div>
     </template>
 
