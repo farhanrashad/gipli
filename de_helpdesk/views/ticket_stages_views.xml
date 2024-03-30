@@ -31,17 +31,18 @@
                             <tree editable="bottom" string="Ticket Approvals" create="0" delete="0">
                                 <field name="group_approval" column_invisible="1" />
                                 <field name="user_approval" column_invisible="1" />
+                                <field name="ticket_approval_type" column_invisible="1" />
                                 <field name="project_id" 
                                     options="{'no_edit':True, 'no_create':True}" 
                                      domain="[('is_helpdesk_team','=',True)]"
                                 />
                                 <field name="group_ids" widget="many2many_tags"
                                     options="{'no_edit':True, 'no_create':True}" 
-                                    readonly="not group_approval"
+                                    readonly="ticket_approval_type != 'group'"
                                 />
                                 <field name="user_ids" widget="many2many_tags"
                                     options="{'no_edit':True, 'no_create':True}" 
-                                    readonly="not user_approval"
+                                    readonly="ticket_approval_type != 'user'"
                                 />
                             </tree>
                         </field>

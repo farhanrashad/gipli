@@ -110,6 +110,8 @@ class Project(models.Model):
         res = super(Project, self).write(vals)
         if 'is_sla' in vals:
             self.sudo()._compute_group_project_sla()
+        if 'is_ticket_approvals' in vals:
+            self.sudo()._handle_ticket_approvals()
         return res
         
     # SLA Policies
@@ -149,7 +151,21 @@ class Project(models.Model):
                     'implied_ids': [Command.unlink(group_sla_enabled.id)]
                 })
                 group_sla_enabled.write({'users': [(5, 0, 0)]})
-                
+
+    # Handle Ticket Approvals
+    def _remove_approvals(self, project):
+        approvals = self.env['project.task.type.approvals'].search([
+            ('project_id', '=', project.id),
+        ])
+        approvals.write({
+            'user_ids': [(5, 0, 0)],  # Clear existing user_ids
+            'group_ids': [(5, 0, 0)],  # Clear existing group_ids
+        })
+        
+    def _handle_ticket_approvals(self):
+        if not self.is_ticket_approvals:
+            self._remove_approvals(self)
+        
     # Merge Tickets
     def _check_merge_tickets_feature(self, check_user_has_group=False):
         user_has_group_sla_enabled = self.user_has_groups('de_helpdesk.group_project_merge_ticket_enabled') if check_user_has_group else True

@@ -187,27 +187,44 @@ class ProjectTask(models.Model):
         return sla_lines
 
     @api.model
-    def _check_stage_access(self, stage_id):
+    def _check_stage_access(self, stage_id, ticket_approval_type, group_ids, user_ids):
         if not stage_id:
             return True  # Allow empty stages
-
-        # Check if the current user belongs to any of the required groups for the stage
-        allowed_groups = stage_id.group_ids.ids
-        user_groups = self.env.user.groups_id.ids
-        return bool(set(allowed_groups) & set(user_groups))
-        
+    
+        if ticket_approval_type == 'group' and group_ids:
+            # Check if the current user belongs to any of the required groups for the stage
+            allowed_groups = group_ids.ids
+            user_groups = self.env.user.groups_id.ids
+            return bool(set(allowed_groups) & set(user_groups))
+    
+        if ticket_approval_type == 'user' and user_ids:
+            # Check if the current user is one of the specified users for the stage
+            return self.env.user.id in user_ids.ids
+    
+        return True  # Allow if no specific group or user is defined
+    
     def write(self, vals):
         if 'stage_id' in vals:
             new_stage_id = vals['stage_id'] if vals['stage_id'] else self.stage_id.id
-            if not self._check_stage_access(
-                self.env['project.task.type.approvals'].search([
-                    ('ticket_stage_id','=',new_stage_id),
-                    ('project_id','=',self.project_id.id),
+            project = self.project_id
+            if project.is_helpdesk_team:
+                ticket_approvals = self.env['project.task.type.approvals'].search([
+                    ('ticket_stage_id', '=', new_stage_id),
+                    ('project_id', '=', self.project_id.id),
                 ])
-            ):
-                raise ValidationError(_("You don't have access to change the stage to this value."))
+        
+                if ticket_approvals:
+                    approval = ticket_approvals[0]  # Assume there's only one approval record
+                    if not self._check_stage_access(
+                        new_stage_id,
+                        approval.ticket_approval_type,
+                        approval.group_ids,
+                        approval.user_ids
+                    ):
+                        raise ValidationError(_("You don't have access to change the stage."))
         
         return super(ProjectTask, self).write(vals)
+
 
     # ------------------------------------------------------------------------
     # ------------------------------ actions ---------------------------------

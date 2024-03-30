@@ -33,6 +33,8 @@ class ProjectTaskType(models.Model):
     group_approval = fields.Boolean(string='Group Approval', compute='_compute_all_approval_type')
     user_approval = fields.Boolean(string='Group Approval', compute='_compute_all_approval_type')
 
+    ticket_approval_type = fields.Char(string='Ticket Approval Type', compute='_compute_ticket_approval_type')
+
     group_ids = fields.Many2many('res.groups', 'project_ticket_stage_groups_rel',
         'ticket_type_id', 'group_id', string="Groups",
                               )
@@ -42,6 +44,10 @@ class ProjectTaskType(models.Model):
     
     group_ids = fields.Many2many('res.groups', string='Security Groups')
 
+    def _compute_ticket_approval_type(self):
+        for record in self:
+            record.ticket_approval_type = record.project_id.ticket_approval_type
+            
     def _compute_all_approval_type(self):
         for record in self:
             if record.project_id.ticket_approval_type == 'group':
