@@ -94,6 +94,8 @@
                                 <tree editable="bottom" >
                                     <field name="prj_sla_id" />
                                     <field name="date_deadline" />
+                                    <field name="sla_stage_id" />
+                                    <field name="sla_time" widget="float_time" />
                                 </tree>
                             </field>
                         </page>

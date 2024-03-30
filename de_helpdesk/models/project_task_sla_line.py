@@ -13,6 +13,8 @@ class ProjectTaskSLALine(models.Model):
     date_deadline = fields.Datetime("Deadline", 
                                     #compute='_compute_deadline', compute_sudo=True, 
                                     store=True)
+    sla_time = fields.Float(related='prj_sla_id.time')
+    sla_stage_id = fields.Many2one(related='prj_sla_id.stage_id')
     
     status = fields.Selection([
         ('failed', 'Failed'), 
@@ -22,6 +24,13 @@ class ProjectTaskSLALine(models.Model):
         compute='_compute_status', compute_sudo=True, search='_search_status')
     
     exceeded_hours = fields.Float("Exceeded Working Hours", compute='_compute_exceeded_hours', compute_sudo=True, store=True, help="Working hours exceeded for reached SLAs compared with deadline. Positive number means the SLA was reached after the deadline.")
+
+    status = fields.Selection([
+        ('failed', 'Failed'), 
+        ('reached', 'Reached'), 
+        ('ongoing', 'Ongoing')
+    ], string="Status", compute='_compute_status', compute_sudo=True, search='_search_status')
+
 
     def _compute_deadline(self):
         pass

@@ -23,7 +23,7 @@ class ProjectTask(models.Model):
     # SLA fields
     sla_date_deadline = fields.Datetime("SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     sla_hours_deadline = fields.Float("Hours to SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
-    prj_task_sla_line = fields.One2many('project.task.sla.line', 'task_id', string="SLA Line")
+    prj_task_sla_line = fields.One2many('project.task.sla.line', 'task_id', readonly=True, string="SLA Line")
     
     
     domain_user_ids = fields.Many2many('res.users', compute='_compute_domain_from_project')

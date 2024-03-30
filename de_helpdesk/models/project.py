@@ -2,6 +2,7 @@
 
 from odoo import api, Command, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from datetime import datetime, timedelta
 
 TICKET_PRIORITY = [
     ('0', 'Low priority'),
@@ -57,10 +58,11 @@ class Project(models.Model):
 
     allow_portal_user_close_ticket = fields.Boolean('Close by Customers')
     allow_portal_user_reopen_ticket = fields.Boolean('Reopen by Customers')
-    allow_ticket_auto_close = fields.Boolean('Ticket Auto Clsoe')
+    
 
     allow_stock_returns = fields.Boolean('Returns')
-    
+
+    allow_ticket_auto_close = fields.Boolean('Ticket Auto Clsoe')
     from_stage_ids = fields.Many2many('project.task.type', 
         relation='project_ticket_stage_auto_close_from_rel',
         string='In Stages',
@@ -133,6 +135,23 @@ class Project(models.Model):
         if 'is_ticket_approvals' in vals:
             self.sudo()._handle_ticket_approvals()
         return res
+
+    # Schedule Action
+    @api.model
+    def _cron_ticket_auto_close(self):
+        today = fields.Date.today()
+        inactive_period = timedelta(days=self.day_to_close)
+
+        tickets_to_close = self.search([
+            ('active', '=', True),
+            ('project_id.allow_ticket_auto_close', '=', True),
+            ('from_stage_ids', 'in', self.stage_id.id),
+            ('date_last_stage_update', '<=', today - inactive_period),
+        ])
+
+        for ticket in tickets_to_close:
+            ticket.stage_id = self.close_stage_id.id
+        return True
         
     # SLA Policies
     def _check_group_project_sla_enabled(self, check_user_has_group=False):

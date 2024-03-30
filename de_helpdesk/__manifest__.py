@@ -37,6 +37,7 @@ Features:
         'data/ir_sequence.xml',
         'data/ir_server_actions.xml',
         'data/diget_data.xml',
+        'data/ir_cron_actions.xml',
         'views/helpdesk_menu.xml',
         'views/ticket_tags_views.xml',
         'views/ticket_activity_type_views.xml',
