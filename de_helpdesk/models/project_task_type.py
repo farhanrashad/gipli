@@ -10,11 +10,12 @@ class ProjectTaskType(models.Model):
                                                  
                                                  )
 
-    tikcet_approvals = fields.Boolean(string='Ticket Approvals Feature', compute='_compute_ticket_approvals')
+    ticket_approvals = fields.Boolean(string='Ticket Approvals Feature', compute='_compute_ticket_approvals')
 
     def _compute_ticket_approvals(self):
         for record in self:
-            if any(project.is_helpdesk_team or project.is_ticket_approvals for project in record.project_ids):
+            projects = record.project_ids.filtered(lambda x:x.is_helpdesk_team)
+            if projects and any(project.is_ticket_approvals for project in projects):
                 record.ticket_approvals = True
             else:
                 record.ticket_approvals = False

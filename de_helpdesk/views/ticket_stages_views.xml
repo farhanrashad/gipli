@@ -8,7 +8,7 @@
                 <form string="Ticket Stage" delete="0">
                     <field name="active" invisible="1" />
                     <sheet>
-                        <field name="tikcet_approvals" invisible="1" />
+                        <field name="ticket_approvals" invisible="1" />
                         <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
                         <group>
                             <group>
@@ -30,7 +30,7 @@
                             <page string="Approvals" 
                                 name="ticket_approvals" 
                                 groups="de_helpdesk.group_project_ticket_approvals"
-                                invisible="not tikcet_approvals"
+                                invisible="not ticket_approvals"
                             >
                                 <field name="prj_task_type_approval_line" >
                                     <tree editable="bottom" string="Ticket Approvals" create="0" delete="0">
