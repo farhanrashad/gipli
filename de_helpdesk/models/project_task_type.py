@@ -10,6 +10,15 @@ class ProjectTaskType(models.Model):
                                                  
                                                  )
 
+    tikcet_approvals = fields.Boolean(string='Ticket Approvals Feature', compute='_compute_ticket_approvals')
+
+    def _compute_ticket_approvals(self):
+        for record in self:
+            if any(project.is_helpdesk_team or project.is_ticket_approvals for project in record.project_ids):
+                record.ticket_approvals = True
+            else:
+                record.ticket_approvals = False
+                
     @api.onchange('project_ids')
     def _onchange_project_ids(self):
         # Clear existing approvals lines
@@ -30,9 +39,6 @@ class ProjectTaskType(models.Model):
     ticket_stage_id = fields.Many2one('project.task.type', string='Stage', required=True, ondelete='cascade', index=True)
     project_id = fields.Many2one('project.project', string='Helpdesk Team', required=True, ondelete='cascade', index=True)
     
-    group_approval = fields.Boolean(string='Group Approval', compute='_compute_all_approval_type')
-    user_approval = fields.Boolean(string='Group Approval', compute='_compute_all_approval_type')
-
     ticket_approval_type = fields.Char(string='Ticket Approval Type', compute='_compute_ticket_approval_type')
 
     group_ids = fields.Many2many('res.groups', 'project_ticket_stage_groups_rel',

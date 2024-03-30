@@ -299,7 +299,8 @@ class ProjectTask(models.Model):
             raise UserError(_("One or more tickets are already closed and cannot be merged."))
         if len(active_ids) == 1:
             raise UserError(_("Please select two or more tickets to merge."))
-            
+        if any(not ticket.project_id.is_helpdesk_team for ticket in ticket_ids):
+            raise UserError(_("At least one of the selected teams or projects is not eligible for merging tickets."))
         return {
             'name': 'Merge Tickets',
             'view_mode': 'form',
@@ -314,7 +315,10 @@ class ProjectTask(models.Model):
         #raise UserError(ticket_ids)
         if len(project_ids) > 1:
             raise UserError('It is not permissible to reopen tickets concurrently across different support groups.')
-        
+        if any(not ticket.project_id.is_helpdesk_team for ticket in ticket_ids):
+            raise UserError(_("At least one of the selected teams or projects is not eligible for merging tickets."))
+        if any(not ticket.stage_id.fold for ticket in ticket_ids):
+            raise UserError(_("One or more tickets are already open."))
         return {
             'name': 'Reopen Ticket',
             'view_mode': 'form',

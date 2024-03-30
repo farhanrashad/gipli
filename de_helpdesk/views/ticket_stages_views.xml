@@ -8,6 +8,7 @@
                 <form string="Ticket Stage" delete="0">
                     <field name="active" invisible="1" />
                     <sheet>
+                        <field name="tikcet_approvals" invisible="1" />
                         <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
                         <group>
                             <group>
@@ -26,28 +27,30 @@
                             </group>
                         </group>
                         <notebook>
-                    <page string="Approvals" name="ticket_approvals" groups="de_helpdesk.group_project_ticket_approvals">
-                        <field name="prj_task_type_approval_line" >
-                            <tree editable="bottom" string="Ticket Approvals" create="0" delete="0">
-                                <field name="group_approval" column_invisible="1" />
-                                <field name="user_approval" column_invisible="1" />
-                                <field name="ticket_approval_type" column_invisible="1" />
-                                <field name="project_id" 
-                                    options="{'no_edit':True, 'no_create':True}" 
-                                     domain="[('is_helpdesk_team','=',True)]"
-                                />
-                                <field name="group_ids" widget="many2many_tags"
-                                    options="{'no_edit':True, 'no_create':True}" 
-                                    readonly="ticket_approval_type != 'group'"
-                                />
-                                <field name="user_ids" widget="many2many_tags"
-                                    options="{'no_edit':True, 'no_create':True}" 
-                                    readonly="ticket_approval_type != 'user'"
-                                />
-                            </tree>
-                        </field>
-                    </page>
-                </notebook>
+                            <page string="Approvals" 
+                                name="ticket_approvals" 
+                                groups="de_helpdesk.group_project_ticket_approvals"
+                                invisible="not tikcet_approvals"
+                            >
+                                <field name="prj_task_type_approval_line" >
+                                    <tree editable="bottom" string="Ticket Approvals" create="0" delete="0">
+                                        <field name="ticket_approval_type" column_invisible="1" />
+                                        <field name="project_id" 
+                                            options="{'no_edit':True, 'no_create':True}" 
+                                             domain="[('is_helpdesk_team','=',True)]"
+                                        />
+                                        <field name="group_ids" widget="many2many_tags"
+                                            options="{'no_edit':True, 'no_create':True}" 
+                                            readonly="ticket_approval_type != 'group'"
+                                        />
+                                        <field name="user_ids" widget="many2many_tags"
+                                            options="{'no_edit':True, 'no_create':True}" 
+                                            readonly="ticket_approval_type != 'user'"
+                                        />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
