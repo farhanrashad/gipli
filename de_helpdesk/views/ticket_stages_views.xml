@@ -28,18 +28,20 @@
                         <notebook>
                     <page string="Approvals" name="ticket_approvals" groups="de_helpdesk.group_project_ticket_approvals">
                         <field name="prj_task_type_approval_line" >
-                            <tree editable="bottom" string="Ticket Approvals">
+                            <tree editable="bottom" string="Ticket Approvals" create="0" delete="0">
                                 <field name="group_approval" column_invisible="1" />
                                 <field name="user_approval" column_invisible="1" />
                                 <field name="project_id" 
                                     options="{'no_edit':True, 'no_create':True}" 
+                                     domain="[('is_helpdesk_team','=',True)]"
                                 />
                                 <field name="group_ids" widget="many2many_tags"
                                     options="{'no_edit':True, 'no_create':True}" 
-                                    required="group_approval"
+                                    readonly="not group_approval"
                                 />
                                 <field name="user_ids" widget="many2many_tags"
                                     options="{'no_edit':True, 'no_create':True}" 
+                                    readonly="not user_approval"
                                 />
                             </tree>
                         </field>

@@ -158,7 +158,9 @@ class ProjectTask(models.Model):
         return False
 
 
-    # CRUD 
+    # -----------------------------------------------------------------------------
+    # ------------------------------ CRUD Operations ------------------------------ 
+    # -----------------------------------------------------------------------------
     @api.model_create_multi
     def create(self, vals_list):
         tasks = super(ProjectTask, self).create(vals_list)
@@ -184,7 +186,32 @@ class ProjectTask(models.Model):
                     sla_lines |= sla_line
         return sla_lines
 
-    #actions
+    @api.model
+    def _check_stage_access(self, stage_id):
+        if not stage_id:
+            return True  # Allow empty stages
+
+        # Check if the current user belongs to any of the required groups for the stage
+        allowed_groups = stage_id.group_ids.ids
+        user_groups = self.env.user.groups_id.ids
+        return bool(set(allowed_groups) & set(user_groups))
+        
+    def write(self, vals):
+        if 'stage_id' in vals:
+            new_stage_id = vals['stage_id'] if vals['stage_id'] else self.stage_id.id
+            if not self._check_stage_access(
+                self.env['project.task.type.approvals'].search([
+                    ('ticket_stage_id','=',new_stage_id),
+                    ('project_id','=',self.project_id.id),
+                ])
+            ):
+                raise ValidationError(_("You don't have access to change the stage to this value."))
+        
+        return super(ProjectTask, self).write(vals)
+
+    # ------------------------------------------------------------------------
+    # ------------------------------ actions ---------------------------------
+    # ------------------------------------------------------------------------
     def _get_ticket_reopen_digest(self, origin='', template='de_helpdesk.project_ticket_reopen_digest', lang=None):
         self.ensure_one()
         values = {'origin': origin,
