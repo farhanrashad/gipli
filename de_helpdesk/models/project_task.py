@@ -57,7 +57,10 @@ class ProjectTask(models.Model):
         string='Rating'
     )
     rating_comment = fields.Text(string='Rating Comment')
-    rating_score = fields.Integer(string='Rating Scroe', compute='_compute_customer_rating')
+    rating_score = fields.Integer(string='Rating Scroe', 
+                                  store=True,
+                                  compute='_compute_customer_rating'
+                                 )
 
     # Re-open Tickets
     prj_ticket_reopen_ids = fields.One2many('project.ticket.reopen', 'ticket_id', string="Re-Open Reasons")
@@ -85,6 +88,8 @@ class ProjectTask(models.Model):
             record.write({
                 'stage_id': stage_id.id,
             })
+
+    @api.depends('customer_rating')
     def _compute_customer_rating(self):
         for record in self:
             record.rating_score = int(record.customer_rating)

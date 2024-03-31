@@ -176,6 +176,29 @@
             </search>
         </field>
     </record>
+
+    <!-- Graph view -->
+    <record id="project_ticket_graph_view" model="ir.ui.view">
+        <field name="name">project.ticket.graph.view</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <graph string="Helpdesk Tickets" type="bar" sample="1" >
+                <field name="stage_id"/>
+                <field name="color" invisible="1"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="project_ticket_pivot_view" model="ir.ui.view">
+        <field name="name">project.ticket.pivot.view</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Helpdesk Tickets" sample="1" >
+                <field name="stage_id" type="col"/>
+                <field name="color" invisible="1"/>
+            </pivot>
+        </field>
+    </record>
     
     <record id="action_project_helpdesk_my_task" model="ir.actions.act_window">
         <field name="name">Tickets</field>

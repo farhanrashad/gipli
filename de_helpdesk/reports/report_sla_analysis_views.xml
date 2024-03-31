@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Pivot view -->
+    <record id="action_report_sla_analysis" model="ir.actions.act_window">
+        <field name="name">SLA Analysis</field>
+        <field name="res_model">project.task.sla.line</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem name="SLA Analysis" id="menu_helpdesk_reports_sla_analysis"
+            parent="menu_helpdesk_reports" 
+            action="action_report_sla_analysis"
+            sequence="20"
+        />
+</odoo>

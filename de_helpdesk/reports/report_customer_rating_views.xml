@@ -2,19 +2,9 @@
 <odoo>
 
     <!-- Pivot view -->
-    
-    
-    <record id="action_report_customer_ratings" model="ir.actions.act_window">
-        <field name="name">Customer Ratings</field>
-        <field name="res_model">project.task.sla.line</field>
-        <field name="view_mode">tree,kanban,pivot</field>
-         <field name="view_id" ref="project_task_sla_line_tree_view"/>
-        
-    </record>
-
     <menuitem name="Customer Ratings" id="menu_report_customer_ratings"
             parent="menu_helpdesk_reports" 
-            action="action_report_customer_ratings"
+            action="action_ticket_customer_rating"
             sequence="30"
         />
 </odoo>
