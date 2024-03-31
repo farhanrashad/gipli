@@ -5,15 +5,15 @@ access_project_helpdesk_sla_manager,access.project.helpdesk.sla.manager,model_pr
 access_project_ticket_type_internal_user,access.project.ticket.type.internal.user,model_project_ticket_type,base.group_user,1,0,0,0
 access_project_ticket_type_manager,access.project.ticket.type.manager,model_project_ticket_type,group_project_helpdesk_manager,1,1,1,1
 
-access_project_task_sla_line_internal_user,access.project.task.sla.line.internal.user,model_project_task_sla_line,base.group_user,1,0,0,0
-access_project_task_sla_line_manager,access.project.task.sla.line.manager,model_project_task_sla_line,group_project_helpdesk_manager,1,1,1,1
+access_project_ticket_sla_line_internal_user,access.project.ticket.sla.line.internal.user,model_project_ticket_sla_line,base.group_user,1,0,0,0
+access_project_ticket_sla_line_manager,access.project.ticket.sla.line.manager,model_project_ticket_sla_line,group_project_helpdesk_manager,1,1,1,1
 
 access_project_ticket_reopen,access.project.ticket.reopen,model_project_ticket_reopen,,1,1,1,1
 access_project_ticket_reopen_wizard,access.project.ticket.reopen.wizard,model_project_ticket_reopen_wizard,,1,1,1,1
 access_project_ticket_merge_wizard,access.project.ticket.merge.wizard,model_project_ticket_merge_wizard,,1,1,1,1
 
-access_project_task_type_approvals_user,access.project.task.type.approvals.user,model_project_task_type_approvals,base.group_user,1,1,1,0
-access_project_task_type_approvals_manager,access.project.task.type.approvals.manager,model_project_task_type_approvals,group_project_helpdesk_manager,1,1,1,1
+access_project_ticket_stage_approvals_user,access.project.ticket.stage.approvals.user,model_project_ticket_stage_approvals,base.group_user,1,1,1,0
+access_project_ticket_stage_approvals_manager,access.project.ticket.stage.approvals.manager,model_project_ticket_stage_approvals,group_project_helpdesk_manager,1,1,1,1
 
 
 access_report_project_ticket_sla_analysis,access.report.project.ticket.sla.analysis,model_report_project_ticket_sla_analysis,,1,1,1,1

@@ -5,7 +5,7 @@ from odoo import api, fields, models, _
 class ProjectTaskType(models.Model):
     _inherit = 'project.task.type'
 
-    prj_task_type_approval_line = fields.One2many('project.task.type.approvals', 'ticket_stage_id', 
+    ticket_stage_approval_ids = fields.One2many('project.ticket.stage.approvals', 'ticket_stage_id', 
                                                   string="Stage Approvals Line",
                                                  
                                                  )
@@ -23,7 +23,7 @@ class ProjectTaskType(models.Model):
     @api.onchange('project_ids')
     def _onchange_project_ids(self):
         # Clear existing approvals lines
-        self.prj_task_type_approval_line.unlink()
+        self.ticket_stage_approval_ids.unlink()
         approval_lines = []
         for project_id in self.project_ids.filtered(lambda p: p.is_helpdesk_team):
             approval_lines.append((0, 0, {
@@ -31,11 +31,11 @@ class ProjectTaskType(models.Model):
                 'project_id': project_id.id,
             }))
         
-        self.prj_task_type_approval_line = approval_lines
+        self.ticket_stage_approval_ids = approval_lines
 
-class ProjectTaskType(models.Model):
-    _name = 'project.task.type.approvals'
-    _description = 'Task Type Approvals'
+class ProjectTicketStageApprovals(models.Model):
+    _name = 'project.ticket.stage.approvals'
+    _description = 'Ticket Stage Approvals'
 
     ticket_stage_id = fields.Many2one('project.task.type', string='Stage', required=True, ondelete='cascade', index=True)
     project_id = fields.Many2one('project.project', string='Helpdesk Team', required=True, ondelete='cascade', index=True)

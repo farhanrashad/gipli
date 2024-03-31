@@ -5,11 +5,11 @@
         
         <!-- SLA Status -->
         <record id="project_task_sla_line_tree_view" model="ir.ui.view">
-			<field name="name">project.task.sla.line.tree.view</field>
-			<field name="model">project.task.sla.line</field>
+			<field name="name">project.ticket.sla.line.tree.view</field>
+			<field name="model">project.ticket.sla.line</field>
 			<field name="arch" type="xml">
 				<tree string="Sla Status" editable="bottom">
-					<field name="task_id"/>
+					<field name="ticket_id"/>
                     <field name="date_deadline" />
                     <field name="sla_time" />
                     <field name="sla_stage_id" />
@@ -21,7 +21,7 @@
         <!-- pivot View -->
         <record id="project_ticket_sla_pivot_view" model="ir.ui.view">
             <field name="name">project.ticket.sla.pivot.view</field>
-            <field name="model">project.task.sla.line</field>
+            <field name="model">project.ticket.sla.line</field>
             <field name="arch" type="xml">
                 <pivot string="SLA Analysis" sample="1">
                     <field name="project_id" string="Team" type="row"/>
@@ -44,7 +44,7 @@
         
         <record id="action_ticket_sla_analysis" model="ir.actions.act_window">
             <field name="name">SLA Status</field>
-            <field name="res_model">project.task.sla.line</field>
+            <field name="res_model">project.ticket.sla.line</field>
             <field name="view_mode">pivot,graph,cohort</field>
             <!--
             <field name="search_view_id" ref="project_ticket_sla_search_view"/>

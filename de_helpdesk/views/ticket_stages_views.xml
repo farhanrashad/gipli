@@ -32,7 +32,7 @@
                                 groups="de_helpdesk.group_project_ticket_approvals"
                                 invisible="not ticket_approvals"
                             >
-                                <field name="prj_task_type_approval_line" >
+                                <field name="ticket_stage_approval_ids" >
                                     <tree editable="bottom" string="Ticket Approvals" create="0" delete="0">
                                         <field name="ticket_approval_type" column_invisible="1" />
                                         <field name="project_id" 

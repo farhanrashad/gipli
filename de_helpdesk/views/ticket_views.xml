@@ -90,7 +90,7 @@
                             </group>
                         </page>
                         <page string="SLA" name="ticket_sla">
-                            <field name="prj_task_sla_line">
+                            <field name="ticket_sla_ids">
                                 <tree editable="bottom" >
                                     <field name="prj_sla_id" />
                                     <field name="date_deadline" />
@@ -200,7 +200,7 @@
         </field>
     </record>
     
-    <record id="action_project_helpdesk_my_task" model="ir.actions.act_window">
+    <record id="action_project_helpdesk_my_ticket" model="ir.actions.act_window">
         <field name="name">Tickets</field>
         <field name="res_model">project.task</field>
         <field name="view_mode">tree,form</field>
@@ -224,7 +224,7 @@
       
     <menuitem name="My Tickets" id="menu_helpdesk_tickets_my_tickets"
             parent="menu_helpdesk_tickets" 
-            action="action_project_helpdesk_my_task"
+            action="action_project_helpdesk_my_ticket"
             sequence="10"
         />
 
@@ -232,18 +232,18 @@
         <field name="sequence" eval="2"/>
         <field name="view_mode">tree</field>
         <field name="view_id" ref="project_helpdesk_tickets_tree_view"/>
-        <field name="act_window_id" ref="action_project_helpdesk_my_task"/>
+        <field name="act_window_id" ref="action_project_helpdesk_my_ticket"/>
     </record>
 
     <record id="project_helpdesk_my_ticket_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
         <field name="view_id" ref="project_helpdesk_ticket_form_view"/>
-        <field name="act_window_id" ref="action_project_helpdesk_my_task"/>
+        <field name="act_window_id" ref="action_project_helpdesk_my_ticket"/>
     </record>
     
     <!-- All Tickets -->
-    <record id="action_project_helpdesk_all_task" model="ir.actions.act_window">
+    <record id="action_project_helpdesk_all_ticket" model="ir.actions.act_window">
         <field name="name">Tickets</field>
         <field name="res_model">project.task</field>
         <field name="view_mode">tree,form</field>
@@ -267,7 +267,7 @@
       
     <menuitem name="All Tickets" id="menu_helpdesk_tickets_all_tickets"
             parent="menu_helpdesk_tickets" 
-            action="action_project_helpdesk_all_task"
+            action="action_project_helpdesk_all_ticket"
             sequence="10"
         />
 
@@ -275,41 +275,15 @@
         <field name="sequence" eval="2"/>
         <field name="view_mode">tree</field>
         <field name="view_id" ref="project_helpdesk_tickets_tree_view"/>
-        <field name="act_window_id" ref="action_project_helpdesk_all_task"/>
+        <field name="act_window_id" ref="action_project_helpdesk_all_ticket"/>
     </record>
 
     <record id="project_helpdesk_all_ticket_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
         <field name="view_id" ref="project_helpdesk_ticket_form_view"/>
-        <field name="act_window_id" ref="action_project_helpdesk_all_task"/>
+        <field name="act_window_id" ref="action_project_helpdesk_all_ticket"/>
     </record>
 
-    <!-- Ticket RAting Views -->
-    <record id="helpdesk_ticket_customer_rating_tree_view" model="ir.ui.view">
-        <field name="name">helpdesk.ticket.customer.rating.tree.view</field>
-        <field name="model">project.task</field>
-        <field name="arch" type="xml">
-            <tree string="Customer Rating" >
-                <field name="company_id" column_invisible="True"/>
-                <field name="is_sla" column_invisible="True"/>
-                <field name="ticket_no" />
-                <field name="ticket_priority" optional="show" widget="priority"/>
-                 <field name="name" string="Name"/>
-                <field name="project_id" string="Helpdesk Team" />
-                <field name="user_ids" optional="show" widget="many2many_avatar_user"/>
-                <field name="partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" optional="show" options="{'no_open': True}"/>
-                <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1" column_invisible="context.get('default_project_id', False)"/>
-                <field name="customer_rating" />
-                
-            </tree>
-        </field>
-    </record>
-    <record id="action_ticket_customer_rating" model="ir.actions.act_window">
-        <field name="name">Tickets</field>
-        <field name="res_model">project.task</field>
-        <field name="view_mode">tree</field>
-         <field name="view_id" ref="helpdesk_ticket_customer_rating_tree_view"/>
-        
-    </record>
+    
 </odoo>

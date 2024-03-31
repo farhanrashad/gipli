@@ -33,7 +33,7 @@ class HelpdeskSLAReport(models.Model):
     #close_date = fields.Datetime("Close date", readonly=True)
     sla_id = fields.Many2one('project.sla', string='SLA', readonly=True)
     #sla_ids = fields.Many2many('helpdesk.sla', 'helpdesk_sla_status', 'ticket_id', 'sla_id', string="SLAs", copy=False)
-    sla_status_ids = fields.One2many('project.task.sla.line', 'task_id', string="SLA Status")
+    sla_status_ids = fields.One2many('project.ticket.sla.line', 'ticket_id', string="SLA Status")
     #sla_stage_id = fields.Many2one('helpdesk.stage', string="SLA Stage", readonly=True)
     sla_deadline = fields.Datetime("SLA Deadline", group_operator='min', readonly=True)
     sla_status = fields.Selection([('failed', 'SLA Failed'), ('reached', 'SLA Success'), ('ongoing', 'SLA in Progress')], string="Status", readonly=True)
@@ -108,7 +108,7 @@ class HelpdeskSLAReport(models.Model):
         return f"""
             project_task t
             LEFT JOIN project_task_type STAGE ON t.stage_id = stage.id
-            RIGHT JOIN project_task_sla_line tsla ON t.id = tsla.task_id
+            RIGHT JOIN project_ticket_sla_line tsla ON t.id = tsla.ticket_id
             LEFT JOIN project_sla sla ON sla.id = tsla.prj_sla_id
             LEFT JOIN res_partner c on t.partner_id = c.id
         """

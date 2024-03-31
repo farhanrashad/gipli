@@ -15,7 +15,7 @@ TICKET_PRIORITY = [
 ]
 _logger = logging.getLogger(__name__)
 
-class ProjectTask(models.Model):
+class ProjectTicket(models.Model):
     _inherit = 'project.task'
 
     is_sla = fields.Boolean(related='project_id.is_sla')
@@ -27,7 +27,7 @@ class ProjectTask(models.Model):
     # SLA fields
     sla_date_deadline = fields.Datetime("SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     sla_hours_deadline = fields.Float("Hours to SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
-    prj_task_sla_line = fields.One2many('project.task.sla.line', 'task_id', readonly=True, string="SLA Line")
+    ticket_sla_ids = fields.One2many('project.ticket.sla.line', 'ticket_id', readonly=True, string="SLA Line")
     
     
     domain_user_ids = fields.Many2many('res.users', compute='_compute_domain_from_project')
@@ -95,7 +95,7 @@ class ProjectTask(models.Model):
             record.rating_score = int(record.customer_rating)
         
     @api.model
-    def _compute_task_priority(self):
+    def _compute_ticket_priority(self):
         if self._context.get('default_is_ticket') or self.project_id.is_helpdesk_team:
             return TICKET_PRIORITY
         else:
@@ -172,23 +172,23 @@ class ProjectTask(models.Model):
     # -----------------------------------------------------------------------------
     @api.model_create_multi
     def create(self, vals_list):
-        tasks = super(ProjectTask, self).create(vals_list)
-        created_sla_lines = self._prepare_sla_lines(tasks)
-        for task in tasks:
-            if task.is_ticket or (task.project_id and task.project_id.is_helpdesk_team):
-                task.ticket_no = self.env['ir.sequence'].next_by_code('project.task.ticket.no')
+        tickets = super(ProjectTicket, self).create(vals_list)
+        created_sla_lines = self._prepare_sla_lines(tickets)
+        for ticket in tickets:
+            if ticket.is_ticket or (ticket.project_id and ticket.project_id.is_helpdesk_team):
+                ticket.ticket_no = self.env['ir.sequence'].next_by_code('project.task.ticket.no')
 
             # Check if automatic assignment is enabled and assign_method is valid
-            if task.project_id.auto_assignment and task.project_id.assign_method in ['balanced', 'randomly']:
-                # Assign users to the task based on the assign_method
-                self._assign_user(task)
+            if ticket.project_id.auto_assignment and ticket.project_id.assign_method in ['balanced', 'randomly']:
+                # Assign users to the ticket based on the assign_method
+                self._assign_user(ticket)
 
              # Check if automatic assignment is enabled and assign_method is valid
-            if task.project_id.auto_assignment and task.project_id.assign_method in ['equal', 'random']:
-                # Assign users to the task based on the assign_method
-                self._assign_user(task)
+            if ticket.project_id.auto_assignment and ticket.project_id.assign_method in ['equal', 'random']:
+                # Assign users to the ticket based on the assign_method
+                self._assign_user(ticket)
             
-        return tasks
+        return tickets
 
 
     def _calculate_deadline_date(self, sla_hours, create_date):
@@ -229,12 +229,12 @@ class ProjectTask(models.Model):
         return deadline_date
         
     def _prepare_sla_lines(self, tickets):
-        sla_lines = self.env['project.task.sla.line']
+        sla_lines = self.env['project.ticket.sla.line']
         current_date = datetime.now()
 
         for ticket in tickets:
             if ticket.is_sla and ticket.project_id.is_helpdesk_team:
-                ticket.prj_task_sla_line.unlink()
+                ticket.ticket_sla_ids.unlink()
                 sla_ids = self.env['project.sla'].search([('project_id','=',ticket.project_id.id)])
 
                 for sla in sla_ids:
@@ -242,8 +242,8 @@ class ProjectTask(models.Model):
                         sla.time,  # SLA time in hours
                         ticket.create_date  # Ticket's create date
                     )
-                    sla_line = self.env['project.task.sla.line'].create({
-                        'task_id': ticket.id,
+                    sla_line = self.env['project.ticket.sla.line'].create({
+                        'ticket_id': ticket.id,
                         'prj_sla_id': sla.id,
                         'date_deadline': deadline_date
                     })
@@ -272,7 +272,7 @@ class ProjectTask(models.Model):
             new_stage_id = vals['stage_id'] if vals['stage_id'] else self.stage_id.id
             project = self.project_id
             if project.is_helpdesk_team:
-                ticket_approvals = self.env['project.task.type.approvals'].search([
+                ticket_approvals = self.env['project.ticket.stage.approvals'].search([
                     ('ticket_stage_id', '=', new_stage_id),
                     ('project_id', '=', self.project_id.id),
                 ])
@@ -289,25 +289,25 @@ class ProjectTask(models.Model):
 
             if project.is_sla:
                 #raise UserError(new_stage_id)
-                tasks_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
-                for task in tasks_to_update:
-                    if task.prj_task_sla_line:
-                        task.prj_task_sla_line._update_sla_status(new_stage_id)
+                tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
+                for ticket in tickets_to_update:
+                    if ticket.ticket_sla_ids:
+                        ticket.ticket_sla_ids._update_sla_status(new_stage_id)
                 
                 # Update SLA line statuses based on stage and deadline conditions
-                #sla_lines_to_update = self.env['project.task.sla.line'].search([('task_id', '=', self.id)])
+                #sla_lines_to_update = self.env['project.ticket.sla.line'].search([('ticket_id', '=', self.id)])
                 #sla_lines_to_update._update_sla_status()
 
 
-        # Call super write to update the task
-        res = super(ProjectTask, self).write(vals)
+        # Call super write to update the ticket
+        res = super(ProjectTicket, self).write(vals)
 
         # Check if project_id changed
         if 'project_id' in vals:
             new_project_id = vals['project_id'] if vals['project_id'] else self.project_id.id
-            tasks_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
-            # Call _prepare_sla_lines for tasks to be updated
-            self._prepare_sla_lines(tasks_to_update)
+            tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
+            # Call _prepare_sla_lines for tickets to be updated
+            self._prepare_sla_lines(tickets_to_update)
         
         return res
 
@@ -325,7 +325,7 @@ class ProjectTask(models.Model):
                 self._assign_random(ticket, active_users)
     
     def _assign_equal(self, ticket, active_users):
-        # Calculate the user index based on the total number of tasks assigned to users
+        # Calculate the user index based on the total number of tickets assigned to users
         user_index = ticket.id % len(active_users)
         ticket.user_ids = [(4, active_users[user_index].id)]
     

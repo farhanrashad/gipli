@@ -85,19 +85,19 @@ class Project(models.Model):
     # Compute Methods
     def _compute_tickets_avg_rating(self):
         for record in self:
-            task_ids = record.task_ids.filtered(lambda x:x.customer_rating)
-            record.tickets_avg_rating = sum(task_ids.mapped('rating_score')) / len(task_ids.mapped('rating_score'))
+            ticket_ids = record.task_ids.filtered(lambda x:x.customer_rating)
+            record.tickets_avg_rating = sum(ticket_ids.mapped('rating_score')) / len(ticket_ids.mapped('rating_score'))
             
     def _compute_sla_count(self):
-        sla_lines = self.env['project.task.sla.line']
+        sla_lines = self.env['project.ticket.sla.line']
         for record in self:
-            sla_lines = self.env['project.task.sla.line'].search([('task_id','in',record.task_ids.ids)])
+            sla_lines = self.env['project.ticket.sla.line'].search([('ticket_id','in',record.task_ids.ids)])
             record.count_sla = len(sla_lines)
 
     def _compute_customer_rating_count(self):
         for record in self:
-            task_ids = record.task_ids.filtered(lambda x:x.customer_rating)
-            record.count_tickets_rating = len(task_ids.mapped('rating_score'))
+            ticket_ids = record.task_ids.filtered(lambda x:x.customer_rating)
+            record.count_tickets_rating = len(ticket_ids.mapped('rating_score'))
             
     def _compute_close_ticket_count(self):
         for prj in self:
@@ -197,7 +197,7 @@ class Project(models.Model):
 
     # Handle Ticket Approvals
     def _remove_approvals(self, project):
-        approvals = self.env['project.task.type.approvals'].search([
+        approvals = self.env['project.ticket.stage.approvals'].search([
             ('project_id', '=', project.id),
         ])
         approvals.write({
@@ -243,7 +243,7 @@ class Project(models.Model):
         
     # Actions
     def action_open_tickets_view(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
         action.update({
             'name': 'Tickets',
             'view_mode': 'tree,form',
@@ -255,13 +255,13 @@ class Project(models.Model):
 
     def action_open_tickets_rating_view(self):
         action = self.env.ref('de_helpdesk.action_ticket_customer_rating').read()[0]
-        task_ids = self.task_ids.filtered(lambda x:x.customer_rating)
+        ticket_ids = self.task_ids.filtered(lambda x:x.customer_rating)
         action.update({
             'name': 'Customer Rating',
             'view_mode': 'tree',
             'res_model': 'project.task',
             'type': 'ir.actions.act_window',
-            'domain': [('id', 'in', task_ids.ids)],
+            'domain': [('id', 'in', ticket_ids.ids)],
             'context': {
                 'create':False,
                 'edit': False,
@@ -275,9 +275,9 @@ class Project(models.Model):
         action.update({
             'name': 'SLA',
             'view_mode': 'tree',
-            'res_model': 'project.task.sla.line',
+            'res_model': 'project.ticket.sla.line',
             'type': 'ir.actions.act_window',
-            'domain': [('task_id', 'in', self.task_ids.ids)],
+            'domain': [('ticket_id', 'in', self.task_ids.ids)],
             'context': {
                 'create': False,
                 'edit': False,
@@ -288,7 +288,7 @@ class Project(models.Model):
 
     
     def action_project_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
         action.update({
             'name': 'Tickets',
             'view_mode': 'tree,form',
@@ -303,7 +303,7 @@ class Project(models.Model):
         return action
 
     def action_project_closed_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
         action.update({
             'name': 'Closed Tickets',
             'view_mode': 'tree,form',
@@ -318,7 +318,7 @@ class Project(models.Model):
         return action
 
     def action_project_open_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
         action.update({
             'name': 'Closed Tickets',
             'view_mode': 'tree,form',
@@ -333,7 +333,7 @@ class Project(models.Model):
         return action
 
     def action_project_unassigned_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
         action.update({
             'name': 'Unassigned Tickets',
             'view_mode': 'tree,form',
@@ -348,7 +348,7 @@ class Project(models.Model):
         return action
 
     def action_project_urgent_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
         action.update({
             'name': 'Urgent Tickets',
             'view_mode': 'tree,form',
