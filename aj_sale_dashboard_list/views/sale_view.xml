@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_sale_dashboard_view" model="ir.ui.view">
+        <field name="name">Sale list dashboard</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                 <attribute name="js_class">sale_dashboard_list</attribute>
+            </xpath>
+        </field>
+
+    </record>
+</odoo>
