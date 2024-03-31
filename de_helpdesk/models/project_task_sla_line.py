@@ -10,6 +10,7 @@ class ProjectTaskSLALine(models.Model):
     _rec_name = 'prj_sla_id'
 
     task_id = fields.Many2one('project.task', string='Ticket', required=True, ondelete='cascade', index=True)
+    project_id = fields.Many2one('project.project', store=True, compute='_compute_project_from_task')
     prj_sla_id = fields.Many2one('project.sla', string='SLA', required=True, ondelete='cascade')
     date_deadline = fields.Datetime("Deadline", 
                                     #compute='_compute_deadline', compute_sudo=True, 
@@ -31,6 +32,11 @@ class ProjectTaskSLALine(models.Model):
     
     exceeded_hours = fields.Float("Exceeded Working Hours", compute='_compute_exceeded_hours', compute_sudo=True, store=True, help="Working hours exceeded for reached SLAs compared with deadline. Positive number means the SLA was reached after the deadline.")
 
+    @api.depends('task_id')
+    def _compute_project_from_task(self):
+        for record in self:
+            record.project_id = record.task_id.project_id.id
+            
 
     @api.model
     def _update_sla_status(self, target_stage_id):

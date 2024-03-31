@@ -105,7 +105,7 @@
         </field>
     </record>
 
-    <!-- Ticket RAting Views -->
+    <!-- tree View -->
     <record id="project_ticket_customer_rating_tree_view" model="ir.ui.view">
         <field name="name">helpdesk.ticket.customer.rating.tree.view</field>
         <field name="model">project.task</field>
@@ -130,7 +130,7 @@
         </field>
     </record>
 
-    <!-- Customer Ratings pivot View -->
+    <!-- pivot View -->
     <record id="project_ticket_customer_ratings_pivot_view" model="ir.ui.view">
         <field name="name">project.ticket.customer.ratings.pivot.view</field>
         <field name="model">project.task</field>
