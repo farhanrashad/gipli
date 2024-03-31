@@ -52,7 +52,7 @@ class ProjectTask(models.Model):
     )
     #Customer Rating
     allow_customer_rating = fields.Boolean(related='project_id.allow_customer_rating')
-    rating = fields.Selection(
+    customer_rating = fields.Selection(
         [('1', 'Poor'), ('2', 'Fair'), ('3', 'Average'), ('4', 'Good'), ('5', 'Excellent')],
         string='Rating'
     )
@@ -87,7 +87,7 @@ class ProjectTask(models.Model):
             })
     def _compute_customer_rating(self):
         for record in self:
-            record.rating_score = int(record.rating)
+            record.rating_score = int(record.customer_rating)
         
     @api.model
     def _compute_task_priority(self):

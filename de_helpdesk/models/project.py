@@ -79,13 +79,14 @@ class Project(models.Model):
 
     # smart buttons
     count_sla = fields.Integer('SLA', compute='_compute_sla_count')
-    count_tickets_rating = fields.Integer('Rating', compute='_compute_customer_rating')
-    tickets_rating = fields.Float('Rating Avg.', compute='_compute_tickets_rating')
+    count_tickets_rating = fields.Integer('Rating', compute='_compute_customer_rating_count')
+    tickets_avg_rating = fields.Float('Rating Avg.', compute='_compute_tickets_avg_rating')
 
     # Compute Methods
-    def _compute_tickets_rating(self):
+    def _compute_tickets_avg_rating(self):
         for record in self:
-            record.tickets_rating = 1
+            task_ids = record.task_ids.filtered(lambda x:x.customer_rating)
+            record.tickets_avg_rating = sum(task_ids.mapped('rating_score')) / len(task_ids.mapped('rating_score'))
             
     def _compute_sla_count(self):
         sla_lines = self.env['project.task.sla.line']
@@ -93,9 +94,10 @@ class Project(models.Model):
             sla_lines = self.env['project.task.sla.line'].search([('task_id','in',record.task_ids.ids)])
             record.count_sla = len(sla_lines)
 
-    def _compute_customer_rating(self):
+    def _compute_customer_rating_count(self):
         for record in self:
-            record.count_tickets_rating = 1
+            task_ids = record.task_ids.filtered(lambda x:x.customer_rating)
+            record.count_tickets_rating = len(task_ids.mapped('rating_score'))
             
     def _compute_close_ticket_count(self):
         for prj in self:
@@ -252,7 +254,21 @@ class Project(models.Model):
         return action
 
     def action_open_tickets_rating_view(self):
-        pass
+        action = self.env.ref('de_helpdesk.action_ticket_customer_rating').read()[0]
+        task_ids = self.task_ids.filtered(lambda x:x.customer_rating)
+        action.update({
+            'name': 'Customer Rating',
+            'view_mode': 'tree',
+            'res_model': 'project.task',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', task_ids.ids)],
+            'context': {
+                'create':False,
+                'edit': False,
+                'delete': False,
+            }
+        })
+        return action
 
     def action_open_tickets_sla_view(self):
         action = self.env.ref('de_helpdesk.action_task_ticket_line').read()[0]
