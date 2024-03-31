@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError, ValidationError
 
 class ProjectTaskSLALine(models.Model):
     _name = 'project.task.sla.line'
@@ -23,12 +24,26 @@ class ProjectTaskSLALine(models.Model):
         ('failed', 'Failed'), 
         ('reached', 'Reached'), 
         ('ongoing', 'Ongoing')
-    ], string="Status", 
-        compute='_compute_status', compute_sudo=True, search='_search_status')
+    ], string="Status",  
+        default='ongoing',
+    #    compute='_compute_status', compute_sudo=True, search='_search_status'
+    )
     
     exceeded_hours = fields.Float("Exceeded Working Hours", compute='_compute_exceeded_hours', compute_sudo=True, store=True, help="Working hours exceeded for reached SLAs compared with deadline. Positive number means the SLA was reached after the deadline.")
 
 
+    @api.model
+    def _update_sla_status(self, target_stage_id):
+        for sla_line in self:
+            if sla_line.prj_sla_id.stage_id.id == target_stage_id:
+                if sla_line.date_deadline and fields.Datetime.now() > sla_line.date_deadline:
+                    sla_line.status = 'failed'
+                elif sla_line.date_reached or fields.Datetime.now() <= sla_line.date_deadline:
+                    sla_line.status = 'reached'
+                else:
+                    sla_line.status = 'ongoing'
+
+        
     def _compute_deadline(self):
         pass
 

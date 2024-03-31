@@ -282,6 +282,18 @@ class ProjectTask(models.Model):
                     ):
                         raise ValidationError(_("You don't have access to change the stage."))
 
+            if project.is_sla:
+                #raise UserError(new_stage_id)
+                tasks_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
+                for task in tasks_to_update:
+                    if task.prj_task_sla_line:
+                        task.prj_task_sla_line._update_sla_status(new_stage_id)
+                
+                # Update SLA line statuses based on stage and deadline conditions
+                #sla_lines_to_update = self.env['project.task.sla.line'].search([('task_id', '=', self.id)])
+                #sla_lines_to_update._update_sla_status()
+
+
         # Call super write to update the task
         res = super(ProjectTask, self).write(vals)
 
