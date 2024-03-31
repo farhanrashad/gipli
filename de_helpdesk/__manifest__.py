@@ -52,6 +52,7 @@ Features:
         'views/ticket_reopen_reason_views.xml',
         'wizards/tickets_reopen_wizard_views.xml',
         'wizards/tickets_merge_wizard_views.xml',
+        'views/ticket_sla_line_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

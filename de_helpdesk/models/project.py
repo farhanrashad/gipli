@@ -88,8 +88,10 @@ class Project(models.Model):
             record.tickets_rating = 1
             
     def _compute_sla_count(self):
+        sla_lines = self.env['project.task.sla.line']
         for record in self:
-            record.count_sla = 1
+            sla_lines = self.env['project.task.sla.line'].search([('task_id','in',record.task_ids.ids)])
+            record.count_sla = len(sla_lines)
 
     def _compute_customer_rating(self):
         for record in self:
@@ -239,13 +241,34 @@ class Project(models.Model):
         
     # Actions
     def action_open_tickets_view(self):
-        pass
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_task').read()[0]
+        action.update({
+            'name': 'Tickets',
+            'view_mode': 'tree,form',
+            'res_model': 'project.task',
+            'type': 'ir.actions.act_window',
+            'domain': [('project_id', '=', self.id)],
+        })
+        return action
 
     def action_open_tickets_rating_view(self):
         pass
 
     def action_open_tickets_sla_view(self):
-        pass
+        action = self.env.ref('de_helpdesk.action_task_ticket_line').read()[0]
+        action.update({
+            'name': 'SLA',
+            'view_mode': 'tree',
+            'res_model': 'project.task.sla.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('task_id', 'in', self.task_ids.ids)],
+            'context': {
+                'create': False,
+                'edit': False,
+                'delete': False,
+            }
+        })
+        return action
 
     
     def action_project_tickets(self):

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <!-- SLA Status -->
+        <record id="project_task_sla_line_tree_view" model="ir.ui.view">
+			<field name="name">project.task.sla.line.tree.view</field>
+			<field name="model">project.task.sla.line</field>
+			<field name="arch" type="xml">
+				<tree string="Sla Status" editable="bottom">
+					<field name="task_id"/>
+                    <field name="date_deadline" />
+                    <field name="sla_time" />
+                    <field name="sla_stage_id" />
+                    <field name="status" />
+				</tree>
+			</field>
+		</record>
+
+        <record id="action_task_ticket_line" model="ir.actions.act_window">
+            <field name="name">SLA Status</field>
+            <field name="res_model">project.task.sla.line</field>
+            <field name="view_mode">tree</field>
+        </record>
+    </data>
+</odoo>
