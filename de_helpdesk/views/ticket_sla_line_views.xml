@@ -1,6 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
+        <kanban create="false" sample="1">
+                    <field name="rating"/>
+                    <field name="res_name"/>
+                    <field name="feedback"/>
+                    <field name="partner_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click d-flex align-items-center justify-content-center">
+                                <div class="row oe_kanban_details">
+                                    <div class="col-4 my-auto">
+                                        <field name="rating_image" widget="image" class="bg-view"/>
+                                    </div>
+                                    <div class="col-8 ps-1">
+                                        <strong>
+                                            <field name="rated_partner_name"/>
+                                        </strong>
+                                        <ul>
+                                            <li t-if="record.partner_id.value">
+                                                <span class="o_text_overflow">
+                                                    by
+                                                    <span t-att-title="record.partner_id.value">
+                                                        <field name="partner_id"/>
+                                                    </span>
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <span class="o_text_overflow">
+                                                    for
+                                                    <a type="object" name="action_open_rated_object" t-att-title="record.res_name.raw_value">
+                                                        <field name="res_name"/>
+                                                    </a>
+                                                </span>
+                                            </li>
+                                            <li>
+                                                on <field name="create_date"/>
+                                            </li>
+                                            <li t-if="record.feedback.raw_value" class="o_text_overflow" t-att-title="record.feedback.raw_value">
+                                                <field name="feedback"/>
+                                            </li>
+                                        </ul>
+                                </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+        
         <!-- SLA Status -->
         <record id="project_task_sla_line_tree_view" model="ir.ui.view">
 			<field name="name">project.task.sla.line.tree.view</field>
@@ -11,7 +58,7 @@
                     <field name="date_deadline" />
                     <field name="sla_time" />
                     <field name="sla_stage_id" />
-                    <field name="status" />
+                    <field name="status" decoration-danger="status == 'failed'" decoration-warning="status == 'ongoing'" decoration-success="status == 'reached'" class="fw-bold" widget="badge"/>
 				</tree>
 			</field>
 		</record>

@@ -53,6 +53,7 @@ Features:
         'wizards/tickets_reopen_wizard_views.xml',
         'wizards/tickets_merge_wizard_views.xml',
         'views/ticket_sla_line_views.xml',
+        'reports/report_customer_rating_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
