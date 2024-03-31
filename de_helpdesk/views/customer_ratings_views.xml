@@ -147,6 +147,19 @@
             </pivot>
         </field>
     </record>
+
+    <!-- graph view -->
+    <record id="project_ticket_customer_ratings_graph_view" model="ir.ui.view">
+        <field name="name">project.ticket.customer.rating.graph.view</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <graph string="Ratings" sample="1">
+                <field name="create_date"/>
+                <field name="rating_score" type="measure" string="Rating Value (/5)"/>
+                <field name="partner_id" invisible="1"/>
+            </graph>
+        </field>
+    </record>
     
     <!-- Search view -->
     <record id="project_ticket_customer_ratings_search_view" model="ir.ui.view">
@@ -189,12 +202,13 @@
     <record id="action_ticket_customer_rating" model="ir.actions.act_window">
         <field name="name">Customer Ratings</field>
         <field name="res_model">project.task</field>
-        <field name="view_mode">kanban,tree,pivot,form</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
         <field name="search_view_id" ref="project_ticket_customer_ratings_search_view"/>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('project_task_customer_ratings_kanban_view')}),
             (0, 0, {'view_mode': 'tree', 'view_id': ref('project_ticket_customer_rating_tree_view')}),
             (0, 0, {'view_mode': 'pivot', 'view_id': ref('project_ticket_customer_ratings_pivot_view')}),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('project_ticket_customer_ratings_graph_view')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('project_ticket_customer_ratings_form_view')})]"
             />
         <field name="domain">[('customer_rating', 'in', ['1','2','3','4','5'])]</field>

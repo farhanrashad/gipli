@@ -6,5 +6,6 @@
             parent="menu_helpdesk_reports" 
             action="action_ticket_customer_rating"
             sequence="30"
+        groups="group_project_ticket_customer_ratings"
         />
 </odoo>
