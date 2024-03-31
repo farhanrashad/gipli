@@ -27,6 +27,7 @@ Features:
     'depends': [
         'project',
         'digest',
+        'resource',
     ],
 
     # always loaded

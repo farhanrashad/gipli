@@ -3,6 +3,9 @@
 from odoo import api, Command, fields, models, tools, _
 from datetime import datetime, timedelta
 from odoo.exceptions import UserError, ValidationError
+import pytz
+import logging
+
 
 TICKET_PRIORITY = [
     ('0', 'Low priority'),
@@ -10,6 +13,7 @@ TICKET_PRIORITY = [
     ('2', 'High priority'),
     ('3', 'Urgent'),
 ]
+_logger = logging.getLogger(__name__)
 
 class ProjectTask(models.Model):
     _inherit = 'project.task'
@@ -180,19 +184,63 @@ class ProjectTask(models.Model):
                 self._assign_user(task)
             
         return tasks
+
+
+    def _calculate_deadline_date(self, sla_hours, create_date):
+        _logger.info("Calculating deadline date...")
+        _logger.info(f"SLA Hours: {sla_hours}, Create Date: {create_date}")
+
+        # Convert create_date to datetime object
+        from_datetime = fields.Datetime.from_string(create_date)
+
+        # Calculate to_datetime based on SLA hours
+        to_datetime = from_datetime + timedelta(hours=sla_hours)
+
+        _logger.info(f"From Datetime: {from_datetime}, To Datetime: {to_datetime}")
+
+        # Initialize work_duration_data
+        work_duration_data = {}
+
+        try:
+            # Get work duration data with compute_leaves=True and domain=None
+            work_duration_data = self.project_id.resource_calendar_id.get_work_duration_data(
+                from_datetime,
+                to_datetime,
+                compute_leaves=True,
+                domain=None
+            )
+            _logger.info(f"Work Duration Data: {work_duration_data}")
+        except Exception as e:
+            _logger.error(f"Error while getting work duration data: {e}")
+
+        # Calculate deadline date based on work duration data if available
+        deadline_date = to_datetime + timedelta(
+            days=work_duration_data.get('days', 0),
+            hours=work_duration_data.get('hours', 0)
+        )
+
+        _logger.info(f"Deadline Date: {deadline_date}")
+
+        return deadline_date
         
-    def _prepare_sla_lines(self, tasks):
+    def _prepare_sla_lines(self, tickets):
         sla_lines = self.env['project.task.sla.line']
         current_date = datetime.now()
-        
-        for task in tasks:
-            if task.is_sla and task.project_id.is_helpdesk_team:
-                sla_ids = self.env['project.sla'].search([('project_id','=',task.project_id.id)])
+
+        for ticket in tickets:
+            if ticket.is_sla and ticket.project_id.is_helpdesk_team:
+                ticket.prj_task_sla_line.unlink()
+                sla_ids = self.env['project.sla'].search([('project_id','=',ticket.project_id.id)])
+
                 for sla in sla_ids:
+                    deadline_date = self._calculate_deadline_date(
+                        sla.time,  # SLA time in hours
+                        ticket.create_date  # Ticket's create date
+                    )
                     sla_line = self.env['project.task.sla.line'].create({
-                        'task_id': task.id,
+                        'task_id': ticket.id,
                         'prj_sla_id': sla.id,
-                        'date_deadline': current_date + timedelta(days=sla.time)  # Assuming time is in days
+                        'date_deadline': deadline_date
                     })
                     sla_lines |= sla_line
         return sla_lines
@@ -233,8 +281,18 @@ class ProjectTask(models.Model):
                         approval.user_ids
                     ):
                         raise ValidationError(_("You don't have access to change the stage."))
+
+        # Call super write to update the task
+        res = super(ProjectTask, self).write(vals)
+
+        # Check if project_id changed
+        if 'project_id' in vals:
+            new_project_id = vals['project_id'] if vals['project_id'] else self.project_id.id
+            tasks_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
+            # Call _prepare_sla_lines for tasks to be updated
+            self._prepare_sla_lines(tasks_to_update)
         
-        return super(ProjectTask, self).write(vals)
+        return res
 
 
     # -----------------------------------------------------------------------

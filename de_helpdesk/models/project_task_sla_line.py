@@ -13,6 +13,9 @@ class ProjectTaskSLALine(models.Model):
     date_deadline = fields.Datetime("Deadline", 
                                     #compute='_compute_deadline', compute_sudo=True, 
                                     store=True)
+    date_reached = fields.Datetime('Date Reached', 
+                                   help='The date on which the SLA reached')
+    
     sla_time = fields.Float(related='prj_sla_id.time')
     sla_stage_id = fields.Many2one(related='prj_sla_id.stage_id')
     
@@ -25,16 +28,18 @@ class ProjectTaskSLALine(models.Model):
     
     exceeded_hours = fields.Float("Exceeded Working Hours", compute='_compute_exceeded_hours', compute_sudo=True, store=True, help="Working hours exceeded for reached SLAs compared with deadline. Positive number means the SLA was reached after the deadline.")
 
-    status = fields.Selection([
-        ('failed', 'Failed'), 
-        ('reached', 'Reached'), 
-        ('ongoing', 'Ongoing')
-    ], string="Status", compute='_compute_status', compute_sudo=True, search='_search_status')
-
 
     def _compute_deadline(self):
         pass
-        
+
+    #@api.depends('deadline', 'reached_datetime')
+    def _compute_status(self):
+        for status in self:
+            if status.reached_datetime and status.deadline:  # if reached_datetime, SLA is finished: either failed or succeeded
+                status.status = 'reached' if status.reached_datetime < status.deadline else 'failed'
+            else:  # if not finished, deadline should be compared to now()
+                status.status = 'ongoing' if not status.deadline or status.deadline > fields.Datetime.now() else 'failed'
+
     @api.model
     def _search_status(self, operator, value):
         """ Supported operators: '=', 'in' and their negative form. """

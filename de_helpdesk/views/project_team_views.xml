@@ -103,6 +103,7 @@
             <xpath expr="//group[1]" position="after">
             <t invisible="not is_helpdesk_team">
                 <h2>Visibility &amp; Assignment </h2>
+                <field name="resource_calendar_id" />
                     <div class="row mt16 o_settings_container" id="productivity">
                         <setting
                             help="People to whom this team and its tickets will be visible"
