@@ -441,8 +441,10 @@ class ProjectTicket(models.Model):
             'target': 'new',
         }
 
-    def action_ticket_all(self, action_ref, title, search_view_ref):
-        raise UserError(search_view_ref)
+    def action_ticket_all(self, action_ref, title, search_view_ref,context=None):
+        if context is None:
+            context = {}
+        #raise UserError(context)
         action = self.env["ir.actions.actions"]._for_xml_id(action_ref)
         action = clean_action(action, self.env)
         if title:
@@ -451,4 +453,10 @@ class ProjectTicket(models.Model):
             action['search_view_id'] = self.env.ref(search_view_ref).read()[0]
         if 'views' not in action:
             action['views'] = [(False, view) for view in action['view_mode'].split(",")]
+        action['context'] = {
+            **context, 
+            'create': False, 
+            'edit': False, 
+            'delete': False
+        }
         return action

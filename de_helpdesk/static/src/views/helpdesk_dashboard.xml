@@ -13,27 +13,48 @@
                                 </td>
                                 <td t-attf-class="col-3 px-1">
                                     <a href="#" 
-                                        name="de_helpdesk.action_project_helpdesk_my_ticket"
-                                        class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary"
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-primary"
                                         title="My Tickets"
                                         context="{
-                                            'search_default_high_priority': True,
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
                                             'search_view_ref': 'context_search',
                                         }"
-                                        search_view_ref="test"
-                                        data-hotkey="p" 
                                         t-on-click="onActionClicked"
                                     >
                                         <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>Tickets
                                     </a>
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-primary"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_high':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                         <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>High Priority
                                     </a>
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-primary"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_urgent':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                         <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>Urgent
                                     </a>
                                 </td> 
@@ -65,17 +86,52 @@
                                     Failed Tickets
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_sla_failed':1,
+                                            'search_default_open_tickets':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_sla_failed':1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_high':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_sla_failed':1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_urgent':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                     </a>
                                 </td> 
@@ -92,7 +148,17 @@
                                     Today
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_close_tickets':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                         <div class="p-2">
                                             <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                             Closed Tickets
@@ -100,7 +166,17 @@
                                     </a>
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_sla_success':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                         <div class="p-2">
                                             <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                             SLA Success Rate
@@ -108,7 +184,17 @@
                                     </a>
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_customer_rating"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="Customer Ratings"
+                                        context="{
+                                            'search_default_my_ratings': 1,
+                                            'search_default_rating_today':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                         <div class="p-2">
                                             <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                             Average Rating
@@ -131,7 +217,17 @@
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_customer_rating"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="Customer Ratings"
+                                        context="{
+                                            'search_default_my_ratings': 1,
+                                            'search_default_rating_last_7_days':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                     </a>
                                 </td> 

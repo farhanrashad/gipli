@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_dashboard_ticket_all" model="ir.actions.act_window">
+        <field name="name">Tickets</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">tree,kanban,activity,pivot,graph,cohort,form</field>
+        <field name="search_view_id" ref="project_helpdesk_ticket_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('project_helpdesk_tickets_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('project.view_task_kanban')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('project_ticket_pivot_view')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('project_ticket_graph_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('project_helpdesk_ticket_form_view')}),
+            ]"/>
+        <field name="domain">[
+            ('project_id.is_helpdesk_team', '=', True),
+            ('is_ticket','=',True),
+            ]
+        </field>
+    </record>
+
+    <record id="action_dashboard_customer_rating" model="ir.actions.act_window">
+        <field name="name">Customer Ratings</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,tree,pivot,graph,form</field>
+        <field name="search_view_id" ref="project_ticket_customer_ratings_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('project_task_customer_ratings_kanban_view')}),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('project_ticket_customer_rating_tree_view')}),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('project_ticket_customer_ratings_pivot_view')}),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('project_ticket_customer_ratings_graph_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('project_ticket_customer_ratings_form_view')})]"
+            />
+        <field name="domain">[('customer_rating', 'in', ['1','2','3','4','5'])]</field>
+    </record>
+</odoo>
