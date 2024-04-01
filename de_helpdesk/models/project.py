@@ -186,7 +186,7 @@ class Project(models.Model):
                 group_helpdesk_user = self._get_group_project_helpdesk_user()
                 group_helpdesk_user.write({
                     'implied_ids': [Command.link(group_sla_enabled.id)]
-                })   
+                })
             self.env['project.sla'].search([
                 ('project_id', 'in', sla_projects.ids), ('active', '=', False),
             ]).write({'active': True})
@@ -387,13 +387,23 @@ class Project(models.Model):
 
         result = {
             'all_quotation': 0,
-            
+            'count_my_tickets': 0,
+            'count_my_high_tickets':0,
+            'count_my_urgent_tickets':0,
+            'count_my_closed_tickets': 0,
         }
 
         
         # easy counts
         so = self.env['project.project']
+        
+        ticket_ids = self.env['project.task']
+        domain = [('is_ticket','=',True),('user_ids','in',self.env.user.id)]
+        
         result['all_quotation'] = so.search_count([])
+        result['count_my_tickets'] = ticket_ids.search_count(domain)
+        result['count_my_high_tickets'] = ticket_ids.search_count(domain+[('ticket_priority','=',2)])
+        result['count_my_urgent_tickets'] = ticket_ids.search_count(domain+[('ticket_priority','=',3)])
+        result['count_my_closed_tickets'] = ticket_ids.search_count(domain+[('stage_id.fold','=',True)])
  
-
         return result

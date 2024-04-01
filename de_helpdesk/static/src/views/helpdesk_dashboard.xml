@@ -23,7 +23,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>Tickets
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['count_my_tickets']"/>Tickets
                                     </a>
                                 </td>
                                 <td t-attf-class="col-3 px-1">
@@ -39,7 +39,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>High Priority
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['count_my_high_tickets']"/>High Priority
                                     </a>
                                 </td>
                                 <td t-attf-class="col-3 px-1">
@@ -55,7 +55,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>Urgent
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['count_my_urgent_tickets']"/>Urgent
                                     </a>
                                 </td> 
                             </tr>
@@ -160,7 +160,7 @@
                                         t-on-click="onActionClicked"
                                     >
                                         <div class="p-2">
-                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['count_my_closed_tickets']"/>
                                             Closed Tickets
                                         </div>
                                     </a>
