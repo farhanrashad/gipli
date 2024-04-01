@@ -142,7 +142,8 @@
                 <field name="sla_date_deadline" invisible="not is_sla" optional="show" widget="remaining_days"/>
                 <field name="create_date" optional="hide" readonly="1" string="Creation Date"/>
                 <field name="write_date" optional="hide" readonly="1"/>
-                <field name="stage_id" optional="show" readonly="not context.get('default_project_id', False)"/>
+                <field name="state" nolabel="1" optional="show" widget="state_selection"/>
+                <field name="stage_id" widget="badge" optional="show" readonly="not context.get('default_project_id', False)"/>
             </tree>
         </field>
     </record>

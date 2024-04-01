@@ -86,8 +86,13 @@ class Project(models.Model):
     # Compute Methods
     def _compute_tickets_avg_rating(self):
         for record in self:
-            ticket_ids = record.task_ids.filtered(lambda x:x.customer_rating)
-            record.tickets_avg_rating = sum(ticket_ids.mapped('rating_score')) / len(ticket_ids.mapped('rating_score'))
+            ticket_ids = record.task_ids.filtered(lambda x: x.customer_rating)
+            rating_scores = ticket_ids.mapped('rating_score')
+            try:
+                record.tickets_avg_rating = sum(rating_scores) / len(rating_scores)
+            except ZeroDivisionError:
+                record.tickets_avg_rating = 0  # or any default value
+
             
     def _compute_sla_count(self):
         sla_lines = self.env['project.ticket.sla.line']
