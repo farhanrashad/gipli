@@ -30,6 +30,8 @@ class ProjectTicket(models.Model):
     sla_date_deadline = fields.Datetime("SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     sla_hours_deadline = fields.Float("Hours to SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     ticket_sla_ids = fields.One2many('project.ticket.sla.line', 'ticket_id', readonly=True, string="SLA Line")
+    date_sla_deadline = fields.Datetime('SLA Deadline', 
+                                   help='The date on which the SLA should close')
     
     
     domain_user_ids = fields.Many2many('res.users', compute='_compute_domain_from_project')
@@ -52,6 +54,8 @@ class ProjectTicket(models.Model):
         ('user', 'Closed by User')],
         string='Closed Type',
     )
+    date_closed = fields.Datetime('Close on', 
+                                   help='The date on which the ticket closed')
     #Customer Rating
     allow_customer_rating = fields.Boolean(related='project_id.allow_customer_rating')
     customer_rating = fields.Selection(
@@ -437,8 +441,8 @@ class ProjectTicket(models.Model):
             'target': 'new',
         }
 
-    def create_action(self, action_ref, title, search_view_ref):
-        #raise UserError(title)
+    def action_ticket_all(self, action_ref, title, search_view_ref):
+        raise UserError(search_view_ref)
         action = self.env["ir.actions.actions"]._for_xml_id(action_ref)
         action = clean_action(action, self.env)
         if title:

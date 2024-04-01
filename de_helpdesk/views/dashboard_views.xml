@@ -139,4 +139,23 @@
         <field name="view_id" ref="helpdesk_project_kanban_view"/>
         <field name="act_window_id" ref="action_project_helpdesk_dashboard"/>
     </record>
+
+    <!-- Dashboard Action views -->
+    <record id="action_dashboard_project_helpdesk_my_ticket" model="ir.actions.act_window">
+        <field name="name">Tickets</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">tree,form</field>
+         <field name="search_view_id" ref="project_helpdesk_ticket_search_view"/>
+        <field name="domain">[
+            ('project_id.is_helpdesk_team', '=', True),
+        ]
+        </field>
+        <field name="context">{
+            'create': False,
+            'edit': False,
+            'delete': False,
+            'default_is_ticket': 1,
+            }
+        </field>
+    </record>
 </odoo>

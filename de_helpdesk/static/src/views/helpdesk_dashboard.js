@@ -29,7 +29,7 @@ export class HelpdeskDashBoard extends Component {
         if (action.getAttribute('name').includes('de_helpdesk.')) {
             return await this.action.doActionButton({
                 resModel: 'project.task',
-                name: 'create_action',
+                name: 'action_ticket_all',
                 args: JSON.stringify([actionRef, title, searchViewRef]),
                 context: '',
                 buttonContext,

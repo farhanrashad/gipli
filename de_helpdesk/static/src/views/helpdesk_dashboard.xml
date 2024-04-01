@@ -16,7 +16,11 @@
                                         name="de_helpdesk.action_project_helpdesk_my_ticket"
                                         class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary"
                                         title="My Tickets"
-                                        context="{'search_default_high_priority': True}"
+                                        context="{
+                                            'search_default_high_priority': True,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        search_view_ref="test"
                                         data-hotkey="p" 
                                         t-on-click="onActionClicked"
                                     >
