@@ -135,7 +135,6 @@
         <field name="name">Overview</field>
         <field name="res_model">project.project</field>
         <field name="view_mode">kanban,tree,form</field>
-        <field name="view_id" ref="helpdesk_project_kanban_view"/>
         <field name="domain">[
             ('is_helpdesk_team', '=', True),
             ]
@@ -161,14 +160,13 @@
             sequence="10"
         />
 
-    <!--
     <record id="helpdesk_project_kanban" model="ir.actions.act_window.view">
         <field name="sequence" eval="1"/>
         <field name="view_mode">kanban</field>
         <field name="view_id" ref="helpdesk_project_kanban_view"/>
         <field name="act_window_id" ref="action_project_helpdesk_dashboard"/>
     </record>
--->
+
     <!-- Dashboard Action views -->
     <record id="action_dashboard_project_helpdesk_my_ticket" model="ir.actions.act_window">
         <field name="name">Tickets</field>
