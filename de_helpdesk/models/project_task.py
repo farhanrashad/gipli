@@ -56,6 +56,7 @@ class ProjectTicket(models.Model):
     )
     date_closed = fields.Datetime('Close on', 
                                    help='The date on which the ticket closed')
+    hours_close = fields.Integer("Time to close (hours)", compute='_get_closing_hours', store=True)
     #Customer Rating
     allow_customer_rating = fields.Boolean(related='project_id.allow_customer_rating')
     customer_rating = fields.Selection(
@@ -75,6 +76,20 @@ class ProjectTicket(models.Model):
 
     
     # Computed Methods
+    @api.depends('create_date', 'date_closed')
+    def _get_closing_hours(self):
+        for record in self:
+            create_date = fields.Datetime.from_string(record.create_date)
+            if create_date and record.date_closed and record.team:
+                duration_data = record.team.calendar.get_work_duration_data(
+                    create_date,
+                    fields.Datetime.from_string(record.date_closed),
+                    compute_leaves=True
+                )
+                record.hours_close = duration_data['hours']
+            else:
+                record.hours_close = False
+            
     def _compute_allow_reopen(self):
         for record in self:
             record.allowed_reopen = True

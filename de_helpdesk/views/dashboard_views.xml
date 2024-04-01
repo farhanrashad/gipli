@@ -45,7 +45,7 @@
                         </div>
                     </t>
                     <t t-name="kanban-box">
-                        <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}">
+                        <div  t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}">
                             <div t-attf-class="o_kanban_card_header">
                                 <div class="o_kanban_card_header_title">
                                     <div class="o_primary"><field name="display_name"/></div>
@@ -134,7 +134,7 @@
     <record id="action_project_helpdesk_dashboard" model="ir.actions.act_window">
         <field name="name">Overview</field>
         <field name="res_model">project.project</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,form</field>
         <field name="view_id" ref="helpdesk_project_kanban_view"/>
         <field name="domain">[
             ('is_helpdesk_team', '=', True),

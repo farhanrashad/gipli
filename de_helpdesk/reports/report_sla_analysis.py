@@ -28,9 +28,11 @@ class HelpdeskSLAReport(models.Model):
     ticket_type_id = fields.Many2one('project.ticket.type', string="Type", readonly=True)
     stage_id = fields.Many2one('project.task.type', string="Stage", readonly=True)
     #ticket_closed = fields.Boolean("Ticket Closed", readonly=True)
-    #ticket_close_hours = fields.Integer("Working Hours to Close", group_operator="avg", readonly=True)
+    close_ticket_hours = fields.Integer("Hours to Close", group_operator="avg", readonly=True)
     #ticket_assignation_hours = fields.Integer("Working Hours to Assign", group_operator="avg", readonly=True)
-    #close_date = fields.Datetime("Close date", readonly=True)
+    open_ticket_hours = fields.Float("Hours Open", group_operator="avg", readonly=True)
+    
+    close_date = fields.Datetime("Close date", readonly=True)
     sla_id = fields.Many2one('project.sla', string='SLA', readonly=True)
     #sla_ids = fields.Many2many('helpdesk.sla', 'helpdesk_sla_status', 'ticket_id', 'sla_id', string="SLAs", copy=False)
     sla_status_ids = fields.One2many('project.ticket.sla.line', 'ticket_id', string="SLA Status")
@@ -43,7 +45,8 @@ class HelpdeskSLAReport(models.Model):
     sla_status_failed = fields.Integer("Number of SLA Failed", readonly=True)
     active = fields.Boolean("Active", readonly=True)
     #rating_last_value = fields.Float("Rating (/5)", group_operator="avg", readonly=True)
-    #rating_avg = fields.Float('Average Rating', readonly=True, group_operator='avg')
+    rating_avg = fields.Float('Average Rating', readonly=True, group_operator='avg')
+    
     team_id = fields.Many2one('project.project', string='Helpdesk Team', readonly=True)
     company_id = fields.Many2one('res.company', string='Company', readonly=True)
     message_is_follower = fields.Boolean(related='ticket_id.message_is_follower')
@@ -62,8 +65,11 @@ class HelpdeskSLAReport(models.Model):
                 t.name as name,
                 t.create_date as create_date, 
                 t.project_id as team_id,
+                AVG(t.rating_score) as rating_avg,
                 t.active as active,
                 t.stage_id as stage_id,
+                EXTRACT(EPOCH FROM (COALESCE(t.date_closed, NOW() AT TIME ZONE 'UTC') - T.create_date)) / 3600 AS open_ticket_hours,
+                t.hours_close as close_ticket_hours,
                 t.prj_ticket_type_id as ticket_type_id, 
                 t.partner_id,
                 c.name as partner_name,
@@ -75,6 +81,7 @@ class HelpdeskSLAReport(models.Model):
                 stage.fold as ticket_closed,
                 sla.stage_id as sla_stage_id,
                 tsla.date_deadline as sal_deadline,
+                t.date_closed as close_date,
                 sla.id as sla_id,
                 tsla.date_reached >= tsla.date_deadline OR (tsla.date_reached IS NULL AND tsla.date_deadline < NOW() AT TIME ZONE 'UTC') AS sla_fail,
                 CASE
