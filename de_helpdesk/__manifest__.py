@@ -59,14 +59,9 @@ Features:
         'reports/report_sla_analysis_views.xml',
         'reports/report_customer_rating_views.xml',
         'views/helpdesk_dashboard.xml',
-        #'views/dashboard3.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            #'de_helpdesk/static/src/scss/helpdesk.scss',
-            #'de_helpdesk/static/src/js/*.js',
-            #'de_helpdesk/static/src/xml/*.xml',
-            #'de_helpdesk/static/src/xml/project_dashboard.xml',
             'de_helpdesk/static/src/views/*.js',
             'de_helpdesk/static/src/**/*.xml',
         ],

@@ -183,8 +183,8 @@
                 <filter string="SLA Failed" domain="[('ticket_sla_ids.status', '=', 'failed')]" name="sla_failed" groups="de_helpdesk.group_project_sla_enabled"/>
                                 
                 <separator/>
-                <filter string="Open Tickets" domain="[('stage_id.fold', '=', False)]" name="open_tickets"/>
-                <filter string="Closed Tickets" domain="[('stage_id.fold', '=', True)]" name="close_tickets"/>
+                <filter string="Open" domain="[('stage_id.fold', '=', False)]" name="open_tickets"/>
+                <filter string="Closed" domain="[('stage_id.fold', '=', True)]" name="close_tickets"/>
                 <filter string="Closed in Last 7 days" name="closed_last_7days" domain="[('date_closed','&gt;', (context_today() - datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d'))]"/>
                 <filter string="Closed in Last 30 days" name="closed_last_30days" domain="[('date_closed', '&gt;', (context_today() - datetime.timedelta(days=30)).strftime('%%Y-%%m-%%d'))]"/>
 
@@ -246,6 +246,17 @@
         </field>
     </record>
 
+    <!-- cohort view -->
+    <record id="project_ticket_view_cohort" model="ir.ui.view">
+        <field name="name">project.ticket.view.cohort</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <cohort string="Tickets" date_start="create_date" date_stop="date_closed" interval="day" sample="1">
+                <field name="customer_rating" string="Rating (/5)"/>
+            </cohort>
+        </field>
+    </record>
+    
     <!-- Kanban view inherit -->
     <record id="project_ticket_kanban_view_inherit" model="ir.ui.view">
         <field name="name">project.ticket.kanban.view.inherit</field>
@@ -284,11 +295,13 @@
     <record id="action_project_ticket" model="ir.actions.act_window">
         <field name="name">Tickets</field>
         <field name="res_model">project.task</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">tree,kanban,activity,pivot,graph,cohort,form</field>
          <field name="search_view_id" ref="project_helpdesk_ticket_search_view"/>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('project_helpdesk_tickets_tree_view')}),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('project.view_task_kanban')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('project_ticket_pivot_view')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('project_ticket_graph_view')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('project_helpdesk_ticket_form_view')}),
             
             ]"/>
@@ -298,6 +311,8 @@
         </field>
         <field name="context">{
             'default_is_ticket': 1,
+            'search_default_my_ticket': 1,
+            'search_default_open_tickets':1,
             }
         </field>
         <field name="help" type="html">
@@ -315,40 +330,27 @@
             sequence="10"
         />
 
-    <!--
-    <record id="project_helpdesk_tickets_tree" model="ir.actions.act_window.view">
-        <field name="sequence" eval="1"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="project_helpdesk_tickets_tree_view"/>
-        <field name="act_window_id" ref="action_project_ticket"/>
-    </record>
-
-     <record id="project_helpdesk_kanban" model="ir.actions.act_window.view">
-        <field name="sequence" eval="2"/>
-        <field name="view_mode">kanban</field>
-        <field name="view_id" ref="project.project.view_task_kanban"/>
-        <field name="act_window_id" ref="action_project_ticket"/>
-    </record>
-    
-    <record id="project_helpdesk_ticket_form" model="ir.actions.act_window.view">
-        <field name="sequence" eval="3"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="project_helpdesk_ticket_form_view"/>
-        <field name="act_window_id" ref="action_project_ticket"/>
-    </record>
-    -->
     <!-- All Tickets -->
     <record id="action_project_helpdesk_all_ticket" model="ir.actions.act_window">
         <field name="name">Tickets</field>
         <field name="res_model">project.task</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,kanban,activity,pivot,graph,cohort,form</field>
         <field name="search_view_id" ref="project_helpdesk_ticket_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('project_helpdesk_tickets_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('project.view_task_kanban')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('project_ticket_pivot_view')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('project_ticket_graph_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('project_helpdesk_ticket_form_view')}),
+            
+            ]"/>
         <field name="domain">[
             ('project_id.is_helpdesk_team', '=', True),
             ]
         </field>
         <field name="context">{
             'default_is_ticket': 1,
+            'search_default_open_tickets':1,
             }
         </field>
         <field name="help" type="html">
@@ -365,20 +367,6 @@
             action="action_project_helpdesk_all_ticket"
             sequence="10"
         />
-<!--
-    <record id="project_helpdesk_all_tickets_tree_view" model="ir.actions.act_window.view">
-        <field name="sequence" eval="2"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="project_helpdesk_tickets_tree_view"/>
-        <field name="act_window_id" ref="action_project_helpdesk_all_ticket"/>
-    </record>
 
-    <record id="project_helpdesk_all_ticket_form" model="ir.actions.act_window.view">
-        <field name="sequence" eval="3"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="project_helpdesk_ticket_form_view"/>
-        <field name="act_window_id" ref="action_project_helpdesk_all_ticket"/>
-    </record>
--->
     
 </odoo>
