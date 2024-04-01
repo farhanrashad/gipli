@@ -2,132 +2,154 @@
 <templates>
     <t t-name="de_helpdesk.HelpdeskDashboard" owl="1">
         <div class="o_helpdesk_dashboard container-fluid py-4 border-bottom bg-white">
-            <div class="w-100">
-                <table class="o_helpdesk_banner_table table table-sm table-borderless h-100 px-3 mb-0 text-center">
-                    <tbody>
-                        <tr t-if="env.isSmall">
-                            <td colspan="2">
-                                <h3 class="o_highlight float-start">My Tickets</h3>
-                            </td>
-                        </tr>
-                        <tr class="h-100">
-                            <td class="o_text py-2 text-start align-middle">
-                                Open Tickets
-                            </td>
-                            <td t-attf-class="p-0">
-                                <a name="helpdesk.helpdesk_my_ticket_action_no_create"
-                                   title="My Tickets"
-                                   data-hotkey="t"
-                                   t-on-click="onActionClicked"
-                                    class="btn btn-primary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal"
-                                    <span class="d-block mb-0 fs-2" />
-                                    Tickets
-                                </a>
-                            </td>
-                        </tr>
-                        <tr class="h-100">
-                            <td class="o_text py-2 text-start align-middle">
-                                Avg Open Hours
-                            </td>
-                        </tr>
-                        <tr class="h-100">
-                            <td class="o_text py-2 text-start align-middle">
-                                Failed Tickets
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-                            
-            <div class="row justify-content-between gap-3 gap-lg-0">
-                <div class="col-12 col-lg-5 col-xl-5 col-xxl-4 flex-grow-1 flex-lg-grow-0 flex-shrink-0">
-                    <div class="grid gap-4">
-                        <div class="g-col-3 g-col-sm-2 d-flex align-items-center py-2 justify-content-end text-end justify-content-lg-start text-lg-start">
-                            All Quotation
-                        </div>
-                        <div class="g-col-9 g-col-sm-10 grid gap-1">
-                            <div class="g-col-4 p-0" t-on-click="setSearchContext" title="All Draft Quotation" filter_name="Quotations">
-                                <a href="#" class="btn btn-primary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal">
-                                    <div class="fs-2" t-out="helpdeskData['all_quotation']"/>Quotation
-                                </a>
-                            </div>
-                            <div class="g-col-4 p-0" t-on-click="setSearchContext" title="All Waiting RFQs" filter_name="waiting_rfqs">
-                                <a href="#" class="btn btn-primary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal">
-                                    <div class="fs-2" t-out="helpdeskData['all_quotation_sent']"/>Quotation Sent
-                                </a>
-                            </div>
-                            <div class="g-col-4 p-0" t-on-click="setSearchContext" title="All Late RFQs" filter_name="late_rfqs">
-                                <a href="#" class="btn btn-primary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal">
-                                    <div class="fs-2" t-out="helpdeskData['all_sales_order']"/>Sales Order
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid gap-4">
-                        <div class="g-col-3 g-col-sm-2 d-flex align-items-center py-2 justify-content-end text-end justify-content-lg-start text-lg-start">
-                            My Quotation
-                        </div>
-                        <div class="g-col-9 g-col-sm-10 grid gap-2">
-                            <div class="g-col-4 p-0" t-on-click="setSearchContext" title="My Draft RFQs" filter_name="draft_rfqs,my_purchases">
-                                <a href="#" class="btn btn-light d-flex align-items-center w-100 h-100 p-0 border-0 bg-100 fw-normal">
-                                    <div class="w-100 p-2" t-out="helpdeskData['my_quotation']" />
-                                </a>
-                            </div>
-                            <div class="g-col-4 p-0" t-on-click="setSearchContext" title="My Waiting RFQs" filter_name="waiting_rfqs,my_purchases">
-                                <a href="#" class="btn btn-light d-flex align-items-center w-100 h-100 p-0 border-0 bg-100 fw-normal">
-                                    <div class="w-100 p-2" t-out="helpdeskData['my_quotation_sent']" />
-                                </a>
-                            </div>
-                            <div class="g-col-4 p-0" t-on-click="setSearchContext" title="My Late RFQs" filter_name="late_rfqs,my_purchases">
-                                <a href="#" class="btn btn-light d-flex align-items-center w-100 h-100 p-0 border-0 bg-100 fw-normal">
-                                    <div class="w-100 p-2" t-out="helpdeskData['my_sales_order']" />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col-6">
+                    <table class="o_helpdesk_banner_table table table-sm table-borderless h-100 px-3 mb-0 text-center">
+                        <tbody>
+                            <tr class="h-100">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    <h3 class="o_highlight">My Tickets</h3>
+                                    Open Tickets
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary">
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>Tickets
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary">
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>High Priority
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary">
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>Urgent
+                                    </a>
+                                </td> 
+                            </tr>
+                            <tr class="h-100">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    Avg Open Hours
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                        
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                        
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                            </tr>
+                            <tr class="h-100">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    Failed Tickets
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="col-12 col-lg-7 col-xl-6 col-xxl-5 flex-shrink-0">
-                    <div class="d-flex flex-column justify-content-between gap-2 h-100">
-                        <div class="grid gap-2 h-100">
-                            <div class="g-col-6 g-col-md-6 grid gap-1 gap-md-4">
-                                <div class="g-col-12 g-col-sm-4 g-col-lg-6 d-flex align-items-center justify-content-center text-center justify-content-md-end text-md-end mt-4 mt-md-0">
-                                    Orders Created Last 7 Days
-                                </div>
-                                <div class="g-col-12 g-col-sm-8 g-col-lg-5 d-flex align-items-center justify-content-center py-2 bg-light">
-                                    <span><t t-out="helpdeskData['order_create_last_7_days']"/></span>
-                                </div>
-                            </div>
-                             <div class="g-col-6 g-col-md-6 grid gap-1 gap-md-4">
-                                <div class="g-col-12 g-col-sm-4 g-col-lg-6 d-flex align-items-center py-2 justify-content-center text-center justify-content-md-end text-md-end mt-4 mt-md-0">
-                                    No. Sold Last 7 Days
-                                </div>
-                                <div class="g-col-12 g-col-sm-8 g-col-lg-6 d-flex align-items-center justify-content-center py-2 bg-light">
-                                    <span><t t-out="helpdeskData['sold_total_last_7_days']"/></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="grid gap-2 h-100">
-                            <div class="g-col-6 g-col-md-6 grid gap-1 gap-md-4">
-                                <div class="g-col-12 g-col-sm-4 g-col-lg-6 d-flex align-items-center justify-content-center text-center justify-content-md-end text-md-end mt-4 mt-md-0">
-                                    Quotation Sent Last 7 Days
-                                </div>
-                                <div class="g-col-12 g-col-sm-8 g-col-lg-5 d-flex align-items-center justify-content-center py-2 bg-light">
-                                    <span><t t-out="helpdeskData['all_sent_rfqs']"/></span>
-                                </div>
-                            </div>
-                            <div class="g-col-6 g-col-md-6 grid gap-1 gap-md-4">
-                                <div class="g-col-12 g-col-md-4 g-col-sm-4 g-col-lg-6 d-flex align-items-center justify-content-center text-center justify-content-md-end text-md-end mt-4 mt-md-0">
-                                    Sold Last 7 Days
-                                </div>
-                                <div class="g-col-12 g-col-sm-8 g-col-lg-6 d-flex align-items-center justify-content-center py-2 bg-light">
-                                    <span><t t-out="helpdeskData['all_total_last_7_days']"/></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-6">
+                    <table class="o_helpdesk_banner_table table table-sm table-borderless h-100 px-3 mb-0 text-center">
+                        <tbody>
+                            <tr class="h-100">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    <h3 class="o_highlight">My Performance</h3>
+                                    Today
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal">
+                                        <div class="p-2">
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            Closed Tickets
+                                        </div>
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal">
+                                        <div class="p-2">
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            SLA Success Rate
+                                        </div>
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal">
+                                        <div class="p-2">
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            Average Rating
+                                        </div>
+                                    </a>
+                                </td> 
+                            </tr>
+                            <tr class="h-100">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    Avg Last 7 Days
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                                
+                            </tr>
+                            <tr class="h-100">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    Daily Target
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                    </a>
+                                </td> 
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
         </div>
     </t>
 </templates>

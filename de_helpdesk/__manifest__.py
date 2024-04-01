@@ -63,6 +63,7 @@ Features:
     ],
     'assets': {
         'web.assets_backend': [
+            #'de_helpdesk/static/src/scss/helpdesk.scss',
             #'de_helpdesk/static/src/js/*.js',
             #'de_helpdesk/static/src/xml/*.xml',
             #'de_helpdesk/static/src/xml/project_dashboard.xml',
