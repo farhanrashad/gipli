@@ -16,6 +16,39 @@ export class HelpdeskDashBoard extends Component {
         });
     }
 
+    async onActionClicked(e) {
+        if (this.showDemo) {
+            return;
+        }
+        const action = e.currentTarget;
+        const actionRef = action.getAttribute('name');
+        const title = action.dataset.actionTitle || action.getAttribute('title');
+        const searchViewRef = action.getAttribute('search_view_ref');
+        const buttonContext = action.getAttribute('context') || '';
+
+        if (action.getAttribute('name').includes('de_helpdesk.')) {
+            return await this.action.doActionButton({
+                resModel: 'project.task',
+                name: 'create_action',
+                args: JSON.stringify([actionRef, title, searchViewRef]),
+                context: '',
+                buttonContext,
+                type: 'object',
+            });
+        } else {
+            if (['action_view_rating_today', 'action_view_rating_7days'].includes(actionRef)) {
+                return this.action.doActionButton({
+                    resModel: 'project.task',
+                    name: actionRef,
+                    context: '',
+                    buttonContext,
+                    type: 'object',
+                });
+            }
+            return this.action.doAction(actionRef);
+        }
+    }
+
     /**
      * This method clears the current search query and activates
      * the filters found in `filter_name` attibute from button pressed

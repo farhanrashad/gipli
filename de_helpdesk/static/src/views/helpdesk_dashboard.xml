@@ -12,7 +12,14 @@
                                     Open Tickets
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_project_helpdesk_my_ticket"
+                                        class="btn w-100 h-100 p-2 border-0 text-capitalize fw-normal btn-primary"
+                                        title="My Tickets"
+                                        context="{'search_default_high_priority': True}"
+                                        data-hotkey="p" 
+                                        t-on-click="onActionClicked"
+                                    >
                                         <span class="d-block mb-0 fs-2" t-out="helpdeskData['all_quotation']"/>Tickets
                                     </a>
                                 </td>

@@ -3,6 +3,8 @@
 from odoo import api, Command, fields, models, tools, _
 from datetime import datetime, timedelta
 from odoo.exceptions import UserError, ValidationError
+from odoo.addons.web.controllers.utils import clean_action
+
 import pytz
 import logging
 
@@ -434,3 +436,15 @@ class ProjectTicket(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
+
+    def create_action(self, action_ref, title, search_view_ref):
+        #raise UserError(title)
+        action = self.env["ir.actions.actions"]._for_xml_id(action_ref)
+        action = clean_action(action, self.env)
+        if title:
+            action['display_name'] = title
+        if search_view_ref:
+            action['search_view_id'] = self.env.ref(search_view_ref).read()[0]
+        if 'views' not in action:
+            action['views'] = [(False, view) for view in action['view_mode'].split(",")]
+        return action
