@@ -30,8 +30,9 @@ class ProjectTicket(models.Model):
     sla_date_deadline = fields.Datetime("SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     sla_hours_deadline = fields.Float("Hours to SLA Deadline", compute='_compute_all_sla_deadline', compute_sudo=True, store=True)
     ticket_sla_ids = fields.One2many('project.ticket.sla.line', 'ticket_id', readonly=True, string="SLA Line")
-    date_sla_deadline = fields.Datetime('SLA Deadline', 
-                                   help='The date on which the SLA should close')
+    is_sla_fail = fields.Boolean("Failed SLA Policy", compute='_compute_ticket_sla_fail', search='_search_failed_sla')
+    is_sla_success = fields.Boolean("Success SLA Policy", compute='_compute_ticket_sla_success', search='_search_success_sla')
+    #date_sla_deadline = fields.Datetime('SLA Deadline', help='The date on which the SLA should close')
     
     
     domain_user_ids = fields.Many2many('res.users', compute='_compute_domain_from_project')
@@ -76,6 +77,68 @@ class ProjectTicket(models.Model):
 
     
     # Computed Methods
+    @api.depends('sla_status_ids.deadline', 'sla_status_ids.reached_datetime')
+    def _compute_sla_reached(self):
+        sla_status_read_group = self.env['helpdesk.sla.status']._read_group(
+            [('exceeded_hours', '<', 0), ('ticket_id', 'in', self.ids)],
+            ['ticket_id'],
+        )
+        sla_status_ids_per_ticket = {ticket.id for [ticket] in sla_status_read_group}
+        for ticket in self:
+            ticket.sla_reached = ticket.id in sla_status_ids_per_ticket
+            
+    @api.depends('sla_status_ids.deadline', 'sla_status_ids.reached_datetime')
+    def _compute_sla_reached_late(self):
+        """ Required to do it in SQL since we need to compare 2 columns value """
+        mapping = {}
+        if self.ids:
+            self.env.cr.execute("""
+                SELECT ticket_id, COUNT(id) AS reached_late_count
+                FROM helpdesk_sla_status
+                WHERE ticket_id IN %s AND (deadline < reached_datetime OR (deadline < %s AND reached_datetime IS NULL))
+                GROUP BY ticket_id
+            """, (tuple(self.ids), fields.Datetime.now()))
+            mapping = dict(self.env.cr.fetchall())
+
+        for ticket in self:
+            ticket.sla_reached_late = mapping.get(ticket.id, 0) > 0
+            
+    @api.depends('sla_date_deadline')
+    def _compute_ticket_sla_fail(self):
+        current_time = fields.Datetime.now()
+        for record in self:
+            if record.sla_date_deadline:
+                record.is_sla_fail = (record.sla_date_deadline < current_time)
+            
+
+    @api.model
+    def _search_failed_sla(self, operator, value):
+        datetime_now = fields.Datetime.now()
+        domain = []
+        if (value and operator in expression.NEGATIVE_TERM_OPERATORS) or (not value and operator not in expression.NEGATIVE_TERM_OPERATORS):
+            domain = ['|', ('sla_date_deadline', '=', False), ('sla_date_deadline', '>=', datetime_now)]
+        else:
+            domain = [('sla_date_deadline', '<', datetime_now)]
+        return domain
+
+    
+    @api.depends('sla_date_deadline')
+    def _compute_ticket_sla_success(self):
+        current_time = fields.Datetime.now()
+        for record in self:
+            record.is_sla_success = (record.sla_date_deadline and record.sla_date_deadline > current_time)
+
+
+    @api.model
+    def _search_success_sla(self, operator, value):
+        datetime_now = fields.Datetime.now()
+        domain = []
+        if (value and operator in expression.NEGATIVE_TERM_OPERATORS) or (not value and operator not in expression.NEGATIVE_TERM_OPERATORS):
+            domain = [('ticket_sla_ids.date_reached', '>', datetime_now), '|', ('sla_date_deadline', '!=', False), ('sla_date_deadline', '<', datetime_now)]
+        else:
+            domain = [('ticket_sla_ids.date_reached', '<', datetime_now), '|', ('sla_date_deadline', '=', False), ('sla_date_deadline', '>=', datetime_now)]
+        return domain
+        
     @api.depends('create_date', 'date_closed')
     def _get_closing_hours(self):
         for record in self:

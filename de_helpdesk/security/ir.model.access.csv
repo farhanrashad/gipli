@@ -17,3 +17,4 @@ access_project_ticket_stage_approvals_manager,access.project.ticket.stage.approv
 
 
 access_report_project_ticket_sla_analysis,access.report.project.ticket.sla.analysis,model_report_project_ticket_sla_analysis,,1,1,1,1
+access_report_project_ticket_analysis,access.report.project.ticket.analysis,model_report_project_ticket_analysis,,1,1,1,1

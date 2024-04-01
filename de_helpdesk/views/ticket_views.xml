@@ -214,7 +214,7 @@
                     <filter string="Customer" name="group_customer" context="{'group_by': 'partner_id'}"/>
                     <filter string="Company" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
                     <filter string="SLA" name="group_tickets_sla" context="{'group_by': 'ticket_sla_ids'}" groups="de_helpdesk.group_project_sla_enabled"/>
-                    <filter string="SLA Deadline" name="group_sla_deadline" context="{'group_by': 'date_sla_deadline'}" groups="helpdesk.group_project_sla_enabled"/>
+                    <filter string="SLA Deadline" name="group_sla_deadline" context="{'group_by': 'sla_date_deadline'}" groups="helpdesk.group_project_sla_enabled"/>
                     <filter string="Create Date" name="group_created_by" context="{'group_by': 'create_date'}"/>
 
                 </group>
