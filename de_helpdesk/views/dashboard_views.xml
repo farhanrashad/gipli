@@ -5,7 +5,7 @@
         <field name="model">project.project</field>
         <field name="priority">200</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_dashboard " create="0" sample="1">
+            <kanban class="o_kanban_dashboard " js_class="helpdesk_dashboard_kanban" create="0" sample="1">
                 <field name="name"/>
                 <field name="sequence" widget="handle"/>
                 <field name="color"/>

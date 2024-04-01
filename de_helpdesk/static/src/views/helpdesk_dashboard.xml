@@ -1,7 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
     <t t-name="de_helpdesk.HelpdeskDashboard" owl="1">
-        <div class="o_purchase_dashboard container-fluid py-4 border-bottom bg-white">
+        <div class="o_helpdesk_dashboard container-fluid py-4 border-bottom bg-white">
+            <div class="w-100">
+                <table class="o_helpdesk_banner_table table table-sm table-borderless h-100 px-3 mb-0 text-center">
+                    <tbody>
+                        <tr t-if="env.isSmall">
+                            <td colspan="2">
+                                <h3 class="o_highlight float-start">My Tickets</h3>
+                            </td>
+                        </tr>
+                        <tr class="h-100">
+                            <td class="o_text py-2 text-start align-middle">
+                                Open Tickets
+                            </td>
+                            <td t-attf-class="p-0">
+                                <a name="helpdesk.helpdesk_my_ticket_action_no_create"
+                                   title="My Tickets"
+                                   data-hotkey="t"
+                                   t-on-click="onActionClicked"
+                                    class="btn btn-primary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal"
+                                    <span class="d-block mb-0 fs-2" />
+                                    Tickets
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="h-100">
+                            <td class="o_text py-2 text-start align-middle">
+                                Avg Open Hours
+                            </td>
+                        </tr>
+                        <tr class="h-100">
+                            <td class="o_text py-2 text-start align-middle">
+                                Failed Tickets
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+                            
             <div class="row justify-content-between gap-3 gap-lg-0">
                 <div class="col-12 col-lg-5 col-xl-5 col-xxl-4 flex-grow-1 flex-lg-grow-0 flex-shrink-0">
                     <div class="grid gap-4">
