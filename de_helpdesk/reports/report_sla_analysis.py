@@ -123,6 +123,7 @@ class HelpdeskSLAReport(models.Model):
     def _where(self):
         return """
             t.active = true
+            and t.is_ticket = True
         """
 
     def _order_by(self):

@@ -21,7 +21,7 @@ class TicketAnalysis(models.Model):
     name = fields.Char(string='Subject', readonly=True)
     sla_fail = fields.Boolean(related="ticket_id.is_sla_fail", readonly=True)
     sla_success = fields.Boolean("SLA Status Success", group_operator='bool_or', readonly=True)
-    sla_ids = fields.Many2many('project.sla', 'helpdesk_sla_status', 'ticket_id', 'sla_id', string="SLAs", copy=False)
+    sla_ids = fields.Many2many('project.ticket.sla.line', 'helpdesk_sla_status', 'ticket_id', 'sla_id', string="SLAs", copy=False)
     sla_status_ids = fields.One2many('project.ticket.sla.line', 'ticket_id', string="SLA Status")
     create_date = fields.Datetime("Created On", readonly=True)
     priority = fields.Selection(TICKET_PRIORITY, string='Minimum Priority', readonly=True)
@@ -101,10 +101,17 @@ class TicketAnalysis(models.Model):
         """
         return from_str
 
+    def _where(self):
+        return """
+            t.active = true
+            and t.is_ticket = True
+        """
+        
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""CREATE or REPLACE VIEW %s as (
             %s
             FROM %s
+            WHERE %s
             GROUP BY %s
-            )""" % (self._table, self._select(), self._from(), self._group_by()))
+            )""" % (self._table, self._select(), self._from(), self._where(), self._group_by()))

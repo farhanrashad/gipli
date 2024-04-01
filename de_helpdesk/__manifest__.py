@@ -58,6 +58,7 @@ Features:
         'wizards/tickets_merge_wizard_views.xml',
         'reports/report_sla_analysis_views.xml',
         'reports/report_customer_rating_views.xml',
+        'reports/report_ticket_analysis_views.xml',
         'views/dashboard_action_views.xml',
         'views/helpdesk_dashboard.xml',
     ],
