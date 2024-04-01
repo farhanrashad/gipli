@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_project_ticket_pivot" model="ir.actions.act_window">
+       <field name="name">Ticket Pivot</field>
+       <field name="res_model">project.task</field>
+       <field name="view_mode">pivot</field>
+       <field name="view_id" ref="project.view_project_task_pivot"/>
+    </record>
+
+    <record model="ir.ui.view" id="simple_dashboard_view">
+       <field name="name">Simple Dashboard</field>
+       <field name="model">board.board</field>
+       <field name="type">form</field>
+       <field name="arch" type="xml">
+           <form string="My Dashboard">
+               <board style="1-1">
+                   <column>
+                     <action name="%(de_helpdesk.action_project_ticket_pivot)d" string="Sale Orders"/>
+                   </column>
+                   <column>
+                     <action name="%(de_helpdesk.action_project_ticket_pivot)d" string="Sale Order Graph"/>
+                     <action name="%(de_helpdesk.action_project_ticket_pivot)d" string="Sale Order Pivot"/>
+                   </column>
+               </board>
+           </form>
+       </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="open_simple_dashboard_action">
+   <field name="name">My Dashboard</field>
+   <field name="res_model">board.board</field>
+   <field name="view_mode">form</field>
+   <field name="usage">menu</field>
+   <field name="view_id" ref="simple_dashboard_view"/>
+</record>
+    
+        <menuitem name="Dashborad1" id="menu_helpdesk_root_dashboard1"
+            parent="menu_helpdesk_root" 
+            action="open_simple_dashboard_action"
+            sequence="20"
+        />
+</odoo>

@@ -3,6 +3,7 @@
 from odoo import api, Command, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 TICKET_PRIORITY = [
     ('0', 'Low priority'),
@@ -370,3 +371,24 @@ class Project(models.Model):
 
     def action_view_sla_analysis(self):
         pass
+
+    # JS Dashbaord
+    @api.model
+    def retrieve_dashboard(self):
+        """ This function returns the values to populate the custom dashboard in
+            the purchase order views.
+        """
+        self.check_access_rights('read')
+
+        result = {
+            'all_quotation': 0,
+            
+        }
+
+        
+        # easy counts
+        so = self.env['project.project']
+        result['all_quotation'] = so.search_count([])
+ 
+
+        return result
