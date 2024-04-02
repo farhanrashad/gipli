@@ -207,19 +207,40 @@
                                     Avg Last 7 Days
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_closed_last_7days':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_closed_last_7days':1,
+                                            'search_default_sla_success':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
                                     <a href="#" 
                                         name="de_helpdesk.action_dashboard_customer_rating"
-                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning"
                                         title="Customer Ratings"
                                         context="{
                                             'search_default_my_ratings': 1,

@@ -1,5 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- Search view -->
+    <record id="report_project_ticket_analysis_search_view" model="ir.ui.view">
+        <field name="name">report.project.ticket.analysis.search.view</field>
+        <field name="model">report.project.ticket.analysis</field>
+        <field name="arch" type="xml">
+            <search string="Tickets Search">
+                <field name="ticket_ref" />
+                <field name="tag_ids"/>
+                <field name="partner_id" filter_domain="['|', '|', '|', ('partner_id', 'ilike', self), ('partner_email', 'ilike', self), ('partner_phone', 'ilike', self), ('partner_name', 'ilike', self)]"/>
+
+                <field name="team_id" />
+                <field name="ticket_type_id"/>
+                <field name="stage_id"/>
+                <field name="sla_ids" groups="de_helpdesk.group_project_sla_enabled"/>
+                <field name="company_id" groups="base.group_multi_company" invisible="context.get('default_project_id', False)"/>
+                <field name="description"/>
+                
+                <field name="priority" invisible="1"/>
+
+                <filter string="My Tickets" domain="[('user_id','=',uid)]" name="my_ticket"/>
+                <filter string="Followed" domain="[('message_is_follower', '=', True)]" name="my_followed_ticket"/>
+                <filter string="Unassigned" domain="[('user_id','=',False)]" name="unassigned_ticket"/>
+                <separator/>
+                <filter string="Urgent" domain="[('priority', '=', 3)]" name="priority_urgent"/>
+                <filter string="High Priority" domain="[('priority', '=', 2)]" name="priority_high"/>
+                <filter string="Medium Priority" domain="[('priority', '=', 1)]" name="priority_medium"/>
+                <filter string="Low Priority" domain="[('priority', '=', 0)]" name="priority_low"/>
+
+                <!-- SLA Filters -->
+                <separator groups="de_helpdesk.group_project_sla_enabled"/>
+                <filter string="SLA Success" domain="[('sla_ids.status', '=', 'reached')]" name="sla_success" groups="de_helpdesk.group_project_sla_enabled"/>
+                <filter string="SLA in Progress" domain="[('sla_ids.status', '=', 'ongoing')]" name="sla_inprogress" groups="de_helpdesk.group_project_sla_enabled"/>
+                <filter string="SLA Failed" domain="[('sla_ids.status', '=', 'failed')]" name="sla_failed" groups="de_helpdesk.group_project_sla_enabled"/>
+                                
+                <separator/>
+                <filter string="Open" domain="[('stage_id.fold', '=', False)]" name="open_tickets"/>
+                <filter string="Closed" domain="[('stage_id.fold', '=', True)]" name="close_tickets"/>
+                <filter string="Last 7 days" name="closed_last_7days" domain="[('close_date','&gt;', (context_today() - datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d'))]"/>
+                <filter string="Last 30 days" name="closed_last_30days" domain="[('close_date', '&gt;', (context_today() - datetime.timedelta(days=30)).strftime('%%Y-%%m-%%d'))]"/>
+
+                <!--
+                <separator groups="de_helpdesk.group_project_ticket_customer_ratings"/>
+                <filter name="customer_rating_excellent" string="Excellent" domain="[('customer_rating', '=', '5')]" groups="de_helpdesk.group_project_ticket_customer_ratings"/>
+                <filter name="customer_rating_good" string="Good" domain="[('customer_rating', '=', '4')]" groups="de_helpdesk.group_project_ticket_customer_ratings"/>
+                <filter name="customer_rating_average" string="Average" domain="[('customer_rating', '=', '3')]" groups="de_helpdesk.group_project_ticket_customer_ratings"/>
+                <filter name="customer_rating_fair" string="Fair" domain="[('customer_rating', '=', '2')]" groups="de_helpdesk.group_project_ticket_customer_ratings"/>
+                <filter name="customer_rating_poor" string="Poor" domain="[('customer_rating', '=', '1')]" groups="de_helpdesk.group_project_ticket_customer_ratings"/>
+-->
+
+                
+                <separator/>
+                <filter name="filter_create_date" date="create_date"/>
+                <filter name="filter_sla_date_deadline" date="sla_deadline"/>
+                <separator/>
+                <separator/>
+                <filter string="Archived" domain="[('active','=',False)]" name="archive"/>
+                <group expand="0" string="Group By">
+                    <filter string="Assignee" name="group_assignee" context="{'group_by':'user_id'}"/>
+                    <filter string="Helpdesk Team" name="group_team" context="{'group_by':'team_id'}"/>
+                    <filter string="Stage" name="group_stage" context="{'group_by':'stage_id'}"/>
+                    <filter string="Status" name="group_kanban_state" context="{'group_by': 'kanban_state'}"/>
+                    <filter string="Type" name="group_ticket_type" context="{'group_by':'ticket_type_id'}"/>
+                    <filter string="Tags" name="group_tag" context="{'group_by': 'tag_ids'}"/>
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                    <filter string="Customer" name="group_customer" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                    <filter string="SLA" name="group_tickets_sla" context="{'group_by': 'sla_ids'}" groups="de_helpdesk.group_project_sla_enabled"/>
+                    <filter string="SLA Deadline" name="group_sla_deadline" context="{'group_by': 'sla_deadline'}" groups="helpdesk.group_project_sla_enabled"/>
+                    <filter string="Create Date" name="group_created_by" context="{'group_by': 'create_date'}"/>
+
+                </group>
+            </search>
+        </field>
+    </record>
+    
     <record id="report_project_ticket_analysis_pivot" model="ir.ui.view">
         <field name="name">report.project.ticket.analysis.pivot</field>
         <field name="model">report.project.ticket.analysis</field>
@@ -42,6 +118,7 @@
         <field name="name">Ticket Analysis</field>
         <field name="res_model">report.project.ticket.analysis</field>
         <field name="view_mode">pivot,graph,cohort</field>
+        <field name="search_view_id" ref="report_project_ticket_analysis_search_view"/>
     </record>
 
     <menuitem name="Ticket Analysis" id="menu_helpdesk_reports_ticket_analysis"
