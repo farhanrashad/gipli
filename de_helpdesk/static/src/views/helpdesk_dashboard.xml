@@ -64,19 +64,51 @@
                                     Avg Open Hours
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_analysis_open_hours"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                         
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                         
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_analysis_open_hours"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_high':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_analysis_open_hours"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_urgent':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
                                             <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
                                     </a>
                                 </td> 
