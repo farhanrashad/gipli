@@ -20,4 +20,11 @@
             </form>
         </field>
     </record>
+
+
+    <record id="action_set_target" model="ir.actions.act_window">
+        <field name="name">Set Target</field>
+        <field name="res_model">project.ticket.reopen.wizard</field>
+        <field name="view_mode">form</field>
+    </record>
 </odoo>

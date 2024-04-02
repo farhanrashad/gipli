@@ -523,8 +523,17 @@ class ProjectTicket(models.Model):
         }
 
     def action_ticket_all(self, action_ref, title, search_view_ref,context=None):
+        #raise UserError(action_ref)
+        if action_ref == 'de_helpdesk.action_set_target':
+            return {
+                'name': 'Reopen Ticket',
+                'view_mode': 'form',
+                'res_model': 'project.ticket.reopen.wizard',
+                'type': 'ir.actions.act_window',
+                'target': 'new',
+            }
         if context is None:
-            context = {}
+            context = {} 
         #raise UserError(context)
         action = self.env["ir.actions.actions"]._for_xml_id(action_ref)
         action = clean_action(action, self.env)
@@ -538,6 +547,6 @@ class ProjectTicket(models.Model):
             **context, 
             'create': False, 
             'edit': False, 
-            'delete': False
+            'delete': False,
         }
         return action
