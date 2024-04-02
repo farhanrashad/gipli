@@ -479,24 +479,24 @@ class Project(models.Model):
             result['today_closed_sla_success'] = len(today_closed_ticket_ids.filtered(lambda x:x.is_sla_success)) / len(today_closed_ticket_ids)
             result['today_closed_rating'] = sum(today_closed_ticket_ids.mapped('rating_score')) / len(today_closed_ticket_ids)
         else:
-            result['today_closed_sla_success'] = 0
-            result['today_closed_rating'] = 0
+            result['today_closed_sla_success'] = '0 %'
+            result['today_closed_rating'] = '0 %'
             
         # Last 7 Days
         last_7days_ticket_ids = ticket_ids.search(domain + [('date_closed', '<=', (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d'))])
         result['closed_last_7days'] = len(last_7days_ticket_ids)
         if len(ticket_ids) > 0:
-            result['closed_success_last_7days'] = len(ticket_ids.filtered(lambda x:x.is_sla_success)) / len(ticket_ids)
-            result['closed_rating_last_7days'] = sum(ticket_ids.mapped('rating_score')) / len(ticket_ids)
+            result['closed_success_last_7days'] = str(len(ticket_ids.filtered(lambda x:x.is_sla_success)) / len(ticket_ids)) + ' %'
+            result['closed_rating_last_7days'] = str(sum(ticket_ids.mapped('rating_score')) / len(ticket_ids)) + ' %'
         else:
-            result['closed_success_last_7days'] = 0
-            result['closed_rating_last_7days'] = 0
+            result['closed_success_last_7days'] = '0 %'
+            result['closed_rating_last_7days'] = '0 %'
 
         user_id = self.env.user
         user_target_id = self.env['res.users'].search([('id','=',user_id.id)],limit=1)
         result['target_ticket_closed'] = user_target_id.target_ticket_closed
-        result['target_ticket_rating'] = user_target_id.target_ticket_rating
-        result['target_ticket_success'] = user_target_id.target_ticket_sla_success_rate
+        result['target_ticket_rating'] = str(user_target_id.target_ticket_rating) + ' %'
+        result['target_ticket_success'] = str(user_target_id.target_ticket_sla_success_rate) + ' %'
 
         ticket_analysis = self.env['report.project.ticket.analysis'].search([('user_id','=',self.env.user.id)])
         return result
