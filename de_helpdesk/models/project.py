@@ -491,8 +491,9 @@ class Project(models.Model):
         else:
             result['closed_success_last_7days'] = 0
             result['closed_rating_last_7days'] = 0
-        
-        user_target_id = self.env['res.users'].search([('user_id','=',self.env.user.id)],limit=1)
+
+        user_id = self.env.user
+        user_target_id = self.env['res.users'].search([('id','=',user_id.id)],limit=1)
         result['target_ticket_closed'] = user_target_id.target_ticket_closed
         result['target_ticket_rating'] = user_target_id.target_ticket_rating
         result['target_ticket_success'] = user_target_id.target_ticket_sla_success_rate

@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="project.helpdesk.user.target.wizard_wizard_form_view" model="ir.ui.view">
-        <field name="name">project.helpdesk.user.target.wizard.wizard.form</field>
+    <record id="project_helpdesk_user_target_wizard_form_view" model="ir.ui.view">
+        <field name="name">project.helpdesk.user.target.wizard.form</field>
         <field name="model">project.helpdesk.user.target.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <group>
                     <group>
-                        <field name="ticket_ids" invisible="1"/>
-                        <field name="project_ids" invisible="1"/>
-                        <field name="stage_id" options="{'no_edit':True, 'no_create':True}" />
+                        <field name="target_ticket_closed" />
+                        <field name="target_ticket_rating" />
+                        <field name="target_ticket_sla_success_rate" />
                     </group>
-                   <field name="reopen_reason" placeholder="Please explain why you need to reopen the ticket." />
                 </group>
                 <footer>
-                    <button name="action_reopen_tickets" string="Reopen" type="object" class="btn-primary"/>
+                    <button name="action_set_target" string="Set Target" type="object" class="btn-primary"/>
                     <button special="cancel" string="Cancel" class="btn-secondary"/>
                 </footer>
             </form>

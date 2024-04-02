@@ -526,9 +526,9 @@ class ProjectTicket(models.Model):
         #raise UserError(action_ref)
         if action_ref == 'de_helpdesk.action_set_target':
             return {
-                'name': 'Reopen Ticket',
+                'name': 'Set Target',
                 'view_mode': 'form',
-                'res_model': 'project.ticket.reopen.wizard',
+                'res_model': 'project.helpdesk.user.target.wizard',
                 'type': 'ir.actions.act_window',
                 'target': 'new',
             }
