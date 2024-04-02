@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons.web.controllers.utils import clean_action
 
+from odoo.osv import expression
+
+
 import pytz
 import logging
 

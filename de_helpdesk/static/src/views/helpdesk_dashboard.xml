@@ -76,7 +76,7 @@
                                         t-on-click="onActionClicked"
                                     >
                                         
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['avg_open_hours']"/>
                                         
                                     </a>
                                 </td> 
@@ -93,7 +93,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['avg_open_hours_high']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
@@ -109,7 +109,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['avg_open_hours_urgent']"/>
                                     </a>
                                 </td> 
                             </tr>
@@ -130,7 +130,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['count_sla_failed']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
@@ -147,7 +147,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['count_sla_failed_high']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
@@ -164,7 +164,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['count_sla_failed_urgent']"/>
                                     </a>
                                 </td> 
                             </tr>
@@ -192,7 +192,7 @@
                                         t-on-click="onActionClicked"
                                     >
                                         <div class="p-2">
-                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['count_my_closed_tickets']"/>
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['today_closed_tickets']"/>
                                             Closed Tickets
                                         </div>
                                     </a>
@@ -210,7 +210,7 @@
                                         t-on-click="onActionClicked"
                                     >
                                         <div class="p-2">
-                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['today_closed_sla_success']"/>
                                             SLA Success Rate
                                         </div>
                                     </a>
@@ -228,7 +228,7 @@
                                         t-on-click="onActionClicked"
                                     >
                                         <div class="p-2">
-                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['today_closed_rating']"/>
                                             Average Rating
                                         </div>
                                     </a>
@@ -250,7 +250,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['closed_last_7days']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
@@ -266,7 +266,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['closed_success_last_7days']"/>
                                     </a>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
@@ -281,7 +281,7 @@
                                         }"
                                         t-on-click="onActionClicked"
                                     >
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['closed_rating_last_7days']"/>
                                     </a>
                                 </td> 
                                 

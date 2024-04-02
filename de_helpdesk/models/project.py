@@ -390,10 +390,26 @@ class Project(models.Model):
             'count_my_tickets': 0,
             'count_my_high_tickets':0,
             'count_my_urgent_tickets':0,
-            'count_my_closed_tickets': 0,
+            
             'target_ticket_closed': 0,
             'target_ticket_rating': 0,
             'target_ticket_success': 0,
+
+            'avg_open_hours': 0,
+            'avg_open_hours_high': 0,
+            'avg_open_hours_urgent': 0,
+
+            'count_sla_failed': 0,
+            'count_sla_failed_high': 0,
+            'count_sla_failed_urgent': 0,
+
+            'today_closed_tickets': 0,
+            'today_closed_sla_success': 0,
+            'today_closed_rating': 0,
+            
+            'closed_last_7days': 0,
+            'closed_success_last_7days': 0,
+            'closed_rating_last_7days': 0,
         }
 
         
@@ -404,13 +420,89 @@ class Project(models.Model):
         domain = [('is_ticket','=',True),('user_ids','in',self.env.user.id)]
         
         result['all_quotation'] = so.search_count([])
+
+        # Open Tickets
         result['count_my_tickets'] = ticket_ids.search_count(domain)
         result['count_my_high_tickets'] = ticket_ids.search_count(domain+[('ticket_priority','=',2)])
         result['count_my_urgent_tickets'] = ticket_ids.search_count(domain+[('ticket_priority','=',3)])
-        result['count_my_closed_tickets'] = ticket_ids.search_count(domain+[('stage_id.fold','=',True)])
+        
+        # Failed Tickets
+        result['count_sla_failed'] = ticket_ids.search_count(domain+[('is_sla_fail','=',True)])
+        result['count_sla_failed_high'] = ticket_ids.search_count(domain+[('ticket_priority','=',2),('is_sla_fail','=',True)])
+        result['count_sla_failed_urgent'] = ticket_ids.search_count(domain+[('ticket_priority','=',3),('is_sla_fail','=',True)])
 
+        # Average Open Hours
+        query1 = """
+            SELECT
+                round(AVG(open_ticket_hours),2) AS avg_open_hours,
+                round(AVG(CASE WHEN priority = '2' THEN open_ticket_hours ELSE 0 END),2) AS avg_open_hours_high,
+                round(AVG(CASE WHEN priority = '3' THEN open_ticket_hours ELSE 0 END),2) AS avg_open_hours_urgent
+            FROM report_project_ticket_analysis
+        """
+        query = """
+            select round(AVG(a.open_ticket_hours),2) AS avg_open_hours,
+                round(AVG(CASE WHEN a.priority = '2' THEN a.open_ticket_hours ELSE 0 END),2) AS avg_open_hours_high,
+                round(AVG(CASE WHEN a.priority = '3' THEN a.open_ticket_hours ELSE 0 END),2) AS avg_open_hours_urgent
+            from (
+            SELECT
+                EXTRACT(EPOCH FROM (COALESCE(t.date_closed, NOW() AT TIME ZONE 'UTC') - t.create_date)) / 3600 as open_ticket_hours,
+                t.ticket_priority as priority
+            FROM project_task t
+            where t.is_ticket = True
+            ) a
+        """
+        self.env.cr.execute(query)
+        results = self.env.cr.dictfetchall()
+        for record in results:
+            result['avg_open_hours'] = record['avg_open_hours'] if result else 0.0
+            result['avg_open_hours_high'] = record['avg_open_hours_high'] if result else 0.0
+            result['avg_open_hours_urgent'] = record['avg_open_hours_urgent'] if result else 0.0
+        #else:
+        #    result['avg_open_hours'] = 0
+        #    result['avg_open_hours_high'] = 0
+        #    result['avg_open_hours_urgent'] = 0
+
+        #report_ticket_ids = self.env['report.project.ticket.analysis'].search([
+        #    ('user_id','=',self.env.user.id),
+        #    ('stage_id.fold', '!=', True)
+        #])
+        #if len(report_ticket_ids) > 0:
+        #    result['avg_open_hours'] = round(sum(report_ticket_ids.mapped('open_ticket_hours')) / len(report_ticket_ids),2)
+        #    result['avg_open_hours_high'] = round(sum(report_ticket_ids.filtered(lambda x:x.priority == '2').mapped('open_ticket_hours')) / len(report_ticket_ids),2)
+        #    result['avg_open_hours_urgent'] = round(sum(report_ticket_ids.filtered(lambda x:x.priority == '3').mapped('open_ticket_hours')) / len(report_ticket_ids),2)
+        #else:
+        #    result['avg_open_hours'] = 0
+        #    result['avg_open_hours_high'] = 0
+        #    result['avg_open_hours_urgent'] = 0
+        
+        # Today closed
+        today_date = datetime.now().date()
+        today_start = datetime.combine(today_date, datetime.min.time())
+        today_end = datetime.combine(today_date, datetime.max.time())
+        today_closed_ticket_ids = ticket_ids.search(domain + [('date_closed', '>=', today_start), ('date_closed', '<=', today_end)])
+
+        result['today_closed_tickets'] = len(today_closed_ticket_ids)
+        if len(today_closed_ticket_ids) > 0:
+            result['today_closed_sla_success'] = len(today_closed_ticket_ids.filtered(lambda x:x.is_sla_success)) / len(today_closed_ticket_ids)
+            result['today_closed_rating'] = sum(today_closed_ticket_ids.mapped('rating_score')) / len(today_closed_ticket_ids)
+        else:
+            result['today_closed_sla_success'] = 0
+            result['today_closed_rating'] = 0
+            
+        # Last 7 Days
+        last_7days_ticket_ids = ticket_ids.search(domain + [('date_closed', '<=', (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d'))])
+        result['closed_last_7days'] = len(last_7days_ticket_ids)
+        if len(ticket_ids) > 0:
+            result['closed_success_last_7days'] = len(ticket_ids.filtered(lambda x:x.is_sla_success)) / len(ticket_ids)
+            result['closed_rating_last_7days'] = sum(ticket_ids.mapped('rating_score')) / len(ticket_ids)
+        else:
+            result['closed_success_last_7days'] = 0
+            result['closed_rating_last_7days'] = 0
+        
         user_target_id = self.env['res.users'].search([('user_id','=',self.env.user.id)],limit=1)
         result['target_ticket_closed'] = user_target_id.target_ticket_closed
         result['target_ticket_rating'] = user_target_id.target_ticket_rating
         result['target_ticket_success'] = user_target_id.target_ticket_success
+
+        ticket_analysis = self.env['report.project.ticket.analysis'].search([('user_id','=',self.env.user.id)])
         return result

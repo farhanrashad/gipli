@@ -41,7 +41,6 @@
         <field name="arch" type="xml">
         <pivot string="SLA Status Analysis" disable_linking="1" sample="1">
             <field name="create_date" type="row"/>
-            <field name="team_id" type="row"/>
             <field name="open_ticket_hours" widget="float_time" type="measure"/>
             <field name="close_ticket_hours" widget="float_time" />
             <field name="ticket_deadline_hours" widget="float_time"/>
