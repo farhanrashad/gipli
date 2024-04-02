@@ -16,6 +16,15 @@ export class HelpdeskDashBoard extends Component {
         });
     }
 
+    async TargetDashboard(targetName, value) {
+        await this.orm.write(
+            'res.users',
+            [session.uid],
+            { [targetName]: value },
+        );
+        this.state.dashboardValues[targetName] = value;
+    }
+    
     async onActionClicked(e) {
         if (this.showDemo) {
             return;

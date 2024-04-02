@@ -291,19 +291,13 @@
                                     Daily Target
                                 </td>
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
-                                    </a>
+                                    <span class="mb-0 text-reset" t-out="helpdeskData['target_ticket_closed']"/>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
-                                    </a>
+                                    <span class="mb-0 text-reset" t-out="helpdeskData['target_ticket_success']"/>
                                 </td> 
                                 <td t-attf-class="col-3 px-1">
-                                    <a href="#" class="btn w-100 p-2 border-0 text-capitalize fw-normal">
-                                            <span class="mb-0 text-reset" t-out="helpdeskData['all_quotation']"/>
-                                    </a>
+                                    <span class="mb-0 text-reset" t-out="helpdeskData['target_ticket_rating']"/>
                                 </td> 
                             </tr>
                         </tbody>

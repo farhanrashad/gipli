@@ -391,6 +391,9 @@ class Project(models.Model):
             'count_my_high_tickets':0,
             'count_my_urgent_tickets':0,
             'count_my_closed_tickets': 0,
+            'target_ticket_closed': 0,
+            'target_ticket_rating': 0,
+            'target_ticket_success': 0,
         }
 
         
@@ -405,5 +408,9 @@ class Project(models.Model):
         result['count_my_high_tickets'] = ticket_ids.search_count(domain+[('ticket_priority','=',2)])
         result['count_my_urgent_tickets'] = ticket_ids.search_count(domain+[('ticket_priority','=',3)])
         result['count_my_closed_tickets'] = ticket_ids.search_count(domain+[('stage_id.fold','=',True)])
- 
+
+        user_target_id = self.env['res.users'].search([('user_id','=',self.env.user.id)],limit=1)
+        result['target_ticket_closed'] = user_target_id.target_ticket_closed
+        result['target_ticket_rating'] = user_target_id.target_ticket_rating
+        result['target_ticket_success'] = user_target_id.target_ticket_success
         return result
