@@ -432,13 +432,6 @@ class Project(models.Model):
         result['count_sla_failed_urgent'] = ticket_ids.search_count(domain+[('ticket_priority','=',3),('is_sla_fail','=',True)])
 
         # Average Open Hours
-        query1 = """
-            SELECT
-                round(AVG(open_ticket_hours),2) AS avg_open_hours,
-                round(AVG(CASE WHEN priority = '2' THEN open_ticket_hours ELSE 0 END),2) AS avg_open_hours_high,
-                round(AVG(CASE WHEN priority = '3' THEN open_ticket_hours ELSE 0 END),2) AS avg_open_hours_urgent
-            FROM report_project_ticket_analysis
-        """
         query = """
             select round(AVG(a.open_ticket_hours),2) AS avg_open_hours,
                 round(AVG(CASE WHEN a.priority = '2' THEN a.open_ticket_hours ELSE 0 END),2) AS avg_open_hours_high,
@@ -502,7 +495,7 @@ class Project(models.Model):
         user_target_id = self.env['res.users'].search([('user_id','=',self.env.user.id)],limit=1)
         result['target_ticket_closed'] = user_target_id.target_ticket_closed
         result['target_ticket_rating'] = user_target_id.target_ticket_rating
-        result['target_ticket_success'] = user_target_id.target_ticket_success
+        result['target_ticket_success'] = user_target_id.target_ticket_sla_success_rate
 
         ticket_analysis = self.env['report.project.ticket.analysis'].search([('user_id','=',self.env.user.id)])
         return result

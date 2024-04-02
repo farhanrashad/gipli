@@ -7,4 +7,4 @@ class ResUsers(models.Model):
 
     target_ticket_closed = fields.Integer(string='Target Tickets to Close', default=1)
     target_ticket_rating = fields.Float(string='Target Rating', default=85)
-    target_ticket_success = fields.Float(string='Target Success Rate', default=85)
+    target_ticket_sla_success_rate = fields.Float(string='Target Success Rate', default=85)

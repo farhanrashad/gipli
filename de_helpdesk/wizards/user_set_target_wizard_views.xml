@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="ticket_reopen_wizard_form_view" model="ir.ui.view">
-        <field name="name">project.ticket.reopen.wizard.form</field>
-        <field name="model">project.ticket.reopen.wizard</field>
+    <record id="project.helpdesk.user.target.wizard_wizard_form_view" model="ir.ui.view">
+        <field name="name">project.helpdesk.user.target.wizard.wizard.form</field>
+        <field name="model">project.helpdesk.user.target.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <group>
@@ -19,5 +19,12 @@
                 </footer>
             </form>
         </field>
+    </record>
+
+
+    <record id="action_set_target" model="ir.actions.act_window">
+        <field name="name">Set Target</field>
+        <field name="res_model">project.ticket.reopen.wizard</field>
+        <field name="view_mode">form</field>
     </record>
 </odoo>

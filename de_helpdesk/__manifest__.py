@@ -56,6 +56,7 @@ Features:
         'views/dashboard_views.xml',
         'wizards/tickets_reopen_wizard_views.xml',
         'wizards/tickets_merge_wizard_views.xml',
+        'wizards/user_set_target_wizard_views.xml',
         'reports/report_sla_analysis_views.xml',
         'reports/report_customer_rating_views.xml',
         'reports/report_ticket_analysis_views.xml',

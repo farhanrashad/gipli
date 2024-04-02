@@ -11,6 +11,7 @@ access_project_ticket_sla_line_manager,access.project.ticket.sla.line.manager,mo
 access_project_ticket_reopen,access.project.ticket.reopen,model_project_ticket_reopen,,1,1,1,1
 access_project_ticket_reopen_wizard,access.project.ticket.reopen.wizard,model_project_ticket_reopen_wizard,,1,1,1,1
 access_project_ticket_merge_wizard,access.project.ticket.merge.wizard,model_project_ticket_merge_wizard,,1,1,1,1
+access_project_helpdesk_user_target_wizard,access.project.helpdesk.user.target.wizard,model_project_helpdesk_user_target_wizard,,1,1,1,1
 
 access_project_ticket_stage_approvals_user,access.project.ticket.stage.approvals.user,model_project_ticket_stage_approvals,base.group_user,1,1,1,0
 access_project_ticket_stage_approvals_manager,access.project.ticket.stage.approvals.manager,model_project_ticket_stage_approvals,group_project_helpdesk_manager,1,1,1,1
