@@ -91,8 +91,12 @@
                                     <field name="sla_hours_deadline" />
                                     <field name="is_sla_fail" />
                                      <field name="is_sla_success" />
+                                    
                                 </group>
                                 <group>
+                                    <field name="closed_by" />
+                                    <field name="hours_close" />
+                                    <field name="date_closed" />
                                     <field name="company_id" groups="base.group_multi_company" context="{'create': False}"/>
                                 </group>
                             </group>

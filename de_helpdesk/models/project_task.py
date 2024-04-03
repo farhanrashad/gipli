@@ -149,8 +149,8 @@ class ProjectTicket(models.Model):
     def _get_closing_hours(self):
         for record in self:
             create_date = fields.Datetime.from_string(record.create_date)
-            if create_date and record.date_closed and record.team:
-                duration_data = record.team.calendar.get_work_duration_data(
+            if create_date and record.date_closed and record.project_id.is_helpdesk_team:
+                duration_data = record.project_id.resource_calendar_id.get_work_duration_data(
                     create_date,
                     fields.Datetime.from_string(record.date_closed),
                     compute_leaves=True
@@ -161,7 +161,7 @@ class ProjectTicket(models.Model):
             
     def _compute_allow_reopen(self):
         for record in self:
-            record.allowed_reopen = True
+            record.allowed_reopen = record.project_id.is_reopen_tickets
             
     def _compute_reopen_count(self):
         for record in self:
@@ -351,6 +351,7 @@ class ProjectTicket(models.Model):
                     if ticket.ticket_sla_ids:
                         #ticket.ticket_sla_ids._update_sla_status(new_stage_id)
                         ticket._update_sla_lines(ticket, vals.get('stage_id'))
+            self._update_ticket(vals.get('stage_id'))
                 
                 # Update SLA line statuses based on stage and deadline conditions
                 #sla_lines_to_update = self.env['project.ticket.sla.line'].search([('ticket_id', '=', self.id)])
@@ -373,13 +374,23 @@ class ProjectTicket(models.Model):
     # -----------------------------------------------------------------------
     # ---------------------------- Business Logics --------------------------
     # -----------------------------------------------------------------------
+    # Update Ticket fields ----------------
+    def _update_ticket(self, stage_id):
+        ticket_stage_id = self.env['project.task.type'].browse(stage_id)
+        if ticket_stage_id.fold:
+            self.closed_by = 'user'
+            self.date_closed = fields.Datetime.now()
+        else:
+            self.closed_by = False
+            self.date_closed = False
+            
     # ------------ Apply SLA ------------
     def _update_sla_lines(self,ticket, stage_id):
         ticket_stage_id = self.env['project.task.type'].browse(stage_id)
         for sla_line in ticket.ticket_sla_ids:
             #raise UserError(stage_id)
             if sla_line.prj_sla_id.stage_id.id == ticket_stage_id.id:
-                sla_line.date_reached = fields.Datetime.now()
+                sla_line.date_reached = fields.Datetime.now()                    
             else:
                 #raise UserError('execute')
                 # Check for stage_id change and update date_reached accordingly
