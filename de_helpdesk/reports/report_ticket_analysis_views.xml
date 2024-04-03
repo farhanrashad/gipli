@@ -108,7 +108,7 @@
         <field name="name">report.project.ticket.sla.analysis.cohort</field>
         <field name="model">report.project.ticket.analysis</field>
         <field name="arch" type="xml">
-            <cohort string="Tickets Analysis" date_start="create_date" date_stop="date_closed" disable_linking="True" interval="day" sample="1" measure="open_ticket_hours">
+            <cohort string="Tickets Analysis" date_start="create_date" date_stop="close_date" disable_linking="True" interval="day" sample="1" measure="open_ticket_hours">
                 <field name="rating_avg" invisible="1"/>
             </cohort>
         </field>
