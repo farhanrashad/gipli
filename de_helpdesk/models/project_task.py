@@ -378,7 +378,10 @@ class ProjectTicket(models.Model):
     def _update_ticket(self, stage_id):
         ticket_stage_id = self.env['project.task.type'].browse(stage_id)
         if ticket_stage_id.fold:
-            self.closed_by = 'user'
+            if self.env.user.has_group('base.group_portal'):
+                self.closed_by = 'customer'
+            else:
+                self.closed_by = 'user'
             self.date_closed = fields.Datetime.now()
         else:
             self.closed_by = False
@@ -394,7 +397,7 @@ class ProjectTicket(models.Model):
             else:
                 #raise UserError('execute')
                 # Check for stage_id change and update date_reached accordingly
-                if ticket.stage_id.sequence > ticket_stage_id.sequence:
+                if sla_line.prj_sla_id.stage_id.sequence > ticket_stage_id.sequence:
                     sla_line.date_reached = False
                     
                     

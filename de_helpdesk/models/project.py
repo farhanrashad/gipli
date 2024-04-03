@@ -83,6 +83,10 @@ class Project(models.Model):
     count_tickets_rating = fields.Integer('Rating', compute='_compute_customer_rating_count')
     tickets_avg_rating = fields.Float('Rating Avg.', compute='_compute_tickets_avg_rating')
 
+    # module fields
+    module_hr_timesheet = fields.Boolean('Timesheet', default=False)
+    module_sale_timesheet = fields.Boolean('Timesheet', default=False)
+    
     # Compute Methods
     def _compute_tickets_avg_rating(self):
         for record in self:
@@ -162,7 +166,10 @@ class Project(models.Model):
         for ticket in tickets_to_close:
             ticket.stage_id = self.close_stage_id.id
         return True
-        
+
+    # --------------------------------------------------------------
+    # ------------------- Busienss Logics --------------------------
+    # ------------------------------------------
     # SLA Policies
     def _check_group_project_sla_enabled(self, check_user_has_group=False):
         user_has_group_sla_enabled = self.user_has_groups('de_helpdesk.group_project_sla_enabled') if check_user_has_group else True
@@ -246,8 +253,34 @@ class Project(models.Model):
                     'implied_ids': [Command.unlink(group_merge_tickets_enabled.id)]
                 })
                 group_merge_tickets_enabled.write({'users': [(5, 0, 0)]})
+
+    # Modules to Install
+    
+    def _get_modules_list(self):
+        vals = {
+            'hr_timesheet': self.module_hr_timesheet,
+            'sale_timesheet': self.module_sale_timesheet,
+        }
+        return vals
+
+    def _install_helpdesk_modules(self):
+        module_list = self._get_modules_list()
+        module_names = [key for key, value in module_list.items() if value]
+
         
+        if module_names:
+            modules_to_isntall = self.env['ir.module.module'].search([
+                ('name', 'in', module_names),
+                ('state','=','uninstalled')
+            ])
+            modules_to_isntall.button_immediate_install()
+            #raise UserError(modules_to_isntall)
+            # Process the installed modules as needed
+            #for module in installed_modules:
+        
+    # -------------------------------------------------------------
     # Actions
+    # -------------------------------------------------------------
     def action_open_tickets_view(self):
         action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
         action.update({
