@@ -81,7 +81,7 @@ class ProjectTicket(models.Model):
 
     
     # Computed Methods
-    @api.depends('sla_status_ids.deadline', 'sla_status_ids.reached_datetime')
+    @api.depends('ticket_sla_ids.date_deadline', 'ticket_sla_ids.date_reached')
     def _compute_sla_reached(self):
         sla_status_read_group = self.env['helpdesk.sla.status']._read_group(
             [('exceeded_hours', '<', 0), ('ticket_id', 'in', self.ids)],
@@ -91,7 +91,7 @@ class ProjectTicket(models.Model):
         for ticket in self:
             ticket.sla_reached = ticket.id in sla_status_ids_per_ticket
             
-    @api.depends('sla_status_ids.deadline', 'sla_status_ids.reached_datetime')
+    @api.depends('ticket_sla_ids.date_deadline', 'ticket_sla_ids.date_reached')
     def _compute_sla_reached_late(self):
         """ Required to do it in SQL since we need to compare 2 columns value """
         mapping = {}
@@ -99,7 +99,7 @@ class ProjectTicket(models.Model):
             self.env.cr.execute("""
                 SELECT ticket_id, COUNT(id) AS reached_late_count
                 FROM helpdesk_sla_status
-                WHERE ticket_id IN %s AND (deadline < reached_datetime OR (deadline < %s AND reached_datetime IS NULL))
+                WHERE ticket_id IN %s AND (deadline < reached_date OR (deadline < %s AND reached_date IS NULL))
                 GROUP BY ticket_id
             """, (tuple(self.ids), fields.Datetime.now()))
             mapping = dict(self.env.cr.fetchall())
@@ -113,6 +113,8 @@ class ProjectTicket(models.Model):
         for record in self:
             if record.sla_date_deadline:
                 record.is_sla_fail = (record.sla_date_deadline < current_time)
+            else:
+                record.is_sla_fail = False
             
 
     @api.model
@@ -201,12 +203,12 @@ class ProjectTicket(models.Model):
             min_deadline = False
     
             # Find the minimum deadline among all SLA statuses for the ticket
-            for status in ticket.sla_status_ids:
-                if status.reached_datetime or not status.deadline:
+            for status in ticket.ticket_sla_ids:
+                if status.date_reached or not status.date_deadline:
                     continue
     
-                if not min_deadline or status.deadline < min_deadline:
-                    min_deadline = status.deadline
+                if not min_deadline or status.date_deadline < min_deadline:
+                    min_deadline = status.date_deadline
     
             # Update the ticket's SLA fields based on the minimum deadline
             ticket.update({
@@ -347,7 +349,8 @@ class ProjectTicket(models.Model):
                 tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
                 for ticket in tickets_to_update:
                     if ticket.ticket_sla_ids:
-                        ticket.ticket_sla_ids._update_sla_status(new_stage_id)
+                        #ticket.ticket_sla_ids._update_sla_status(new_stage_id)
+                        ticket._update_sla_lines(ticket, vals.get('stage_id'))
                 
                 # Update SLA line statuses based on stage and deadline conditions
                 #sla_lines_to_update = self.env['project.ticket.sla.line'].search([('ticket_id', '=', self.id)])
@@ -371,34 +374,56 @@ class ProjectTicket(models.Model):
     # ---------------------------- Business Logics --------------------------
     # -----------------------------------------------------------------------
     # ------------ Apply SLA ------------
-    def _find_sla_ids(self):
+    def _update_sla_lines(self,ticket, stage_id):
+        ticket_stage_id = self.env['project.task.type'].browse(stage_id)
+        for sla_line in ticket.ticket_sla_ids:
+            #raise UserError(stage_id)
+            if sla_line.prj_sla_id.stage_id.id == ticket_stage_id.id:
+                sla_line.date_reached = fields.Datetime.now()
+            else:
+                #raise UserError('execute')
+                # Check for stage_id change and update date_reached accordingly
+                if ticket.stage_id.sequence > ticket_stage_id.sequence:
+                    sla_line.date_reached = False
+                    
+                    
+                # Update status based on date_deadline
+                #if prj_sla.date_deadline <= fields.Datetime.now() and prj_sla.stage_id.id == task.stage_id.id:
+                #    prj_sla.status = 'reached'
+                #elif prj_sla.date_deadline > fields.Datetime.now():
+                #    prj_sla.status = 'failed'
+                #else:
+                #    prj_sla.status = 'ongoing'
+                    
+    def _find_sla_ids(self, ticket):
         domain = [
-            ('project_id', '=', self.project_id.id),
+            ('project_id', '=', ticket.project_id.id),
         ]
 
+        #raise UserError(domain)
         # Extend the domain based on additional conditions if they exist
-        if self.partner_id:
-            domain.append(('partner_ids', '=', self.partner_id.id))
-        if self.tag_ids:
-            domain.append(('tag_ids', 'in', self.tag_ids.ids))
-        if self.prj_ticket_type_ids:
-            domain.append(('prj_ticket_type_ids', 'in', self.prj_ticket_type_ids.ids))
+        if ticket.partner_id:
+            domain.append(('partner_ids', '=', ticket.partner_id.id))
+        if ticket.tag_ids:
+            domain.append(('tag_ids', 'in', ticket.tag_ids.ids))
+        if ticket.prj_ticket_type_id:
+            domain.append(('prj_ticket_type_ids', 'in', ticket.prj_ticket_type_id.id))
             
         sla_policies = self.env['project.sla'].search(domain)
         return sla_policies
 
-    def _calculate_deadline_date(self, sla_hours, create_date):
+    def _calculate_deadline_date(self, ticket, sla):
         # Convert create_date to datetime object
-        from_datetime = fields.Datetime.from_string(create_date)
+        from_datetime = fields.Datetime.from_string(ticket.create_date)
 
         # Calculate to_datetime based on SLA hours
-        to_datetime = from_datetime + timedelta(hours=sla_hours)
+        to_datetime = from_datetime + timedelta(hours=sla.time)
 
         # Initialize work_duration_data
         work_duration_data = {}
 
         # Get work duration data with compute_leaves=True and domain=None
-        work_duration_data = self.project_id.resource_calendar_id.get_work_duration_data(
+        work_duration_data = ticket.project_id.resource_calendar_id.get_work_duration_data(
             from_datetime,
             to_datetime,
             compute_leaves=True,
@@ -417,19 +442,23 @@ class ProjectTicket(models.Model):
         sla_lines = self.env['project.ticket.sla.line']
         current_date = datetime.now()
 
+        
         for ticket in tickets:
             if ticket.is_sla and ticket.project_id.is_helpdesk_team:
-                ticket.ticket_sla_ids.unlink()
-                sla_ids = self.sudo()._find_sla_ids()
+                #raise UserError(ticket.project_id)
+                #ticket.ticket_sla_ids.unlink()
+                sla_ids = self.sudo()._find_sla_ids(ticket)
+                #raise UserError(sla_ids)
                 for sla in sla_ids:
-                    sla_line = self.env['project.ticket.sla.line'].create(self._prpeare_sla_line_values(ticket,sla))
+                    sla_line_vals = self._prpeare_sla_line_values(ticket, sla)
+                    sla_line = self.env['project.ticket.sla.line'].create(sla_line_vals)
                     sla_lines |= sla_line
         return sla_lines
         
     def _prpeare_sla_line_values(self, ticket, sla):
         deadline_date = self._calculate_deadline_date(
-            sla.time,  # SLA time in hours
-            ticket.create_date  # Ticket's create date
+            ticket,  
+            sla
         )
         return {
             'ticket_id': ticket.id,
