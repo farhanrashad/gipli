@@ -57,11 +57,11 @@ class ProjectTicket(models.Model):
     closed_by = fields.Selection([
         ('customer', 'Closed by Customer'), 
         ('user', 'Closed by User')],
-        string='Closed Type',
+        string='Closed Type', readonly=True,
     )
-    date_closed = fields.Datetime('Close on', 
+    date_closed = fields.Datetime('Close on', readonly=True,
                                    help='The date on which the ticket closed')
-    hours_close = fields.Integer("Time to close (hours)", compute='_get_closing_hours', store=True)
+    hours_close = fields.Integer("Time to close (hours)", compute='_get_closing_hours', store=True, readonly=True)
     #Customer Rating
     allow_customer_rating = fields.Boolean(related='project_id.allow_customer_rating')
     customer_rating = fields.Selection(

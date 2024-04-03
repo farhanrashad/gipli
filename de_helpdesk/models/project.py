@@ -119,11 +119,11 @@ class Project(models.Model):
 
     def _compute_urgent_ticket(self):
         for prj in self:
-            prj.urgent_ticket_count = len(prj.task_ids.filtered(lambda x: not x.priority == 3))
+            prj.urgent_ticket_count = len(prj.task_ids.filtered(lambda x: x.ticket_priority == '3'))
 
     def _compute_sla_failed(self):
         for prj in self:
-            prj.sla_failed_ticket_count = len(prj.task_ids.filtered(lambda x: not x.priority == 3))
+            prj.sla_failed_ticket_count = len(prj.task_ids.filtered(lambda x: x.is_sla_fail))
 
     def _compute_sla_success_rate(self):
         for prj in self:
@@ -334,6 +334,7 @@ class Project(models.Model):
             'context': {
                 'default_project_id': self.id,
                 'search_default_my_ticket': 1,
+                'search_default_sla_failed': 1,
             },
         })
         return action
@@ -345,10 +346,10 @@ class Project(models.Model):
             'view_mode': 'tree,form',
             'res_model': 'project.task',
             'type': 'ir.actions.act_window',
-            'domain': [('project_id', '=', self.id),('user_ids', '=', False)],
+            'domain': [('project_id', '=', self.id)],
             'context': {
                 'default_project_id': self.id,
-                'search_default_my_ticket': 1,
+                'search_default_unassigned_ticket': 1,
             },
         })
         return action
@@ -360,10 +361,11 @@ class Project(models.Model):
             'view_mode': 'tree,form',
             'res_model': 'project.task',
             'type': 'ir.actions.act_window',
-            'domain': [('project_id', '=', self.id),('priority', '=', 3)],
+            'domain': [('project_id', '=', self.id)],
             'context': {
                 'default_project_id': self.id,
                 'search_default_my_ticket': 1,
+                'search_default_priority_urgent':1,
             },
         })
         return action
@@ -476,18 +478,20 @@ class Project(models.Model):
 
         result['today_closed_tickets'] = len(today_closed_ticket_ids)
         if len(today_closed_ticket_ids) > 0:
-            result['today_closed_sla_success'] = len(today_closed_ticket_ids.filtered(lambda x:x.is_sla_success)) / len(today_closed_ticket_ids)
-            result['today_closed_rating'] = sum(today_closed_ticket_ids.mapped('rating_score')) / len(today_closed_ticket_ids)
+            result['today_closed_sla_success'] = str(len(today_closed_ticket_ids.filtered(lambda x:x.is_sla_success)) / len(today_closed_ticket_ids)) + ' %'
+            result['today_closed_rating'] = str(sum(today_closed_ticket_ids.mapped('rating_score')) / len(today_closed_ticket_ids)) + ' %'
         else:
             result['today_closed_sla_success'] = '0 %'
             result['today_closed_rating'] = '0 %'
             
         # Last 7 Days
-        last_7days_ticket_ids = ticket_ids.search(domain + [('date_closed', '<=', (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d'))])
+        last_7days_ticket_ids = ticket_ids.search(domain + [('date_closed', '>=', (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d'))])
+
+        
         result['closed_last_7days'] = len(last_7days_ticket_ids)
-        if len(ticket_ids) > 0:
-            result['closed_success_last_7days'] = str(len(ticket_ids.filtered(lambda x:x.is_sla_success)) / len(ticket_ids)) + ' %'
-            result['closed_rating_last_7days'] = str(sum(ticket_ids.mapped('rating_score')) / len(ticket_ids)) + ' %'
+        if len(last_7days_ticket_ids) > 0:
+            result['closed_success_last_7days'] = str(len(last_7days_ticket_ids.filtered(lambda x:x.is_sla_success)) / len(last_7days_ticket_ids)) + ' %'
+            result['closed_rating_last_7days'] = str(sum(last_7days_ticket_ids.mapped('rating_score')) / len(last_7days_ticket_ids)) + ' %'
         else:
             result['closed_success_last_7days'] = '0 %'
             result['closed_rating_last_7days'] = '0 %'

@@ -181,6 +181,7 @@
                 <field name="ticket_priority" invisible="1"/>
 
                 <filter string="My Tickets" domain="[('user_ids','in',uid)]" name="my_ticket"/>
+                <separator/>
                 <filter string="Followed" domain="[('message_is_follower', '=', True)]" name="my_followed_ticket"/>
                 <filter string="Unassigned" domain="[('user_ids','=',False)]" name="unassigned_ticket"/>
                 <separator/>

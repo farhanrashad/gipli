@@ -61,7 +61,7 @@ Features:
         'reports/report_customer_rating_views.xml',
         'reports/report_ticket_analysis_views.xml',
         'views/dashboard_action_views.xml',
-        'views/helpdesk_dashboard.xml',
+        #'views/helpdesk_dashboard.xml',
     ],
     'assets': {
         'web.assets_backend': [
