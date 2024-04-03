@@ -85,7 +85,14 @@ class Project(models.Model):
 
     # module fields
     module_hr_timesheet = fields.Boolean('Timesheet', default=False)
-    module_sale_timesheet = fields.Boolean('Timesheet', default=False)
+    module_sale_timesheet = fields.Boolean('Sale Timesheet', default=False)
+    module_helpdesk_website = fields.Boolean('Website Form', default=False)
+    module_website_helpdesk_forum = fields.Boolean('Forum', default=False)
+    module_website_helpdesk_slides = fields.Boolean('Slides', default=False)
+    module_website_helpdesk_knowledg = fields.Boolean('Knowledge', default=False)
+    module_helpdesk_account = fields.Boolean('Account', default=False)
+    module_helpdesk_stock = fields.Boolean('Stock', default=False)
+    module_helpdesk_repair = fields.Boolean('Repair', default=False)
     
     # Compute Methods
     def _compute_tickets_avg_rating(self):
@@ -258,8 +265,19 @@ class Project(models.Model):
     
     def _get_modules_list(self):
         vals = {
-            'hr_timesheet': self.module_hr_timesheet,
+            'de_helpdesk_timesheet': self.module_helpdesk_website,
             'sale_timesheet': self.module_sale_timesheet,
+            'de_helpdesk_website': self.module_helpdesk_website,
+            'de_helpdesk_website_forum': self.module_website_helpdesk_forum,
+            'de_helpdesk_website_slides': self.module_website_helpdesk_slides,
+            'de_helpdesk_website_knowledge': self.module_website_helpdesk_knowledge,
+            'de_helpdesk_account': self.module_helpdesk_account,
+            'de_helpdesk_stock': self.module_helpdesk_stock,
+            'de_helpdesk_repairs': self.module_helpdesk_repair,
+
+            #'de_helpdesk_whatsapp': self.module_helpdesk_whatsapp,
+            #'de_helpdesk_slack': self.module_helpdesk_slack,
+            #'de_helpdesk_discord': self.module_helpdesk_discord,
         }
         return vals
 
