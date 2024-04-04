@@ -19,8 +19,35 @@ class TicketCustomerPortal(CustomerPortal):
             values['tickets_count'] = request.env['project.task'].search_count([('project_id', '!=', False)]) \
                 if request.env['project.task'].check_access_rights('read', raise_exception=False) else 0
         return values
+
+    def _get_ticket_page_view_values(self, task, access_token, **kwargs):
+        # Inherit the original method and add custom logic here
+        values = super(TicketCustomerPortal, self)._task_get_page_view_values(task, access_token, **kwargs)
+
+        # Check if the project is a helpdesk team
+        if task.project_id.is_helpdesk_team:
+            # Modify the URL accordingly
+            #ticket_url = f"my/desk/ticket/%s?model=project.project&res_id={values['user'].id}&access_token={access_token}"
+
+            history = request.session.get('my_tickets_history', [])
+            try:
+                current_task_index = history.index(task.id)
+            except ValueError:
+                return values
     
-    def _get_ticket_page_view_values(self, ticket_id, access_token, **kwargs):
+            total_ticket = len(history)
+        
+            task_url = f"/my/desk/ticket/%s?model=project.task&res_id={values['user'].id}&access_token={access_token}"
+            values['prev_record'] = task_url % task.id
+            values['next_record'] = task_url % task.id
+            values['ticket'] = task
+            values['prev_record'] = current_task_index != 0 and task_url % history[current_task_index - 1]
+            values['next_record'] = current_task_index < total_ticket - 1 and task_url % history[current_task_index + 1]
+
+        return values
+
+        
+    def _get_ticket_page_view_values1(self, ticket_id, access_token, **kwargs):
         page_name = 'ticket'
         history = 'my_tickets_history'
         values = {
@@ -44,6 +71,7 @@ class TicketCustomerPortal(CustomerPortal):
 
         values['prev_record'] = current_ticket_index != 0 and ticket_url % history[current_ticket_index - 1]
         values['next_record'] = current_ticket_index < total_ticket - 1 and ticket_url % history[current_ticket_index + 1]
+        values['url'] = ticket_url
         #return values
         #raise UserError(ticket_url)
         return self._get_page_view_values(ticket_id, access_token, values, 'my_tickets_history', False, **kwargs)
