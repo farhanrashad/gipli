@@ -245,17 +245,17 @@ class TicketCustomerPortal(CustomerPortal):
         rating = kw.get('rating')
         
         ticket_sudo.write({
-            'rating' : rating,
+            'customer_rating' : rating,
             'rating_comment': comment,
             'closed_by': 'customer',
         })
         #raise UserError(comment + rating)
         return request.redirect(f'/my/desk/ticket/{ticket_id}?access_token={access_token}')
 
-    # Clsoe Ticket
+    # Submit Rating
     @http.route(['/my/desk/ticket/rating/<int:ticket_id>'
                 ], type='http', auth="user", website=True)        
-    def close_ticket(
+    def customer_rating_form(
         self,
         ticket_id,
         access_token=False,
@@ -264,6 +264,28 @@ class TicketCustomerPortal(CustomerPortal):
         ticket_sudo = request.env['project.task'].browse(ticket_id)
         values = self._get_ticket_page_view_values(ticket_sudo, access_token, **kw)
         values['no_breadcrumbs'] = True
-        return request.render("de_helpdesk.portal_customer_rating_template", values)        
+        return request.render("de_helpdesk.portal_customer_rating_template", values)
+
+    # Submit Rating
+    @http.route(['/my/desk/ticket/rating/submit/<int:ticket_id>'
+                ], type='http', auth="user", website=True)        
+    def customer_rating_submit(
+        self,
+        ticket_id,
+        access_token=False,
+        **kw
+    ):
+        ticket_sudo = request.env['project.task'].browse(ticket_id)
+        comment = kw.get('comment')
+        rating = kw.get('rating')
+        
+        ticket_sudo.write({
+            'customer_rating' : rating,
+            'rating_comment': comment,
+            'closed_by': 'customer',
+        })
+        values = self._get_ticket_page_view_values(ticket_sudo, access_token, **kw)
+        values['no_breadcrumbs'] = True
+        return request.render("de_helpdesk.portal_customer_rating_thanks_template", values)
 
     
