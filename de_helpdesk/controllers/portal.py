@@ -23,7 +23,7 @@ class TicketCustomerPortal(CustomerPortal):
     def _get_ticket_page_view_values(self, task, access_token, **kwargs):
         # Inherit the original method and add custom logic here
         values = super(TicketCustomerPortal, self)._task_get_page_view_values(task, access_token, **kwargs)
-
+        
         # Check if the project is a helpdesk team
         if task.project_id.is_helpdesk_team:
             # Modify the URL accordingly
@@ -36,13 +36,19 @@ class TicketCustomerPortal(CustomerPortal):
                 return values
     
             total_ticket = len(history)
-        
+
+            values['ticket_link_section'] = []
+            
+            values['page_name'] = 'ticket'
             task_url = f"/my/desk/ticket/%s?model=project.task&res_id={values['user'].id}&access_token={access_token}"
-            values['prev_record'] = task_url % task.id
-            values['next_record'] = task_url % task.id
+            #values['prev_record'] = task_url % task.id
+            #values['next_record'] = task_url % task.id
             values['ticket'] = task
             values['prev_record'] = current_task_index != 0 and task_url % history[current_task_index - 1]
             values['next_record'] = current_task_index < total_ticket - 1 and task_url % history[current_task_index + 1]
+            #values['breadcrumb'] = [{'name': 'Tasks', 'url': '/my/desk/tickets'}, 
+            #                        {'name': f'This is testing ticket 011111 (copy) (#TKT/{task.id})', 'url': task_url % task.id}]
+            values['detail_page'] = 'ticket'
 
         return values
 
@@ -245,6 +251,18 @@ class TicketCustomerPortal(CustomerPortal):
         })
         #raise UserError(comment + rating)
         return request.redirect(f'/my/desk/ticket/{ticket_id}?access_token={access_token}')
-        
+
+    # Clsoe Ticket
+    @http.route(['/my/desk/ticket/rating/<int:ticket_id>'
+                ], type='http', auth="user", website=True)        
+    def close_ticket(
+        self,
+        ticket_id,
+        access_token=False,
+        **kw
+    ):
+        ticket_sudo = request.env['project.task'].browse(ticket_id)
+        values = self._get_ticket_page_view_values(ticket_sudo, access_token, **kw)
+        return request.render("de_helpdesk.portal_customer_rating_template", values)        
 
     
