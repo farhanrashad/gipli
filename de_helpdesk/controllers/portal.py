@@ -263,6 +263,7 @@ class TicketCustomerPortal(CustomerPortal):
     ):
         ticket_sudo = request.env['project.task'].browse(ticket_id)
         values = self._get_ticket_page_view_values(ticket_sudo, access_token, **kw)
+        values['no_breadcrumbs'] = True
         return request.render("de_helpdesk.portal_customer_rating_template", values)        
 
     

@@ -240,9 +240,10 @@
                     <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
                         <t t-call="de_helpdesk.customer_feedback_template"/>
                         <footer class="modal-footer">
-                            <button class="btn btn-primary">Close Ticket</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        </footer>
+                                <button class="btn btn-primary">Close Ticket</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            </footer>
                     </form>
                 </div>
             </div>
@@ -265,7 +266,7 @@
                             <main class="modal-body">
                             </main>
                             <footer class="modal-footer">
-                                <button class="btn btn-primary">Close Ticket</button>
+                                <button class="btn btn-primary">Open Ticket</button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 
                             </footer>
@@ -423,6 +424,9 @@
                                     <small class="text-muted"><span t-field="ticket.ticket_no" /></small>
                                 </h5>
                                 <t t-call="de_helpdesk.customer_feedback_template"/>
+                                <footer class="modal-footer">
+                                    <button class="btn btn-primary">Submit Feedback</button>    
+                                </footer>
                             </div>
                         </div>
                     </div>
