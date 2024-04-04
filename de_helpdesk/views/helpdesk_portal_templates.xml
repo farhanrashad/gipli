@@ -296,6 +296,7 @@
                             </div>
                             <div class="d-flex flex-column gap-1" id="sale_order_sidebar_button">
                                 <h3>Tickets History</h3>
+                                
                                 <t t-set="otickets" t-value="request.env['project.task'].sudo().search([('id','!=',ticket.id),('is_ticket','=',True),('partner_id','=',ticket.partner_id.id),('active','=',True)],limit=5,order='create_date desc')"/>
                                 <t t-foreach="otickets" t-as="oticket">
                                     <a t-attf-href="/my/desk/ticket/{{oticket.id}}" t-attf-title="{{oticket.name}}" class="d-flex  gap-2 gap-md-3  py-1" previewlistener="true">

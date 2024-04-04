@@ -24,7 +24,9 @@ class ProjectTicket(models.Model):
     _inherit = 'project.task'
 
     is_sla = fields.Boolean(related='project_id.is_sla')
-    is_ticket = fields.Boolean('Ticket', default=False,)
+    is_ticket = fields.Boolean('Ticket', default=False, store=True, 
+                              compute='_compute_is_ticket'
+                              )
 
     
     ticket_priority = fields.Selection(TICKET_PRIORITY, string='Priority', default='0', tracking=True)
@@ -47,7 +49,7 @@ class ProjectTicket(models.Model):
                                         )
 
     partner_phone = fields.Char(string='Customer Phone', compute='_compute_phone_from_partner', inverse="_compute_inverse_phone_from_partner", store=True, readonly=False)
-    partner_email = fields.Char(string='Customer Email', compute='_compute_email_from_partner', inverse="_inverse_partner_email", store=True, readonly=False)
+    partner_email = fields.Char(string='Customer Email', compute='_compute_email_from_partner', inverse="_compute_inverse_email_from_partner", store=True, readonly=False)
 
     is_update_partner_email = fields.Boolean('Partner Email will Update', compute='_compute_is_update_partner_email')
     is_update_partner_phone = fields.Boolean('Partner Phone will Update', compute='_compute_is_update_partner_phone')
@@ -85,6 +87,13 @@ class ProjectTicket(models.Model):
 
     
     # Computed Methods
+    @api.depends('project_id.is_helpdesk_team')
+    def _compute_is_ticket(self):
+        for record in self:
+            if record.project_id.is_helpdesk_team:
+                record.is_ticket = True
+
+    
     @api.depends('ticket_sla_ids.date_deadline', 'ticket_sla_ids.date_reached')
     def _compute_sla_reached(self):
         sla_status_read_group = self.env['helpdesk.sla.status']._read_group(
