@@ -20,7 +20,10 @@ class ProjectSLA(models.Model):
     project_id = fields.Many2one('project.project', 'Helpdesk Team', required=True)
 
     prj_ticket_type_ids = fields.Many2many(
-        'project.ticket.type', string='Types')
+        'project.ticket.type', 
+        string='Types',
+         domain="['|',('project_id','=',False),('project_id','=',project_id)]"
+    )
     tag_ids = fields.Many2many(
         'project.tags', string='Tags')
     stage_id = fields.Many2one(

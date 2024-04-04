@@ -40,7 +40,11 @@ class ProjectTicket(models.Model):
     
     
     domain_user_ids = fields.Many2many('res.users', compute='_compute_domain_from_project')
-    prj_ticket_type_id = fields.Many2one('project.ticket.type', string="Type", tracking=True)
+    prj_ticket_type_id = fields.Many2one('project.ticket.type', 
+                                         string="Type", 
+                                         tracking=True,
+                                         domain="['|',('project_id','=',False),('project_id','=',project_id)]"
+                                        )
 
     partner_phone = fields.Char(string='Customer Phone', compute='_compute_phone_from_partner', inverse="_compute_inverse_phone_from_partner", store=True, readonly=False)
     partner_email = fields.Char(string='Customer Email', compute='_compute_email_from_partner', inverse="_inverse_partner_email", store=True, readonly=False)

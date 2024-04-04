@@ -8,6 +8,9 @@
 			<field name="arch" type="xml">
 				<tree string="Ticket Type" editable="bottom">
 					<field name="name"/>
+                    <field name="project_id" 
+                        options="{'no_edit': True,'no_create': True}"
+                    />
 				</tree>
 			</field>
 		</record>
@@ -20,6 +23,7 @@
             <field name="arch" type="xml">
                 <search string="Ticket Type">
                     <field name="name" string="Ticket Type"/>
+                    <field name="project_id" string="Team" />
                 </search>
              </field>
         </record>
