@@ -12,31 +12,6 @@ from odoo.osv.expression import OR, AND
 
 
 class TicketCustomerPortal(CustomerPortal):
-
-    def _task_get_page_view_values(self, task, access_token, **kwargs):
-        # Call the parent method to get the initial values
-        values = super(TicketCustomerPortal, self)._task_get_page_view_values(task, access_token, **kwargs)
-
-        # Add or modify values as needed for your customization
-        # For example, set the 'task' key with the provided task object
-        values['task'] = task
-
-        # Ensure other necessary keys are present in the values dictionary
-        values['user'] = request.env.user  # Example: Set the 'user' key
-        values['project_accessible'] = True  # Example: Set the 'project_accessible' key
-
-        values['task_url'] = 'my/desk'
-        return values
-
-    def _prepare_tasks_values(self, page, date_begin, date_end, sortby, search, search_in, groupby, url="/my/tasks", domain=None, su=False, project=False):
-        values = super(TicketCustomerPortal, self)._prepare_tasks_values(page, date_begin, date_end, sortby, search, search_in, groupby, url="/my/desk", domain=None, su=False, project=False)
-        values['default_url'] = "/my/desk"
-        return values
-        
-    def _task_get_page_view_values1(self, ticket, access_token, **kwargs):
-        values = super(TicketCustomerPortal, self)._task_get_page_view_values(ticket, access_token, **kwargs)
-        #raise UserError('hello')
-        values['task_url'] = 'my/desk'
         
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
@@ -73,105 +48,12 @@ class TicketCustomerPortal(CustomerPortal):
         #raise UserError(ticket_url)
         return self._get_page_view_values(ticket_id, access_token, values, 'my_tickets_history', False, **kwargs)
 
-    def _ticket_get_searchbar_sortings(self, project=False):
-        values = {
-            'date': {'label': _('Newest'), 'order': 'create_date desc', 'sequence': 1},
-            'name': {'label': _('Title'), 'order': 'name', 'sequence': 2},
-            'users': {'label': _('Assignees'), 'order': 'user_ids', 'sequence': 4},
-            'stage': {'label': _('Stage'), 'order': 'stage_id, project_id', 'sequence': 5},
-            'status': {'label': _('Status'), 'order': 'state', 'sequence': 6},
-            'priority': {'label': _('Priority'), 'order': 'priority desc', 'sequence': 8},
-            'date_deadline': {'label': _('Deadline'), 'order': 'date_deadline asc', 'sequence': 9},
-            'update': {'label': _('Last Stage Update'), 'order': 'date_last_stage_update desc', 'sequence': 11},
-        }
-        
-        return values
-
-    def _ticket_get_searchbar_groupby(self, project=False):
-        values = {
-            'none': {'input': 'none', 'label': _('None'), 'order': 1},
-            'stage': {'input': 'stage', 'label': _('Stage'), 'order': 4},
-            'status': {'input': 'status', 'label': _('Status'), 'order': 5},
-            'priority': {'input': 'priority', 'label': _('Priority'), 'order': 7},
-            'customer': {'input': 'customer', 'label': _('Customer'), 'order': 10},
-        }
-        
-        return dict(sorted(values.items(), key=lambda item: item[1]["order"]))
-
-    def _ticket_get_groupby_mapping(self):
-        return {
-            'stage': 'stage_id',
-            'customer': 'partner_id',
-            'priority': 'priority',
-            'status': 'state',
-        }
-
-    def _ticket_get_order(self, order, groupby):
-        #groupby_mapping = self._ticket_get_groupby_mapping()
-        #field_name = groupby_mapping.get(groupby, '')
-        if not field_name:
-            return order
-        return '%s, %s' % (field_name, order)
-
-    def _ticket_get_searchbar_inputs(self):
-        values = {
-            'all': {'input': 'all', 'label': _('Search in All'), 'order': 1},
-            'content': {'input': 'content', 'label': Markup(_('Search <span class="nolabel"> (in Content)</span>')), 'order': 1},
-            'ref': {'input': 'ref', 'label': _('Search in Ref'), 'order': 1},
-            'users': {'input': 'users', 'label': _('Search in Assignees'), 'order': 3},
-            'stage': {'input': 'stage', 'label': _('Search in Stages'), 'order': 4},
-            'status': {'input': 'status', 'label': _('Search in Status'), 'order': 5},
-            'priority': {'input': 'priority', 'label': _('Search in Priority'), 'order': 7},
-            'customer': {'input': 'customer', 'label': _('Search in Customer'), 'order': 10},
-            'message': {'input': 'message', 'label': _('Search in Messages'), 'order': 11},
-        }
-        return dict(sorted(values.items(), key=lambda item: item[1]["order"]))
-
-    def _ticket_get_search_domain(self, search_in, search):
-        search_domain = []
-        if search_in in ('content', 'all'):
-            search_domain.append([('name', 'ilike', search)])
-            search_domain.append([('description', 'ilike', search)])
-        if search_in in ('customer', 'all'):
-            search_domain.append([('partner_id', 'ilike', search)])
-        if search_in in ('message', 'all'):
-            search_domain.append([('message_ids.body', 'ilike', search)])
-        if search_in in ('stage', 'all'):
-            search_domain.append([('stage_id', 'ilike', search)])
-        if search_in in ('project', 'all'):
-            search_domain.append([('project_id', 'ilike', search)])
-        if search_in in ('ref', 'all'):
-            search_domain.append([('id', 'ilike', search)])
-        if search_in in ('milestone', 'all'):
-            search_domain.append([('milestone_id', 'ilike', search)])
-        if search_in in ('users', 'all'):
-            user_ids = request.env['res.users'].sudo().search([('name', 'ilike', search)])
-            search_domain.append([('user_ids', 'in', user_ids.ids)])
-        if search_in in ('priority', 'all'):
-            search_domain.append([('priority', 'ilike', search == 'normal' and '0' or '1')])
-        if search_in in ('status', 'all'):
-            state_dict = dict(map(reversed, request.env['project.task']._fields['state']._description_selection(request.env)))
-            search_domain.append([('state', 'ilike', state_dict.get(search, search))])
-        return OR(search_domain)
-
     def _prepare_tickets_domain(self, partner):
         return [
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
             ('project_id.is_helpdesk_team', '=', True)
         ]
         
-    
-    def _get_my_tickets_searchbar_filters(self):
-        searchbar_filters = {
-            'all': {'label': _('All'), 'domain': [('prj_ticket_type_id', '!=', False)]},
-        }
-        ticket_types = request.env['project.ticket.type'].search([])
-        for type in ticket_types:
-            searchbar_filters.update({
-                str(type.id): {'label': type.name, 'domain': [('prj_ticket_type_id', '=', type.id)]}
-            })
-
-        return searchbar_filters
 
     def _prepare_tickets_values(self, page=1, date_begin=None, date_end=None, sortby=None, filterby='all', search=None, groupby='none', search_in='content'):
         values = self._prepare_portal_layout_values()

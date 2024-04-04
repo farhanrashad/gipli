@@ -264,8 +264,46 @@
                                     <i class="fa fa-check"/> Re-Open Ticket
                                 </a>
                             </div>
-                            <div class="d-flex flex-column gap-2" id="sale_order_sidebar_button">
+                            
+                            <div t-if="ticket.partner_id" class="mt-1">
+                                <div t-attf-class="col-12 col-md-12" t-if="ticket.partner_id">
+                                    <h6>
+                                        <small class="text-muted">Customer</small>
+                                    </h6>
+                                </div>
+                                <div class="o_portal_contact_details d-flex flex-column gap-1">
+                                    <div class="d-flex justify-content-start align-items-center gap-2">
+                                        <img class="o_avatar o_portal_contact_img rounded" t-att-src="image_data_uri(ticket.partner_id.avatar_128)" alt="Contact"/>
+                                        <h6 class="mb-0" t-out="ticket.partner_id.name"></h6>
+                                    </div>
+                                    <div>
+                                        <a t-attf-href="mailto:{{ticket.partner_id.email}}" t-if="ticket.partner_id.email"><div t-field="ticket.partner_id" t-options='{"widget": "contact", "fields": ["email"]}'/></a>
+                                        <a t-attf-href="tel:{{ticket.partner_id.phone}}" t-if="ticket.partner_id.phone"><div t-field="ticket.partner_id" t-options='{"widget": "contact", "fields": ["phone"]}'/></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="ticket.user_ids" class="mt-1">
+                                <div t-attf-class="col-12 col-md-12" t-if="ticket.user_ids">
+                                    <h6>
+                                        <small class="text-muted">Assigned to</small>
+                                    </h6>
+                                    <t t-set="assignees" t-value="ticket.sudo().user_ids"/>
+                                    <div t-if="assignees" class="row flex-nowrap ps-3">
+                                        <img class="rounded-circle o_portal_contact_img me-2 px-0" t-attf-src="#{image_data_uri(assignees[:1].avatar_128)}" alt="User" style="width: 20px; height: 20px;"/>
+                                        <span t-out="'%s%s' % (assignees[:1].name, ' + %s others' % len(assignees[1:]) if len(assignees.user_ids) > 1 else '')" t-att-title="'\n'.join(assignees.mapped('name'))"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column gap-1" id="sale_order_sidebar_button">
                                 <h3>Tickets History</h3>
+                                <t t-set="otickets" t-value="request.env['project.task'].sudo().search([('id','!=',ticket.id),('is_ticket','=',True),('partner_id','=',ticket.partner_id.id),('active','=',True)],limit=5,order='create_date desc')"/>
+                                <t t-foreach="otickets" t-as="oticket">
+                                    <a t-attf-href="/my/desk/ticket/{{oticket.id}}" t-attf-title="{{oticket.name}}" class="d-flex  gap-2 gap-md-3  py-1" previewlistener="true">
+                                        <span t-field="oticket.ticket_no"/> - <span t-field="oticket.name"/>
+                                    </a>
+
+                                        
+                                </t>
                             </div>
                         </div>
                     </t>
