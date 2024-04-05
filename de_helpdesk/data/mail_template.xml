@@ -5,7 +5,7 @@
             <field name="name">Helpdesk: Ticket Acknowledgement</field>
             <field name="model_id" ref="de_helpdesk.model_project_task"/>
             <field name="subject">{{ object.display_name }}</field>
-            <field name="email_from">{{ (object.project_id.alias_email_from or object.company_id.email_formatted or object.user_id.email_formatted or user.email_formatted) }}</field>
+            <field name="email_from">{{ (object.project_id.alias_email or object.company_id.email_formatted or user.email_formatted) }}</field>
             <field name="email_to">{{ (object.partner_email if not object.sudo().partner_id.email or object.sudo().partner_id.email != object.partner_email else '') }}</field>
             <field name="partner_to">{{ object.partner_id.id if object.sudo().partner_id.email and object.sudo().partner_id.email == object.partner_email else '' }}</field>
             <field name="description">
@@ -48,7 +48,7 @@
             <field name="name">Helpdesk: Ticket Closed</field>
             <field name="model_id" ref="de_helpdesk.model_project_task"/>
             <field name="subject">Ticket# {{ object.ticket_no if object.ticket_no else 15 }} has closed.</field>
-            <field name="email_from">{{ (object.project_id.alias_email_from or object.company_id.email_formatted or object.user_id.email_formatted or user.email_formatted) }}</field>
+            <field name="email_from">{{ (object.project_id.alias_email or object.company_id.email_formatted or  user.email_formatted) }}</field>
             <field name="email_to">{{ (object.partner_email if not object.sudo().partner_id.email or object.sudo().partner_id.email != object.partner_email else '') }}</field>
             <field name="partner_to">{{ object.partner_id.id if object.sudo().partner_id.email and object.sudo().partner_id.email == object.partner_email else '' }}</field>
             <field name="description">Set this template to automatically send emails when tasks reach specific stages in a project.</field>
@@ -73,7 +73,7 @@
             <field name="name">Helpdesk: Request for Ticket Rating</field>
             <field name="model_id" ref="de_helpdesk.model_project_task"/>
             <field name="subject">{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk' }}: Share Your Feedback</field>
-            <field name="email_from">{{ (object.project_id.alias_email_from or object.company_id.email_formatted or object._rating_get_operator().email_formatted or user.email_formatted) }}</field>
+            <field name="email_from">{{ (object.project_id.alias_email or object.company_id.email_formatted or object._rating_get_operator().email_formatted or user.email_formatted) }}</field>
             <field name="email_to">{{ (object.partner_email if not object.sudo().partner_id.email or object.sudo().partner_id.email != object.partner_email else '') }}</field>
             <field name="partner_to">{{ object.partner_id.id if object.sudo().partner_id.email and object.sudo().partner_id.email == object.partner_email else '' }}</field>
             <field name="description">Enable "customer ratings" feature on the helpdesk team</field>
