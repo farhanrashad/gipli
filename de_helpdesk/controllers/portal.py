@@ -241,7 +241,11 @@ class TicketCustomerPortal(CustomerPortal):
         **kw
     ):
         ticket_sudo = request.env['project.task'].browse(ticket_id)
-        comment = kw.get('comment')
+        if kw.get('comment'):
+            comment = kw.get('comment')
+        else:
+            comment = ' Ticket is no longer needed'
+            
         rating = kw.get('rating')
         
         ticket_sudo.write({

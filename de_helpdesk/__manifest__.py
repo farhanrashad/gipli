@@ -41,6 +41,7 @@ Features:
         'data/ir_server_actions.xml',
         'data/diget_data.xml',
         'data/ir_cron_actions.xml',
+        'data/mail_template.xml',
         'views/helpdesk_menu.xml',
         'views/ticket_tags_views.xml',
         'views/ticket_activity_type_views.xml',
