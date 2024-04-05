@@ -6,7 +6,7 @@
         <field name="model_id" ref="model_project_project"/>
         <field name="state">code</field>
         <field name="code">model._cron_ticket_auto_close()</field>
-        <field name="active" eval="False"/>
+        <field name="active" eval="True"/>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
