@@ -101,7 +101,7 @@ class TicketMergeWizard(models.TransientModel):
         
     def _send_message(self, ticket_ids, message_body):
         for ticket_id in ticket_ids:
-            ticket_id.message_post(body=message_body)
+            ticket_id.message_post(body=message_body,message_type='comment')
 
     def _close_tickets(self, ticket_ids):
         close_stage_id = self.env['project.task.type']

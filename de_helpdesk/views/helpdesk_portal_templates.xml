@@ -366,6 +366,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 <span>Your support ticket has been successfully resolved and closed. We appreciate your cooperation and assistance throughout the process. Thank you.</span>
             </div>
+
+            <div t-if="op_type=='ticket_reopend'" class="alert alert-warning alert-dismissible d-print-none" role="status">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <span>Your ticket has been successfully reopened. Our team will review your request and get back to you as soon as possible. Thank you for reaching out to us.</span>
+            </div>
+            Operation Type: <span t-esc="op_type" />
+            
             <div id="card">
                 <div id="card_header" class="container" data-anchor="true">
                     <div class="row gs-0">
@@ -449,7 +456,7 @@
         </t>
     </template>
 
-    <template id="portal_customer_rating_thanks_template" name="Customer Rating">
+    <template id="portal_thanks_message_template" name="Thanks Message">
         <t t-call="portal.portal_layout">
             <t t-call="portal.portal_record_layout">
                 <t t-set="card_header">
@@ -457,14 +464,7 @@
                         <div class="col-12 row">
                             <div  class="col-2" />
                             <div  class="col-8 text-center">
-                                <h3>
-                                    
-                                    Thank You for Your Valuable Feedback for
-                                    <small class="text-muted"><span t-field="ticket.ticket_no" /></small>
-                                </h3>
-                                <p>
-                                    We appreciate your input and value your feedback. Thank you for taking the time to share your thoughts with us.
-                                </p>
+                                 <t t-raw="html_message"/>
                             </div>
                             <div  class="col-2" />
                         </div>

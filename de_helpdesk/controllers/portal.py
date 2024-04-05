@@ -249,6 +249,11 @@ class TicketCustomerPortal(CustomerPortal):
             'rating_comment': comment,
             'closed_by': 'customer',
         })
+
+        lang = ticket_sudo.partner_id.lang or request.env.user.lang
+        message_body = ticket_sudo._get_ticket_reopen_digest(comment, lang=lang)
+        ticket_sudo.message_post(body=message_body,message_type='comment')
+        
         #raise UserError(comment + rating)
         return request.redirect(f'/my/desk/ticket/{ticket_id}?access_token={access_token}')
 
@@ -272,17 +277,18 @@ class TicketCustomerPortal(CustomerPortal):
         ],limit=1,order='sequence')
 
         ticket_sudo._prepare_ticket_reopen(stage_id)
-    
+     
         lang = ticket_sudo.partner_id.lang or request.env.user.lang
         message_body = ticket_sudo._get_ticket_reopen_digest(reason, lang=lang)
-        ticket_sudo.message_post(body=message_body)
+        ticket_sudo.message_post(body=message_body,message_type='comment')
         ticket_sudo.write({
             'stage_id': stage_id.id,
         })
         
         values = self._get_ticket_page_view_values(ticket_sudo, access_token, **kw)
         values['no_breadcrumbs'] = True
-        return request.render("de_helpdesk.portal_customer_rating_thanks_template", values)
+        values['op_type'] = 'ticket_reopend'
+        return request.redirect(f'/my/desk/ticket/{ticket_id}?access_token={access_token}')
         
     # Submit Rating
     @http.route(['/my/desk/ticket/rating/<int:ticket_id>'
@@ -317,6 +323,11 @@ class TicketCustomerPortal(CustomerPortal):
         })
         values = self._get_ticket_page_view_values(ticket_sudo, access_token, **kw)
         values['no_breadcrumbs'] = True
-        return request.render("de_helpdesk.portal_customer_rating_thanks_template", values)
+
+        html_message = ''
+        html_message += '<h3>Thank You for Your Valuable Feedback on ' + ticket_sudo.name + '(##' + ticket.sudo.ticket_no + ')' + '</h3>'
+        html_message += '<p>We appreciate your input and value your feedback. Thank you for taking the time to share your thoughts with us.</p>'
+        values['html_message'] = html_message
+        return request.render("de_helpdesk.portal_thanks_message_template", values)
 
     
