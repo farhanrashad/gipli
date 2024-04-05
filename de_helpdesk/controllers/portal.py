@@ -252,6 +252,38 @@ class TicketCustomerPortal(CustomerPortal):
         #raise UserError(comment + rating)
         return request.redirect(f'/my/desk/ticket/{ticket_id}?access_token={access_token}')
 
+    # Reopen Ticket
+    @http.route(['/my/desk/ticket/reopen/<int:ticket_id>'
+                ], type='http', auth="user", website=True)        
+    def reopen_ticket(
+        self,
+        ticket_id,
+        access_token=False,
+        **kw
+    ):
+        ticket_sudo = request.env['project.task'].browse(ticket_id)
+        reason = kw.get('reason')
+
+        reopen_reason_id = request.env['project.ticket.reopen']
+        reopen_reason_id.create(ticket_sudo._prepare_ticket_reopen_reason_values(ticket_sudo,reason))
+
+        stage_id = request.env['project.task.type'].search([
+            ('fold','=',False),('project_ids','in',ticket_sudo.project_id.id)
+        ],limit=1,order='sequence')
+
+        ticket_sudo._prepare_ticket_reopen(stage_id)
+    
+        lang = ticket_sudo.partner_id.lang or request.env.user.lang
+        message_body = ticket_sudo._get_ticket_reopen_digest(reason, lang=lang)
+        ticket_sudo.message_post(body=message_body)
+        ticket_sudo.write({
+            'stage_id': stage_id.id,
+        })
+        
+        values = self._get_ticket_page_view_values(ticket_sudo, access_token, **kw)
+        values['no_breadcrumbs'] = True
+        return request.render("de_helpdesk.portal_customer_rating_thanks_template", values)
+        
     # Submit Rating
     @http.route(['/my/desk/ticket/rating/<int:ticket_id>'
                 ], type='http', auth="user", website=True)        
@@ -266,7 +298,6 @@ class TicketCustomerPortal(CustomerPortal):
         values['no_breadcrumbs'] = True
         return request.render("de_helpdesk.portal_customer_rating_template", values)
 
-    # Submit Rating
     @http.route(['/my/desk/ticket/rating/submit/<int:ticket_id>'
                 ], type='http', auth="user", website=True)        
     def customer_rating_submit(

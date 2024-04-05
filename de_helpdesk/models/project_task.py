@@ -83,8 +83,11 @@ class ProjectTicket(models.Model):
     # Re-open Tickets
     prj_ticket_reopen_ids = fields.One2many('project.ticket.reopen', 'ticket_id', string="Re-Open Reasons")
     count_reopen = fields.Integer(string='Reopen Number', compute='_compute_reopen_count')
-    allowed_reopen = fields.Boolean(string='Allow Reopen', compute='_compute_allow_reopen')
+    allowed_reopen = fields.Boolean(related='project_id.is_reopen_tickets')
 
+    # Portal Options
+    allow_portal_user_close_ticket = fields.Boolean(compute='_compute_portal_close_ticket')
+    allow_portal_user_reopen_ticket = fields.Boolean(compute='_compute_portal_reopen_ticket')
     
     # Computed Methods
     @api.depends('project_id.is_helpdesk_team')
@@ -171,10 +174,20 @@ class ProjectTicket(models.Model):
                 record.hours_close = duration_data['hours']
             else:
                 record.hours_close = False
-            
-    def _compute_allow_reopen(self):
+
+    def _compute_portal_close_ticket(self):
         for record in self:
-            record.allowed_reopen = record.project_id.is_reopen_tickets
+            if record.project_id.allow_portal_user_close_ticket and not record.stage_id.fold:
+                record.allow_portal_user_close_ticket = True
+            else:
+                record.allow_portal_user_close_ticket = False
+                
+    def _compute_portal_reopen_ticket(self):
+        for record in self:
+            if record.project_id.allow_portal_user_reopen_ticket and record.stage_id.fold:
+                record.allow_portal_user_reopen_ticket = True
+            else:
+                record.allow_portal_user_reopen_ticket = False
             
     def _compute_reopen_count(self):
         for record in self:
