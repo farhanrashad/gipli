@@ -286,12 +286,14 @@
                         </setting>
                     </div>
 
+                <!--
                     <h2>After Sales Service <a href="https://www.odoo.com/documentation/17.0/applications/services/helpdesk/advanced/after_sales.html" title="Documentation" class="o_doc_link" target="_blank"></a></h2>
                     <div class="row mt32 o_settings_container" id="after-sales">
                         <setting help="Allow stock returns and refunds">
                             <field name="allow_stock_returns"/>
                         </setting>
                     </div>
+                -->
             </t>
             </xpath>
         </field>
