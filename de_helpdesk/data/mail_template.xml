@@ -29,7 +29,7 @@
                     </t>
 
                 <div style="text-align: center; padding: 16px 0px 16px 0px;">
-                    <a style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;" t-att-href="object.get_portal_url()" target="_blank">View Ticket</a>
+                    <a style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;" t-att-href="'/my/desk/ticket/%s/%s' % (object.id, object.access_token)" target="_blank">View Ticket</a>
                     <t t-if="object.project_id.allow_portal_user_close_ticket">
                         <a style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;" t-att-href="'/my/desk/ticket/close/%s/%s' % (object.id, object.access_token)" target="_blank">Close Ticket</a>
                     </t>
