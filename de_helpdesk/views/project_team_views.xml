@@ -160,7 +160,10 @@
                     <h2>Automation</h2>
                     <div class="row mt16 o_settings_container" id="automation">
                         <div class="col-lg-6">
-                            <setting class="col-lg-12" help="Set approval for tickets: By security groups (pre-defined teams) or by individual Users.">
+                            <setting class="col-lg-12" 
+                                help="Set approval for tickets: By security groups (pre-defined teams) or by individual Users."
+                                documentation="https://www.dynexcel.co/blog/docs-3/ticket-approvals-13"
+                                >
                                 <field name="is_ticket_approvals"/>
                                 <div invisible="not is_ticket_approvals" class="mt16">
                                     <field name="ticket_approval_type" 
@@ -170,12 +173,18 @@
                                     />
                                 </div>
                             </setting>
-                            <setting class="col-lg-12" help="Allow users to combine related tickets into one for a more streamlined resolution.">
+                            <setting class="col-lg-12" 
+                                help="Allow users to combine related tickets into one for a more streamlined resolution."
+                                documentation="https://www.dynexcel.co/blog/docs-3/merge-tickets-14"
+                                >
                                 <field name="is_merge_tickets"/>
                             </setting>
                         </div>
                         <div class="col-lg-6">
-                            <setting help="Close inactive tickets automatically">
+                            <setting 
+                                help="Close inactive tickets automatically"
+                                documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-close-tickets-10"
+                            >
                                 <field name="allow_ticket_auto_close"/>
                                 <div class="content-group" invisible="not allow_ticket_auto_close">
                                     <div class="mt16">
@@ -191,7 +200,9 @@
                                     </div>
                                 </div>
                             </setting>
-                            <setting class="col-lg-12" help="Allow users to reopen tickets for a more streamlined resolution.">
+                            <setting class="col-lg-12" 
+                                documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-reopen-tickets-9"
+                                help="Allow users to reopen tickets for a more streamlined resolution.">
                                 <field name="is_reopen_tickets"/>
                             </setting>
                         </div>
@@ -249,7 +260,7 @@
                     <div class="row mt16 o_settings_container" id="website_form_channel">
                         <setting id="sla"
                                   help="Make sure tickets are handled on time"
-                                  documentation="/applications/services/helpdesk/overview/sla.html">
+                                  documentation="https://www.dynexcel.co/blog/docs-3/sla-policies-11">
                             <field name="is_sla"/>
                             <div class="mt16" invisible="not is_sla">
                                 <label for="resource_calendar_id"/>
@@ -257,7 +268,7 @@
                             </div>
                         </setting>
                         <setting id="rating" help="Track customer satisfaction on tickets"
-                            documentation="/applications/services/helpdesk/overview/ratings.html">
+                            documentation="https://www.dynexcel.co/blog/docs-3/customer-ratings-12">
                             <field name="allow_customer_rating"/>
                             <div id="allow_customer_rating" invisible="not allow_customer_rating">
                                 <field name="publish_rating" class="oe_inline"/>
@@ -277,11 +288,11 @@
 
                     <h2>Self Service</h2>
                     <div class="row mt16 o_settings_container" id="website_form_channel">
-                        <setting help="Allow customers to easily close their tickets through the portal for quick resolutions." documentation="/applications/services/helpdesk/advanced/close_tickets.html">
+                        <setting help="Allow customers to easily close their tickets through the portal for quick resolutions." documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-close-tickets-10">
                             <field name="allow_portal_user_close_ticket"/>
                         </setting>
                         
-                        <setting help="Allow customers to conveniently reopen their tickets through the portal for further assistance." documentation="/applications/services/helpdesk/advanced/close_tickets.html">
+                        <setting help="Allow customers to conveniently reopen their tickets through the portal for further assistance." documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-reopen-tickets-9">
                             <field name="allow_portal_user_reopen_ticket"/>
                         </setting>
                     </div>
