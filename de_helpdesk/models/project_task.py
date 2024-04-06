@@ -390,7 +390,7 @@ class ProjectTicket(models.Model):
         res = super(ProjectTicket, self).write(vals)
 
         # Check if project_id changed
-        if 'partner_id' in vals or 'prj_ticket_type_id' in vals or 'ticket_priority' in vals:
+        if 'partner_id' in vals or 'prj_ticket_type_id' in vals or 'ticket_priority' in vals or 'tag_ids' in vals:
             #new_project_id = vals['project_id'] if vals['project_id'] else self.project_id.id
             tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
             # Call _compute_sla_lines for tickets to be updated
@@ -483,11 +483,12 @@ class ProjectTicket(models.Model):
             # add domain for tag ids
             tags_domain = []
             tag_ids = sla_policies.mapped('tag_ids')
-            #if tag_ids:
-            #    if ticket.tag_ids in tag_ids:
-            #        tags_domain += ['|', ('tag_ids', 'in', ticket.tag_ids.ids), ('tag_ids', '=', False)]
-            #    else:
-            #        tags_domain += [('tag_ids', '=', False)]
+            if tag_ids:
+                if any(tag_id in tag_ids.ids for tag_id in ticket.tag_ids.ids):
+                    #if tag_ids.ids in ticket.tag_ids.ids:
+                    tags_domain += ['|',('tag_ids', 'in', ticket.tag_ids.ids),('tag_ids', '=', False)]
+                else:
+                    tags_domain += [('tag_ids', '=', False)]
 
             domain += expression.AND([prj_ticket_domain, partner_domain, tags_domain, priority_domain])
             #partner_ids = sla_policies.mapped('partner_ids')
@@ -495,7 +496,8 @@ class ProjectTicket(models.Model):
             #    domain += [('prj_ticket_type_ids','in',ticket.prj_tikcet_type_id.id)]
 
         filter_sla_policies = filter_sla_policies.search(domain)
-        self.message_post(body=f'priority={ticket.ticket_priority}')
+        self.message_post(body=f'tags={ticket.tag_ids.ids}')
+        self.message_post(body=f'sla tags={tag_ids.ids}')
         self.message_post(body=domain)
         return filter_sla_policies
 
