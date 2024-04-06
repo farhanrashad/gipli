@@ -351,6 +351,7 @@ class ProjectTicket(models.Model):
         return True  # Allow if no specific group or user is defined
     
     def write(self, vals):
+        
         if 'stage_id' in vals:
             new_stage_id = vals['stage_id'] if vals['stage_id'] else self.stage_id.id
             project = self.project_id
@@ -379,17 +380,18 @@ class ProjectTicket(models.Model):
                         ticket._update_sla_lines(ticket, vals.get('stage_id'))
             self._update_ticket(vals.get('stage_id'))
                 
-                # Update SLA line statuses based on stage and deadline conditions
-                #sla_lines_to_update = self.env['project.ticket.sla.line'].search([('ticket_id', '=', self.id)])
-                #sla_lines_to_update._update_sla_status()
-
+        ticket_ids_to_sla = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
+        #raise UserError(ticket_ids_to_sla.ticket_sla_ids)
+        #if not len(ticket_ids_to_sla.ticket_sla_ids):
+        created_sla_lines = self._compute_sla_lines(ticket_ids_to_sla)
+        #raise UserError(ticket_ids_to_sla)
 
         # Call super write to update the ticket
         res = super(ProjectTicket, self).write(vals)
 
         # Check if project_id changed
-        if 'project_id' in vals:
-            new_project_id = vals['project_id'] if vals['project_id'] else self.project_id.id
+        if 'partner_id' in vals or 'prj_ticket_type_id' in vals or 'ticket_priority' in vals:
+            #new_project_id = vals['project_id'] if vals['project_id'] else self.project_id.id
             tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
             # Call _compute_sla_lines for tickets to be updated
             self._compute_sla_lines(tickets_to_update)
@@ -434,23 +436,129 @@ class ProjectTicket(models.Model):
                 #    prj_sla.status = 'failed'
                 #else:
                 #    prj_sla.status = 'ongoing'
-                    
+
     def _find_sla_ids(self, ticket):
+        domain = [('project_id', '=', ticket.project_id.id)]
+    
+        sla_policies = self.env['project.sla'].search([('project_id', '=', ticket.project_id.id)])
+        filter_sla_policies = sla_policies
+    
+        #if sla_policies:
+        #    prj_ticket_type_ids = sla_policies.mapped('prj_ticket_type_ids')
+        #    if ticket.prj_ticket_type_id not in prj_ticket_type_ids:
+        #        sla_policies = sla_policies.filtered(lambda p: not p.prj_ticket_type_ids)
+        if sla_policies:
+
+            # add domain for ticket type
+            prj_ticket_domain = []
+            prj_ticket_type_ids = sla_policies.mapped('prj_ticket_type_ids')
+            if prj_ticket_type_ids:
+                if ticket.prj_ticket_type_id in prj_ticket_type_ids:
+                    prj_ticket_domain += ['|',('prj_ticket_type_ids','in',ticket.prj_ticket_type_id.id),('prj_ticket_type_ids','=',False)]
+                else:
+                    prj_ticket_domain += [('prj_ticket_type_ids','=',False)]
+
+            # add domain for partner
+            partner_domain = []
+            partner_ids = sla_policies.mapped('partner_ids')
+            if partner_ids:
+                if ticket.partner_id in partner_ids:
+                    partner_domain += ['|',('partner_ids','in',ticket.partner_id.id),('partner_ids','=',False)]
+                else:
+                    partner_domain += [('partner_ids','=',False)]
+
+            # add domain for pririty
+            priority_domain = []
+            priorities = sla_policies.filtered(lambda x:x.priority != '0').mapped('priority')
+            #for sla in sla_policies:
+            #    if sla.priority == ticket.ticket_priority:
+            #        priority_domain += 
+            if priorities:
+                if ticket.ticket_priority in priorities:
+                    priority_domain += ['|',('priority','=',ticket.ticket_priority),('priority','!=',priorities)]
+                else:
+                    priority_domain += [('priority','!=',priorities)]
+            #priority_domain = [('priority', '=', ticket.ticket_priority)]
+
+            # add domain for tag ids
+            tags_domain = []
+            tag_ids = sla_policies.mapped('tag_ids')
+            #if tag_ids:
+            #    if ticket.tag_ids in tag_ids:
+            #        tags_domain += ['|', ('tag_ids', 'in', ticket.tag_ids.ids), ('tag_ids', '=', False)]
+            #    else:
+            #        tags_domain += [('tag_ids', '=', False)]
+
+            domain += expression.AND([prj_ticket_domain, partner_domain, tags_domain, priority_domain])
+            #partner_ids = sla_policies.mapped('partner_ids')
+            #if ticket.prj_ticket_type_id not in prj_ticket_type_ids:
+            #    domain += [('prj_ticket_type_ids','in',ticket.prj_tikcet_type_id.id)]
+
+        filter_sla_policies = filter_sla_policies.search(domain)
+        self.message_post(body=f'priority={ticket.ticket_priority}')
+        self.message_post(body=domain)
+        return filter_sla_policies
+
+
+
+
+
+
+
+
+
+        
+    def _find_sla_ids1(self, ticket):
         domain = [
             ('project_id', '=', ticket.project_id.id),
         ]
+        sla_policies = self.env['project.sla'].search([('project_id', '=', ticket.project_id.id)])
+        
+        def construct_domain(field, field_value):
+            if field_value:
+                return [field, 'in', field_value.ids], ['|', ('partner_ids', 'in', ticket.partner_id.ids), ('partner_ids', '=', False)]
+            else:
+                return [('partner_ids', '=', False)]
 
+            tag_domain = construct_domain('tag_ids', ticket.tag_ids)
+            prj_ticket_type_domain = construct_domain('prj_ticket_type_ids', ticket.prj_ticket_type_id)
+            priority_domain = construct_domain('ticket_priority', ticket.priority)
+        
+            combined_domain = domain + tag_domain + prj_ticket_type_domain + priority_domain
+        
+            sla_policies = self.env['project.sla'].search(combined_domain)
+
+
+            # Filter out duplicate records based on stage_id
+            
+        stage_ids_processed = {}
+        unique_sla_policies = self.env['project.sla']
+        for sla_policy in sla_policies:
+            if sla_policy.stage_id.id not in stage_ids_processed:
+                unique_sla_policies += sla_policy
+                stage_ids_processed[sla_policy.stage_id.id] = True
+    
+        return unique_sla_policies
+        
+        #if ticket.partner_id:
+        #    sla_policies = sla_policies.filtered(lambda x: ticket.partner_id.id in x.partner_ids.ids)
+        
         #raise UserError(domain)
         # Extend the domain based on additional conditions if they exist
-        if ticket.partner_id:
-            domain.append(('partner_ids', '=', ticket.partner_id.id))
-        if ticket.tag_ids:
-            domain.append(('tag_ids', 'in', ticket.tag_ids.ids))
-        if ticket.prj_ticket_type_id:
-            domain.append(('prj_ticket_type_ids', 'in', ticket.prj_ticket_type_id.id))
-            
-        sla_policies = self.env['project.sla'].search(domain)
-        return sla_policies
+        #if ticket.partner_id:
+        #    domain.append('|')
+        #    domain.append(('partner_ids', 'in', ticket.partner_id.ids))
+        #    domain.append(('partner_ids', '=', False))
+    
+        #if ticket.partner_id:
+        #    domain.append(('partner_ids', 'in', ticket.partner_id.id))
+       # if ticket.tag_ids:
+       #     domain.append(('tag_ids', 'in', ticket.tag_ids.ids))
+       # if ticket.prj_ticket_type_id:
+       #     domain.append(('prj_ticket_type_ids', 'in', ticket.prj_ticket_type_id.id))
+       # raise UserError(domain)
+       # sla_policies = self.env['project.sla'].search(domain)
+       #return sla_policies
 
     def _calculate_deadline_date(self, ticket, sla):
         # Convert create_date to datetime object
@@ -481,14 +589,12 @@ class ProjectTicket(models.Model):
     def _compute_sla_lines(self, tickets):
         sla_lines = self.env['project.ticket.sla.line']
         current_date = datetime.now()
-
-        
+        tickets.ticket_sla_ids.unlink()
         for ticket in tickets:
             if ticket.is_sla and ticket.project_id.is_helpdesk_team:
                 #raise UserError(ticket.project_id)
                 #ticket.ticket_sla_ids.unlink()
                 sla_ids = self.sudo()._find_sla_ids(ticket)
-                #raise UserError(sla_ids)
                 for sla in sla_ids:
                     sla_line_vals = self._prpeare_sla_line_values(ticket, sla)
                     sla_line = self.env['project.ticket.sla.line'].create(sla_line_vals)

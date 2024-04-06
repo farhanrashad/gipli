@@ -138,7 +138,12 @@ class Project(models.Model):
 
     def _compute_sla_success_rate(self):
         for prj in self:
-            prj.sla_success_rate = 33.45    
+            close_ticket_ids = prj.task_ids.filtered(lambda x:x.stage_id.fold)
+            if len(close_ticket_ids) > 0:
+                prj.sla_success_rate = len(close_ticket_ids.filtered(lambda x:x.is_sla_success)) / len(close_ticket_ids)
+            else:
+                prj.sla_success_rate = 0
+            prj.sla_success_rate = len(close_ticket_ids.filtered(lambda x:x.is_sla_success))
     
     # ----------------------------------------------------------------
     # --------------------------- CRUD Operations --------------------

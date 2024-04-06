@@ -33,8 +33,14 @@ class ProjectSLA(models.Model):
         'project.task.type', string='Excluding Stages', copy=True,
         domain="[('id', '!=', stage_id.id)]",
         help="The time spent in these stages won't be taken into account in the calculation of the SLA.")
-    partner_ids = fields.Many2many(
-        'res.partner', string="Customers")
+    #partner_ids = fields.Many2many(
+    #    'res.partner', string="Customers")
+    partner_ids = fields.Many2many('res.partner', string='Partners', 
+                    relation='project_sla_partner_rel', 
+                    column1='sla_id', 
+                    column2='partner_id'
+    )
+
     company_id = fields.Many2one('res.company', 'Company', related='team_id.company_id', readonly=True, store=True)
     time = fields.Float('Within', default=0, required=True,
         help='Maximum number of working hours a ticket should take to reach the target stage, starting from the date it was created.')
