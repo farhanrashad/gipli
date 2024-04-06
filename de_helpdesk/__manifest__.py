@@ -20,10 +20,11 @@ Features:
 
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-
+    'support': "info@dynexcel.com",
+    'live_test_url': 'https://youtu.be/PJEkGzyCQ2Q',
     'category': 'Services/Helpdesk',
-    'version': '0.1',
-
+    'version': '17.0.0.1',
+    
     'depends': [
         'project',
         'digest',
@@ -74,7 +75,7 @@ Features:
         'demo/demo.xml',
     ],
     'license': 'OPL-1',
-    'price': 50,
+    'price': 75,
     'currency': 'USD',
     'images': ['static/description/banner.gif'],
     'installable': True,
