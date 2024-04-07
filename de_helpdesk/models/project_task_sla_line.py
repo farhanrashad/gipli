@@ -29,8 +29,18 @@ class ProjectTicketSLALine(models.Model):
         default='ongoing', store=True,
         compute='_compute_status', compute_sudo=True, search='_search_status'
     )
-    
+    color = fields.Integer("Color Index", compute='_compute_color')
 
+    @api.depends('status')
+    def _compute_color(self):
+        for record in self:
+            if record.status == 'failed':
+                record.color = 1
+            elif record.status == 'reached':
+                record.color = 10
+            else:
+                record.color = 0
+                
     @api.depends('ticket_id')
     def _compute_project_from_ticket(self):
         for record in self:

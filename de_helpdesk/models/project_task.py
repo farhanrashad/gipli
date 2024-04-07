@@ -380,16 +380,16 @@ class ProjectTicket(models.Model):
                         ticket._update_sla_lines(ticket, vals.get('stage_id'))
             self._update_ticket(vals.get('stage_id'))
                 
-        ticket_ids_to_sla = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
+        #ticket_ids_to_sla = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
         #raise UserError(ticket_ids_to_sla.ticket_sla_ids)
         #if not len(ticket_ids_to_sla.ticket_sla_ids):
-        created_sla_lines = self._compute_sla_lines(ticket_ids_to_sla)
+        #    created_sla_lines = self._compute_sla_lines(ticket_ids_to_sla)
         #raise UserError(ticket_ids_to_sla)
 
         # Call super write to update the ticket
         res = super(ProjectTicket, self).write(vals)
 
-        # Check if project_id changed
+        # Recompute SLA Lines
         if 'partner_id' in vals or 'prj_ticket_type_id' in vals or 'ticket_priority' in vals or 'tag_ids' in vals:
             #new_project_id = vals['project_id'] if vals['project_id'] else self.project_id.id
             tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)

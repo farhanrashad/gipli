@@ -59,3 +59,9 @@ class ProjectSLA(models.Model):
     # Actions
     def action_open_helpdesk_ticket(self):
         pass
+
+    def copy(self, default=None):
+        default = dict(default or {})
+        if not default.get('name'):
+            default['name'] = _("%s (copy)", self.name)
+        return super().copy(default)

@@ -10,7 +10,7 @@
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('project.view_task_kanban')}),
                 (0, 0, {'view_mode': 'pivot', 'view_id': ref('project_ticket_pivot_view')}),
                 (0, 0, {'view_mode': 'graph', 'view_id': ref('project_ticket_graph_view')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('project_helpdesk_ticket_form_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('project_ticket_form_view')}),
             ]"/>
         <field name="domain">[
             ('project_id.is_helpdesk_team', '=', True),
