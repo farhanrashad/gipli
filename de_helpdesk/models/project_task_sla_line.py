@@ -67,11 +67,17 @@ class ProjectTicketSLALine(models.Model):
 
     @api.depends('date_deadline', 'date_reached')
     def _compute_status(self):
-        for status in self:
-            if status.date_reached and status.date_deadline:  # if reached_datetime, SLA is finished: either failed or succeeded
-                status.status = 'reached' if status.date_reached < status.date_deadline else 'failed'
-            else:  # if not finished, deadline should be compared to now()
-                status.status = 'ongoing' if not status.date_deadline or status.date_deadline > fields.Datetime.now() else 'failed'
+        for record in self:
+            if record.date_reached and record.date_deadline:
+                if record.date_reached < record.date_deadline:
+                    record.status = 'reached'
+                else:
+                    record.status = 'failed'
+            elif not record.date_deadline or record.date_deadline > fields.Datetime.now():
+                record.status = 'ongoing'
+            else:
+                record.status = 'failed'
+
 
     @api.model
     def _search_status(self, operator, value):

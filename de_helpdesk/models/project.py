@@ -122,7 +122,9 @@ class Project(models.Model):
             
     def _compute_open_ticket_count(self):
         for prj in self:
-            prj.open_ticket_count = len(prj.task_ids.filtered(lambda x: not x.stage_id.fold))
+            open_tickets = prj.task_ids.filtered(lambda x: self.env.user.id in x.user_ids.ids)
+            prj.open_ticket_count = len(open_tickets)
+
 
     def _compute_unassigned_tickets(self):
         for prj in self:
@@ -350,7 +352,7 @@ class Project(models.Model):
 
     
     def action_project_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
+        action = self.env.ref('de_helpdesk.action_project_ticket').read()[0]
         action.update({
             'name': 'Tickets',
             'view_mode': 'tree,form',
@@ -360,6 +362,7 @@ class Project(models.Model):
             'context': {
                 'default_project_id': self.id,
                 'search_default_my_ticket': 1,
+                'default_is_ticket': True,
             },
         })
         return action
@@ -375,6 +378,7 @@ class Project(models.Model):
             'context': {
                 'default_project_id': self.id,
                 'search_default_my_ticket': 1,
+                'default_is_ticket': True,
             },
         })
         return action
@@ -386,11 +390,11 @@ class Project(models.Model):
             'view_mode': 'tree,form',
             'res_model': 'project.task',
             'type': 'ir.actions.act_window',
-            'domain': [('project_id', '=', self.id),('stage_id.fold', '=', False)],
+            'domain': [('project_id', '=', self.id)],
             'context': {
                 'default_project_id': self.id,
                 'search_default_my_ticket': 1,
-                'search_default_sla_failed': 1,
+                'default_is_ticket': True,
             },
         })
         return action
@@ -406,6 +410,7 @@ class Project(models.Model):
             'context': {
                 'default_project_id': self.id,
                 'search_default_unassigned_ticket': 1,
+                'default_is_ticket': True,
             },
         })
         return action
@@ -422,6 +427,7 @@ class Project(models.Model):
                 'default_project_id': self.id,
                 'search_default_my_ticket': 1,
                 'search_default_priority_urgent':1,
+                'default_is_ticket': True,
             },
         })
         return action

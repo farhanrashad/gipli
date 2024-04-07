@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 TICKET_PRIORITY = [
     ('0', 'Low priority'),
@@ -54,11 +54,26 @@ class ProjectSLA(models.Model):
     # Computed Methods
     def _compute_ticket_count(self):
         for record in self:
-            record.ticket_count = 1
+            sla_ids = self.env['project.ticket.sla.line'].search([('prj_sla_id','=',record.id)])
+            record.ticket_count = len(sla_ids.mapped('ticket_id'))
             
     # Actions
     def action_open_helpdesk_ticket(self):
-        pass
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
+        sla_ids = self.env['project.ticket.sla.line'].search([('prj_sla_id','=',record.id)])
+        action.update({
+            'name': 'Tickets',
+            'view_mode': 'tree,kanban,activity,pivot,graph,cohort,form',
+            'res_model': 'project.task',
+            'type': 'ir.actions.act_window',
+            'domain': [('id','in',sla_ids.mapped('ticket_id').ids)],
+            'context': {
+                'create': False,
+                'edit': False,
+            },
+            
+        })
+        return action
 
     def copy(self, default=None):
         default = dict(default or {})

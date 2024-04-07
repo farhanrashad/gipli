@@ -327,21 +327,21 @@ class ProjectTicket(models.Model):
     
     def write(self, vals):
         if 'stage_id' in vals:
-            new_stage_id = vals['stage_id'] if vals['stage_id'] else self.stage_id.id
-            new_stage = self.env['project.task.type'].browse(vals['stage_id'] if vals['stage_id'] else self.stage_id.id)
+            #new_stage_id = vals['stage_id'] if vals['stage_id'] else self.stage_id.id
+            new_stage_id = self.env['project.task.type'].browse(vals['stage_id'] if vals['stage_id'] else self.stage_id.id)
             project = self.project_id
 
             # Ticket Approvals
             if project.is_helpdesk_team:
                 ticket_approvals = self.env['project.ticket.stage.approvals'].search([
-                    ('ticket_stage_id', '=', new_stage_id),
+                    ('ticket_stage_id', '=', new_stage_id.id),
                     ('project_id', '=', self.project_id.id),
                 ])
         
                 if ticket_approvals:
                     approval = ticket_approvals[0]  # Assume there's only one approval record
                     if not self._check_stage_access(
-                        new_stage_id,
+                        new_stage_id.id,
                         approval.ticket_approval_type,
                         approval.group_ids,
                         approval.user_ids
@@ -357,18 +357,18 @@ class ProjectTicket(models.Model):
             if min_open_stage:
                 min_stage_id = min_open_stage[0]
 
-            if new_stage.id == min_stage_id.id:
+            if new_stage_id.id == min_stage_id.id:
                 ticket = self.filtered(lambda t: t.is_ticket)
                 if not vals.get('reopen_reason'):
-                    self._reopen_ticket(ticket, 'Ticket reopened by user.')
+                    ticket._reopen_ticket(ticket, 'Ticket reopened by user.')
             
             # Update SLA
             if project.is_sla:
-                #raise UserError(new_stage_id)
+                #raise UserError(new_stage_id.id)
                 tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
                 for ticket in tickets_to_update:
                     if ticket.ticket_sla_ids:
-                        #ticket.ticket_sla_ids._update_sla_status(new_stage_id)
+                        #ticket.ticket_sla_ids._update_sla_status(new_stage_id.id)
                         ticket._update_sla_lines(ticket, vals.get('stage_id'))
             self._update_ticket(vals.get('stage_id'))
                 
@@ -398,7 +398,7 @@ class ProjectTicket(models.Model):
     # -----------------------------------------------------------------------
     # ---------------------------- Business Logics --------------------------
     # -----------------------------------------------------------------------
-    # Update Ticket fields ----------------
+    # Update Ticket close fields ----------------
     def _update_ticket(self, stage_id):
         ticket_stage_id = self.env['project.task.type'].browse(stage_id)
         if ticket_stage_id.fold:
@@ -412,32 +412,26 @@ class ProjectTicket(models.Model):
             self.date_closed = False
             
     # ------------ Apply SLA ------------
-    def _update_sla_lines(self,ticket, stage_id):
-        ticket_stage_id = self.env['project.task.type'].browse(stage_id)
+    def _update_sla_lines(self, ticket, stage_id):
+        new_stage_id = self.env['project.task.type'].browse(stage_id)
         for sla_line in ticket.ticket_sla_ids:
-            #raise UserError(stage_id)
-            if sla_line.prj_sla_id.stage_id.id == ticket_stage_id.id:
-                sla_line.date_reached = fields.Datetime.now()                    
+            if sla_line.prj_sla_id.stage_id.id == new_stage_id.id:
+                sla_line.date_reached = fields.Datetime.now()
+            elif new_stage_id.sequence < sla_line.prj_sla_id.stage_id.sequence:
+                sla_line.date_reached = False
             else:
-                #raise UserError('execute')
-                # Check for stage_id change and update date_reached accordingly
-                if sla_line.prj_sla_id.stage_id.sequence > ticket_stage_id.sequence:
-                    sla_line.date_reached = False
-                    
-                    
-                # Update status based on date_deadline
-                #if prj_sla.date_deadline <= fields.Datetime.now() and prj_sla.stage_id.id == task.stage_id.id:
-                #    prj_sla.status = 'reached'
-                #elif prj_sla.date_deadline > fields.Datetime.now():
-                #    prj_sla.status = 'failed'
-                #else:
-                #    prj_sla.status = 'ongoing'
+                if not sla_line.date_reached:
+                    sla_line.date_reached = fields.Datetime.now()
+
+
 
     def _find_sla_ids(self, ticket):
         domain = [('project_id', '=', ticket.project_id.id)]
     
         sla_policies = self.env['project.sla'].search([('project_id', '=', ticket.project_id.id)])
         filter_sla_policies = sla_policies
+
+        
     
         #if sla_policies:
         #    prj_ticket_type_ids = sla_policies.mapped('prj_ticket_type_ids')
@@ -454,6 +448,7 @@ class ProjectTicket(models.Model):
                 else:
                     prj_ticket_domain += [('prj_ticket_type_ids','=',False)]
 
+            
             # add domain for partner
             partner_domain = []
             partner_ids = sla_policies.mapped('partner_ids')
@@ -475,7 +470,7 @@ class ProjectTicket(models.Model):
                 else:
                     priority_domain += [('priority','!=',priorities)]
             #priority_domain = [('priority', '=', ticket.ticket_priority)]
-
+            
             # add domain for tag ids
             tags_domain = []
             tag_ids = sla_policies.mapped('tag_ids')
@@ -492,9 +487,9 @@ class ProjectTicket(models.Model):
             #    domain += [('prj_ticket_type_ids','in',ticket.prj_tikcet_type_id.id)]
 
         filter_sla_policies = filter_sla_policies.search(domain)
-        self.message_post(body=f'tags={ticket.tag_ids.ids}')
-        self.message_post(body=f'sla tags={tag_ids.ids}')
-        self.message_post(body=domain)
+        #self.message_post(body=f'tags={ticket.tag_ids.ids}')
+        #self.message_post(body=f'sla tags={tag_ids.ids}')
+        #self.message_post(body=domain)
         return filter_sla_policies
 
 
@@ -534,10 +529,11 @@ class ProjectTicket(models.Model):
                 #raise UserError(ticket.project_id)
                 #ticket.ticket_sla_ids.unlink()
                 sla_ids = self.sudo()._find_sla_ids(ticket)
-                for sla in sla_ids:
-                    sla_line_vals = self._prpeare_sla_line_values(ticket, sla)
-                    sla_line = self.env['project.ticket.sla.line'].create(sla_line_vals)
-                    sla_lines |= sla_line
+                if sla_ids:
+                    for sla in sla_ids:
+                        sla_line_vals = self._prpeare_sla_line_values(ticket, sla)
+                        sla_line = self.env['project.ticket.sla.line'].create(sla_line_vals)
+                        sla_lines |= sla_line
         return sla_lines
         
     def _prpeare_sla_line_values(self, ticket, sla):
@@ -600,14 +596,12 @@ class ProjectTicket(models.Model):
     # ------------------------------ actions ---------------------------------
     # ------------------------------------------------------------------------
     def _get_ticket_reopen_digest(self, reason, template='de_helpdesk.project_ticket_reopen_digest', lang=None):
-        self.ensure_one()
         values = {
                   'reason': reason,
                  }
         return self.env['ir.qweb'].with_context(lang=lang)._render(template, values)
 
     def _get_ticket_merge_digest(self, ticket, template='de_helpdesk.merge_tickets_digest', lang=None):
-        self.ensure_one()
         values = {
             'record_url': ticket._get_html_link(),
             'assignees': ','.join(user.name for user in ticket.user_ids),
