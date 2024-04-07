@@ -324,7 +324,7 @@
     <record id="action_project_ticket" model="ir.actions.act_window">
         <field name="name">Tickets</field>
         <field name="res_model">project.task</field>
-        <field name="view_mode">tree,kanban,activity,pivot,graph,cohort,form</field>
+        <field name="view_mode">tree,kanban,activity,pivot,graph,form</field>
          <field name="search_view_id" ref="project_helpdesk_ticket_search_view"/>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('project_helpdesk_tickets_tree_view')}),
@@ -363,7 +363,7 @@
     <record id="action_project_helpdesk_all_ticket" model="ir.actions.act_window">
         <field name="name">Tickets</field>
         <field name="res_model">project.task</field>
-        <field name="view_mode">tree,kanban,activity,pivot,graph,cohort,form</field>
+        <field name="view_mode">tree,kanban,activity,pivot,graph,form</field>
         <field name="search_view_id" ref="project_helpdesk_ticket_search_view"/>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('project_helpdesk_tickets_tree_view')}),
