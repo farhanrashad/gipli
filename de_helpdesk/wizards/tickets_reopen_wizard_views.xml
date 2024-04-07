@@ -9,7 +9,6 @@
                     <group>
                         <field name="ticket_ids" invisible="1"/>
                         <field name="project_ids" invisible="1"/>
-                        <field name="stage_id" options="{'no_edit':True, 'no_create':True}" />
                     </group>
                    <field name="reopen_reason" placeholder="Please explain why you need to reopen the ticket." />
                 </group>

@@ -43,7 +43,16 @@
                             groups="de_helpdesk.group_project_ticket_reopen"
                         />
             </xpath>
-            
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button invisible="count_reopen == 0"
+                    name="open_reopen_ticket_reaons"
+                    class="oe_stat_button"
+                    icon="fa-file-text-o"
+                    type="object"
+                >
+                    <field name="count_reopen" widget="statinfo" string="Reopen Reasons"/>
+                </button>
+            </xpath>
             <xpath expr="//group[1]/group[1]//field[@name='project_id']" position="replace">
                 <field name="project_id" 
                     domain="[('active', '=', True), '|', ('company_id', '=', False), ('company_id', '=?', company_id)]"

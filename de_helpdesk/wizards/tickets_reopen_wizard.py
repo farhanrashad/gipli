@@ -13,9 +13,9 @@ class TicketReopen(models.TransientModel):
     
     project_ids = fields.Many2many('project.project', string='Projects', compute='_compute_project_ids')
 
-    stage_id = fields.Many2one('project.task.type', string='Reopen In', required=True,
-        domain="[('project_ids', 'in', project_ids),('fold', '=', False)]"
-    )
+    #stage_id = fields.Many2one('project.task.type', string='Reopen In', required=True,
+    #    domain="[('project_ids', 'in', project_ids),('fold', '=', False)]"
+    #)
 
     @api.depends('ticket_ids')
     def _compute_project_ids(self):
@@ -38,15 +38,27 @@ class TicketReopen(models.TransientModel):
         reopen_reason_id = self.env['project.ticket.reopen']
         for ticket in self.ticket_ids:
             #raise UserError('hello')
-            reopen_reason_id.create(ticket._prepare_ticket_reopen_reason_values(ticket,self.reopen_reason))
-            ticket._prepare_ticket_reopen(self.stage_id)
+            ticket._reopen_ticket(ticket, self.reopen_reason)
+            ticket.write(self._prepare_ticket_reopen_values(ticket.project_id))
+            
+            # old logic
+            #reopen_reason_id.create(ticket._prepare_ticket_reopen_reason_values(ticket,self.reopen_reason))
+            #ticket._prepare_ticket_reopen(self.stage_id)
     
-            lang = ticket.partner_id.lang or self.env.user.lang
-            message_body = ticket._get_ticket_reopen_digest(self.reopen_reason, lang=lang)
-            ticket.message_post(body=message_body,message_type='comment')
-            ticket.write(self._prepare_ticket_reopen_values())
-    def _prepare_ticket_reopen_values(self):
+            #lang = ticket.partner_id.lang or self.env.user.lang
+            #message_body = ticket._get_ticket_reopen_digest(self.reopen_reason, lang=lang)
+            #ticket.message_post(body=message_body,message_type='comment')
+            
+    def _prepare_ticket_reopen_values(self, project_id):
+        min_open_stage = self.env['project.task.type'].search([
+                ('project_ids','in',project_id.id),
+                ('active','=',True),
+                ('fold','=',False),
+        ], order='sequence', limit=1)
+        if min_open_stage:
+            min_stage_id = min_open_stage[0]
+                
         return {
-            'stage_id': self.stage_id.id,
+            'stage_id': min_stage_id.id,
         }
 

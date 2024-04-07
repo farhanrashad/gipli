@@ -10,6 +10,7 @@
 					<field name="name"/>
                     <field name="reopen_by" />
                     <field name="ticket_id" invisible="1" />
+                    <field name="create_uid" string="Opened By"/>
 				</tree>
 			</field>
 		</record>

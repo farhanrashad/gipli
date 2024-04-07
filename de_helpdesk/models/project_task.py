@@ -84,6 +84,7 @@ class ProjectTicket(models.Model):
     prj_ticket_reopen_ids = fields.One2many('project.ticket.reopen', 'ticket_id', string="Re-Open Reasons")
     count_reopen = fields.Integer(string='Reopen Number', compute='_compute_reopen_count')
     allowed_reopen = fields.Boolean(related='project_id.is_reopen_tickets')
+    reopen_reason = fields.Text('Reason for Reopen Ticket')
 
     # Portal Options
     allow_portal_user_close_ticket = fields.Boolean(compute='_compute_portal_close_ticket')
@@ -96,32 +97,6 @@ class ProjectTicket(models.Model):
             if record.project_id.is_helpdesk_team:
                 record.is_ticket = True
 
-    
-    @api.depends('ticket_sla_ids.date_deadline', 'ticket_sla_ids.date_reached')
-    def _compute_sla_reached(self):
-        sla_status_read_group = self.env['helpdesk.sla.status']._read_group(
-            [('exceeded_hours', '<', 0), ('ticket_id', 'in', self.ids)],
-            ['ticket_id'],
-        )
-        sla_status_ids_per_ticket = {ticket.id for [ticket] in sla_status_read_group}
-        for ticket in self:
-            ticket.sla_reached = ticket.id in sla_status_ids_per_ticket
-            
-    @api.depends('ticket_sla_ids.date_deadline', 'ticket_sla_ids.date_reached')
-    def _compute_sla_reached_late(self):
-        """ Required to do it in SQL since we need to compare 2 columns value """
-        mapping = {}
-        if self.ids:
-            self.env.cr.execute("""
-                SELECT ticket_id, COUNT(id) AS reached_late_count
-                FROM helpdesk_sla_status
-                WHERE ticket_id IN %s AND (deadline < reached_date OR (deadline < %s AND reached_date IS NULL))
-                GROUP BY ticket_id
-            """, (tuple(self.ids), fields.Datetime.now()))
-            mapping = dict(self.env.cr.fetchall())
-
-        for ticket in self:
-            ticket.sla_reached_late = mapping.get(ticket.id, 0) > 0
             
     @api.depends('sla_date_deadline')
     def _compute_ticket_sla_fail(self):
@@ -351,10 +326,12 @@ class ProjectTicket(models.Model):
         return True  # Allow if no specific group or user is defined
     
     def write(self, vals):
-        
         if 'stage_id' in vals:
             new_stage_id = vals['stage_id'] if vals['stage_id'] else self.stage_id.id
+            new_stage = self.env['project.task.type'].browse(vals['stage_id'] if vals['stage_id'] else self.stage_id.id)
             project = self.project_id
+
+            # Ticket Approvals
             if project.is_helpdesk_team:
                 ticket_approvals = self.env['project.ticket.stage.approvals'].search([
                     ('ticket_stage_id', '=', new_stage_id),
@@ -371,6 +348,21 @@ class ProjectTicket(models.Model):
                     ):
                         raise ValidationError(_("You don't have access to change the stage."))
 
+            # Reopen Ticket Log
+            min_open_stage = self.env['project.task.type'].search([
+                ('project_ids','in',self.project_id.id),
+                ('active','=',True),
+                ('fold','=',False),
+            ], order='sequence', limit=1)
+            if min_open_stage:
+                min_stage_id = min_open_stage[0]
+
+            if new_stage.id == min_stage_id.id:
+                ticket = self.filtered(lambda t: t.is_ticket)
+                if not vals.get('reopen_reason'):
+                    self._reopen_ticket(ticket, 'Ticket reopened by user.')
+            
+            # Update SLA
             if project.is_sla:
                 #raise UserError(new_stage_id)
                 tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
@@ -380,6 +372,10 @@ class ProjectTicket(models.Model):
                         ticket._update_sla_lines(ticket, vals.get('stage_id'))
             self._update_ticket(vals.get('stage_id'))
                 
+        # Create Reopening Reason Record -
+        if 'reopen_reason' in vals:
+            self._create_reopen_ticket_reason(self, vals.get('reopen_reason'))
+            
         #ticket_ids_to_sla = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
         #raise UserError(ticket_ids_to_sla.ticket_sla_ids)
         #if not len(ticket_ids_to_sla.ticket_sla_ids):
@@ -503,65 +499,6 @@ class ProjectTicket(models.Model):
 
 
 
-
-
-
-
-
-
-        
-    def _find_sla_ids1(self, ticket):
-        domain = [
-            ('project_id', '=', ticket.project_id.id),
-        ]
-        sla_policies = self.env['project.sla'].search([('project_id', '=', ticket.project_id.id)])
-        
-        def construct_domain(field, field_value):
-            if field_value:
-                return [field, 'in', field_value.ids], ['|', ('partner_ids', 'in', ticket.partner_id.ids), ('partner_ids', '=', False)]
-            else:
-                return [('partner_ids', '=', False)]
-
-            tag_domain = construct_domain('tag_ids', ticket.tag_ids)
-            prj_ticket_type_domain = construct_domain('prj_ticket_type_ids', ticket.prj_ticket_type_id)
-            priority_domain = construct_domain('ticket_priority', ticket.priority)
-        
-            combined_domain = domain + tag_domain + prj_ticket_type_domain + priority_domain
-        
-            sla_policies = self.env['project.sla'].search(combined_domain)
-
-
-            # Filter out duplicate records based on stage_id
-            
-        stage_ids_processed = {}
-        unique_sla_policies = self.env['project.sla']
-        for sla_policy in sla_policies:
-            if sla_policy.stage_id.id not in stage_ids_processed:
-                unique_sla_policies += sla_policy
-                stage_ids_processed[sla_policy.stage_id.id] = True
-    
-        return unique_sla_policies
-        
-        #if ticket.partner_id:
-        #    sla_policies = sla_policies.filtered(lambda x: ticket.partner_id.id in x.partner_ids.ids)
-        
-        #raise UserError(domain)
-        # Extend the domain based on additional conditions if they exist
-        #if ticket.partner_id:
-        #    domain.append('|')
-        #    domain.append(('partner_ids', 'in', ticket.partner_id.ids))
-        #    domain.append(('partner_ids', '=', False))
-    
-        #if ticket.partner_id:
-        #    domain.append(('partner_ids', 'in', ticket.partner_id.id))
-       # if ticket.tag_ids:
-       #     domain.append(('tag_ids', 'in', ticket.tag_ids.ids))
-       # if ticket.prj_ticket_type_id:
-       #     domain.append(('prj_ticket_type_ids', 'in', ticket.prj_ticket_type_id.id))
-       # raise UserError(domain)
-       # sla_policies = self.env['project.sla'].search(domain)
-       #return sla_policies
-
     def _calculate_deadline_date(self, ticket, sla):
         # Convert create_date to datetime object
         from_datetime = fields.Datetime.from_string(ticket.create_date)
@@ -633,6 +570,31 @@ class ProjectTicket(models.Model):
         user_index = len(ticket.project_id.task_ids) % len(active_users)
         ticket.user_ids = [(4, active_users[user_index].id)]
 
+
+    # Reopen Tickets
+    def _reopen_ticket(self, ticket, reason):
+        ticket.sudo().update({
+            'reopen_reason': reason,
+        })
+        lang = ticket.partner_id.lang or self.env.user.lang
+        message_body = ticket._get_ticket_reopen_digest(reason, lang=lang)
+        ticket.message_post(body=message_body,message_type='comment')
+    
+    def _create_reopen_ticket_reason(self, ticket, reason):
+        reopen_reason_id = self.env['project.ticket.reopen']
+        reopen_reason_id.create(ticket._prepare_ticket_reopen_reason_values(ticket, reason))
+
+    def _prepare_ticket_reopen_reason_values(self, ticket, reason):
+        if self.env.user.has_group('base.group_portal'):
+            reopen_by = 'customer'
+        else:
+            reopen_by = 'user'
+        return {
+            'ticket_id': ticket.id,
+            'reopen_by': reopen_by,
+            'name': reason,
+            'date_reopen': fields.Datetime.now(),
+        }
         
     # ------------------------------------------------------------------------
     # ------------------------------ actions ---------------------------------
@@ -681,15 +643,7 @@ class ProjectTicket(models.Model):
         })
         return action
 
-    def _prepare_ticket_reopen_reason_values(self, ticket, reason):
-        #if self.env.user
-        reopen_by = 'user'
-        return {
-            'ticket_id': ticket.id,
-            'reopen_by': reopen_by,
-            'name': reason,
-            'date_reopen': fields.Datetime.now(),
-        }
+    
     def _prepare_ticket_reopen(self, stage_id):
         return {
             'closed_by': False,
