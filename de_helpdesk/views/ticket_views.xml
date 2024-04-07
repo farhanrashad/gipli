@@ -276,15 +276,7 @@
     </record>
 
     <!-- cohort view -->
-    <record id="project_ticket_view_cohort" model="ir.ui.view">
-        <field name="name">project.ticket.view.cohort</field>
-        <field name="model">project.task</field>
-        <field name="arch" type="xml">
-            <cohort string="Tickets" date_start="create_date" date_stop="date_closed" interval="day" sample="1">
-                <field name="customer_rating" string="Rating (/5)"/>
-            </cohort>
-        </field>
-    </record>
+    
     
     <!-- Kanban view inherit -->
     <record id="project_ticket_kanban_view_inherit" model="ir.ui.view">
