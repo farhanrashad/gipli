@@ -10,7 +10,8 @@
             <xpath expr="//sheet" position="inside">
               <field name="is_ticket" invisible="1"/>
                 <field name="is_sla" invisible="1"/>
-                <field name="allowed_reopen" invisible="1"/>
+                <field name="allow_reopen" invisible="1"/>
+                <field name="allow_history" invisible="1"/>
             </xpath>
             <xpath expr="//div[hasclass('oe_title')]" position="before">
                 <field name="ticket_no" 
@@ -39,7 +40,7 @@
             
             <xpath expr="//header" position="inside">
                 <button string="Reopen Ticket" name="action_reopen_tickets" type="object"
-                            invisible="not allowed_reopen" 
+                            invisible="not allow_reopen" 
                             groups="de_helpdesk.group_project_ticket_reopen"
                         />
             </xpath>
@@ -52,6 +53,16 @@
                 >
                     <field name="count_reopen" widget="statinfo" string="Reopen Reasons"/>
                 </button>
+
+                <button invisible="count_ticket_history == 0"
+                    name="open_ticket_history"
+                    class="oe_stat_button"
+                    icon="fa-history"
+                    type="object"
+                >
+                    <field name="count_ticket_history" widget="statinfo" string="History"/>
+                </button>
+                
             </xpath>
             <xpath expr="//group[1]/group[1]//field[@name='project_id']" position="replace">
                 <field name="project_id" 

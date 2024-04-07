@@ -42,25 +42,10 @@
     
 
         
-        <record id="action_ticket_sla_analysis" model="ir.actions.act_window">
+        <record id="action_ticket_sla" model="ir.actions.act_window">
             <field name="name">SLA Status</field>
             <field name="res_model">project.ticket.sla.line</field>
-            <field name="view_mode">pivot,graph,cohort</field>
-            <!--
-            <field name="search_view_id" ref="project_ticket_sla_search_view"/>
-            -->
-            <field name="view_ids" eval="[(5, 0, 0),
-                    (0, 0, {'view_mode': 'pivot', 'view_id': ref('project_task_customer_ratings_kanban_view')}),
-                (0, 0, {'view_mode': 'graph', 'view_id': ref('project_ticket_customer_rating_tree_view')}),
-                    (0, 0, {'view_mode': 'cohort', 'view_id': ref('project_ticket_customer_ratings_form_view')})]"
-                />
-            <field name="domain">[('customer_rating', 'in', ['1','2','3','4','5'])]</field>
-            <field name="context">{
-                'create': False,
-                'edit': False,
-                'delete': False,
-                }
-            </field>
+            <field name="view_mode">tree</field>
         </record>
     </data>
 </odoo>

@@ -31,6 +31,7 @@ class Project(models.Model):
 
     is_merge_tickets = fields.Boolean('Merge Tickets', default=False)
     is_reopen_tickets = fields.Boolean('Reopen Tickets', default=False)
+    is_history_tickets = fields.Boolean('Tickets Log', default=False)
     is_ticket_approvals = fields.Boolean(string="Ticket Approvals", default=False)
     ticket_approval_type = fields.Selection([
         ('group', 'By Groups'),
@@ -314,6 +315,13 @@ class Project(models.Model):
             'res_model': 'project.task',
             'type': 'ir.actions.act_window',
             'domain': [('project_id', '=', self.id)],
+            'context': {
+                'default_project_id': self.id,
+                'search_default_group_stage': 1,
+                'default_is_ticket': True,
+                'create': False,
+                'edit': False,
+            },
         })
         return action
 
@@ -335,7 +343,7 @@ class Project(models.Model):
         return action
 
     def action_open_tickets_sla_view(self):
-        action = self.env.ref('de_helpdesk.action_task_ticket_line').read()[0]
+        action = self.env.ref('de_helpdesk.action_ticket_sla').read()[0]
         action.update({
             'name': 'SLA',
             'view_mode': 'tree',

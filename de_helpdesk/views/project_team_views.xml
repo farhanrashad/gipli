@@ -116,7 +116,6 @@
                     <div class="row mt16 o_settings_container" id="productivity">
                         <setting
                             help="People to whom this team and its tickets will be visible"
-                            documentation="/applications/services/helpdesk/overview/getting_started.html#teams-productivity-and-visibility"
                         >
                             <field name="privacy_visibility" class="mt16 o_light_label" widget="radio"/>
                             <div>
@@ -179,6 +178,11 @@
                                 >
                                 <field name="is_merge_tickets"/>
                             </setting>
+                            <setting class="col-lg-12" 
+                                documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-tickets-history-15"
+                                help="Allow users to reopen tickets for a more streamlined resolution.">
+                                <field name="is_history_tickets"/>
+                            </setting>
                         </div>
                         <div class="col-lg-6">
                             <setting 
@@ -205,6 +209,7 @@
                                 help="Allow users to reopen tickets for a more streamlined resolution.">
                                 <field name="is_reopen_tickets"/>
                             </setting>
+                            
                         </div>
                         
                     </div>

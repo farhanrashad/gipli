@@ -83,8 +83,12 @@ class ProjectTicket(models.Model):
     # Re-open Tickets
     prj_ticket_reopen_ids = fields.One2many('project.ticket.reopen', 'ticket_id', string="Re-Open Reasons")
     count_reopen = fields.Integer(string='Reopen Number', compute='_compute_reopen_count')
-    allowed_reopen = fields.Boolean(compute='_compute_allowed_reopen')
+    allow_reopen = fields.Boolean(compute='_compute_allow_reopen')
     reopen_reason = fields.Text('Reason for Reopen Ticket')
+
+    allow_history = fields.Boolean(compute='_compute_allow_history')
+    ticket_log_ids = fields.One2many('project.ticket.log', 'ticket_id', string="Ticket History")
+    count_ticket_history = fields.Integer(string='Ticket Log', compute='_compute_ticket_history_count')
 
     # Portal Options
     allow_portal_user_close_ticket = fields.Boolean(compute='_compute_portal_close_ticket')
@@ -157,13 +161,20 @@ class ProjectTicket(models.Model):
             else:
                 record.allow_portal_user_close_ticket = False
 
-    def _compute_allowed_reopen(self):
+    def _compute_allow_reopen(self):
         for record in self:
             if record.project_id.is_reopen_tickets and record.stage_id.fold:
-                record.allowed_reopen = True
+                record.allow_reopen = True
             else:
-                record.allowed_reopen = False
-                
+                record.allow_reopen = False
+
+    def _compute_allow_history(self):
+        for record in self:
+            if record.project_id.is_history_tickets:
+                record.allow_history = True
+            else:
+                record.allow_history = False
+    
     def _compute_portal_reopen_ticket(self):
         for record in self:
             if record.project_id.allow_portal_user_reopen_ticket and record.stage_id.fold:
@@ -174,6 +185,10 @@ class ProjectTicket(models.Model):
     def _compute_reopen_count(self):
         for record in self:
             record.count_reopen = len(record.prj_ticket_reopen_ids)
+
+    def _compute_ticket_history_count(self):
+        for record in self:
+            record.count_ticket_history = len(record.ticket_log_ids)
             
     @api.depends('closed_by')
     def _update_stage_on_closed_by(self):
@@ -360,10 +375,14 @@ class ProjectTicket(models.Model):
             #    self._create_reopen_ticket_reason(self, vals.get('reopen_reason'))
             #else: #if not vals.get('reopen_reason'):
             ticket = self.filtered(lambda t: t.is_ticket and t.project_id.is_reopen_tickets)
-            ticket._reopen_ticket(ticket, new_stage_id=new_stage_id, reason=vals.get('reopen_reason'))
+            if ticket:
+                ticket._reopen_ticket(ticket, new_stage_id=new_stage_id, reason=vals.get('reopen_reason'))
             #ticket._create_reopen_ticket_reason(ticket, reason=False)
             
-                    
+            # Maintain Ticket Log 
+            ticket = self.filtered(lambda t: t.is_ticket and t.project_id.is_history_tickets)
+            if ticket:
+                ticket._create_ticket_log(ticket, ticket.stage_id, new_stage_id)
             
             # Update SLA
             if project.is_sla:
@@ -610,7 +629,14 @@ class ProjectTicket(models.Model):
             'name': reason,
             'date_reopen': fields.Datetime.now(),
         }
-        
+
+    # Ticket Log ----------------
+    def _create_ticket_log(self, ticket, old_stage_id, new_stage_id):
+        log_id = self.env['project.ticket.log'].create({
+            'ticket_id': ticket.id,
+            'old_stage_id': old_stage_id.id,
+            'new_stage_id': new_stage_id.id,
+        })
     # ------------------------------------------------------------------------
     # ------------------------------ actions ---------------------------------
     # ------------------------------------------------------------------------
@@ -651,6 +677,24 @@ class ProjectTicket(models.Model):
             'context': {
                 'create': False,
                 'edit': False,
+                'delete': False,
+            },
+            
+        })
+        return action
+
+    def open_ticket_history(self):
+        action = self.env.ref('de_helpdesk.action_ticket_log').read()[0]
+        action.update({
+            'name': 'Ticket History',
+            'view_mode': 'tree',
+            'res_model': 'project.ticket.log',
+            'type': 'ir.actions.act_window',
+            'domain': [('ticket_id','=',self.id)],
+            'context': {
+                'create': False,
+                'edit': False,
+                'delete': False,
             },
             
         })

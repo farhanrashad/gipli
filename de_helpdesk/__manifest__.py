@@ -55,6 +55,7 @@ Features:
         'views/ticket_sla_line_views.xml',
         'views/helpdesk_portal_templates.xml',
         'views/ticket_reopen_reason_views.xml',
+        'views/ticket_log_views.xml',
         'views/dashboard_views.xml',
         'wizards/tickets_reopen_wizard_views.xml',
         'wizards/tickets_merge_wizard_views.xml',
