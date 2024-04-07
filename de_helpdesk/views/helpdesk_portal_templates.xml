@@ -371,7 +371,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 <span>Your ticket has been successfully reopened. Our team will review your request and get back to you as soon as possible. Thank you for reaching out to us.</span>
             </div>
-            Operation Type: <span t-esc="op_type" />
             
             <div id="card">
                 <div id="card_header" class="container" data-anchor="true">

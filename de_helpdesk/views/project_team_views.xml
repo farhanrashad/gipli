@@ -140,7 +140,10 @@
                                     <field name="message_partner_ids" string="Follow All Team's Tickets" widget="many2many_tags_email"/>
                                 </div>
                             </setting>
-                            <setting class="col-lg-12" help="Automate the assignment of new tickets to the right people, and make sure all tickets are being handled">
+                            <setting class="col-lg-12" 
+                                help="Automate the assignment of new tickets to the right people, and make sure all tickets are being handled"
+                                documentation="https://www.dynexcel.co/helpdesk-doc#user-assignment"
+                                >
                                 <field name="auto_assignment"/>
                                 <div invisible="not auto_assignment" class="mt16">
                                     <field name="assign_method" class="o_light_label w-100" widget="radio"/>
@@ -161,7 +164,7 @@
                         <div class="col-lg-6">
                             <setting class="col-lg-12" 
                                 help="Set approval for tickets: By security groups (pre-defined teams) or by individual Users."
-                                documentation="https://www.dynexcel.co/blog/docs-3/ticket-approvals-13"
+                                documentation="https://www.dynexcel.co/helpdesk-doc#approvals"
                                 >
                                 <field name="is_ticket_approvals"/>
                                 <div invisible="not is_ticket_approvals" class="mt16">
@@ -174,12 +177,12 @@
                             </setting>
                             <setting class="col-lg-12" 
                                 help="Allow users to combine related tickets into one for a more streamlined resolution."
-                                documentation="https://www.dynexcel.co/blog/docs-3/merge-tickets-14"
+                                documentation="https://www.dynexcel.co/helpdesk-doc#merge-tickets"
                                 >
                                 <field name="is_merge_tickets"/>
                             </setting>
                             <setting class="col-lg-12" 
-                                documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-tickets-history-15"
+                                documentation="https://www.dynexcel.co/helpdesk-doc#ticket-history"
                                 help="Allow users to reopen tickets for a more streamlined resolution.">
                                 <field name="is_history_tickets"/>
                             </setting>
@@ -187,7 +190,7 @@
                         <div class="col-lg-6">
                             <setting 
                                 help="Close inactive tickets automatically"
-                                documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-close-tickets-10"
+                                documentation="https://www.dynexcel.co/helpdesk-doc#ticket-close-auto"
                             >
                                 <field name="allow_ticket_auto_close"/>
                                 <div class="content-group" invisible="not allow_ticket_auto_close">
@@ -205,7 +208,7 @@
                                 </div>
                             </setting>
                             <setting class="col-lg-12" 
-                                documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-reopen-tickets-9"
+                                documentation="https://www.dynexcel.co/helpdesk-doc#reopen-tickets"
                                 help="Allow users to reopen tickets for a more streamlined resolution.">
                                 <field name="is_reopen_tickets"/>
                             </setting>
@@ -216,7 +219,7 @@
                     <h2>Channels</h2>
                     <div class="row mt16 o_settings_container" id="channels">
                         <setting id="alias_channels" help="Create tickets by sending an email to an alias"
-                            documentation="/applications/services/helpdesk/overview/receiving_tickets.html">
+                            documentation="https://www.dynexcel.co/helpdesk-doc#receive-tickets">
                             <div class="mt16">
                                 <div class="oe_edit_only">
                                     <div class="text-muted">
@@ -250,12 +253,12 @@
                         <div class="row mt16 o_settings_container">
                             <setting id="hr_timesheet"
                                      help="Track the employee time spent on tickets"
-                                     documentation="/applications/services/helpdesk/advanced/track_and_bill.html">
+                                     documentation="https://www.dynexcel.co/helpdesk-doc#track-time">
                                 <field name="module_hr_timesheet"/>
                             </setting>
                             <setting id="sale_timesheet"
                                      help="Bill the time spent on your tickets to your customers"
-                                     documentation="/applications/services/helpdesk/advanced/track_and_bill.html">
+                                     documentation="https://www.dynexcel.co/helpdesk-doc#bill-time">
                                 <field name="module_sale_timesheet"/>
                             </setting>
                         </div>
@@ -265,7 +268,7 @@
                     <div class="row mt16 o_settings_container" id="website_form_channel">
                         <setting id="sla"
                                   help="Make sure tickets are handled on time"
-                                  documentation="https://www.dynexcel.co/blog/docs-3/sla-policies-11">
+                                  documentation="https://www.dynexcel.co/helpdesk-doc#sla-policy">
                             <field name="is_sla"/>
                             <div class="mt16" invisible="not is_sla">
                                 <label for="resource_calendar_id"/>
@@ -273,7 +276,7 @@
                             </div>
                         </setting>
                         <setting id="rating" help="Track customer satisfaction on tickets"
-                            documentation="https://www.dynexcel.co/blog/docs-3/customer-ratings-12">
+                            documentation="https://www.dynexcel.co/helpdesk-doc#customer-rating">
                             <field name="allow_customer_rating"/>
                             <div id="allow_customer_rating" invisible="not allow_customer_rating">
                                 <field name="publish_rating" class="oe_inline"/>
@@ -293,11 +296,11 @@
 
                     <h2>Self Service</h2>
                     <div class="row mt16 o_settings_container" id="website_form_channel">
-                        <setting help="Allow customers to easily close their tickets through the portal for quick resolutions." documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-close-tickets-10">
+                        <setting help="Allow customers to easily close their tickets through the portal for quick resolutions." documentation="https://www.dynexcel.co/helpdesk-doc#portal-ticket-close">
                             <field name="allow_portal_user_close_ticket"/>
                         </setting>
                         
-                        <setting help="Allow customers to conveniently reopen their tickets through the portal for further assistance." documentation="https://www.dynexcel.co/blog/docs-3/helpdesk-reopen-tickets-9">
+                        <setting help="Allow customers to conveniently reopen their tickets through the portal for further assistance." documentation="https://www.dynexcel.co/helpdesk-doc#portal-ticket-reopen">
                             <field name="allow_portal_user_reopen_ticket"/>
                         </setting>
                     </div>

@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, tools
-from odoo.addons.helpdesk.models.helpdesk_ticket import TICKET_PRIORITY
+from odoo.addons.de_helpdesk.models.project_task import TICKET_PRIORITY
 from odoo.addons.rating.models.rating_data import RATING_LIMIT_MIN
 
 
