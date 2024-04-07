@@ -39,7 +39,7 @@
             
             <xpath expr="//header" position="inside">
                 <button string="Reopen Ticket" name="action_reopen_tickets" type="object"
-                            invisible="not allowed_reopen or not is_ticket" 
+                            invisible="not allowed_reopen" 
                             groups="de_helpdesk.group_project_ticket_reopen"
                         />
             </xpath>

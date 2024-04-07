@@ -83,7 +83,7 @@ class ProjectTicket(models.Model):
     # Re-open Tickets
     prj_ticket_reopen_ids = fields.One2many('project.ticket.reopen', 'ticket_id', string="Re-Open Reasons")
     count_reopen = fields.Integer(string='Reopen Number', compute='_compute_reopen_count')
-    allowed_reopen = fields.Boolean(related='project_id.is_reopen_tickets')
+    allowed_reopen = fields.Boolean(compute='_compute_allowed_reopen')
     reopen_reason = fields.Text('Reason for Reopen Ticket')
 
     # Portal Options
@@ -156,6 +156,13 @@ class ProjectTicket(models.Model):
                 record.allow_portal_user_close_ticket = True
             else:
                 record.allow_portal_user_close_ticket = False
+
+    def _compute_allowed_reopen(self):
+        for record in self:
+            if record.project_id.is_reopen_tickets and record.stage_id.fold:
+                record.allowed_reopen = True
+            else:
+                record.allowed_reopen = False
                 
     def _compute_portal_reopen_ticket(self):
         for record in self:
@@ -348,19 +355,15 @@ class ProjectTicket(models.Model):
                     ):
                         raise ValidationError(_("You don't have access to change the stage."))
 
-            # Reopen Ticket Log
-            min_open_stage = self.env['project.task.type'].search([
-                ('project_ids','in',self.project_id.id),
-                ('active','=',True),
-                ('fold','=',False),
-            ], order='sequence', limit=1)
-            if min_open_stage:
-                min_stage_id = min_open_stage[0]
-
-            if new_stage_id.id == min_stage_id.id:
-                ticket = self.filtered(lambda t: t.is_ticket)
-                if not vals.get('reopen_reason'):
-                    ticket._reopen_ticket(ticket, 'Ticket reopened by user.')
+            # Reopen Ticket ----------
+            #if 'reopen_reason' in vals:
+            #    self._create_reopen_ticket_reason(self, vals.get('reopen_reason'))
+            #else: #if not vals.get('reopen_reason'):
+            ticket = self.filtered(lambda t: t.is_ticket and t.project_id.is_reopen_tickets)
+            ticket._reopen_ticket(ticket, new_stage_id=new_stage_id, reason=vals.get('reopen_reason'))
+            #ticket._create_reopen_ticket_reason(ticket, reason=False)
+            
+                    
             
             # Update SLA
             if project.is_sla:
@@ -372,9 +375,7 @@ class ProjectTicket(models.Model):
                         ticket._update_sla_lines(ticket, vals.get('stage_id'))
             self._update_ticket(vals.get('stage_id'))
                 
-        # Create Reopening Reason Record -
-        if 'reopen_reason' in vals:
-            self._create_reopen_ticket_reason(self, vals.get('reopen_reason'))
+        
             
         #ticket_ids_to_sla = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
         #raise UserError(ticket_ids_to_sla.ticket_sla_ids)
@@ -568,13 +569,31 @@ class ProjectTicket(models.Model):
 
 
     # Reopen Tickets
-    def _reopen_ticket(self, ticket, reason):
-        ticket.sudo().update({
-            'reopen_reason': reason,
-        })
-        lang = ticket.partner_id.lang or self.env.user.lang
-        message_body = ticket._get_ticket_reopen_digest(reason, lang=lang)
-        ticket.message_post(body=message_body,message_type='comment')
+    def _reopen_ticket(self, ticket, new_stage_id=False, reason=False):
+        min_open_stage = self.env['project.task.type'].search([
+            ('project_ids','in',ticket.project_id.id),
+            ('active','=',True),
+            ('fold','=',False),
+        ], order='sequence', limit=1)
+        if min_open_stage:
+            min_stage_id = min_open_stage[0]
+
+        vals = {}
+        if not reason:
+            reason = 'Reopen By User'
+        
+        if not new_stage_id:
+            vals['stage_id'] = min_stage_id.id
+            
+        if (new_stage_id and new_stage_id.id == min_stage_id.id) or not new_stage_id:
+            #ticket.sudo().update(vals)
+            ticket.sudo()._create_reopen_ticket_reason(ticket,reason)
+            lang = ticket.partner_id.lang or self.env.user.lang
+            message_body = ticket._get_ticket_reopen_digest(reason, lang=lang)
+            try:
+                ticket.message_post(body=message_body,message_type='comment')
+            except:
+                pass
     
     def _create_reopen_ticket_reason(self, ticket, reason):
         reopen_reason_id = self.env['project.ticket.reopen']
