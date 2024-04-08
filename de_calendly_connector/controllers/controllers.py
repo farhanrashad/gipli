@@ -28,9 +28,6 @@ class CalendlyCallbackController(http.Controller):
         #raise UserError(kw.get('code'))
         
         if kw.get('code'):
-            #response = company_id._generate_calendly_token(kw.get('code'))
-            #self._prepare_calendly_token_values(response)
-            #raise UserError(response)
             data = {
                 'code': kw.get('code'),
                 'redirect_uri': redirect_uri,
@@ -46,28 +43,10 @@ class CalendlyCallbackController(http.Controller):
                     'Authorization': 'Basic ' + cient_id_secret,
                     'content-type': 'application/x-www-form-urlencoded'})
 
-            #raise UserError(response.json())
             if response.json() and response.json().get('access_token'):
                 company_id.write(self._prepare_calendly_token_values(response))
-                #expires_in = response.json().get('expires_in')
-                #new_token_validity = datetime.now() + timedelta(seconds=expires_in)
-                #company_id.write({
-                #    'calendly_access_token': response.json().get('access_token'),
-                #    'calendly_refresh_token':  response.json().get('refresh_token'),
-                #    'calendly_generated_access_token': True,
-                #    'calendly_token_validity': new_token_validity,
-                #})
-                close_script = "<script>window.close();</script>"
-                response_msg = {'success': True, 'close_script': close_script}
-                return json.dumps(response_msg)
-                #return "Authentication Success. You Can Close this window"
-            else:
-                raise UserError(
-                    _('Something went wrong during the token generation.'
-                      'Maybe your Authorization Code is invalid'))
-                raise UserError(response.json().get('access_token'))
                 
-            #raise UserError(response)
+        return request.redirect(request.httprequest.referrer or '/')
 
     def _prepare_calendly_token_values(self, response):
         expires_in = response.json().get('expires_in')
@@ -79,13 +58,6 @@ class CalendlyCallbackController(http.Controller):
             'calendly_generated_access_token': True,
         }
 
-    #@http.route('/calendly/event/create', type='json', auth='none', methods=['POST'])
-    #def create_calendly_event(self, **kw):
-    #    if post.get('payload'):
-            # Pass the payload to the model method for processing
-    #        payload = json.loads(post['payload'])
-    #        self.env['calendar.event'].handle_webhook_event(payload)
-    #    return {'status': 'success'}
         
     @http.route('/calendly/invitee/created', type='json', auth='none', methods=['POST'])
     def create_invitee_created(self, **kw):

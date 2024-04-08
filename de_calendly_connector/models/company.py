@@ -44,37 +44,42 @@ class ResCompany(models.Model):
         # self.write(self._prepare_calendly_token_values(response))
         return self._handle_response(response)
 
-    def _refresh_calendly_access_token(self):
-        company_ids = self.env['res.company'].search([('active','=',True)])
+    def _generate_calendly_refresh_token(self):
+        #company_ids = self.env['res.company'].search([('active','=',True)])
+        company_id = self
         payload = {}
         url = 'https://auth.calendly.com/oauth/token'
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': "application/json",
         }
-        for company_id in company_ids:
-            if company_id.calendly_token_validity > fields.Datetime.now():
-                return False
-            else:
-                payload = {
+        #for company_id in company_ids:
+        #    if company_id:
+        payload = {
                     'grant_type': 'refresh_token',
                     'refresh_token': company_id.calendly_refresh_token,
                     'client_id': company_id.calendly_client_id,
                     'client_secret': company_id.calendly_client_secret
-                }
-                response = requests.post(url, headers=headers, data=payload)
-                response.raise_for_status()
-                data = response.json()
+        }
+        response = requests.post(url, headers=headers, data=payload)
+        response.raise_for_status()
+        data = response.json()
     
-                company_id.write({
-                    'calendly_access_token': data.get('access_token'),
-                    'calendly_token_validity': fields.Datetime.now() + timedelta(seconds=data.get('expires_in')),
-                })
-    
-    def _get_calendly_api_header(self):
+        company_id.write({
+            'calendly_access_token': data.get('access_token'),
+            'calendly_refresh_token': data.get('refresh_token'),
+            'calendly_token_validity': fields.Datetime.now() + timedelta(seconds=data.get('expires_in')),
+        })
+        return data
+
+    def _get_calendly_access_token(self):
+        if self.calendly_token_validity < fields.Datetime.now():
+            self._generate_calendly_refresh_token()
         access_token = self.calendly_access_token
-        token_validity = self.calendly_token_validity
-        self.sudo()._refresh_calendly_access_token()
+        return access_token
+            
+    def _get_calendly_api_header(self):
+        access_token = self._get_calendly_access_token
         return {
             'Authorization': f'Bearer {access_token}', 
             'Accept': 'application/json'
@@ -95,12 +100,24 @@ class ResCompany(models.Model):
 
     
 
-    def get_current_user(self):
-        url = f'{CALENDLY_BASE_URL}/users/me'
-        params = {}
-        headers = self._get_calendly_api_header()
-        response = requests.get(url, params=params, headers=headers)
-        return self._handle_response(response)
+    def _get_calendly_current_user(self):
+        access_token = self._get_calendly_access_token()
+        url = 'https://api.calendly.com/users/me'
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+        }
+        
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        
+        return data
+        
+        #url = f'{CALENDLY_BASE_URL}/users/me'
+        #params = {}
+        #headers = self._get_calendly_api_header()
+        #response = requests.get(url, params=params, headers=headers)
+        #return self._handle_response(response)
 
     def _get_calendly_users(self, user=None):
         url = f'{CALENDLY_BASE_URL}/user'
@@ -123,16 +140,32 @@ class ResCompany(models.Model):
         return self._handle_response(response)
 
     # Calendly Membership
-    def _get_organization_memberships(self, organization=None, user=None):
-        url = f'{CALENDLY_BASE_URL}/organization_memberships'
+    def _get_calendly_organization_memberships(self, organization=None, user=None):
+        access_token = self._get_calendly_access_token()
+        url = 'https://api.calendly.com/organization_memberships'
         params = {}
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+        }
         if organization:
             params['organization'] = organization
         if user:
             params['user'] = user
-        headers = self._get_calendly_api_header()
         response = requests.get(url, params=params, headers=headers)
-        return self._handle_response(response)
+        response.raise_for_status()
+        data = response.json()
+        
+        return data
+        
+        #url = f'{CALENDLY_BASE_URL}/organization_memberships'
+        #params = {}
+        #if organization:
+        #    params['organization'] = organization
+        #if user:
+        #    params['user'] = user
+        #headers = self._get_calendly_api_header()
+        #response = requests.get(url, params=params, headers=headers)
+        #return self._handle_response(response)
 
     def _update_calendly_memberships(self, collection_data):
         user_ids = self.env['res.users']

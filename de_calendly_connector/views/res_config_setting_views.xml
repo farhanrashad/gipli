@@ -16,7 +16,7 @@
                         <div class="text-start" style="position:relative;" invisible="not is_calendly">
                             <a class="oe_link" href="https://developer.calendly.com/console/apps" target="_blank">
                                 <i class="oi oi-arrow-right"/>
-                                Sign up to MapBox to get a free token
+                                Sign up to Calendly to get a free token
                             </a>
                         </div>
                         <div class="mt0 content-group" invisible="not is_calendly">
