@@ -59,6 +59,12 @@ class Project(models.Model):
     publish_rating = fields.Boolean('Publish Ratings')
 
     allow_portal_user_close_ticket = fields.Boolean('Close by Customers')
+    portal_close_stage_id = fields.Many2one('project.task.type',
+        string='Close Stage',
+        readonly=False, store=True,
+        domain="[('project_ids','in',id)]",
+    )
+    
     allow_portal_user_reopen_ticket = fields.Boolean('Reopen by Customers')
     
 

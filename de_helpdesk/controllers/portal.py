@@ -255,6 +255,7 @@ class TicketCustomerPortal(CustomerPortal):
             'customer_rating' : rating,
             'rating_comment': comment,
             'closed_by': 'customer',
+            'stage_id': ticket_sudo.project_id.portal_close_stage_id.id,
         })
 
         lang = ticket_sudo.partner_id.lang or request.env.user.lang

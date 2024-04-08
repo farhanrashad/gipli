@@ -298,6 +298,15 @@
                     <div class="row mt16 o_settings_container" id="website_form_channel">
                         <setting help="Allow customers to easily close their tickets through the portal for quick resolutions." documentation="https://www.dynexcel.co/helpdesk-doc#portal-ticket-close">
                             <field name="allow_portal_user_close_ticket"/>
+                            <div class="mt16">
+                                        <label for="portal_close_stage_id"/>
+                                        <field name="portal_close_stage_id" 
+                                            class="ms-2 oe_inline" 
+                                            required="allow_portal_user_close_ticket" 
+                                            context="{'default_project_id': id}"
+                                            invisible="not allow_portal_user_close_ticket"
+                                        />
+                                    </div>
                         </setting>
                         
                         <setting help="Allow customers to conveniently reopen their tickets through the portal for further assistance." documentation="https://www.dynexcel.co/helpdesk-doc#portal-ticket-reopen">
