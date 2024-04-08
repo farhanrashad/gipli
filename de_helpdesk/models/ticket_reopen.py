@@ -10,7 +10,7 @@ class ProjectTicketReopen(models.Model):
     ticket_id = fields.Many2one('project.task', 'Ticket')
     date_reopen = fields.Datetime("Reopen at", required=True)
     reopen_by = fields.Selection([
-        ('customer', 'Closed by Customer'), 
-        ('user', 'Closed by User')],
+        ('customer', 'Opened by Customer'), 
+        ('user', 'Opened by User')],
         string='Re-Open By',
     )

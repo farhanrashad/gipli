@@ -8,7 +8,7 @@ access_project_ticket_type,access.project.ticket.type,model_project_ticket_type,
 access_project_ticket_type_internal_user,access.project.ticket.type.internal.user,model_project_ticket_type,base.group_user,1,0,0,0
 access_project_ticket_type_manager,access.project.ticket.type.manager,model_project_ticket_type,group_project_helpdesk_manager,1,1,1,1
 
-access_project_ticket_sla_line,access.project.ticket.sla.line,model_project_ticket_sla_line,,1,0,0,0
+access_project_ticket_sla_line,access.project.ticket.sla.line,model_project_ticket_sla_line,,1,1,1,0
 access_project_ticket_sla_line_internal_user,access.project.ticket.sla.line.internal.user,model_project_ticket_sla_line,base.group_user,1,0,0,0
 access_project_ticket_sla_line_manager,access.project.ticket.sla.line.manager,model_project_ticket_sla_line,group_project_helpdesk_manager,1,1,1,1
 

@@ -25,7 +25,7 @@ class TicketCustomerPortal(CustomerPortal):
         values = super(TicketCustomerPortal, self)._task_get_page_view_values(task, access_token, **kwargs)
         
         # Check if the project is a helpdesk team
-        if task.project_id.is_helpdesk_team:
+        if task.sudo().project_id.is_helpdesk_team:
             # Modify the URL accordingly
             #ticket_url = f"my/desk/ticket/%s?model=project.project&res_id={values['user'].id}&access_token={access_token}"
 
@@ -84,8 +84,9 @@ class TicketCustomerPortal(CustomerPortal):
 
     def _prepare_tickets_domain(self, partner):
         return [
-            ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
-            ('project_id.is_helpdesk_team', '=', True)
+            #('message_partner_ids', 'child_of', [partner.sudo().commercial_partner_id.id]),
+            #('is_ticket', '=', True),
+            ('partner_id','=',partner.id),
         ]
         
 
@@ -203,6 +204,7 @@ class TicketCustomerPortal(CustomerPortal):
         '/my/desk/tickets/page/<int:page>'
     ], type='http', auth="user", website=True)
     def portal_my_tickets(self, page=1, date_begin=None, date_end=None, sortby='date', filterby=None, search=None, search_in='content', groupby=None, **kw):
+
         values = self._prepare_tickets_values(page, date_begin, date_end, sortby, filterby, search, groupby, search_in)
         return request.render("de_helpdesk.portal_my_tickets", values)
 
@@ -247,8 +249,9 @@ class TicketCustomerPortal(CustomerPortal):
             comment = ' Ticket is no longer needed'
             
         rating = kw.get('rating')
+
         
-        ticket_sudo.write({
+        ticket_sudo.sudo().write({
             'customer_rating' : rating,
             'rating_comment': comment,
             'closed_by': 'customer',
@@ -256,9 +259,12 @@ class TicketCustomerPortal(CustomerPortal):
 
         lang = ticket_sudo.partner_id.lang or request.env.user.lang
         message_body = ticket_sudo._get_ticket_reopen_digest(comment, lang=lang)
-        ticket_sudo.message_post(body=message_body,message_type='comment')
+        ticket_sudo.sudo().message_post(
+            body=message_body,
+            message_type='comment',
+            subtype_id=request.env.ref('mail.mt_comment').id
+        )
         
-        #raise UserError(comment + rating)
         return request.redirect(f'/my/desk/ticket/{ticket_id}?access_token={access_token}')
 
     # Reopen Ticket
@@ -284,8 +290,12 @@ class TicketCustomerPortal(CustomerPortal):
      
         lang = ticket_sudo.partner_id.lang or request.env.user.lang
         message_body = ticket_sudo._get_ticket_reopen_digest(reason, lang=lang)
-        ticket_sudo.message_post(body=message_body,message_type='comment')
-        ticket_sudo.write({
+        ticket_sudo.sudo().message_post(
+            body=message_body,
+            message_type='comment',
+            subtype_id=request.env.ref('mail.mt_comment').id
+        )
+        ticket_sudo.sudo().write({
             'stage_id': stage_id.id,
         })
         

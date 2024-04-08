@@ -310,7 +310,7 @@ class ProjectTicket(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         tickets = super(ProjectTicket, self).create(vals_list)
-        created_sla_lines = self._compute_sla_lines(tickets)
+        created_sla_lines = self.sudo()._compute_sla_lines(tickets)
         for ticket in tickets:
             if ticket.is_ticket or (ticket.project_id and ticket.project_id.is_helpdesk_team):
                 ticket.ticket_no = self.env['ir.sequence'].next_by_code('project.task.ticket.no')
@@ -392,7 +392,7 @@ class ProjectTicket(models.Model):
                 for ticket in tickets_to_update:
                     if ticket.ticket_sla_ids:
                         #ticket.ticket_sla_ids._update_sla_status(new_stage_id.id)
-                        ticket._update_sla_lines(ticket, vals.get('stage_id'))
+                        ticket.sudo()._update_sla_lines(ticket, vals.get('stage_id'))
             self._update_ticket(vals.get('stage_id'))
                 
         
@@ -411,13 +411,11 @@ class ProjectTicket(models.Model):
             #new_project_id = vals['project_id'] if vals['project_id'] else self.project_id.id
             tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
             # Call _compute_sla_lines for tickets to be updated
-            self._compute_sla_lines(tickets_to_update)
+            self.sudo()._compute_sla_lines(tickets_to_update)
 
         # add followers -----------
         if 'partner_id' in vals:
-            self.message_subscribe(partner_ids=[vals['partner_id']])
-            self.project_id.message_subscribe(partner_ids=[vals['partner_id']])
-        
+            self.message_subscribe(partner_ids=[vals['partner_id']])        
         return res
 
 
@@ -427,15 +425,20 @@ class ProjectTicket(models.Model):
     # Update Ticket close fields ----------------
     def _update_ticket(self, stage_id):
         ticket_stage_id = self.env['project.task.type'].browse(stage_id)
+        vals = {}
         if ticket_stage_id.fold:
             if self.env.user.has_group('base.group_portal'):
-                self.closed_by = 'customer'
+                #self.closed_by = 'customer'
+                vals['closed_by'] = 'customer'
             else:
-                self.closed_by = 'user'
-            self.date_closed = fields.Datetime.now()
+                #self.closed_by = 'user'
+                vals['closed_by'] = 'user'
+            #self.date_closed = fields.Datetime.now()
+            vals['date_closed'] = fields.Datetime.now()
         else:
-            self.closed_by = False
-            self.date_closed = False
+            vals['closed_by'] = False
+            vals['date_closed'] = False
+        self.sudo().write(vals)
             
     # ------------ Apply SLA ------------
     def _update_sla_lines(self, ticket, stage_id):
@@ -549,7 +552,7 @@ class ProjectTicket(models.Model):
     def _compute_sla_lines(self, tickets):
         sla_lines = self.env['project.ticket.sla.line']
         current_date = datetime.now()
-        tickets.ticket_sla_ids.unlink()
+        tickets.ticket_sla_ids.sudo().unlink()
         for ticket in tickets:
             if ticket.is_sla and ticket.project_id.is_helpdesk_team:
                 #raise UserError(ticket.project_id)
@@ -558,7 +561,7 @@ class ProjectTicket(models.Model):
                 if sla_ids:
                     for sla in sla_ids:
                         sla_line_vals = self._prpeare_sla_line_values(ticket, sla)
-                        sla_line = self.env['project.ticket.sla.line'].create(sla_line_vals)
+                        sla_line = self.env['project.ticket.sla.line'].sudo().create(sla_line_vals)
                         sla_lines |= sla_line
         return sla_lines
         
@@ -643,6 +646,7 @@ class ProjectTicket(models.Model):
             'old_stage_id': old_stage_id.id,
             'new_stage_id': new_stage_id.id,
         })
+
     # ------------------------------------------------------------------------
     # ------------------------------ actions ---------------------------------
     # ------------------------------------------------------------------------
