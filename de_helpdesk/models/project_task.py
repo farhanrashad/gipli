@@ -380,9 +380,10 @@ class ProjectTicket(models.Model):
             #ticket._create_reopen_ticket_reason(ticket, reason=False)
             
             # Maintain Ticket Log 
-            ticket = self.filtered(lambda t: t.is_ticket and t.project_id.is_history_tickets)
-            if ticket:
-                ticket._create_ticket_log(ticket, ticket.stage_id, new_stage_id)
+            tickets = self.filtered(lambda t: t.is_ticket and t.project_id.is_history_tickets)
+            if tickets:
+                for ticket in tickets:
+                    ticket._create_ticket_log(ticket, ticket.stage_id, new_stage_id)
             
             # Update SLA
             if project.is_sla:

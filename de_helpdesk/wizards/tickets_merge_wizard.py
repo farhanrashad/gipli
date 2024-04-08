@@ -47,14 +47,15 @@ class TicketMergeWizard(models.TransientModel):
             ticket = self._merge_tickets(self.target_ticket_id)
 
     def _create_ticket(self):
-        description = '\n'.join(ticket.description for ticket in self.ticket_ids.sorted(key=lambda t: t.create_date))
+        description = '\n'.join(str(ticket.description) for ticket in self.ticket_ids.sorted(key=lambda t: t.create_date))
         name = ','.join(ticket.ticket_no for ticket in self.ticket_ids.sorted(key=lambda t: t.create_date))
         name = 'Combine tickets ' + name
         ticket = self.env['project.task'].create(self._prepare_ticket_values(name, description))
         lang = ticket.partner_id.lang or self.env.user.lang
         message_body = ticket._get_ticket_merge_digest(ticket, lang=lang)
         self._send_message(self.ticket_ids, message_body)
-        self._close_tickets(self.ticket_ids)
+        for ticket in self.ticket_ids:
+            self._close_tickets(ticket)
         return ticket
         
     def _prepare_ticket_values(self, name, description):
@@ -87,7 +88,8 @@ class TicketMergeWizard(models.TransientModel):
         lang = ticket.partner_id.lang or self.env.user.lang
         message_body = ticket._get_ticket_merge_digest(ticket, lang=lang)
         self._send_message(to_combine_ticket_ids, message_body)
-        self._close_tickets(to_combine_ticket_ids)
+        for ticket in to_combine_ticket_ids:
+            self._close_tickets(ticket)
     
     def _prepare_ticket_updated_values(self,description):
         partner_id = self.ticket_ids.filtered(lambda x:x.partner_id).mapped('partner_id')
@@ -103,14 +105,13 @@ class TicketMergeWizard(models.TransientModel):
         for ticket_id in ticket_ids:
             ticket_id.message_post(body=message_body,message_type='comment')
 
-    def _close_tickets(self, ticket_ids):
-        close_stage_id = self.env['project.task.type']
-        for ticket in ticket_ids:
-            close_stage_id = self.env['project.task.type'].search([
-                ('project_ids','in',ticket.project_id.id),
-                ('fold','=',True),
-            ],limit=1)
-            ticket_ids.write({
-                'stage_id': close_stage_id.id,
-                'closed_by': 'user',
-            })
+    def _close_tickets(self, ticket_id):
+        #close_stage_id = self.env['project.task.type']
+        close_stage_id = self.env['project.task.type'].search([
+            ('project_ids','in',ticket_id.project_id.id),
+            ('fold','=',True),
+        ],limit=1)
+        ticket_id.write({
+            'stage_id': close_stage_id.id,
+            'closed_by': 'user',
+        })
