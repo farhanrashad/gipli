@@ -412,6 +412,11 @@ class ProjectTicket(models.Model):
             tickets_to_update = self.filtered(lambda t: t.is_sla and t.project_id.is_helpdesk_team)
             # Call _compute_sla_lines for tickets to be updated
             self._compute_sla_lines(tickets_to_update)
+
+        # add followers -----------
+        if 'partner_id' in vals:
+            self.message_subscribe(partner_ids=[vals['partner_id']])
+            self.project_id.message_subscribe(partner_ids=[vals['partner_id']])
         
         return res
 
