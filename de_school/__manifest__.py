@@ -40,9 +40,9 @@
         'demo/student_demo.xml',
     ],
     'assets': {
-        'web.assets_backend': [
-            'de_school/static/src/js/planning_calendar.js',
-        ],
+        #'web.assets_backend': [
+        #    'de_school/static/src/js/planning_calendar.js',
+        #],
         'web.assets_frontend': [
             
         ]

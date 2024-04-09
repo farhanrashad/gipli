@@ -7,9 +7,48 @@
             <field name="model">res.company</field>
             <field name="inherit_id" ref="base.view_company_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[1]/group[2]" position="inside">
+                <xpath expr="//group[1]/group[1]" position="inside">
                     <field name="is_school" />
-                    <field name="resource_calendar_id" string="Calendar" attrs="{'required':[('is_school','=',True)]}"/>
+                </xpath>
+                <xpath expr="//group[1]" position="after">
+                    <h2 invisible="not is_school">Basic Features</h2>
+                    <block class="row col-12" title="Basic Features" name="basic_features_setting_container" invisible="not is_school">
+                        <setting help="Calendar" class="col-6">
+                            <field name="resource_calendar_id"
+                                required="is_school == True"
+                                invisible="not is_school"
+                                />
+                        </setting>
+                        <setting class="col-6">
+                            <field name="school_type"
+                                required="is_school == True"
+                                invisible="not is_school"
+                                />
+                        </setting>
+                        <setting class="col-6">
+                            <field name="use_batch"
+                                invisible="not is_school"
+                                />
+                        </setting>
+                    </block>
+                    <h2 invisible="not is_school">Additional Features</h2>
+                    <block class="row col-12" title="Additional Features" name="add_features_setting_container" invisible="not is_school">
+                        <setting help="Calendar" class="col-6">
+                            
+                        </setting>
+                        <setting class="col-6">
+                           
+                        </setting>
+                    </block>
+                    <h2 invisible="not is_school">Advanced Features</h2>
+                    <block class="row col-12" title="Advanced Features" name="addvanced_features_setting_container" invisible="not is_school">
+                        <setting help="Calendar" class="col-6">
+                            
+                        </setting>
+                        <setting class="col-6">
+                           
+                        </setting>
+                    </block>
                 </xpath>
             </field>
         </record>

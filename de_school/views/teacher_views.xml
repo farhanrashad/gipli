@@ -22,7 +22,8 @@
                     </div>
                 </xpath>
                 <xpath expr="//notebook[1]" position="inside">
-                    <page string="Subjects" name="subjects" attrs="{'invisible':[('is_teacher','=',False)]}">
+                    <page string="Subjects" name="subjects" 
+                        invisible="is_teacher == False">
                         <field name="subject_ids" widget="one2many_list" readonly="1">
                             <tree>
 								<field name="name" />

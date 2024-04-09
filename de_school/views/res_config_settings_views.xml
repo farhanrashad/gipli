@@ -7,23 +7,54 @@
             <field name="priority" eval="90"/>
             <field name="inherit_id" ref="base.res_config_settings_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[hasclass('settings')]" position="inside">
-                    <div class="app_settings_block" data-string="School" id="school" string="School" data-key="de_school" groups="de_school.group_school_manager">
-                        <h2>School Management</h2>
-                        <div class="row mt16 o_settings_container" id="end_contract_setting">
-                            <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane">
-                                    <field name="group_school_batch_setting"/>
-                                </div>
-                                <div class="o_setting_right_pane">
-                                    <label for="group_school_batch_setting"/>
-                                    <div class="text-muted">
-                                        Batches would be define for a course
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <xpath expr="//form" position="inside">
+                    <app data-string="School" string="School" name="de_school" groups="de_school.group_school_manager">
+                        <block title="School Management" name="school_setting_container">
+                            <setting class="col-6" 
+                                string="Activate School Mode"
+                                title="Activate School Mode"
+                                help="Transform Your Company into an Educational Institution"
+                                documentation="https://www.dynexcel.co/sms#activate-school"
+                            >
+                                <field name="is_school"/>
+                            </setting>
+                            <setting class="col-6"
+                                string="Operating Hours"
+                                title="Operating Hours"
+                                help="Manage schedules efficiently for a smooth academic experience."
+                                documentation="https://www.dynexcel.co/sms#activate-school"
+                                invisible="not is_school"
+                            >
+                                <field name="resource_calendar_id"
+                                    required="is_school == True"
+                                    invisible="not is_school"
+                                    />
+                            </setting>
+                            <setting class="col-6"
+                                string="School Type"
+                                title="School Type"
+                                help="Customize Your School Type to Tailor Your Institution's Identity"
+                                documentation="https://www.dynexcel.co/sms#activate-school"
+                                invisible="not is_school"
+                            >
+                                <field name="school_type"
+                                    required="is_school == True"
+                                    invisible="not is_school"
+                                    />
+                            </setting>
+                            <setting class="col-6"
+                                string="Batch Management"
+                                title="Batch Management"
+                                help="Organize classes and students effectively with batch management"
+                                documentation="https://www.dynexcel.co/sms#activate-school"
+                                invisible="not is_school"
+                            >
+                                <field name="use_batch"
+                                    invisible="not is_school"
+                                    />
+                            </setting>
+                        </block>
+                    </app>
                 </xpath>
             </field>
         </record>
@@ -42,6 +73,6 @@
         parent="menu_school_config"
         sequence="0"
         action="action_school_config_settings"
-        groups="base.group_system"/>
+        />
     
 </odoo>
