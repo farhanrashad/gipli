@@ -204,23 +204,23 @@ class ResCompany(models.Model):
         response = requests.get(base_url + endpoint, headers=headers)
         return self._handle_response(response)
         
-    def _calendly_cancel_event(self, uuid, reason=False):
-        base_url = 'api.calendly.com'
+    def _calendly_cancel_event(self, uuid, reason=None):
+        base_url = 'https://api.calendly.com'
         endpoint = f'/scheduled_events/{uuid}/cancellation'
-        conn = http.client.HTTPSConnection(base_url)
-
-        payloads = {}
-        if reason:
-            payloads['reason'] = reason
-
-        url = f"{endpoint}?{urlencode(payloads)}"  # Include parameters in the URL
+        url = f"{base_url}{endpoint}"
         headers = self._get_calendly_api_header()
-        headers['Content-Type'] = 'application/json'  # Set the content type header
-
-        conn.request("POST", url, body='', headers=headers)
-        res = conn.getresponse()
-        data = res.read()
-        return data.decode("utf-8")
+        headers['Content-Type'] = 'application/json'
+    
+        payload = {}
+        if reason:
+            payload['reason'] = reason
+    
+        try:
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()  # Raise an error for non-2xx responses
+            return response.json()  # Return JSON response as Python dictionary
+        except requests.exceptions.RequestException as e:
+            return {'error': str(e)}
 
     # CRUD for Calendly Events
     def _update_calendly_events(self, collection_data):
@@ -352,7 +352,11 @@ class ResCompany(models.Model):
         conn = http.client.HTTPSConnection("api.calendly.com")
         payload = {
             "url": self.env['ir.config_parameter'].sudo().get_param('web.base.url') + uri,
-            "events": events,
+            "events": [
+                "invitee.created",
+                "invitee.canceled",
+                "invitee_no_show.created"
+              ],
             "scope": "organization",
             "signing_key": self.calendly_webhook_signing_key,
         }

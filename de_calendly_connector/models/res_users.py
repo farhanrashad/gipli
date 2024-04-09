@@ -18,7 +18,7 @@ class ResUsers(models.Model):
         """ Cron job """
         company_id = self.env.user.company_id
         
-        current_user = company_id.get_current_user()
+        current_user = company_id._get_calendly_current_user()
         #data_str = json.dumps(current_user, indent=4)
         #raise UserError(data_str)
         org_uri = current_user['resource']['current_organization']
@@ -28,7 +28,7 @@ class ResUsers(models.Model):
 
     def _sync_calendly_users(self,org_uri):
         company_id = self.env.user.company_id
-        members = company_id._get_organization_memberships(org_uri,user=False)
+        members = company_id._get_calendly_organization_memberships(org_uri,user=False)
         members_collection_data = members.get('collection', [])
         if not members_collection_data:
             raise ValueError('No data found in the collection')
