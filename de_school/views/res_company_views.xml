@@ -13,23 +13,49 @@
                 <xpath expr="//group[1]" position="after">
                     <h2 invisible="not is_school">Basic Features</h2>
                     <block class="row col-12" title="Basic Features" name="basic_features_setting_container" invisible="not is_school">
-                        <setting help="Calendar" class="col-6">
-                            <field name="resource_calendar_id"
-                                required="is_school == True"
+                        <setting class="col-6" 
+                                string="Activate School Mode"
+                                title="Activate School Mode"
+                                help="Transform Your Company into an Educational Institution"
+                                documentation="https://www.dynexcel.co/sms#activate-school"
+                            >
+                                <field name="is_school"/>
+                            </setting>
+                            <setting class="col-6"
+                                string="Operating Hours"
+                                title="Operating Hours"
+                                help="Manage schedules efficiently for a smooth academic experience."
+                                documentation="https://www.dynexcel.co/sms#activate-school"
                                 invisible="not is_school"
-                                />
-                        </setting>
-                        <setting class="col-6">
-                            <field name="school_type"
-                                required="is_school == True"
+                            >
+                                <field name="resource_calendar_id"
+                                    required="is_school == True"
+                                    invisible="not is_school"
+                                    />
+                            </setting>
+                            <setting class="col-6"
+                                string="School Type"
+                                title="School Type"
+                                help="Customize Your School Type to Tailor Your Institution's Identity"
+                                documentation="https://www.dynexcel.co/sms#activate-school"
                                 invisible="not is_school"
-                                />
-                        </setting>
-                        <setting class="col-6">
-                            <field name="use_batch"
+                            >
+                                <field name="school_type"
+                                    required="is_school == True"
+                                    invisible="not is_school"
+                                    />
+                            </setting>
+                            <setting class="col-6"
+                                string="Batch Management"
+                                title="Batch Management"
+                                help="Organize classes and students effectively with batch management"
+                                documentation="https://www.dynexcel.co/sms#activate-school"
                                 invisible="not is_school"
-                                />
-                        </setting>
+                            >
+                                <field name="use_batch"
+                                    invisible="not is_school"
+                                    />
+                            </setting>
                     </block>
                     <h2 invisible="not is_school">Additional Features</h2>
                     <block class="row col-12" title="Additional Features" name="add_features_setting_container" invisible="not is_school">
