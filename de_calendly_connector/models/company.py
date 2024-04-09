@@ -156,17 +156,8 @@ class ResCompany(models.Model):
         data = response.json()
         
         return data
-        
-        #url = f'{CALENDLY_BASE_URL}/organization_memberships'
-        #params = {}
-        #if organization:
-        #    params['organization'] = organization
-        #if user:
-        #    params['user'] = user
-        #headers = self._get_calendly_api_header()
-        #response = requests.get(url, params=params, headers=headers)
-        #return self._handle_response(response)
 
+    
     def _update_calendly_memberships(self, collection_data):
         user_ids = self.env['res.users']
         data_str = json.dumps(collection_data, indent=4)
@@ -178,16 +169,32 @@ class ResCompany(models.Model):
     
     # Calendly Events
     def _get_calendly_scheduled_events(self, organization=None, user=None):
-        url = f'{CALENDLY_BASE_URL}/scheduled_events'
+        access_token = self._get_calendly_access_token()
+        url = 'https://api.calendly.com/scheduled_events'
         params = {}
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+        }
         if organization:
             params['organization'] = organization
         if user:
             params['user'] = user
-
-        headers = self._get_calendly_api_header()
         response = requests.get(url, params=params, headers=headers)
-        return self._handle_response(response)
+        response.raise_for_status()
+        data = response.json()
+        
+        return data
+        
+        #url = f'{CALENDLY_BASE_URL}/scheduled_events'
+        #params = {}
+        #if organization:
+        #    params['organization'] = organization
+        #if user:
+        #    params['user'] = user
+
+        #headers = self._get_calendly_api_header()
+        #response = requests.get(url, params=params, headers=headers)
+        #return self._handle_response(response)
 
     def _get_calendly_event(self, uuid=None, user=None):
         base_url = 'https://api.calendly.com'

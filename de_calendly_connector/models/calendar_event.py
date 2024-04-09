@@ -61,20 +61,12 @@ class CalendarEvent(models.Model):
             'target': 'new',
         }
         
-        #raise UserError(self.user_id.calendly_uri)
-        #event = self.env.user.company_id.sudo()._get_calendly_event(self.calendly_uri)
-        #event = self.env.user.company_id.sudo()._calendly_cancel_event(self.calendly_uri,'test reason')
-        #data_str = json.dumps(event, indent=4)
-        #raise UserError(data_str)
-        
-    def action_get_schedule_events2(self):
-        self.env.user.sudo()._sync_all_calendly_events()
 
     def action_get_schedule_events(self):
         company_id = self.env.user.company_id
-        token = company_id._refresh_calendly_access_token()
+        #token = company_id._refresh_calendly_access_token()
         
-        current_user = company_id.get_current_user()
+        current_user = company_id._get_calendly_current_user()
         org_uri = current_user['resource']['current_organization']
 
         subscriptions = company_id._get_calendly_webhook_subscriptions(org_uri, user=False)
@@ -98,30 +90,15 @@ class CalendarEvent(models.Model):
         #raise UserError(company_id._get_base_url())
         #company_id._refresh_access_token()
         
-    def action_get_schedule_events3(self):
+    def action_get_schedule_events(self):
         company_id = self.env.user.company_id
-        
-        current_user = company_id.get_current_user()
+        current_user = company_id._get_calendly_current_user()
         org_uri = current_user['resource']['current_organization']
-        
 
         events = company_id._get_calendly_scheduled_events(org_uri, user=False)
 
-        collection_data = events.get('collection', [])
-        if not collection_data:
-            raise ValueError('No data found in the collection')
-        
-        company_id._update_calendly_events(collection_data)
-
-        users = []
-        for member in collection_data:
-            user_info = member.get('event_memberships')
-            if user_info:
-                users.append(user_info)
-        #raise UserError(users)
-        member_data = events.get('collection', ['event_memberships'])
-        data_str = json.dumps(users, indent=4)
-        #raise UserError(data_str)
+        data_str = json.dumps(events, indent=4)
+        raise UserError(data_str)
         
     
     def test_users(self):
@@ -132,10 +109,11 @@ class CalendarEvent(models.Model):
         #raise UserError(company_id._get_calendly_access_token())
         #refresh_token = company_id._generate_calendly_refresh_token()
 
-        members = company_id._get_calendly_organization_memberships(org_uri, user=False)
+        #members = company_id._get_calendly_organization_memberships(org_uri, user=False)
+        subscriptions = company_id._get_calendly_scheduled_events(org_uri, user=False)
 
         #subscriptions = company_id._get_calendly_webhook_subscriptions(org_uri, user=False)
-        data_str = json.dumps(members, indent=4)
+        data_str = json.dumps(subscriptions, indent=4)
         raise UserError(data_str)
 
     # action for calendly 
