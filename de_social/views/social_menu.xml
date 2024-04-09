@@ -3,7 +3,7 @@
     <!-- Top menu item -->
     <menuitem name="Social"
         id="menu_social_root"
-        groups="sales_team.group_sale_salesman"
+        groups="de_social.group_sm_user"
         web_icon="de_social,static/description/icon.png"
         sequence="40" />
 
