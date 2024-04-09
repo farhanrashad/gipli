@@ -69,18 +69,18 @@ class CalendarEvent(models.Model):
     
     def test_users(self):
         company_id = self.env.user.company_id
-        #current_user = company_id._get_calendly_current_user()
-        #org_uri = current_user['resource']['current_organization']
+        current_user = company_id._get_calendly_current_user()
+        org_uri = current_user['resource']['current_organization']
 
         #raise UserError(company_id._get_calendly_access_token())
-        refresh_token = company_id._generate_calendly_refresh_token()
+        #refresh_token = company_id._generate_calendly_refresh_token()
 
         #members = company_id._get_calendly_organization_memberships(org_uri, user=False)
         #events = company_id._get_calendly_scheduled_events(org_uri, user=False)
 
         #subscriptions = company_id._get_calendly_webhook_subscriptions(org_uri, user=False)
-        #subscription = company_id._create_calendly_webhook_subscription('/calendly/events',organization=org_uri, user=False)
-        data_str = json.dumps(refresh_token, indent=4)
+        subscription = company_id._create_calendly_webhook_subscription('/calendly/events',organization=org_uri, user=False)
+        data_str = json.dumps(subscription, indent=4)
         raise UserError(data_str)
 
     # action for calendly 

@@ -67,7 +67,7 @@ class ResCompany(models.Model):
     
         company_id.write({
             'calendly_access_token': data.get('access_token'),
-            'calendly_refresh_token': data.get('refresh_token'),
+            #'calendly_refresh_token': data.get('refresh_token'),
             'calendly_token_validity': fields.Datetime.now() + timedelta(seconds=data.get('expires_in')),
         })
         return data
