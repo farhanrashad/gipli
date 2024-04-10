@@ -39,7 +39,7 @@ class ResPartner(models.Model):
     
     course_id = fields.Many2one('oe.school.course', string='Course')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch', domain="[('course_id','=',course_id)]")
-    subject_ids = fields.Many2many('oe.school.course.subject', string='Subjects', compute='_compute_subjects')
+    subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subjects')
     
     enrollment_ids = fields.One2many('oe.school.student.enrollment', 'partner_id', 'Enrollments')
     sibling_ids = fields.One2many('oe.student.sibling', 'partner_id', 'Siblings')
@@ -113,8 +113,8 @@ class ResPartner(models.Model):
                 
 
     def _compute_subjects(self):
-        subject_ids = self.env['oe.school.course.subject'].search(['|',('course_ids','in',self.course_id.id),('batch_ids','in',self.batch_id.id)])
-        self.subject_ids = subject_ids.ids
+        #subject_ids = self.env['oe.school.course.subject'].search(['|',('course_ids','in',self.course_id.id),('batch_ids','in',self.batch_id.id)])
+        self.subject_ids = False #subject_ids.ids
     
     def attach_document(self, **kwargs):
         pass

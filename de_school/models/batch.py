@@ -15,7 +15,7 @@ class SchoolCourseBatch(models.Model):
         
     name = fields.Char(string='Batch', required=True, index=True, translate=True)
     course_id = fields.Many2one('oe.school.course', string='Course', required=True)
-    subject_ids = fields.Many2many('oe.school.course.subject', compute='_compute_subjects')
+    subject_ids = fields.Many2many('oe.school.subject', compute='_compute_subjects')
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
     year_id = fields.Many2one('oe.school.year', string='Year', required=True, 
                            default=lambda self: self._default_year_id(),
@@ -26,8 +26,8 @@ class SchoolCourseBatch(models.Model):
                            store=True, compute='_compute_date_from_school_year')
     
     def _compute_subjects(self):
-        subject_ids = self.env['oe.school.course.subject'].search([('batch_ids','in', self.id)])
-        self.subject_ids = subject_ids.ids
+        #subject_ids = self.env['oe.school.course.subject'].search([('batch_ids','in', self.id)])
+        self.subject_ids = False #subject_ids.ids
 
     @api.depends('year_id')
     def _compute_date_from_school_year(self):

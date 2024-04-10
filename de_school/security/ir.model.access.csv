@@ -9,14 +9,17 @@ access_school_course_grading_type_manager,access.school.course.grading.type.mana
 access_school_course,access.school.course,model_oe_school_course,,1,0,0,0
 access_school_course_user,access.school.course.user,model_oe_school_course,de_school.group_school_user,1,1,1,1
 
+access_school_course_subject_line,access.school.course.subject.line,model_oe_school_course_subject_line,,1,0,0,0
+access_school_course_subject_line_user,access.school.course.subject.line.user,model_oe_school_course_subject_line,de_school.group_school_user,1,1,1,1
+
 access_school_course_batch,access.school.course.batch,model_oe_school_course_batch,,1,0,0,0
 access_school_course_batch_user,access.school.course.batch.user,model_oe_school_course_batch,de_school.group_school_user,1,1,1,1
 
-access_school_course_subject_group,access.school.course.subject.group,model_oe_school_course_subject_group,,1,0,0,0
-access_school_course_subject_group_user,access.school.course.subject.group.user,model_oe_school_course_subject_group,de_school.group_school_user,1,1,1,1
+access_school_subject_group,access.school.subject.group,model_oe_school_subject_group,,1,0,0,0
+access_school_subject_group_user,access.school.subject.group.user,model_oe_school_subject_group,de_school.group_school_user,1,1,1,1
 
-access_school_course_subject,access.school.course.subject,model_oe_school_course_subject,,1,0,0,0
-access_school_course_subject_user,access.school.course.subject.user,model_oe_school_course_subject,de_school.group_school_user,1,1,1,1
+access_school_subject,access.school.subject,model_oe_school_subject,,1,0,0,0
+access_school_subject_user,access.school.subject.user,model_oe_school_subject,de_school.group_school_user,1,1,1,1
 
 access_student_enrollment,access.student.enrollment,model_oe_school_student_enrollment,,1,0,0,0
 access_student_enrollment_user,access.student.enrollment.user,model_oe_school_student_enrollment,de_school.group_school_user,1,1,1,1

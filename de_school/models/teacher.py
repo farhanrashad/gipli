@@ -8,5 +8,5 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
  
     is_teacher = fields.Boolean('Is a Teacher')
-    subject_ids = fields.Many2many('oe.school.course.subject', string='Subjects')
+    subject_ids = fields.Many2many('oe.school.subject', string='Subjects')
     #teacher_subject_ids = fields.One2many('oe.school.teacher.subject', 'employee_id', 'Subjects')

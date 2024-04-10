@@ -34,3 +34,4 @@ class Company(models.Model):
         default='k12', string='School Type',
     )
     use_batch = fields.Boolean('Enable Batch')
+    use_credit_hours = fields.Boolean('Enable Credit Hours')

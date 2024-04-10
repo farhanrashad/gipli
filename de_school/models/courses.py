@@ -26,15 +26,26 @@ class OeSchoolCourse(models.Model):
     parent_id = fields.Many2one('oe.school.course', string='Parent Course', index=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     active = fields.Boolean('Active', default=True)
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
-    grading_type_id = fields.Many2one('oe.school.course.grading.type', string='Grading Type', required=True)
+    #grading_type_id = fields.Many2one('oe.school.course.grading.type', string='Grading Type', required=True)
 
     enable_elective = fields.Boolean('Enable Elective Subjects Selection')
-    subject_ids = fields.Many2many('oe.school.course.subject', compute='_compute_subjects')
     color = fields.Integer(default=_default_color)
     
     sequence_id = fields.Many2one('ir.sequence', 'Roll Number Sequence', copy=False, check_company=True)
-    
-    
+
+    course_subject_line = fields.One2many('oe.school.course.subject.line', 'course_id', readonly=True, string="Subject Line")
+
+    use_batch = fields.Boolean(compute='_compute_use_batch_from_company')
+    use_credit_hours = fields.Char(compute='_compute_use_credit_hours_from_company')
+
+    def _compute_use_credit_hours_from_company(self):
+        for record in self:
+            record.use_credit_hours = record.company_id.use_credit_hours
+            
+    def _compute_use_batch_from_company(self):
+        for record in self:
+            record.use_batch = record.company_id.use_batch
+            
     @api.depends('name', 'parent_id.complete_name')
     def _compute_complete_name(self):
         for course in self:
@@ -42,11 +53,7 @@ class OeSchoolCourse(models.Model):
                 course.complete_name = '%s / %s' % (course.parent_id.complete_name, course.name)
             else:
                 course.complete_name = course.name
-    
-    def _compute_subjects(self):
-        subject_ids = self.env['oe.school.course.subject'].search([('course_ids','in', self.id)])
-        self.subject_ids = subject_ids.ids
-    
+        
     @api.model
     def create(self, vals):
         sequence = self.env['ir.sequence'].create({
@@ -79,3 +86,13 @@ class OeSchoolCourse(models.Model):
                     course.sequence_id.company_id = vals.get('company_id')
         return super().write(vals)
 
+    class SchoolCourseSubjectLine(models.Model):
+        _name = 'oe.school.course.subject.line'
+        _description = 'Course Subject Line'
+
+        course_id = fields.Many2one('oe.school.course', string='Course', required=True, ondelete='cascade', index=True)
+        subject_id = fields.Many2one('oe.school.course.subject', string='Subject', required=True)
+        batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
+        max_weekly_class = fields.Integer('Max Weekly Classes', required=True)
+        credit_hours = fields.Float('Credit Hours', required=True)
+    
