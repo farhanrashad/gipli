@@ -25,7 +25,11 @@ class OeSchoolCourse(models.Model):
     complete_name = fields.Char('Complete Name', compute='_compute_complete_name', recursive=True, store=True)
     parent_id = fields.Many2one('oe.school.course', string='Parent Course', index=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     active = fields.Boolean('Active', default=True)
-    company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', 
+                                 string='Company', index=True, 
+                                 default=lambda self: self.env.company,
+                                 domain=[('active','=',True),('is_school','=',True)]
+                                )
     #grading_type_id = fields.Many2one('oe.school.course.grading.type', string='Grading Type', required=True)
 
     enable_elective = fields.Boolean('Enable Elective Subjects Selection')
@@ -33,7 +37,7 @@ class OeSchoolCourse(models.Model):
     
     sequence_id = fields.Many2one('ir.sequence', 'Roll Number Sequence', copy=False, check_company=True)
 
-    course_subject_line = fields.One2many('oe.school.course.subject.line', 'course_id', readonly=True, string="Subject Line")
+    course_subject_line = fields.One2many('oe.school.course.subject.line', 'course_id', string="Subject Line")
 
     use_batch = fields.Boolean(compute='_compute_use_batch_from_company')
     use_credit_hours = fields.Char(compute='_compute_use_credit_hours_from_company')
@@ -91,7 +95,7 @@ class OeSchoolCourse(models.Model):
         _description = 'Course Subject Line'
 
         course_id = fields.Many2one('oe.school.course', string='Course', required=True, ondelete='cascade', index=True)
-        subject_id = fields.Many2one('oe.school.course.subject', string='Subject', required=True)
+        subject_id = fields.Many2one('oe.school.subject', string='Subject', required=True)
         batch_id = fields.Many2one('oe.school.course.batch', string='Batch')
         max_weekly_class = fields.Integer('Max Weekly Classes', required=True)
         credit_hours = fields.Float('Credit Hours', required=True)

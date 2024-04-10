@@ -12,6 +12,7 @@ class ResConfigSettings(models.TransientModel):
     school_type = fields.Selection(related='company_id.school_type', readonly=False)
     resource_calendar_id = fields.Many2one(related='company_id.resource_calendar_id', readonly=False)
     use_batch = fields.Boolean(related='company_id.use_batch', readonly=False)
+    use_section = fields.Boolean(related='company_id.use_section', readonly=False)
 
     @api.onchange('school_type')
     def _change_school_type(self):

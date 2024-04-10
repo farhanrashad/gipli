@@ -42,10 +42,24 @@
                                     invisible="not is_school"
                                     />
                             </setting>
-                            <setting class="col-6"
+                            
+                        </block>
+                        <block title="Class Management" class="mt0 mb0" name="school_setting_container">
+                            <setting class="col-6 mt8"
                                 string="Batch Management"
                                 title="Batch Management"
                                 help="Organize classes and students effectively with batch management"
+                                documentation="https://www.dynexcel.co/sms#activate-school"
+                                invisible="not is_school"
+                            >
+                                <field name="use_batch"
+                                    invisible="not is_school"
+                                    />
+                            </setting>
+                            <setting class="col-6 mt8"
+                                string="Section Management"
+                                title="Section Management"
+                                help="Organize Large Classes into Sections for Efficient Administration"
                                 documentation="https://www.dynexcel.co/sms#activate-school"
                                 invisible="not is_school"
                             >

@@ -72,19 +72,21 @@
                             </group>
                         </group>
 						<notebook>
-                            <page string="Sbujects">
-                                <field name="course_subject_line" widget="one2many_list" readonly="1">
-									<tree editable ="top" >
-                                        <field name="course_id" 
+                            <page string="Sbujects Assignment">
+                                <field name="course_subject_line" >
+									<tree editable ="bottom" >
+                                        <field name="course_id" column_invisible="1" />
+                                        <field name="subject_id" 
                                             options="{'no_create': True,'no_edit':True}" 
                                         />
                                         <field name="batch_id" 
                                             options="{'no_create': True,'no_edit':True}" 
-                                            invisible="not parent.use_batch"
+                                            column_invisible="not parent.use_batch"
                                         />
                                          <field name="credit_hours" 
-                                             invisible="not parent.use_credit_hours" 
+                                             column_invisible="not parent.use_credit_hours" 
                                         />
+                                        <field name="max_weekly_class" />
                                        
 									</tree>
 								</field>
