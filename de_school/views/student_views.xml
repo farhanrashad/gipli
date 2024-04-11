@@ -54,8 +54,11 @@
                             invisible="is_student != True or is_parent_student == True">
                             <field name="course_id"  options="{'no_quick_create': True, 'no_create_edit' : True}" 
                                 required="is_student == True and is_parent_student == False" />
-                            <field name="batch_id"  options="{'no_quick_create': True, 'no_create_edit' : True}" 
-                                required="is_student == True and is_parent_student == False" />
+                            <field name="batch_id"  
+                                options="{'no_quick_create': True, 'no_create_edit' : True}" 
+                                required="is_student and is_parent_student == False and use_batch" 
+                                invisible="not use_batch" 
+                                />
                             <field name="roll_no"  />
                             <field name="admission_no" string="Registraion No" />
                         </group>
@@ -197,10 +200,13 @@
             <field eval="8" name="priority"/>
             <field name="arch" type="xml">
                 <tree string="Students" sample="1" multi_edit="1">
+                    <field name="use_batch" invisible="1" />
                     <field name="display_name" string="Name"/>
                     <field name="function" invisible="1"/>
                     <field name="course_id" />
-                    <field name="batch_id" />
+                    <field name="batch_id" 
+                        column_invisible="not use_batch"
+                        />
                     <field name="roll_no" />
                     <field name="admission_no" />
                     <field name="ref" optional="hide" />

@@ -49,6 +49,18 @@
 			<field name="arch" type="xml">
 				<form string="Courses">
 					<sheet>
+                        <field name="batch_count" invisible="1"/>
+                        <field name="use_batch_subject" invisible="1" />
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_open_batch" 
+                                type="object" 
+                                icon="fa-list-alt" 
+                                class="oe_stat_button"
+                                invisible="not use_batch"
+                            >
+                                    <field string="Batch" name="batch_count" widget="statinfo"/>
+                            </button>
+                        </div>
                         <widget name="web_ribbon" title="Archived" bg_color="bg-danger" 
                             invisible="active == True"/>
                         <field name="active" invisible="1"/>
@@ -79,9 +91,9 @@
                                         <field name="subject_id" 
                                             options="{'no_create': True,'no_edit':True}" 
                                         />
-                                        <field name="batch_id" 
+                                         <field name="batch_ids" widget="many2many_tags"
                                             options="{'no_create': True,'no_edit':True}" 
-                                            column_invisible="not parent.use_batch"
+                                            column_invisible="not parent.use_batch_subject"
                                         />
                                          <field name="credit_hours" 
                                              column_invisible="not parent.use_credit_hours" 

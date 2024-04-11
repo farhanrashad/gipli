@@ -10,6 +10,7 @@
                 <xpath expr="//group[1]/group[2]" position='inside'>
                     <field name="is_student" invisible="1"/>
                     <field name="is_parent_student" invisible="1"/>
+                    <field name="use_batch" invisible="1"/>
                 </xpath>
             </field>
         </record>

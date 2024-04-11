@@ -14,10 +14,10 @@ class ResConfigSettings(models.TransientModel):
     use_batch = fields.Boolean(related='company_id.use_batch', readonly=False)
     use_section = fields.Boolean(related='company_id.use_section', readonly=False)
 
-    @api.onchange('school_type')
-    def _change_school_type(self):
-        for record in self:
-            if record.school_type in ('col','uni'):
-                record.use_batch = True
-            else:
-                record.use_batch = False
+    #@api.onchange('school_type')
+    #def _change_school_type(self):
+    #    for record in self:
+    #        if record.school_type in ('col','uni'):
+    #            record.use_batch = True
+    #        else:
+    #            record.use_batch = False

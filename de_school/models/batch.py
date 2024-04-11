@@ -24,10 +24,24 @@ class SchoolCourseBatch(models.Model):
                              store=True, compute='_compute_date_from_school_year')
     date_end = fields.Date(string='End Date', required=True, readonly=False,
                            store=True, compute='_compute_date_from_school_year')
-    
+    count_subjects = fields.Integer(string='Subjects', compute='_compute_course_subjects')
+
+    def _compute_course_subjects(self):
+        for record in self:
+            subject_ids = self.course_id.course_subject_line.filtered(lambda x: self.id in x.batch_ids.ids)
+            record.count_subjects = 1 #len(subject_ids.ids)
+
     def _compute_subjects(self):
-        #subject_ids = self.env['oe.school.course.subject'].search([('batch_ids','in', self.id)])
-        self.subject_ids = False #subject_ids.ids
+        subject_lines = self.course_id.course_subject_line
+        filtered_subject_lines = self.env['oe.school.course.subject.line'].browse([
+            line.id for line in subject_lines if self.id in line.batch_ids.ids
+        ])
+        self.subject_ids = filtered_subject_lines.mapped('subject_id').ids
+
+
+    #def _compute_subjects(self):
+    #    subject_ids = self.course_id.course_subject_line.filtered(lambda x: self.id in x.batch_ids.ids)
+    #    self.subject_ids = subject_ids.mapped('subject_id').id
 
     @api.depends('year_id')
     def _compute_date_from_school_year(self):
