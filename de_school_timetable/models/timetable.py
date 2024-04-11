@@ -21,7 +21,7 @@ class SchoolTimetable(models.Model):
     name = fields.Text('Note', compute='_compute_name', store=True)
     course_id = fields.Many2one('oe.school.course', 'Course', store=True, required=True)
     batch_id = fields.Many2one('oe.school.course.batch', 'Batch', store=True, required=True)
-    subject_id = fields.Many2one('oe.school.course.subject', 'Subject', store=True, required=True)
+    subject_id = fields.Many2one('oe.school.subject', 'Subject', store=True, required=True)
     teacher_id = fields.Many2one('hr.employee', 'Teacher', store=True, domain="[('is_teacher','=',True)]")
     user_id = fields.Many2one('res.users',compute='_compute_user_from_teacher', store=True)
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)

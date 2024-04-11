@@ -4,6 +4,7 @@
     <menuitem name="Timetable"
         id="menu_school_timetable"
         web_icon="de_school_timetable,static/description/icon.png"
+        groups="de_school.group_school_user"
         sequence="55" />
     
     <menuitem name="Timetable" id="menu_school_timetable_main"
