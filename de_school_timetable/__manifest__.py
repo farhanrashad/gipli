@@ -27,7 +27,7 @@
         'views/classroom_timetable_views.xml',
         'views/timetable_teacher_allocation_views.xml',
         'views/timetable_room_allocation_views.xml',
-        #'reports/report_timetable_period.xml',
+        'reports/report_timetable_period.xml',
         'wizards/timetable_wizard_views.xml',
         #'views/assets.xml',
         
