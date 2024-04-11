@@ -18,6 +18,10 @@ access_school_course_batch_user,access.school.course.batch.user,model_oe_school_
 access_school_subject_group,access.school.subject.group,model_oe_school_subject_group,,1,0,0,0
 access_school_subject_group_user,access.school.subject.group.user,model_oe_school_subject_group,de_school.group_school_user,1,1,1,1
 
+access_school_subject_allocation,access.school.subject.allocation,model_oe_school_subject_allocation,,1,0,0,0
+access_school_subject_allocation_user,access.school.subject.allocation.user,model_oe_school_subject_allocation,de_school.group_school_user,1,1,1,1
+
+
 access_school_subject,access.school.subject,model_oe_school_subject,,1,0,0,0
 access_school_subject_user,access.school.subject.user,model_oe_school_subject,de_school.group_school_user,1,1,1,1
 

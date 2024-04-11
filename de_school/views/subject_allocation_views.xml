@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <!-- Batch -->
+        <record id="school_subject_allocation_tree_view" model="ir.ui.view">
+			<field name="name">school.subject.allocation.tree.view</field>
+			<field name="model">oe.school.subject.allocation</field>
+			<field name="arch" type="xml">
+				<tree string="Subject Allocation">
+                    <field name="subject_id"/>
+                    <field name="employee_id"/>
+				</tree>
+			</field>
+		</record>
+		<record id="school_subject_allocation_form_view" model="ir.ui.view">
+			<field name="name">school.subject.allocaiton.form.view</field>
+			<field name="model">oe.school.subject.allocation</field>
+			<field name="arch" type="xml">
+				<form string="Subject Allocation">
+					<sheet>
+                        <div class="oe_title">
+                            <label for="employee_id"/>
+                            <h1><field name="employee_id" options="{'no_create': True}" /></h1>
+                        </div>
+                        <group >
+                            <group>
+                                <field name="subject_id" options="{'no_create': True}" />
+                            </group>
+                            <group>
+                                <field name="employee_id" options="{'no_create': True}" />
+                            </group>
+                        </group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+        
+        <record id="view_subject_allocation_filter" model="ir.ui.view">
+            <field name="name">school.course.batch.search</field>
+            <field name="model">oe.school.subject.allocation</field>
+            <field name="arch" type="xml">
+                <search string="Batches">
+                    <field name="subject_id" string="Subject"/>
+                    <separator/>
+                </search>
+             </field>
+        </record>
+        
+        <record id="action_subject_allocation" model="ir.actions.act_window">
+            <field name="name">Subject Allocation</field>
+            <field name="res_model">oe.school.subject.allocation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_subject_allocation_filter"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new allocation
+                </p>
+            </field>
+        </record>
+        
+        <menuitem name="Subject Allocation" id="menu_schoolsubject_allocation"
+                    parent="menu_school_courses" action="action_subject_allocation"
+                    sequence="5"/>
+        
+    </data>
+</odoo>

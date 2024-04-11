@@ -35,6 +35,7 @@
         'views/course_views.xml',
         'views/batch_views.xml',
         'views/subject_views.xml',
+        'views/subject_allocation_views.xml',
     ],
     'demo': [
         'demo/student_demo.xml',

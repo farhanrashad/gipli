@@ -80,10 +80,10 @@
                 </p>
             </field>
         </record>
-        
+        <!--
         <menuitem name="Batch" id="menu_school_courses_course_batch"
                     parent="menu_school_courses" action="action_course_batch"
                     groups="group_school_user" sequence="2"/>
-        
+        -->
     </data>
 </odoo>
