@@ -19,6 +19,9 @@ class SchoolTimetable(models.Model):
     _check_company_auto = True
     
     name = fields.Text('Note', compute='_compute_name', store=True)
+    course_ids = fields.Many2many(
+        'oe.school.course', 'timetable_school_course_rel',
+        string='Courses')
     course_id = fields.Many2one('oe.school.course', 'Course', store=True, required=True)
     batch_id = fields.Many2one('oe.school.course.batch', 'Batch', store=True, required=True)
     subject_id = fields.Many2one('oe.school.subject', 'Subject', store=True, required=True)
@@ -29,8 +32,11 @@ class SchoolTimetable(models.Model):
     
     classroom_id = fields.Many2one('oe.school.building.room', 'Classroom', store=True,)
     date = fields.Date('Date', required=True)
+    duration = fields.Float('Duration', 
+                            #compute='_compute_duration', 
+                            store=True, readonly=False)
     color = fields.Integer("Color", compute='_compute_color' )
-    
+    allday = fields.Boolean('All Day', default=False)
     state = fields.Selection([
             ('draft', 'Draft'),
             ('published', 'Published'),
@@ -72,7 +78,7 @@ class SchoolTimetable(models.Model):
     @api.depends('course_id','batch_id','subject_id','company_id')
     def _compute_name(self):
         for record in self:
-            record.name = record.course_id.code + '/' + record.batch_id.name + ' - ' + record.subject_id.code
+            record.name = str(record.course_id.code) + '/' + str(record.batch_id.name) + ' - ' + str(record.subject_id.code)
             
     @api.depends('course_id.color', 'subject_id.color')
     def _compute_color(self):
@@ -110,3 +116,16 @@ class SchoolTimetable(models.Model):
         start = start.replace(tzinfo=pytz.utc).astimezone(tz).replace(tzinfo=None)
         result = start + delta
         return tz.localize(result).astimezone(pytz.utc).replace(tzinfo=None)
+
+    # -----------------------------------
+    # ----------- Actions ---------------
+    # -----------------------------------
+    def action_timetable_planning(self):
+        action = self.env.ref('de_school_timetable.action_timetable_wizard').read()[0]
+        action.update({
+            'name': 'Timetable Planning',
+            'res_model': 'oe.school.timetable.wizard',
+            'type': 'ir.actions.act_window',
+        })
+        return action
+        
