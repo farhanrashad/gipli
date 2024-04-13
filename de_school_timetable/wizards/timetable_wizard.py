@@ -12,7 +12,11 @@ class TimetableWizard(models.TransientModel):
     _description = 'Timetable Wizard'
 
     course_id = fields.Many2one('oe.school.course', 'Course', store=True, required=True)
+    use_batch = fields.Boolean(compute='_compute_batch_from_course')
     batch_id = fields.Many2one('oe.school.course.batch', 'Batch', store=True, required=True)
+    use_section = fields.Boolean(compute='_compute_section_from_company')
+    section_id = fields.Many2one('oe.school.course.section', 'Section', store=True, required=True)
+    
     subject_id = fields.Many2one('oe.school.subject', 'Subject', store=True, required=True)
     teacher_id = fields.Many2one('hr.employee', 'Teacher', store=True, domain="[('is_teacher','=',True)]")
     user_id = fields.Many2one('res.users',compute='_compute_user_from_teacher', store=True)
@@ -35,6 +39,17 @@ class TimetableWizard(models.TransientModel):
         help="Repeat type determines how often a course timetable schedule."
     )
 
+    def _compute_batch_from_course(self):
+        for record in self:
+            if record.course_id.use_batch and len(record.course_id.batch_ids) > 0:
+                record.use_batch = True
+            else:
+                record.use_batch = False
+
+    def _compute_section_from_company(self):
+        for record in self:
+            record.use_section = record.course_id.company_id.use_section
+            
     @api.depends('batch_id')
     def _compute_datetime(self):
         for record in self:

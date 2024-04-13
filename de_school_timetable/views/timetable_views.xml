@@ -151,7 +151,7 @@
             <field name="model">oe.school.timetable</field>
             <field name="priority" eval="2"/>
             <field name="arch" type="xml">
-                <calendar js_class="attendee_calendar" string="Meetings" banner_route="/onboarding/calendar" date_start="date" date_stop="date" date_delay="duration" all_day="allday"
+                <calendar string="Meetings" banner_route="/onboarding/calendar" date_start="date" date_stop="date" date_delay="duration" all_day="allday" 
                 event_open_popup="true"
                 event_limit="5"
                 quick_create="true"
