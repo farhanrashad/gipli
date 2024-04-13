@@ -9,7 +9,6 @@ from . import teacher
 from . import courses
 from . import batch
 from . import subject
-#from . import section
+from . import section
 from . import classroom
-from . import subject_allocation
 

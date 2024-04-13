@@ -51,6 +51,7 @@
 					<sheet>
                         <field name="batch_count" invisible="1"/>
                         <field name="use_batch_subject" invisible="1" />
+                        <field name="use_section" invisible="1" />
                         <div class="oe_button_box" name="button_box">
                             <button name="action_open_batch" 
                                 type="object" 
@@ -59,6 +60,14 @@
                                 invisible="not use_batch"
                             >
                                     <field string="Batch" name="batch_count" widget="statinfo"/>
+                            </button>
+                            <button name="action_open_section" 
+                                type="object" 
+                                icon="fa-list-alt" 
+                                class="oe_stat_button"
+                                invisible="not use_section"
+                            >
+                                    <field string="Section" name="section_count" widget="statinfo"/>
                             </button>
                         </div>
                         <widget name="web_ribbon" title="Archived" bg_color="bg-danger" 

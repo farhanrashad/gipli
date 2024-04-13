@@ -46,6 +46,18 @@ class OeSchoolCourse(models.Model):
     use_credit_hours = fields.Char(compute='_compute_use_credit_hours_from_company')
     use_batch_subject = fields.Boolean(compute='_compute_use_batch_subject')
 
+    use_section = fields.Boolean(compute='_compute_use_section_from_company')
+    section_ids = fields.One2many('oe.school.course.section', 'course_id', string="Sections")
+    section_count = fields.Integer(string='Batches', compute='_compute_course_section_count')
+
+    def _compute_use_section_from_company(self):
+        for record in self:
+            record.use_section = record.company_id.use_section
+
+    def _compute_course_section_count(self):
+        for record in self:
+            record.section_count = len(record.section_ids)
+        
     def _compute_course_batch_count(self):
         for record in self:
             record.batch_count = len(record.batch_ids)
@@ -119,6 +131,21 @@ class OeSchoolCourse(models.Model):
             }
         })
         return action
+
+    def action_open_section(self):
+        action = self.env.ref('de_school.action_course_section').read()[0]
+        action.update({
+            'name': 'Sections',
+            'view_mode': 'tree',
+            'res_model': 'oe.school.course.section',
+            'type': 'ir.actions.act_window',
+            'domain': [('course_id','=',self.id)],
+            'context': {
+                'default_course_id': self.id,
+            }
+        })
+        return action
+        
     class SchoolCourseSubjectLine(models.Model):
         _name = 'oe.school.course.subject.line'
         _description = 'Course Subject Line'
