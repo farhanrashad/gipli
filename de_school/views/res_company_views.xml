@@ -56,6 +56,17 @@
                                     invisible="not is_school"
                                     />
                             </setting>
+                            <setting class="col-6"
+                                string="Section Management"
+                                title="Section Management"
+                                help="Organize classes and students effectively with batch management"
+                                documentation="https://www.dynexcel.co/sms#activate-school"
+                                invisible="not is_school"
+                            >
+                                <field name="use_section"
+                                    invisible="not is_school"
+                                    />
+                            </setting>
                     </block>
                     <h2 invisible="not is_school">Additional Features</h2>
                     <block class="row col-12" title="Additional Features" name="add_features_setting_container" invisible="not is_school">

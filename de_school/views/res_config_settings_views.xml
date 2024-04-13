@@ -63,7 +63,7 @@
                                 documentation="https://www.dynexcel.co/sms#activate-school"
                                 invisible="not is_school"
                             >
-                                <field name="use_batch"
+                                <field name="use_section"
                                     invisible="not is_school"
                                     />
                             </setting>
