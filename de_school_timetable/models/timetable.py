@@ -26,7 +26,9 @@ class SchoolTimetable(models.Model):
         ('4', 'Friday'),
         ('5', 'Saturday'),
         ('6', 'Sunday')
-        ], 'Day of Week', default='0')
+        ], 'Day of Week',
+                                 compute='_compute_dayofweek', store=True,
+                                )
     
     name = fields.Text('Note', compute='_compute_name', store=True)
     course_ids = fields.Many2many(
@@ -103,6 +105,11 @@ class SchoolTimetable(models.Model):
             # Construct the name using the formatted values
             record.name = f"{course_code}/{subject_code} On {date_str} ({hour_from_time} to {hour_to_time})"
 
+    @api.depends('date')
+    def _compute_dayofweek(self):
+        for record in self:
+            record.dayofweek = str(record.date.weekday())
+            
             
     def _float_to_time(self, float_value):
         hour = int(float_value)

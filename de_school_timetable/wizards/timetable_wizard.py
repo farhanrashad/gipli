@@ -72,11 +72,17 @@ class TimetableWizard(models.TransientModel):
     def action_create_timetable(self):
         current_date = self.date_start
         end_date = self.date_end
+
+        #raise UserError(current_date.weekday())
+        selected_day_index = int(self.dayofweek)
+        days_until_selected_day = (selected_day_index - current_date.weekday() + 7) % 7
+        current_date += timedelta(days=days_until_selected_day)
     
         while current_date <= end_date:
             #attendance_records = self._find_school_time(current_date)
             #raise UserError(self._find_school_holiday(current_date, self.hour_from, self.hour_to))
             #raise UserError(current_date.weekday())
+        
             if not self._find_timetable(current_date):
                 if self._find_school_time(current_date):
                     if not self._find_school_holiday(current_date, self.hour_from, self.hour_to):
@@ -153,7 +159,7 @@ class TimetableWizard(models.TransientModel):
             'date': current_date,
             'hour_from': self.hour_from,
             'hour_to': self.hour_to,
-            'dayofweek': current_date.weekday(),
+            #'dayofweek': current_date.weekday(),
         })
 
     def _find_timetable(self, current_date):
