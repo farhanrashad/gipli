@@ -74,17 +74,11 @@ class TimetableWizard(models.TransientModel):
         end_date = self.date_end
     
         while current_date <= end_date:
-            self.env['oe.school.timetable'].create({
-                'course_id': self.course_id.id,
-                'batch_id': self.batch_id.id,
-                'subject_id': self.subject_id.id,
-                'teacher_id': self.teacher_id.id,
-                'user_id': self.user_id.id,
-                'classroom_id': self.classroom_id.id,
-                'date': current_date,
-                'hour_from': self.hour_from,
-                'hour_to': self.hour_to,
-            })
+            attendance_records = self._find_school_time(current_date)
+            #raise UserError(attendance_records)
+            if attendance_records:
+                self._create_timetable_records(current_date)
+
     
             if self.repeat_type == 'day':
                 current_date += timedelta(days=self.repeat_interval)
@@ -105,3 +99,27 @@ class TimetableWizard(models.TransientModel):
             #'context': {'create': False, 'edit': False},
         }
         return action
+
+    def _find_school_time(self, current_date):
+        attendance_records = self.env['resource.calendar.attendance'].search([
+            ('dayofweek', '=', current_date.weekday()),
+            ('hour_from', '>=', self.hour_from),
+            ('hour_to', '<=', self.hour_to),
+        ])
+        return attendance_records
+
+    def _create_timetable_records(self, current_date):
+        """
+        Create timetable records for the given day and time range.
+        """
+        self.env['oe.school.timetable'].create({
+            'course_id': self.course_id.id,
+            'batch_id': self.batch_id.id,
+            'subject_id': self.subject_id.id,
+            'teacher_id': self.teacher_id.id,
+            'user_id': self.user_id.id,
+            'classroom_id': self.classroom_id.id,
+            'date': current_date,
+            'hour_from': self.hour_from,
+            'hour_to': self.hour_to,
+        })

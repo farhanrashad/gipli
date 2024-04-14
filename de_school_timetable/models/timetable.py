@@ -10,7 +10,7 @@ import logging
 import pytz
 import uuid
 from math import ceil, modf
-    
+
 class SchoolTimetable(models.Model):
     _name = 'oe.school.timetable'
     _description = 'School Timetable'
@@ -91,10 +91,26 @@ class SchoolTimetable(models.Model):
                 or self.company_id.resource_calendar_id.tz
                 or 'UTC')
 
-    @api.depends('course_id','batch_id','subject_id','company_id')
+    @api.depends('course_id', 'subject_id', 'date', 'hour_from', 'hour_to')
     def _compute_name(self):
         for record in self:
-            record.name = str(record.course_id.code) + '/' + str(record.batch_id.name) + ' - ' + str(record.subject_id.code)
+            course_code = record.course_id.code if record.course_id else ''
+            subject_code = record.subject_id.code if record.subject_id else ''
+            date_str = record.date.strftime('%A') if record.date else ''
+            hour_from_time = self._float_to_time(record.hour_from) if record.hour_from else ''
+            hour_to_time = self._float_to_time(record.hour_to) if record.hour_to else ''
+    
+            # Construct the name using the formatted values
+            record.name = f"{course_code}/{subject_code} On {date_str} ({hour_from_time} to {hour_to_time})"
+
+            
+    def _float_to_time(self, float_value):
+        hour = int(float_value)
+        minutes = int((float_value - hour) * 60)
+        return time(hour=hour, minute=minutes)
+
+            
+
             
     @api.depends('course_id.color', 'subject_id.color')
     def _compute_color(self):
