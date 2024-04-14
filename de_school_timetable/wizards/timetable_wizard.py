@@ -74,10 +74,17 @@ class TimetableWizard(models.TransientModel):
         end_date = self.date_end
     
         while current_date <= end_date:
-            attendance_records = self._find_school_time(current_date)
+            #attendance_records = self._find_school_time(current_date)
             #raise UserError(attendance_records)
-            if attendance_records:
+            if self._find_school_time(current_date) and not self._find_school_holiday(current_date, self.hour_from, self.hour_to):
+
+            #if not self._find_school_holiday(current_date, self.hour_from, self.hour_to):
                 self._create_timetable_records(current_date)
+            else:
+                pass
+                
+            #if attendance_records:
+            #    self._create_timetable_records(current_date)
 
     
             if self.repeat_type == 'day':
@@ -107,6 +114,17 @@ class TimetableWizard(models.TransientModel):
             ('hour_to', '<=', self.hour_to),
         ])
         return attendance_records
+
+    def _find_school_holiday(self, current_date, hour_from, hour_to):
+        datetime_from = datetime.combine(current_date, datetime.strptime(hour_from, "%H.%M").time())
+        datetime_to = datetime.combine(current_date, datetime.strptime(hour_to, "%H.%M").time())
+        holiday_records = self.env['resource.calendar.leaves'].search([
+            ('date_from', '>=', datetime_from),
+            ('date_to', '<=', datetime_to),
+        ])
+        return bool(holiday_records)
+
+
 
     def _create_timetable_records(self, current_date):
         """
