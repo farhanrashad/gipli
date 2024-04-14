@@ -26,7 +26,7 @@ class SchoolTimetable(models.Model):
         ('4', 'Friday'),
         ('5', 'Saturday'),
         ('6', 'Sunday')
-        ], 'Day of Week', required=True, default='0')
+        ], 'Day of Week', default='0')
     
     name = fields.Text('Note', compute='_compute_name', store=True)
     course_ids = fields.Many2many(

@@ -75,11 +75,12 @@ class TimetableWizard(models.TransientModel):
     
         while current_date <= end_date:
             #attendance_records = self._find_school_time(current_date)
-            #raise UserError(attendance_records)
-            if self._find_school_time(current_date) and not self._find_school_holiday(current_date, self.hour_from, self.hour_to):
-
-            #if not self._find_school_holiday(current_date, self.hour_from, self.hour_to):
-                self._create_timetable_records(current_date)
+            #raise UserError(self._find_school_holiday(current_date, self.hour_from, self.hour_to))
+            #raise UserError(current_date.weekday())
+            if not self._find_timetable(current_date):
+                if self._find_school_time(current_date):
+                    if not self._find_school_holiday(current_date, self.hour_from, self.hour_to):
+                        self._create_timetable_records(current_date)
             else:
                 pass
                 
@@ -112,19 +113,31 @@ class TimetableWizard(models.TransientModel):
             ('dayofweek', '=', current_date.weekday()),
             ('hour_from', '>=', self.hour_from),
             ('hour_to', '<=', self.hour_to),
+            ('calendar_id','=',self.course_id.company_id.resource_calendar_id.id),
         ])
+        #raise UserError(attendance_records)
         return attendance_records
 
+    from datetime import datetime
+
     def _find_school_holiday(self, current_date, hour_from, hour_to):
-        datetime_from = datetime.combine(current_date, datetime.strptime(hour_from, "%H.%M").time())
-        datetime_to = datetime.combine(current_date, datetime.strptime(hour_to, "%H.%M").time())
-        holiday_records = self.env['resource.calendar.leaves'].search([
-            ('date_from', '>=', datetime_from),
-            ('date_to', '<=', datetime_to),
-        ])
-        return bool(holiday_records)
-
-
+        if isinstance(hour_from, float) and isinstance(hour_to, float):
+            hour_from_str = str(hour_from).replace('.', ':')  # Convert float to string and format as HH:MM
+            hour_to_str = str(hour_to).replace('.', ':')  # Convert float to string and format as HH:MM
+            
+            datetime_from = datetime.combine(current_date, datetime.strptime(hour_from_str, "%H:%M").time())
+            datetime_to = datetime.combine(current_date, datetime.strptime(hour_to_str, "%H:%M").time())
+            
+            holiday_records = self.env['resource.calendar.leaves'].search([
+               ('date_from', '<=', datetime_to),
+                ('date_to', '>=', datetime_from),
+                ('calendar_id','=',self.course_id.company_id.resource_calendar_id.id),
+                ('resource_id','=',False)
+            ])
+            #raise UserError(holiday_records)
+            return bool(holiday_records)
+        else:
+            return False  # Return False if hour_from and hour_to are not float values\
 
     def _create_timetable_records(self, current_date):
         """
@@ -140,4 +153,21 @@ class TimetableWizard(models.TransientModel):
             'date': current_date,
             'hour_from': self.hour_from,
             'hour_to': self.hour_to,
+            'dayofweek': current_date.weekday(),
         })
+
+    def _find_timetable(self, current_date):
+        domain = [
+            ('course_id','=',self.course_id.id),
+            ('subject_id','=',self.subject_id.id),
+            ('hour_from', '<=', self.hour_to),
+            ('hour_to','>=', self.hour_from),
+            ('date','=',current_date),
+            ('dayofweek','=',self.dayofweek),
+        ]
+        if self.batch_id:
+            domain += [('batch_id','=',self.batch_id.id)]
+
+        timetable_ids = self.env['oe.school.timetable'].search(domain)
+        #raise UserError(timetable_ids)
+        return timetable_ids
