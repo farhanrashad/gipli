@@ -7,14 +7,12 @@
 			<field name="arch" type="xml">
 				<tree string="Periods" >
                     <field name="dayofweek" optional="hide"/>
-                    <field name="day_period"/>
                     <field name="course_id" />
                     <field name="batch_id" />
                     <field name="subject_id" />
                     <field name="date"/>
                     <field name="hour_from"/>
                     <field name="hour_to"/>
-                    <field name="calendar_id" optional="hide"/>
                     <field name="company_id" string="Institute" groups="base.group_multi_company"/>
                     
 				</tree>

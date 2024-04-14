@@ -12,7 +12,6 @@
                     <sheet string="Timetable">
                         <!-- invisible fields -->
                         <field name="company_id" invisible="1" />
-                        <field name="calendar_id" invisible="1"/>
                         
                         <div class="oe_button_box" name="button_box">
                             <!-- Used by other modules-->
@@ -20,10 +19,6 @@
                         <group name="timetable_periods" class="oe_edit_only">
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" force_save="1"/>
                             
-                            <label for="timetable_period_id"/>
-                            <field name="timetable_period_id" nolabel="1" class="text-break flex-wrap"
-                                 options="{'horizontal': true}"
-                            />
                             <!--widget="selection_badge" -->
                         </group>
                         <group>
@@ -36,18 +31,17 @@
                             </group>
                             <group>
                                 <field name="date" />
+                                <label for="hour_from" label="Time"/>
+                                <div class="o_row">
+                                        <field name="hour_from" widget="float_time" class="oe_inline col-lg-1" nolabel="1"/>
+                                        <field name="hour_to" widget="float_time"  class="oe_inline col-lg-2" nolabel="1" />
+                                </div>
                                 <field name="classroom_id" options="{'no_create':True}"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
-                                <field name="calendar_id" invisible="1"/>
                             </group>
                         </group>
                         <group col="4">
-                            <label for="repeat_interval" string="Repeat"/>
-                            <div class="o_row" >
-                                <span>Every</span>
-                                <field name="repeat_interval" class="oe_inline col-lg-1" nolabel="1"/>
-                                <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" />
-                            </div>
+                            
                         </group>
                     </sheet>
                 </form>
@@ -65,7 +59,10 @@
                             string="Planning"  display="always"
                             />
                     </header>
-                    <field name="name"/>
+                    <field name="name" />
+                    <field name="date" />
+                    <field name="hour_from" />
+                    <field name="hour_to" />
                     <field name="course_id"/>
                     <field name="batch_id"/>
                     <field name="subject_id"/>
@@ -82,7 +79,6 @@
                 <pivot string="Timetable" disable_linking="False" sample="1">
                     <field name="course_id" type="row"/>
                     <field name="subject_id" type="row"/>
-                    <field name="timetable_period_id" type="col"/>
                     <field name="date" type="measure"/>
                  </pivot>
             </field>

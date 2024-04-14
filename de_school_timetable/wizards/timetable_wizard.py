@@ -11,11 +11,22 @@ class TimetableWizard(models.TransientModel):
     _name = "oe.school.timetable.wizard"
     _description = 'Timetable Wizard'
 
+    dayofweek = fields.Selection([
+        ('0', 'Monday'),
+        ('1', 'Tuesday'),
+        ('2', 'Wednesday'),
+        ('3', 'Thursday'),
+        ('4', 'Friday'),
+        ('5', 'Saturday'),
+        ('6', 'Sunday')
+        ], 'Day of Week', required=True, default='0')
+    
     course_id = fields.Many2one('oe.school.course', 'Course', store=True, required=True)
+    
     use_batch = fields.Boolean(compute='_compute_batch_from_course')
-    batch_id = fields.Many2one('oe.school.course.batch', 'Batch', store=True, required=True)
+    batch_id = fields.Many2one('oe.school.course.batch', 'Batch', store=True)
     use_section = fields.Boolean(compute='_compute_section_from_company')
-    section_id = fields.Many2one('oe.school.course.section', 'Section', store=True, required=True)
+    section_id = fields.Many2one('oe.school.course.section', 'Section',)
     
     subject_id = fields.Many2one('oe.school.subject', 'Subject', store=True, required=True)
     teacher_id = fields.Many2one('hr.employee', 'Teacher', store=True, domain="[('is_teacher','=',True)]")
@@ -26,7 +37,9 @@ class TimetableWizard(models.TransientModel):
     
     date_start = fields.Date("Start Date", compute='_compute_datetime', store=True, readonly=False, required=True, copy=True)
     date_end = fields.Date("End Date", compute='_compute_datetime', store=True, readonly=False, required=True, copy=True)
-    timetable_period_id = fields.Many2one('resource.calendar.attendance', string='Period', readonly=False, store=True, required=True, domain="[('calendar_id','=',calendar_id)]")
+
+    hour_from = fields.Float(string='From', required=True)
+    hour_to  = fields.Float(string='To', required=True)
 
     repeat_interval = fields.Integer("Repeat Every", default=1, )
     repeat_type = fields.Selection(
@@ -69,7 +82,8 @@ class TimetableWizard(models.TransientModel):
                 'user_id': self.user_id.id,
                 'classroom_id': self.classroom_id.id,
                 'date': current_date,
-                'timetable_period_id': self.timetable_period_id.id,
+                'hour_from': self.hour_from,
+                'hour_to': self.hour_to,
             })
     
             if self.repeat_type == 'day':

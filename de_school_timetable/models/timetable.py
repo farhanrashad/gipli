@@ -17,21 +17,38 @@ class SchoolTimetable(models.Model):
     _order = 'date,id desc'
     _rec_name = 'name'
     _check_company_auto = True
+
+    dayofweek = fields.Selection([
+        ('0', 'Monday'),
+        ('1', 'Tuesday'),
+        ('2', 'Wednesday'),
+        ('3', 'Thursday'),
+        ('4', 'Friday'),
+        ('5', 'Saturday'),
+        ('6', 'Sunday')
+        ], 'Day of Week', required=True, default='0')
     
     name = fields.Text('Note', compute='_compute_name', store=True)
     course_ids = fields.Many2many(
         'oe.school.course', 'timetable_school_course_rel',
         string='Courses')
     course_id = fields.Many2one('oe.school.course', 'Course', store=True, required=True)
-    batch_id = fields.Many2one('oe.school.course.batch', 'Batch', store=True, required=True)
+
+    use_batch = fields.Boolean(compute='_compute_batch_from_course')
+    batch_id = fields.Many2one('oe.school.course.batch', 'Batch', store=True,)
+
+    use_section = fields.Boolean(compute='_compute_section_from_company')
+    section_id = fields.Many2one('oe.school.course.section', 'Section', store=True,)
+    
     subject_id = fields.Many2one('oe.school.subject', 'Subject', store=True, required=True)
     teacher_id = fields.Many2one('hr.employee', 'Teacher', store=True, domain="[('is_teacher','=',True)]")
     user_id = fields.Many2one('res.users',compute='_compute_user_from_teacher', store=True)
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
-    calendar_id = fields.Many2one('resource.calendar', related='company_id.resource_calendar_id')
     
     classroom_id = fields.Many2one('oe.school.building.room', 'Classroom', store=True,)
     date = fields.Date('Date', required=True)
+    hour_from = fields.Float(string='From', required=True)
+    hour_to = fields.Float(string='To', required=True)
     duration = fields.Float('Duration', 
                             #compute='_compute_duration', 
                             store=True, readonly=False)
@@ -41,34 +58,33 @@ class SchoolTimetable(models.Model):
             ('draft', 'Draft'),
             ('published', 'Published'),
     ], string='Status', default='draft')
-    timetable_period_id = fields.Many2one('resource.calendar.attendance', string='Period Templates', readonly=False, required=True, store=True, domain="[('calendar_id','=',calendar_id)]")
-    
-    repeat_interval = fields.Integer("Repeat Every", default=1, required=True)
-    repeat_type = fields.Selection(
-        [
-            ('month', 'Month(s)'),
-            ('week', 'Week(s)'),
-            ('day', 'Day(s)'),
-        ],
-        string="Repeat Type", required=True, default='week',
-        help="Repeat type determines how often a course timetable schedule."
-    )
     
 
-    @api.constrains('course_id', 'batch_id', 'subject_id', 'timetable_period_id')
-    def _check_duplicate_timetable(self):
+    #@api.constrains('course_id', 'batch_id', 'subject_id', 'dayofweek')
+    #def _check_duplicate_timetable(self):
+    #    for record in self:
+    #        domain = [
+    #            ('course_id', '=', record.course_id.id),
+    #            ('batch_id', '=', record.batch_id.id),
+    #            ('subject_id', '=', record.subject_id.id),
+    #            ('dayofweek', '=', record.dayofweek),
+    #        ]
+    #        if self.search_count(domain) > 1:
+    #            raise UserError("Timetable already exists.")
+
+    
+    def _compute_batch_from_course(self):
         for record in self:
-            domain = [
-                ('course_id', '=', record.course_id.id),
-                ('batch_id', '=', record.batch_id.id),
-                ('subject_id', '=', record.subject_id.id),
-                ('timetable_period_id', '=', record.timetable_period_id.id),
-            ]
-            if self.search_count(domain) > 1:
-                raise UserError("Timetable with the same Course, Batch, Subject, and Period already exists.")
+            if record.course_id.use_batch and len(record.course_id.batch_ids) > 0:
+                record.use_batch = True
+            else:
+                record.use_batch = False
+
+    def _compute_section_from_company(self):
+        for record in self:
+            record.use_section = record.course_id.company_id.use_section
 
     
-            
     def _get_tz(self):
         return (self.env.user.tz
                 or self._context.get('tz')
