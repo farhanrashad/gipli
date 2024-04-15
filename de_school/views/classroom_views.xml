@@ -11,11 +11,11 @@
 			<field name="model">oe.school.building</field>
 			<field name="arch" type="xml">
 				<tree string="Buildings" >
-					<field name="active" invisible="1" />
+					<field name="active" column_invisible="1" />
                     <field name="name" />
                     <field name="address_id" />
                     <field name="company_id" groups="base.group_multi_company" />
-                    <field name="company_id" invisible="1"/>
+                    <field name="company_id" column_invisible="1"/>
 				</tree>
 			</field>
 		</record>

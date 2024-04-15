@@ -38,8 +38,11 @@ class ResPartner(models.Model):
     admission_no = fields.Char('Admission No')
     
     course_id = fields.Many2one('oe.school.course', string='Course')
-    use_batch = fields.Boolean(compute='_compute_use_batch_from_company')
+    
+    use_batch = fields.Boolean(default=True)
+    #use_batch = fields.Boolean(compute='_compute_use_batch_from_course')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch', domain="[('course_id','=',course_id)]")
+    
     subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subjects')
     
     enrollment_ids = fields.One2many('oe.school.student.enrollment', 'partner_id', 'Enrollments')
@@ -117,7 +120,7 @@ class ResPartner(models.Model):
         #subject_ids = self.env['oe.school.course.subject'].search(['|',('course_ids','in',self.course_id.id),('batch_ids','in',self.batch_id.id)])
         self.subject_ids = False #subject_ids.ids
 
-    def _compute_use_batch_from_company(self):
+    def _compute_use_batch_from_course(self):
         for record in self:
             if record.course_id.use_batch and len(record.course_id.batch_ids) > 0:
                 record.use_batch = True
