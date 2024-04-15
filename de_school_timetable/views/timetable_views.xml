@@ -150,14 +150,15 @@
             <field name="model">oe.school.timetable</field>
             <field name="priority" eval="2"/>
             <field name="arch" type="xml">
-                <calendar string="Meetings" banner_route="/onboarding/calendar" date_start="date" date_stop="date" date_delay="duration" all_day="allday" 
-                event_open_popup="true"
-                event_limit="5"
-                quick_create="true"
-                quick_create_view_id="%(calendar.view_calendar_event_form_quick_create)d"
+                <calendar string="Schedules" 
+                    date_start="date"
+                    mode="month" color="course_id"
+                    event_open_popup="true"
+                    event_limit="5"
+                    quick_create="0"
                 >
-                    <field name="course_id" invisible="1" />
-                    <field name="course_ids" invisible="1" />
+                    <field name="course_id" filters="1" invisible="1" />
+                    <field name="teacher_id" filters="2" invisible="1" />
                     <field name="subject_id" invisible="1" />
                     <field name="batch_id" invisible="1" />
                     <field name="date" invisible="1" />

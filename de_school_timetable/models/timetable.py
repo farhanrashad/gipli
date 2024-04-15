@@ -31,9 +31,6 @@ class SchoolTimetable(models.Model):
                                 )
     
     name = fields.Text('Note', compute='_compute_name', store=True)
-    course_ids = fields.Many2many(
-        'oe.school.course', 'timetable_school_course_rel',
-        string='Courses')
     course_id = fields.Many2one('oe.school.course', 'Course', store=True, required=True)
 
     use_batch = fields.Boolean(compute='_compute_batch_from_course')
