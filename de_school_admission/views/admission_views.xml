@@ -11,12 +11,12 @@
                             type="object" class="oe_highlight" data-hotkey="w" title="Accept Application"
                             invisible="active == False or probability == 100 or type == 'lead' or won_status == 'won'"/>
                         <button name="action_application_lost" string="Reject" data-hotkey="l" title="Reject Application" type="object" context="{'admission_id': active_id}" 
-                            invisible="type == 'lead' or (active == False and probability <= 100"/>
+                            invisible="type == 'lead' or (active == False and probability &lt; 100)"/>
 
                          <button name="toggle_active" string="Restore" type="object" data-hotkey="z"
                             invisible="probability >= 0 or active == True"/>
                         <button name="action_set_lost" string="Lost" type="object" data-hotkey="l" title="Mark as lost"
-                            invisible="type == 'opportunity' or (probability ==0 and active == False"/>
+                            invisible="type == 'opportunity' or (probability ==0 and active == False)"/>
                         
                         <field name="stage_id" widget="statusbar"
                             options="{'clickable': '1', 'fold_field': 'fold'}"
@@ -51,16 +51,16 @@
                                 <div class="o_stat_info">
                                     <field name="calendar_event_count" class="o_stat_value"/>
                                     <span class="o_stat_text" 
-                                        invisible="calendar_event_count <= 2"> Meetings</span>
+                                        invisible="calendar_event_count &lt; 2"> Meetings</span>
                                     <span class="o_stat_text" 
-                                        invisible="calendar_event_count >= 1"> Meeting</span>
+                                        invisible="calendar_event_count &gt; 1"> Meeting</span>
                                 </div>
                             </button>
                         </div>
                         <widget name="web_ribbon" title="Rejected" bg_color="bg-danger" 
                             invisible="probability >= 0 or active == True"/>
                         <widget name="web_ribbon" title="Accepted" 
-                            invisible="probability <= 100" />
+                            invisible="probability &lt; 100" />
                         <div class="oe_title">
                             <label for="name" />
                             <h1><field class="text-break" name="name" required="1" /></h1>
