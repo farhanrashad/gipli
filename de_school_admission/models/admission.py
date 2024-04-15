@@ -31,16 +31,11 @@ class Admission(models.Model):
         'mail.activity.mixin',
         'utm.mixin',
         'format.address.mixin',
+        'avatar.mixin'
     ]
     _primary_email = 'email_from'
     _check_company_auto = True
-        
-    @api.model
-    def _read_group_stage_ids(self, stages, domain, order):
-        search_domain = [('id', 'in', stages.ids)]
-        stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
-        return stages.browse(stage_ids)
-
+    _track_duration_field = 'stage_id'
     
     # Description
     name = fields.Char(string='Reference', copy=False, readonly=True, index=True, default=lambda self: _('New'))
@@ -182,15 +177,15 @@ class Admission(models.Model):
     # ------------------------------------------------------
 
     def _compute_calendar_event_count(self):
-        if self.ids:
-            meeting_data = self.env['calendar.event'].sudo()._read_group([
-                ('opportunity_id', 'in', self.ids)
-            ], ['opportunity_id'], ['opportunity_id'])
-            mapped_data = {m['opportunity_id'][0]: m['opportunity_id_count'] for m in meeting_data}
-        else:
-            mapped_data = dict()
+        #if self.ids:
+        #    meeting_data = self.env['calendar.event'].sudo()._read_group([
+        #        ('opportunity_id', 'in', self.ids)
+        #    ], ['opportunity_id'], ['opportunity_id'])
+        #    mapped_data = {m['opportunity_id'][0]: m['opportunity_id_count'] for m in meeting_data}
+        #else:
+        #    mapped_data = dict()
         for lead in self:
-            lead.calendar_event_count = mapped_data.get(lead.id, 0)
+            lead.calendar_event_count = 1 #mapped_data.get(lead.id, 0)
             
     def _compute_admission_setting_values(self):
         application_score = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_score', False)
@@ -273,7 +268,19 @@ class Admission(models.Model):
                 admission.user_company_ids = all_companies
             else:
                 admission.user_company_ids = admission.company_id
-                
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        team_id = self._context.get('default_team_id')
+        if team_id:
+            search_domain = ['|', ('id', 'in', stages.ids), '|', ('team_id', '=', False), ('team_id', '=', team_id)]
+        else:
+            search_domain = ['|', ('id', 'in', stages.ids), ('team_id', '=', False)]
+
+        # perform search
+        stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
+        return stages.browse(stage_ids)
+        
     @api.depends('team_id', 'type')
     def _compute_stage_id(self):
         for lead in self:

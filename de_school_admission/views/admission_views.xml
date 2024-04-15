@@ -61,9 +61,25 @@
                             invisible="probability >= 0 or active == True"/>
                         <widget name="web_ribbon" title="Accepted" 
                             invisible="probability &lt; 100" />
+                        <field name="avatar_128" invisible="1"/>
+                         <field name="image_1920" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;avatar_128&quot;}"/>
                         <div class="oe_title">
-                            <label for="name" />
-                            <h1><field class="text-break" name="name" required="1" /></h1>
+                            <label for="contact_name" string="Applicant Name" invisible="won_status == 'won'"/>
+                            <label for="contact_name" string="Student Name" invisible="won_status != 'won'"/>
+
+                            <div class="row justify-content-between position-relative w-100 m-0 mb-2">
+                                <div class="oe_title mw-75 ps-0 pe-2">
+                                    <h3 class="d-flex flex-row align-items-start">
+                                         <field name="title" class="oe_inline" nolabel="1" style="width: 3rem;" />
+                                    </h3>
+                                    <h1 class="d-flex flex-row align-items-center">
+                                       <field name="contact_name" required="1" style="font-size: min(4vw, 2.6rem);" placeholder="Full Name e.g John Doe"/>
+                                    </h1>
+                                    <field name="name" />
+                                </div>
+                                
+                            </div>
+                            
                             <h2 class="d-flex gap-2 g-0 align-items-end pb-3" 
                                 invisible="is_application_revenue == False and                       is_application_revenue == False">
                                 <div invisible="type =='lead' or is_application_revenue != True">
@@ -86,12 +102,6 @@
                         </div>
                         <group>
                             <group>
-                                <label for="contact_name" string="Applicant Name" invisible="won_status == 'won'"/>
-                                <label for="contact_name" string="Student Name" invisible="won_status != 'won'"/>
-                                <div class="d-flex flex-row align-items-start">
-                                    <field name="title" class="w-auto" nolabel="1" style="width: 7rem;" />
-                                    <field name="contact_name" required="1" class="oe_inline text-start" placeholder="Full Name e.g John Doe"/>
-                                </div>
                                 <label for="street_page_lead" string="Address"/>
                                 <div class="o_address_format">
                                     <field name="street" id="street_page_lead" placeholder="Street..." class="o_address_street"/>
@@ -288,7 +298,7 @@
                     on_create="quick_create"
                     quick_create_view="de_school_admission.quick_create_admission_form"
                     examples="Admission"
-                    js_class="" sample="1"
+                   archivable="false" sample="1" js_class="crm_kanban"
                 >
                     <field name="probability"/>
                     <field name="color"/>
@@ -307,19 +317,14 @@
                     <field name="is_application_revenue" invisible="1" />
                     <progressbar field="activity_state" colors="{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}" sum_field="expected_revenue"  help="This bar allows to filter the opportunities based on scheduled activities."/>
                     <templates>
+                        <t t-name="kanban-menu">
+                            <t t-if="widget.editable"><a role="menuitem" type="edit" class="dropdown-item">Edit</a></t>
+                            <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
+                            <ul class="oe_kanban_colorpicker" data-field="color"/>
+                        </t>
+                        <!-- Kanban box -->
                         <t t-name="kanban-box">
                             <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''}  oe_kanban_global_click oe_kanban_card d-flex flex-column">
-                                <!-- Kanban Menu -->
-                                <div class="o_dropdown_kanban dropdown">
-                                    <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" data-bs-display="static" href="#" aria-label="Dropdown menu" title="Dropdown menu">
-                                        <span class="fa fa-ellipsis-v"/>
-                                    </a>
-                                    <div class="dropdown-menu" role="menu">
-                                        <t t-if="widget.editable"><a role="menuitem" type="edit" class="dropdown-item">Edit</a></t>
-                                        <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
-                                        <ul class="oe_kanban_colorpicker" data-field="color"/>
-                                    </div>
-                                </div>
                                 <!-- Kanban Content -->
                                 <div class="oe_kanban_content flex-grow-1">
                                     <div class="o_kanban_record_title oe_kanban_details">
@@ -440,13 +445,31 @@
                 </p>
             </field>
         </record>
+
+      <!--
       <menuitem
         id="menu_admission_pipeline"
         name="My Piepeline"
         parent="menu_admission_main"
         action="action_my_admission_pipeline"
         sequence="3"/>
-      
+      -->
+
+      <record model="ir.actions.act_window" id="action_admission_application_pipeline">
+            <field name="name">Pipeline</field>
+            <field name="res_model">oe.admission</field>
+            <field name="view_mode">kanban,tree,graph,pivot,form,calendar,activity</field>
+            <field name="domain">[('type','=','opportunity')]</field>
+            <field name="context">{
+                    'default_type': 'opportunity',
+                    'search_default_assigned_to_me': 1
+            }</field>
+            <field name="search_view_id" ref="de_school_admission.admission_search_view"/>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('admission_kanban_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('admission_form_view')}),
+            ]"/>
+        </record>
       
       
       <!-- My Admissions -->
