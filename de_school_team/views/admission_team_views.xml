@@ -115,7 +115,7 @@
     </record>
 
     <record id="action_school_team_config" model="ir.actions.act_window">
-        <field name="name">Sales Teams</field>
+        <field name="name">Admission Teams</field>
         <field name="res_model">oe.admission.team</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{}</field>
