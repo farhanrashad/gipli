@@ -9,18 +9,19 @@
                     <header>
                         <button name="action_accept_application" string="Accept"
                             type="object" class="oe_highlight" data-hotkey="w" title="Accept Application"
-                            attrs="{'invisible': ['|','|','|', ('active','=',False), ('probability', '=', 100), ('type', '=', 'lead'),('won_status', '=', 'won')]}"/>
-                        <button name="action_application_lost" string="Reject" data-hotkey="l" title="Reject Application" type="object" context="{'admission_id': active_id}" attrs="{'invisible': ['|', ('type', '=', 'lead'), '&amp;',('active', '=', False),('probability', '&lt;', 100)]}"/>
+                            invisible="active == False or probability == 100 or type == 'lead' or won_status == 'won'"/>
+                        <button name="action_application_lost" string="Reject" data-hotkey="l" title="Reject Application" type="object" context="{'admission_id': active_id}" 
+                            invisible="type == 'lead' or (active == False and probability <= 100"/>
 
                          <button name="toggle_active" string="Restore" type="object" data-hotkey="z"
-                            attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}"/>
+                            invisible="probability >= 0 or active == True"/>
                         <button name="action_set_lost" string="Lost" type="object" data-hotkey="l" title="Mark as lost"
-                            attrs="{'invisible': ['|', ('type', '=', 'opportunity'), '&amp;', ('probability', '=', 0), ('active', '=', False)]}"/>
+                            invisible="type == 'opportunity' or (probability ==0 and active == False"/>
                         
                         <field name="stage_id" widget="statusbar"
                             options="{'clickable': '1', 'fold_field': 'fold'}"
                             domain="['|', ('team_id', '=', team_id), ('team_id', '=', False)]"
-                            attrs="{'invisible': ['|', ('active', '=', False), ('type', '=', 'lead')]}"/>
+                            invisible="active == False or type == 'lead'"/>
 
                     </header>
                     <sheet>
@@ -46,30 +47,33 @@
                              <button name="action_schedule_meeting" type="object"
                                 class="oe_stat_button" icon="fa-calendar"
                                 context="{'partner_id': partner_id}"
-                                attrs="{'invisible': [('type', '=', 'lead')]}">
+                                invisible="type == 'lead'">
                                 <div class="o_stat_info">
                                     <field name="calendar_event_count" class="o_stat_value"/>
-                                    <span class="o_stat_text" attrs="{'invisible': [('calendar_event_count', '&lt;', 2)]}"> Meetings</span>
-                                    <span class="o_stat_text" attrs="{'invisible': [('calendar_event_count', '&gt;', 1)]}"> Meeting</span>
+                                    <span class="o_stat_text" 
+                                        invisible="calendar_event_count <= 2"> Meetings</span>
+                                    <span class="o_stat_text" 
+                                        invisible="calendar_event_count >= 1"> Meeting</span>
                                 </div>
                             </button>
                         </div>
-                        <widget name="web_ribbon" title="Rejected" bg_color="bg-danger" attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}"/>
-                        <widget name="web_ribbon" title="Accepted" attrs="{'invisible': [('probability', '&lt;', 100)]}" />
+                        <widget name="web_ribbon" title="Rejected" bg_color="bg-danger" 
+                            invisible="probability >= 0 or active == True"/>
+                        <widget name="web_ribbon" title="Accepted" 
+                            invisible="probability <= 100" />
                         <div class="oe_title">
                             <label for="name" />
                             <h1><field class="text-break" name="name" required="1" /></h1>
                             <h2 class="d-flex gap-2 g-0 align-items-end pb-3" 
-                                attrs="{'invisible': [('is_application_revenue', '=', False), 
-                                ('is_application_revenue', '=', False)]}">
-                                <div attrs="{'invisible': ['|',('type', '=', 'lead'),('is_application_revenue', '!=', True)]}">
+                                invisible="is_application_revenue == False and                       is_application_revenue == False">
+                                <div invisible="type =='lead' or is_application_revenue != True">
                                     <label for="expected_revenue" string="Estimated Fees" class="oe_edit_only pb-1"/>
                                     <div class="d-flex align-items-end">
                                         <field name="company_currency" invisible="1"/>
                                         <field name="expected_revenue" class="oe_inline o_input_8ch" widget="monetary" options="{'currency_field': 'company_currency'}"/>
                                     </div>
                                 </div>
-                                <div attrs="{'invisible': [('is_application_score', '!=', True)]}" >
+                                <div invisible="is_application_score != True" >
                                     <div class="oe_edit_only d-md-flex align-items-center">
                                         <label for="probability"/>
                                     </div>
@@ -82,8 +86,8 @@
                         </div>
                         <group>
                             <group>
-                                <label for="contact_name" string="Applicant Name" attrs="{'invisible':[('won_status','=','won')]}"/>
-                                <label for="contact_name" string="Student Name" attrs="{'invisible':[('won_status','!=','won')]}"/>
+                                <label for="contact_name" string="Applicant Name" invisible="won_status == 'won'"/>
+                                <label for="contact_name" string="Student Name" invisible="won_status != 'won'"/>
                                 <div class="d-flex flex-row align-items-start">
                                     <field name="title" class="w-auto" nolabel="1" style="width: 7rem;" />
                                     <field name="contact_name" required="1" class="oe_inline text-start" placeholder="Full Name e.g John Doe"/>
@@ -99,7 +103,7 @@
                                 </div>
                                 <field name="partner_id"
                                     widget="res_partner_many2one"
-                                    string="Student" attrs="{'invisible':[('partner_id','=',False)]}"
+                                    string="Student" invisible="partner_id == False"
                                     context="{
                                         'default_name': contact_name,
                                         'default_street': street,
@@ -118,42 +122,31 @@
                                 />
                                 <label for="email_from" class="oe_inline"/>
                                 <div class="o_row o_row_readonly">
-                                    <!--
-                                    <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger"
-                                        title="This email is blacklisted for mass mailings. Click to unblacklist."
-                                        type="object" context="{'default_email': email_from}" groups="base.group_user"
-                                        attrs="{'invisible': [('is_blacklisted', '=', False)]}"/>
--->
+                                    
                                     <field name="email_from" string="Email" widget="email"/>
                                     <span class="fa fa-exclamation-triangle text-warning oe_edit_only"
                                         title="By saving this change, the customer email will also be updated."
-                                        attrs="{'invisible': [('partner_email_update', '=', False)]}"/>
+                                        invisible="partner_email_update == False"/>
                                 </div>
                                 <label for="phone" class="oe_inline"/>
                                 <div class="o_row o_row_readonly">
                                     <field name="phone" widget="phone"/>
                                     <span class="fa fa-exclamation-triangle text-warning oe_edit_only"
                                         title="By saving this change, the customer phone number will also be updated."
-                                        attrs="{'invisible': [('partner_phone_update', '=', False)]}"/>
+                                        invisible="partner_phone_update == False"/>
                                 </div>
                                 <label for="mobile" class="oe_inline"/>
                                 <div class="o_row o_row_readonly">
-                                    <!--
-                                    <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger"
-                                        title="This phone number is blacklisted for SMS Marketing. Click to unblacklist."
-                                        type="object" context="{'default_phone': mobile}" groups="base.group_user"
-                                        attrs="{'invisible': [('mobile_blacklisted', '=', False)]}"/>
--->
                                     <field name="mobile" widget="phone" string="Mobile"/>
                                 </div>
                                 <field name="user_id"
                                     context="{'default_team_id': team_id}" widget="many2one_avatar_user"/>
                                 <field name="team_id" options="{'no_open': True, 'no_create': True}"/>
                                 <field name="type" invisible="1"/>
-                                <field name="lost_reason_id" attrs="{'invisible': [('active', '=', True)]}"/>
+                                <field name="lost_reason_id" invisible="active == True"/>
                             </group>
                             <group string="Academic" name="academic">
-                                <field name="admission_register_id" attrs="{'required':[('type','=','opportunity')]}" options="{'no_create_edit': True}" />
+                                <field name="admission_register_id" required="type == 'opportunity'" options="{'no_create_edit': True}" />
                                 <field name="course_id" options="{'no_create_edit': True}" />
                                 <field name="batch_id" options="{'no_create_edit': True}" domain="[('course_id','=',course_id)]"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
@@ -336,7 +329,7 @@
                                     <div>
                                         <strong><field name="name"/></strong>
                                     </div>
-                                    <div attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                                    <div invisible="is_application_revenue == False">
                                         <field name="expected_revenue"/>
                                     </div>
                                     <div>
