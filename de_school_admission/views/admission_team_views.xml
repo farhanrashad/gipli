@@ -44,7 +44,8 @@
                                                     <t t-else="">Open Applications</t>
                                                 </a>
                                             </div>
-                                            <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                                            <div class="col-4 text-end text-truncate" 
+                                                invisible="is_application_revenue == False">
                                                 <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                             </div>
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
@@ -54,7 +55,8 @@
                                                     <t t-else="">Overdue Applications</t>
                                                 </a>
                                             </div>
-                                            <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                                            <div class="col-4 text-end text-truncate" 
+                                                invisible="is_application_revenue == False">
                                                 <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                             </div>
                                             <t name="first_options"/>
@@ -63,7 +65,8 @@
                                         </div>
                                         
                                     </div>
-                                    <div class="row" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                                    <div class="row" 
+                                        invisible="is_application_revenue == False">
                                         <div class="col-12 o_kanban_primary_bottom">
                                             <t t-call="AdmissionTeamDashboardGraph"/>
                                         </div>
