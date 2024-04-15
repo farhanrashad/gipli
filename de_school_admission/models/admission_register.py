@@ -85,18 +85,17 @@ class AdmissionRegister(models.Model):
     def _compute_total_score(self):
         for record in self:
             record.score_total = sum(record.score_ids.mapped('score'))
-    
+
     def _compute_opportunities_data(self):
         opportunity_data = self.env['oe.admission']._read_group([
             ('admission_register_id', 'in', self.ids),
+            ('probability', '<', 100),
             ('type', '=', 'opportunity'),
-        ], ['expected_revenue:sum', 'team_id'], ['admission_register_id'])
-        counts = {datum['admission_register_id'][0]: datum['admission_register_id_count'] for datum in opportunity_data}
-        amounts = {datum['admission_register_id'][0]: datum['expected_revenue'] for datum in opportunity_data}
+        ], ['admission_register_id'], ['__count', 'expected_revenue:sum'])
+        counts_amounts = {register.id: (count, expected_revenue_sum) for register, count, expected_revenue_sum in opportunity_data}
         for register in self:
-            register.opportunities_count = counts.get(register.id, 0)
-            register.opportunities_amount = amounts.get(register.id, 0)
-    
+            register.opportunities_count, register.opportunities_amount = counts_amounts.get(register.id, (0, 0))
+            
     def _compute_all_admission(self):
         admission_ids = self.env['oe.admission']
         for ar in self:

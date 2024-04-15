@@ -37,17 +37,15 @@ class AdmissionTeam(models.Model):
         for team in self:
             team.dashboard_graph_data = json.dumps(team._get_dashboard_graph_data())
 
-
     def _compute_opportunities_data(self):
         opportunity_data = self.env['oe.admission']._read_group([
             ('team_id', 'in', self.ids),
+            ('probability', '<', 100),
             ('type', '=', 'opportunity'),
-        ], ['expected_revenue:sum', 'team_id'], ['team_id'])
-        counts = {datum['team_id'][0]: datum['team_id_count'] for datum in opportunity_data}
-        amounts = {datum['team_id'][0]: datum['expected_revenue'] for datum in opportunity_data}
+        ], ['team_id'], ['__count', 'expected_revenue:sum'])
+        counts_amounts = {team.id: (count, expected_revenue_sum) for team, count, expected_revenue_sum in opportunity_data}
         for team in self:
-            team.opportunities_count = counts.get(team.id, 0)
-            team.opportunities_amount = amounts.get(team.id, 0)
+            team.opportunities_count, team.opportunities_amount = counts_amounts.get(team.id, (0, 0))
             
     # -----------------------------------------------------------------
     # ----------------------- Action buttons- --------------------------
