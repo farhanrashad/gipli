@@ -74,6 +74,27 @@ class SchoolTimetable(models.Model):
     #        if self.search_count(domain) > 1:
     #            raise UserError("Timetable already exists.")
 
+    @api.constrains('course_id', 'subject_id', 'teacher_id', 'batch_id', 'section_id', 'hour_from', 'hour_to')
+    def _check_duplicate_timetable(self):
+        for record in self:
+            domain = [
+                ('course_id', '=', record.course_id.id),
+                ('subject_id', '=', record.subject_id.id),
+                ('teacher_id', '=', record.teacher_id.id),
+                ('batch_id', '=', record.batch_id.id),
+                ('section_id', '=', record.section_id.id),
+                ('date','=',record.date),
+            ]
+            if record.id:
+                domain.append(('id', '!=', record.id))
+            timetable_ids = self.search(domain).filtered(lambda x:
+                    x.hour_from <= record.hour_to
+                    and x.hour_to >= record.hour_from
+                )
+            #raise UserError(len(timetable_ids))           
+            if len(timetable_ids) > 0:
+                raise UserError("Timesheet already scheduled for the specified date and time.")
+
     
     def _compute_batch_from_course(self):
         for record in self:

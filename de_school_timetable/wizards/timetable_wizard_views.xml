@@ -15,7 +15,6 @@
                             <group>
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" force_save="1"/>
 
-                                <field name="dayofweek" />
                                 <field name="course_id"/>
                                 <field name="batch_id"
                                     options="{'no_create': True,'no_edit': True}" 
@@ -30,8 +29,16 @@
 
                                 <label for="repeat_interval" label="Repeat"/>
                                 <div class="o_row">
-                                        <field name="repeat_interval" class="oe_inline col-lg-1" nolabel="1"/>
-                                        <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" />
+                                    <field name="repeat_interval" class="oe_inline col-lg-1" nolabel="1"/>
+                                    <field name="repeat_type" class="oe_inline col-lg-2" nolabel="1" />
+                                    <div invisible="repeat_type == 'day'">
+                                        <span class="text-center mr8">On</span>
+                                        <field name="dayofweek" 
+                                            class="oe_inline col-lg-2" 
+                                            nolabel="1"
+                                            required="repeat_type != 'day'"
+                                        />
+                                    </div>
                                 </div>
                             </group>
                             <group>

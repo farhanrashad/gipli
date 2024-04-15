@@ -19,7 +19,8 @@ class TimetableWizard(models.TransientModel):
         ('4', 'Friday'),
         ('5', 'Saturday'),
         ('6', 'Sunday')
-        ], 'Day of Week', required=True, default='0')
+        ], 'Day of Week', 
+    )
     
     course_id = fields.Many2one('oe.school.course', 'Course', store=True, required=True)
     
@@ -35,8 +36,8 @@ class TimetableWizard(models.TransientModel):
     calendar_id = fields.Many2one('resource.calendar', related='company_id.resource_calendar_id')
     classroom_id = fields.Many2one('oe.school.building.room', 'Classroom', store=True,)
     
-    date_start = fields.Date("Start Date", compute='_compute_datetime', store=True, readonly=False, required=True, copy=True)
-    date_end = fields.Date("End Date", compute='_compute_datetime', store=True, readonly=False, required=True, copy=True)
+    date_start = fields.Date("Start Date", compute='_compute_datetime', store=True, readonly=False)
+    date_end = fields.Date("End Date", compute='_compute_datetime', store=True, readonly=False)
 
     hour_from = fields.Float(string='From', required=True)
     hour_to  = fields.Float(string='To', required=True)
@@ -69,15 +70,23 @@ class TimetableWizard(models.TransientModel):
             record.date_start = record.batch_id.date_start
             record.date_end = record.batch_id.date_end
             
-    def action_create_timetable(self):
+    def action_create_timetable(self):  
+        # Check if dates are null
+        if not self.date_start or not self.date_end:
+            raise UserError(_("Please specify both start date and end date."))
+
+        # Check if hours are null or invalid
+        if not self.hour_from > 0 or not self.hour_to > 0 or self.hour_from >= self.hour_to:
+            raise UserError(_("Please specify valid hours."))
+
         current_date = self.date_start
         end_date = self.date_end
 
         #raise UserError(current_date.weekday())
-        selected_day_index = int(self.dayofweek)
-        days_until_selected_day = (selected_day_index - current_date.weekday() + 7) % 7
-        current_date += timedelta(days=days_until_selected_day)
-    
+        if self.repeat_type != 'day':
+            selected_day_index = int(self.dayofweek)
+            days_until_selected_day = (selected_day_index - current_date.weekday() + 7) % 7
+            current_date += timedelta(days=days_until_selected_day)
         while current_date <= end_date:
             #attendance_records = self._find_school_time(current_date)
             #raise UserError(self._find_school_holiday(current_date, self.hour_from, self.hour_to))
