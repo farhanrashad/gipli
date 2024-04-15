@@ -44,7 +44,7 @@
                             </setting>
                             
                         </block>
-                        <block title="Class Management" class="mt0 mb0" name="school_setting_container">
+                        <block title="Class Management" class="mt0 mb0" name="class_setting_container">
                             <setting class="col-6 mt8"
                                 string="Batch Management"
                                 title="Batch Management"
