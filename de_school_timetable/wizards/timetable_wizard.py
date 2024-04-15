@@ -116,13 +116,15 @@ class TimetableWizard(models.TransientModel):
 
     def _find_school_time(self, current_date):
         attendance_records = self.env['resource.calendar.attendance'].search([
-            ('dayofweek', '=', current_date.weekday()),
-            ('hour_from', '>=', self.hour_from),
-            ('hour_to', '<=', self.hour_to),
+            ('dayofweek', '=', str(current_date.weekday())),
             ('calendar_id','=',self.course_id.company_id.resource_calendar_id.id),
         ])
-        #raise UserError(attendance_records)
-        return attendance_records
+        filter_attendance_records = attendance_records.filtered(lambda x:
+                x.hour_from <= self.hour_to
+                and x.hour_to >= self.hour_from
+        )
+        #raise UserError(filter_attendance_records.mapped('name'))
+        return filter_attendance_records
 
     from datetime import datetime
 
@@ -166,14 +168,20 @@ class TimetableWizard(models.TransientModel):
         domain = [
             ('course_id','=',self.course_id.id),
             ('subject_id','=',self.subject_id.id),
-            ('hour_from', '<=', self.hour_to),
-            ('hour_to','>=', self.hour_from),
+            #('hour_from', '<=', self.hour_to+1),
+            #('hour_to','>=', self.hour_from-1),
             ('date','=',current_date),
             ('dayofweek','=',self.dayofweek),
         ]
         if self.batch_id:
             domain += [('batch_id','=',self.batch_id.id)]
+        if self.section_id:
+            domain += [('section_id','=',self.section_id.id)]
 
         timetable_ids = self.env['oe.school.timetable'].search(domain)
-        #raise UserError(timetable_ids)
-        return timetable_ids
+        filter_timetable_ids = timetable_ids.filtered(lambda x:
+            x.hour_from <= self.hour_to
+            and x.hour_to >= self.hour_from
+        )
+        #raise UserError(filter_timetable_ids.mapped('name'))
+        return filter_timetable_ids
