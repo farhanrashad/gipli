@@ -31,7 +31,7 @@
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" 
                         invisible="active == True"/>
                     <div class="oe_title">
-                        <label for="name" string="Sales Team"/>
+                        <label for="name" string="Admission Team"/>
                         <h1>
                             <field class="text-break" name="name" placeholder="e.g. Admission Pioneers"/>
                         </h1>
