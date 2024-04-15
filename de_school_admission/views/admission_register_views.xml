@@ -86,14 +86,15 @@
                     <separator string="Description"/>
                     <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Admission details..."/>
                     <notebook>
-                        <page string="Score" name="scroe" attrs="{'invisible': [('is_application_score', '!=', True)]}">
+                        <page string="Score" name="scroe" 
+                            invisible="is_application_score !=  True">
                             <field name="score_ids">
                                 <tree editable="bottom">
                                     <field name="stage_id" options='{"no_open": True, "no_create": True}'/>
                                     <field name="score"/>
                                 </tree>
                             </field>
-                            <group attrs="{'invisible': [('is_application_score', '!=', True)]}">
+                            <group invisible="is_application_score != True">
                                 <group colspan="4">
                                     <group class="oe_subtotal_footer oe_right" >
                                         <field name="score_total" class="oe_subtotal_footer_separator" />
@@ -163,8 +164,10 @@
                                                     <t t-else="">Open Applications</t>
                                                 </a>
                                             </div>
-                                            <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
-                                                <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('is_application_revenue', '=', False)]}"/>
+                                            <div class="col-4 text-end text-truncate" 
+                                                invisible="is_application_revenue == False">
+                                                <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}" 
+                                                    invisible="is_application_revenue == False"/>
                                             </div>
                                             <div class="col-8 o_kanban_primary_right" style="padding-bottom:0;">
                                                 <a name="action_open_overdue_applications" type="object" context="{'admission_register_id': active_id, 'search_default_open_opportunities': True}"> <!-- context="{'search_default_probability': NOT or < 100}" -->
@@ -173,7 +176,8 @@
                                                     <t t-else="">Overdue Applications</t>
                                                 </a>
                                             </div>
-                                            <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                                            <div class="col-4 text-end text-truncate" 
+                                                invisible="is_application_revenue == False">
                                                 <field name="opportunities_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                             </div>
                                             <t name="first_options"/>
@@ -182,7 +186,7 @@
                                         </div>
                                         
                                     </div>
-                                    <div class="row" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                                    <div class="row" invisible="is_application_revenue == False">
                                         <div class="col-12 o_kanban_primary_bottom">
                                             <t t-call="AdmissionTeamDashboardGraph"/>
                                         </div>
