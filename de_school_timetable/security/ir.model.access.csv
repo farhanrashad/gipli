@@ -6,4 +6,8 @@ access_school_timetable_user,access.school.timetable.user,model_oe_school_timeta
 access_report_timetable_period,access.report.timetable.period,model_oe_report_timetable_period,,1,0,0,0
 access_timetable_wizard,access.timetable.wizard,model_oe_school_timetable_wizard,,1,1,1,1
 
+access_assign_teacher_wizard,access.assign.teacher.wizard,model_oe_school_tt_assign_teacher_wizard,,1,1,1,1
+access_room_allocation_wizard,access.room.allocaiton.wizard,model_oe_school_tt_room_alloc_wizard,,1,1,1,1
+
+
 

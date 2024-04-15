@@ -6,12 +6,20 @@
 			<field name="name">school.timetable.teacher.allocation.tree.view</field>
 			<field name="model">oe.school.timetable</field>
 			<field name="arch" type="xml">
-				<tree string="Teacher Allocation" editable="bottom" edit="1">
+				<tree string="Teacher Allocation" >
+                    <header>
+                        <button name="action_teacher_assignment" type="object" 
+                            string="Assign Teacher" 
+                            class="oe_highlight"
+                            />
+                    </header>
                     <field name="course_id" readonly="1"/>
-					<field name="batch_id" readonly="1"/>
 					<field name="subject_id" readonly="1"/>
                     <field name="date" readonly="1"/>
                     <field name="teacher_id" readonly="0"/>
+                    <field name="classroom_id" optional="hide"/>
+                    <field name="batch_id" optional="hide"/>
+                    <field name="section_id" optional="hide"/>
                     <field name="company_id" groups="base.group_multi_company" optional="hide"/>
 				</tree>
 			</field>

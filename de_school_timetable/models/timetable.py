@@ -43,11 +43,17 @@ class SchoolTimetable(models.Model):
     section_id = fields.Many2one('oe.school.course.section', 'Section', store=True,)
     
     subject_id = fields.Many2one('oe.school.subject', 'Subject', store=True, required=True)
-    teacher_id = fields.Many2one('hr.employee', 'Teacher', store=True, domain="[('is_teacher','=',True)]")
+    teacher_id = fields.Many2one('hr.employee', 'Teacher', 
+                                 store=True, 
+                                 domain="[('is_teacher','=',True)]"
+                                )
     user_id = fields.Many2one('res.users',compute='_compute_user_from_teacher', store=True)
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
     
-    classroom_id = fields.Many2one('oe.school.building.room', 'Classroom', store=True,)
+    classroom_id = fields.Many2one('oe.school.building.room', 
+                                   'Classroom', 
+                                   store=True,
+                                  )
     date = fields.Date('Date', required=True)
     hour_from = fields.Float(string='From', required=True)
     hour_to = fields.Float(string='To', required=True)
@@ -188,4 +194,30 @@ class SchoolTimetable(models.Model):
             'type': 'ir.actions.act_window',
         })
         return action
+
+    def action_classroom_allocation(self):
+        active_ids = self.env.context.get('active_ids')
+        timetable_ids = self.env['oe.school.timetable'].search([('id','in',active_ids)])
+        if any(tt.date < fields.Date.today() for tt in timetable_ids):
+            raise UserError(_("Some of the selected schedules have already expired. Please choose active schedules."))
+        return {
+            'name': 'Room Allocation',
+            'view_mode': 'form',
+            'res_model': 'oe.school.tt.room.alloc.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+
+    def action_teacher_assignment(self):
+        active_ids = self.env.context.get('active_ids')
+        timetable_ids = self.env['oe.school.timetable'].search([('id','in',active_ids)])
+        if any(tt.date < fields.Date.today() for tt in timetable_ids):
+            raise UserError(_("Some of the selected schedules have already expired. Please choose active schedules."))
+        return {
+            'name': 'Assign Teacher',
+            'view_mode': 'form',
+            'res_model': 'oe.school.tt.assign.teacher.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
         

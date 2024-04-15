@@ -56,7 +56,9 @@
                 <tree string="Timetable" sample="1" multi_edit="1">
                      <header>
                         <button name="action_timetable_planning" type="object" 
-                            string="Planning"  display="always"
+                            string="Planning" 
+                            class="oe_highlight"
+                            display="always"
                             />
                     </header>
                     <field name="name" />
@@ -153,7 +155,6 @@
                 event_limit="5"
                 quick_create="true"
                 quick_create_view_id="%(calendar.view_calendar_event_form_quick_create)d"
-                color="course_ids"
                 >
                     <field name="course_id" invisible="1" />
                     <field name="course_ids" invisible="1" />
