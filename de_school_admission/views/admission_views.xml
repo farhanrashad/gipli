@@ -445,7 +445,7 @@
         name="My Piepeline"
         parent="menu_admission_main"
         action="action_my_admission_pipeline"
-        sequence="1"/>
+        sequence="3"/>
       
       
       
