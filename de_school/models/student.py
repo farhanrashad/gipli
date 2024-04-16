@@ -39,13 +39,20 @@ class ResPartner(models.Model):
     
     course_id = fields.Many2one('oe.school.course', string='Course')
     
-    use_batch = fields.Boolean(default=True)
-    #use_batch = fields.Boolean(compute='_compute_use_batch_from_course')
-    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', domain="[('course_id','=',course_id)]")
+    use_batch = fields.Boolean(related='course_id.use_batch_subject')
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', 
+                               domain="[('course_id','=',course_id)]"
+                              )
+
+    use_section = fields.Boolean(related='course_id.use_section')
+    section_id = fields.Many2one('oe.school.course.section', string='Section', 
+                                 domain="[('course_id','=',course_id)]"
+                              )
     
     subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subjects')
     
-    enrollment_ids = fields.One2many('oe.school.student.enrollment', 'partner_id', 'Enrollments')
+    enrollment_ids = fields.One2many('oe.school.student.enrollment', 'student_id', 'Enrollments')
+    enrollment_count = fields.Integer(string='Enrollments', compute='_compute_enrollment_count')
     sibling_ids = fields.One2many('oe.student.sibling', 'partner_id', 'Siblings')
     #student_subject_ids = fields.One2many('oe.school.student.subject', 'partner_id', 'Subjects')
     
@@ -98,7 +105,9 @@ class ResPartner(models.Model):
                 record.guardian_name = False
 
         
-            
+    def _compute_enrollment_count(self):
+        for record in self:
+            record.enrollment_count = len(record.enrollment_ids)
     @api.onchange('contact_type')
     def _onchange_contact_type(self):
         for record in self:
@@ -140,17 +149,46 @@ class ResPartner(models.Model):
                 student.write({
                     'roll_no': number,
                 })
+
+    # -------- Actions ---------------
+    def open_enrollment_history(self):
+        action = self.env.ref('de_school.action_enrollment_history').read()[0]
+        action.update({
+            'name': 'Enrollment History',
+            'view_mode': 'tree',
+            'res_model': 'oe.school.student.enrollment',
+            'type': 'ir.actions.act_window',
+            'domain': [('student_id','=',self.id)],
+            'context': {
+                'default_student_id': self.id,
+            },
+        })
+        return action
+
+    def open_medical_info(self):
+        action = self.env.ref('de_school.action_enrollment_history').read()[0]
+        action.update({
+            'name': 'Enrollment History',
+            'view_mode': 'tree',
+            'res_model': 'oe.school.student.enrollment',
+            'type': 'ir.actions.act_window',
+            'domain': [('student_id','=',self.id)],
+            'context': {
+                'default_student_id': self.id,
+            },
+        })
+        return action
             
 class StudentEnrollment(models.Model):
     _name = 'oe.school.student.enrollment'
     _description = 'Student Enrollment'
     
-    partner_id = fields.Many2one('res.partner', string='Student', required=True, ondelete='cascade', index=True, copy=False)
-    school_name = fields.Char('School Name')
-    school_year = fields.Char('School Year')
-    level_grade = fields.Char('Grading Level')
-    date_start = fields.Date('Start Date')
-    date_end = fields.Date('End Date')
+    student_id = fields.Many2one('res.partner', string='Student', required=True, ondelete='cascade', index=True, copy=False)
+    school_name = fields.Char('School Name', required=True)
+    school_year = fields.Char('School Year', required=True)
+    level_grade = fields.Char('Grading Level', required=True)
+    date_start = fields.Date('Start Date', required=True)
+    date_end = fields.Date('End Date', required=True)
     address_school = fields.Char('School Address')
 
 class StudentSiblings(models.Model):

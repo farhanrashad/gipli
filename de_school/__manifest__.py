@@ -31,6 +31,7 @@
         'views/classroom_views.xml',
         'views/res_partner_views.xml',
         'views/student_views.xml',
+        'views/student_enrollment_views.xml',
         'views/teacher_views.xml',
         'views/course_views.xml',
         'views/batch_views.xml',

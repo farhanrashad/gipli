@@ -10,8 +10,29 @@
             <field name="arch" type="xml">
                 <xpath expr="//sheet[1]" position="inside">
                     <field name="use_batch" invisible="1"/>
+                    <field name="use_section" invisible="1"/>
                 </xpath>
-                
+
+                <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                    <button invisible="not is_student"
+                        name="open_enrollment_history"
+                        class="oe_stat_button"
+                        icon="fa-history"
+                        type="object"
+                    >
+                        <field name="enrollment_count" widget="statinfo" string="Enrollments"/>
+                    </button>
+
+                    <button invisible="not is_student"
+                        name="open_medical_info"
+                        class="oe_stat_button"
+                        icon="fa-plus"
+                        type="object"
+                    >
+                        <field name="enrollment_count" widget="statinfo" string="Enrollments"/>
+                    </button>
+                    
+                </xpath>
                 <xpath expr="//field[@name='company_type']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
@@ -57,11 +78,14 @@
                         <group string="Enrollment" 
                             invisible="is_student != True or is_parent_student == True">
                             <field name="course_id"  options="{'no_quick_create': True, 'no_create_edit' : True}" 
-                                required="is_student == True and is_parent_student == False" />
+                            />
                             <field name="batch_id"  
                                 options="{'no_quick_create': True, 'no_create_edit' : True}" 
-                                required="is_student and is_parent_student == False and use_batch" 
                                 invisible="not use_batch" 
+                            />
+                            <field name="section_id"  
+                                options="{'no_quick_create': True, 'no_create_edit' : True}" 
+                                invisible="not use_section" 
                             />
 
 
@@ -152,19 +176,7 @@
                             </tree>
                         </field>
 					</page>
-                    <page name='enrollment_history' string="Enrollment History" 
-                        invisible="is_student != True or is_parent_student == True">
-                                <field name="enrollment_ids" widget="one2many_list" >
-                                    <tree editable ="top" >
-                                        <field name="school_name" required="1" />
-                                        <field name="school_year"  />
-                                        <field name="level_grade"  />
-                                        <field name="date_start"  />
-                                        <field name="date_end"  />
-                                        <field name="address_school" optional="hide" />
-                                    </tree>
-                                </field>
-					</page>
+                    
                     <page name='active_subjects' string="Subjects" 
                         invisible="is_student  != True or is_parent_student == True">
                         <field name="subject_ids" widget="one2many_list" readonly="1" nolabel="1">
