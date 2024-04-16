@@ -164,6 +164,7 @@ class Admission(models.Model):
 
     use_section = fields.Boolean(related='course_id.use_section')
     section_id = fields.Many2one('oe.school.course.section', string='Section', 
+                                 domain="[('course_id','=',course_id)]"
                               )
 
     # Probability (Opportunity only)
