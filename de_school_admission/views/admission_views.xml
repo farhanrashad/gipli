@@ -95,13 +95,13 @@
                                         <field name="expected_revenue" class="oe_inline o_input_8ch" widget="monetary" options="{'currency_field': 'company_currency'}"/>
                                     </div>
                                 </div>
-                                <div invisible="is_application_score != True" >
+                                <div invisible="type != 'opportunity' and not is_application_score" >
                                     <div class="oe_edit_only d-md-flex align-items-center">
                                         <label for="probability"/>
                                     </div>
                                     <div id="probability" 
                                         class="d-inline-block"
-                                        invisible="type != 'opportunity'"
+                                        invisible="type != 'opportunity' and not is_application_score"
                                     >
                                         <field name="probability" widget="float" class="oe_inline o_input_6ch"/>
                                         <span class="oe_grey"> %</span>
@@ -237,6 +237,12 @@
             <field name="priority">1</field>
             <field name="arch" type="xml">
                 <tree string="Opportunities" sample="1" multi_edit="1">
+                    <header>
+                        <button name="action_convert_application" type="object" 
+                                string="Convert to Application" 
+                                class="oe_highlight"
+                                />
+                    </header>
                     <field name="company_id" column_invisible="1"/>
                     <field name="create_date" optional="hide"/>
                     <field name="name" string="Opportunity" readonly="1"/>
