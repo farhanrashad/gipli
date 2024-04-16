@@ -13,7 +13,8 @@
                         <t t-else="">Enrollment Orders</t>
                     </a>
                 </div>
-                <div class="col-4 text-end text-truncate" attrs="{'invisible': [('is_application_revenue', '=', False)]}">
+                <div class="col-4 text-end text-truncate" 
+                    invisible="is_application_revenue == False">
                     <field name="enrol_orders_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 </div>
             </xpath>

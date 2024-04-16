@@ -45,7 +45,7 @@ class AdmissionEnrolStudentWizard(models.TransientModel):
         """
         self.ensure_one()
         if self.action == 'create':
-            self.lead_id._handle_partner_assignment(create_missing=True)
+            self.lead_id._handle_student_assignment(create_missing=True)
         elif self.action == 'exist':
-            self.lead_id._handle_partner_assignment(force_partner_id=self.partner_id.id, create_missing=False)
+            self.lead_id._handle_student_assignment(force_partner_id=self.partner_id.id, create_missing=False)
         return self.lead_id._action_create_enrol_order()

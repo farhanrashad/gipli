@@ -17,7 +17,7 @@ class Admission(models.Model):
     def _compute_sale_data(self):
         for lead in self:
             company_currency = lead.company_currency or self.env.company.currency_id
-            sale_orders = lead.order_ids.filtered_domain(self._get_lead_sale_order_domain())
+            sale_orders = lead.order_ids.filtered_domain(self._get_enrol_order_domain())
             lead.sale_amount_total = sum(
                 order.currency_id._convert(
                     order.amount_untaxed, company_currency, order.company_id, order.date_order or fields.Date.today()
@@ -26,8 +26,8 @@ class Admission(models.Model):
             )
             lead.sale_order_count = len(sale_orders)
 
-    def _get_lead_sale_order_domain(self):
-        return [('state', 'not in', ('draft', 'sent', 'cancel'))]
+    def _get_enrol_order_domain(self):
+       return [('state', 'not in', ['cancel'])]
 
     def action_new_enrol_order(self):
         return {
@@ -78,10 +78,10 @@ class Admission(models.Model):
             'default_admission_id': self.id,
             'default_is_enrol_order': True,
         }
-        action['domain'] = expression.AND([[('admission_id', '=', self.id)], self._get_lead_sale_order_domain()])
-        orders = self.order_ids.filtered_domain(self._get_lead_sale_order_domain())
+        action['domain'] = expression.AND([[('admission_id', '=', self.id)], self._get_enrol_order_domain()])
+        orders = self.order_ids.filtered_domain(self._get_enrol_order_domain())
         if len(orders) == 1:
-            action['views'] = [(self.env.ref('de_school_admission.enrollment_order_form').id, 'form')]
+            action['views'] = [(self.env.ref('de_school_enrollment.enrol_contract_primary_form_view').id, 'form')]
             action['res_id'] = orders.id
         return action
 
