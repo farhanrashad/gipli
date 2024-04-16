@@ -28,6 +28,16 @@ access_school_subject_user,access.school.subject.user,model_oe_school_subject,de
 access_student_enrollment,access.student.enrollment,model_oe_school_student_enrollment,,1,0,0,0
 access_student_enrollment_user,access.student.enrollment.user,model_oe_school_student_enrollment,de_school.group_school_user,1,1,1,1
 
+access_medical_category,access.medical.category,model_oe_school_medical_cat,,1,0,0,0
+access_medical_category_user,access.medical.category.user,model_oe_school_medical_cat,de_school.group_school_user,1,1,1,1
+
+access_medical_type,access.medical.type,model_oe_school_medical_type,,1,0,0,0
+access_medical_type_user,access.medical.type.user,model_oe_school_medical_type,de_school.group_school_user,1,1,1,1
+
+access_student_medical,access.student.medical,model_oe_school_student_medical,,1,0,0,0
+access_student_medical_user,access.student.medical.user,model_oe_school_student_medical,de_school.group_school_user,1,1,1,1
+
+
 access_student_sibling,access.student.sibling,model_oe_student_sibling,,1,0,0,0
 access_student_sibling_user,access.student.sibling.user,model_oe_student_sibling,de_school.group_school_user,1,1,1,1
 

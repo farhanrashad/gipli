@@ -53,6 +53,10 @@ class ResPartner(models.Model):
     
     enrollment_ids = fields.One2many('oe.school.student.enrollment', 'student_id', 'Enrollments')
     enrollment_count = fields.Integer(string='Enrollments', compute='_compute_enrollment_count')
+
+    med_info_ids = fields.One2many('oe.school.student.medical', 'student_id', 'Medical Info')
+    med_info_count = fields.Integer(string='Enrollments', compute='_compute_med_info_count')
+    
     sibling_ids = fields.One2many('oe.student.sibling', 'partner_id', 'Siblings')
     #student_subject_ids = fields.One2many('oe.school.student.subject', 'partner_id', 'Subjects')
     
@@ -108,6 +112,11 @@ class ResPartner(models.Model):
     def _compute_enrollment_count(self):
         for record in self:
             record.enrollment_count = len(record.enrollment_ids)
+
+    def _compute_med_info_count(self):
+        for record in self:
+            record.med_info_count = len(record.med_info_ids)
+            
     @api.onchange('contact_type')
     def _onchange_contact_type(self):
         for record in self:
@@ -166,11 +175,11 @@ class ResPartner(models.Model):
         return action
 
     def open_medical_info(self):
-        action = self.env.ref('de_school.action_enrollment_history').read()[0]
+        action = self.env.ref('de_school.action_medical_history').read()[0]
         action.update({
-            'name': 'Enrollment History',
+            'name': 'Medical History',
             'view_mode': 'tree',
-            'res_model': 'oe.school.student.enrollment',
+            'res_model': 'oe.school.student.medical',
             'type': 'ir.actions.act_window',
             'domain': [('student_id','=',self.id)],
             'context': {

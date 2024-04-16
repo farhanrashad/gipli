@@ -29,7 +29,7 @@
                         icon="fa-plus"
                         type="object"
                     >
-                        <field name="enrollment_count" widget="statinfo" string="Enrollments"/>
+                        <field name="med_info_count" widget="statinfo" string="Medical Info"/>
                     </button>
                     
                 </xpath>

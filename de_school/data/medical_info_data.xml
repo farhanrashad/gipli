@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Medical Category -->
+        <record model="oe.school.medical.cat" id="school_medical_category_allergy">
+          <field name="name">Allergy</field>
+        </record>
+        <record model="oe.school.medical.cat" id="school_medical_category_disease">
+          <field name="name">Disease</field>
+        </record>
+        <record model="oe.school.medical.cat" id="school_medical_category_injury">
+          <field name="name">Injury</field>
+        </record>
+        <record model="oe.school.medical.cat" id="school_medical_category_allergy">
+          <field name="name">Allergy</field>
+        </record>
+        <record model="oe.school.medical.cat" id="school_medical_category_immunization">
+          <field name="name">Immunization</field>
+        </record>
+        <record model="oe.school.medical.cat" id="school_medical_category_surgery">
+          <field name="name">Surgery</field>
+        </record>
+        <record model="oe.school.medical.cat" id="school_medical_category_others">
+          <field name="name">Others</field>
+        </record>
+        
+
+    </data>
+</odoo>
