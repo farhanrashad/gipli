@@ -92,6 +92,9 @@
             <field name="act_window_id" ref="enrollment_fee_product_action"/>
     </record>
     
-    <menuitem id="menu_school_enrollment_fee_products" name="Fee Products" parent="menu_school_enrollment_menu_config" sequence="1" action="enrollment_fee_product_action"/>
+    <menuitem id="menu_school_enrollment_fee_products" name="Fee Products" 
+        parent="menu_school_enrollment_menu_config" 
+        sequence="2" 
+        action="enrollment_fee_product_action"/>
 
 </odoo>

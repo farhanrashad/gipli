@@ -38,8 +38,6 @@ class EnrollmentContract(models.Model):
                                  domain="[('course_id','=',course_id)]"
                               )
     
-    enrol_order_tmpl_id = fields.Many2one('oe.enrol.order.template', 'Template', readonly=True, check_company=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
-
     admission_team_id = fields.Many2one(
         comodel_name='oe.admission.team',
         string="Admission Team",

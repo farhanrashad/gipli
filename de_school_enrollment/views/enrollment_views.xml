@@ -53,7 +53,6 @@
                     invisible="not use_section"
                     options="{'no_open':True,'no_create': True}"
                     />
-                <field name="enrol_order_tmpl_id" domain="[('course_ids','in',course_id)]"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="domain">[('is_student', '=', True)]</attribute>
