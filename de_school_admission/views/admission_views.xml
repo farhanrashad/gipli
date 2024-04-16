@@ -62,6 +62,14 @@
                                         invisible="calendar_event_count &gt; 1"> Meeting</span>
                                 </div>
                             </button>
+                            <button
+                                name="open_enrollment_history"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                type="object"
+                            >
+                                <span>Enrollment History</span>
+                            </button>
                         </div>
                         <widget name="web_ribbon" title="Rejected" bg_color="bg-danger" 
                             invisible="probability >= 0 or active == True"/>

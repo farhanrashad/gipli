@@ -895,4 +895,21 @@ class Admission(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
+
+    def open_enrollment_history(self):
+        action = self.env.ref('de_school_admission.action_enrollment_history').read()[0]
+        action.update({
+            'name': 'Ticket History',
+            'view_mode': 'tree',
+            'res_model': 'project.ticket.log',
+            'type': 'ir.actions.act_window',
+            'domain': [('ticket_id','=',self.id)],
+            'context': {
+                'create': False,
+                'edit': False,
+                'delete': False,
+            },
+            
+        })
+        return action
         
