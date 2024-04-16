@@ -253,10 +253,6 @@
             <field name="arch" type="xml">
                 <tree string="Opportunities" sample="1" multi_edit="1">
                     <header>
-                        <button name="action_convert_application" type="object" 
-                                string="Convert to Application" 
-                                class="oe_highlight"
-                                />
                         <button name="action_confirm_admission" type="object" 
                                 string="Confirm Admission" 
                                 class="oe_highlight"
