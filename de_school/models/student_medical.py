@@ -23,9 +23,10 @@ class StudentMedical(models.Model):
 
 
     student_id = fields.Many2one('res.partner', string='Student', required=True, ondelete='cascade', index=True, copy=False)
-    med_cat_id = fields.Many2one('oe.school.medical.cat', required=True)
-    med_type_id = fields.Many2one('oe.school.medical.type', required=True,
+    med_cat_id = fields.Many2one('oe.school.medical.cat', string='Category', required=True)
+    med_type_id = fields.Many2one('oe.school.medical.type', string='Type', required=True,
                                  domain="[('med_cat_id','=',med_cat_id)]"
                                  )
     med_condition = fields.Text(string='Condition')
+    med_remarks = fields.Text(string='Remarks')
     
