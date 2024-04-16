@@ -36,6 +36,16 @@
                 <attribute name="string">Student</attribute>
             </xpath>
             
+            <xpath expr="//field[@name='sale_order_template_id']" position="attributes">
+                <attribute name="invisible">is_enrol_order</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <field name="sale_order_template_id"
+                    options="{'no_create': True}"
+                    groups="de_school_enrollment.group_enrol_template"
+                    domain="[('use_enrol_order','=',True)]"
+                 readonly="state in ['cancel', 'sale']"/>
+            </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="course_id" 
                     required="enrol_status == 'progress'"
@@ -126,7 +136,7 @@
                 </header>
           <field name="name" readonly="1" decoration-bf="1"/>
           <field name="date_order" widget='date'/>
-          <field name="partner_id" readonly="1"/>
+          <field name="partner_id" string="student" readonly="1"/>
           <field name="user_id" optional="show" widget='many2one_avatar_user'/>
           <field name="team_id" optional="hide"/>
           <field name="amount_total" sum="Total Tax Included" widget="monetary" decoration-bf="1"/>
