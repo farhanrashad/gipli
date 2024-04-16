@@ -92,8 +92,6 @@ class ResPartner(models.Model):
     student_weight = fields.Float('Weight (in kg)') 
     student_height = fields.Float('Height (in cm)')
     student_mark_identify = fields.Text('Mark for Identity')
-    student_clinic_history = fields.Text('Clinical History')
-    student_allergic_history = fields.Text('Allergic History')
     student_emergency_contact = fields.Char('Emergency Contact Name') 
     student_emergency_phone = fields.Char('Emergency Contact Number')
 

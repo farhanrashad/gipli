@@ -150,17 +150,25 @@
             
                 
                 <xpath expr="//page[1]" position='after'>
-                    <page name='demographic_info' string="Demographic Info" 
+                    <page name='additional_info' string="Additional Info" 
                         invisible="is_student != True or is_parent_student == True">
                         <group>
-                            <group>
+                            <group string="Demographics" name="demographics">
                                 <field name="date_birth" />
                                 <field name="gender" />
                                 <field name="merital_status"/>
-                            </group>
-                            <group>
                                 <field name="country_birth" placeholder="Country of Birth" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
                                 <field name="country_nationality" placeholder="Nationality" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                            </group>
+                            <group string="Medical" name="medical">
+                                <field name="student_complexion" />
+                                <field name="student_weight" />
+                                <field name="student_height"/>
+                                <field name="student_mark_identify" />
+                            </group>
+                            <group string="Emergency Contact">
+                                <field name="student_emergency_contact" string="Contact Name"/>
+                                <field name="student_emergency_phone" string="Contact No." />
                             </group>
                         </group>
                     </page>
@@ -186,27 +194,7 @@
                             </tree>
                         </field>
                     </page>
-                    <page name='medical_info' string="Medical Info" 
-                        invisible="is_student != True or is_parent_student == True">
-                        <group>
-                            <group>
-                                <field name="student_complexion" />
-                                <field name="student_weight" />
-                                <field name="student_height"/>
-                            </group>
-                            <group>
-                                <field name="student_mark_identify" />
-                                <field name="student_clinic_history" />
-                                <field name="student_allergic_history" />
-                            </group>
-                        </group>
-                        <group>
-                            <group name="emergency_contact" string="Emergency Contact">
-                                <field name="student_emergency_contact" string="Contact Name"/>
-                                <field name="student_emergency_phone" string="Contact No." />
-                            </group>
-                        </group>
-                    </page>
+                    
                 </xpath>
             </field>
         </record>
