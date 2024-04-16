@@ -6,7 +6,6 @@
         <field name="priority">1</field>
         <field name="arch" type="xml">
             <tree string="Enrollment" sample="1" multi_edit="1" editable="bottom">
-                <field name="student_id" column_invisible="1" />
                 <field name="school_name"/>
                 <field name="school_year"/>
                 <field name="level_grade"/>

@@ -51,7 +51,6 @@ class ResPartner(models.Model):
     
     subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subjects')
     
-    enrollment_ids = fields.One2many('oe.school.student.enrollment', 'student_id', 'Enrollments')
     enrollment_count = fields.Integer(string='Enrollments', compute='_compute_enrollment_count')
 
     med_info_ids = fields.One2many('oe.school.student.medical', 'student_id', 'Medical Info')
@@ -108,8 +107,9 @@ class ResPartner(models.Model):
 
         
     def _compute_enrollment_count(self):
+        enrollment_ids = self.env['oe.school.student.enrollment']
         for record in self:
-            record.enrollment_count = len(record.enrollment_ids)
+            record.enrollment_count = len(enrollment_ids.search([('model','=',self._name),('res_id','=',record.id)]))
 
     def _compute_med_info_count(self):
         for record in self:
@@ -159,15 +159,17 @@ class ResPartner(models.Model):
 
     # -------- Actions ---------------
     def open_enrollment_history(self):
+        enrollment_ids = self.env['oe.school.student.enrollment'].search([('model','=',self._name),('res_id','=',self.id)])
         action = self.env.ref('de_school.action_enrollment_history').read()[0]
         action.update({
             'name': 'Enrollment History',
             'view_mode': 'tree',
             'res_model': 'oe.school.student.enrollment',
             'type': 'ir.actions.act_window',
-            'domain': [('student_id','=',self.id)],
+            'domain': [('id','in',enrollment_ids.ids)],
             'context': {
-                'default_student_id': self.id,
+                'default_model': self._name,
+                'default_res_id': self.id,
             },
         })
         return action
@@ -185,18 +187,6 @@ class ResPartner(models.Model):
             },
         })
         return action
-            
-class StudentEnrollment(models.Model):
-    _name = 'oe.school.student.enrollment'
-    _description = 'Student Enrollment'
-    
-    student_id = fields.Many2one('res.partner', string='Student', required=True, ondelete='cascade', index=True, copy=False)
-    school_name = fields.Char('School Name', required=True)
-    school_year = fields.Char('School Year', required=True)
-    level_grade = fields.Char('Grading Level', required=True)
-    date_start = fields.Date('Start Date', required=True)
-    date_end = fields.Date('End Date', required=True)
-    address_school = fields.Char('School Address')
 
 class StudentSiblings(models.Model):
     _name = 'oe.student.sibling'

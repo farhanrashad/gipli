@@ -5,6 +5,7 @@ from . import resource_calendar
 from . import res_company
 from . import academic_year
 from . import student
+from . import student_enrollment
 from . import student_medical
 from . import teacher
 from . import courses
