@@ -19,18 +19,18 @@
                         </setting>
 
                         <setting class="col-6 mt8"
-                            string="Enquiries"
-                            title="Enquiries"
-                            help="Manage application scoreks to better manage admissions."
+                            string="Application Score"
+                            title="Application Score"
+                            help="Streamline admissions and identify top candidates efficiently."
                             documentation="https://www.dynexcel.co/sms#activate-school"
                         >
                             <field name="is_application_score"/>
                         </setting>
 
                         <setting class="col-6 mt8"
-                            string="Enquiries"
-                            title="Enquiries"
-                            help="Manage expected revenue/Fee to plan revenue thorugh admission process."
+                            string="Expected Income"
+                            title="Expected Income"
+                            help="Plan ahead with accurate income estimations."
                             documentation="https://www.dynexcel.co/sms#activate-school"
                         >
                             <field name="is_application_revenue"/>
@@ -47,7 +47,7 @@
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
-        <field name="context">{'module' : 'de_school_admission'}</field>
+        <field name="context">{'module' : 'de_school'}</field>
     </record>
     
     <menuitem id="menu_school_admission_general_settings"
@@ -55,6 +55,6 @@
         parent="menu_admission_config_main"
         sequence="0"
         action="action_school_admision_config_settings"
-        groups="base.group_system"/>
+        />
     
 </odoo>

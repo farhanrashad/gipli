@@ -2,7 +2,7 @@
 <odoo>
     <record id="admission_stage_0" model="oe.admission.stage">
         <field name="sequence">10</field>
-        <field name="name">Inquiry</field>
+        <field name="name">New</field>
     </record>
 
     <record id="admission_stage_1" model="oe.admission.stage">
@@ -18,7 +18,7 @@
     <record id="admission_stage_3" model="oe.admission.stage">
         <field name="sequence">25</field>
         <field name="name">Interview</field>
-        <field name="fold" eval="True"/>
+        <field name="fold" eval="False"/>
     </record>
 
     <record id="admission_stage_4" model="oe.admission.stage">

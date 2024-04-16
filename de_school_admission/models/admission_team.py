@@ -198,12 +198,12 @@ class AdmissionTeam(models.Model):
             action['help'] = "<p class='o_view_nocontent_smiling_face'>%s</p><p>" % _("Create an Opportunity")
             if user_team_id:
                 if self.user_has_groups('de_school_team.group_school_admission_manager'):
-                    action['help'] += "<p>%s</p>" % _("""As you are a member of no Sales Team, you are showed the Pipeline of the <b>first team by default.</b>
-                                        To work with the CRM, you should <a name="%d" type="action" tabindex="-1">join a team.</a>""",
-                                        self.env.ref('sales_team.crm_team_action_config').id)
+                    action['help'] += "<p>%s</p>" % _("""As you are a member of no Admission Team, you are showed the Pipeline of the <b>first team by default.</b>
+                                        To work with the Admission, you should <a name="%d" type="action" tabindex="-1">join a team.</a>""",
+                                        self.env.ref('de_school_team.action_school_team_config').id)
                 else:
-                    action['help'] += "<p>%s</p>" % _("""As you are a member of no Sales Team, you are showed the Pipeline of the <b>first team by default.</b>
-                                        To work with the CRM, you should join a team.""")
+                    action['help'] += "<p>%s</p>" % _("""As you are a member of no Admission Team, you are showed the Pipeline of the <b>first team by default.</b>
+                                        To work with the Admission, you should join a team.""")
         action_context = safe_eval(action['context'], {'uid': self.env.uid})
         if user_team_id:
             action_context['default_team_id'] = user_team_id

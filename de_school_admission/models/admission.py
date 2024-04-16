@@ -156,7 +156,15 @@ class Admission(models.Model):
     
     course_id = fields.Many2one('oe.school.course', string='Course', compute='_compute_from_admission_register')
     course_code = fields.Char(related='course_id.code')
-    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', domain="[('course_id','=',course_id)]")
+
+    use_batch = fields.Boolean(related='course_id.use_batch_subject')
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', 
+                               domain="[('course_id','=',course_id)]"
+                              )
+
+    use_section = fields.Boolean(related='course_id.use_section')
+    section_id = fields.Many2one('oe.school.course.section', string='Section', 
+                              )
 
     # Probability (Opportunity only)
     is_application_score = fields.Boolean(string='Allow Score', compute='_compute_admission_setting_values')
@@ -177,15 +185,9 @@ class Admission(models.Model):
     # ------------------------------------------------------
 
     def _compute_calendar_event_count(self):
-        #if self.ids:
-        #    meeting_data = self.env['calendar.event'].sudo()._read_group([
-        #        ('opportunity_id', 'in', self.ids)
-        #    ], ['opportunity_id'], ['opportunity_id'])
-        #    mapped_data = {m['opportunity_id'][0]: m['opportunity_id_count'] for m in meeting_data}
-        #else:
-        #    mapped_data = dict()
+        meeting_ids = self.env['calendar.event'].search([('opportunity_id','=',self.id)])
         for lead in self:
-            lead.calendar_event_count = 1 #mapped_data.get(lead.id, 0)
+            lead.calendar_event_count = len(meeting_ids)
             
     def _compute_admission_setting_values(self):
         application_score = self.env['ir.config_parameter'].sudo().get_param('de_school_admission.is_application_score', False)
@@ -883,4 +885,14 @@ class Admission(models.Model):
         if self.lang_id:
             res['lang'] = self.lang_id.code
         return res
+
+    # ------------ Actions -----------------------------
+    def action_convert_application(self):
+         return {
+            'name': 'Convert into Application',
+            'view_mode': 'form',
+            'res_model': 'oe.admission.lead2op.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
         
