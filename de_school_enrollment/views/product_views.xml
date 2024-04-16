@@ -5,9 +5,10 @@
             <field name="name">product.product.expense.form</field>
             <field name="model">product.product</field>
             <field name="arch" type="xml">
-                <form string="Expense Categories">
+                <form string="Fee Categories">
                     <sheet>
-                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" 
+                            invisible="active == True"/>
                         <field name='product_variant_count' invisible='1'/>
                         <field name="id" invisible="True"/>
                         <field name="image_1920" widget="image" class="oe_avatar" options="{'image_preview': 'image_128'}"/>

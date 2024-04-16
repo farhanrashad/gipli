@@ -24,7 +24,7 @@
         'security/enrollment_security.xml',
         'security/ir.model.access.csv',
         'views/enrollment_menu.xml',
-        'views/enrol_order_template_views.xml',
+        #'views/enrol_order_template_views.xml',
         'views/product_views.xml',
         'views/sale_views.xml',
         'views/enrollment_views.xml',

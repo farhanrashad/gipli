@@ -9,40 +9,27 @@
         <field name="priority">999</field>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="button_submit" id="button_submit" data-hotkey="v"
-                    string="Submit" class="btn-primary" type="object" 
-                    attrs="{'invisible': [('enrol_status', 'not in', ['draft'])]}"/>
+                <button string="Start" name="start_contract" type="object" 
+                        class="btn-primary"
+                        invisible="enrol_status != 'progress'"/>
 
-                <button name="button_start_review" id="button_start_review" data-hotkey="v"
-                    string="Review Start" class="btn-primary" type="object" 
-                    attrs="{'invisible': [('enrol_status', 'not in', ['submit'])]}"/>
-
-                <button name="button_end_review" id="button_end_review" data-hotkey="v"
-                    string="Review End" class="btn-primary" type="object" 
-                    attrs="{'invisible': [('enrol_status', 'not in', ['review'])]}"/>
-
-                <button name="button_interview" id="button_interview" data-hotkey="v"
-                    string="Interview Taken" class="btn-primary" type="object" 
-                    attrs="{'invisible': [('enrol_status', 'not in', ['approved'])]}"/>
-
-                <button name="button_payment" id="button_payment" data-hotkey="v"
-                    string="Payment" class="btn-primary" type="object" 
-                    attrs="{'invisible': [('enrol_status', 'not in', ['pending'])]}"/>
-
-                <button name="button_confirm" id="button_confirm" data-hotkey="v"
-                    string="Confirm Enrollment" class="btn-primary" type="object" 
-                    attrs="{'invisible': [('enrol_status', 'not in', ['done'])]}"/>
-                
+                <button string="Assign Roll No." name="assign_roll_number" type="object" 
+                        invisible="enrol_status != 'open' or roll_no_assigned"/>
             </xpath>
-            
-            <xpath expr="//form[1]/header[1]/field[@name='state']" position="attributes">
-                <attribute name="attrs">{}</attribute>
-                <attribute name="invisible">1</attribute>
+            <xpath expr="//sheet" position="inside">
+                <field name="use_batch" invisible="1" />
+                <field name="use_section" invisible="1" />
+                <field name="roll_no_assigned" invisible="1" />
             </xpath>
-            
-            
-            <xpath expr="//header" position='inside'>
-                <field name="enrol_status" widget="statusbar" statusbar_visible="draft,submit,review,approved,pending,done,open"/>
+            <xpath expr="//div[@name='button_box']" position="after">
+                <field name="enrol_status" class="float-end fs-6"
+                    invisible="enrol_status not in ['draft','progress','open','close','paused'] or state == 'cancel'"
+                    widget="badge"
+                    decoration-info="enrol_status in ['draft','close']"
+                    decoration-warning="enrol_status in ['progress']"
+                    decoration-success="enrol_status in ['open']"
+                    decoration-danger="enrol_status in ['paused']"
+                />
             </xpath>
             
             <xpath expr="//field[@name='partner_id']" position="attributes">
@@ -50,8 +37,22 @@
             </xpath>
             
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="course_id" required="1"/>
-                <field name="batch_id" />
+                <field name="course_id" 
+                    required="enrol_status == 'progress'"
+                    options="{'no_open':True,'no_create': True}"
+                />
+                <field name="roll_no"
+                    invisible="not roll_no_assigned"
+                    readonly="1"
+                    />
+                <field name="batch_id" 
+                    invisible="not use_batch"
+                    options="{'no_open':True,'no_create': True}"
+                    />
+                <field name="section_id" 
+                    invisible="not use_section"
+                    options="{'no_open':True,'no_create': True}"
+                    />
                 <field name="enrol_order_tmpl_id" domain="[('course_ids','in',course_id)]"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
@@ -96,8 +97,8 @@
           </xpath>
 
         <xpath expr="//field[@name='order_line']//form//field[@name='product_uom_qty']" position='after'>
-            <field name="qty_invoiced" attrs="{'column_invisible': [('parent.is_enrol_order', '!=', True)]}"/>
-            <field name="qty_to_invoice" optional="hide" attrs="{'column_invisible': [('parent.is_enrol_order', '!=', True)]}"/>
+            <field name="qty_invoiced" column_invisible="parent.is_enrol_order != True"/>
+            <field name="qty_to_invoice" optional="hide" column_invisible="parent.is_enrol_order != True"/>
         </xpath>
         <xpath expr="//notebook/page[@name='order_lines']/field/tree" position='inside'>
             <field name="invoice_lines" widget="many2many_tags" optional="hide"/>
@@ -108,22 +109,22 @@
                 <attribute name="string">Student Signature</attribute>
             </xpath>
         <xpath expr="//field[@name='user_id']" position="after">
-            <field name="admission_team_id" options='{"no_open": True, "no_create": True}' attrs="{'invisible':[('is_enrol_order','=',False)]}"/>
+            <field name="admission_team_id" options='{"no_open": True, "no_create": True}' invisible="is_enrol_order == False"/>
         </xpath>
-            
-<!--
-            <xpath expr="//page" position="attributes">
-                <attribute name="attrs">{'invisible': [('name', 'not in', ['order_lines'])]}</attribute>
-            </xpath>
-            -->
         </field>
       </record>
     
     <record id="enrollment_order_view_tree" model="ir.ui.view">
-      <field name="name">enrol.order.tree</field>
-      <field name="model">sale.order</field>
-      <field name="arch" type="xml">
-        <tree sample="1" decoration-info="enrol_status in ['draft', 'sent']" decoration-muted="enrol_status == 'cancel'">
+        <field name="name">enrol.order.tree</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <tree sample="1" decoration-info="enrol_status in ['draft', 'sent']" decoration-muted="enrol_status == 'cancel'">
+                <header>
+                    <button name="assign_roll_number" type="object" 
+                        string="Assign Roll Number" 
+                        class="oe_highlight"
+                    />
+                </header>
           <field name="name" readonly="1" decoration-bf="1"/>
           <field name="date_order" widget='date'/>
           <field name="partner_id" readonly="1"/>
@@ -131,8 +132,8 @@
           <field name="team_id" optional="hide"/>
           <field name="amount_total" sum="Total Tax Included" widget="monetary" decoration-bf="1"/>
           <field name="enrol_status" widget='badge' decoration-info="enrol_status == 'draft' or enrol_status == 'sent'" decoration-warning="enrol_status == 'pickup'" decoration-success="enrol_status == 'return'"/>
-          <field name="state" invisible="1"/>
-          <field name="currency_id" invisible="1"/>
+          <field name="state" />
+          <field name="currency_id" column_invisible="1"/>
         </tree>
       </field>
     </record>

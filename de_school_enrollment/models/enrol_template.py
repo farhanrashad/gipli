@@ -33,7 +33,11 @@ class EnrolOrderTemplate(models.Model):
         domain=[('model', '=', 'sale.order')],
         help="This e-mail template will be sent on confirmation. Leave empty to send nothing.")
     active = fields.Boolean(default=True, help="If unchecked, it will allow you to hide the quotation template without removing it.")
-    company_id = fields.Many2one('res.company', string='Company')
+    company_id = fields.Many2one('res.company', 
+                                 string='Company', index=True, 
+                                 default=lambda self: self.env.company,
+                                 domain=[('active','=',True),('is_school','=',True)]
+                                )
 
     @api.constrains('company_id', 'enrol_order_tmpl_line')
     def _check_company_id(self):
