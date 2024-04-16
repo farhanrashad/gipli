@@ -23,8 +23,9 @@
 
     <record id="admission_stage_4" model="oe.admission.stage">
         <field name="sequence">30</field>
-        <field name="name">Acceptance</field>
+        <field name="name">Accepted</field>
         <field name="fold" eval="True"/>
+        <field name="is_close" eval="True"/>
     </record>
 
     <record id="admission_stage_5" model="oe.admission.stage">

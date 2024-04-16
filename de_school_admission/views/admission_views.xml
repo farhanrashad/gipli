@@ -10,6 +10,12 @@
                         <button name="action_accept_application" string="Accept"
                             type="object" class="oe_highlight" data-hotkey="w" title="Accept Application"
                             invisible="active == False or probability == 100 or type == 'lead' or won_status == 'won'"/>
+
+                        <button name="action_confirm_admission" string="Confirm Admission"
+                            type="object" class="oe_highlight" 
+                            title="Confirm Admission"
+                            invisible="won_status != 'won' or admission_confirmed"/>
+                        
                         <button name="action_application_lost" string="Reject" data-hotkey="l" title="Reject Application" type="object" context="{'admission_id': active_id}" 
                             invisible="type == 'lead' or (active == False and probability &lt; 100)"/>
 
@@ -37,6 +43,7 @@
                         <field name="is_application_revenue" invisible="1" />
                         <field name="use_batch" invisible="1"/>
                         <field name="use_section" invisible="1"/>
+                        <field name="admission_confirmed" invisible="1"/>
                         <!--
                         <field name="is_blacklisted" invisible="1"/>
                         <field name="phone_blacklisted" invisible="1"/>
@@ -65,10 +72,10 @@
                             <button
                                 name="open_enrollment_history"
                                 class="oe_stat_button"
-                                icon="fa-file-text-o"
+                                icon="fa-history"
                                 type="object"
                             >
-                                <span>Enrollment History</span>
+                                <field name="enrollment_count" widget="statinfo" string="Enrollments"/>
                             </button>
                         </div>
                         <widget name="web_ribbon" title="Rejected" bg_color="bg-danger" 
@@ -248,6 +255,10 @@
                     <header>
                         <button name="action_convert_application" type="object" 
                                 string="Convert to Application" 
+                                class="oe_highlight"
+                                />
+                        <button name="action_confirm_admission" type="object" 
+                                string="Confirm Admission" 
                                 class="oe_highlight"
                                 />
                     </header>

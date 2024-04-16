@@ -59,6 +59,7 @@
         'wizards/lost_reason_wizard_views.xml',
         'views/course_views.xml',
         'wizards/lead_to_application_wizard_views.xml',
+        'wizards/admission_confirm_wizard_views.xml',
     ],
     'installable': True,
     'application': True,

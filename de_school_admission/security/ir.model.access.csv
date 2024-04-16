@@ -20,6 +20,8 @@ access_admission_lost_reason_manager,admission.lost.reason.manager,model_oe_admi
 access_admission_lost_reason_user,admission.lost.reason.user,model_oe_admission_lost_reason,de_school_team.group_school_admission_user,1,0,0,0
 access_admission_lost_reason,admission.lost.reason,model_oe_admission_lost_reason,base.group_user,1,0,0,0
 
-access_admission_lost_wizard,access.admission.lost.wizard,model_oe_admission_lost_wizard,de_school_team.group_school_admission_user,1,1,1,0
+access_admission_lost_wizard,access.admission.lost.wizard,model_oe_admission_lost_wizard,de_school_team.group_school_admission_user,1,1,1,1
 
-access_admission_lead2op_wizard_user,access.admission.lead2op.wizard.user,model_oe_admission_lead2op_wizard,de_school_team.group_school_admission_user,1,1,1,0
+access_admission_lead2op_wizard_user,access.admission.lead2op.wizard.user,model_oe_admission_lead2op_wizard,de_school_team.group_school_admission_user,1,1,1,1
+
+access_admission_confirm_wizard_user,access.admission.confirm.wizard.user,model_oe_admission_confirm_wizard,de_school_team.group_school_admission_user,1,1,1,1

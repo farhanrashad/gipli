@@ -7,6 +7,7 @@ import threading
 from collections import OrderedDict, defaultdict
 from datetime import date, datetime, timedelta
 from psycopg2 import sql
+from odoo.addons.phone_validation.tools import phone_validation
 
 from odoo import api, fields, models, tools, SUPERUSER_ID
 from odoo.addons.iap.tools import iap_tools
@@ -20,14 +21,31 @@ from odoo.tools import date_utils, email_re, email_split, is_html_empty
 
 _logger = logging.getLogger(__name__)
 
+# Subset of partner fields: sync any of those
+PARTNER_FIELDS_TO_SYNC = [
+    'lang',
+    'mobile',
+    'title',
+    'function',
+    'website',
+]
 
+# Subset of partner fields: sync all or none to avoid mixed addresses
+PARTNER_ADDRESS_FIELDS_TO_SYNC = [
+    'street',
+    'street2',
+    'city',
+    'zip',
+    'state_id',
+    'country_id',
+]
 class Admission(models.Model):
     _name = "oe.admission"
     _description = 'Admission'
     _inherit = [
         'mail.thread.cc',
         'mail.thread.blacklist',
-        #'mail.thread.phone',
+        'mail.thread.phone',
         'mail.activity.mixin',
         'utm.mixin',
         'format.address.mixin',
@@ -166,6 +184,7 @@ class Admission(models.Model):
     section_id = fields.Many2one('oe.school.course.section', string='Section', 
                                  domain="[('course_id','=',course_id)]"
                               )
+    admission_confirmed = fields.Boolean('Admission Confirmed',help='Once the application is converted into a student profile, admission is confirmed.')
 
     # Probability (Opportunity only)
     is_application_score = fields.Boolean(string='Allow Score', compute='_compute_admission_setting_values')
@@ -180,13 +199,14 @@ class Admission(models.Model):
 
     calendar_event_count = fields.Integer('# Meetings', compute='_compute_calendar_event_count')
 
-    
+    enrollment_count = fields.Integer(string='Enrollments', compute='_compute_enrollment_count')
+
     # ------------------------------------------------------
     # ----------------- Computed Methods -------------------
     # ------------------------------------------------------
 
     def _compute_calendar_event_count(self):
-        meeting_ids = self.env['calendar.event'].search([('opportunity_id','=',self.id)])
+        meeting_ids = self.env['calendar.event'].search([('admission_id','=',self.id)])
         for lead in self:
             lead.calendar_event_count = len(meeting_ids)
             
@@ -240,6 +260,17 @@ class Admission(models.Model):
                 admission.probability = 0
 
 
+    def _compute_enrollment_count(self):
+        enrollment_ids = self.env['oe.school.student.enrollment'].search([
+            ('model','=',self._name),
+            ('res_id','=',self.id)
+        ])
+        partner_enrollment_ids = self.env['oe.school.student.enrollment'].search([
+            ('model','=','res.partner'),
+            ('res_id','=',self.partner_id.id)
+        ])
+        for record in self:
+            record.enrollment_count = len(enrollment_ids.mapped('res_id') + partner_enrollment_ids.mapped('res_id'))
                     
     @api.depends('expected_revenue', 'probability')
     def _compute_prorated_revenue(self):
@@ -256,8 +287,38 @@ class Admission(models.Model):
         pls_safe_fields = [field for field in pls_fields if field in self._fields.keys()]
         return pls_safe_fields
 
-    
-    
+    @api.depends('partner_id','partner_id.mobile')
+    def _compute_mobile(self):
+        """ compute the new values when partner_id has changed """
+        for admission in self:
+            if not admission.mobile or admission.partner_id.mobile:
+                admission.mobile = admission.partner_id.mobile
+
+    @api.depends('partner_id',
+                 'partner_id.street',
+                 'partner_id.street2',
+                'partner_id.city',
+                 'partner_id.country_id',
+                 'partner_id.zip',
+                )
+    def _compute_partner_address_values(self):
+        """ Sync all or none of address fields """
+        for admission in self:
+            admission.update(admission._prepare_address_values_from_partner(admission.partner_id))
+
+    @api.depends('partner_id',
+                 'street',
+                 'street2',
+                 'city',
+                 'country_id',
+                 'zip',
+                )
+    def _update_partner_address_values(self):
+        """ Sync all or none of address fields """
+        for admission in self:
+            raise UserError('hello')
+            admission.update(admission.partner_id._prepare_address_values_from_partner(admission.partner_id))
+            
     @api.depends('admission_register_id')
     def _compute_from_admission_register(self):
         for record in self:
@@ -451,6 +512,15 @@ class Admission(models.Model):
                         break
             lead.email_state = email_state
 
+    
+    def _prepare_address_values_from_partner(self, partner):
+        # Sync all address fields from partner, or none, to avoid mixing them.
+        if any(partner[f] for f in PARTNER_ADDRESS_FIELDS_TO_SYNC):
+            values = {f: partner[f] for f in PARTNER_ADDRESS_FIELDS_TO_SYNC}
+        else:
+            values = {f: self[f] for f in PARTNER_ADDRESS_FIELDS_TO_SYNC}
+        return values
+        
     def _get_partner_email_update(self):
         """Calculate if we should write the email on the related partner. When
         the email of the lead / partner is an empty string, we force it to False
@@ -476,8 +546,8 @@ class Admission(models.Model):
         """
         self.ensure_one()
         if self.partner_id and self.phone != self.partner_id.phone:
-            lead_phone_formatted = self.phone_get_sanitized_number(number_fname='phone') or self.phone or False
-            partner_phone_formatted = self.partner_id.phone_get_sanitized_number(number_fname='phone') or self.partner_id.phone or False
+            lead_phone_formatted = self._phone_format(fname='phone') or self.phone or False
+            partner_phone_formatted = self.partner_id._phone_format(fname='phone') or self.partner_id.phone or False
             return lead_phone_formatted != partner_phone_formatted
         return False
 
@@ -525,6 +595,7 @@ class Admission(models.Model):
         result = super(Admission, self).create(vals)
         return result
 
+    
     # -------------------------------------------------------
     # ------------------- Button Actions --------------------
     # -------------------------------------------------------
@@ -788,7 +859,7 @@ class Admission(models.Model):
                 return "month", earliest_start_dt.date()
 
     # Partner/Student Creation and assignment
-    def _handle_partner_assignment(self, force_partner_id=False, create_missing=True):
+    def _handle_student_assignment(self, force_partner_id=False, create_missing=True):
         """ Update student (partner_id) of leads. Purpose is to set the same
         partner on most leads; either through a newly created partner either
         through a given partner_id.
@@ -797,13 +868,42 @@ class Admission(models.Model):
         :param create_missing: for leads without customer, create a new one
           based on lead information;
         """
-        for lead in self:
+        for admission in self:
             if force_partner_id:
-                lead.partner_id = force_partner_id
-            if not lead.partner_id and create_missing:
-                partner = lead._create_student()
-                lead.partner_id = partner.id
+                admission.partner_id = force_partner_id
+            if not admission.partner_id and create_missing:
+                partner = admission._create_student()
+                admission.partner_id = partner.id
 
+    def _get_application_duplicates(self, partner=None, email=None, include_lost=False):
+        """ Search for leads that seem duplicated based on partner / email.
+
+        :param partner : optional customer when searching duplicated
+        :param email: email (possibly formatted) to search
+        :param boolean include_lost: if True, search includes archived opportunities
+          (still only active leads are considered). If False, search for active
+          and not won leads and opportunities;
+        """
+        if not email and not partner:
+            return self.env['oe.admission']
+
+        domain = []
+        for normalized_email in [tools.email_normalize(email) for email in tools.email_split(email)]:
+            domain.append(('email_normalized', '=', normalized_email))
+        if partner:
+            domain.append(('partner_id', '=', partner.id))
+
+        if not domain:
+            return self.env['oe.admission']
+
+        domain = ['|'] * (len(domain) - 1) + domain
+        if include_lost:
+            domain += ['|', ('type', '=', 'opportunity'), ('active', '=', True)]
+        else:
+            domain += ['&', ('active', '=', True), '|', ('stage_id', '=', False), ('stage_id.is_won', '=', False)]
+            
+        return self.with_context(active_test=False).search(domain)
+        
     def _find_matching_partner(self, email_only=False):
         """ Try to find a matching partner with available information on the
         lead, using notably customer's name, email, ...
@@ -866,7 +966,11 @@ class Admission(models.Model):
             'name': partner_name,
             'user_id': self.env.context.get('default_user_id') or self.user_id.id,
             'comment': self.description,
-            #'team_id': self.team_id.id,
+            'admission_team_id': self.team_id.id,
+            'is_student': True,
+            'course_id': self.course_id.id,
+            'batch_id': self.batch_id.id,
+            'section_id': self.section_id.id,
             'parent_id': parent_id,
             'phone': self.phone,
             'mobile': self.mobile,
@@ -886,7 +990,7 @@ class Admission(models.Model):
         if self.lang_id:
             res['lang'] = self.lang_id.code
         return res
-
+        
     # ------------ Actions -----------------------------
     def action_convert_application(self):
          return {
@@ -897,20 +1001,70 @@ class Admission(models.Model):
             'target': 'new',
         }
 
-    def open_enrollment_history(self):
-        action = self.env.ref('de_school_admission.action_enrollment_history').read()[0]
-        action.update({
-            'name': 'Ticket History',
-            'view_mode': 'tree',
-            'res_model': 'project.ticket.log',
-            'type': 'ir.actions.act_window',
-            'domain': [('ticket_id','=',self.id)],
-            'context': {
-                'create': False,
-                'edit': False,
-                'delete': False,
-            },
+    def action_confirm_admission(self):
+        active_ids = self.env.context.get('active_ids', [])
+        current_record = 0
+        try:
+            current_record = self.id
+        except:
+            current_record = 0
+        
+        admission_ids = self.env['oe.admission'].search(['|', ('id', 'in', active_ids), ('id', '=', current_record)])
+
+        course_id = admission_ids.mapped('course_id')
+        #raise UserError(admission_ids)
+        
+        if len(course_id) != 1:
+            raise UserError('Please note that admission confirmation is limited to one course at a time.')
+        if any(admission.admission_confirmed for admission in admission_ids):
+            raise UserError(_("One or more selected application are already confirmed."))
             
+        return {
+            'name': 'Confirm Admission',
+            'view_mode': 'form',
+            'res_model': 'oe.admission.confirm.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'course_id': course_id.id,
+                'use_batch': course_id.use_batch_subject,
+                'use_section': course_id.use_section,
+            }
+        }
+        
+    def open_enrollment_history(self):
+        admission_enrollment_ids = self.env['oe.school.student.enrollment'].search([
+            ('model','=',self._name),
+            ('res_id','=',self.id)
+        ])
+        partner_enrollment_ids = self.env['oe.school.student.enrollment'].search([
+            ('model','=','res.partner'),
+            ('res_id','=',self.partner_id.id)
+        ])
+        enrollment_ids = admission_enrollment_ids.mapped('id') + partner_enrollment_ids.mapped('id')
+            
+        #raise UserError(enrollment_ids)
+        action = self.env.ref('de_school.action_enrollment_history').read()[0]
+        action.update({
+            'name': 'Enrollment History',
+            'view_mode': 'tree',
+            'res_model': 'oe.school.student.enrollment',
+            'type': 'ir.actions.act_window',
+            'domain': [
+               ('id','in',enrollment_ids),
+               # ('model','=','res.partner'),
+            ],
+            'context': {
+                'default_model': self._name,
+                'default_res_id': self.id,
+            },
         })
+        if self.admission_confirmed:
+            action['context'].update({
+                'create': False,
+                'delete': False,
+                'edit': False,
+            })
+            
         return action
         
