@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Admission",
+    'name': "Openrol - Admission",
     'summary': """
     Efficiently manage admissions from application to enrollment.
         """,
