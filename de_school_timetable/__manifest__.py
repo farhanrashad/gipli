@@ -1,28 +1,32 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "School Timetable",
-
+    'name': "Openrol - Timetable",
     'summary': """
-    School Timetable
+    Efficiently organize and schedule classes, and resources with our timetable management system.
         """,
-
     'description': """
-        School Timetable
-    """,
+School Managmeent - Timetable App
+================================
 
+Features:
+
+ - Create and manage class schedules
+ - Allocate classrooms and resources
+ - Define and assign teacher schedules
+ - Set up recurring events and activities
+ - Customize timetable views for different stakeholders
+ - Easily make changes and adjustments
+ - Integrate with other school management systems
+ - Generate reports and analytics for schedule optimization
+    """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-
-    'category': 'CRM/School',
+    'category': 'CRM/School/industries',
     'version': '17.0.0.1',
-
-    # any module necessary for this one to work correctly
     'depends': [
         'de_school',
         'calendar',
     ],
-
-    # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/timetable_menu.xml',
@@ -49,8 +53,9 @@
             #'de_school_timetable/static/src/xml/timetable_button.xml',
         ],
     },
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'license': 'LGPL-3',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
