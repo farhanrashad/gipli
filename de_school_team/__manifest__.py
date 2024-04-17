@@ -1,27 +1,24 @@
 # -*- coding: utf-8 -*-
 {
     'name': "School Teams",
-
     'summary': """
-    Admission/Enrollment Teams
+    Efficient Admission Team Management
         """,
-
     'description': """
-        School Teams
-        1 - Admission Teams
-        2 - Enrollment TEams
-    """,
+School Managmeent - Admission Team Management
+================================
+Features:
 
+dmission team management simplifies coordination, communication, and task delegation within the admissions department, ensuring efficient and organized processes.        
+
+ - Admission Teams
+ - Enrollment TEams
+    """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-
-    'category': 'School/CRM',
+    'category': 'School/CRM/Industries',
     'version': '17.0.0.2',
-
-    # any module necessary for this one to work correctly
     'depends': ['base', 'mail','de_school'],
-
-    # always loaded
     'data': [
         'security/school_team_security.xml',
         'security/ir.model.access.csv',
@@ -30,8 +27,9 @@
         'views/admission_tag_views.xml',
         'views/student_views.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'license': 'LGPL-3',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
