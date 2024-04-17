@@ -23,16 +23,19 @@
             <field name="arch" type="xml">
                 <form string="Assignment">
                     <header>
-                        <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
-                        <button name="button_publish" states="draft" string="Publish" type="object" class="oe_highlight" data-hotkey="o" />
-                        <button name="button_close" type="object" string="Close assignment" states="publish" class="oe_highlight" data-hotkey="l"/>
+                        <button name="button_draft" invisible="state != 'cancel'" string="Set to Draft" type="object" data-hotkey="n"/>
+                        <button name="button_publish" invisible="state != 'draft'" string="Publish" type="object" class="oe_highlight" data-hotkey="o" />
+                        <button name="button_close" type="object" string="Close assignment" invisible="state != 'publish'" class="oe_highlight" data-hotkey="l"/>
                         
-                        <button name="button_cancel" states="publish" string="Cancel" type="object" data-hotkey="x" />
+                        <button name="button_cancel" invisible="state != 'publish'" string="Cancel" type="object" data-hotkey="x" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,publish,close" readonly="1"/>
                         
                     </header>
                     <sheet>
                         <field name="company_id" invisible="1" />
+                        <field name="subject_ids" invisible="1" />
+                        <field name="use_batch" invisible="1" />
+                        <field name="use_section" invisible="1" />
                         <div class="oe_button_box" name="button_box">
                             <button name="action_view_assigned_assignments"
                                 type="object"
@@ -52,24 +55,55 @@
                         <div class="oe_title">
                             <label for="name"/>
                             <h1>
-                                <field name="name" placeholder="e.g Assignment 01"/>
+                                <field name="name" placeholder="e.g Assignment 01"
+                                    readonly="state != 'draft'"
+                                />
                             </h1>
                         </div>
                         <group>
                             <group>
-                                <field name="course_id" options="{'no_open':True,'no_create':True}"/>
-                                <field name="subject_id" options="{'no_open':True,'no_create':True}"/>
-                                <field name="batch_ids" widget="many2many_tags" options="{'no_open':True,'no_create':True}"/>
-                                <field name="file_assignment" widget="binary" />
+                                <field name="teacher_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
+                                <field name="course_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
+                                <field name="batch_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    invisible="not use_batch"
+                                />
+                                <field name="section_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    invisible="not use_section"
+                                />
+                                <field name="subject_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
+                                
+                                
+                                <field name="file_assignment" widget="binary" 
+                                    readonly="state != 'draft'"
+                                    />
                             </group>
                             <group>
-                                <field name="date" />
-                                <field name="date_due" />
-                                <field name="date_publish" attrs="{'invisible':[('state','!=','publish')]}"/>
-                                <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':True}"/>
+                                <field name="date" readonly="state != 'draft'"/>
+                                <field name="date_due" readonly="state != 'draft'"/>
+                                <field name="date_publish" invisible="state != 'publish'"/>
+                                <field name="company_id" 
+                                    groups="base.group_multi_company" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
                             </group>y
                         </group>
-                        <field name="note" class="oe-bordered-editor field_description" placeholder="Assignment Instructions..."/>
+                        <notebook>
+                            <page name="description_page" string="Description">
+                                <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Add details about this assignment..."/>
+                            </page>
+                        </notebook>
                          
                     </sheet>
                     <div class="oe_chatter">
@@ -86,7 +120,7 @@
             <field name="model">oe.assignment</field>
             <field name="arch" type="xml">
                 <search string="Assignment">
-                    <field name="batch_ids" string="Batch"/>
+                    <field name="batch_id" string="Batch"/>
                 </search>
              </field>
         </record>

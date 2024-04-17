@@ -15,15 +15,13 @@ class AssignmentSubmit(models.Model):
         comodel_name='oe.assignment',
         string='Assignment',
         required=True,
-        readonly=True,
         index=True,
         auto_join=True,
         ondelete="cascade",
-        check_company=True,
     )
     date_due = fields.Datetime(related='assignment_id.date_due')
     course_id = fields.Many2one('oe.school.course',related='assignment_id.course_id')
-    subject_id = fields.Many2one('oe.school.course.subject',related='assignment_id.subject_id')
+    subject_id = fields.Many2one('oe.school.subject',related='assignment_id.subject_id')
     
     student_id = fields.Many2one(
         comodel_name='res.partner',
@@ -40,10 +38,10 @@ class AssignmentSubmit(models.Model):
     description = fields.Html(string='description')
     state = fields.Selection([
         ('draft', 'Pending'),
-        ('submit', 'Submitted'),
-        ('expire', 'Expired'),
+        ('submitted', 'Submitted'),
+        ('expired', 'Expired'),
         ('cancel', 'Cancelled'),
-    ], string='Assignment Status', )
+    ], string='Assignment Status', default='draft')
 
     date = fields.Datetime(string='Date Submission', readonly=True)
 

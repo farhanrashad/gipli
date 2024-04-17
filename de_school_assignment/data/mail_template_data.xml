@@ -39,7 +39,6 @@ We appreciate your commitment and dedication to your studies. We look forward to
 </div>
                 <!-- Message end -->
             </field>
-            <field name="report_name">{{ (object.name or '').replace('/','_') }}</field>
             <field name="auto_delete" eval="True"/>
         </record>
     </data>

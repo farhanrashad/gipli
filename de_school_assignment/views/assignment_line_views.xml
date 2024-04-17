@@ -25,10 +25,10 @@
             <field name="arch" type="xml">
                 <form string="Assignment">
                     <header>
-                        <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
-                        <button name="button_submit" states="draft" string="Submit" type="object" class="oe_highlight" data-hotkey="o" />                        
-                        <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
-                        <field name="state" widget="statusbar" statusbar_visible="draft,submit" readonly="1"/>
+                        <button name="button_draft" invisible="state != 'cancel'" string="Set to Draft" type="object" data-hotkey="n"/>
+                        <button name="button_submit" invisible="state != 'draft'" string="Submit" type="object" class="oe_highlight" data-hotkey="o" />                        
+                        <button name="button_cancel" invisible="state != 'draft'" string="Cancel" type="object" data-hotkey="x" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submitted,expired" readonly="1"/>
                         
                     </header>
                     <sheet>
