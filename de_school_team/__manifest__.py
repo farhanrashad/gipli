@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "School Teams",
+    'name': "Openrol - School Teams",
     'summary': """
     Efficient Admission Team Management
         """,
