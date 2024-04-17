@@ -133,7 +133,7 @@ class OeSchoolCourse(models.Model):
         return action
 
     def action_open_section(self):
-        action = self.env.ref('de_school.action_course_section').read()[0]
+        action = self.env.ref('de_school.action_school_seciton').read()[0]
         action.update({
             'name': 'Sections',
             'view_mode': 'tree',
