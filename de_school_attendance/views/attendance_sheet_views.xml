@@ -46,14 +46,16 @@
         <field name="arch" type="xml">
             <form string="Attendance Sheet">
                 <header>
-                    <button name="button_draft" states="cancel,progress" string="Set to Draft" type="object" data-hotkey="n"/>
-                    <button name="button_open" states="draft" string="Start Attendance" type="object" class="oe_highlight" data-hotkey="o" />
-                    <button name="button_mark_attendance" string="Mark Attendances" type="object" class="oe_highlight" data-hotkey="m" attrs="{'invisible': ['|',('sheet_to_close','=',True),('state','!=','progress')]}"/>
-                    <button name="button_close" type="object" string="Close Attendance" data-hotkey="c" attrs="{'invisible': ['|',('sheet_to_close','=',True),('state','!=','progress')]}"/>
-                    <button name="button_close" type="object" string="Close Attendance" data-hotkey="c" class="oe_highlight" attrs="{'invisible': ['|',('sheet_to_close','!=',True),('state','!=','progress')]}"/>
-                    <button name="button_mark_attendance" string="Mark Attendances" type="object"  data-hotkey="m" attrs="{'invisible': ['|',('sheet_to_close','!=',True),('state','!=','progress')]}"/>
+                    <button name="button_draft" invisible="state not in ('cancel','progress')" string="Set to Draft" type="object" data-hotkey="n"/>
+                    <button name="button_open" invisible="state != 'draft'" string="Start Attendance" type="object" class="oe_highlight" data-hotkey="o" />
+                    <button name="button_mark_attendance" string="Mark Attendances" type="object" class="oe_highlight" data-hotkey="m" invisible="sheet_to_close == True or state != 'progress'"/>
+                    <button name="button_close" type="object" string="Close Attendance" data-hotkey="c" 
+                        invisible="sheet_to_close ==True or state != 'progress'"/>
+                    <button name="button_close" type="object" string="Close Attendance" data-hotkey="c" class="oe_highlight" invisible="sheet_to_close ==  True or state != 'progress'"/>
+                    <button name="button_mark_attendance" string="Mark Attendances" type="object"  data-hotkey="m" 
+                        invisible="sheet_to_close != True or state != 'progress'"/>
 
-                    <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
+                    <button name="button_cancel" invisible="state != 'draft'" string="Cancel" type="object" data-hotkey="x" />
                     
                     <field name="state" widget="statusbar" statusbar_visible="draft,progress,done" readonly="1"/>
                 </header>
@@ -70,12 +72,18 @@
                             <field name="attendance_register_id" options="{'no_create': True}"/>
                             <field name="course_id" />
                             <field name="batch_id" options="{'no_create': True}"/>
-                            <field name="subject_id" options="{'no_create': True}" attrs="{'invisible':[('student_attendance_mode','!=','period')],'required':[('student_attendance_mode','=','period')]}"/>
+                            <field name="subject_id" options="{'no_create': True}" 
+                                invisible="student_attendance_mode != 'period'"
+                                required="student_attendance_mode == 'period'"/>
                         </group>
                         <group>
                             <field name="date" />
-                                <field name="check_in" attrs="{'invisible':[('student_attendance_mode','!=','period')],'required':[('student_attendance_mode','=','period')]}"/>
-                                <field name="check_out" attrs="{'invisible':[('student_attendance_mode','!=','period')],'required':[('student_attendance_mode','=','period')]}"/>
+                                <field name="check_in" 
+                                    invisible="student_attendance_mode != 'period'"
+                                    required="student_attendance_mode == 'period'"/>
+                                <field name="check_out" 
+                                    invisible="student_attendance_mode != 'period'"
+                                    required="student_attendance_mode == 'period'"/>
 
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                             <field name="sheet_to_close" />
@@ -90,7 +98,8 @@
                                 <tree editable="bottom">
                                     <field name="student_id"/>
                                     <field name="attendance_status"/>
-                                    <field name="is_late_arrival" attrs="{'readonly':[('attendance_status','=','absent')]}"/>
+                                    <field name="is_late_arrival" 
+                                        readonly="attendance_status == 'absent'"/>
                                 </tree>
                             </field>
                        </page>

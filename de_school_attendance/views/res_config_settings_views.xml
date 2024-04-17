@@ -1,99 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record id="res_config_settings_view_form_inherit_school_attendance" model="ir.ui.view">
-            <field name="name">res.config.settings.view.form.inherit.school.attendance</field>
-            <field name="model">res.config.settings</field>
-            <field name="priority" eval="90"/>
-            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//div[hasclass('settings')]" position="inside">
-                    
-                    
-                    <div class="app_settings_block" data-string="attendance" id="attendance" string="Attendance" data-key="de_school_attendance" groups="de_school_attendance.group_student_attendance_manager">
-                        <!-- Section 1 Attendance mode/type configuration -->
-                        <h2>Student Attendance</h2>
-                        <div class="row mt16 o_settings_container" name="attendance_mode_setting_container">
-                            <!-- Enable Attendance Mode by period/class or by daily -->
-                            <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_right_pane">
-                                    <label for="student_attendance_mode"/>
-                                    <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." role="img" aria-label="Values set here are company-specific." groups="base.group_multi_company"/>
-                                    <div class="row">
-                                        <div class="text-muted col-lg-10">
-                                            Define the way the user will be identified by the application.
-                                            <field name="group_student_attendance_use_day" invisible="1" />
-                    <field name="group_student_attendance_use_period" invisible="1" />
-                                        </div>
-                                    </div>
-                                    <div class="content-group">
-                                        <div class="mt16">
-                                            <field name="student_attendance_mode" widget="radio" required="1" class="w-75"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Set either attendance record with time -->
-                            <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane">
-                                    <field name="group_student_attendance_use_time"/>
-                                </div>
-                                <div class="o_setting_right_pane">
-                                    <label for="group_student_attendance_use_time"/>
-                                    <div class="text-muted">
-"Maintain check-in and check-out times along with attendance if 'True,' otherwise record only 'present' and 'absent' statuses."                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt16 o_settings_container" name="student_attendance_setting_container">
-                            <!-- Enable student attendance pin -->
-                            <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane">
-                                    <field name="group_student_attendance_use_pin"/>
-                                </div>
-                                <div class="o_setting_right_pane">
-                                    <label for="group_student_attendance_use_pin"/>
-                                    <div class="text-muted">
-                                        Use PIN codes (defined on the Student's profile) to check-in.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Enable Attendance Mode by period/class or by daily -->
-                        
-                        <!-- Admission -->
-                        <!--
-                        <h2>Admissions</h2>
-                        <div class="row mt16 o_settings_container" id="end_contract_setting">
-                            <div class="col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane">
-                                    <field name="is_application_score"/>
-                                </div>
-                                <div class="o_setting_right_pane">
-                                    <label for="is_application_score"/>
-                                    <div class="text-muted">
-                                        Manage application scoreks to better manage admissions.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane">
-                                    <field name="is_application_revenue"/>
-                                </div>
-                                <div class="o_setting_right_pane">
-                                    <label for="is_application_revenue"/>
-                                    <div class="text-muted">
-                                        Manage expected revenue/Fee to plan revenue thorugh admission process.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        -->
-                        <!-- -->
-                    </div>
-                </xpath>
-            </field>
-        </record>
+        <field name="name">res.config.settings.view.form.inherit.school.attendance</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="de_school.res_config_settings_school_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='de_school']" position="inside">
+                <block title="Attendance Management" class="mt0 mb0" name="attendance_setting_container">
+                    <setting id="use_period_setting" help="Define the way the user will be identified by the application" documentation="https://www.dynexcel.co/oe-doc#use_period">
+                        <field name="group_student_attendance_use_period"/>
+                    </setting>
+                    <setting id="attendance_mode_setting" help="Maintain check-in and check-out times along with attendance if 'True,' otherwise record only 'present' and 'absent' statuses." documentation="https://www.dynexcel.co/oe-doc#attendance_mode">
+                        <field name="student_attendance_mode" widget="radio" />
+                    </setting>
+                    <setting id="use_time_setting" help="Define the way the user will be identified by the application" documentation="https://www.dynexcel.co/oe-doc#use_time">
+                        <field name="group_student_attendance_use_time"/>
+                    </setting>
+
+                    <setting id="use_pin_setting" Title="PIN Code" string="Pin Code"
+                        help="Use PIN codes (defined on the Student's profile) to check-in." documentation="https://www.dynexcel.co/oe-doc#use_pin">
+                        <field name="group_student_attendance_use_pin"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
 
     <record id="action_school_attendance_config_settings" model="ir.actions.act_window">
         <field name="name">Settings</field>
@@ -101,7 +33,7 @@
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
-        <field name="context">{'module' : 'de_school_attendance'}</field>
+        <field name="context">{'module' : 'de_school'}</field>
     </record>
     
     <menuitem id="menu_school_attendance_general_settings"
@@ -109,6 +41,6 @@
         parent="menu_student_attendance_config_main"
         sequence="0"
         action="action_school_attendance_config_settings"
-        groups="base.group_system"/>
+        />
     
 </odoo>

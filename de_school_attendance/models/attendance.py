@@ -9,7 +9,7 @@ from odoo import models, fields, api, exceptions, _
 from odoo.tools import format_datetime
 from odoo.osv.expression import AND, OR
 from odoo.tools.float_utils import float_is_zero
-from odoo.exceptions import AccessError
+from odoo.exceptions import UserError, ValidationError
 
 
 class StudentAttendance(models.Model):
@@ -38,14 +38,18 @@ class StudentAttendance(models.Model):
     attendance_sheet_id = fields.Many2one('oe.attendance.sheet', string='Attendance Sheet')
 
     #Academic Fields
-    course_id = fields.Many2one('oe.school.course', store=True, compute='_compute_from_student_id')
+    course_id = fields.Many2one('oe.school.course', store=True, 
+                                compute='_compute_from_student_id'
+                               )
     roll_no = fields.Char(string='Roll No.', store=True, compute='_compute_from_student_id')
     batch_id = fields.Many2one('oe.school.course.batch', related='student_id.batch_id')
 
     #period wise attendance fields
-    subject_id = fields.Many2one('oe.school.course.subject', string='Subject',
-                                 domain="[('course_ids','in',course_id)]",
+    subject_id = fields.Many2one('oe.school.subject', string='Subject',
+                                 domain="[('id','in',subject_ids)]"
                                 )
+    subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subject_ids', store=True)
+
     period_id = fields.Many2one('resource.calendar.attendance', string="Period",
                                 compute='_compute_period_id', readonly=False,
                                 store=True, 
@@ -165,5 +169,16 @@ class StudentAttendance(models.Model):
         localized_dt = original_dt.astimezone(target_tz)
         
         return localized_dt
+
+    @api.depends('course_id')
+    def _compute_subject_ids(self):
+        for attendance in self:
+            if attendance.course_id:
+                subject_lines = attendance.env['oe.school.course.subject.line'].search([
+                    ('course_id', '=', attendance.course_id.id)
+                ])
+                attendance.subject_ids = subject_lines.mapped('subject_id')
+            else:
+                attendance.subject_ids = False
 
 

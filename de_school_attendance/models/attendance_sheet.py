@@ -34,8 +34,8 @@ class AttendanceSheet(models.Model):
     attendance_register_id = fields.Many2one('oe.attendance.register', string='Attendance Register', required=True, states=READONLY_STATES,)
     course_id = fields.Many2one('oe.school.course', related='attendance_register_id.course_id')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch', required=True, states=READONLY_STATES,)
-    subject_id = fields.Many2one('oe.school.course.subject', string='Subject', 
-                                 domain="[('course_ids','in',course_id)]",
+    subject_id = fields.Many2one('oe.school.subject', string='Subject', 
+                                 
                                  states=READONLY_STATES,)
     description = fields.Html(string='Description')
 
