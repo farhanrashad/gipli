@@ -29,4 +29,9 @@
         'wizards/report_attendance_xlsx_wizard_views.xml',
         'wizards/save_xlsx_views.xml',
     ],
+    'license': 'LGPL-3',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }

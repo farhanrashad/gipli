@@ -49,11 +49,6 @@ class StudentAttendance(models.Model):
                                  domain="[('id','in',subject_ids)]"
                                 )
     subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subject_ids', store=True)
-
-    period_id = fields.Many2one('resource.calendar.attendance', string="Period",
-                                compute='_compute_period_id', readonly=False,
-                                store=True, 
-                               )
     
     # ----------------------------------------
     # Constraints
@@ -122,37 +117,6 @@ class StudentAttendance(models.Model):
                 attendance.check_in = datetime.combine(attendance.date_attendance, time(9, 0))
             else:
                 attendance.check_in = False
-
-    
-    @api.depends('check_in', 'date_attendance')
-    def _compute_period_id(self):
-        for attendance in self:
-            attendance.period_id = False  # Initialize period_id to False
-            
-            # time
-            hours = 0
-            minutes = 0
-            if attendance.check_in:
-                hours = attendance._company_calendar_timezone(attendance.check_in).hour
-                minutes = attendance._company_calendar_timezone(attendance.check_in).minute
-                time_as_float = hours + minutes / 60.0
-
-            if attendance.date_attendance and attendance.check_in:
-                # Get the day of the week as an integer (0=Monday, 6=Sunday)
-                day_of_week = attendance.date_attendance.weekday()
-    
-                # Find the corresponding period for the given day of the week
-                period = self.env['resource.calendar.attendance'].search([
-                    ('dayofweek', '=', day_of_week),
-                    ('hour_from', '>=', time_as_float),
-                    #('hour_to', '<=', time_as_float),
-                    ('calendar_id','=',attendance.company_id.resource_calendar_id.id),
-                ], limit=1)  # Use limit=1 to get at most one record
-    
-                # Set the period_id based on the search result
-                if period:
-                    attendance.period_id = period.id
-
 
     def _company_calendar_timezone(self, original_dt):
         """

@@ -13,10 +13,9 @@
                  <field name="course_id" />
                 <field name="batch_id" />
                 <field name="subject_id" groups="de_school_attendance.group_student_attendance_use_period"/>
-                <field name="subject_ids" invisible="1"/>
+                <field name="subject_ids" column_invisible="1"/>
                 <field name="check_in" groups="de_school_attendance.group_student_attendance_use_time"/>
                 <field name="check_out" groups="de_school_attendance.group_student_attendance_use_time"/>
-                <field name="period_id" groups="de_school_attendance.group_student_attendance_use_period"/>
                 <field name="attendance_hours" string="Attendance Hours" widget="float_time" groups="de_school_attendance.group_student_attendance_use_time"/>
                  <field name="attendance_sheet_id" optional="hide" />
                 <field name="attendance_status" />
