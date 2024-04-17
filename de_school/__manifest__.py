@@ -41,15 +41,9 @@
         'views/section_views.xml',
         'views/subject_views.xml',
     ],
-    'demo': [
-        'demo/student_demo.xml',
-    ],
-    'assets': {
-        'web.assets_backend': [
-            #'de_school/static/src/js/batch.js',
-        ],
-        'web.assets_frontend': [
-            
-        ]
-    }
+    'license': 'LGPL-3',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
