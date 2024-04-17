@@ -1,25 +1,29 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Admission",
-
     'summary': """
-    Admission
+    Efficiently manage admissions from application to enrollment.
         """,
-
     'description': """
-        Admission
-    """,
+School Managmeent - Admission App
+================================
 
+Features:
+
+ - Application submission and tracking: Accept and monitor incoming applications efficiently.
+ - Applicant profile management: Maintain detailed records of each applicant's information.
+ - Communication with applicants: Engage with applicants through emails, calls, and messages.
+ - Admission criteria customization: Customize admission requirements based on various factors.
+ - Application review and evaluation: Review applications thoroughly to make informed decisions.
+ - Admission decision tracking: Track the status of each application and admission decision.
+ - Enrollment management: Facilitate smooth enrollment processes for accepted applicants.
+ - Reporting and analytics: Generate reports and analyze data for insights and improvements.
+ - Seamlessly integrate with other systems for data consistency.
+    """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'CRM',
+    'category': 'CRM/Sale/Industries',
     'version': '17.0.0.2',
-
-    # any module necessary for this one to work correctly
     'depends': [
         'de_school',
         'de_school_team',
@@ -32,8 +36,6 @@
         'digest',
         'phone_validation',
     ],
-
-    # always loaded
     'data': [
         'security/admission_security.xml',
         'security/ir.model.access.csv',
@@ -61,12 +63,9 @@
         'wizards/lead_to_application_wizard_views.xml',
         'wizards/admission_confirm_wizard_views.xml',
     ],
+    'license': 'LGPL-3',
+    'images': ['static/description/banner.gif'],
     'installable': True,
     'application': True,
     'auto_install': False,
-
-    # only loaded in demonstration mode
-    #'demo': [
-    #    'demo/demo.xml',
-    #],
 }
