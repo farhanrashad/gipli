@@ -35,7 +35,7 @@
                         <button name="button_complete_result" type="object" string="Result Completed" 
                             invisible="state != 'prepare'" class="oe_highlight" data-hotkey="l"/>
                         
-                        <button name="button_cancel" invisible="state != 'draft'" string="Cancel" type="object" data-hotkey="x" />
+                        <button name="button_cancel" invisible="state not in ('draft','schedule')" string="Cancel" type="object" data-hotkey="x" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,schedule,complete,prepare,done" readonly="1"/>
                         
                     </header>
@@ -65,36 +65,46 @@
                             <group>
                                 <field name="exam_session_id" 
                                     options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
                                 />
                                 <field name="course_id" />
                                 <field name="batch_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     invisible="not use_batch"
+                                    readonly="state != 'draft'"
                                 />
                                 <field name="subject_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     invisible="not use_section"
+                                    readonly="state != 'draft'"
                                 />
                                 <label for="date_start" string="Schedule"/>
                                 <div name="dates" class="o_row">
-                                    <field name="date_start" />
+                                    <field name="date_start" readonly="state != 'draft'"/>
                                     <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
-                                    <field name="date_end" />
+                                    <field name="date_end" readonly="state != 'draft'"/>
                                 </div>
-                                <field name="exam_hours" />
+                                <field name="exam_hours" readonly="state != 'draft'"/>
                                 
                             </group>
                             <group>
-                                <field name="marks_min" />
-                                <field name="marks_max" />
+                                <field name="marks_min" readonly="state != 'draft'"/>
+                                <field name="marks_max" readonly="state != 'draft'"/>
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':True}"/>
                                 <field name="exam_mode" 
                                     widget="radio" 
                                     options="{'horizontal':true}"
+                                    readonly="state != 'draft'"
                                 />
-                                <separator class="mt-0 mb-0" string="Exam Venue" invisible="exam_mode == 'online'"/>
-                                <field name="address_id" options="{'no_create':True}" invisible="exam_mode == 'online'"/>
-                                <field name="exam_location_id" options="{'no_create':True}" invisible="exam_mode == 'online'"/>
+                                <separator class="mt-0 mb-0" string="Exam Venue" 
+                                    invisible="exam_mode == 'online'"
+                                    readonly="state != 'draft'"/>
+                                <field name="address_id" options="{'no_create':True}" 
+                                    invisible="exam_mode == 'online'"
+                                    readonly="state != 'draft'"/>
+                                <field name="exam_location_id" options="{'no_create':True}" 
+                                    invisible="exam_mode == 'online'"
+                                    readonly="state != 'draft'"/>
                             </group>y
                         </group>
                         

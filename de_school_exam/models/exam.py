@@ -10,6 +10,9 @@ from odoo.exceptions import UserError, ValidationError
 from lxml import etree
 import xml.etree.ElementTree as ET
 
+from odoo.osv import expression
+
+
 class Exam(models.Model):
     _name = 'oe.exam'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
@@ -150,13 +153,20 @@ class Exam(models.Model):
         self.write({'state': 'draft'})
 
     def button_schedule(self):
+        domain = [('course_id','=',self.course_id.id)]
+        if self.batch_id:
+            domain = expression.AND([domain, [('batch_id', '=', self.batch_id.id)]])
+
+        if self.section_id:
+            domain = expression.AND([domain, [('section_id', '=', self.section_id.id)]])
+
         self.write({'state': 'schedule'})
 
     def button_close(self):
         self.write({'state': 'complete'})
         
     def button_cancel(self):
-        self.write({'state': 'draft'})
+        self.write({'state': 'cancel'})
 
     def button_prepare_result(self):
         student_ids = self.env['res.partner'].search([('course_id','=',self.exam_session_id.course_id.id),('batch_id','=',self.batch_id.id)])
