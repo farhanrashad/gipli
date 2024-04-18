@@ -16,7 +16,8 @@
                             <tree editable="bottom">
                                 <field name="name"/>
                                 <field name="score_min" />
-                                <field name="credit_points" attrs="{'column_invisible':[('parent.enable_credit_points','!=',True)],'required':[('parent.enable_credit_points','=',True)]}"/>
+                                <field name="credit_points" column_invisible="parent.enable_credit_points !=True"
+                                    required="parent.enable_credit_points == True"/>
                             </tree>
                         </field>
                     </page>

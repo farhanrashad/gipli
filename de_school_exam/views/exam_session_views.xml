@@ -21,11 +21,11 @@
             <field name="arch" type="xml">
                 <form string="Exam Session">
                     <header>
-                        <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
-                        <button name="button_open" states="draft" string="Start Exam Session" type="object" class="oe_highlight" data-hotkey="o" />
+                        <button name="button_draft" invisible="state != 'cancel'" string="Set to Draft" type="object" data-hotkey="n"/>
+                        <button name="button_open" invisible="state != 'draft'" string="Start Exam Session" type="object" class="oe_highlight" data-hotkey="o" />
                         
-                        <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
-                        <button name="button_close" type="object" string="Close Session" states="progress" class="oe_highlight" data-hotkey="l"/>
+                        <button name="button_cancel" invisbile="state != 'draft'" string="Cancel" type="object" data-hotkey="x" />
+                        <button name="button_close" type="object" string="Close Session" invisible="state != 'progress'" class="oe_highlight" data-hotkey="l"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,progress,close" readonly="1"/>
                     </header>
                     <sheet>

@@ -26,23 +26,23 @@ class Exam(models.Model):
     
     exam_session_id = fields.Many2one(
         comodel_name='oe.exam.session',
-        string="Exam Session", states=READONLY_STATES,
+        string="Exam Session", 
         required=True, ondelete='cascade', index=True, copy=False)
 
     batch_id = fields.Many2one(
         comodel_name='oe.school.course.batch',
         string="Batch", required=True,
-        states=READONLY_STATES,
+        
         change_default=True, ondelete='restrict', )
     
     subject_id = fields.Many2one(
-        comodel_name='oe.school.course.subject',
-        string="Subject", required=True, states=READONLY_STATES,
+        comodel_name='oe.school.subject',
+        string="Subject", required=True, 
         change_default=True, ondelete='restrict', )
-    marks_min = fields.Float(string='Minimum Marks', required=True, states=READONLY_STATES,)
-    marks_max = fields.Float(string='Maximum Marks', required=True, states=READONLY_STATES,)
-    date_start = fields.Datetime(string='Start Time', required=True, states=READONLY_STATES,)
-    date_end = fields.Datetime(string='End Time', required=True, states=READONLY_STATES,)
+    marks_min = fields.Float(string='Minimum Marks', required=True, )
+    marks_max = fields.Float(string='Maximum Marks', required=True, )
+    date_start = fields.Datetime(string='Start Time', required=True, )
+    date_end = fields.Datetime(string='End Time', required=True, )
 
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -55,16 +55,16 @@ class Exam(models.Model):
     company_id = fields.Many2one(
         comodel_name='res.company',
         required=True, index=True,
-        states=READONLY_STATES,
+        
         default=lambda self: self.env.company)
     # Address Fields
     address_id = fields.Many2one('res.partner', 'Work Address', 
                                  compute="_compute_address_id", 
-                                 store=True, readonly=False, states=READONLY_STATES,
+                                 store=True, readonly=False, 
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     exam_location_id = fields.Many2one('oe.school.building.room', 'Exam Location', 
                                        compute="_compute_exam_location_id", 
-                                       states=READONLY_STATES,
+                                      
                                        store=True, readonly=False,
                                        domain="[('building_id.address_id', '=', address_id)]")
 
@@ -72,7 +72,7 @@ class Exam(models.Model):
                               compute='_compute_exam_hours', 
                               store=True, readonly=True)
 
-    exam_result_line = fields.One2many('oe.exam.result', 'exam_id', string='Exams', states=READONLY_STATES,)
+    exam_result_line = fields.One2many('oe.exam.result', 'exam_id', string='Exams', )
     exam_result_count = fields.Integer('Exam Result Count', compute='_compute_exam_result')
     
     # ----------------------------------------

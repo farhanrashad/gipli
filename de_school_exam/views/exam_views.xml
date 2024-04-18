@@ -23,17 +23,18 @@
             <field name="arch" type="xml">
                 <form string="Exam">
                     <header>
-                        <button name="button_draft" states="cancel" string="Set to Draft" type="object" data-hotkey="n"/>
-                        <button name="button_schedule" states="draft" string="Schedule Exam" type="object" class="oe_highlight" data-hotkey="o" />
+                        <button name="button_draft" invisible="state != 'cancel'" string="Set to Draft" type="object" data-hotkey="n"/>
+                        <button name="button_schedule" invisible="state != 'draft'" string="Schedule Exam" type="object" class="oe_highlight" data-hotkey="o" />
 
-                        <button name="button_open_result" states="prepare,done" string="Open Result" type="object" class="oe_highlight" data-hotkey="o" />
+                        <button name="button_open_result" invisible="state not in ('prepare','done')" string="Open Result" type="object" class="oe_highlight" data-hotkey="o" />
 
                         
-                        <button name="button_close" type="object" string="Close Exam" states="schedule" class="oe_highlight" data-hotkey="l"/>
-                        <button name="button_prepare_result" type="object" string="Prepare Result" states="complete" class="oe_highlight" data-hotkey="l"/>
-                        <button name="button_complete_result" type="object" string="Result Completed" states="prepare" class="oe_highlight" data-hotkey="l"/>
+                        <button name="button_close" type="object" string="Close Exam" invisible="state != 'schedule'" class="oe_highlight" data-hotkey="l"/>
+                        <button name="button_prepare_result" type="object" string="Prepare Result" invisible="state != 'complete'" class="oe_highlight" data-hotkey="l"/>
+                        <button name="button_complete_result" type="object" string="Result Completed" 
+                            invisible="state != 'prepare'" class="oe_highlight" data-hotkey="l"/>
                         
-                        <button name="button_cancel" states="draft" string="Cancel" type="object" data-hotkey="x" />
+                        <button name="button_cancel" invisible="state != 'draft'" string="Cancel" type="object" data-hotkey="x" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,schedule,complete,prepare,done" readonly="1"/>
                         
                     </header>
