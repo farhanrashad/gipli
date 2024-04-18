@@ -51,7 +51,7 @@
 					<sheet>
                         <field name="batch_count" invisible="1"/>
                         <field name="use_batch_subject" invisible="1" />
-                        <field name="use_section" invisible="0" />
+                        <field name="use_section" invisible="1" />
                         <div class="oe_button_box" name="button_box">
                             <button name="action_open_batch" 
                                 type="object" 
