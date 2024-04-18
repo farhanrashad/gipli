@@ -16,8 +16,8 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    'category': 'Account/School',
-    'version': '0.1',
+    'category': 'School/Industries',
+    'version': '17.0.0.1',
 
     # any module necessary for this one to work correctly
     'depends': ['de_school'],
@@ -35,6 +35,7 @@
         'views/exam_session_views.xml',
         'views/exam_views.xml',
         'views/exam_result_views.xml',
+        'views/exam_attendees_views.xml',
         'reports/report_exam_sheet.xml',
         'reports/report_result_sheet.xml',
         'reports/report_exam_tickets.xml',

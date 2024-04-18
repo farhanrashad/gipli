@@ -27,18 +27,28 @@ class Exam(models.Model):
     exam_session_id = fields.Many2one(
         comodel_name='oe.exam.session',
         string="Exam Session", 
-        required=True, ondelete='cascade', index=True, copy=False)
+        required=True, ondelete='cascade', index=True, copy=False,
+        domain="[('state','=','progress')]"
+    )
 
-    batch_id = fields.Many2one(
-        comodel_name='oe.school.course.batch',
-        string="Batch", required=True,
-        
-        change_default=True, ondelete='restrict', )
+    course_id = fields.Many2one(related='exam_session_id.course_id')
+
+    use_batch = fields.Boolean(related='course_id.use_batch_subject')
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', 
+                               domain="[('course_id','=',course_id)]"
+                              )
+
+    use_section = fields.Boolean(related='course_id.use_section')
+    section_id = fields.Many2one('oe.school.course.section', string='Section', 
+                                 domain="[('course_id','=',course_id)]"
+                              )
+
+    subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subject_ids', store=True)
+    subject_id = fields.Many2one('oe.school.subject', string='Subject',
+                                 domain="[('id','in',subject_ids)]",
+                                 required=True,
+                                )
     
-    subject_id = fields.Many2one(
-        comodel_name='oe.school.subject',
-        string="Subject", required=True, 
-        change_default=True, ondelete='restrict', )
     marks_min = fields.Float(string='Minimum Marks', required=True, )
     marks_max = fields.Float(string='Maximum Marks', required=True, )
     date_start = fields.Datetime(string='Start Time', required=True, )
@@ -58,6 +68,10 @@ class Exam(models.Model):
         
         default=lambda self: self.env.company)
     # Address Fields
+    exam_mode = fields.Selection([
+        ('physical', 'Physical'),
+        ('online', 'Online'),
+    ], string='Mode', default='physical', required=True)
     address_id = fields.Many2one('res.partner', 'Work Address', 
                                  compute="_compute_address_id", 
                                  store=True, readonly=False, 
@@ -72,6 +86,9 @@ class Exam(models.Model):
                               compute='_compute_exam_hours', 
                               store=True, readonly=True)
 
+    attendees_count = fields.Integer('Attendees',)
+    exam_attendee_ids = fields.One2many('oe.exam.attendees', 'exam_id', string='Attendees', )
+    
     exam_result_line = fields.One2many('oe.exam.result', 'exam_id', string='Exams', )
     exam_result_count = fields.Integer('Exam Result Count', compute='_compute_exam_result')
     
@@ -102,7 +119,18 @@ class Exam(models.Model):
     def _compute_exam_result(self):
         for record in self:
             record.exam_result_count = len(record.exam_result_line)
-            
+
+    @api.depends('course_id')
+    def _compute_subject_ids(self):
+        for attendance in self:
+            if attendance.course_id:
+                subject_lines = attendance.env['oe.school.course.subject.line'].search([
+                    ('course_id', '=', attendance.course_id.id)
+                ])
+                attendance.subject_ids = subject_lines.mapped('subject_id')
+            else:
+                attendance.subject_ids = False
+                
     # CRUD Operations
     def unlink(self):
         for record in self:
@@ -242,3 +270,19 @@ class Exam(models.Model):
                 </data>
             """
         })
+
+    def action_view_attendees(self):
+        action = self.env.ref('de_school_exam.action_exam_attendees').read()[0]
+        action.update({
+            'name': 'Exam Attendees',
+            'view_mode': 'tree',
+            'res_model': 'oe.exam.attendees',
+            'type': 'ir.actions.act_window',
+            'domain': [('exam_id','=',self.id)],
+            'context': {
+                'create': False,
+                'delete': False,
+            },
+            
+        })
+        return action

@@ -17,5 +17,7 @@ access_exam_manager,access.exam.manager,model_oe_exam,de_school_exam.group_exam_
 access_exam_result_officer,access.exam.result.officer,model_oe_exam_result,de_school_exam.group_exam_user,1,1,1,0
 access_exam_result_manager,access.exam.result.manager,model_oe_exam_result,de_school_exam.group_exam_manager,1,1,1,1
 
+access_exam_attendees_officer,access.exam.attendees.officer,model_oe_exam_attendees,de_school_exam.group_exam_user,1,1,1,0
+access_exam_attendees_manager,access.exam.attendees.manager,model_oe_exam_attendees,de_school_exam.group_exam_manager,1,1,1,1
 
 

@@ -7,7 +7,8 @@
 			<field name="model">oe.exam</field>
 			<field name="arch" type="xml">
 				<tree string="Exam " >
-                    <field name="batch_id"/>
+                    <field name="exam_session_id"/>
+                    <field name="course_id"/>
 					<field name="subject_id"/>
                     <field name="date_start" />
                     <field name="date_end" />
@@ -40,7 +41,18 @@
                     </header>
                     <sheet>
                         <field name="company_id" invisible="1" />
+                        <field name="use_batch" invisible="1" />
+                        <field name="use_section" invisible="1" />
+                        <field name="subject_ids" invisible="1" />
                         <div class="oe_button_box" name="button_box">
+                            <button name="action_view_attendees"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-users"
+                            >
+                                <field name="attendees_count" widget="statinfo" string="Attendees"/>
+                            </button>
+                            
                             <button name="action_view_exam_results"
                                 type="object"
                                 class="oe_stat_button"
@@ -51,8 +63,18 @@
                         </div>
                         <group>
                             <group>
-                                <field name="batch_id" options="{'no_open':True,'no_create':True}"/>
-                                <field name="subject_id" options="{'no_open':True,'no_create':True}"/>
+                                <field name="exam_session_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                />
+                                <field name="course_id" />
+                                <field name="batch_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    invisible="not use_batch"
+                                />
+                                <field name="subject_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    invisible="not use_section"
+                                />
                                 <label for="date_start" string="Schedule"/>
                                 <div name="dates" class="o_row">
                                     <field name="date_start" />
@@ -60,14 +82,19 @@
                                     <field name="date_end" />
                                 </div>
                                 <field name="exam_hours" />
-                                <separator string="Exam Venue" />
-                                <field name="address_id" options="{'no_create':True}"/>
-                                <field name="exam_location_id" options="{'no_create':True}"/>
+                                
                             </group>
                             <group>
                                 <field name="marks_min" />
                                 <field name="marks_max" />
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':True}"/>
+                                <field name="exam_mode" 
+                                    widget="radio" 
+                                    options="{'horizontal':true}"
+                                />
+                                <separator class="mt-0 mb-0" string="Exam Venue" invisible="exam_mode == 'online'"/>
+                                <field name="address_id" options="{'no_create':True}" invisible="exam_mode == 'online'"/>
+                                <field name="exam_location_id" options="{'no_create':True}" invisible="exam_mode == 'online'"/>
                             </group>y
                         </group>
                         
