@@ -12,16 +12,10 @@ class ExamResult(models.Model):
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
     _description = 'Exam Results'
     _rec_name = 'student_id'
-
-    READONLY_STATES = {
-        'progress': [('readonly', True)],
-        'close': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    }
     
     exam_id = fields.Many2one(
         comodel_name='oe.exam',
-        string="Exam", states=READONLY_STATES,
+        string="Exam", 
         required=True, ondelete='cascade', index=True, copy=False)
 
     batch_id = fields.Many2one(
@@ -37,7 +31,7 @@ class ExamResult(models.Model):
     student_id = fields.Many2one(
         comodel_name='res.partner',
         domain="[('is_student','=',True),('batch_id','=',batch_id)]",
-        string="Student", required=True, states=READONLY_STATES,
+        string="Student", required=True, 
         change_default=True, ondelete='restrict', 
     )
     roll_no = fields.Char(related='student_id.roll_no')
@@ -48,14 +42,13 @@ class ExamResult(models.Model):
         ('absent', 'Absent'),
     ], string='Attendance Type', default='present', required=True)
     seat_no = fields.Char('Seat No')
-    marks = fields.Float(string='Obtained Marks', required=True, states=READONLY_STATES,)
+    marks = fields.Float(string='Obtained Marks', required=True, )
     credit_points = fields.Float(string='Credit Points')
     exam_grade_line_id = fields.Many2one('oe.exam.grade.line', string='Exam Grade', compute='_compute_exam_grade')
     
     company_id = fields.Many2one(
         comodel_name='res.company',
         required=True, index=True,
-        states=READONLY_STATES,
         default=lambda self: self.env.company)
     
     # ----------------------------------------

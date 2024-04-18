@@ -15,8 +15,9 @@
                     </header>
                     <field name="exam_id" optional="hide" options="{'no_open':True,'no_create':True}"/>
                     <field name="student_id" readonly="1" options="{'no_open':True,'no_create':True}"/>
-                    <field name="status" />
+                    <field name="status" readonly="exam_state not in ('draft','schedule')"/>
                     <field name="slip_no" />
+                    <field name="exam_state" column_invisible="1" />
 				</tree>
 			</field>
 		</record>

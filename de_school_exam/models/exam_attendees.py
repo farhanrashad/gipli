@@ -27,12 +27,13 @@ class ExamAttendees(models.Model):
         string="Student", required=True, 
         ondelete='restrict', 
     )
+    exam_state = fields.Selection(related='exam_id.state', store=True)
     status = fields.Selection([
         ('P', 'Present'),
         ('A', 'Absent'),
     ], string='Status', 
     )
-    slip_no = fields.Char(string='Exam Slip No')
+    slip_no = fields.Char(string='Exam Slip No', readonly=True)
 
     def Mark_attendance(self):
         return {

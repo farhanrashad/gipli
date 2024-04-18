@@ -18,14 +18,6 @@ class Exam(models.Model):
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
     _description = 'Exam'
     _rec_name = 'subject_id'
-
-    READONLY_STATES = {
-        'schedule': [('readonly', True)],
-        'complete': [('readonly', True)],
-        'prepare': [('readonly', True)],
-        'done': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    }
     
     exam_session_id = fields.Many2one(
         comodel_name='oe.exam.session',
