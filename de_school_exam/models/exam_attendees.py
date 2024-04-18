@@ -27,3 +27,18 @@ class ExamAttendees(models.Model):
         string="Student", required=True, 
         ondelete='restrict', 
     )
+    status = fields.Selection([
+        ('P', 'Present'),
+        ('A', 'Absent'),
+    ], string='Status', 
+    )
+    slip_no = fields.Char(string='Exam Slip No')
+
+    def Mark_attendance(self):
+        return {
+            'name': 'Mark Attendance',
+            'view_mode': 'form',
+            'res_model': 'oe.exam.attendees.attend',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }

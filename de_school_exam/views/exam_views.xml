@@ -67,6 +67,7 @@
                                     options="{'no_open':True,'no_create':True}"
                                     readonly="state != 'draft'"
                                 />
+                                <field name="code" readonly="state != 'draft'"/>
                                 <field name="course_id" />
                                 <field name="batch_id" 
                                     options="{'no_open':True,'no_create':True}"

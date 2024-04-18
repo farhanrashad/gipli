@@ -39,6 +39,7 @@
         'reports/report_exam_sheet.xml',
         'reports/report_result_sheet.xml',
         'reports/report_exam_tickets.xml',
+        'wizards/attendees_attendance_wizard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

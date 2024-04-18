@@ -34,6 +34,8 @@ class Exam(models.Model):
         domain="[('state','=','progress')]"
     )
 
+    code = fields.Char(string='Code', required=True, size=10)
+    sequence_id = fields.Many2one('ir.sequence', 'Exam Slip Sequence', copy=False, check_company=True)
     course_id = fields.Many2one(related='exam_session_id.course_id')
 
     use_batch = fields.Boolean(related='course_id.use_batch_subject')
@@ -89,7 +91,7 @@ class Exam(models.Model):
                               compute='_compute_exam_hours', 
                               store=True, readonly=True)
 
-    attendees_count = fields.Integer('Attendees',)
+    attendees_count = fields.Integer('Attendees',compute='_compute_attendees_count')
     exam_attendee_ids = fields.One2many('oe.exam.attendees', 'exam_id', string='Attendees', )
     
     exam_result_line = fields.One2many('oe.exam.result', 'exam_id', string='Exams', )
@@ -119,6 +121,10 @@ class Exam(models.Model):
             else:
                 exam.exam_hours = False
 
+    def _compute_attendees_count(self):
+        for record in self:
+            record.attendees_count = len(record.exam_attendee_ids)
+            
     def _compute_exam_result(self):
         for record in self:
             record.exam_result_count = len(record.exam_result_line)
@@ -135,6 +141,18 @@ class Exam(models.Model):
                 attendance.subject_ids = False
                 
     # CRUD Operations
+    @api.model
+    def create(self, vals):
+        sequence = self.env['ir.sequence'].create({
+            'name': _('Sequence') + ' ' + vals['code'],
+            'padding': 5,
+            'prefix': vals['code'],
+            'company_id': vals.get('company_id'),
+        })
+        vals['sequence_id'] = sequence.id
+        course = super().create(vals)
+        return course
+        
     def unlink(self):
         for record in self:
             if record.state != 'draft':
@@ -153,15 +171,27 @@ class Exam(models.Model):
         self.write({'state': 'draft'})
 
     def button_schedule(self):
+        student_ids = self.env['res.partner'].search(self._get_student_domain())
+        for student in student_ids:
+            self.exam_attendee_ids.create(self._prepare_attendees_values(student))
+        self.write({'state': 'schedule'})
+
+    def _get_student_domain(self):
         domain = [('course_id','=',self.course_id.id)]
         if self.batch_id:
             domain = expression.AND([domain, [('batch_id', '=', self.batch_id.id)]])
 
         if self.section_id:
             domain = expression.AND([domain, [('section_id', '=', self.section_id.id)]])
+        return domain
 
-        self.write({'state': 'schedule'})
-
+    def _prepare_attendees_values(self, student):
+        vals = {
+            'exam_id': self.id,
+            'student_id': student.id,
+            'slip_no': self.sequence_id.next_by_id()
+        }
+        return vals
     def button_close(self):
         self.write({'state': 'complete'})
         

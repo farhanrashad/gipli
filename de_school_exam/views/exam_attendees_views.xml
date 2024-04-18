@@ -7,8 +7,16 @@
 			<field name="model">oe.exam.attendees</field>
 			<field name="arch" type="xml">
 				<tree string="Exam" editable="bottom">
-                    <field name="exam_id" options="{'no_open':True,'no_create':True}"/>
-                    <field name="student_id" options="{'no_open':True,'no_create':True}"/>
+                    <header>
+                        <button name="Mark_attendance" type="object" 
+                            string="Mark Attendance" 
+                            class="oe_highlight"
+                            />
+                    </header>
+                    <field name="exam_id" optional="hide" options="{'no_open':True,'no_create':True}"/>
+                    <field name="student_id" readonly="1" options="{'no_open':True,'no_create':True}"/>
+                    <field name="status" />
+                    <field name="slip_no" />
 				</tree>
 			</field>
 		</record>
