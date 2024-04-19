@@ -65,7 +65,8 @@ class MarkSheet(models.Model):
     def button_generate(self):
         self.marksheet_line.unlink()
         exam_ids = self.env['oe.exam'].search([
-            ('exam_session_id','=',self.exam_session_id.id)
+            ('exam_session_id','=',self.exam_session_id.id),
+            ('state','=','done')
         ])
         subject_ids = exam_ids.mapped('subject_id')
         for subject in subject_ids:
@@ -133,7 +134,7 @@ class MarkSheet(models.Model):
                 
                 for group in self.marksheet_group_id.ms_group_line:
                     arch += '<td class="o_data_cell cursor-pointer o_field_cell o_list_number o_readonly_modifier">'
-                    arch += str(line._compute_marksheet_value())
+                    arch += str(line._compute_marksheet_value(group.exam_type_id))
                     arch += '</td>'
 
                 arch += '<td class="o_data_cell cursor-pointer o_field_cell o_list_number o_readonly_modifier">'
@@ -159,8 +160,17 @@ class MarkSheetLine(models.Model):
                                  required=True,
                                 )
 
-    def _compute_marksheet_value(self):
-        val = self.subject_id.id
+    def _compute_marksheet_value(self, exam_type_id):
+        exam_id = self.env['oe.exam'].search([
+            ('exam_session_id','=',self.marksheet_id.exam_session_id.id),
+            ('exam_session_id.exam_type_id','=',exam_type_id.id),
+            ('subject_id','=',self.subject_id.id),
+        ],limit=1)
+        result_id = self.env['oe.exam.result'].search([
+            ('exam_id','=', exam_id.id),
+            ('student_id','=',self.marksheet_id.student_id.id),
+        ])
+        val = result_id.marks
         return val
 
     
