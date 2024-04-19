@@ -29,6 +29,11 @@ class Exam(models.Model):
     code = fields.Char(string='Code', required=True, size=10)
     sequence_id = fields.Many2one('ir.sequence', 'Exam Slip Sequence', copy=False, check_company=True)
     course_id = fields.Many2one(related='exam_session_id.course_id')
+    
+    exam_grade_id = fields.Many2one('oe.exam.grade', string='Grade', 
+                                    store=True, readonly=False,
+                                    compute='_compute_exam_grade_from_course',
+                                   )
 
     use_batch = fields.Boolean(related='course_id.use_batch_subject')
     batch_id = fields.Many2one('oe.school.course.batch', string='Batch', 
@@ -46,8 +51,6 @@ class Exam(models.Model):
                                  required=True,
                                 )
     
-    marks_min = fields.Float(string='Minimum Marks', required=True, )
-    marks_max = fields.Float(string='Maximum Marks', required=True, )
     date_start = fields.Datetime(string='Start Time', required=True, )
     date_end = fields.Datetime(string='End Time', required=True, )
 
@@ -123,15 +126,19 @@ class Exam(models.Model):
 
     @api.depends('course_id')
     def _compute_subject_ids(self):
-        for attendance in self:
-            if attendance.course_id:
-                subject_lines = attendance.env['oe.school.course.subject.line'].search([
-                    ('course_id', '=', attendance.course_id.id)
+        for record in self:
+            if record.course_id:
+                subject_lines = self.env['oe.school.course.subject.line'].search([
+                    ('course_id', '=', record.course_id.id)
                 ])
-                attendance.subject_ids = subject_lines.mapped('subject_id')
+                record.subject_ids = subject_lines.mapped('subject_id')
             else:
-                attendance.subject_ids = False
-                
+                record.subject_ids = False
+
+    @api.depends('course_id')
+    def _compute_exam_grade_from_course(self):
+        for record in self:
+            record.exam_grade_id = record.exam_grade_id.id
     # CRUD Operations
     @api.model
     def create(self, vals):
@@ -191,16 +198,16 @@ class Exam(models.Model):
         self.write({'state': 'cancel'})
 
     def button_prepare_result(self):
-        student_ids = self.env['res.partner'].search([('course_id','=',self.exam_session_id.course_id.id),('batch_id','=',self.batch_id.id)])
         #raise UserError(student_ids)
-        for student in student_ids:
+        self.exam_result_line.unlink()
+        for attendee in record.exam_attendee_ids: #student_ids:
             exam_result = self.env['oe.exam.result'].create({
-                'student_id': student.id,
-                'exam_id': self.id,
-                'attendance_status': 'present',
+                'student_id': attendee.student_id.id,
+                'exam_id': record.id,
+                'attendance_status': attendee.status,
                 'marks': 0,
             })
-        self.write({'state': 'prepare'})
+        #self.write({'state': 'prepare'})
 
     def button_complete_result(self):
         for exam in self:
@@ -248,28 +255,17 @@ class Exam(models.Model):
         arch = etree.tostring(doc, encoding='unicode')
         return arch
         
-    def button_open_result(self):
-        
-        #view_id = self.env['ir.ui.view'].search([('name','=','dynamic_extend_result_tree_view')])
-        #if view_id:
-        #    view_id.unlink()
-            
-        #if self.batch_id.enable_credit_points:
-        #    self.open_dynamic_tree_view()
-
-        #view_id = self.env.ref('de_school_exam.exam_result_tree_view')
-        #view_id.render()
-        #view_id.load()
-        #self.env.ref('de_school_exam.exam_result_tree_view').arch
-
-        if self.batch_id.enable_credit_points:
+    def button_open_results(self):
+        if self.exam_grade_id.enable_credit_points:
             #action['action_id'] = self.env.ref('de_school_exam.action_exam_result_grade').id
             #raise UserError('grade')
             action = self.env['ir.actions.actions']._for_xml_id('de_school_exam.action_exam_result_grade')
         else:
             #action['action_id'] = self.env.ref('de_school_exam.action_exam_result').id
             action = self.env['ir.actions.actions']._for_xml_id('de_school_exam.action_exam_result')
-        
+
+        domain = [('exam_id', '=', self.id)]
+        action['domain'] = domain
         context = {
             'default_exam_id': self.id,
             'exam_id': self.id,

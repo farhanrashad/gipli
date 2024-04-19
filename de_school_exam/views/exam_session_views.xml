@@ -43,17 +43,23 @@
                         <div class="oe_title">
                             <label for="name"/>
                             <h1>
-                                <field name="name" placeholder="e.g Fall 2023-Mid Term"/>
+                                <field name="name" placeholder="e.g Fall 2023-Mid Term"
+                                    readonly="state != 'draft'"
+                                />
                             </h1>
                         </div>
                         <group>
                             <group>
-                                <field name="course_id" options="{'no_open':True,'no_create':True}"/>
-                                <field name="exam_type_id" options="{'no_open':True,'no_create':True}"/>
+                                <field name="course_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
+                                <field name="exam_type_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
                             </group>
                             <group>
-                                <field name="marks_min" />
-                                <field name="marks_max" />
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':True}"/>
                             </group>y
                         </group>

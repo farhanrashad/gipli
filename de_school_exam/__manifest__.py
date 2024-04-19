@@ -31,7 +31,6 @@
         'views/exam_type_views.xml',
         'views/exam_grade_views.xml',
         'views/course_views.xml',
-        'views/batch_views.xml',
         'views/exam_session_views.xml',
         'views/exam_views.xml',
         'views/exam_result_views.xml',
@@ -41,8 +40,9 @@
         'reports/report_exam_tickets.xml',
         'wizards/attendees_attendance_wizard_views.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'license': 'LGPL-3',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }

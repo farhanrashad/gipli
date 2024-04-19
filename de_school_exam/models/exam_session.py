@@ -20,19 +20,16 @@ class ExamSession(models.Model):
         'cancel': [('readonly', True)],
     }
     
-    name = fields.Char(string='Name', required=True, states=READONLY_STATES,)
-    marks_min = fields.Float(string='Minimum Marks', required=True, states=READONLY_STATES,)
-    marks_max = fields.Float(string='Maximum Marks', required=True, states=READONLY_STATES,)
+    name = fields.Char(string='Name', required=True, )
     course_id = fields.Many2one(
         comodel_name='oe.school.course',
         string="Course", required=True,
-        change_default=True, ondelete='restrict', states=READONLY_STATES,)
-    exam_type_id = fields.Many2one('oe.exam.type', string='Exam Type', required=True, states=READONLY_STATES,)
+        change_default=True, ondelete='restrict', )
+    exam_type_id = fields.Many2one('oe.exam.type', string='Exam Type', required=True, )
     company_id = fields.Many2one(
         comodel_name='res.company',
         required=True, index=True,
         default=lambda self: self.env.company,
-        states=READONLY_STATES,
     )
 
     state = fields.Selection([
@@ -43,7 +40,7 @@ class ExamSession(models.Model):
     ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
     
 
-    exam_line = fields.One2many('oe.exam', 'exam_session_id', string='Exams', states=READONLY_STATES,)
+    exam_line = fields.One2many('oe.exam', 'exam_session_id', string='Exams')
     exam_count = fields.Integer('Exam Count', compute='_compute_exam')
 
     # Constraints

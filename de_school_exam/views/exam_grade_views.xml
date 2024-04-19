@@ -34,7 +34,7 @@
                            <page string="Grading" name="grading">
                                <field name="exam_grade_line">
                                     <tree editable="bottom">
-                                        <field name="exam_grade_id" invisible="1"/>
+                                        <field name="exam_grade_id" column_invisible="1"/>
                                         <field name="name"/>
                                         <field name="score_min" />
                                         <field name="credit_points" 

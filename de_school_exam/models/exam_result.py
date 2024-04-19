@@ -17,20 +17,15 @@ class ExamResult(models.Model):
         comodel_name='oe.exam',
         string="Exam", 
         required=True, ondelete='cascade', index=True, copy=False)
-
-    batch_id = fields.Many2one(
-        comodel_name='oe.school.course.batch',
-        related='exam_id.batch_id'
-    )
     
     subject_id = fields.Many2one(
-        comodel_name='oe.school.course.subject',
+        comodel_name='oe.school.subject',
         related='exam_id.subject_id',
     )
 
     student_id = fields.Many2one(
         comodel_name='res.partner',
-        domain="[('is_student','=',True),('batch_id','=',batch_id)]",
+        domain="[('is_student','=',True)]",
         string="Student", required=True, 
         change_default=True, ondelete='restrict', 
     )
@@ -38,8 +33,8 @@ class ExamResult(models.Model):
     admission_no = fields.Char(related='student_id.admission_no')
     
     attendance_status = fields.Selection([
-        ('present', 'Present'),
-        ('absent', 'Absent'),
+        ('P', 'Present'),
+        ('A', 'Absent'),
     ], string='Attendance Type', default='present', required=True)
     seat_no = fields.Char('Seat No')
     marks = fields.Float(string='Obtained Marks', required=True, )
@@ -55,33 +50,22 @@ class ExamResult(models.Model):
     # Constrains
     # ----------------------------------------
 
-    @api.constrains('marks')
-    def _check_marks_range(self):
-        for record in self:
-            if record.marks < record.exam_id.marks_min or record.marks > record.exam_id.marks_max:
-                raise ValidationError(f"Obtained Marks must be between {record.exam_id.marks_min} and {record.exam_id.marks_max}.")
-
-
-            
+    
     # CRUD Operations
-    def unlink11(self):
-        for record in self:
-            if record.exam_id.state != 'draft':
-                raise ValidationError("You cannot delete result.")
-        return super(ExamResult, self).unlink()
-
+    
     #compute Methods
     @api.depends('marks')
     def _compute_exam_grade(self):
         for result in self:
+            result.exam_grade_line_id = False
             # Get the grade lines ordered by score_min in descending order
-            grade_lines = self.env['oe.exam.grade.line'].search([('exam_grade_id','=',result.batch_id.exam_grade_id.id)], order='score_min DESC')
+            #grade_lines = self.env['oe.exam.grade.line'].search([('exam_grade_id','=',result.batch_id.exam_grade_id.id)], order='score_min DESC')
 
             # Find the first grade that the score is greater than or equal to
-            for line in grade_lines:
-                if result.marks >= line.score_min:
-                    result.exam_grade_line_id = line.id
-                    break
+            #for line in grade_lines:
+            #    if result.marks >= line.score_min:
+            #        result.exam_grade_line_id = line.id
+            #        break
 
         
     
