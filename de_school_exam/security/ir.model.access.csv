@@ -28,6 +28,10 @@ access_exam_marksheet_manager,access.exam.marksheet.manager,model_oe_exam_marksh
 access_exam_marksheet_line_officer,access.exam.marksheet.line.officer,model_oe_exam_marksheet_line,de_school_exam.group_exam_user,1,1,1,0
 access_exam_marksheet_line_manager,access.exam.marksheet.line.manager,model_oe_exam_marksheet_line,de_school_exam.group_exam_manager,1,1,1,1
 
+access_marksheet_line_score_officer,access.marksheet.line.score.officer,model_oe_exam_ms_line_score,de_school_exam.group_exam_user,1,1,1,0
+access_marksheet_line_score_manager,access.marksheet.line.score.manager,model_oe_exam_ms_line_score,de_school_exam.group_exam_user,1,1,1,1
+
+
 access_exam_result_officer,access.exam.result.officer,model_oe_exam_result,de_school_exam.group_exam_user,1,1,1,0
 access_exam_result_manager,access.exam.result.manager,model_oe_exam_result,de_school_exam.group_exam_manager,1,1,1,1
 

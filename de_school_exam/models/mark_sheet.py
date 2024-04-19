@@ -115,20 +115,49 @@ class MarkSheet(models.Model):
 
     def button_generate(self):
         self.marksheet_line.unlink()
-        exam_ids = self.env['oe.exam'].search([
+        self.env['oe.exam.ms.line.score'].search([('marksheet_line_id.marksheet_id', '=', self.id)]).unlink()
+
+        subject_ids = self.env['oe.exam'].search(self._exam_domain()).mapped('subject_id')
+
+        marksheet_lines = self.env['oe.exam.marksheet.line'].create([
+            {'subject_id': subject.id, 'marksheet_id': self.id} for subject in subject_ids
+        ])
+
+        score_lines = []
+        for marksheet_line in marksheet_lines:
+            score_lines += self._create_score_line(marksheet_line)
+
+        self.env['oe.exam.ms.line.score'].create(score_lines)
+        #self.dynamic_view_arch = self._compute_dynamic_view_arch()
+        
+    def _exam_domain(self):
+        domain = [
             ('exam_session_id','in',self.exam_session_ids.ids),
             ('state','=','done'),
             #('exam_session_id.exam_type_id','in', self.marksheet_group_id.ms_group_line.mapped('exam_type_id').ids)
-        ])
-        #raise UserError(exam_ids)
-        subject_ids = exam_ids.mapped('subject_id')
-        for subject in subject_ids:
-            self.marksheet_line.create({
-                'subject_id': subject.id,
-                'marksheet_id': self.id,
-            })
+        ]
+        return domain
 
-        self.dynamic_view_arch = self._compute_dynamic_view_arch()
+    def _create_score_line(self, marksheet_line):
+        score_lines = []
+        for type in self.exam_session_ids.mapped('exam_type_id'):
+            score_vals = {
+                'marksheet_line_id': marksheet_line.id,
+                'exam_type_id': type.id,
+                'marks': self._compute_marksheet_value(marksheet_line.subject_id, type),
+            }
+            score_lines.append(score_vals)
+        return score_lines
+
+    @api.model
+    def _compute_marksheet_value(self, subject, exam_type_id):
+        exam_results = self.env['oe.exam.result'].search([
+            ('exam_id.exam_session_id.exam_type_id', '=', exam_type_id.id),
+            ('exam_id.subject_id', '=', subject.id),
+            ('student_id', '=', self.student_id.id),
+        ])
+        total_marks = sum(exam_results.mapped('marks'))
+        return total_marks
 
     def button_cancel(self):
         pass
@@ -213,17 +242,29 @@ class MarkSheetLine(models.Model):
                                  required=True,
                                 )
 
+    marksheet_line_score_ids = fields.One2many('oe.exam.ms.line.score', 'marksheet_line_id', string='Subject Scores', )
+    
     def _compute_marksheet_value(self, exam_type_id):
-        exam_id = self.env['oe.exam'].search([
+        exam_ids = self.env['oe.exam'].search([
             ('exam_session_id','in',self.marksheet_id.exam_session_ids.ids),
             ('exam_session_id.exam_type_id','=',exam_type_id.id),
             ('subject_id','=',self.subject_id.id),
-        ],limit=1)
-        result_id = self.env['oe.exam.result'].search([
-            ('exam_id','=', exam_id.id),
+        ])
+        result_ids = self.env['oe.exam.result'].search([
+            ('exam_id','in', exam_ids.ids),
             ('student_id','=',self.marksheet_id.student_id.id),
         ])
-        val = result_id.marks
-        return val
+        ob_marks = sum(result_ids.mapped('marks'))
+        tot_marks = sum(exam_ids.mapped('marks_max'))
+        return (str(ob_marks) + '/' + str(tot_marks))
 
-    
+class MarkSheetLine(models.Model):
+    _name = 'oe.exam.ms.line.score'
+    _description = 'Marksheet Subject Score'
+
+    marksheet_line_id = fields.Many2one(
+        comodel_name='oe.exam.marksheet.line',
+        string="Mark Sheet Line", 
+        required=True, ondelete='cascade', index=True, copy=False)
+    exam_type_id = fields.Many2one('oe.exam.type', string='Exam Type', required=True)
+    marks = fields.Float(string='Marks', required=True)
