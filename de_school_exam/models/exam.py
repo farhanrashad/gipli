@@ -192,6 +192,8 @@ class Exam(models.Model):
         }
         return vals
     def button_close(self):
+        if any(not attendee.status for attendee in self.exam_attendee_ids):
+            raise UserError(_("One or more attendance is missing."))
         self.write({'state': 'complete'})
         
     def button_cancel(self):
@@ -200,10 +202,10 @@ class Exam(models.Model):
     def button_prepare_result(self):
         #raise UserError(student_ids)
         self.exam_result_line.unlink()
-        for attendee in record.exam_attendee_ids: #student_ids:
+        for attendee in self.exam_attendee_ids:
             exam_result = self.env['oe.exam.result'].create({
                 'student_id': attendee.student_id.id,
-                'exam_id': record.id,
+                'exam_id': self.id,
                 'attendance_status': attendee.status,
                 'marks': 0,
             })

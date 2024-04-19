@@ -69,12 +69,17 @@
                                 />
                                 <field name="code" readonly="state != 'draft'"/>
                                 <field name="course_id" />
+                                 <field name="subject_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    required="1"
+                                    readonly="state != 'draft'"
+                                />
                                 <field name="batch_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     invisible="not use_batch"
                                     readonly="state != 'draft'"
                                 />
-                                <field name="subject_id" 
+                                <field name="section_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     invisible="not use_section"
                                     readonly="state != 'draft'"
