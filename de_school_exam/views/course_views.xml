@@ -10,6 +10,10 @@
                 <xpath expr="//group[1]/group[2]" position="inside">
                     <field name="exam_grade_id" options="{'no_open': True, 'no_create': True}" groups="de_school_exam.group_exam_user,de_school_exam.group_exam_manager" />
                 </xpath>
+                <xpath expr="//field[@name='course_subject_line']/tree[1]" position="inside">
+                    <field name="marks_min" />
+                    <field name="marks_max" />
+                </xpath>
             </field>
         </record>
         

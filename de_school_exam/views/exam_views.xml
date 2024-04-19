@@ -94,6 +94,8 @@
                                 
                             </group>
                             <group>
+                                <field name="marks_min" />
+                                <field name="marks_max" />
                                 <field name="exam_grade_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     readonly="state not in ('draft','schedule','complete')"

@@ -56,12 +56,6 @@ class MarkSheet(models.Model):
         #domain=lambda self: self._get_exam_session_domain(),  # Domain method
     )
 
-    exam_session_id = fields.Many2one(
-        comodel_name='oe.exam.session',
-        string="Exam Session", 
-        required=True, ondelete='cascade', index=True, copy=False,
-        domain="[('state','=','progress')]"
-    )
     student_id = fields.Many2one(
         comodel_name='res.partner',
         domain="[('is_student','=',True)]",
@@ -80,7 +74,11 @@ class MarkSheet(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
     
-    company_id = fields.Many2one(related='exam_session_id.company_id')
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        required=True, index=True,
+        default=lambda self: self.env.company
+    )
     
     marksheet_line = fields.One2many('oe.exam.marksheet.line', 'marksheet_id', string='Mark Sheet', )
     dynamic_view_arch = fields.Html(string='view code')
@@ -91,7 +89,7 @@ class MarkSheet(models.Model):
                 ('exam_session_id', '=', self.exam_session_id.id),
                 ('student_id', '=', self.student_id.id),
                 ('state', '=', ['draft','done']),
-                ('id', '!=', self.id),  # Exclude current record
+                ('id', '!=', self.id),
         ]
         if self.search_count(domain) > 0:
             raise exceptions.ValidationError(_('Mark Sheet must be unique per session for a student.'))
@@ -104,7 +102,8 @@ class MarkSheet(models.Model):
                 exams = self.env['oe.exam.session'].search([
                     ('state', '=', 'progress'),
                     ('exam_line', '!=', False),
-                    ('exam_type_id', 'in', exam_type_ids.ids)
+                    ('exam_type_id', 'in', exam_type_ids.ids),
+                    ('company_id','=', record.company_id.id),
                 ])
                 record.domain_exam_session_ids = [(6, 0, exams.ids)]
             else:
@@ -117,11 +116,11 @@ class MarkSheet(models.Model):
     def button_generate(self):
         self.marksheet_line.unlink()
         exam_ids = self.env['oe.exam'].search([
-            ('exam_session_id','=',self.exam_session_id.id),
+            ('exam_session_id','in',self.exam_session_ids.ids),
             ('state','=','done'),
             #('exam_session_id.exam_type_id','in', self.marksheet_group_id.ms_group_line.mapped('exam_type_id').ids)
         ])
-        raise UserError(exam_ids)
+        #raise UserError(exam_ids)
         subject_ids = exam_ids.mapped('subject_id')
         for subject in subject_ids:
             self.marksheet_line.create({
@@ -216,7 +215,7 @@ class MarkSheetLine(models.Model):
 
     def _compute_marksheet_value(self, exam_type_id):
         exam_id = self.env['oe.exam'].search([
-            ('exam_session_id','=',self.marksheet_id.exam_session_id.id),
+            ('exam_session_id','in',self.marksheet_id.exam_session_ids.ids),
             ('exam_session_id.exam_type_id','=',exam_type_id.id),
             ('subject_id','=',self.subject_id.id),
         ],limit=1)

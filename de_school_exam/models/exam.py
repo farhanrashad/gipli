@@ -91,6 +91,13 @@ class Exam(models.Model):
     
     exam_result_line = fields.One2many('oe.exam.result', 'exam_id', string='Exams', )
     exam_result_count = fields.Integer('Exam Result Count', compute='_compute_exam_result')
+
+    marks_min = fields.Float(string='Minimum Marks',store=True, default=0,
+                             compute='_compute_subject_marks',
+                            )
+    marks_max = fields.Float(string='Maximum Marks',store=True, default=100,
+                             compute='_compute_subject_marks',
+                            )
     
     # ----------------------------------------
     # Compute Methods
@@ -139,6 +146,18 @@ class Exam(models.Model):
     def _compute_exam_grade_from_course(self):
         for record in self:
             record.exam_grade_id = record.exam_grade_id.id
+
+    @api.depends('subject_id')
+    def _compute_subject_marks(self):
+        subject_id = self.env['oe.school.course.subject.line']
+        for record in self:
+            subject_id = self.env['oe.school.course.subject.line'].search([
+                ('subject_id','=',record.subject_id.id),
+                ('course_id','=',record.course_id.id),
+            ])
+            record.marks_min = subject_id.marks_min
+            record.marks_max = subject_id.marks_max
+    
     # CRUD Operations
     @api.model
     def create(self, vals):

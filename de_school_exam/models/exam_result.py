@@ -58,7 +58,11 @@ class ExamResult(models.Model):
     # ----------------------------------------
     # Constrains
     # ----------------------------------------
-
+    @api.constrains('marks')
+    def _check_marks_range(self):
+        for record in self:
+            if record.marks < record.exam_id.marks_min or record.marks > record.exam_id.marks_max:
+                raise ValidationError(f"Obtained Marks must be between {record.exam_id.marks_min} and {record.exam_id.marks_max}.")
     
     # CRUD Operations
     
