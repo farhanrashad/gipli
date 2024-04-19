@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "School Exam",
+    'name': "Openrol - Exams",
 
     'summary': """
     School Examiniation
@@ -27,6 +27,7 @@
         'security/exam_security.xml',
         'security/ir.model.access.csv',
         'data/exam_data.xml',
+        'data/ir_sequence.xml',
         'views/exam_menu.xml',
         'views/exam_type_views.xml',
         'views/exam_grade_views.xml',
@@ -41,6 +42,7 @@
         'reports/report_result_sheet.xml',
         'reports/report_exam_tickets.xml',
         'wizards/attendees_attendance_wizard_views.xml',
+        'wizards/generate_marksheets_views.xml',
     ],
     'license': 'LGPL-3',
     'images': ['static/description/banner.gif'],

@@ -161,7 +161,7 @@
             </field>
         </record>
         
-        <menuitem name="Exams" id="menu_exam_config_main_exam"
+        <menuitem name="Exams" id="menu_exam_main_exams"
             parent="menu_exam_main" 
             action="action_exam"
             groups="de_school_exam.group_exam_user" 

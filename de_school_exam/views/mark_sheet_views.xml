@@ -7,6 +7,7 @@
 			<field name="model">oe.exam.marksheet</field>
 			<field name="arch" type="xml">
 				<tree string="Mark Sheet" >
+                    <field name="name" />
                     <field name="student_id"/>
                     <field name="state" />
 				</tree>
@@ -40,15 +41,25 @@
                                     readonly="state != 'draft'"
                                 />
                             </h1>
+                            <h2>
+                                <field name="name" readonly="1" />
+                            </h2>
                         </div>
                         <group>
+                            <group>
+                                <field name="roll_no"/>
+                                <field name="batch_id"
+                                    invisible="not batch_id"
+                                />
+                                <field name="section_id"
+                                    invisible="not section_id"
+                                />
+                            </group>
                             <group>
                                 <field name="marksheet_group_id"
                                     options="{'no_open':True,'no_create':True}"
                                     readonly="state != 'draft'"
                                 />
-                            </group>
-                            <group>
                                 <field name="domain_exam_session_ids" widget="many2many_tags" invisible="1" />
                                 <field name="exam_session_ids" 
                                     widget="many2many_tags"

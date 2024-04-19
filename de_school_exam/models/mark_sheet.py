@@ -13,29 +13,12 @@ class MarkSheet(models.Model):
     _name = 'oe.exam.marksheet'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
     _description = 'Mark Sheet'
-    _rec_name = 'student_id'
 
-    def _get_exam_session_domain(self):
-        # Check the marksheet group ID
-        if not self.marksheet_group_id:
-            return []
-    
-        # Get exam type IDs from marksheet group lines
-        exam_type_ids = self.env['oe.exam.msheet.group.line'].search([
-            ('ms_group_id', '=', self.marksheet_group_id.id)
-        ]).mapped('exam_type_id')
-        
-        # Check if exam type IDs are retrieved
-        if not exam_type_ids:
-            return []
-        
-        domain = [
-            ('state', '=', 'progress'),
-            ('exam_line', '!=', False),
-            ('exam_type_id', 'in', exam_type_ids.ids),
-        ]
-        return domain
-
+    name = fields.Char(
+        string="Reference",
+        copy=False, readonly=False,
+        index='trigram',
+        default=lambda self: _('/'))
 
     domain_exam_session_ids = fields.Many2many(
         comodel_name='oe.exam.session',
@@ -53,7 +36,6 @@ class MarkSheet(models.Model):
         compute='_compute_domain_exam_sessions',
         store=True,
         domain="[('id','in',domain_exam_session_ids)]"
-        #domain=lambda self: self._get_exam_session_domain(),  # Domain method
     )
 
     student_id = fields.Many2one(
@@ -62,6 +44,10 @@ class MarkSheet(models.Model):
         string="Student", required=True, 
         change_default=True, ondelete='restrict', 
     )
+
+    roll_no = fields.Char(related='student_id.roll_no')
+    batch_id = fields.Many2one(related='student_id.batch_id')
+    section_id = fields.Many2one(related='student_id.section_id')
 
     marksheet_group_id = fields.Many2one(
         comodel_name='oe.exam.msheet.group',
@@ -86,7 +72,7 @@ class MarkSheet(models.Model):
     @api.constrains('exam_session_id', 'student_id', 'state')
     def _check_unique_marksheet(self):
         domain = [
-                ('exam_session_id', '=', self.exam_session_id.id),
+                ('exam_session_ids', 'in', self.exam_session_ids.ids),
                 ('student_id', '=', self.student_id.id),
                 ('state', '=', ['draft','done']),
                 ('id', '!=', self.id),
@@ -94,6 +80,17 @@ class MarkSheet(models.Model):
         if self.search_count(domain) > 0:
             raise exceptions.ValidationError(_('Mark Sheet must be unique per session for a student.'))
 
+    # -----------------------------------------------------------------------------
+    # ------------------------------ CRUD Operations ------------------------------ 
+    # -----------------------------------------------------------------------------
+    @api.model_create_multi
+    def create(self, vals_list):
+        sheets = super(MarkSheet, self).create(vals_list)
+        for sheet in sheets:
+            sheet.name = self.env['ir.sequence'].next_by_code('marksheet.sequence')            
+        return sheets
+        
+    # Compute Methods
     @api.depends('marksheet_group_id')
     def _compute_domain_exam_sessions(self):
         for record in self:
@@ -114,6 +111,10 @@ class MarkSheet(models.Model):
         pass
 
     def button_generate(self):
+        self._generate_marksheet()
+
+    @api.model
+    def _generate_marksheet(self):
         self.marksheet_line.unlink()
         self.env['oe.exam.ms.line.score'].search([('marksheet_line_id.marksheet_id', '=', self.id)]).unlink()
 
@@ -128,7 +129,7 @@ class MarkSheet(models.Model):
             score_lines += self._create_score_line(marksheet_line)
 
         self.env['oe.exam.ms.line.score'].create(score_lines)
-        #self.dynamic_view_arch = self._compute_dynamic_view_arch()
+        self.dynamic_view_arch = self._compute_dynamic_view_arch()
         
     def _exam_domain(self):
         domain = [
@@ -164,13 +165,8 @@ class MarkSheet(models.Model):
 
     def _compute_dynamic_view_arch(self):
         arch = ''
-        for marks in self:
-            # Prepare dynamic fields based on the number of records in group_line_ids
-            dynamic_fields = [
-                f'<field name="dynamic_field_{index}" string="Dynamic Field {index}" />' 
-                for index in range(1, len(marks.marksheet_line) + 1)
-            ]
-
+        for ms in self:
+            
             # Construct the dynamic arch
             arch += "<div class='o_field_widget o_field_section_and_note_one2many o_field_one2many'>"
             arch += "<div class='o_list_view o_field_x2many o_field_x2many_list'>"
@@ -185,11 +181,11 @@ class MarkSheet(models.Model):
             arch += 'Subject'
             arch += '</span>'
             arch += '</th>'
-            for line in self.marksheet_group_id.ms_group_line:
+            for group in ms.marksheet_group_id.ms_group_line:
                 arch += '<th data-tooltip-delay="1000" tabindex="-1" data-name="name" class="aalign-middle o_column_sortable position-relative cursor-pointer o_list_number_th opacity-trigger-hover" style="min-width: 104px; width: 104px;">'
                 arch += '<div class="d-flex flex-row-reverse">'
                 arch += '<span class="d-block min-w-0 text-truncate flex-grow-1 o_list_number_th">'
-                arch += line.exam_type_id.name
+                arch += group.exam_type_id.name
                 arch += '</span>'
                 arch += '</div>'
                 arch += '</th>'
@@ -206,21 +202,22 @@ class MarkSheet(models.Model):
             arch += '</thead>'
             arch += '<tbody>'
 
-            for line in self.marksheet_line:
+            for line in ms.marksheet_line:
                 arch += '<tr class="o_data_row o_is_false">'
                 arch += '<td class="o_data_cell cursor-pointer o_field_cell o_list_text o_section_and_note_text_cell o_required_modifier">'
                 arch += '<div class="o_field_widget o_required_modifier o_field_section_and_note_text o_field_text">'
                 arch += line.subject_id.name
                 arch += '</div>'
                 arch += '</td>'
-                
-                for group in self.marksheet_group_id.ms_group_line:
-                    arch += '<td class="o_data_cell cursor-pointer o_field_cell o_list_number o_readonly_modifier">'
-                    arch += str(line._compute_marksheet_value(group.exam_type_id))
-                    arch += '</td>'
+
+                for group in ms.marksheet_group_id.ms_group_line:
+                    for score in line.marksheet_line_score_ids.filtered(lambda x:x.exam_type_id.id == group.exam_type_id.id):
+                        arch += '<td class="o_data_cell cursor-pointer o_field_cell o_list_number o_readonly_modifier">'
+                        arch += str(score.marks)
+                        arch += '</td>'
 
                 arch += '<td class="o_data_cell cursor-pointer o_field_cell o_list_number o_readonly_modifier">'
-                arch += '100'
+                arch += str(line.marks_total)
                 arch += '</td>'
                 arch += '</tr>'
             arch += '</tbody>'
@@ -243,8 +240,37 @@ class MarkSheetLine(models.Model):
                                 )
 
     marksheet_line_score_ids = fields.One2many('oe.exam.ms.line.score', 'marksheet_line_id', string='Subject Scores', )
-    
-    def _compute_marksheet_value(self, exam_type_id):
+    marks_total = fields.Float('Total Marks', compute='_compute_marks_total')
+
+    #@api.depends(
+    #    'marksheet_line_score_ids', 
+    #    'marksheet_line_score_ids.marks', 
+    #    'marksheet_line_score_ids.exam_type_id.grade_weightage'
+    #)
+    def _compute_marks_total(self):
+        group_line_id = self.env['oe.exam.msheet.group.line']
+        for line in self:
+            total_marks = 0.0
+            total_weightage = 0.0
+            
+            for score in line.marksheet_line_score_ids:
+                group_line_id = self.env['oe.exam.msheet.group.line'].search([
+                    ('ms_group_id','=', line.marksheet_id.marksheet_group_id.id),
+                    ('exam_type_id','=', score.exam_type_id.id),
+                ])
+                
+                total_marks += score.marks * (group_line_id.grade_weightage/100)
+                # total_weightage += group_line_id.grade_weightage
+
+            line.marks_total = round(total_marks,2)
+
+            #if total_weightage:
+                #line.marks_total = round(total_marks / total_weightage,2)
+            #else:
+            #    line.marks_total = 0.0
+            
+        
+    def _compute_marksheet_value111111(self, exam_type_id):
         exam_ids = self.env['oe.exam'].search([
             ('exam_session_id','in',self.marksheet_id.exam_session_ids.ids),
             ('exam_session_id.exam_type_id','=',exam_type_id.id),
