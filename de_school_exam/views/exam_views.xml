@@ -114,7 +114,7 @@
                                 <field name="exam_location_id" options="{'no_create':True}" 
                                     invisible="exam_mode == 'online'"
                                     readonly="state != 'draft'"/>
-                            </group>y
+                            </group>
                         </group>
                         
                     </sheet>
