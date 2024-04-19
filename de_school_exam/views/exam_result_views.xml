@@ -12,7 +12,8 @@
                     <field name="admission_no" />
 					<field name="subject_id"/>
                     <field name="attendance_status" />
-                    <field name="marks" />
+                    <field name="exam_state" column_invisible="1"/>
+                    <field name="marks" readonly="exam_state != 'prepare'"/>
                     <field name="exam_grade_line_id" />
 				</tree>
 			</field>
@@ -29,9 +30,10 @@
                     <field name="admission_no" />
 					<field name="subject_id"/>
                     <field name="attendance_status" />
-                    <field name="marks" />
+                    <field name="exam_state" column_invisible="1"/>
+                    <field name="marks" readonly="exam_state != 'prepare'" />
                     <field name="exam_grade_line_id" />
-                    <field name="credit_points" />
+                    <field name="credit_points" readonly="exam_state != 'prepare'"/>
 				</tree>
 			</field>
 		</record>

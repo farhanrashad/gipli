@@ -209,7 +209,7 @@ class Exam(models.Model):
                 'attendance_status': attendee.status,
                 'marks': 0,
             })
-        #self.write({'state': 'prepare'})
+        self.write({'state': 'prepare'})
 
     def button_complete_result(self):
         for exam in self:

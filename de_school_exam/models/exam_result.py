@@ -31,13 +31,19 @@ class ExamResult(models.Model):
     )
     roll_no = fields.Char(related='student_id.roll_no')
     admission_no = fields.Char(related='student_id.admission_no')
+
+    exam_state = fields.Selection(related='exam_id.state', store=True)
     
     attendance_status = fields.Selection([
         ('P', 'Present'),
         ('A', 'Absent'),
-    ], string='Attendance Type', default='present', required=True)
+    ], string='Attendance Type', default='present', required=True,
+                                         readonly="exam_state != 'prepare'"
+                                        )
     seat_no = fields.Char('Seat No')
-    marks = fields.Float(string='Obtained Marks', required=True, )
+    marks = fields.Float(string='Obtained Marks', 
+                         required=True, 
+                        )
     credit_points = fields.Float(string='Credit Points')
     exam_grade_line_id = fields.Many2one('oe.exam.grade.line', string='Exam Grade', 
                                          store=True,
