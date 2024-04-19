@@ -14,7 +14,48 @@ class MarkSheet(models.Model):
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin', 'utm.mixin']
     _description = 'Mark Sheet'
     _rec_name = 'student_id'
+
+    def _get_exam_session_domain(self):
+        # Check the marksheet group ID
+        if not self.marksheet_group_id:
+            return []
     
+        # Get exam type IDs from marksheet group lines
+        exam_type_ids = self.env['oe.exam.msheet.group.line'].search([
+            ('ms_group_id', '=', self.marksheet_group_id.id)
+        ]).mapped('exam_type_id')
+        
+        # Check if exam type IDs are retrieved
+        if not exam_type_ids:
+            return []
+        
+        domain = [
+            ('state', '=', 'progress'),
+            ('exam_line', '!=', False),
+            ('exam_type_id', 'in', exam_type_ids.ids),
+        ]
+        return domain
+
+
+    domain_exam_session_ids = fields.Many2many(
+        comodel_name='oe.exam.session',
+        string='Open Sessions',
+        compute='_compute_domain_exam_sessions',
+    )
+    
+    exam_session_ids = fields.Many2many(
+        comodel_name='oe.exam.session',
+        relation='exam_session_mark_sheet_rel',  # Custom relation name
+        column1='mark_sheet_id',  # Column name for this model
+        column2='exam_session_id',  # Column name for the related model
+        string="Exam Sessions",  # Field label
+        copy=False,  # Copy behavior
+        compute='_compute_domain_exam_sessions',
+        store=True,
+        domain="[('id','in',domain_exam_session_ids)]"
+        #domain=lambda self: self._get_exam_session_domain(),  # Domain method
+    )
+
     exam_session_id = fields.Many2one(
         comodel_name='oe.exam.session',
         string="Exam Session", 
@@ -55,8 +96,19 @@ class MarkSheet(models.Model):
         if self.search_count(domain) > 0:
             raise exceptions.ValidationError(_('Mark Sheet must be unique per session for a student.'))
 
-    
-
+    @api.depends('marksheet_group_id')
+    def _compute_domain_exam_sessions(self):
+        for record in self:
+            if record.marksheet_group_id:
+                exam_type_ids = record.marksheet_group_id.ms_group_line.mapped('exam_type_id')
+                exams = self.env['oe.exam.session'].search([
+                    ('state', '=', 'progress'),
+                    ('exam_line', '!=', False),
+                    ('exam_type_id', 'in', exam_type_ids.ids)
+                ])
+                record.domain_exam_session_ids = [(6, 0, exams.ids)]
+            else:
+                record.domain_exam_session_ids = [(5, 0, 0)]  # 
     
     # Actions
     def button_draft(self):
@@ -66,8 +118,10 @@ class MarkSheet(models.Model):
         self.marksheet_line.unlink()
         exam_ids = self.env['oe.exam'].search([
             ('exam_session_id','=',self.exam_session_id.id),
-            ('state','=','done')
+            ('state','=','done'),
+            #('exam_session_id.exam_type_id','in', self.marksheet_group_id.ms_group_line.mapped('exam_type_id').ids)
         ])
+        raise UserError(exam_ids)
         subject_ids = exam_ids.mapped('subject_id')
         for subject in subject_ids:
             self.marksheet_line.create({

@@ -100,7 +100,7 @@ class ExamSession(models.Model):
             'res_model': 'oe.exam',
             'type': 'ir.actions.act_window',
             'context': context,
-            #'domain': [('admission_register_id','=',self.id),('type','=','opportunity')]
+            'domain': [('exam_session_id','=',self.id)],
         }
         return action
 

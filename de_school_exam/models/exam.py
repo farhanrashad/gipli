@@ -258,28 +258,9 @@ class Exam(models.Model):
         return arch
         
     def button_open_results(self):
-        view = self.env['ir.ui.view']
-        dynamic_fields = {
-            'dynamic_field_1': fields.Char('Dynamic Field 1'),
-            'dynamic_field_2': fields.Integer('Dynamic Field 2'),
-            # Add more dynamic fields as needed
-        }
         if self.exam_grade_id.enable_credit_points:
             #action['action_id'] = self.env.ref('de_school_exam.action_exam_result_grade').id
             #raise UserError('grade')
-            view = self.env['ir.ui.view'].create({
-                'name': 'Test View',
-                'type': 'tree',
-                'model': 'oe.exam.result',
-                'inherit_id': self.env.ref('de_school_exam.exam_result_grade_tree_view').id,  # Replace with your existing view ID
-                'arch': """
-                    <tree>
-                        <field name="credit_points"/>
-                        <field name="credit_points" string="Test Field"/>
-                        <!-- Add more dynamic fields here -->
-                    </tree>
-                """,
-            })
             action = self.env.ref('de_school_exam.action_exam_result_grade').read()[0]  # Replace with your action ID
             #action = self.env['ir.actions.actions']._for_xml_id('de_school_exam.action_exam_result_grade')
         else:
@@ -293,7 +274,7 @@ class Exam(models.Model):
 
         domain = [('exam_id', '=', self.id)]
         action['domain'] = domain
-        action['views'] = [(view.id, 'tree')]
+        #action['views'] = [(view.id, 'tree')]
         action['view_mode'] = 'tree,form'
         context = {
             'default_exam_id': self.id,

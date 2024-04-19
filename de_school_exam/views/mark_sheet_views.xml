@@ -32,20 +32,32 @@
                         <div class="oe_button_box" name="button_box">
                             
                         </div>
-                        <group>
-                            <group>
-                                <field name="exam_session_id" 
-                                    options="{'no_open':True,'no_create':True}"
-                                    readonly="state != 'draft'"
-                                />
-                                 <field name="student_id" 
+                        <div class="oe_title">
+                            <label for="student_id"/>
+                            <h1>
+                                <field name="student_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     required="1"
                                     readonly="state != 'draft'"
                                 />
-                            </group>
+                            </h1>
+                        </div>
+                        <group>
                             <group>
                                 <field name="marksheet_group_id"
+                                    options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
+                            </group>
+                            <group>
+                                <field name="domain_exam_session_ids" widget="many2many_tags" invisible="1" />
+                                <field name="exam_session_ids" 
+                                    widget="many2many_tags"
+                                    options="{'no_open':True,'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
+                                
+                                <field name="exam_session_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     readonly="state != 'draft'"
                                 />
