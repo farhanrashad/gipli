@@ -39,7 +39,10 @@ class ExamResult(models.Model):
     seat_no = fields.Char('Seat No')
     marks = fields.Float(string='Obtained Marks', required=True, )
     credit_points = fields.Float(string='Credit Points')
-    exam_grade_line_id = fields.Many2one('oe.exam.grade.line', string='Exam Grade', compute='_compute_exam_grade')
+    exam_grade_line_id = fields.Many2one('oe.exam.grade.line', string='Exam Grade', 
+                                         store=True,
+                                         compute='_compute_exam_grade'
+                                        )
     
     company_id = fields.Many2one(
         comodel_name='res.company',
@@ -59,13 +62,13 @@ class ExamResult(models.Model):
         for result in self:
             result.exam_grade_line_id = False
             # Get the grade lines ordered by score_min in descending order
-            #grade_lines = self.env['oe.exam.grade.line'].search([('exam_grade_id','=',result.batch_id.exam_grade_id.id)], order='score_min DESC')
+            grade_lines = self.env['oe.exam.grade.line'].search([('exam_grade_id','=',result.exam_id.exam_grade_id.id)], order='score_min DESC')
 
             # Find the first grade that the score is greater than or equal to
-            #for line in grade_lines:
-            #    if result.marks >= line.score_min:
-            #        result.exam_grade_line_id = line.id
-            #        break
+            for line in grade_lines:
+                if result.marks >= line.score_min:
+                    result.exam_grade_line_id = line.id
+                    break
 
         
     
