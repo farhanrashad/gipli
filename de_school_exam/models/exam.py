@@ -187,10 +187,10 @@ class Exam(models.Model):
     def _get_student_domain(self):
         domain = [('course_id','=',self.course_id.id)]
         if self.batch_id:
-            domain = expression.AND([domain, [('batch_id', '=', self.batch_id.id)]])
+            domain = expression.AND([domain, [('batch_id', '=', self.exam_session_id.batch_id.id)]])
 
         if self.section_id:
-            domain = expression.AND([domain, [('section_id', '=', self.section_id.id)]])
+            domain = expression.AND([domain, [('section_id', '=', self.exam_session_id.section_id.id)]])
         return domain
 
     def _prepare_attendees_values(self, student):
