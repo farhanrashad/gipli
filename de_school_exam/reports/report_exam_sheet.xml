@@ -60,7 +60,7 @@
         </template>
         <!--  Exam Session Report  -->
         <record id="exam_session_report" model="ir.actions.report">
-            <field name="name">Print Exam Sheet</field>
+            <field name="name">Print Exam Schedules</field>
             <field name="model">oe.exam.session</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">de_school_exam.exam_session_detail_report_template</field>

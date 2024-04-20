@@ -30,7 +30,8 @@
                     </header>
                     <sheet>
                         <field name="company_id" invisible="1" />
-
+                        <field name="use_batch" invisible="1" />
+                        <field name="use_section" invisible="1" />
                         <div class="oe_button_box" name="button_box">
                             <button name="action_view_exams"
                                 type="object"
@@ -60,6 +61,16 @@
                                 />
                             </group>
                             <group>
+                                <field name="batch_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    invisible="not use_batch"
+                                    readonly="state != 'draft'"
+                                />
+                                <field name="section_id" 
+                                    options="{'no_open':True,'no_create':True}"
+                                    invisible="not use_section"
+                                    readonly="state != 'draft'"
+                                />
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':True}"/>
                             </group>y
                         </group>

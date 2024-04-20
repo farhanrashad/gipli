@@ -35,16 +35,6 @@ class Exam(models.Model):
                                     compute='_compute_exam_grade_from_course',
                                    )
 
-    use_batch = fields.Boolean(related='course_id.use_batch_subject')
-    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', 
-                               domain="[('course_id','=',course_id)]"
-                              )
-
-    use_section = fields.Boolean(related='course_id.use_section')
-    section_id = fields.Many2one('oe.school.course.section', string='Section', 
-                                 domain="[('course_id','=',course_id)]"
-                              )
-
     subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subject_ids', store=True)
     subject_id = fields.Many2one('oe.school.subject', string='Subject',
                                  domain="[('id','in',subject_ids)]",

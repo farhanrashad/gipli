@@ -41,8 +41,7 @@
                     </header>
                     <sheet>
                         <field name="company_id" invisible="1" />
-                        <field name="use_batch" invisible="1" />
-                        <field name="use_section" invisible="1" />
+                        
                         <field name="subject_ids" invisible="1" />
                         <div class="oe_button_box" name="button_box">
                             <button name="action_view_attendees"
@@ -74,16 +73,7 @@
                                     required="1"
                                     readonly="state != 'draft'"
                                 />
-                                <field name="batch_id" 
-                                    options="{'no_open':True,'no_create':True}"
-                                    invisible="not use_batch"
-                                    readonly="state != 'draft'"
-                                />
-                                <field name="section_id" 
-                                    options="{'no_open':True,'no_create':True}"
-                                    invisible="not use_section"
-                                    readonly="state != 'draft'"
-                                />
+                                
                                 <label for="date_start" string="Schedule"/>
                                 <div name="dates" class="o_row">
                                     <field name="date_start" readonly="state != 'draft'"/>
@@ -135,14 +125,12 @@
             <field name="arch" type="xml">
                 <search string="Exam">
                     <field name="subject_id" />
-                    <field name="batch_id" string="Exam Reference"/>
                     <filter string="Scheduled" domain="[('state', '=', 'schedule')]" name="schedule_exam_filter"/>
                     <filter string="Awaiting Result" domain="[('state', 'in', ['complete','prepare'])]" name="awaiting_result_filter"/>
                     <filter string="Result Updated" domain="[('state', 'in', ['done'])]" name="result_updated_filter"/>
 
                     <group expand="0" string="Group By">
                         <filter string="Subject" name="group_subject" domain="[]" context="{'group_by': 'subject_id'}"/>
-                        <filter name="Batch" string="group_batch" domain="[]" context="{'group_by': 'batch_id'}"/>
                         <filter string="State" name="group_state" domain="[]" context="{'group_by': 'state'}"/>
                     </group>
                 </search>

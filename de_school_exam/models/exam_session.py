@@ -32,6 +32,16 @@ class ExamSession(models.Model):
         default=lambda self: self.env.company,
     )
 
+    use_batch = fields.Boolean(related='course_id.use_batch_subject')
+    batch_id = fields.Many2one('oe.school.course.batch', string='Batch', 
+                               domain="[('course_id','=',course_id)]"
+                              )
+
+    use_section = fields.Boolean(related='course_id.use_section')
+    section_id = fields.Many2one('oe.school.course.section', string='Section', 
+                                 domain="[('course_id','=',course_id)]"
+                              )
+    
     state = fields.Selection([
         ('draft', 'Draft'),
         ('progress', 'Open'),
