@@ -3,7 +3,7 @@
 # This module has been developed by Dynexcel to enhance the functionality and user experience of the system. Dynexcel, with its commitment to excellence, ensures that this module adheres to the highest standards of quality and performance. We appreciate feedback and suggestions to continually improve our offerings. For any queries or support, please reach out to the Dynexcel team.
 ###############################################################################
 {
-    'name': "Openrol - School Management System",
+    'name': "Openrol - School Core",
     'summary': """
         Core Module of School Management System
     """,
@@ -40,6 +40,10 @@
         'views/batch_views.xml',
         'views/section_views.xml',
         'views/subject_views.xml',
+    ],
+    'demo': [
+        'demo/student_demo.xml',
+        'demo/teacher_demo.xml',
     ],
     'license': 'LGPL-3',
     'images': ['static/description/banner.gif'],
