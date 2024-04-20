@@ -82,10 +82,10 @@ class Exam(models.Model):
     exam_result_line = fields.One2many('oe.exam.result', 'exam_id', string='Exams', )
     exam_result_count = fields.Integer('Exam Result Count', compute='_compute_exam_result')
 
-    marks_min = fields.Float(string='Minimum Marks',store=True, default=0,
+    marks_min = fields.Float(string='Minimum Marks',store=True, default=0,readonly=False,
                              compute='_compute_subject_marks',
                             )
-    marks_max = fields.Float(string='Maximum Marks',store=True, default=100,
+    marks_max = fields.Float(string='Maximum Marks',store=True, default=100,readonly=False,
                              compute='_compute_subject_marks',
                             )
     
@@ -186,10 +186,10 @@ class Exam(models.Model):
 
     def _get_student_domain(self):
         domain = [('course_id','=',self.course_id.id)]
-        if self.batch_id:
+        if self.exam_session_id.batch_id:
             domain = expression.AND([domain, [('batch_id', '=', self.exam_session_id.batch_id.id)]])
 
-        if self.section_id:
+        if self.exam_session_id.section_id:
             domain = expression.AND([domain, [('section_id', '=', self.exam_session_id.section_id.id)]])
         return domain
 

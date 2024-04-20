@@ -2,7 +2,7 @@
     <data>
         <template id="exam_tickets_report_view">
             <t t-call="web.external_layout">
-                <t t-foreach="o.exam_attendee_ids" t-as="attendee">
+                <t t-foreach="o.exam_line.exam_attendee_ids" t-as="attendee">
                     <div class="page">
                         <div class="row mt-4 mb-16 text-center" id="exam_center">
                             <h2 class="">
@@ -76,7 +76,6 @@
                             <thead style="display: table-row-group">
                                 <tr>
                                     <th class="text-center">Sr.No</th>
-                                    <th class="text-center">Batch</th>
                                     <th class="text-center">Subject</th>
                                     <th class="text-center">Schedule</th>
                                     <th class="text-center">Total Duration</th>
@@ -84,28 +83,25 @@
                                 </tr>
                             </thead>
                             <tbody class="consumed_tbody">
-                                <t t-foreach="o.exam_result_line" t-as="line">
+                                <t t-foreach="o.exam_line" t-as="line">
                                     <t t-set="serial_number" t-value="serial_number + 1"/>
                                     <tr>
                                         <td>
                                             <t t-esc="serial_number"/>
                                         </td>
                                         <td class="text-center">
-                                            <span t-field="line.exam_id.batch_id"/>
+                                            <span t-field="line.subject_id"/>
                                         </td>
                                         <td class="text-center">
-                                            <span t-field="line.exam_id.subject_id"/>
+                                            <span t-field="line.date_start"/> - 
+                                            <span t-field="line.date_end"/>
                                         </td>
                                         <td class="text-center">
-                                            <span t-field="line.exam_id.date_start"/> - 
-                                            <span t-field="line.exam_id.date_end"/>
+                                            <span t-field="line.exam_hours"/>
                                         </td>
                                         <td class="text-center">
-                                            <span t-field="line.exam_id.exam_hours"/>
-                                        </td>
-                                        <td class="text-center">
-                                            <span t-field="line.exam_id.address_id"/>, 
-                                            <span t-field="line.exam_id.exam_location_id"/>
+                                            <span t-field="line.address_id"/>, 
+                                            <span t-field="line.exam_location_id"/>
                                         </td>
                                     </tr>
                                 </t>
@@ -126,12 +122,12 @@
         <!--  Student Hall Ticket Report  -->
         <record id="exam_session_ticket_report" model="ir.actions.report">
             <field name="name">Print Exam Slips</field>
-            <field name="model">oe.exam</field>
+            <field name="model">oe.exam.session</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">de_school_exam.exam_tickets_report_template</field>
             <field name="report_file">de_school_exam.exam_tickets_report_template</field>
             <field name="print_report_name">'Exam Slips'</field>
-            <field name="binding_model_id" ref="de_school_exam.model_oe_exam"/>
+            <field name="binding_model_id" ref="de_school_exam.model_oe_exam_session"/>
             <field name="binding_type">report</field>
         </record>
     </data>
