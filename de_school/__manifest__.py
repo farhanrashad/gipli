@@ -42,6 +42,8 @@
         'views/subject_views.xml',
     ],
     'demo': [
+        'demo/base_demo.xml',
+        'demo/course_demo.xml',
         'demo/student_demo.xml',
         'demo/teacher_demo.xml',
     ],

@@ -160,6 +160,6 @@ class OeSchoolCourse(models.Model):
             column2='batch_id',  
             domain="[('course_id','=',course_id)]"
         )
-        max_weekly_class = fields.Integer('Max Weekly Classes', required=True)
-        credit_hours = fields.Float('Credit Hours', required=True)
+        max_weekly_class = fields.Integer('Max Weekly Classes')
+        credit_hours = fields.Float('Credit Hours')
     
