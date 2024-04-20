@@ -22,7 +22,7 @@
                         <div class="oe_title">
                             <label for="name"/>
                             <h1>
-                                <field name="name" placeholder="e.g Numerical Grading"/>
+                                <field name="name" placeholder="e.g Course-Wise Weightage"/>
                             </h1>
                         </div>
                         <group>

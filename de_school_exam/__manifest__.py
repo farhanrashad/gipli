@@ -45,6 +45,11 @@
         'wizards/attendees_attendance_wizard_views.xml',
         'wizards/generate_marksheets_views.xml',
     ],
+    'demo': [
+        'demo/exam_grade_demo.xml',
+        'demo/marksheet_demo.xml',
+        'demo/exam_session_demo.xml',
+    ],
     'license': 'LGPL-3',
     'images': ['static/description/banner.gif'],
     'installable': True,
