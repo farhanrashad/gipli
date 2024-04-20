@@ -108,10 +108,19 @@ class MarkSheet(models.Model):
     
     # Actions
     def button_draft(self):
-        pass
+        record.write({
+            'state': 'draft'
+        })
 
     def button_generate(self):
         self._generate_marksheet()
+        self._action_post()
+
+    def _action_post(self):
+        for record in self:
+            record.write({
+                'state': 'done'
+            })
 
     @api.model
     def _generate_marksheet(self):
@@ -161,7 +170,9 @@ class MarkSheet(models.Model):
         return total_marks
 
     def button_cancel(self):
-        pass
+        record.write({
+            'state': 'cancel'
+        })
 
     def _compute_dynamic_view_arch(self):
         arch = ''

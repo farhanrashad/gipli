@@ -44,6 +44,7 @@ class CreateMarksheets(models.TransientModel):
                 }
                 try:
                     marksheet_id = self.env['oe.exam.marksheet'].create(marksheet_vals)
+                    marksheet_id._action_post()
                     marksheet_id._generate_marksheet()
                 except:
                     pass
