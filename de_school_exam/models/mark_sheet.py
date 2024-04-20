@@ -271,31 +271,9 @@ class MarkSheetLine(models.Model):
                 ])
                 
                 total_marks += score.marks * (group_line_id.grade_weightage/100)
-                # total_weightage += group_line_id.grade_weightage
-
             line.marks_total = round(total_marks,2)
 
-            #if total_weightage:
-                #line.marks_total = round(total_marks / total_weightage,2)
-            #else:
-            #    line.marks_total = 0.0
-            
-        
-    def _compute_marksheet_value111111(self, exam_type_id):
-        exam_ids = self.env['oe.exam'].search([
-            ('exam_session_id','in',self.marksheet_id.exam_session_ids.ids),
-            ('exam_session_id.exam_type_id','=',exam_type_id.id),
-            ('subject_id','=',self.subject_id.id),
-        ])
-        result_ids = self.env['oe.exam.result'].search([
-            ('exam_id','in', exam_ids.ids),
-            ('student_id','=',self.marksheet_id.student_id.id),
-        ])
-        ob_marks = sum(result_ids.mapped('marks'))
-        tot_marks = sum(exam_ids.mapped('marks_max'))
-        return (str(ob_marks) + '/' + str(tot_marks))
-
-class MarkSheetLine(models.Model):
+class MarkSheetLineScore(models.Model):
     _name = 'oe.exam.ms.line.score'
     _description = 'Marksheet Subject Score'
 

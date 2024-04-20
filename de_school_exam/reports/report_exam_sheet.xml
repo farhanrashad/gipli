@@ -14,19 +14,10 @@
                             <strong>Course</strong>
                             <p t-field="o.course_id" class="m-0"/>
                         </div>
-                        <div class="col-3 bm-2">
-                            <strong>Minimum Marks</strong>
-                            <p t-field="o.marks_min" class="m-0"/>
-                        </div>
-                        <div  class="col-3 bm-2">
-                            <strong>Maximum Marks</strong>
-                            <p t-field="o.marks_max" class="m-0"/>
-                        </div>
-                        
                     </div>
                     
                     
-                    <h4>Exams</h4>
+                    <h4>Exam Schedules</h4>
                     <table class="table table-sm o_main_table mt-4">
                         <thead style="display: table-row-group">
                             <tr>

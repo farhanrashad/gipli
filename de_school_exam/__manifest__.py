@@ -41,6 +41,7 @@
         'reports/report_exam_sheet.xml',
         'reports/report_result_sheet.xml',
         'reports/report_exam_tickets.xml',
+        'reports/report_marksheet.xml',
         'wizards/attendees_attendance_wizard_views.xml',
         'wizards/generate_marksheets_views.xml',
     ],

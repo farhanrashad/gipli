@@ -1,13 +1,12 @@
 <odoo>
     <data>
-        <template id="exam_session_exam_tickets_report_view">
+        <template id="exam_tickets_report_view">
             <t t-call="web.external_layout">
-                <t t-set="students" t-value="env['res.partner'].search([('is_student','=',True),('course_id','=',o.course_id.id)])"/>
-                <t t-foreach="students" t-as="student">
+                <t t-foreach="o.exam_attendee_ids" t-as="attendee">
                     <div class="page">
                         <div class="row mt-4 mb-16 text-center" id="exam_center">
                             <h2 class="">
-                                <span>Examination Hall Ticket</span>
+                                <span>Examination Hall Slip</span>
                             </h2>
                         </div>
                         <br/><br/>
@@ -30,44 +29,44 @@
                                         <strong>Candidate:</strong>
                                     </div>
                                     <div class="col-auto col-8 ">
-                                        <p class="m-0" t-field="student.name"/>
+                                        <p class="m-0" t-field="attendee.student_id.name"/>
                                     </div>
                                 </div>
-                                <div class="row " id="exam_center">
+                                <div t-if="attendee.student_id.roll_no" class="row " id="exam_center">
                                     <div class="col-auto col-4 ">
                                         <strong>Roll Number:</strong>
                                     </div>
                                     <div class="col-auto col-8 ">
-                                        <p class="m-0" t-field="student.roll_no"/>
+                                        <p class="m-0" t-field="attendee.student_id.roll_no"/>
                                     </div>
                                 </div>
-                                <div class="row " id="exam_center">
+                                <div t-if="attendee.student_id.admission_no" class="row " id="exam_center">
                                     <div class="col-auto col-4 ">
                                         <strong>Admission Number:</strong>
                                     </div>
                                     <div class="col-auto col-8 ">
-                                        <p class="m-0" t-field="student.admission_no"/>
+                                        <p class="m-0" t-field="attendee.student_id.admission_no"/>
                                     </div>
                                 </div>
-                                <div class="row " id="exam_center">
+                                <div t-if="attendee.student_id.guardian_name" class="row " id="exam_center">
                                     <div class="col-auto col-4 ">
                                         <strong>Guardian:</strong>
                                     </div>
                                     <div class="col-auto col-8 ">
-                                        <p class="m-0" t-field="student.guardian_name"/>
+                                        <p class="m-0" t-field="attendee.student_id.guardian_name"/>
                                     </div>
                                 </div>
-                                <div class="row " id="exam_center">
+                                <div t-if="attendee.slip_no" class="row " id="exam_center">
                                     <div class="col-auto col-4 ">
-                                        <strong>Seat No:</strong>
+                                        <strong>Slip No:</strong>
                                     </div>
                                     <div class="col-auto col-8 ">
-                                        <p class="m-0" t-field="student.name"/>
+                                        <p class="m-0" t-field="attendee.slip_no"/>
                                     </div>
                                 </div>
                             </div>
                             <div class="text-left col-4">
-                                <span t-field="student.image_medium" t-options="{'widget': 'image'}"/>
+                                <span t-field="attendee.student_id.image_medium" t-options="{'widget': 'image'}"/>
                             </div>
                         </div>
                         <br/>
@@ -85,14 +84,14 @@
                                 </tr>
                             </thead>
                             <tbody class="consumed_tbody">
-                                <t t-foreach="o.exam_line.exam_result_line.filtered(lambda x:x.student_id.id == student.id and x.exam_id.batch_id.id == student.batch_id.id)" t-as="line">
+                                <t t-foreach="o.exam_result_line" t-as="line">
                                     <t t-set="serial_number" t-value="serial_number + 1"/>
                                     <tr>
                                         <td>
                                             <t t-esc="serial_number"/>
                                         </td>
                                         <td class="text-center">
-                                            <span t-field="line.batch_id"/>
+                                            <span t-field="line.exam_id.batch_id"/>
                                         </td>
                                         <td class="text-center">
                                             <span t-field="line.exam_id.subject_id"/>
@@ -117,22 +116,22 @@
                 </t>
             </t>
         </template>
-        <template id="exam_session_exam_tickets_report_template">
+        <template id="exam_tickets_report_template">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <t t-call="de_school_exam.exam_session_exam_tickets_report_view" />
+                    <t t-call="de_school_exam.exam_tickets_report_view" />
                 </t>
             </t>
         </template>
         <!--  Student Hall Ticket Report  -->
         <record id="exam_session_ticket_report" model="ir.actions.report">
-            <field name="name">Print Hall Ticket</field>
-            <field name="model">oe.exam.session</field>
+            <field name="name">Print Exam Slips</field>
+            <field name="model">oe.exam</field>
             <field name="report_type">qweb-pdf</field>
-            <field name="report_name">de_school_exam.exam_session_exam_tickets_report_template</field>
-            <field name="report_file">de_school_exam.exam_session_exam_tickets_report_template</field>
-            <field name="print_report_name">'Exam Details'</field>
-            <field name="binding_model_id" ref="de_school_exam.model_oe_exam_session"/>
+            <field name="report_name">de_school_exam.exam_tickets_report_template</field>
+            <field name="report_file">de_school_exam.exam_tickets_report_template</field>
+            <field name="print_report_name">'Exam Slips'</field>
+            <field name="binding_model_id" ref="de_school_exam.model_oe_exam"/>
             <field name="binding_type">report</field>
         </record>
     </data>
