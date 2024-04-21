@@ -21,7 +21,7 @@
 <strong>Due Date: </strong><t t-out="object.date_due or ''">--</t><br/>
 <strong>Submission Method: </strong>Log in to your account, find the assignment and attach your document before submit"
 <br/>
-<strong>Assignment Instructions: </strong><t t-out="object.note or ''">--</t><br/><br/>
+<strong>Assignment Instructions: </strong><t t-out="object.description or ''">--</t><br/><br/>
 
 <p>
 Adhering to the due date and submission guidelines is crucial to receive proper credit for your work. Submitting assignments on time is essential for your academic success and allows us to provide timely feedback.

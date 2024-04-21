@@ -40,14 +40,14 @@
                             <button name="action_view_assigned_assignments"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-user"
+                                icon="fa-file"
                             >
                                 <field name="assignment_count" widget="statinfo" string="Assigned"/>
                             </button>
                             <button name="action_view_assigned_assignments"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-file"
+                                icon="fa-file-o"
                             >
                                 <field name="assignment_submit_count" widget="statinfo" string="Submit"/>
                             </button>

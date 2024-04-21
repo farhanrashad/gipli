@@ -3,6 +3,7 @@
 from odoo import fields, models, api, _
 from odoo.exceptions import AccessError, UserError, ValidationError
 from datetime import datetime, timedelta, time
+from odoo.osv import expression
 
 
 class Assignment(models.Model):
@@ -110,27 +111,36 @@ class Assignment(models.Model):
         self.write({'state': 'draft'})
 
     def button_publish(self):
-        for record in self:
-            student_ids = self.env['res.partner'].search([('is_student','=',True),('batch_id','in',record.batch_id.id)])
-            for student in student_ids:
-                assignment_line_id = self.env['oe.assignment.line'].create({
-                    'assignment_id': record.id,
-                    'student_id': student.id,
-                    'state': 'draft',
-                })
-                #self._action_send_email(student)
-            partner_ids_to_add = student_ids.ids
-            self.message_subscribe(partner_ids=partner_ids_to_add)
-            self._action_send_email(student_ids)
-            self.write({'state': 'publish'})
+        self.assignment_line_ids.unlink()
+        self._assign_assignment()
+        #self.write({'state': 'publish'})
 
+    
     def _assign_assignment(self):
         student_ids = self.env['res.partner'].search(self._get_student_domain())
+        for student in student_ids:
+            assignment_line_id = self.env['oe.assignment.line'].create(self._assignment_values(student))
+        self.message_subscribe(partner_ids=student_ids.ids)
+        self._action_send_email(student_ids)
 
     def _get_student_domain(self):
-        domain = [('is_studnet','=',True),('course_id','=',self.course_id.id)]
+        domain = [('is_student', '=', True), ('course_id', '=', self.course_id.id)]
+        if self.batch_id:
+            domain += expression.AND([domain, [('batch_id', '=', self.batch_id.id)]])
+    
+        if self.section_id:
+            domain += expression.AND([domain, [('section_id', '=', self.section_id.id)]])
+        #domain = expression.AND([primary_domain, batch_domain, section_domain])
         return domain
         
+    def _assignment_values(self, student):
+        vals = {
+            'assignment_id': self.id,
+            'student_id': student.id,
+            'state': 'draft',
+        }
+        return vals
+    
     def button_close(self):
         self.write({'state': 'close'})
         
@@ -138,7 +148,21 @@ class Assignment(models.Model):
         self.write({'state': 'draft'})
 
     def action_view_assigned_assignments(self):
-        pass
+        action = self.env.ref('de_school_assignment.action_assignment_line').read()[0]
+        action.update({
+            'name': 'Assigned Students',
+            'view_mode': 'tree,form',
+            'res_model': 'oe.assignment.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('assignment_id','=',self.id)],
+            'context': {
+                'create': False,
+                'edit': False,
+                'delete': False,
+            },
+            
+        })
+        return action
 
     def _action_send_email(self, student_ids):
         """ send email to students for assignment """

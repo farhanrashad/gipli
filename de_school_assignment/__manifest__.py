@@ -7,22 +7,18 @@
         """,
 
     'description': """
-        Student Assignment
+Openrol - Exam Management App
+================================
+Features:
+
     """,
 
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'School',
-    'version': '0.1',
-
-    # any module necessary for this one to work correctly
+    'category': 'Sales/Industries',
+    'version': '17.0.0.1',
+    'live_test_url': 'https://youtu.be/dCpbMEO6EmY',
     'depends': ['de_school'],
-
-    # always loaded
     'data': [
         'security/assignment_security.xml',
         'security/ir.model.access.csv',
@@ -32,8 +28,12 @@
         'views/assignment_views.xml',
         'views/assignment_line_views.xml',
     ],
-    # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+    'license': 'LGPL-3',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
