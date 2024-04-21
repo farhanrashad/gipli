@@ -47,3 +47,6 @@ access_school_building_user,access.school.building.user,model_oe_school_building
 
 access_school_building_room,access.school.building.room,model_oe_school_building_room,,1,0,0,0
 access_school_building_room_user,access.school.building.room.user,model_oe_school_building_room,de_school.group_school_user,1,1,1,1
+
+access_teacher_subject_line,access.teacher.subject.line,model_hr_employee_subjects_line,,1,0,0,0
+access_teacher_subject_line_user,access.teacher.subject.line.user,model_hr_employee_subjects_line,de_school.group_school_user,1,1,1,1

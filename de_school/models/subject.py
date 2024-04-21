@@ -24,4 +24,5 @@ class SchoolCourseSubject(models.Model):
     active = fields.Boolean('Active', default=True)
     subject_group_id = fields.Many2one('oe.school.subject.group', string='Subject Group')
     color = fields.Integer(default=_default_color)
+    company_id = fields.Many2one('res.company', 'Company', index=True)
     

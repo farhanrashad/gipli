@@ -14,7 +14,7 @@
     'website': "https://dynexcel.com/",
     'category': 'Sales/School/Industries',
     'live_test_url': 'https://youtu.be/Idkqo8CpSAs',
-    'version': '17.0.0.1',
+    'version': '17.0.0.3',
     'depends': ['base','hr'],
     'data': [
         'security/school_security.xml',
@@ -33,6 +33,7 @@
         'views/student_medical_views.xml',
         'views/medical_type_views.xml',
         'views/teacher_views.xml',
+        'views/teacher_subjects_views.xml',
         'views/course_views.xml',
         'views/batch_views.xml',
         'views/section_views.xml',

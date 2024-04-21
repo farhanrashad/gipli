@@ -151,6 +151,7 @@ class OeSchoolCourse(models.Model):
         _description = 'Course Subject Line'
 
         course_id = fields.Many2one('oe.school.course', string='Course', required=True, ondelete='cascade', index=True)
+        company_id = fields.Many2one('res.company',related='course_id.company_id')
         subject_id = fields.Many2one('oe.school.subject', string='Subject', required=True)
         batch_ids = fields.Many2many(
             'oe.school.course.batch',  
