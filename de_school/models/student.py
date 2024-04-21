@@ -49,7 +49,6 @@ class ResPartner(models.Model):
                                  domain="[('course_id','=',course_id)]"
                               )
     
-    subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subjects')
     student_subject_line = fields.One2many('res.partner.subjects.line', 'student_id', 'Subjects')
     
     enrollment_count = fields.Integer(string='Enrollments', compute='_compute_enrollment_count')
@@ -222,6 +221,7 @@ class SubjectLine(models.Model):
         string='Courses for Subject',
         compute='_compute_subjects_from_course',
     )
+    
 
     _sql_constraints = [
         ('unique_student_subject', 'UNIQUE(student_id, subject_id)', 'Subject must be unique!'),
