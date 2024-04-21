@@ -50,6 +50,7 @@ class ResPartner(models.Model):
                               )
     
     subject_ids = fields.Many2many('oe.school.subject', string='Subjects', compute='_compute_subjects')
+    student_subject_line = fields.One2many('res.partner.subjects.line', 'student_id', 'Subjects')
     
     enrollment_count = fields.Integer(string='Enrollments', compute='_compute_enrollment_count')
 
@@ -201,7 +202,21 @@ class StudentSiblings(models.Model):
         ('brother', 'Brother'),
         ('sister', 'Sister'),
     ], string='Gender', default='brother', required=True)
-    
 
+class SubjectLine(models.Model):
+    _name = 'res.partner.subjects.line'
+    _description = 'Student Sibling'
+
+    student_id = fields.Many2one('res.partner', 
+                                  string='Student', 
+                                  required=True, 
+                                  ondelete='cascade', 
+                                  index=True, copy=False
+                                )
+    subject_id = fields.Many2one('oe.school.subject', string='Subject', 
+                                 required=True,
+                                 domain="[('course_id','=',parent.course_id)]"
+                                )
+    
     
     
