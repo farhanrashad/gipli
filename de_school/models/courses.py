@@ -146,21 +146,21 @@ class OeSchoolCourse(models.Model):
         })
         return action
         
-    class SchoolCourseSubjectLine(models.Model):
-        _name = 'oe.school.course.subject.line'
-        _description = 'Course Subject Line'
+class SchoolCourseSubjectLine(models.Model):
+    _name = 'oe.school.course.subject.line'
+    _description = 'Course Subject Line'
 
-        course_id = fields.Many2one('oe.school.course', string='Course', required=True, ondelete='cascade', index=True)
-        company_id = fields.Many2one('res.company',related='course_id.company_id')
-        subject_id = fields.Many2one('oe.school.subject', string='Subject', required=True)
-        batch_ids = fields.Many2many(
-            'oe.school.course.batch',  
-            'subject_batch_rel',  
-            string='Batches',
-            column1='subject_id',  
-            column2='batch_id',  
-            domain="[('course_id','=',course_id)]"
-        )
-        max_weekly_class = fields.Integer('Max Weekly Classes')
-        credit_hours = fields.Float('Credit Hours')
+    course_id = fields.Many2one('oe.school.course', string='Course', required=True, ondelete='cascade', index=True)
+    company_id = fields.Many2one('res.company',related='course_id.company_id')
+    subject_id = fields.Many2one('oe.school.subject', string='Subject', required=True)
+    batch_ids = fields.Many2many(
+        'oe.school.course.batch',  
+        'subject_batch_rel',  
+        string='Batches',
+        column1='subject_id',  
+        column2='batch_id',  
+        domain="[('course_id','=',course_id)]"
+    )
+    max_weekly_class = fields.Integer('Max Weekly Classes')
+    credit_hours = fields.Float('Credit Hours')
     

@@ -215,8 +215,27 @@ class SubjectLine(models.Model):
                                 )
     subject_id = fields.Many2one('oe.school.subject', string='Subject', 
                                  required=True,
-                                 domain="[('course_id','=',parent.course_id)]"
+                                 domain="[('id','in',subject_ids)]"
                                 )
-    
+    subject_ids = fields.Many2many(
+        comodel_name='oe.school.subject',
+        string='Courses for Subject',
+        compute='_compute_subjects_from_course',
+    )
+
+    _sql_constraints = [
+        ('unique_student_subject', 'UNIQUE(student_id, subject_id)', 'Subject must be unique!'),
+    ]
+
+    @api.depends('student_id.course_id')
+    def _compute_subjects_from_course(self):
+        for record in self:
+            if record.student_id.course_id:
+                subject_ids = self.env['oe.school.course.subject.line'].search([
+                    ('course_id','=',record.student_id.course_id.id)
+                ]).mapped('subject_id')
+                record.subject_ids = subject_ids
+            else:
+                record.subject_ids = False    
     
     

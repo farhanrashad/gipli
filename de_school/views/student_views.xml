@@ -11,6 +11,7 @@
                 <xpath expr="//sheet[1]" position="inside">
                     <field name="use_batch" invisible="1"/>
                     <field name="use_section" invisible="1"/>
+                    <field name="course_id" invisible="1" />
                 </xpath>
 
                 <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
@@ -184,15 +185,17 @@
                             </tree>
                         </field>
 					</page>
-                    
-                    <page name='active_subjects' string="Subjects" 
-                        invisible="is_student  != True or is_parent_student == True">
-                        <field name="subject_ids" widget="one2many_list" readonly="1" nolabel="1">
-                            <tree >
-                                <field name="name" />
-                                <field name="subject_group_id"  />
-                            </tree>
-                        </field>
+                    <page string="Subjects" name="subjects" 
+                        invisible="is_student == False">
+                        <field name="student_subject_line" >
+                            <tree editable="bottom">
+								<field name="student_id" column_invisible="1"/>
+                                <field name="subject_ids" column_invisible="0"/>
+								<field name="subject_id"
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    />
+							</tree>
+						</field>
                     </page>
                     
                 </xpath>
