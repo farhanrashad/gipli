@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Assignment",
+    'name': "Openrol - Assignment",
 
     'summary': """
     Student Assignment

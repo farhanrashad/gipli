@@ -89,7 +89,22 @@ class Assignment(models.Model):
                 attendance.subject_ids = subject_lines.mapped('subject_id')
             else:
                 attendance.subject_ids = False
-                
+
+    # CRUD Operations
+    def write(self, vals):
+        res = super(Assignment, self).write(vals)
+        if 'file_assignment' in vals and vals['file_assignment']:
+            attachment_vals = {
+                'name': self.name + '_attachment',
+                'datas': vals['file_assignment'],
+                'res_model': 'oe.assignment',
+                'res_id': self.id,
+            }
+            attachment = self.env['ir.attachment'].create(attachment_vals)
+            self.message_post(body='Assignment added', attachment_ids=[attachment.id])
+        return res
+
+    
     # Action Buttons
     def button_draft(self):
         self.write({'state': 'draft'})
@@ -109,6 +124,13 @@ class Assignment(models.Model):
             self._action_send_email(student_ids)
             self.write({'state': 'publish'})
 
+    def _assign_assignment(self):
+        student_ids = self.env['res.partner'].search(self._get_student_domain())
+
+    def _get_student_domain(self):
+        domain = [('is_studnet','=',True),('course_id','=',self.course_id.id)]
+        return domain
+        
     def button_close(self):
         self.write({'state': 'close'})
         
