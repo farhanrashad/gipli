@@ -12,6 +12,16 @@ class HrEmployee(models.Model):
     subject_ids = fields.Many2many('oe.school.subject', string='Subjects')
     teacher_subject_line = fields.One2many('hr.employee.subjects.line', 'employee_id', 'Subjects')
 
+    use_batch = fields.Boolean(compute='_compute_use_batch_from_company')
+    use_section = fields.Boolean(compute='_compute_use_section_from_company')
+    def _compute_use_batch_from_company(self):
+        for record in self:
+            record.use_batch = record.company_id.use_batch
+            
+    def _compute_use_section_from_company(self):
+        for record in self:
+            record.use_section = record.company_id.use_section
+            
     def open_subjects(self):
         action = self.env.ref('de_school.action_teacher_subjects').read()[0]
         action.update({
@@ -21,8 +31,8 @@ class HrEmployee(models.Model):
             'type': 'ir.actions.act_window',
             'domain': [('employee_id','=',self.id)],
             'context': {
-                #'create': False,
-                #'edit': False,
+                'create': True,
+                'edit': True,
                 'delete': False,
             },
             
@@ -56,7 +66,7 @@ class SubjectLine(models.Model):
         string='Courses',
         domain="[('id','in',domain_courses_for_subject)]"
     )
-    use_batch = fields.Boolean(compute='_compute_use_batch_from_company')
+    
     batch_ids = fields.Many2many(
         comodel_name='oe.school.course.batch', 
         relation='course_batch_rel', 
@@ -66,7 +76,7 @@ class SubjectLine(models.Model):
         domain="[('course_id','in',course_ids)]"
     )
 
-    use_section = fields.Boolean(compute='_compute_use_section_from_company')
+    
     section_ids = fields.Many2many(
         comodel_name='oe.school.course.section', 
         relation='course_section_rel', 
@@ -97,11 +107,3 @@ class SubjectLine(models.Model):
                 record.domain_courses_for_subject = [(6, 0, courses.ids)]
             else:
                 record.domain_courses_for_subject = False
-
-    def _compute_use_batch_from_company(self):
-        for record in self:
-            record.use_batch = record.employee_id.company_id.use_batch
-            
-    def _compute_use_section_from_company(self):
-        for record in self:
-            record.use_section = record.employee_id.company_id.use_section

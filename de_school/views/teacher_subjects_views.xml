@@ -6,11 +6,9 @@
 			<field name="name">employee.subjects.line.tree.view</field>
 			<field name="model">hr.employee.subjects.line</field>
 			<field name="arch" type="xml">
-				<tree string="Subjects" >
+				<tree string="Subjects" editable="bottom">
 					<field name="active" column_invisible="1" />
                     <field name="employee_id" column_invisible="1" />
-                    <field name="use_batch" column_invisible="1" />
-                    <field name="use_section" column_invisible="1" />
                     <field name="domain_courses_for_subject" column_invisible="1"/>
 					<field name="subject_id"
                         options="{'no_create':True, 'no_edit':True}"
@@ -19,11 +17,11 @@
                         options="{'no_create':True, 'no_edit':True}"
                     /> 
                     <field name="batch_ids" widget="many2many_tags"
-                        invisible="not use_batch"
+                        column_invisible="not not parent.employee_id.use_section"
                         options="{'no_create':True, 'no_edit':True}"
                     /> 
                     <field name="section_ids" widget="many2many_tags"
-                        invisible="not use_section"
+                        column_invisible="not parent.employee_id.use_section"
                         options="{'no_create':True, 'no_edit':True}"
                     /> 
 				</tree>

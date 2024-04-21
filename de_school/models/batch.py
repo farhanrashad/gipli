@@ -7,6 +7,7 @@ from odoo.exceptions import UserError, AccessError
 class SchoolCourseBatch(models.Model):
     _name = 'oe.school.course.batch'
     _description = 'Course Batch'
+    _rec_name = 'display_name'
 
     def _default_year_id(self):
         # Search for the active academic year in oe.school.year
@@ -14,6 +15,7 @@ class SchoolCourseBatch(models.Model):
         return active_year.id if active_year else False
         
     name = fields.Char(string='Batch', required=True, index=True, translate=True)
+    display_name = fields.Char(string="Display Name", compute='_compute_display_name')
     course_id = fields.Many2one('oe.school.course', string='Course', required=True)
     subject_ids = fields.Many2many('oe.school.subject', compute='_compute_subjects')
     company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
@@ -26,6 +28,11 @@ class SchoolCourseBatch(models.Model):
                            store=True, compute='_compute_date_from_school_year')
     count_subjects = fields.Integer(string='Subjects', compute='_compute_course_subjects')
 
+    @api.depends('name','course_id.code')
+    def _compute_display_name(self):
+        for record in self:
+            record.display_name = record.course_id.code + '/' + record.name
+            
     def _compute_course_subjects(self):
         for record in self:
             subject_ids = self.course_id.course_subject_line.filtered(lambda x: self.id in x.batch_ids.ids)

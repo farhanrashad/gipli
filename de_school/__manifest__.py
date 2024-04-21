@@ -33,7 +33,6 @@
         'views/student_medical_views.xml',
         'views/medical_type_views.xml',
         'views/teacher_views.xml',
-        'views/teacher_subjects_views.xml',
         'views/course_views.xml',
         'views/batch_views.xml',
         'views/section_views.xml',
