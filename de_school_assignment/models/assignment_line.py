@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from datetime import datetime
+from odoo.exceptions import AccessError, UserError, ValidationError
 
 
 class AssignmentSubmit(models.Model):
@@ -47,17 +48,14 @@ class AssignmentSubmit(models.Model):
     date = fields.Datetime(string='Date Submission', readonly=True)
 
     # CRUD Operations
-    def write1111(self, vals):
-        res = super(AssignmentSubmit, self).write(vals)
+    def write(self, vals):
         if 'file_submit' in vals and vals['file_submit']:
-            body = 'Assignment submitted by ' + self.student_id.name
-            attachment = self.env['ir.attachment'].create(
-                self._assignment_values('oe.assignment',self.assignment_id.id,vals['file_submit'])
-            )
-            self.assignment_id.message_post(body=body, attachment_ids=[attachment.id])
-            #self.message_post(body=body, attachment_ids=[attachment.id])
+            self._action_submit(vals['file_submit'])
+            vals['date'] = datetime.now()
+        if self.state == 'draft':
+            vals['state'] = 'submitted'
+        res = super(AssignmentSubmit, self).write(vals)
         return res
-
     
         
     # Action Buttons
@@ -65,16 +63,16 @@ class AssignmentSubmit(models.Model):
         self.write({'state': 'draft'})
 
     def button_submit(self):
-        self._action_submit()
+        self._action_submit(self.file_submit)
         self.write({
             'state': 'submitted',
             'date': datetime.now(),
         })
 
-    def _action_submit(self):
+    def _action_submit(self, file):
         body = 'Assignment submitted by ' + self.student_id.name
         attachment = self.env['ir.attachment'].create(
-            self._assignment_values('oe.assignment',self.assignment_id.id,self.file_submit)
+            self._assignment_values('oe.assignment',self.assignment_id.id,file)
         )
         self.assignment_id.message_post(body=body, attachment_ids=[attachment.id])
         
@@ -89,4 +87,25 @@ class AssignmentSubmit(models.Model):
         return vals
     def button_cancel(self):
         self.write({'state': 'draft'})
+
+    def _share_assignment_file(self, file):
+        body = 'Please download the assignment file and submit your solution before the due date.'
+        attachment = self.env['ir.attachment'].create(
+            self._share_assignment_file_values('oe.assignment.line',self.id,file)
+        )
+        self.message_post(
+            body=body, 
+            attachment_ids=[attachment.id],
+            message_type='comment',
+            subtype_id=self.env.ref('mail.mt_comment').id,
+        )
+
+    def _share_assignment_file_values(self, res_model, res_id, file):
+        vals = {
+            'name': self.assignment_id.name + '_' + self.assignment_id.subject_id.code,
+            'datas': file,
+            'res_model': res_model,
+            'res_id': res_id,
+        }
+        return vals
         

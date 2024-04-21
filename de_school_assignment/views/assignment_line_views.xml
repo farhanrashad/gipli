@@ -8,11 +8,12 @@
 			<field name="arch" type="xml">
 				<tree string="Assignment Line" >
                     <field name="student_id"/>
-                    <field name="assignment_id"/>
-                    <field name="course_id"/>
+                    <field name="assignment_id" optional="hide"/>
+                    <field name="course_id" optional="hide"/>
 					<field name="subject_id"/>
-                    <field name="batch_id"/>
                     <field name="date_due" />
+                    <field name="file_assignment" widget="binary" />
+                    <field name="date" />
                     <field name="state" />
 				</tree>
 			</field>
@@ -26,7 +27,9 @@
                 <form string="Assignment">
                     <header>
                         <button name="button_draft" invisible="state != 'cancel'" string="Set to Draft" type="object" data-hotkey="n"/>
-                        <button name="button_submit" invisible="state != 'draft'" string="Submit" type="object" class="oe_highlight" data-hotkey="o" />                        
+                        <!--
+                        <button name="button_submit" invisible="state != 'draft'" string="Submit" type="object" class="oe_highlight" data-hotkey="o" />
+                        -->
                         <button name="button_cancel" invisible="state != 'draft'" string="Cancel" type="object" data-hotkey="x" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,submitted,expired" readonly="1"/>
                         
@@ -34,15 +37,24 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="assignment_id" options="{'no_create':True}"/>
-                                <field name="student_id" options="{'no_create':True}"/>
+                                <field name="assignment_id" 
+                                    options="{'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
+                                <field name="student_id" 
+                                    options="{'no_create':True}"
+                                    readonly="state != 'draft'"
+                                />
                                 <field name="course_id" options="{'no_open':True,'no_create':True}"/>
                                 <field name="subject_id" options="{'no_open':True,'no_create':True}"/>
                                 <field name="batch_id" options="{'no_open':True,'no_create':True}"/>
                             </group>
                             <group>
                                 <field name="file_assignment" widget="binary" />
-                                <field name="file_submit" widget="binary" />
+                                <field name="file_submit" 
+                                    widget="binary" 
+                                    readonly="state in ['expired','cancel']"
+                                />
                                 <field name="date_due" />
                                 <field name="date" />
                                 

@@ -24,17 +24,8 @@
 <strong>Assignment Instructions: </strong><t t-out="object.description or ''">--</t><br/><br/>
 
 <p>
-Adhering to the due date and submission guidelines is crucial to receive proper credit for your work. Submitting assignments on time is essential for your academic success and allows us to provide timely feedback.
+Adherence to due dates and submission guidelines is crucial for receiving proper credit and timely feedback. Starting assignments early for review and revisions is encouraged, and if you encounter challenges or need clarification, contact your teaching assistant. Timely submissions are vital for course progress and academic success, so plan accordingly for your assignment submissions.
 </p>
-<p>We encourage you to start working on your assignment early to allow ample time for review and revisions.</p>
-
-<p>If you face any challenges or require clarification on the assignment instructions, please feel free to contact your teaching assistant.</p>
-<p>
-Your success is our priority, and we are here to support you throughout this assignment. Submitting your work on time is vital for your progress in the course, so make sure to plan accordingly.
-</p>
-                    <p>
-We appreciate your commitment and dedication to your studies. We look forward to receiving your assignment on time and witnessing your academic growth.
-                    </p>
                     
 </div>
                 <!-- Message end -->

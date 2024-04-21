@@ -67,7 +67,7 @@ class Assignment(models.Model):
         'assignment_id',
         string='Submit lines',
         copy=False,
-        domain=[('state', '=', 'submit')],
+        domain=[('state', '=', 'submitted')],
     )
     assignment_submit_count = fields.Integer('Assignment Count', compute='_compute_submitted_assignment')
 
@@ -120,7 +120,8 @@ class Assignment(models.Model):
         student_ids = self.env['res.partner'].search(self._get_student_domain())
         for student in student_ids:
             assignment_line_id = self.env['oe.assignment.line'].create(self._assignment_values(student))
-        self.message_subscribe(partner_ids=student_ids.ids)
+            #assignment_line_id._share_assignment_file(self.file_assignment)
+        #self.message_subscribe(partner_ids=student_ids.ids)
         self._action_send_email(student_ids)
 
     def _get_student_domain(self):
@@ -140,7 +141,7 @@ class Assignment(models.Model):
             'state': 'draft',
         }
         return vals
-    
+        
     def button_close(self):
         self.write({'state': 'close'})
         
