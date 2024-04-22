@@ -12,9 +12,10 @@
                     <field name="course_id" optional="hide"/>
 					<field name="subject_id"/>
                     <field name="date_due" />
+                    <field name="date" />
                     <field name="file_assignment" widget="binary" />
                     <field name="marks" />
-                    <field name="date" />
+                    <field name="assignment_grade_line_id" />
                     <field name="state" readonly="1"/>
 				</tree>
 			</field>
@@ -59,6 +60,7 @@
                                 <field name="marks" required="state == 'expired'" 
                                     readonly="state != 'expired'" 
                                     />
+                                <field name="assignment_grade_line_id" />
                                 <field name="date_due" />
                                 <field name="date" />
                                 

@@ -22,6 +22,9 @@ class Assignment(models.Model):
     assignment_type_id = fields.Many2one('oe.assignment.type', 'Assignment Type', 
                                  store=True, required=True,
                                 )
+    assignment_grade_id = fields.Many2one('oe.assignment.grade', 'Assignment Grade', 
+                                 store=True, required=True,
+                                )
     
     teacher_id = fields.Many2one('hr.employee', 'Teacher', 
             compute='_compute_teacher_id', precompute=True, store=True, readonly=False,

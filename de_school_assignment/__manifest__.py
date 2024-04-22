@@ -3,7 +3,7 @@
     'name': "Openrol - Assignment",
 
     'summary': """
-    Student Assignment
+    Streamline Assignment Creation, Submission, and Grading
         """,
 
     'description': """
@@ -26,6 +26,7 @@ Features:
         'data/mail_template_data.xml',
         'views/assignment_menu.xml',
         'views/assignment_type_views.xml',
+        'views/assignment_grade_views.xml',
         'views/assignment_views.xml',
         'views/assignment_line_views.xml',
     ],

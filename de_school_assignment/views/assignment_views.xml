@@ -96,6 +96,7 @@
                                     readonly="state != 'draft'"
                                     required="state == 'draft'"
                                 />
+                                <field name="assignment_grade_id" />
                                 <field name="marks_min" readonly="state != 'draft'"/>
                                 <field name="marks_max" readonly="state != 'draft'"/>
                                 <field name="date" readonly="state != 'draft'"/>

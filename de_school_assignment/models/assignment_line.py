@@ -48,6 +48,23 @@ class AssignmentSubmit(models.Model):
 
     date = fields.Datetime(string='Date Submission', readonly=True)
 
+    assignment_grade_line_id = fields.Many2one('oe.assignment.grade.line', string='Assignment Grade', 
+                                         store=True,
+                                         compute='_compute_assignment_grade'
+                                        )
+
+    @api.depends('marks')
+    def _compute_assignment_grade(self):
+        for assignment in self:
+            assignment.assignment_grade_line_id = False
+            grade_lines = self.env['oe.assignment.grade.line'].search([('assignment_grade_id','=',assignment.assignment_id.assignment_grade_id.id)], order='score_min DESC')
+
+            # Find the first grade that the score is greater than or equal to
+            for line in grade_lines:
+                if assignment.marks >= line.score_min:
+                    assignment.assignment_grade_line_id = line.id
+                    break
+                    
     # CRUD Operations
     def write(self, vals):
         if 'file_submit' in vals and vals['file_submit']:
