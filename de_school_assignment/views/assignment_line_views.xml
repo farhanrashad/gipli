@@ -84,7 +84,21 @@
             <field name="model">oe.assignment.line</field>
             <field name="arch" type="xml">
                 <search string="Assignment">
-                    <field name="batch_id" string="Batch"/>
+                    <field name="subject_id"/>
+                    <field name="student_id"/>
+                    <field name="state" />
+                    <filter string="Due" name="due_assignment" domain="[('date_due','&gt;', context_today())]"/>
+                    <separator/>
+                    <filter string="Submitted" domain="[('state', '=', 'submitted')]" name="filter_submitted_assignments"/>
+                    <filter string="Expired" domain="[('state', '=', 'expired')]" name="filter_expired_assignments"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Student" name="group_student" context="{'group_by':'student_id'}"/>
+                        <separator/>
+                        <filter string="Subject" name="group_course" context="{'group_by':'subject_id'}"/>
+                        <separator/>
+                        <filter string="State" name="group_state" context="{'group_by':'state'}"/>
+                    </group>
                 </search>
              </field>
         </record>

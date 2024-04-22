@@ -128,15 +128,34 @@
                 </form>
             </field>
         </record>
-        
+
+        <!-- Search view -->
         <record id="assignment_search_view" model="ir.ui.view">
             <field name="name">assignment.search.view</field>
             <field name="model">oe.assignment</field>
             <field name="arch" type="xml">
-                <search string="Assignment">
-                    <field name="batch_id" string="Batch"/>
+                <search string="Assignment Search">
+                    <field name="name" string="Assignment" filter_domain="[('name', 'ilike', self)]"/>
+                    <field name="course_id" />
+                    <field name="subject_id"/>
+                    <field name="teacher_id"/>
+                    <field name="state" />
+                    
+                    <filter string="Due" name="due_assignment" domain="[('date_due','&gt;', context_today())]"/>
+                    <separator/>
+                    <filter string="Publish" domain="[('state', '=', 'publish')]" name="filter_publish_assignments"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                            <filter string="Type" name="group_assignment_type" context="{'group_by':'assignment_type_id'}"/>
+                            <filter string="Teacher" name="group_teacher" context="{'group_by':'teacher_id'}"/>
+                            <separator/>
+                            <filter string="Course" name="group_course" context="{'group_by':'course_id'}"/>
+                            <filter string="Subject" name="group_course" context="{'group_by':'subject_id'}"/>
+                            <separator/>
+                            <filter string="State" name="group_state" context="{'group_by':'state'}"/>
+                    </group>
                 </search>
-             </field>
+            </field>
         </record>
         
         <record id="action_assignment" model="ir.actions.act_window">
