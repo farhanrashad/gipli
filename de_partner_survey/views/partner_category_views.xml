@@ -1,0 +1,49 @@
+<odoo>
+    <record id="partner_qualification_survey_category_form" model="ir.ui.view">
+            <field name="name">res.partner.category.view.</field>
+            <field name="model">res.partner.category</field>
+            <field name="inherit_id" ref="base.view_partner_category_form"/>
+            <field name="priority" eval="3"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//form/sheet" position="inside">
+
+                <group string="Interviews">
+                        <field name="interview_count" placeholder="Interview Steps 1-5"/>
+
+                        <label string="Interview 1" for="survey_id_1" attrs="{'invisible' : [('survey_bool_a', '=', False)]}"/>
+                        <div class="o_row">
+                            <field name="survey_id_1" string="Interview 1" attrs="{'invisible' : [ ('survey_bool_a', '=', False)], 'required' : [ ('survey_bool_a', '=', True)]}"/>
+                            <field name="partner_id_a" string="Interview 1" attrs="{'invisible' : [('survey_bool_a', '=', False)], 'required' : [ ('survey_bool_a', '=', True)]}"/>
+                        </div>
+                        <label string="Interview 2" for="survey_id_2" attrs="{'invisible' : [('survey_bool_b', '=', False)]}"/>
+                        <div class="o_row">
+                            <field name="survey_id_2" string="Interview 2" attrs="{'invisible' : [('survey_bool_b', '=', False)], 'required' : [ ('survey_bool_b', '=', True)]}"/>
+                            <field name="partner_id_b" string="Interview 2" attrs="{'invisible' : [('survey_bool_b', '=', False)], 'required' : [ ('survey_bool_b', '=', True)]}"/>
+                        </div>
+                        <label string="Interview 3" for="survey_id_3" attrs="{'invisible' : [ ('survey_bool_c', '=', False)]}"/>
+                        <div class="o_row">
+                            <field name="survey_id_3" string="Interview 3" attrs="{'invisible' : [('survey_bool_c', '=', False)], 'required' : [ ('survey_bool_c', '=', True)]}"/>
+                            <field name="partner_id_c" string="Interview 3" attrs="{'invisible' : [('survey_bool_c', '=', False)], 'required' : [ ('survey_bool_c', '=', True)]}"/>
+                        </div>
+                        <label string="Interview 4" for="survey_id_4" attrs="{'invisible' : [('survey_bool_d', '=', False)]}"/>
+                        <div class="o_row">
+                            <field name="survey_id_4" string="Interview 4" attrs="{'invisible' : [('survey_bool_d', '=', False)], 'required' : [ ('survey_bool_d', '=', True)]}"/>
+                            <field name="partner_id_d" string="Interview 4" attrs="{'invisible' : [ ('survey_bool_d', '=', False)], 'required' : [ ('survey_bool_d', '=', True)]}"/>
+                        </div>
+                        <label string="Interview 5" for="survey_id_5" attrs="{'invisible' : [('survey_bool_e', '=', False)]}"/>
+                        <div class="o_row">
+                            <field name="survey_id_5" string="Interview 5" attrs="{'invisible' : [('survey_bool_e', '=', False)], 'required' : [ ('survey_bool_e', '=', True)]}"/>
+                            <field name="partner_id_e" string="Interview 5" attrs="{'invisible' : [('survey_bool_e', '=', False)], 'required' : [ ('survey_bool_e', '=', True)]}"/>
+                        </div>
+                        <field name="survey_bool_a" invisible="1"/>
+                        <field name="survey_bool_b" invisible="1"/>
+                        <field name="survey_bool_c" invisible="1"/>
+                        <field name="survey_bool_d" invisible="1"/>
+                        <field name="survey_bool_e" invisible="1"/>
+                    </group>
+
+            </xpath>
+            </field>
+    </record>
+</odoo>
