@@ -78,6 +78,25 @@
                 </form>
             </field>
         </record>
+
+        <record id="assignment_line_calendar_view" model="ir.ui.view">
+            <field name="name">assignment.line.calendar.view</field>
+            <field name="model">oe.assignment.line</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Assignments" 
+                    date_start="date"
+                    mode="month" color="subject_id"
+                    event_open_popup="true"
+                    event_limit="10"
+                    quick_create="0"
+                >
+                    <field name="subject_id" filters="1" invisible="1" />
+                    <field name="student_id" filters="2" invisible="1" />
+                    <field name="date_due" invisible="1" />
+                </calendar>
+            </field>
+        </record>
         
         <record id="assignment_line_search_view" model="ir.ui.view">
             <field name="name">assignment.line.search.view</field>
@@ -106,7 +125,7 @@
         <record id="action_assignment_line" model="ir.actions.act_window">
             <field name="name">Assignment</field>
             <field name="res_model">oe.assignment.line</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,calendar,form</field>
             <field name="search_view_id" ref="assignment_line_search_view"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

@@ -129,6 +129,27 @@
             </field>
         </record>
 
+        <record id="assignment_calendar_view" model="ir.ui.view">
+            <field name="name">assignment.calendar.view</field>
+            <field name="model">oe.assignment</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Assignments" 
+                    date_start="date"
+                    mode="month" color="course_id"
+                    event_open_popup="true"
+                    event_limit="10"
+                    quick_create="0"
+                >
+                    <field name="course_id" filters="1" invisible="1" />
+                    <field name="teacher_id" filters="2" invisible="1" />
+                    <field name="subject_id" invisible="1" />
+                    <field name="date" invisible="1" />
+                    <field name="date_due" invisible="1" />
+                </calendar>
+            </field>
+        </record>
+        
         <!-- Search view -->
         <record id="assignment_search_view" model="ir.ui.view">
             <field name="name">assignment.search.view</field>
@@ -161,7 +182,7 @@
         <record id="action_assignment" model="ir.actions.act_window">
             <field name="name">Assignment</field>
             <field name="res_model">oe.assignment</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,calendar,form</field>
             <field name="search_view_id" ref="assignment_search_view"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

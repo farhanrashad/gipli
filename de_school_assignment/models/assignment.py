@@ -24,9 +24,9 @@ class Assignment(models.Model):
                                 )
     
     teacher_id = fields.Many2one('hr.employee', 'Teacher', 
-                                 store=True, 
-                                 domain="[('is_teacher','=',True)]"
-                                )
+            compute='_compute_teacher_id', precompute=True, store=True, readonly=False,
+            domain="[('is_teacher','=',True)]"
+    )
     
     course_id = fields.Many2one(
         comodel_name='oe.school.course',
@@ -98,6 +98,12 @@ class Assignment(models.Model):
             else:
                 attendance.subject_ids = False
 
+    @api.depends('company_id')
+    def _compute_teacher_id(self):
+        if not self.env.context.get('default_teacher_id'):
+            for assignment in self:
+                assignment.teacher_id = self.env.user.with_company(assignment.company_id).employee_id
+                
     # CRUD Operations
     def write(self, vals):
         res = super(Assignment, self).write(vals)
