@@ -13,7 +13,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Marketing',
-    'version': '14.0.0.2',
+    'version': '17.0.0.2',
 
     'depends': ['base', 'survey', 'contacts'],
     "price": 55,
