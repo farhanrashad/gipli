@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_report_config_manager,access.report.config.manager,model_report_config,de_report_builder.group_report_builder_manager,1,1,1,1
+
+access_report_header_fields_manager,access.report.header.fields.manager,model_rc_header_fields,de_report_builder.group_report_builder_manager,1,1,1,1
+
+access_report_line_models_manager,access.report.line.models.manager,model_rc_line_models,de_report_builder.group_report_builder_manager,1,1,1,1
+
