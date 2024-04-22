@@ -7,7 +7,7 @@
         """,
 
     'description': """
-Openrol - Exam Management App
+Openrol - Student Assignment App
 ================================
 Features:
 
@@ -25,6 +25,7 @@ Features:
         'data/assignment_data.xml',
         'data/mail_template_data.xml',
         'views/assignment_menu.xml',
+        'views/assignment_type_views.xml',
         'views/assignment_views.xml',
         'views/assignment_line_views.xml',
     ],

@@ -19,6 +19,10 @@ class Assignment(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
 
+    assignment_type_id = fields.Many2one('oe.assignment.type', 'Assignment Type', 
+                                 store=True, required=True,
+                                )
+    
     teacher_id = fields.Many2one('hr.employee', 'Teacher', 
                                  store=True, 
                                  domain="[('is_teacher','=',True)]"
