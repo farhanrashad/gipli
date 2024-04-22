@@ -10,7 +10,15 @@
 Openrol - Student Assignment App
 ================================
 Features:
-
+ - Assignment Creation
+ - Submission Management
+ - Grading and Evaluation
+ - Feedback Provision
+ - Automatic Notifications
+ - Real-time Updates
+ - Secure Data Storage
+ - Customizable Rubrics
+ - Analytics and Reporting
     """,
 
     'author': "Dynexcel",
