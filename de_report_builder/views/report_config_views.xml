@@ -1,5 +1,53 @@
 <odoo>
     <data>
+        <record model="ir.ui.view" id="report_config_form_view">
+            <field name="name">report.config.form.view</field>
+            <field name="model">report.config</field>
+            <field name="arch" type="xml">
+                <form string="Report Configuration">
+                    <sheet>
+                        <field name="active" invisible="1" />
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="Report Name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <field name="description" placeholder="breif description about the report."/>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="rc_header_model_id" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Fields" name="report_header_fields">
+                                <field name="rc_header_field_ids" >
+                                    <tree string="Header Fields" editable="bottom">
+                                        <field name="rc_header_model_id" column_invisible="1" />
+                                        <field name="field_id" 
+                                            
+                                            />
+                                    </tree>
+                                </field>
+                            </page>
+
+                            <page string="Line Model" name="report_line_models">
+                                <field name="rc_line_model_ids" >
+                                    <tree string="Line Models" editable="bottom">
+                                        <field name="rc_header_model_relations" widget="many2many_tags" invisible="1"/>
+                                        <field name="rc_line_model_id" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
          <record id="action_config_report" model="ir.actions.act_window">
             <field name="name">Report Configuration</field>
             <field name="res_model">report.config</field>
