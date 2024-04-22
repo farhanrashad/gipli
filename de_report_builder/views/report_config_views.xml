@@ -5,6 +5,10 @@
             <field name="model">report.config</field>
             <field name="arch" type="xml">
                 <form string="Report Configuration">
+                    <header>
+                        <button name="button_validate" type="object" string="Validate" class="oe_highlight"/>
+                        <button name="button_delete" type="object" string="Delete" class="oe_highlight"/>
+                    </header>
                     <sheet>
                         <field name="active" invisible="1" />
                         <div class="oe_title">
@@ -21,6 +25,9 @@
                                 <field name="rc_header_model_id" />
                             </group>
                             <group>
+                                <field name="report_parent_menu_id" />
+                                <field name="report_menu_id" />
+                                <field name="report_window_action_id" />
                             </group>
                         </group>
                         <notebook>

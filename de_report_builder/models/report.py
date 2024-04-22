@@ -12,11 +12,61 @@ class ReportConfig(models.Model):
     active = fields.Boolean(default=True)
     description = fields.Char(string='Description')
 
-    rc_header_model_id = fields.Many2one('ir.model', ondelete='cascade', string='Model', required=True)
+    rc_header_model_id = fields.Many2one('ir.model', string='Model', ondelete='cascade', required=True)
+    report_parent_menu_id = fields.Many2one('ir.ui.menu', string='Menu',
+                                     domain="[('action','=',False)]"
+                                    )
+    report_menu_id = fields.Many2one('ir.ui.menu', string='Menu', readonly=True,
+                                    )
+    report_window_action_id = fields.Many2one('ir.actions.act_window', string='Window Action', readonly=True)
 
     rc_header_field_ids = fields.One2many('rc.header.fields', 'report_config_id', string='Header Fields', copy=True, auto_join=True)
     rc_line_model_ids = fields.One2many('rc.line.models', 'report_config_id', string='Header Fields', copy=True, auto_join=True)
 
+    #Action Buttons
+    def button_validate(self):
+        if not self.report_parent_menu_id:
+            raise UserError('Menu is Required')
+        # Create Menu Item
+        parent_menu = self.report_parent_menu_id
+        if not self.report_menu_id:
+            menu_item = self.env['ir.ui.menu'].create({
+                'name': self.name,
+                #'action': 'action_report_config',  # Assuming 'action_report_config' is your XML ID for the action
+                'parent_id': parent_menu.id,
+                'sequence': 1,
+            })
+            self.report_menu_id = menu_item.id
+
+        # Create Action
+        if not self.report_window_action_id:
+            action = self.env['ir.actions.act_window'].create({
+                'name': 'Action' + self.name,
+                'res_model': 'report.config',
+                'view_mode': 'tree,form',
+                'target': 'current',
+                'context': {},
+            })
+            self.report_window_action_id = action.id
+        # Assign Action to Menu Item
+        menu_item.action = 'ir.actions.act_window,%s' % action.id
+
+    def button_delete(self):
+        self.report_menu_id.unlink()
+        self.report_window_action_id.unlink()
+
+    @api.model
+    def uninstall_hook(self):
+        # Find and delete the action
+        action = self.env.ref('de_report_builder.action_report_config', raise_if_not_found=False)
+        if action:
+            action.unlink()
+    
+        # Find and delete the dynamically created menu item
+        menu_item = self.env['ir.ui.menu'].search([('name', '=', 'Report Config')], limit=1)
+        if menu_item:
+            menu_item.unlink()
+        
 class HeaderFields(models.Model):
     _name = 'rc.header.fields'
     _description = 'Custom Report Header Fields'
