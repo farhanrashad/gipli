@@ -28,29 +28,33 @@ class ReportConfig(models.Model):
         if not self.report_parent_menu_id:
             raise UserError('Menu is Required')
         # Create Menu Item
-        parent_menu = self.report_parent_menu_id
         if not self.report_menu_id:
-            menu_item = self.env['ir.ui.menu'].create({
-                'name': self.name,
-                #'action': 'action_report_config',  # Assuming 'action_report_config' is your XML ID for the action
-                'parent_id': parent_menu.id,
-                'sequence': 1,
-            })
-            self.report_menu_id = menu_item.id
+            self.report_menu_id = self._create_menu().id
 
         # Create Action
         if not self.report_window_action_id:
-            action = self.env['ir.actions.act_window'].create({
-                'name': 'Action' + self.name,
-                'res_model': 'report.config',
-                'view_mode': 'tree,form',
-                'target': 'current',
-                'context': {},
-            })
-            self.report_window_action_id = action.id
+            self.report_window_action_id = self._create_action().id
         # Assign Action to Menu Item
-        menu_item.action = 'ir.actions.act_window,%s' % action.id
+        self.report_menu_id.action = 'ir.actions.act_window,%s' % self.report_window_action_id.id
 
+    def _create_menu(self):
+        parent_menu = self.report_parent_menu_id
+        menu_item = self.env['ir.ui.menu'].create({
+            'name': self.name,
+            'parent_id': parent_menu.id,
+            'sequence': 1,
+        })
+        return menu_item
+
+    def _create_action(self):
+        action = self.env['ir.actions.act_window'].create({
+            'name': 'Action' + self.name,
+            'res_model': 'report.config',
+            'view_mode': 'tree,form',
+            'target': 'new',
+            'context': {},
+        })
+        return action
     def button_delete(self):
         self.report_menu_id.unlink()
         self.report_window_action_id.unlink()
