@@ -42,7 +42,9 @@ class AssignmentSubmit(models.Model):
     state = fields.Selection([
         ('draft', 'Pending'),
         ('submitted', 'Submitted'),
+        ('late','Late Submission'),
         ('expired', 'Expired'),
+        ('close', 'Graded'),
         ('cancel', 'Cancelled'),
     ], string='Assignment Status', default='draft')
 
@@ -53,6 +55,16 @@ class AssignmentSubmit(models.Model):
                                          compute='_compute_assignment_grade'
                                         )
 
+    feedback = fields.Html(string='Feedback')
+    user_teacher = fields.Boolean(string='Teacher', compute='_compute_user_teacher')
+
+    def _compute_user_teacher(self):
+        for record in self:
+            if self.env.user.employee_id.is_teacher:
+                record.user_teacher = True
+            else:
+                record.user_teacher = False
+            
     @api.depends('marks')
     def _compute_assignment_grade(self):
         for assignment in self:
@@ -72,6 +84,11 @@ class AssignmentSubmit(models.Model):
             vals['date'] = datetime.now()
         if self.state == 'draft':
             vals['state'] = 'submitted'
+            
+        if 'marks' in vals and vals['marks']:
+            if self.state == 'expired':
+                vals['state'] = 'close'
+                
         res = super(AssignmentSubmit, self).write(vals)
         return res
     
@@ -85,6 +102,11 @@ class AssignmentSubmit(models.Model):
         self.write({
             'state': 'submitted',
             'date': datetime.now(),
+        })
+
+    def button_mark_late_submission(self):
+        self.write({
+            'state': 'late',
         })
 
     def _action_submit(self, file):
