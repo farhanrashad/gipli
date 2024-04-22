@@ -2,10 +2,10 @@
 <odoo>
     <record id="action_custom_report" model="ir.actions.report">
         <field name="name">Custom Report</field>
-        <field name="model">res.partner</field>
+        <field name="model">report.config</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">de_report_builder.custom_report_template</field>
-        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="de_report_builder.model_report_config"/>
         <field name="binding_view_types">form</field>
     </record>
 
