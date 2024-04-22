@@ -2,6 +2,7 @@
 
 from odoo import fields, models, _, api
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import safe_eval
 
 class ReportWizard(models.TransientModel):
     _name = 'rc.report.wizard'
@@ -30,7 +31,7 @@ class ReportWizard(models.TransientModel):
         if report_id.rc_line_model_ids:
             pass
         else:
-            field_ids = report_id.rc_header_field_ids.mapped('field_id')
+            field_lines = report_id.rc_header_field_ids
             model_id = report_id.rc_header_model_id
 
         output += """
@@ -41,7 +42,7 @@ class ReportWizard(models.TransientModel):
                     <tr>
         """
         
-        output += self._generate_heading_ouput(field_ids)
+        output += self._generate_heading_ouput(field_lines)
         output += """
                     </tr>
                 </thead>
@@ -51,7 +52,7 @@ class ReportWizard(models.TransientModel):
                 <tbody>
         """
         
-        output += self._generate_lineitems_output(model_id, field_ids)
+        output += self._generate_lineitems_output(model_id, field_lines)
         output += """
                 </tbody>
         """
@@ -61,34 +62,36 @@ class ReportWizard(models.TransientModel):
         """
         return output
 
-    def _generate_heading_ouput(self,field_ids):
+    def _generate_heading_ouput(self,field_lines):
         output = ''
-        for field in field_ids:
+        for line in field_lines:
             output += """
-            <th class="text-start">""" + str(field.field_description) + """</th>
+            <th class="text-start">""" + str(line.field_id.field_description) + """</th>
             """
         return output
-    def _generate_lineitems_output(self, model_id, field_ids):
+    def _generate_lineitems_output(self, model_id, field_lines):
         output = ''
         records = self.env[model_id.model].search([
             
         ])
         for record in records:
             output += """<tr>"""
-            for field in field_ids:
-                output += """<td class="text-start">""" + str(record[field.name]) + """</td>"""
+            for line in field_lines:
+                if record[line.field_id.name]:
+                    if line.field_id.ttype == 'many2one':
+                        related_record = record[line.field_id.name]
+                        if related_record and hasattr(related_record, line.link_field_id.name):
+                            link_field_value = getattr(related_record, line.link_field_id.name)
+                            output += """<td class="text-start">""" + str(link_field_value) + """</td>"""
+                        
+                        #output += """<td class="text-start">""" + record[eval("'" + line.field_id.name + "'")].line.link_field_id.name + """</td>"""
+                    else:
+                        output += """<td class="text-start">""" + record[line.field_id.name] + """</td>"""
+                else:
+                    output += """<td class="text-start"/>"""
             output += """</tr>"""
         return output
             
-    def _generate_header_data(self, report_id):
-        output = ''
-        records = self.env[report_id.rc_header_model_id.model].search([
-        ])
-        field_ids = report_id.rc_header_field_ids.mapped('field_id')
-        for record in records:
-            for field in field_ids:
-                output += record[field.name]
-        return output
         #raise UserError(len(records))
 
     

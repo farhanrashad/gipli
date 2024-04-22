@@ -11,6 +11,10 @@ class ReportConfig(models.Model):
     name = fields.Char(string='Name', required=True, translate=True, )
     active = fields.Boolean(default=True)
     description = fields.Char(string='Description')
+    state = fields.Selection([
+        ('draft', 'New'),
+        ('publish', 'Publish'),
+    ], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
 
     rc_header_model_id = fields.Many2one('ir.model', string='Model', ondelete='cascade', required=True)
     report_parent_menu_id = fields.Many2one('ir.ui.menu', string='Menu',
@@ -22,10 +26,13 @@ class ReportConfig(models.Model):
     report_wizard_view_id = fields.Many2one('ir.ui.view', string='Wizard View', readonly=True)
 
     rc_header_field_ids = fields.One2many('rc.header.fields', 'report_config_id', string='Header Fields', copy=True, auto_join=True)
+
+    rc_param_line = fields.One2many('rc.param.line', 'report_config_id', string='Parameters', copy=True, auto_join=True)
+    
     rc_line_model_ids = fields.One2many('rc.line.models', 'report_config_id', string='Header Fields', copy=True, auto_join=True)
 
     #Action Buttons
-    def button_validate(self):
+    def button_publish(self):
         if not self.report_parent_menu_id:
             raise UserError('Menu is Required')
 
@@ -43,6 +50,8 @@ class ReportConfig(models.Model):
         
         # Assign Action to Menu Item
         self.report_menu_id.action = 'ir.actions.act_window,%s' % self.report_window_action_id.id
+
+        self.state = 'publish'
 
         
         
@@ -98,10 +107,11 @@ class ReportConfig(models.Model):
         """
         return arch
         
-    def button_delete(self):
+    def button_unpublish(self):
         self.report_menu_id.unlink()
         self.report_window_action_id.unlink()
         self.report_wizard_view_id.unlink()
+        self.state = 'draft'
 
     @api.model
     def uninstall_hook(self):
@@ -124,6 +134,9 @@ class HeaderFields(models.Model):
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True,
                                domain="[('model_id','=',rc_header_model_id)]"
                               )
+    field_type = fields.Selection(related='field_id.ttype')
+    field_model = fields.Char(related='field_id.relation')
+    link_field_id = fields.Many2one('ir.model.fields', string='Link Field', help="Relational Field Reference ")
     
 
 
@@ -152,7 +165,15 @@ class LineModels(models.Model):
             record.rc_header_model_relations = model_ids
     
 
+class ReportParams(models.Model):
+    _name = 'rc.param.line'
+    _description = 'Custom Report Line Models'
 
+    report_config_id = fields.Many2one('report.config', string='Report Config', required=True, ondelete='cascade', index=True, copy=False)
+    rc_header_model_id = fields.Many2one(related='report_config_id.rc_header_model_id')
+    field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True,
+                               domain="[('model_id','=',rc_header_model_id),('store','=',True)]"
+                              )
     
 
 

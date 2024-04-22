@@ -8,4 +8,7 @@ access_report_header_fields_manager,access.report.header.fields.manager,model_rc
 
 access_report_line_models_manager,access.report.line.models.manager,model_rc_line_models,de_report_builder.group_report_builder_manager,1,1,1,1
 
+access_report_param_line_manager,access.report.param.line.manager,model_rc_param_line,de_report_builder.group_report_builder_manager,1,1,1,1
+
+
 access_report_wizard,access.report.wizard,model_rc_report_wizard,,1,1,1,1
