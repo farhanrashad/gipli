@@ -23,7 +23,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'security/contact_security.xml',
-        'views/res_partner_views.xml',
+        #'views/res_partner_views.xml',
         
     ],
     "price": 25,
