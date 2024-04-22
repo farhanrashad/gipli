@@ -26,6 +26,9 @@ Long description of module's purpose
         'security/ir.model.access.csv',
         'views/report_builder_menu.xml',
         'views/report_config_views.xml',
+        'wizards/custom_report_template.xml',
+        'wizards/action_report.xml',
+        'wizards/report_wizard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
