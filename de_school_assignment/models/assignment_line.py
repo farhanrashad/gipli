@@ -36,6 +36,7 @@ class AssignmentSubmit(models.Model):
 
     file_assignment = fields.Binary(related='assignment_id.file_assignment', string='Download Assignment')
     file_submit = fields.Binary(string='Submit Assignment', attachment=True)
+    marks = fields.Float(string='Marks', default=0)
     
     description = fields.Html(string='description')
     state = fields.Selection([

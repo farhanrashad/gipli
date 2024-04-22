@@ -53,6 +53,9 @@ class Assignment(models.Model):
 
     file_assignment = fields.Binary(string='Assignment', attachment=True)    
     
+    marks_min = fields.Float(string='Min Marks', default=0)
+    marks_max = fields.Float(string='Max Marks', default=0)
+    
     description = fields.Html(string='Description')
     
     date_due = fields.Datetime(string='Due Date', required=True)
@@ -113,7 +116,10 @@ class Assignment(models.Model):
     def button_publish(self):
         self.assignment_line_ids.unlink()
         self._assign_assignment()
-        #self.write({'state': 'publish'})
+        self.write({
+            'state': 'publish',
+            'date_publish': datetime.now(),
+        })
 
     
     def _assign_assignment(self):
@@ -158,7 +164,7 @@ class Assignment(models.Model):
             'domain': [('assignment_id','=',self.id)],
             'context': {
                 'create': False,
-                'edit': False,
+                'edit': True,
                 'delete': False,
             },
             

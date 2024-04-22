@@ -73,10 +73,12 @@
                                 <field name="batch_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     invisible="not use_batch"
+                                    readonly="state != 'draft'"
                                 />
                                 <field name="section_id" 
                                     options="{'no_open':True,'no_create':True}"
                                     invisible="not use_section"
+                                    readonly="state != 'draft'"
                                 />
                                 <field name="subject_id" 
                                     options="{'no_open':True,'no_create':True}"
@@ -89,9 +91,12 @@
                                     />
                             </group>
                             <group>
+                                <field name="marks_min" readonly="state != 'draft'"/>
+                                <field name="marks_max" readonly="state != 'draft'"/>
                                 <field name="date" readonly="state != 'draft'"/>
                                 <field name="date_due" readonly="state != 'draft'"/>
-                                <field name="date_publish" invisible="state != 'publish'"/>
+                                <field name="date_publish" readonly="1" invisible="not date_publish"
+                                    />
                                 <field name="company_id" 
                                     groups="base.group_multi_company" 
                                     options="{'no_open':True,'no_create':True}"
@@ -101,7 +106,11 @@
                         </group>
                         <notebook>
                             <page name="description_page" string="Description">
-                                <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Add details about this assignment..."/>
+                                <field name="description" type="html" 
+                                    options="{'collaborative': true, 'resizable': false}" 
+                                    placeholder="Add details about this assignment..."
+                                    readonly="state != 'draft'"
+                                />
                             </page>
                         </notebook>
                          

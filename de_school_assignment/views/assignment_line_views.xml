@@ -13,8 +13,9 @@
 					<field name="subject_id"/>
                     <field name="date_due" />
                     <field name="file_assignment" widget="binary" />
+                    <field name="marks" />
                     <field name="date" />
-                    <field name="state" />
+                    <field name="state" readonly="1"/>
 				</tree>
 			</field>
 		</record>
@@ -55,6 +56,9 @@
                                     widget="binary" 
                                     readonly="state in ['expired','cancel']"
                                 />
+                                <field name="marks" required="state == 'expired'" 
+                                    readonly="state != 'expired'" 
+                                    />
                                 <field name="date_due" />
                                 <field name="date" />
                                 
