@@ -1,5 +1,43 @@
 <odoo>
     <data>
+        <record id="line_models_fields_tree_view" model="ir.ui.view">
+            <field name="name">line.models.fields.tree.view</field>
+            <field name="model">rc.line.models.fields</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom" >
+                    <field name="rc_line_model_id" invisible="1"/>
+                    <field name="field_id" />
+                </tree>
+            </field>
+        </record>
+        <record id="report_line_models_wizard_form" model="ir.ui.view">
+            <field name="name">line.models.wizard.form</field>
+            <field name="model">rc.line.models</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <form string="Report Line Item">
+                    <group>
+                        <group>
+                            <field name="rc_line_model_id" readonly="1"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <field name="hr_service_record_line_items"  context="{
+                        'tree_view_ref': 'de_report_builder.line_models_fields_tree_view', 
+                        'default_report_config_id': report_config_id, 
+                        'default_rc_line_model_id': rc_line_model_id, 
+                    }"/>
+                    <footer class="oe_edit_only" >
+                        <button string="Confirm" special="save" class="oe_highlight"/>
+                        <button string="Discard" special="cancel"/>
+                    </footer>
+                    
+                </form>
+            </field>
+        </record>
+        
         <record model="ir.ui.view" id="report_config_form_view">
             <field name="name">report.config.form.view</field>
             <field name="model">report.config</field>
@@ -50,7 +88,7 @@
                                             />
                                         <field name="link_field_id" 
                                             domain="[('model', '=', field_model)]" 
-                                            required="field_type == 'many2one' and field_type not in ['many2one','many2many']"
+                                            required="field_type in ['many2one','many2many']"
                                             options = "{'no_create':True,'no_edit':True}"
                                             />
                                     </tree>
@@ -62,6 +100,7 @@
                                     <tree string="Line Models" editable="bottom">
                                         <field name="rc_header_model_relations" widget="many2many_tags" column_invisible="1"/>
                                         <field name="rc_line_model_id" />
+                                        <button name="action_configure_line_model_ields" type="object" icon="fa-list" width="0.1" options="{&quot;warn&quot;: true}"/>
                                     </tree>
                                 </field>
                             </page>

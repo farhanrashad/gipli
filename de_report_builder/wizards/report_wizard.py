@@ -83,8 +83,11 @@ class ReportWizard(models.TransientModel):
                         if related_record and hasattr(related_record, line.link_field_id.name):
                             link_field_value = getattr(related_record, line.link_field_id.name)
                             output += """<td class="text-start">""" + str(link_field_value) + """</td>"""
-                        
-                        #output += """<td class="text-start">""" + record[eval("'" + line.field_id.name + "'")].line.link_field_id.name + """</td>"""
+                    elif line.field_id.ttype == 'many2many':
+                        related_records = record[line.field_id.name]
+                        if related_records:
+                            display_names = ", ".join(str(r[line.link_field_id.name]) for r in related_records)
+                            output += """<td class="text-start">""" + display_names + """</td>"""
                     else:
                         output += """<td class="text-start">""" + record[line.field_id.name] + """</td>"""
                 else:

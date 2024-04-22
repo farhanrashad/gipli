@@ -7,6 +7,8 @@ access_report_config,access.report.config,model_report_config,,1,0,0,0
 access_report_header_fields_manager,access.report.header.fields.manager,model_rc_header_fields,de_report_builder.group_report_builder_manager,1,1,1,1
 
 access_report_line_models_manager,access.report.line.models.manager,model_rc_line_models,de_report_builder.group_report_builder_manager,1,1,1,1
+access_report_line_models_fields_manager,access.report.line.models.fields.manager,model_rc_line_models_fields,de_report_builder.group_report_builder_manager,1,1,1,1
+
 
 access_report_param_line_manager,access.report.param.line.manager,model_rc_param_line,de_report_builder.group_report_builder_manager,1,1,1,1
 
