@@ -9,6 +9,8 @@ class ReportWizard(models.TransientModel):
     _name = 'rc.report.wizard'
     _description = 'Custom Report Wizard'
 
+   
+    # Generate Report in PDF
     def generate_report(self):
         #raise UserError(self.env.context.get('report_id'))
         report_id = self.env['report.config'].browse(self.env.context.get('report_id'))

@@ -145,17 +145,31 @@ class ReportConfig(models.Model):
         self.report_wizard_view_id.unlink()
         self.state = 'draft'
 
+    # Override unlink method to control deletion based on state
+    def unlink(self):
+        for record in self:
+            if record.state == 'publish':
+                raise UserError("You cannot delete a record in 'Publish' state.")
+        return super(ReportConfig, self).unlink()
+
+    
     @api.model
     def uninstall_hook(self):
-        # Find and delete the action
-        action = self.env.ref('de_report_builder.action_report_config', raise_if_not_found=False)
-        if action:
-            action.unlink()
-    
-        # Find and delete the dynamically created menu item
-        menu_item = self.env['ir.ui.menu'].search([('name', '=', 'Report Config')], limit=1)
-        if menu_item:
-            menu_item.unlink()
+        # Find and delete actions associated with 'report.config'
+        actions = self.env['ir.actions.act_window'].search([('res_model', '=', 'report.config')])
+        actions.unlink()
+
+        # Find and delete views associated with 'report.config'
+        views = self.env['ir.ui.view'].search([('model', '=', 'report.config')])
+        views.unlink()
+
+        # Find and delete menus associated with 'report.config'
+        menus = self.env['ir.ui.menu'].search([('action', 'in', actions.ids)])
+        menus.unlink()
+
+        self.search([]).unlink()
+
+        return super(ReportConfig, self).uninstall_hook()
         
 class HeaderFields(models.Model):
     _name = 'rc.header.fields'
