@@ -3,6 +3,7 @@
 from odoo import fields, models, _, api
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import safe_eval
+from odoo.osv import expression
 
 class ReportWizard(models.TransientModel):
     _name = 'rc.report.wizard'
@@ -28,7 +29,7 @@ class ReportWizard(models.TransientModel):
 
     def _generate_output(self, report_id):
         output = ''
-        records = self.env[report_id.rc_header_model_id.model].search([])
+        records = self.env[report_id.rc_header_model_id.model].search(self._get_records_domain(report_id))
         test = []
         if report_id.rc_line_model_ids:
             for record in records:
@@ -46,6 +47,16 @@ class ReportWizard(models.TransientModel):
     
         return output
 
+    def _get_records_domain(self, report_id):
+        param_lines = report_id.rc_param_line
+        domain = []
+        for param in param_lines:
+            param_domain = [(param.field_id.name, param.field_operator, self[param.report_param_field_id.name])]
+            domain = expression.AND([param_domain, domain])
+        #raise UserError(domain)
+        return domain
+
+    
     def _generate_header_output(self, record, fields):
         output = """<div id="header" class="row mt-4 mb32">"""
         for field in fields:

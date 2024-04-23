@@ -15,7 +15,7 @@ class ReportParams(models.Model):
             ('=','='),('!=','!='),
             ('>','>'),('>=','>='),
             ('<','<'),('<=','<='),
-            ('contains','Contains'),
+            ('like','Contains'),
         ], string='Operator', required=True, default='=',
     )
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True,
