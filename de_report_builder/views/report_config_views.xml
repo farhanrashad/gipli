@@ -27,22 +27,23 @@
             <field name="priority">1000</field>
             <field name="arch" type="xml">
                 <form string="Report Line Item">
-                    <group>
+                    <sheet>
                         <group>
-                            <field name="rc_line_model_id" readonly="1"/>
+                            <group>
+                                <field name="rc_line_model_id" readonly="1"/>
+                            </group>
+                            <group>
+                            </group>
                         </group>
-                        <group>
-                        </group>
-                    </group>
-                    <field name="rc_line_model_field_ids"  context="{
-                        'tree_view_ref': 'de_report_builder.line_models_fields_tree_view', 
-                        'default_rc_line_model_id': rc_line_model_id, 
-                    }"/>
-                    <footer class="oe_edit_only" >
-                        <button string="Confirm" special="save" class="oe_highlight"/>
-                        <button string="Discard" special="cancel"/>
-                    </footer>
-                    
+                        <field name="rc_line_model_field_ids"  context="{
+                            'tree_view_ref': 'de_report_builder.line_models_fields_tree_view', 
+                            'default_rc_line_model_id': rc_line_model_id, 
+                        }"/>
+                        <footer class="oe_edit_only" >
+                            <button string="Confirm" special="save" class="oe_highlight"/>
+                            <button string="Discard" special="cancel"/>
+                        </footer>
+                    </sheet>
                 </form>
             </field>
         </record>
@@ -118,6 +119,20 @@
                                             required="rc_header_rel_field_ids"
                                             />
                                         <button name="action_configure_line_model_ields" type="object" icon="fa-list" width="0.1" options="{&quot;warn&quot;: true}"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                            <page string="Parameters" name="parameters">
+                                <field name="rc_param_line" >
+                                    <tree string="Parameters" editable="bottom">
+                                        <field name="rc_header_model_id" column_invisible="1" />
+                                        <field name="field_name" />
+                                        <field name="field_operator" />
+                                        <field name="field_id" string="Compare in"
+                                            options = "{'no_create':True,'no_edit':True}"
+                                            />
+                                        <field name="report_param_field_id" />
                                     </tree>
                                 </field>
                             </page>

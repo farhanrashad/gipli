@@ -2,7 +2,8 @@
 
 from odoo import models, fields, exceptions, api, _
 from odoo.exceptions import ValidationError, AccessError, UserError
-   
+from copy import deepcopy
+
 
 class ReportConfig(models.Model):
     _name = 'report.config'
@@ -37,19 +38,23 @@ class ReportConfig(models.Model):
             raise UserError('Menu is Required')
 
         # Create Wizard View
-        if not self.report_wizard_view_id:
-            self.report_wizard_view_id = self._create_wizard_view().id
+        #if not self.report_wizard_view_id:
+        view_id = self._create_wizard_view()
+        self.report_wizard_view_id = view_id.id
             
         # Create Menu Item
-        if not self.report_menu_id:
-            self.report_menu_id = self._create_menu().id
+        #if not self.report_menu_id:
+        menu_id = self._create_menu()
+        self.report_menu_id = menu_id.id
 
         # Create Action
-        if not self.report_window_action_id:
-            self.report_window_action_id = self._create_action().id
+        #if not self.report_window_action_id:
+        action_id = self._create_action()
+        self.report_window_action_id = action_id.id
         
         # Assign Action to Menu Item
-        self.report_menu_id.action = 'ir.actions.act_window,%s' % self.report_window_action_id.id
+        menu_id.action = 'ir.actions.act_window,%s' % action_id.id
+        action_id.view_id = view_id.id
 
         self.state = 'publish'
 
@@ -91,22 +96,49 @@ class ReportConfig(models.Model):
     def _get_view_arch(self):
         arch = """
             <form string="Report Wizard" class="oe_form_container" version="14.0" edit="true">
-                <group>
-                    <group string="hello">
-                        <!-- Add your fields here -->
+                <sheet>
+                    <group col="4">
+        """ + self._get_parameters_output() + """
                     </group>
-                    <group>
-                        <!-- Add more groups or fields as needed -->
-                    </group>
-                </group>
                 <footer>
                     <button name="generate_report" string="Print" type="object" class="btn-primary" data-hotkey="q"/>
                     <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x" />
                 </footer>
+                </sheet>
             </form>
         """
         return arch
+
+    def _get_parameters_output(self):
+        output = ''
+        report_model_id = self.env['ir.model'].search([('model','=','rc.report.wizard')], limit=1)
+        for param in self.rc_param_line:
+            field_tech_name = 'x_' + param.field_name.replace(' ', '_').lower()
+            field_exist_id = self.env['ir.model.fields'].search([
+                ('name','=',field_tech_name), ('model','=','rc.report.wizard')
+            ])
+            if not field_exist_id:
+                new_field_id = self.env['ir.model.fields'].create({
+                    'name': field_tech_name,
+                    'field_description': param.field_name,
+                    'model_id': report_model_id.id,
+                    'relation': param.field_id.relation,
+                    'ttype': param.field_id.ttype,
+                })
+                param.report_param_field_id = new_field_id.id
+                output += self._generate_field_output(new_field_id)
+            else:
+                param.report_param_field_id = field_exist_id.id
+                output += self._generate_field_output(field_exist_id)
+        return output
+    
+    def _generate_field_output(self, field):
+        if field.ttype == 'many2many':
+            return """<field name='{}' widget="many2many_tags" />""".format(field.name)
         
+        return """<field name='{}' />""".format(field.name)
+
+            
     def button_unpublish(self):
         self.report_menu_id.unlink()
         self.report_window_action_id.unlink()

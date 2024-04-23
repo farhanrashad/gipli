@@ -9,9 +9,19 @@ class ReportParams(models.Model):
 
     report_config_id = fields.Many2one('report.config', string='Report Config', required=True, ondelete='cascade', index=True, copy=False)
     rc_header_model_id = fields.Many2one(related='report_config_id.rc_header_model_id')
+    field_name = fields.Char('Field Name', required=True)
+    field_operator = fields.Selection(
+        [
+            ('=','='),('!=','!='),
+            ('>','>'),('>=','>='),
+            ('<','<'),('<=','<='),
+            ('contains','Contains'),
+        ], string='Operator', required=True, default='=',
+    )
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True,
                                domain="[('model_id','=',rc_header_model_id),('store','=',True)]"
                               )
+    report_param_field_id = fields.Many2one('ir.model.fields', string='Param Field', readonly=True)
     
 
 
