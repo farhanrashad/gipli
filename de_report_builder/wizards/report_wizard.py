@@ -16,9 +16,6 @@ class ReportWizard(models.TransientModel):
         #raise UserError(self._generate_output(report_id))
         html_data = """
             <div class="page">
-            <div class="text-center" style="break-inside: avoid;">
-                <h2>""" + report_id.name + """</h2>
-            </div>
         """ + self._generate_output(report_id) + """</div>"""
         data = {
             'date_start': False, 
@@ -33,6 +30,8 @@ class ReportWizard(models.TransientModel):
         test = []
         if report_id.rc_line_model_ids:
             for record in records:
+                output += """<div class="text-center" style="break-inside: avoid;">"""
+                output += """<h2>""" + report_id.name + """</h2></div>"""
                 output += self._generate_header_output(record, report_id.rc_header_field_ids)
                 for line_model in report_id.rc_line_model_ids:
                     field_name = line_model.rc_header_rel_field_id.name
@@ -50,9 +49,16 @@ class ReportWizard(models.TransientModel):
     def _get_records_domain(self, report_id):
         param_lines = report_id.rc_param_line
         domain = []
+        record = self
+        value = self.id
         for param in param_lines:
-            param_domain = [(param.field_id.name, param.field_operator, self[param.report_param_field_id.name])]
-            domain = expression.AND([param_domain, domain])
+            if record[param.report_param_field_id.name]:
+                if param.report_param_field_id.ttype == 'many2one':
+                    value = record[param.report_param_field_id.name].id
+                else:
+                    value = record[param.report_param_field_id.name]
+                param_domain = [(param.field_id.name, param.field_operator, value)]
+                domain = expression.AND([param_domain, domain])
         #raise UserError(domain)
         return domain
 

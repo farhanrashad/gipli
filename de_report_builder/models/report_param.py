@@ -19,8 +19,9 @@ class ReportParams(models.Model):
         ], string='Operator', required=True, default='=',
     )
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True,
-                               domain="[('model_id','=',rc_header_model_id),('store','=',True)]"
-                              )
+                           domain="[('model_id','=',rc_header_model_id),('store','=',True),('ttype','not in',['one2many'])]"
+                          )
+
     report_param_field_id = fields.Many2one('ir.model.fields', string='Param Field', readonly=True)
     
 
