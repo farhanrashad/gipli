@@ -65,8 +65,8 @@ class ReportWizard(models.TransientModel):
         })
 
         # Heading
-        #num_main_columns = len(field_ids)
-        #num_line_item_columns = sum(len(line_model.rc_line_model_field_ids) for line_model in report_id.rc_line_model_ids)
+        num_main_columns = len(field_ids)
+        num_line_item_columns = sum(len(line_model.rc_line_model_field_ids) for line_model in report_id.rc_line_model_ids)
 
         if num_main_columns > 0 or num_line_item_columns > 0:
             start_cell = 'A1'

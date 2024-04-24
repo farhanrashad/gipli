@@ -139,12 +139,15 @@
                                 <field name="rc_param_line" readonly="state != 'draft'">
                                     <tree string="Parameters" editable="bottom">
                                         <field name="rc_header_model_id" column_invisible="1" />
+                                        <field name="field_type" column_invisible="1" />
                                         <field name="field_name" />
                                         <field name="field_operator" />
                                         <field name="field_id" string="Compare in"
                                             options = "{'no_create':True,'no_edit':True}"
                                             />
-                                        <field name="is_multi_vals" />
+                                        <field name="is_multi_vals" 
+                                            readonly="field_type not in ('many2one','many2many')"
+                                            />
                                         <field name="report_param_field_id" invisible="1"/>
                                     </tree>
                                 </field>
