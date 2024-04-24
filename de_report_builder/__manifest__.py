@@ -2,25 +2,18 @@
 {
     'name': "Report Builder",
 
-    'summary': "Short (1 phrase/line) summary of the module's purpose",
+    'summary': "Empower Your Reporting Workflow with Odoo Report Builder",
 
     'description': """
-Long description of module's purpose
+Report Builder
+================================
+Odoo's Report Builder module revolutionizes data reporting by offering a user-friendly interface for creating, customizing, and analyzing reports effortlessly. With intuitive tools and powerful capabilities, users can transform raw data into actionable insights, enabling informed decision-making across the organization.
     """,
-
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
-
-    # any module necessary for this one to work correctly
+    'author': "Dynexcel",
+    'website': "https://www.dynexcel.com",
+    'category': 'Extra Tools/Sales/Accounting/Project',
+    'version': '17.0.0.1',
     'depends': ['base'],
-
-    # always loaded
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -30,9 +23,17 @@ Long description of module's purpose
         'wizards/action_report.xml',
         'wizards/report_wizard_views.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'assets': {
+        'web.assets_backend': [
+            'de_report_builder/static/src/js/report_action.js',
+        ],
+    },
+    'license': 'OPL-1',
+    'price': 75,
+    'currency': 'USD',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
 

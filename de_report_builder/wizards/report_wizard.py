@@ -4,13 +4,157 @@ from odoo import fields, models, _, api
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import safe_eval
 from odoo.osv import expression
+import json
+from odoo.tools import date_utils
+import io
 
+try:
+    from odoo.tools.misc import xlsxwriter
+except ImportError:
+    import xlsxwriter
+    
 class ReportWizard(models.TransientModel):
     _name = 'rc.report.wizard'
     _description = 'Custom Report Wizard'
 
-   
-    # Generate Report in PDF
+    # ==================================================================
+    # =============== Generate Report in excel =========================
+    # ==================================================================
+    def action_report_excel(self):
+        report_id = self.env['report.config'].browse(self.env.context.get('report_id'))
+        data = {
+            'report_id': self.env.context.get('report_id'),
+            'domain': self._get_records_domain(report_id),
+        }
+        return {
+            'type': 'ir.actions.report',
+            'data': {'model': 'rc.report.wizard',
+                     'options': json.dumps(data,
+                                           default=date_utils.json_default),
+                     'output_format': 'xlsx',
+                     'report_name': report_id.name.replace(' ', '_').lower(),
+                     },
+            'report_type': 'report_excel'
+        }
+
+    def get_xlsx_report(self, data, response):
+        rid = data['report_id']
+        domain = data['domain']
+        
+        #raise UserError(data['report_id'])
+        report_id = self.env['report.config'].browse(int(rid))
+        
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet(str(report_id.name))
+
+        # Report Formats
+        format_heading = workbook.add_format({
+            'font_size': 17,
+            'align': 'center', 
+            'bold': True,
+            'border': True,
+        })
+        format_label = workbook.add_format({
+            'font_size': 13, 
+            'align': 'center', 
+            'bg_color': '#D3D3D3', 
+            'bold': True,
+            'border': True,
+        })
+
+        # Heading
+        sheet.merge_range('A1:G1', report_id.name, format_heading)
+        sheet.set_row(0, 25)
+
+        records = self.env[report_id.rc_header_model_id.model].search(domain)
+        field_ids = report_id.rc_header_field_ids
+
+        col_widths = []
+        
+        col = 0
+        row = 2
+        line_row = 0
+        for record in records:
+            col = 0
+            line_row = row
+            for field in field_ids:
+                sheet.write(1, col, field.field_id.field_description, format_label)
+
+                if field.field_id.ttype in ['integer', 'float']:
+                    cell_format = workbook.add_format({'align': 'right'})
+                elif field.field_id.ttype == 'monetary':
+                    cell_format = workbook.add_format({'num_format': '#,##0.00'})
+                else:
+                    cell_format = workbook.add_format({'align': 'left'})
+                            
+                if record[field.field_id.name]:
+                    cell_value, col_width = self.get_cell_value_and_width(record, field)
+                    sheet.write(row, col, cell_value, cell_format)
+                    sheet.set_column(col, col, col_width)
+                col += 1
+
+            
+            for line_model in report_id.rc_line_model_ids:
+                line_row = (row - 1)
+                lines_fields = line_model.rc_line_model_field_ids
+
+                field_name = line_model.rc_header_rel_field_id.name
+                lines = self.env[line_model.rc_line_model_id.model].search([(field_name, '=', record.id)])
+                for line in lines:
+                    line_row += 1
+                    line_col = col
+                    for line_field in lines_fields:
+
+                        if line_field.field_id.ttype in ['integer', 'float']:
+                            cell_format = workbook.add_format({'align': 'right'})
+                        elif line_field.field_id.ttype == 'monetary':
+                            cell_format = workbook.add_format({'num_format': '#,##0.00'})
+                        else:
+                            cell_format = workbook.add_format({'align': 'left'})
+    
+                        sheet.write(1, line_col, line_field.field_id.field_description, format_label)
+                        if line[line_field.field_id.name]:
+                            cell_value, col_width = self.get_cell_value_and_width(line, line_field)
+                            sheet.write(line_row, line_col, cell_value, cell_format)
+                            col_width = max(col_width, 10)
+                            sheet.set_column(line_col, line_col, col_width)
+                        line_col += 1
+                    
+                    
+            row = line_row + 1
+    
+        workbook.close()
+        output.seek(0)
+        response.stream.write(output.read())
+        output.close()
+
+
+    def get_cell_value_and_width(self, record, field):
+        if field.field_id.ttype == 'many2one':
+            related_record = record[field.field_id.name]
+            if related_record and hasattr(related_record, field.link_field_id.name):
+                link_field_value = getattr(related_record, field.link_field_id.name)
+                cell_value = str(link_field_value)
+            else:
+                cell_value = ''
+        elif field.field_id.ttype == 'many2many':
+            related_records = record[field.field_id.name]
+            if related_records:
+                display_names = ", ".join(str(r[field.link_field_id.name]) for r in related_records)
+                cell_value = display_names
+            else:
+                cell_value = ''
+        else:
+            cell_value = str(record[field.field_id.name])
+    
+        col_width = len(cell_value) + 2  # Add some padding to the width
+        return cell_value, col_width
+
+    
+    # ============================================================
+    # PDF Generation Code
+    # ============================================================
     def generate_report(self):
         #raise UserError(self.env.context.get('report_id'))
         report_id = self.env['report.config'].browse(self.env.context.get('report_id'))
@@ -24,12 +168,15 @@ class ReportWizard(models.TransientModel):
             'date_stop': False, 
             'html_data': html_data,
         }
+        #report_action = report_id.report_action_id  # Assuming report_id has a field named report_action_id
+        #return report_action.report_action([], data=data)
+        if report_id.report_orientation == 'landscape':
+            return self.env.ref('de_report_builder.action_custom_report_landscape').report_action([], data=data)
         return self.env.ref('de_report_builder.action_custom_report').report_action([], data=data)
 
     def _generate_output(self, report_id):
         output = ''
         records = self.env[report_id.rc_header_model_id.model].search(self._get_records_domain(report_id))
-        test = []
         if report_id.rc_line_model_ids:
             for record in records:
                 output += """<div class="text-center" style="break-inside: avoid;">"""
@@ -42,6 +189,8 @@ class ReportWizard(models.TransientModel):
                     output += self._generate_table_output(lines, lines_fields)
                 output += """<div style="page-break-after: always;"/>"""
         else:
+            output += """<div class="text-center" style="break-inside: avoid;">"""
+            output += """<h2>""" + report_id.name + """</h2></div>"""
             lines = records
             lines_fields = report_id.rc_header_field_ids
             output += self._generate_table_output(lines, lines_fields)
@@ -51,17 +200,22 @@ class ReportWizard(models.TransientModel):
     def _get_records_domain(self, report_id):
         param_lines = report_id.rc_param_line
         domain = []
+        param_domain = []
         record = self
         value = self.id
+
+        #raise UserError(self['x_from_date'])
         for param in param_lines:
-            if record[param.report_param_field_id.name]:
+            if self[param.report_param_field_id.name]:
+                
                 if param.report_param_field_id.ttype == 'many2one':
                     value = record[param.report_param_field_id.name].id
+                elif param.report_param_field_id.ttype == 'many2many':
+                    value = record[param.report_param_field_id.name].ids
                 else:
                     value = record[param.report_param_field_id.name]
                 param_domain = [(param.field_id.name, param.field_operator, value)]
                 domain = expression.AND([param_domain, domain])
-        #raise UserError(domain)
         return domain
 
     
