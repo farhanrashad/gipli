@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Purchase Reprot",
-
     'summary': "Dynamic Purchase Report",
-
     'description': """
 Long description of module's purpose
     """,
-
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
 
