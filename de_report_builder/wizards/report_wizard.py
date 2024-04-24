@@ -4,12 +4,99 @@ from odoo import fields, models, _, api
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import safe_eval
 from odoo.osv import expression
+import json
+from odoo.tools import date_utils
+import io
 
+try:
+    from odoo.tools.misc import xlsxwriter
+except ImportError:
+    import xlsxwriter
+    
 class ReportWizard(models.TransientModel):
     _name = 'rc.report.wizard'
     _description = 'Custom Report Wizard'
 
-   
+    # ==================================================================
+    # =============== Generate Report in excel =========================
+    # ==================================================================
+    def action_report_excel(self):
+        report_id = self.env['report.config'].browse(self.env.context.get('report_id'))
+        
+        data = {
+            'report_id': self.env.context.get('report_id'),
+        }
+        return {
+            'type': 'ir.actions.report',
+            'data': {'model': 'rc.report.wizard',
+                     'options': json.dumps(data,
+                                           default=date_utils.json_default),
+                     'output_format': 'xlsx',
+                     'report_name': 'Report Builder',
+                     },
+            'report_type': 'report_excel'
+        }
+
+    def get_xlsx_report(self, data, response):
+        rid = data['report_id']
+        #raise UserError(report_id)
+        
+        #raise UserError(data['report_id'])
+        report_id = self.env['report.config'].browse(rid)
+        
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet(report_id.name)
+        format1 = workbook.add_format({'font_size': 14, 'align': 'vcenter', 'bold': True})
+
+        sheet.merge_range('A1:G1', report_id.name, format1)
+        
+        records = self.env[report_id.rc_header_model_id.model].search(self._get_records_domain(report_id))
+        field_ids = report_id.rc_header_field_ids
+
+        col_widths = [len(field.field_id.field_description) for field in field_ids]
+        
+        col = 0
+        row = 2
+        for record in records:
+            col = 0
+            for field in field_ids:
+                sheet.write(1, col, field.field_id.name, format1)
+                if record[field.field_id.name]:
+                    if field.field_id.ttype == 'many2one':
+                        related_record = record[field.field_id.name]
+                        if related_record and hasattr(related_record, field.link_field_id.name):
+                            link_field_value = getattr(related_record, field.link_field_id.name)
+                            sheet.write(row, col, str(link_field_value), format1)
+                            cell_value = str(link_field_value)                        
+                    elif field.field_id.ttype == 'many2many':
+                        related_records = record[field.field_id.name]
+                        if related_records:
+                            display_names = ", ".join(str(r[field.link_field_id.name]) for r in related_records)
+                            sheet.write(row, col, display_names, format1)
+                            cell_value = display_names
+                    else:
+                        sheet.write(row, col, str(record[field.field_id.name]), format1)
+                        cell_value = str(record[field.field_id.name])
+                    
+                    #col_widths[col] = max(col_widths[col], len(cell_value))
+                    col_width = len(cell_value) + 2  # Add some padding to the width
+                    sheet.set_column(col, col, col_width)
+                col += 1
+            row += 1
+
+        # Set the column widths based on the maximum content length in each column
+        #for i, width in enumerate(col_widths):
+        #    sheet.set_column(i, i, width + 2)  # Add some padding to the width
+        
+    
+        workbook.close()
+        output.seek(0)
+        response.stream.write(output.read())
+        output.close()
+
+
+    
     # Generate Report in PDF
     def generate_report(self):
         #raise UserError(self.env.context.get('report_id'))
@@ -29,7 +116,6 @@ class ReportWizard(models.TransientModel):
     def _generate_output(self, report_id):
         output = ''
         records = self.env[report_id.rc_header_model_id.model].search(self._get_records_domain(report_id))
-        test = []
         if report_id.rc_line_model_ids:
             for record in records:
                 output += """<div class="text-center" style="break-inside: avoid;">"""

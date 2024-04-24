@@ -1,22 +1,38 @@
 # -*- coding: utf-8 -*-
-# from odoo import http
+import json
+
+from odoo import http
+from odoo.http import content_disposition, request, \
+    serialize_exception as _serialize_exception
+from odoo.tools import html_escape
 
 
-# class DeReportBuilder(http.Controller):
-#     @http.route('/de_report_builder/de_report_builder', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
+class XLSXReportController(http.Controller):
 
-#     @http.route('/de_report_builder/de_report_builder/objects', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('de_report_builder.listing', {
-#             'root': '/de_report_builder/de_report_builder',
-#             'objects': http.request.env['de_report_builder.de_report_builder'].search([]),
-#         })
-
-#     @http.route('/de_report_builder/de_report_builder/objects/<model("de_report_builder.de_report_builder"):obj>', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('de_report_builder.object', {
-#             'object': obj
-#         })
-
+    @http.route('/xlsx_reports', type='http', auth='user', methods=['POST'],
+                csrf=False)
+    def get_report_xlsx(self, model, options, output_format, report_name):
+        report_obj = request.env[model].with_user(request.session.uid)
+        options = json.loads(options)
+        token = 'dummy-because-api-expects-one'
+        try:
+            if output_format == 'xlsx':
+                response = request.make_response(
+                    None,
+                    headers=[
+                        ('Content-Type', 'application/vnd.ms-excel'),
+                        ('Content-Disposition',
+                         content_disposition(report_name + '.xlsx'))
+                    ]
+                )
+                report_obj.get_xlsx_report(options, response)
+            response.set_cookie('fileToken', token)
+            return response
+        except Exception as e:
+            se = _serialize_exception(e)
+            error = {
+                'code': 200,
+                'message': 'Odoo Server Error',
+                'data': se
+            }
+            return request.make_response(html_escape(json.dumps(error)))
