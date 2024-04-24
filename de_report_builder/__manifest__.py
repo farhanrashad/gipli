@@ -29,7 +29,7 @@ Odoo's Report Builder module revolutionizes data reporting by offering a user-fr
         ],
     },
     'license': 'OPL-1',
-    'price': 75,
+    'price': 150,
     'currency': 'USD',
     'images': ['static/description/banner.gif'],
     'installable': True,
