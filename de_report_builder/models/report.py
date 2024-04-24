@@ -4,6 +4,13 @@ from odoo import models, fields, exceptions, api, _
 from odoo.exceptions import ValidationError, AccessError, UserError
 from copy import deepcopy
 
+"""
+
+<field name="report_menu_id" />
+<field name="report_window_action_id" />
+<field name="report_action_id" />
+<field name="report_wizard_view_id" />
+"""
 
 class ReportConfig(models.Model):
     _name = 'report.config'
@@ -23,8 +30,15 @@ class ReportConfig(models.Model):
                                     )
     report_menu_id = fields.Many2one('ir.ui.menu', string='Menu', readonly=True,
                                     )
+    report_orientation = fields.Selection([
+        ('portrait', 'Portrait'),
+        ('landscape', 'Landscape'),
+    ], string='orientation', default='portrait')
+    
     report_window_action_id = fields.Many2one('ir.actions.act_window', string='Window Action', readonly=True)
     report_wizard_view_id = fields.Many2one('ir.ui.view', string='Wizard View', readonly=True)
+    #report_action_id = fields.Many2one('ir.actions.report', string='Report Action', readonly=True)
+    #report_template_view_id = fields.Many2one('ir.ui.view', string='Template View', readonly=True)
 
     rc_header_field_ids = fields.One2many('rc.header.fields', 'report_config_id', string='Header Fields', copy=True, auto_join=True)
 
@@ -49,9 +63,11 @@ class ReportConfig(models.Model):
 
         # Create Action
         #if not self.report_window_action_id:
-        action_id = self._create_action()
+        action_id = self._create_window_action()
         self.report_window_action_id = action_id.id
-        
+
+        #report_action_id = self._create_report_action()
+        #self.report_action_id = report_action_id
         # Assign Action to Menu Item
         menu_id.action = 'ir.actions.act_window,%s' % action_id.id
         action_id.view_id = view_id.id
@@ -69,7 +85,7 @@ class ReportConfig(models.Model):
         })
         return menu_item
 
-    def _create_action(self):
+    def _create_window_action(self):
         action = self.env['ir.actions.act_window'].create({
             'name': self.name + ' Wizard',
             'res_model': 'rc.report.wizard',
@@ -80,6 +96,42 @@ class ReportConfig(models.Model):
             },
         })
         return action
+
+    def _create_report_action(self):
+        view = self._create_report_template_view()
+        action_vals = {
+            'name': self.name.replace(' ', '_').lower(),
+            'model': 'report.config',
+            'report_type': 'qweb-pdf',
+            'report_name': view.name,
+            'binding_model_id': self.env.ref('de_report_builder.model_report_config').id,
+            'binding_view_types': 'form',
+        }
+        action = self.env['ir.actions.report'].create(action_vals)
+        return action
+
+    def _create_report_template_view(self):
+        view_id = self.env['ir.ui.view'].create({
+            'name': self.name.replace(' ', '_').lower() + '_report_template_view',
+            'type': 'qweb',
+            'model': 'report.config',
+            'arch': """
+                <odoo>
+                    <data>
+                        <template id="{}">
+                            <div class="oe_structure"></div>
+                            <t t-call="web.html_container">
+                                <t t-call="web.internal_layout">
+                                    <span t-raw="html_data" />
+                                </t>
+                            </t>
+                        </template>
+                    </data>
+                </odoo>
+            """.format(self.name.replace(' ', '_').lower() + '_report_template_view'),
+        })
+        return view_id
+
         
     def _create_wizard_view(self):
         #raise UserError(self._get_view_arch)
@@ -163,6 +215,8 @@ class ReportConfig(models.Model):
         self.report_menu_id.unlink()
         self.report_window_action_id.unlink()
         self.report_wizard_view_id.unlink()
+        #self.report_action_id.unlink()
+        #self.report_template_view_id.unlink()
         self.state = 'draft'
 
     # Override unlink method to control deletion based on state
@@ -178,6 +232,9 @@ class ReportConfig(models.Model):
         # Find and delete actions associated with 'report.config'
         actions = self.env['ir.actions.act_window'].search([('res_model', '=', 'report.config')])
         actions.unlink()
+
+        report_actions = self.env['ir.actions.report'].search([('model', '=', 'report.config')])
+        report_actions.unlink()
 
         # Find and delete views associated with 'report.config'
         views = self.env['ir.ui.view'].search([('model', '=', 'report.config')])

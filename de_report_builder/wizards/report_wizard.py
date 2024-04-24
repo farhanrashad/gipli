@@ -22,9 +22,9 @@ class ReportWizard(models.TransientModel):
     # ==================================================================
     def action_report_excel(self):
         report_id = self.env['report.config'].browse(self.env.context.get('report_id'))
-        
         data = {
             'report_id': self.env.context.get('report_id'),
+            'domain': self._get_records_domain(report_id),
         }
         return {
             'type': 'ir.actions.report',
@@ -39,10 +39,10 @@ class ReportWizard(models.TransientModel):
 
     def get_xlsx_report(self, data, response):
         rid = data['report_id']
-        #raise UserError(report_id)
+        domain = data['domain']
         
         #raise UserError(data['report_id'])
-        report_id = self.env['report.config'].browse(rid)
+        report_id = self.env['report.config'].browse(int(rid))
         
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -52,7 +52,6 @@ class ReportWizard(models.TransientModel):
         format_heading = workbook.add_format({
             'font_size': 17,
             'align': 'center', 
-            'bg_color': '#D3D3D3', 
             'bold': True,
             'border': True,
         })
@@ -65,19 +64,10 @@ class ReportWizard(models.TransientModel):
         })
 
         # Heading
-        num_main_columns = len(field_ids)
-        num_line_item_columns = sum(len(line_model.rc_line_model_field_ids) for line_model in report_id.rc_line_model_ids)
-
-        if num_main_columns > 0 or num_line_item_columns > 0:
-            start_cell = 'A1'
-            end_cell = chr(ord('A') + num_main_columns + num_line_item_columns - 1) + '1'
-            heading_text = report_id.name
-
-        sheet.merge_range(start_cell + ':' + end_cell, heading_text, format_heading)
-        #sheet.merge_range('A1:G1', report_id.name, format_heading)
+        sheet.merge_range('A1:G1', report_id.name, format_heading)
         sheet.set_row(0, 25)
-        
-        records = self.env[report_id.rc_header_model_id.model].search(self._get_records_domain(report_id))
+
+        records = self.env[report_id.rc_header_model_id.model].search(domain)
         field_ids = report_id.rc_header_field_ids
 
         col_widths = []
@@ -133,15 +123,6 @@ class ReportWizard(models.TransientModel):
                     
                     
             row = line_row + 1
-
-
-        # Set the column widths based on the maximum content length in each column
-        #for i, width in enumerate(col_widths):
-        #    sheet.set_column(i, i, width + 2)  # Add some padding to the width
-
-        num_visible_columns = 30  # You can adjust this value based on your layout and page size
-        if num_main_columns + num_line_item_columns > num_visible_columns:
-            sheet.set_h_pagebreaks([num_visible_columns])
     
         workbook.close()
         output.seek(0)
@@ -187,6 +168,10 @@ class ReportWizard(models.TransientModel):
             'date_stop': False, 
             'html_data': html_data,
         }
+        #report_action = report_id.report_action_id  # Assuming report_id has a field named report_action_id
+        #return report_action.report_action([], data=data)
+        if report_id.report_orientation == 'landscape':
+            return self.env.ref('de_report_builder.action_custom_report_landscape').report_action([], data=data)
         return self.env.ref('de_report_builder.action_custom_report').report_action([], data=data)
 
     def _generate_output(self, report_id):
@@ -204,6 +189,8 @@ class ReportWizard(models.TransientModel):
                     output += self._generate_table_output(lines, lines_fields)
                 output += """<div style="page-break-after: always;"/>"""
         else:
+            output += """<div class="text-center" style="break-inside: avoid;">"""
+            output += """<h2>""" + report_id.name + """</h2></div>"""
             lines = records
             lines_fields = report_id.rc_header_field_ids
             output += self._generate_table_output(lines, lines_fields)
@@ -213,17 +200,22 @@ class ReportWizard(models.TransientModel):
     def _get_records_domain(self, report_id):
         param_lines = report_id.rc_param_line
         domain = []
+        param_domain = []
         record = self
         value = self.id
+
+        #raise UserError(self['x_from_date'])
         for param in param_lines:
-            if record[param.report_param_field_id.name]:
+            if self[param.report_param_field_id.name]:
+                
                 if param.report_param_field_id.ttype == 'many2one':
                     value = record[param.report_param_field_id.name].id
+                elif param.report_param_field_id.ttype == 'many2many':
+                    value = record[param.report_param_field_id.name].ids
                 else:
                     value = record[param.report_param_field_id.name]
                 param_domain = [(param.field_id.name, param.field_operator, value)]
                 domain = expression.AND([param_domain, domain])
-        #raise UserError(domain)
         return domain
 
     

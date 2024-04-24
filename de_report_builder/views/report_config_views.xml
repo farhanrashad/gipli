@@ -87,11 +87,8 @@
                             <group>
                                 
                                 <field name="report_parent_menu_id" />
-                                <!--
-                                <field name="report_menu_id" />
-                                <field name="report_window_action_id" />
-                                <field name="report_wizard_view_id" />
-                                -->
+                                <field name="report_orientation" widget="radio" readonly="state != 'draft'"/>
+                                
                             </group>
                         </group>
                         <notebook>
