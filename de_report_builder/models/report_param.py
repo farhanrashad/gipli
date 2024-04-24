@@ -15,7 +15,8 @@ class ReportParams(models.Model):
             ('=','='),('!=','!='),
             ('>','>'),('>=','>='),
             ('<','<'),('<=','<='),
-            ('like','Contains'),
+            ('in','Contains'),('not in','Not Contains'),
+            ('like','Like'),('ilike','iLike'),
         ], string='Operator', required=True, default='=',
     )
     field_id = fields.Many2one('ir.model.fields', string='Field', ondelete="cascade", required=True,
@@ -23,6 +24,18 @@ class ReportParams(models.Model):
                           )
 
     report_param_field_id = fields.Many2one('ir.model.fields', string='Param Field', readonly=True)
+    is_multi_vals = fields.Boolean(string='Multi List')
+
+    @api.onchange('is_multi_vals')
+    def _onchange_multi_vals(self):
+        for record in self:
+            record.field_operator = 'in'
+
+    @api.constrains('is_multi_vals', 'field_operator')
+    def _check_multi_vals_operator(self):
+        for field in self:
+            if field.is_multi_vals and field.field_operator not in ('in', 'not in'):
+                raise ValidationError("Multi-list functionality is compatible only with 'Contains' and 'Not Contains' operators.")
     
 
 

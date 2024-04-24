@@ -100,8 +100,15 @@ class ReportConfig(models.Model):
                     <group col="4">
         """ + self._get_parameters_output() + """
                     </group>
+                    <notebook>
+        """ + self._get_parameters_page_output() + """
+                    </notebook>
                 <footer>
-                    <button name="generate_report" string="Print" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button name="generate_report" string="Print PDF" type="object" class="btn-primary" />
+                    <button name="action_report_excel" type="object" default_focus="1"
+                            string="Print Excel"
+                            class="oe_highlight"
+                            icon="fa-download"/>
                     <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x" />
                 </footer>
                 </sheet>
@@ -116,28 +123,41 @@ class ReportConfig(models.Model):
             field_tech_name = 'x_' + param.field_name.replace(' ', '_').lower()
             field_exist_id = self.env['ir.model.fields'].search([
                 ('name','=',field_tech_name), ('model','=','rc.report.wizard')
-            ])
-            if not field_exist_id:
-                new_field_id = self.env['ir.model.fields'].create({
-                    'name': field_tech_name,
-                    'field_description': param.field_name,
-                    'model_id': report_model_id.id,
-                    'relation': param.field_id.relation,
-                    'ttype': param.field_id.ttype,
-                })
-                param.report_param_field_id = new_field_id.id
+            ]).unlink()
+            
+            #if not field_exist_id:
+            new_field_id = self.env['ir.model.fields'].create({
+                'name': field_tech_name,
+                'field_description': param.field_name,
+                'model_id': report_model_id.id,
+                'relation': param.field_id.relation,
+                'ttype': 'many2many' if param.is_multi_vals else param.field_id.ttype,
+            })
+            param.report_param_field_id = new_field_id.id
+            if not param.is_multi_vals:
                 output += self._generate_field_output(new_field_id)
-            else:
-                param.report_param_field_id = field_exist_id.id
-                output += self._generate_field_output(field_exist_id)
+            #else:
+            #    param.report_param_field_id = field_exist_id.id
+            #    output += self._generate_field_output(field_exist_id)
         return output
     
     def _generate_field_output(self, field):
         if field.ttype == 'many2many':
-            return """<field name='{}' widget="many2many_tags" />""".format(field.name)
-        
-        return """<field name='{}' />""".format(field.name)
+            output = """<field name='{}' widget="many2many_tags" />""".format(field.name)
+        else:
+            output = """<field name='{}' />""".format(field.name)
+        return output
 
+    def _get_parameters_page_output(self):
+        output = ''
+        for param in self.rc_param_line:
+            if param.is_multi_vals:
+                output += """
+                    <page string="{}">
+                        <field name="{}" widget="one2many_list" />
+                    </page>
+                """.format(param.field_name, param.report_param_field_id.name)
+        return output
             
     def button_unpublish(self):
         self.report_menu_id.unlink()

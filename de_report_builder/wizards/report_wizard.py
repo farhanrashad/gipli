@@ -32,7 +32,7 @@ class ReportWizard(models.TransientModel):
                      'options': json.dumps(data,
                                            default=date_utils.json_default),
                      'output_format': 'xlsx',
-                     'report_name': 'Report Builder',
+                     'report_name': report_id.name.replace(' ', '_').lower(),
                      },
             'report_type': 'report_excel'
         }
@@ -46,49 +46,102 @@ class ReportWizard(models.TransientModel):
         
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        sheet = workbook.add_worksheet(report_id.name)
-        format1 = workbook.add_format({'font_size': 14, 'align': 'vcenter', 'bold': True})
+        sheet = workbook.add_worksheet(str(report_id.name))
 
-        sheet.merge_range('A1:G1', report_id.name, format1)
+        # Report Formats
+        format_heading = workbook.add_format({
+            'font_size': 17,
+            'align': 'center', 
+            'bg_color': '#D3D3D3', 
+            'bold': True,
+            'border': True,
+        })
+        format_label = workbook.add_format({
+            'font_size': 13, 
+            'align': 'center', 
+            'bg_color': '#D3D3D3', 
+            'bold': True,
+            'border': True,
+        })
+
+        # Heading
+        #num_main_columns = len(field_ids)
+        #num_line_item_columns = sum(len(line_model.rc_line_model_field_ids) for line_model in report_id.rc_line_model_ids)
+
+        if num_main_columns > 0 or num_line_item_columns > 0:
+            start_cell = 'A1'
+            end_cell = chr(ord('A') + num_main_columns + num_line_item_columns - 1) + '1'
+            heading_text = report_id.name
+
+        sheet.merge_range(start_cell + ':' + end_cell, heading_text, format_heading)
+        #sheet.merge_range('A1:G1', report_id.name, format_heading)
+        sheet.set_row(0, 25)
         
         records = self.env[report_id.rc_header_model_id.model].search(self._get_records_domain(report_id))
         field_ids = report_id.rc_header_field_ids
 
-        col_widths = [len(field.field_id.field_description) for field in field_ids]
+        col_widths = []
         
         col = 0
         row = 2
+        line_row = 0
         for record in records:
             col = 0
+            line_row = row
             for field in field_ids:
-                sheet.write(1, col, field.field_id.name, format1)
+                sheet.write(1, col, field.field_id.field_description, format_label)
+
+                if field.field_id.ttype in ['integer', 'float']:
+                    cell_format = workbook.add_format({'align': 'right'})
+                elif field.field_id.ttype == 'monetary':
+                    cell_format = workbook.add_format({'num_format': '#,##0.00'})
+                else:
+                    cell_format = workbook.add_format({'align': 'left'})
+                            
                 if record[field.field_id.name]:
-                    if field.field_id.ttype == 'many2one':
-                        related_record = record[field.field_id.name]
-                        if related_record and hasattr(related_record, field.link_field_id.name):
-                            link_field_value = getattr(related_record, field.link_field_id.name)
-                            sheet.write(row, col, str(link_field_value), format1)
-                            cell_value = str(link_field_value)                        
-                    elif field.field_id.ttype == 'many2many':
-                        related_records = record[field.field_id.name]
-                        if related_records:
-                            display_names = ", ".join(str(r[field.link_field_id.name]) for r in related_records)
-                            sheet.write(row, col, display_names, format1)
-                            cell_value = display_names
-                    else:
-                        sheet.write(row, col, str(record[field.field_id.name]), format1)
-                        cell_value = str(record[field.field_id.name])
-                    
-                    #col_widths[col] = max(col_widths[col], len(cell_value))
-                    col_width = len(cell_value) + 2  # Add some padding to the width
+                    cell_value, col_width = self.get_cell_value_and_width(record, field)
+                    sheet.write(row, col, cell_value, cell_format)
                     sheet.set_column(col, col, col_width)
                 col += 1
-            row += 1
+
+            
+            for line_model in report_id.rc_line_model_ids:
+                line_row = (row - 1)
+                lines_fields = line_model.rc_line_model_field_ids
+
+                field_name = line_model.rc_header_rel_field_id.name
+                lines = self.env[line_model.rc_line_model_id.model].search([(field_name, '=', record.id)])
+                for line in lines:
+                    line_row += 1
+                    line_col = col
+                    for line_field in lines_fields:
+
+                        if line_field.field_id.ttype in ['integer', 'float']:
+                            cell_format = workbook.add_format({'align': 'right'})
+                        elif line_field.field_id.ttype == 'monetary':
+                            cell_format = workbook.add_format({'num_format': '#,##0.00'})
+                        else:
+                            cell_format = workbook.add_format({'align': 'left'})
+    
+                        sheet.write(1, line_col, line_field.field_id.field_description, format_label)
+                        if line[line_field.field_id.name]:
+                            cell_value, col_width = self.get_cell_value_and_width(line, line_field)
+                            sheet.write(line_row, line_col, cell_value, cell_format)
+                            col_width = max(col_width, 10)
+                            sheet.set_column(line_col, line_col, col_width)
+                        line_col += 1
+                    
+                    
+            row = line_row + 1
+
 
         # Set the column widths based on the maximum content length in each column
         #for i, width in enumerate(col_widths):
         #    sheet.set_column(i, i, width + 2)  # Add some padding to the width
-        
+
+        num_visible_columns = 30  # You can adjust this value based on your layout and page size
+        if num_main_columns + num_line_item_columns > num_visible_columns:
+            sheet.set_h_pagebreaks([num_visible_columns])
     
         workbook.close()
         output.seek(0)
@@ -96,8 +149,31 @@ class ReportWizard(models.TransientModel):
         output.close()
 
 
+    def get_cell_value_and_width(self, record, field):
+        if field.field_id.ttype == 'many2one':
+            related_record = record[field.field_id.name]
+            if related_record and hasattr(related_record, field.link_field_id.name):
+                link_field_value = getattr(related_record, field.link_field_id.name)
+                cell_value = str(link_field_value)
+            else:
+                cell_value = ''
+        elif field.field_id.ttype == 'many2many':
+            related_records = record[field.field_id.name]
+            if related_records:
+                display_names = ", ".join(str(r[field.link_field_id.name]) for r in related_records)
+                cell_value = display_names
+            else:
+                cell_value = ''
+        else:
+            cell_value = str(record[field.field_id.name])
     
-    # Generate Report in PDF
+        col_width = len(cell_value) + 2  # Add some padding to the width
+        return cell_value, col_width
+
+    
+    # ============================================================
+    # PDF Generation Code
+    # ============================================================
     def generate_report(self):
         #raise UserError(self.env.context.get('report_id'))
         report_id = self.env['report.config'].browse(self.env.context.get('report_id'))
