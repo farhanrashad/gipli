@@ -12,7 +12,7 @@ Odoo's Report Builder module revolutionizes data reporting by offering a user-fr
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Extra Tools/Sales/Accounting/Project',
-    'version': '17.0.0.1',
+    'version': '17.0.0.2',
     'depends': ['base'],
     'data': [
         'security/security.xml',
@@ -21,7 +21,6 @@ Odoo's Report Builder module revolutionizes data reporting by offering a user-fr
         'views/report_config_views.xml',
         'wizards/custom_report_template.xml',
         'wizards/action_report.xml',
-        'wizards/report_wizard_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
