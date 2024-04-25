@@ -26,16 +26,16 @@ Social Media Management
 
     # always loaded
     'data': [
-        'security/social_security.xml',
-        'security/ir.model.access.csv',
-        'data/social_data.xml',
-        'data/ir_action_data.xml',
-        'views/res_config_settings_views.xml',
-        'views/social_menu.xml',
-        'views/social_media_views.xml',
-        'views/social_channel_views.xml',
-        'views/social_post_views.xml',
-        'views/dashboard_views.xml',
+        #'security/social_security.xml',
+        #'security/ir.model.access.csv',
+        #'data/social_data.xml',
+        #'data/ir_action_data.xml',
+        #'views/res_config_settings_views.xml',
+        #'views/social_menu.xml',
+        #'views/social_media_views.xml',
+        #'views/social_channel_views.xml',
+        #'views/social_post_views.xml',
+        #'views/dashboard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
