@@ -30,5 +30,12 @@ Long description of module's purpose
     'demo': [
         'demo/demo.xml',
     ],
+    'license': 'OPL-1',
+    'price': 149,
+    'currency': 'USD',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
 
