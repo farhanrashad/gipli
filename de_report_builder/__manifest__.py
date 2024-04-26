@@ -12,6 +12,7 @@ Odoo's Report Builder module revolutionizes data reporting by offering a user-fr
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Extra Tools/Sales/Accounting/Project',
+    'live_test_url': 'https://youtu.be/bpUTMHdUwL8',
     'version': '17.0.0.2',
     'depends': ['base'],
     'data': [
