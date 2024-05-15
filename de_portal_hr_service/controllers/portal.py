@@ -360,7 +360,7 @@ class CustomerPortal(portal.CustomerPortal):
                                 for m in m2o_id:
                                     primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
                                     #template += "<t t-esc='t" + m.name + "'/>"
-                                    primary_template += m.name
+                                    primary_template += str(m.name)
                                     primary_template += "</option>"
                                 primary_template += "</select>"
                         # Many2many field
@@ -389,7 +389,7 @@ class CustomerPortal(portal.CustomerPortal):
                         # Selection field
                         elif field.field_type == 'selection':
                             sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic ' >"
+                            primary_template += "<select id='" + str(field.field_name) + "' name='" + str(field.field_name) + "' required='" + required + "' data-model='" + str(field.field_id.relation) + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic ' >"
                             for sel in sel_ids:
                                 primary_template += "<option value='" + str(sel.value) + "' " + (" selected" if str(record_val) == sel.value else " ") + ">"
                                 primary_template += sel.name
@@ -788,7 +788,8 @@ $(document).ready(function() {
                     vals.update({
                         field.field_name: int(kw.get(field.field_name))
                     })
-                elif field.field_type in ('datetime'):
+                elif field.field_type == 'datetime':
+                    raise UserError(field.field_type)
                     vals.update({
                         field.field_name: datetime.datetime.strptime(kw.get(field.field_name),'%Y-%m-%dT%H:%M')
                         #(kw.get(field.field_name))
@@ -815,6 +816,7 @@ $(document).ready(function() {
         if service_id.header_model_id.id == int(model_id):
             if edit_mode == '0' or edit_mode == 0 or not edit_mode:
                 record_sudo = request.env[service_id.header_model_id.model].sudo().create(vals)
+                record_sudo.message_subscribe(partner_ids=[request.env.user.partner_id.id])
             else:
                 record_sudo.sudo().write(vals)
             record = record_sudo
