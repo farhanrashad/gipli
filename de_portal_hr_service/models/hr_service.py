@@ -45,6 +45,9 @@ class HRService(models.Model):
     is_create = fields.Boolean(string='Create', help='Allow record creation', states=READONLY_STATES,)
     is_edit = fields.Boolean(string='Edit', help='Allow record edition', states=READONLY_STATES,)
     allow_messages = fields.Boolean(string='Allow Messages', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='Allow messages to user on portal')
+
+    allow_log_note = fields.Boolean(string='Allow Log Note', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='Allow Log Note to user on portal')
+
     
     @api.onchange('allow_messages')
     def _onchange_allow_messages(self):
@@ -91,8 +94,8 @@ class HRService(models.Model):
     def button_publish(self):
         field_model_ids = self.env['ir.model']
         #model_ids = self.env['ir.model']
-        variant_model_ids = self.env['ir.model'].search([('model','in',['hr.service.field.variant','hr.service.field.variant.line'])])
-        model_ids = self.header_model_id + self.hr_service_record_line.mapped('line_model_id') + variant_model_ids
+        self_model_ids = self.env['ir.model'].search([('model','in',['hr.service.field.variant','hr.service.field.variant.line','hr.service'])])
+        model_ids = self.header_model_id + self.hr_service_record_line.mapped('line_model_id') + self_model_ids
         
         field_model_ids += self.env['ir.model'].search([('model', 'in', self.hr_service_items.filtered(lambda x: x.field_model != False).mapped('field_model'))])
         field_model_ids += self.env['ir.model'].search([('model', 'in', self.hr_service_record_line.hr_service_record_line_items.filtered(lambda x: x.field_model != False).mapped('field_model'))])
@@ -146,6 +149,8 @@ class HRService(models.Model):
                 self.env['ir.model.access'].sudo().create(vals)
             else:
                field_ima_id.sudo().write(vals) 
+
+        
                 
         #raise UserError(_(vals))
         self.write({'state': 'publish'})
@@ -162,8 +167,10 @@ class HRService(models.Model):
             records = self.env['ir.model.fields'].search_count([('model_id','=',service.header_model_id.id),('name','=','website_message_ids')])
             if records > 0:
                 service.allow_messages = True
+                service.allow_log_note = True
             else:
                 service.allow_messages = False
+                service.allow_log_note = False
 
     def get_record_count(self, user_id):
         domain = []

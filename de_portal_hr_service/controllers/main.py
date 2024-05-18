@@ -210,7 +210,7 @@ class CustomerPortal(CustomerPortal):
             record_editable = True
         try:
             partner_id = request.env.user.partner_id
-            record_sudo.message_subscribe([partner_id.id])
+            #record_sudo.message_subscribe([partner_id.id])
         except Exception as e:
             print(e)
 
@@ -273,6 +273,7 @@ class CustomerPortal(CustomerPortal):
 
         template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/main_datatable.js"></script>'
 
+        
         if service_id.is_create:
             template += "<t class='col-lg-6 col-md-4 mb16 mt32'>"
             template +=  "<a href='/my/model/record/" + str(service_id.id) + "/" + str(service_id.header_model_id.id) + "/0/0" + "' class='btn btn-primary pull-left' >Create " + str(service_id.name) + "</a>"
@@ -423,6 +424,9 @@ class CustomerPortal(CustomerPortal):
         template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/items_datatable.js"></script>'
         template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/sweetalert.js"></script>'
 
+        template += '<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>'
+        template += '<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>'
+        template += '<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>'
         
         domain = [('id', '=', record_id.id)]
         record = request.env[service_id.header_model_id.model].search(domain)

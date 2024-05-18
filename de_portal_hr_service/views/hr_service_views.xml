@@ -121,7 +121,7 @@
                             <field name="is_edit" />
                             <field name="condition" widget="domain" string="Edit Domain" options="{'model': 'header_model_name', 'in_dialog': True}"/>
                             <field name="allow_messages" />
-                            
+                            <field name="allow_log_note" />
                         </group>
                     </group>
                         

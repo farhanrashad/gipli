@@ -174,16 +174,33 @@
                         <t t-call="de_portal_hr_service.hr_service_record_portal_content"/>
                     </t>
                 </t>
-                <div t-if="allow_messages" class="mt32">
-                    <h4>
-                        <strong>Message and communication history</strong>
-                    </h4>
-                    <t t-call="portal.message_thread">
-                        <t t-set="object" t-value="record_id"/>
-                        <t t-set="pid" t-value="pid"/>
-                        <t t-set="hash" t-value="hash"/>
-                    </t>
+
+                <!-- -->
+                <div class="mt-4">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages" aria-selected="true">Messages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                            <div t-if="allow_messages" class="mt32">
+                                <h4><strong>Message and communication history</strong></h4>
+                                <t t-call="portal.message_thread">
+                                </t>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+                            <strong>Logs</strong>
+                        </div>
+                    </div>
                 </div>
+                
+                <!-- -->
+                
             </t>
         </template>
 

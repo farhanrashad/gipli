@@ -831,7 +831,7 @@ $(document).ready(function() {
         if service_id.header_model_id.id == int(model_id):
             if edit_mode == '0' or edit_mode == 0 or not edit_mode:
                 record_sudo = request.env[service_id.header_model_id.model].sudo().create(vals)
-                record_sudo.message_subscribe(partner_ids=[request.env.user.partner_id.id])
+                #record_sudo.message_subscribe(partner_ids=[request.env.user.partner_id.id])
             else:
                 record_sudo.sudo().write(vals)
             record = record_sudo
