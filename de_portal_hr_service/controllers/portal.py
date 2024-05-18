@@ -285,6 +285,7 @@ class CustomerPortal(portal.CustomerPortal):
 
                     # check the domain
                     domain_filter = str(field.field_domain).replace("'", "&#39;") if field.field_domain else ""
+
                     
                     if field.is_required:
                         required = '1'
@@ -315,6 +316,7 @@ class CustomerPortal(portal.CustomerPortal):
                                 primary_template += "<input type='file' class='form-control-file mb-2 s_website_form_input' id='" + field.field_name + "' name='" + field.field_name + "' multiple='1' />"
                             else:
                                 if field.field_domain:
+                                    
                                     try:
                                         if 'employee' in field.field_domain:
                                             field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
@@ -328,7 +330,9 @@ class CustomerPortal(portal.CustomerPortal):
                                         field_domain = []
                                     
                                 m2o_id = request.env[field.field_model].sudo().search(field_domain)
-    
+
+                                raise UserError(field_domain)
+                                
                                 if field.ref_populate_field_id:
                                     response_field_name = field.ref_populate_field_id.name
                                     response_field  = hr_service_items.filtered(lambda x:x.field_model == field.ref_populate_field_id.relation)
@@ -622,13 +626,17 @@ $(document).ready(function() {
             partner_id = request.env['ir.model.fields'].sudo().search([('name','=','partner_id'),('model','=',service_id.header_model_id.model)],limit=1)
 
 
-            if service_id.filter_field_id:
-                domain = [(service_id.filter_field_id.name, 'child_of', [request.env.user.partner_id.id]),
-                (service_id.filter_field_id.name, '=', [request.env.user.partner_id.id])]
+            #if service_id.filter_field_id:
+            #    domain = [(service_id.filter_field_id.name, 'child_of', [request.env.user.partner_id.id]),
+            #    (service_id.filter_field_id.name, '=', [request.env.user.partner_id.id])]
    
-            if service_id.filter_domain:
-                domain = safe_eval.safe_eval(service_id.filter_domain) + domain
-            model_records = request.env[service_id.header_model_id.model].sudo().search(domain).ids
+            #if service_id.filter_domain:
+            #    domain = safe_eval.safe_eval(service_id.filter_domain) + domain
+
+            
+            #model_records = request.env[service_id.header_model_id.model].sudo().search(domain).ids
+            model_records = service_id._get_records_filter_by_domain(request.env.user.partner_id.id)
+            
             rec_id = None
             if btn == 'next':
                 rec_id = next(dropwhile(lambda x: x <= int(record), sorted(model_records)), None)

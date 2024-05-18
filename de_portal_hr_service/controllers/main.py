@@ -248,35 +248,15 @@ class CustomerPortal(CustomerPortal):
         #service = request.env['hr.service'].sudo([('id','=',int(service_id))])
         #s_id = request.env['hr.service'].search([('id','=',service.id)],limit=1)
         domain = []
-        message_partner_ids = request.env['ir.model.fields'].sudo().search([('name','=','message_partner_ids'),('model','=',service_id.header_model_id.model)],limit=1)
+        #message_partner_ids = request.env['ir.model.fields'].sudo().search([('name','=','message_partner_ids'),('model','=',service_id.header_model_id.model)],limit=1)
         
         employee_id = request.env['ir.model.fields'].sudo().search([('name','=','employee_id'),('model','=',service_id.header_model_id.model)],limit=1)
         
         partner_id = request.env['ir.model.fields'].sudo().search([('name','=','partner_id'),('model','=',service_id.header_model_id.model)],limit=1)
-        # field_filter_id = request.env['ir.model.fields'].sudo().search([('name','=','filter_field_id'),('model','=','hr.service')],limit=1)
-        if service_id.filter_field_id:
-            domain = [(service_id.filter_field_id.name, 'child_of', [request.env.user.partner_id.id]),
-            (service_id.filter_field_id.name, 'in', [request.env.user.partner_id.id])]
-            
-        # elif employee_id:
-        #     domain = [('employee_id', '=', [request.env.user.employee_id.id])]
-        # elif partner_id:
-        #     domain = [('partner_id', '=', [request.env.user.partner_id.id])]
-        if service_id.filter_domain:
-            domain = safe_eval.safe_eval(service_id.filter_domain) + domain
+        
+        records = request.env[service_id.header_model_id.model].sudo().browse(service_id._get_records_filter_by_domain(request.env.user.partner_id.id))
 
-        
-        records = request.env[service_id.header_model_id.model].search(domain)
-        #records = request.env['project.project'].sudo().search([])
-        #records = records.filtered(lambda x: 32030 in x.message_partner_ids.ids)
-        #raise UserError(records)
-        # records = request.env[service_id.header_model_id.model].search(domain,offset=offset, limit=limit)
-        
-        # template += '<link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet" />'
-        # template += '<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>'
-        # template += '<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>'
-        # template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/main_datatable.js"></script>'
-      
+
       
         template += '<link href="/de_portal_hr_service/static/src/datatable.css" rel="stylesheet" />'
         template += '<link href="/de_portal_hr_service/static/src/datatable_export_button.css" rel="stylesheet" />'
@@ -500,6 +480,7 @@ class CustomerPortal(CustomerPortal):
                 template += "<thead class='bg-100'>"
                 
                 domain = [(rec_line.parent_relational_field_id.name, '=', record_id.id)]
+                
                 if rec_line.relational_field_id:
                     record_lines = request.env[rec_line.line_model_id.model].search(domain)
                     

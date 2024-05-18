@@ -13,7 +13,9 @@ from odoo.tools import safe_eval
 from odoo.exceptions import ValidationError
 
 from lxml import etree
-    
+
+from odoo.osv import expression
+
 
 class HRService(models.Model):
     _name = 'hr.service'
@@ -39,7 +41,7 @@ class HRService(models.Model):
     title_field_id = fields.Many2one('ir.model.fields', string='Title Field', ondelete="cascade", states=READONLY_STATES,)
     state_field_id = fields.Many2one('ir.model.fields', string='State Field', ondelete="cascade", states=READONLY_STATES,)
     # filter_field_id = fields.Many2one('ir.model.fields', string='Filter By ',required=True, ondelete="cascade", states=READONLY_STATES,)
-    filter_field_id = fields.Many2one('ir.model.fields', string='Filter By ',required=True, ondelete="cascade")
+    filter_field_id = fields.Many2one('ir.model.fields', string='Filter By ',ondelete="cascade")
     
     is_create = fields.Boolean(string='Create', help='Allow record creation', states=READONLY_STATES,)
     is_edit = fields.Boolean(string='Edit', help='Allow record edition', states=READONLY_STATES,)
@@ -149,44 +151,10 @@ class HRService(models.Model):
         #raise UserError(_(vals))
         self.write({'state': 'publish'})
         return {}
-    
-    def get_record_count(self, user_id):
-        records = 0
-        #domain = []
-        search_domain = []
-        condition_domain = []
-        field_ids = self.env['ir.model.fields']
-        for service in self:
-            #try:
-            if service.filter_domain:
-                search_domain = safe_eval.safe_eval(service.filter_domain)
-            else:
-                search_domain = [('id','!=',False)]
-            #raise ValidationError(_(domain))
 
-            field_ids = self.env['ir.model.fields'].sudo().search([('model_id','=',service.header_model_id.id)])
-            for field in field_ids:#.filtered(lambda f: f.relation == 'res.partner' or f.relation == 'hr.employee'):
-                if field.name == 'message_partner_ids':
-                    search_domain += [(field.name, '=', user_id.partner_id.id)]
-                    #condition_domain += [('&')]
-                #elif 'employee' in field.name and field.relation == 'hr.employee':
-                #    search_domain += [(field.name, '=', user_id.employee_id.id)]
-                #    condition_domain += [('|')]
-                #if field.relation == 'res.users' and field.ttype == 'many2one':
-                #    search_domain += [(field.name, '=', user_id.id)]
-                #    condition_domain += [('|')]
-                #if field.relation == 'res.partner' and field.ttype == 'many2one':
-                #    search_domain += [(field.name, '=', user_id.partner_id.id)]
-                #    condition_domain += [('|')]
-            #except:
-            #    domain = [('id', '=', 0)]
-            #domain = search_domain + domain
-            
-            search_domain = condition_domain + search_domain
-            records = self.env[service.header_model_id.model].search_count(search_domain)
-            
-            #records = self.env['hr.expense.sheet'].search_count([('message_partner_ids', 'child_of', [user_id.partner_id.id])])
-        return records
+    
+        
+    
     
     @api.depends('header_model_id')
     def _compute_allow_messages(self):
@@ -197,6 +165,33 @@ class HRService(models.Model):
                 service.allow_messages = True
             else:
                 service.allow_messages = False
+
+    def get_record_count(self, user_id):
+        domain = []
+        domain += expression.AND([self._get_user_domain(user_id.partner_id.id), self._get_filter_domain()])
+        records = self.env[self.header_model_id.model].search_count(domain)
+        return records
+        
+    def _get_records_filter_by_domain(self,partner_id):
+        domain = []
+        domain += expression.AND([self._get_user_domain(partner_id), self._get_filter_domain()])
+        #domain = user_domain + filter_domain
+        records = self.env[self.header_model_id.model].search(domain).ids
+        return records
+
+    def _get_user_domain(self,partner_id):
+        user_domain = []
+        if self.filter_field_id:
+            user_domain =  [(self.filter_field_id.name, 'in', [partner_id]),(self.filter_field_id.name, '=', partner_id)]
+        return user_domain
+
+    def _get_filter_domain(self):
+        filter_domain = []
+        if self.filter_domain:
+            filter_domain = safe_eval.safe_eval(self.filter_domain)
+        return filter_domain
+        
+        
     
 class HRServiceItems(models.Model):
     _name = 'hr.service.items'

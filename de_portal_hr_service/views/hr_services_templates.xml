@@ -30,8 +30,11 @@
             <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
                 <t t-set="services" t-value="request.env['hr.service'].sudo().search([('state','=','publish')])"/>
                 <t t-foreach="services" t-as="service">
+                    <t t-set="service_count" t-value="service.get_record_count(request.env.user)" />
+                    <!--
                     <t t-set="service_count" t-value="request.env[service.header_model_id.model].search_count([(service.filter_field_id.name, 'child_of', [request.env.user.partner_id.id]),(service.filter_field_id.name, '=', [request.env.user.partner_id.id])])"/>
-                    <t t-set="group" t-value="service.group_id"/>
+                    -->
+                    <t t-set="group" t-value="service.sudo().group_id"/>
                     <t t-if="group  &amp;  request.env.user.groups_id">
                         <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between" t-attf-href="/my/{{service.id}}" title="Invoices &amp; Bills">
                             <span t-esc="service.name" />
@@ -154,15 +157,15 @@
                                     </div>
                                 </div>
                                 <div class="col-1 col-md-1 d-flex align-items-center justify-content-end">
-                                   <t t-if="record_id.sudo().state">
+                                   <t t-if="state">
                                         <div class="ribbon ribbon-primary">
-                                            <span t-field="record_id.sudo().state"/>
+                                            <span t-esc="state"/>
                                         </div>
                                    </t>
                                 </div>
 
-                                <div t-if="record_id.sudo().state" class="col-1 col-md-1 d-flex align-items-center  text-center">
-                                    <span t-esc="record_id.sudo().state" class=" badge badge-pill badge-info" title="Current stage of this entry"/>
+                                <div t-if="state" class="col-1 col-md-1 d-flex align-items-center  text-center">
+                                    <span t-esc="state" class=" badge badge-pill badge-info" title="Current stage of this entry"/>
                                 </div>
                             </div>
                         </div>
