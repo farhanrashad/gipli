@@ -40,7 +40,6 @@ class HRService(models.Model):
     condition = fields.Char(string='Condition', help="If present, this condition must be satisfied for operations.")
     title_field_id = fields.Many2one('ir.model.fields', string='Title Field', ondelete="cascade", states=READONLY_STATES,)
     state_field_id = fields.Many2one('ir.model.fields', string='State Field', ondelete="cascade", states=READONLY_STATES,)
-    # filter_field_id = fields.Many2one('ir.model.fields', string='Filter By ',required=True, ondelete="cascade", states=READONLY_STATES,)
     filter_field_id = fields.Many2one('ir.model.fields', string='Filter By ',ondelete="cascade")
     
     is_create = fields.Boolean(string='Create', help='Allow record creation', states=READONLY_STATES,)

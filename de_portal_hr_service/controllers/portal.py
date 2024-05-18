@@ -316,7 +316,6 @@ class CustomerPortal(portal.CustomerPortal):
                                 primary_template += "<input type='file' class='form-control-file mb-2 s_website_form_input' id='" + field.field_name + "' name='" + field.field_name + "' multiple='1' />"
                             else:
                                 if field.field_domain:
-                                    
                                     try:
                                         if 'employee' in field.field_domain:
                                             field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
@@ -328,10 +327,15 @@ class CustomerPortal(portal.CustomerPortal):
                                             field_domain = safe_eval.safe_eval(field.field_domain)
                                     except Exception:
                                         field_domain = []
-                                    
-                                m2o_id = request.env[field.field_model].sudo().search(field_domain)
 
-                                raise UserError(field_domain)
+                                    #field_domain = safe_eval.safe_eval(field.field_domain)
+                                m2o_id = request.env[field.field_model].sudo().search(field_domain)
+                                domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
+                                #primary_template += '<h2>' + str(domain_filter) + '/' + str(m2o_id.mapped('id')) + '</h2>'
+
+                                #raise UserError(field_domain)
+                                #field_domain = safe_eval(field.field_domain, {'user': request.env.user.partner_id.id})
+                                
                                 
                                 if field.ref_populate_field_id:
                                     response_field_name = field.ref_populate_field_id.name
@@ -359,8 +363,9 @@ class CustomerPortal(portal.CustomerPortal):
                                         primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
                                     else:
                                         primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
+                                
+                                
                                 primary_template += "<option value='' >Select </option>"
-
                                 for m in m2o_id:
                                     primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
                                     #template += "<t t-esc='t" + m.name + "'/>"
@@ -382,6 +387,8 @@ class CustomerPortal(portal.CustomerPortal):
                                 except Exception:
                                     field_domain = []
                             m2m_id = request.env[field.field_model].sudo().search(field_domain) 
+                            domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
+                            
                             primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic selection-search' multiple='multiple'>"
                             for m in m2m_id:
                                 primary_template += "<option value='' >Select </option>"
