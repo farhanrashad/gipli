@@ -190,11 +190,13 @@
                             <div t-if="allow_messages" class="mt32">
                                 <h4><strong>Message and communication history</strong></h4>
                                 <t t-call="portal.message_thread">
+                                    <t t-set="object" t-value="record_id"/>
+                                    <t t-set="token" t-value="record_id.access_token"/>
                                 </t>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
-                            <strong>Logs</strong>
+                            <t t-call="de_portal_hr_service.hr_service_record_log_notes_tempalte"/>
                         </div>
                     </div>
                 </div>
@@ -214,6 +216,10 @@
 
         <template id="hr_service_record_portal_content" name="Service Records Portal Content">
             <t t-raw="portal_hr_service_record_dyanmic_page_template"/>
+        </template>
+
+        <template id="hr_service_record_log_notes_tempalte" name="Service Records Log Notes">
+            <t t-raw="portal_hr_service_record_log_notes"/>
         </template>
 
     </data>

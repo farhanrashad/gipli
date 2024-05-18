@@ -94,7 +94,7 @@ class HRService(models.Model):
     def button_publish(self):
         field_model_ids = self.env['ir.model']
         #model_ids = self.env['ir.model']
-        self_model_ids = self.env['ir.model'].search([('model','in',['hr.service.field.variant','hr.service.field.variant.line','hr.service'])])
+        self_model_ids = self.env['ir.model'].search([('model','in',['hr.service.field.variant','hr.service.field.variant.line'])])
         model_ids = self.header_model_id + self.hr_service_record_line.mapped('line_model_id') + self_model_ids
         
         field_model_ids += self.env['ir.model'].search([('model', 'in', self.hr_service_items.filtered(lambda x: x.field_model != False).mapped('field_model'))])
@@ -197,7 +197,14 @@ class HRService(models.Model):
             filter_domain = safe_eval.safe_eval(self.filter_domain)
         return filter_domain
         
-        
+
+    def get_log_notes(self, record_id):
+        message_ids = self.env['mail.message'].search([
+            ('res_id','=',record_id.id),
+            ('model','=',self.header_model_id.model),
+            ('subtype_id','=',self.env.ref('mail.mt_note').id)
+        ])
+        return message_ids
     
 class HRServiceItems(models.Model):
     _name = 'hr.service.items'
