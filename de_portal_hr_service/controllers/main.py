@@ -259,8 +259,7 @@ class CustomerPortal(CustomerPortal):
             output += '<div id="message-"' + str(message.id) + 'class="d-flex o_portal_chatter_message" style="display:inline-block;vertical-align:top;">'
             output += f'<img class="o_portal_chatter_avatar" width="45" height="45" src="{user_avatar_url}" alt="Avatar" style="margin-right:1rem;"/>'
             output += f'<img class="o_portal_chatter_avatar" width="45" height="45" t-attf-src="data:image/png;base64,{message.author_avatar}" alt="Avatar" style="margin-right:1rem;"/>'
-            output += '<img t-att-src="data:image/png;base64,' + str(message.author_id.avatar_128)[2:-1] + '"/>'            
-            output +='<img t-att-src="'/web/image/base/%s/image' % message.partner_id.id" alt="Partner"/>'
+            output += '<img t-att-src="data:image/png;base64,' + str(message.author_id.avatar_128)[2:-1] + '"/>'
             
             output += '</div>'
 
