@@ -16,7 +16,10 @@
     'auto_install': False,
     'license': 'OPL-1',
     
-    'depends': ['sale_stock'],
+    'depends': [
+        'sale_stock',
+        'sale_management',
+    ],
     'data': [
         'security/library_security.xml',
         'security/ir.model.access.csv',
@@ -31,9 +34,9 @@
         'views/sale_order_line_views.xml',
         'views/member_views.xml',
         'views/agreement_views.xml',
-        'wizards/fee_configurator_views.xml',
-        'wizards/order_processing_views.xml',
-        'reports/report_library_views.xml',
+        #'wizards/fee_configurator_views.xml',
+        #'wizards/order_processing_views.xml',
+        #'reports/report_library_views.xml',
     ],
     'js': [
         'de_school_library/static/src/js/library_fee_config_wizard.js',
