@@ -10,7 +10,7 @@ Portal Extentsion
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Human Resource',
-    'version': '16.0.0.1',
+    'version': '17.0.0.1',
     'depends': ['hr'],
 
     'data': [
