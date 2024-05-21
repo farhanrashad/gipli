@@ -283,7 +283,7 @@ You will be able to issue and return books to patron.
     />
 
     <!-- Issue agreement -->
-    <!--
+
     <menuitem 
         id="menu_library_circulation_main_agreement_todo_today" 
         name="To Do Today" 
@@ -297,6 +297,11 @@ You will be able to issue and return books to patron.
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="circulation_agreement_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('circulation_agreement_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('circulation_agreement_kanban_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('library_order_primary_form_view')})
+            ]"/>
         <field name="domain">[('is_borrow_order', '=', True)]</field>
         <field name="context">{'default_is_borrow_order': 1,'search_default_filter_today': 1,'search_default_filter_to_issue':1}</field>
         <field name="help" type="html">
@@ -308,28 +313,6 @@ or create a new circulation agreement.
             </p>
         </field>
     </record>
-
-
-    <record id="circulation_agreement_issue_kanban" model="ir.actions.act_window.view">
-        <field name="sequence" eval="1"/>
-        <field name="view_mode">kanban</field>
-        <field name="view_id" ref="circulation_agreement_kanban_view"/>
-        <field name="act_window_id" ref="action_circulation_agreement_issue"/>
-    </record>
-    
-    <record id="circulation_agreement_issue_tree" model="ir.actions.act_window.view">
-        <field name="sequence" eval="2"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="circulation_agreement_tree_view"/>
-        <field name="act_window_id" ref="action_circulation_agreement_issue"/>
-    </record>
-
-    <record id="circulation_agreement_issue_form" model="ir.actions.act_window.view">
-        <field name="sequence" eval="3"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="library_order_primary_form_view"/>
-        <field name="act_window_id" ref="action_circulation_agreement_issue"/>
-    </record>
     
     <menuitem 
         id="menu_library_circulation_main_agreement_issue" 
@@ -338,15 +321,19 @@ or create a new circulation agreement.
         sequence="1" 
         action="action_circulation_agreement_issue"
     />
-    -->
+    
     <!-- Return Agreement -->
-    <!--
     <record id="action_circulation_agreement_return" model="ir.actions.act_window">
         <field name="name">Circulation Agreement</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
         <field name="search_view_id" ref="circulation_agreement_search_view"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('circulation_agreement_tree_view')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('circulation_agreement_kanban_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('library_order_primary_form_view')})
+            ]"/>
         <field name="domain">[('is_borrow_order', '=', True)]</field>
         <field name="context">{'default_is_borrow_order': 1,'search_default_filter_today': 1,'search_default_filter_to_return':1}</field>
         <field name="help" type="html">
@@ -357,28 +344,7 @@ or create a new circulation agreement.
 or create a new circulation agreement.
             </p>
         </field>
-    </record>
-
-   <record id="circulation_agreement_return_kanban" model="ir.actions.act_window.view">
-        <field name="sequence" eval="1"/>
-        <field name="view_mode">kanban</field>
-        <field name="view_id" ref="circulation_agreement_kanban_view"/>
-        <field name="act_window_id" ref="action_circulation_agreement_return"/>
-    </record>
-    <record id="circulation_agreement_return_tree" model="ir.actions.act_window.view">
-        <field name="sequence" eval="2"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="circulation_agreement_tree_view"/>
-        <field name="act_window_id" ref="action_circulation_agreement_return"/>
-    </record>
-    <record id="circulation_agreement_return_form" model="ir.actions.act_window.view">
-        <field name="sequence" eval="3"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="library_order_primary_form_view"/>
-        <field name="act_window_id" ref="action_circulation_agreement_return"/>
-    </record>
-    
-    
+    </record> 
     
     <menuitem 
         id="menu_library_circulation_main_agreement_return" 
@@ -387,5 +353,4 @@ or create a new circulation agreement.
         sequence="1" 
         action="action_circulation_agreement_return"
     />
-    -->
 </odoo>

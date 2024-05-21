@@ -14,7 +14,7 @@ class LibraryProcessing(models.TransientModel):
     _description = 'Pick-up/Return products'
 
     order_id = fields.Many2one('sale.order', required=True, ondelete='cascade',
-                               default=lambda self: self.env.context.get('active_id')
+                               
                               )
     
     

@@ -34,8 +34,8 @@
         'views/sale_order_line_views.xml',
         'views/member_views.xml',
         'views/agreement_views.xml',
-        #'wizards/fee_configurator_views.xml',
-        #'wizards/order_processing_views.xml',
+        'wizards/fee_configurator_views.xml',
+        'wizards/order_processing_views.xml',
         #'reports/report_library_views.xml',
     ],
     'js': [
