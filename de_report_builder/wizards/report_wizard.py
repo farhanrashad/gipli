@@ -95,31 +95,32 @@ class ReportWizard(models.TransientModel):
                 col += 1
 
             
-            for line_model in report_id.rc_line_model_ids:
-                line_row = (row - 1)
-                lines_fields = line_model.rc_line_model_field_ids
-
-                field_name = line_model.rc_header_rel_field_id.name
-                lines = self.env[line_model.rc_line_model_id.model].search([(field_name, '=', record.id)])
-                for line in lines:
-                    line_row += 1
-                    line_col = col
-                    for line_field in lines_fields:
-
-                        if line_field.field_id.ttype in ['integer', 'float']:
-                            cell_format = workbook.add_format({'align': 'right'})
-                        elif line_field.field_id.ttype == 'monetary':
-                            cell_format = workbook.add_format({'num_format': '#,##0.00'})
-                        else:
-                            cell_format = workbook.add_format({'align': 'left'})
+            if report_id.rc_line_model_ids:
+                for line_model in report_id.rc_line_model_ids:
+                    line_row = (row - 1)
+                    lines_fields = line_model.rc_line_model_field_ids
     
-                        sheet.write(1, line_col, line_field.field_id.field_description, format_label)
-                        if line[line_field.field_id.name]:
-                            cell_value, col_width = self.get_cell_value_and_width(line, line_field)
-                            sheet.write(line_row, line_col, cell_value, cell_format)
-                            col_width = max(col_width, 10)
-                            sheet.set_column(line_col, line_col, col_width)
-                        line_col += 1
+                    field_name = line_model.rc_header_rel_field_id.name
+                    lines = self.env[line_model.rc_line_model_id.model].search([(field_name, '=', record.id)])
+                    for line in lines:
+                        line_row += 1
+                        line_col = col
+                        for line_field in lines_fields:
+    
+                            if line_field.field_id.ttype in ['integer', 'float']:
+                                cell_format = workbook.add_format({'align': 'right'})
+                            elif line_field.field_id.ttype == 'monetary':
+                                cell_format = workbook.add_format({'num_format': '#,##0.00'})
+                            else:
+                                cell_format = workbook.add_format({'align': 'left'})
+        
+                            sheet.write(1, line_col, line_field.field_id.field_description, format_label)
+                            if line[line_field.field_id.name]:
+                                cell_value, col_width = self.get_cell_value_and_width(line, line_field)
+                                sheet.write(line_row, line_col, cell_value, cell_format)
+                                col_width = max(col_width, 10)
+                                sheet.set_column(line_col, line_col, col_width)
+                            line_col += 1
                     
                     
             row = line_row + 1
