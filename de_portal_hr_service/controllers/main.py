@@ -218,13 +218,17 @@ class CustomerPortal(CustomerPortal):
         values.update({
             'portal_hr_service_record_dyanmic_page_template': self.portal_hr_service_record_dyanmic_page_template(service_sudo,record_sudo),
             'record_id': record_sudo,
+            'access_token': record_sudo.access_token,
             'title': record_title.upper(),
             'state': record_state, #record_state.upper(),
             'record_editable': record_editable,
             'allow_messages': service_sudo.allow_messages,
             'allow_log_note': service_sudo.allow_log_note,
-            'portal_hr_service_record_log_notes': self.portal_hr_service_record_log_notes(service_sudo,record_sudo)
         })
+        if service_sudo.allow_log_note:
+            values.update({
+                'portal_hr_service_record_log_notes': self.portal_hr_service_record_log_notes(service_sudo,record_sudo)
+            })
         return request.render("de_portal_hr_service.portal_my_hr_service_record", values)
 
     
@@ -258,18 +262,19 @@ class CustomerPortal(CustomerPortal):
             output += '<div class="o_portal_chatter_messages">'
             output += '<div id="message-"' + str(message.id) + 'class="d-flex o_portal_chatter_message" style="display:inline-block;vertical-align:top;">'
             output += f'<img class="o_portal_chatter_avatar" width="45" height="45" src="{user_avatar_url}" alt="Avatar" style="margin-right:1rem;"/>'
-            output += f'<img class="o_portal_chatter_avatar" width="45" height="45" t-attf-src="data:image/png;base64,{message.author_avatar}" alt="Avatar" style="margin-right:1rem;"/>'
-            output += '<img t-att-src="data:image/png;base64,' + str(message.author_id.avatar_128)[2:-1] + '"/>'
+            #output += f'<img class="o_portal_chatter_avatar" width="45" height="45" t-attf-src="data:image/png;base64,{message.author_avatar}" alt="Avatar" style="margin-right:1rem;"/>'
+            #output += '<img t-att-src="data:image/png;base64,' + str(message.author_id.avatar_128)[2:-1] + '"/>'
             
             output += '</div>'
 
-            output += '<div class="flex-grow-1" style="display:inline-block;">'
+            output += '<div class="flex-grow-1" style="display:inline-block;width:90%;">'
             output += '<div class="o_portal_chatter_message_title">'
             output += f'<h5 class="mb-1">{message.author_id.display_name}</h5>'
             output += f'<p class="o_portal_chatter_published_date" style="font-size:85%;color:#6C757D;margin:0px;">Published On {message.date}</p>'
             output += '</div>'
-            output += f'<p>{message.description}</p>'
+            output += f'<p>{message.body}</p>'
             output += '</div>'
+
             
             output += '</div>'
         output += '</div>'
