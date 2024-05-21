@@ -13,7 +13,7 @@ class LineModels(models.Model):
                                                 compute='_compute_header_model_relation'
                                                 )
     rc_line_model_id = fields.Many2one('ir.model', ondelete='cascade', string='Line Item Model', 
-                                       store=True,
+                                       store=True, required=True,
                                        domain="[('id','in',rc_header_model_relations)]"
                                       )
     rc_header_rel_field_ids = fields.Many2many('ir.model.fields', string="Related Fields", 
