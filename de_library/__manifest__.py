@@ -1,14 +1,26 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Library",
+    'name': "Library Management",
     'summary': """
-    Library Management
+    Efficient Library Management Made Easy
         """,
     'description': """
-        Library Management
+Library Management App
+================================
+
+Features:
+
+ - Comprehensive book cataloging to manage and organize your entire library collection efficiently.
+ - Author and publisher management to maintain detailed records.
+ - Flexible book rental pricing to customize rental prices for different books.
+ - Circulation agreements to handle circulation seamlessly.
+ - Efficient issuance and return processes to streamline book transactions.
+ - Detailed books movement analysis report to provide comprehensive insights. 
     """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
+    'support': "info@dynexcel.com",
+    'live_test_url': 'https://youtu.be/PJEkGzyCQ2Q',
     'category': 'Sales/Library',
     'version': '17.0.0.3',
     'installable': True,
@@ -39,11 +51,18 @@
         'reports/report_library_views.xml',
     ],
     'js': [
-        'de_school_library/static/src/js/library_fee_config_wizard.js',
+        #'de_school_library/static/src/js/library_fee_config_wizard.js',
     ],
     'assets': {
        'web.assets_backend': [
            #'de_school_library/static/src/**/*',
        ],
     },
+    'license': 'OPL-1',
+    'price': 75,
+    'currency': 'USD',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
