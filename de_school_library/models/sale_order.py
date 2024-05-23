@@ -23,23 +23,22 @@ class CirculationAgreement(models.Model):
     ], string="Borrow Status", default='draft', store=True, tracking=True, index=True,copy=False)
 
     borrow_next_action_date = fields.Datetime(
-        string="Next Action", compute='_compute_borrow_next_action_date', store=True)
+        string="Next Action", compute='_compute_next_action_date', store=True)
 
     is_book_late = fields.Boolean(
         string="Is overdue",
         help="The products haven't been picked-up or returned in time",
-        compute='_compute_is_book_late',
+        compute='_compute_is_late',
     )
-
+    
     #has_pickable_lines = fields.Boolean(compute="_compute_rental_status", store=True)
     #has_late_lines = fields.Boolean(compute="_compute_has_late_lines")
 
     # ============================================
     # ============= compute Methods ==============
     # ============================================
-    
     @api.depends('is_borrow_order', 'borrow_next_action_date', 'borrow_status')
-    def _compute_is_book_late(self):
+    def _compute_is_late(self):
         now = fields.Datetime.now()
         for order in self:
             tolerance_delay = relativedelta(hours=1)
@@ -49,39 +48,47 @@ class CirculationAgreement(models.Model):
                 and order.borrow_next_action_date
                 and order.borrow_next_action_date + tolerance_delay < now
             )
-
-    
+            
     @api.depends(
         'state', 
         'order_line', 
         'order_line.product_uom_qty', 
         'order_line.qty_delivered', 
-        'order_line.book_qty_returned'
+        'order_line.book_returned'
     )
-    def _compute_borrow_next_action_date(self):
+    def _compute_next_action_date(self):
         for order in self:
             if order.state in ['sale', 'done'] and order.is_borrow_order:
                 rental_order_lines = order.order_line.filtered(lambda l: l.is_borrow_order and l.book_issue_date and l.book_return_date)
                 pickeable_lines = rental_order_lines.filtered(lambda sol: sol.qty_delivered < sol.product_uom_qty)
-                returnable_lines = rental_order_lines.filtered(lambda sol: sol.book_qty_returned < sol.qty_delivered)
+                returnable_lines = rental_order_lines.filtered(lambda sol: sol.book_returned < sol.qty_delivered)
                 min_issue_date = min(pickeable_lines.mapped('book_issue_date')) if pickeable_lines else 0
                 min_return_date = min(returnable_lines.mapped('book_return_date')) if returnable_lines else 0
                 if min_issue_date and pickeable_lines and (not returnable_lines or min_issue_date <= min_return_date):
+                    #order.borrow_status = 'issue'
                     order.borrow_next_action_date = min_issue_date
                 elif returnable_lines:
+                    #order.borrow_status = 'return'
                     order.borrow_next_action_date = min_return_date
                 else:
+                    #order.borrow_status = 'return'
                     order.borrow_next_action_date = False
+                #order.has_pickable_lines = bool(pickeable_lines)
+                #order.has_returnable_lines = bool(returnable_lines)
             else:
+                #order.has_pickable_lines = False
+                #order.has_returnable_lines = False
+                #order.rental_status = order.state if order.is_borrow_order else False
                 order.borrow_next_action_date = False
     
-    @api.depends('is_borrow_order', 'borrow_next_action_date', 'rental_status')
+    @api.depends('is_borrow_order', 'borrow_next_action_date', 'borrow_status')
     def _compute_has_late_lines(self):
         for order in self:
             order.has_late_lines = (
                 order.is_borrow_order
                 and order.rental_status in ['pickup', 'return']  # has_pickable_lines or has_returnable_lines
                 and order.borrow_next_action_date and order.borrow_next_action_date < fields.Datetime.now())
+
 
     def action_confirm(self):
         if self.is_borrow_order:
@@ -139,5 +146,3 @@ class CirculationAgreement(models.Model):
             'target': 'new',
             'context': context
         }
-
-    
