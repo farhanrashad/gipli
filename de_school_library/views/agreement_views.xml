@@ -14,7 +14,7 @@
 
             <button name="action_quotation_send" position="before">
                 <button name="open_issue_form" type="object" class="btn-primary" string="ISSUE" data-hotkey="y"
-                    invisible="borrow_status not in ['confirm']"/>
+                    invisible="borrow_status not in ['confirm'] or state not in ['sale']"/>
                 <button name="open_return_form" type="object" class="btn-primary" string="RETURN" data-hotkey="k"
                     invisible=" borrow_status not in ['issue']"/>
             </button>     
@@ -33,11 +33,11 @@
                 <div class="badge rounded-pill text-bg-danger float-end fs-6 border-0"
                     invisible="state != 'sale' or borrow_status != 'issue' or not is_book_late">Late Issue</div>
                 <div class="badge rounded-pill text-bg-warning float-end fs-6 border-0"
-                    invisible="state != 'sale' or borrow_status != 'return' or is_book_late">Issued</div>
+                    invisible="state != 'sale' or borrow_status != 'issue' or is_book_late">Issued</div>
                 <div class="badge rounded-pill text-bg-danger float-end fs-6 border-0"
                     invisible="state != 'sale' or borrow_status != 'return' or not is_book_late">Late Return</div>
                 <div class="badge rounded-pill text-bg-default float-end fs-6 border-0"
-                    invisible="state != 'sale' or borrow_status != 'returned'">Returned</div>
+                    invisible="state != 'sale' or borrow_status != 'return'">Returned</div>
             </xpath>
             
 

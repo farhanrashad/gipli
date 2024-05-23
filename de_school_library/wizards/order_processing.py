@@ -55,7 +55,7 @@ class LibraryProcessing(models.TransientModel):
         if order_lines:
             lines_values = []
             for line in order_lines:
-                lines_values.append(self.env['lib.process.wizard.line']._default_wizard_line_vals(line, self.status))
+                lines_values.append(self.env['oe.library.process.wizard.line']._default_wizard_line_vals(line, self.status))
 
             self.wizard_line_ids = [(6, 0, [])] + [(0, 0, vals) for vals in lines_values]
 

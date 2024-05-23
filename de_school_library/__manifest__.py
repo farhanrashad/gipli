@@ -24,8 +24,8 @@ Features:
     'version': '17.0.0.2',
     'depends': [
         'de_school',
-        'sale',
-        'stock',
+        'sale_stock',
+        'sale_management',
         'web'
     ],
     'data': [
@@ -46,7 +46,7 @@ Features:
         'views/agreement_views.xml',
         #'wizards/fee_configurator_views.xml',
         'wizards/order_processing_views.xml',
-        #'reports/report_library_views.xml',
+        'reports/report_library_views.xml',
     ],
     'js': [
         #'de_school_library/static/src/js/library_fee_config_wizard.js',
