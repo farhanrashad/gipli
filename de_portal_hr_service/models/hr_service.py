@@ -256,7 +256,7 @@ class HRServiceItems(models.Model):
         ('both', 'Both'),
         ], string='Display View')
     
-    ref_populate_field_id = fields.Many2one('ir.model.fields',string='Filter Reference')
+    #ref_populate_field_id = fields.Many2one('ir.model.fields',string='Filter Reference')
     ref_populate_field_id = fields.Many2one('ir.model.fields',string='Populate Field',domain="[('id', 'in', ref_populate_field_ids)]")
                 
     ref_populate_field_ids = fields.Many2many('ir.model.fields',
@@ -264,6 +264,8 @@ class HRServiceItems(models.Model):
         compute='_compute_related_model_for_populate_field',
     )
 
+    change_field_exp = fields.Char(string='Expression')
+    
     is_model_selected = fields.Boolean(compute='_compute_is_model_selected')
 
     @api.depends('field_model')

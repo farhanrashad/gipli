@@ -46,7 +46,7 @@
                     <field name="ref_field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                     
                     <field name="ref_populate_field_id" domain="[('id', 'in', ref_populate_field_ids)]"/>
-
+                    
                     
                 </tree>
             </field>
@@ -183,6 +183,7 @@
 
                                         <field name="ref_populate_field_ids" invisible="1" />
                                         <field name="ref_populate_field_id" />
+                                        <field name="change_field_exp" />
 
                                         <field name="field_store" invisible="1"/>
                                         <field name="field_readonly" invisible="1"/>
