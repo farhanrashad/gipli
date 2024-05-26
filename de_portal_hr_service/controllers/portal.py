@@ -194,58 +194,279 @@ class CustomerPortal(portal.CustomerPortal):
     # ===========================================================
     # =================== Service Page ==========================
     # ===========================================================
-    def _prepare_service_record_page(self,service_id, model_id, record_id, edit_mode, js_code):
-        
-        extra_template = ''
-        primary_template = ''
-        js_code = ''
-        
-        currency_ids = request.env['res.currency'].sudo().search([('active','=',True)])
-        service = request.env['hr.service'].sudo().search([('id','=',service_id)],limit=1)
-        model = request.env['ir.model'].sudo().search([('id','=',int(model_id))],limit=1)
-        
-        primary_template = self._prepare_html_data(service, model, record_id)
+    def _prepare_service_record_page(self, service_id, model_id, record_id, edit_mode, js_code):
+        service = request.env['hr.service'].sudo().browse(service_id)
+        line_item = request.env['hr.service.record.line'].search([
+            ('hr_service_id', '=', service.id),
+            ('line_model_id', '=', int(model_id))
+        ], limit=1)
+    
+        hr_service_items, record_sudo = self._get_hr_service_items(service, model_id, record_id, line_item, edit_mode)
+    
+        primary_template = self._generate_dynamic_form(service, hr_service_items, record_sudo)
+    
+        currency_ids = request.env['res.currency'].sudo().search([('active', '=', True)])
+        js_code = self._generate_js_code()
+    
         return {
             'currency_ids': currency_ids,
             'template_primary_fields': primary_template,
-            'template_extra_fields': extra_template,
+            'template_extra_fields': '',
             'service_id': service,
             'record_id': record_id,
-            'model_id': model,
-            'edit_mode': edit_mode or 0,
+            'model_id': model_id,
+            'edit_mode': edit_mode,
             'js_code': js_code,
         }
-
-    def _prepare_html_data(self, service_id, model_id, record_id):
-        html_template = ''
-        assets_links = [
-            '<link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />',
-            '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>',
-            '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>',
-            '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>',
-            '<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />',
-            '<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>'
-        ]
-        # Concatenate all libraries
-        html_template += "".join(assets_links)
-        return html_template
-        
-    def _get_service_item_records(self, service_id, model_id, record_id, edit_mode):
-        line_item = request.env['hr.service.record.line'].search([('hr_service_id','=',service_id.id),('line_model_id','=',int(model_id))],limit=1)
-        
-        if service_id.header_model_id.id == int(model_id):
-            hr_service_items = service_id.hr_service_items.filtered(lambda x: x.operation_mode)
-            if edit_mode == '1' or edit_mode == 1:
-                record_sudo = request.env[service_id.header_model_id.model].sudo().search([('id','=',record_id)],limit=1)
-                        
+    
+    def _get_hr_service_items(self, service, model_id, record_id, line_item, edit_mode):
+        record_sudo = request.env[service.header_model_id.model]
+        if service.header_model_id.id == int(model_id):
+            hr_service_items = service.hr_service_items.filtered(lambda x: x.operation_mode)
+            if edit_mode in ('1', 1):
+                record_sudo = request.env[service.header_model_id.model].sudo().browse(record_id)
         elif line_item:
             hr_service_items = line_item.hr_service_record_line_items.filtered(lambda x: x.operation_mode)
-            if edit_mode == '1' or edit_mode == 1:
-                record_sudo = request.env[line_item.line_model_id.model].sudo().search([('id','=',record_id)],limit=1) 
-        
-        return hr_service_items
-        
+            if edit_mode in ('1', 1):
+                record_sudo = request.env[line_item.line_model_id.model].sudo().browse(record_id)
+        else:
+            hr_service_items = record_sudo = False
+        return hr_service_items, record_sudo
+    
+    def _generate_dynamic_form(self, service, hr_service_items, record_sudo):
+        primary_template = self._get_base_template(service)
+    
+        hr_service_grouped_items = self._group_service_items(service)
+        for key, group in sorted(hr_service_grouped_items.items()):
+            primary_template += self._get_column_template(group)
+    
+            for field in hr_service_items.filtered(lambda x: x.field_variant_line_id.id == key.id):
+                record_val, required, required_label = self._get_field_properties(field, record_sudo)
+    
+                primary_template += self._generate_field_template(field, record_val, required, required_label)
+    
+            primary_template += "</div></div></div>"
+    
+        primary_template += self._get_footer_template()
+    
+        return primary_template
+    
+    def _get_base_template(self, service):
+        return '''
+        <link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />
+        <script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>
+        <script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>
+        <script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+        <nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar mt-3 rounded">
+            <ol class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1 row">
+                <li class="breadcrumb-item ml-1">
+                    <a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"></i></a>
+                </li>
+                <li class="breadcrumb-item active">{header_model_name}</li>
+            </ol>
+        </nav>
+        <div class="row" style="">
+        '''.format(header_model_name=service.header_model_id.name)
+    
+    def _group_service_items(self, service):
+        hr_service_grouped_items = {}
+        for key, group in groupby(service.field_variant_id.field_variant_line_ids):
+            hr_service_grouped_items[key] = list(group)
+        return hr_service_grouped_items
+    
+    def _get_column_template(self, group):
+        if group[0].display_column == 'col_6':
+            return '''
+            <div class='col-6'>
+                <div class='p-3 h-100 bg-white'>
+                    {header}
+                    <div style="border-radius: 10px;">
+            '''.format(header=self._get_column_header(group))
+        elif group[0].display_column == 'col_12':
+            return '''
+            <div class='col-12'>
+                <div class='p-3 h-100 bg-white'>
+                    {header}
+                    <div style="border-radius: 10px;">
+            '''.format(header=self._get_column_header(group))
+        return ''
+    
+    def _get_column_header(self, group):
+        if group[0].description:
+            return '''
+            <div class="mb-2">
+                <h5 class="text-uppercase text-o-color-1">{description}</h5>
+                <hr class="w-100 mx-auto" />
+            </div>
+            '''.format(description=group[0].description)
+        return '<div class="mb-2"></div>'
+    
+    def _get_field_properties(self, field, record_sudo):
+        record_val = ''
+        if record_sudo:
+            record_val = str(record_sudo[field.field_name]) if field.field_type != 'many2one' else record_sudo[field.field_name].id
+        required = '1' if field.is_required else ''
+        required_label = '*' if field.is_required else ''
+        return record_val, required, required_label
+    
+    def _generate_field_template(self, field, record_val, required, required_label):
+        template = '''
+        <div class='form-group mb-2 {required_class}' data-type='char' data-name='{field_name}'>
+            <label class='s_website_form_label' style='width: 200px' for='{field_name}'>
+                <span class='s_website_form_label_content'>{field_label}{required_label}</span>
+            </label>
+        '''.format(
+            required_class='s_website_form_required' if required else '',
+            field_name=field.field_name,
+            field_label=field.field_label,
+            required_label=required_label
+        )
+    
+        if field.field_type == 'many2one':
+            template += self._generate_many2one_field(field, record_val, required)
+        elif field.field_type == 'many2many':
+            template += self._generate_many2many_field(field, record_val, required)
+        elif field.field_type == 'selection':
+            template += self._generate_selection_field(field, record_val, required)
+        elif field.field_type == 'date':
+            template += '<input type="date" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_val}" {required}>'.format(
+                field_name=field.field_name, record_val=record_val, required='required="1"' if required else ''
+            )
+        elif field.field_type == 'datetime':
+            template += self._generate_datetime_field(field, record_val, required)
+        elif field.field_type in ('char1', 'text1', 'integer', 'float', 'monetary'):
+            template += '<input type="{input_type}" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_val}" {required}>'.format(
+                input_type='number' if field.field_type in ('integer', 'float', 'monetary') else 'text',
+                field_name=field.field_name, record_val=record_val, required='required="1"' if required else ''
+            )
+        else:
+            template += '''
+            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="updateForm(this)" value="{record_val}" {required}>
+            '''.format(field_name=field.field_name, record_val=record_val, required='required="1"' if required else '')
+    
+        template += "</div>"
+        return template
+    
+    def _generate_many2one_field(self, field, record_val, required):
+        field_domain = self._get_field_domain(field)
+        m2o_id = request.env[field.field_model].sudo().search(field_domain)
+        domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
+    
+        if field.field_model == 'ir.attachment':
+            return '''
+            <input type='file' class='form-control-file mb-2 s_website_form_input' id='{field_name}' name='{field_name}' multiple='1' />
+            '''.format(field_name=field.field_name)
+    
+        ref_populate = " onchange='updateForm(this, {ref_populate_field})'".format(ref_populate_field=field.ref_populate_field_id.name) if field.ref_populate_field_id else ""
+        select_tag = '''
+        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{ref_populate}>
+            <option value=''>Select</option>
+        '''.format(
+            field_name=field.field_name, required='required="1"' if required else '',
+            field_model=field.field_model, search_fields=field.search_fields_ids, label_fields=field.label_fields_ids,
+            domain_filter=domain_filter, ref_populate=ref_populate
+        )
+    
+        for rec in m2o_id:
+            selected = 'selected="selected"' if rec.id == record_val else ''
+            select_tag += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=rec.display_name)
+    
+        select_tag += "</select>"
+        return select_tag
+    
+    def _generate_many2many_field(self, field, record_val, required):
+        field_domain = self._get_field_domain(field)
+        m2m_ids = request.env[field.field_model].sudo().search(field_domain)
+        domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
+    
+        selected_ids = record_val if record_val else []
+    
+        m2m_template = '''
+        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='select2-dynamic-multiple selection-search form-control' multiple>
+        '''.format(
+            field_name=field.field_name, required='required="1"' if required else '',
+            field_model=field.field_model, search_fields=field.search_fields_ids, label_fields=field.label_fields_ids,
+            domain_filter=domain_filter
+        )
+    
+        for rec in m2m_ids:
+            selected = 'selected="selected"' if rec.id in selected_ids else ''
+            m2m_template += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=rec.name)
+    
+        m2m_template += "</select>"
+        return m2m_template
+    
+    def _generate_selection_field(self, field, record_val, required):
+        selection_template = '''
+        <select id='{field_name}' name='{field_name}' {required} class='selection-search form-control mb-2'>
+        '''.format(field_name=field.field_name, required='required="1"' if required else '')
+    
+        for val, label in eval(field.field_selection):
+            selected = 'selected="selected"' if val == record_val else ''
+            selection_template += "<option value='{val}' {selected}>{label}</option>".format(val=val, selected=selected, label=label)
+    
+        selection_template += "</select>"
+        return selection_template
+    
+    def _generate_datetime_field(self, field, record_val, required):
+        return '''
+        <input type="datetime-local" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_val}" {required}>
+        '''.format(field_name=field.field_name, record_val=record_val, required='required="1"' if required else '')
+    
+    def _get_footer_template(self):
+        return '''
+        </div></div>
+        <div class="col-12">
+            <div class="bg-white rounded">
+                <div class="row m-0">
+                    <div class="col-12">
+                        <div class="bg-light p-3 mt-3 rounded">
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <a href="#" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        '''
+    
+    def _get_field_domain(self, field):
+        if field.field_domain:
+            return eval(field.field_domain)
+        return []
+    
+    def _generate_js_code(self):
+        return '''
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('.select2-dynamic').select2({
+                    theme: 'bootstrap4',
+                    placeholder: 'Select an option',
+                    allowClear: true,
+                });
+    
+                $('.select2-dynamic-multiple').select2({
+                    theme: 'bootstrap4',
+                    placeholder: 'Select options',
+                    allowClear: true,
+                    multiple: true,
+                });
+            });
+
+            function updateForm(formId) {
+            
+            }
+        </script>
+        '''
+    
+
     # End Service Record Page
+
+    
     def _prepare_service_record_page1(self,service_id, model_id, record_id, edit_mode, js_code):
         m2o_id = False
         extra_template = ''
