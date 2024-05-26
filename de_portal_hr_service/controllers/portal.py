@@ -191,281 +191,61 @@ class CustomerPortal(portal.CustomerPortal):
         print("Search Fields:", search_fields)
         print("Domain:", combined_domain)
 
-
-    def _prepare_service_record_page(self, service_id, model_id, record_id, edit_mode, js_code):
-        m2o_id = False
+    # ===========================================================
+    # =================== Service Page ==========================
+    # ===========================================================
+    def _prepare_service_record_page(self,service_id, model_id, record_id, edit_mode, js_code):
+        
         extra_template = ''
         primary_template = ''
-        rec_id = 0
-    
-        service_id = request.env['hr.service'].sudo().search([('id', '=', service_id)], limit=1)
-        hr_service_items = False
-        record_sudo = False
-        record_val = ''
-        field_val = ''
-        field_domain = []
-        required = '0'
-        required_label = ''
-        data_pre = stDate = dat_time = ''
+        js_code = ''
         
-        line_item = request.env['hr.service.record.line'].search(
-            [('hr_service_id', '=', service_id.id), ('line_model_id', '=', int(model_id))], limit=1)
-    
-        if service_id.header_model_id.id == int(model_id):
-            hr_service_items = service_id.hr_service_items.filtered(lambda x: x.operation_mode)
-            if edit_mode in ('1', 1):
-                record_sudo = request.env[service_id.header_model_id.model].sudo().search(
-                    [('id', '=', record_id)], limit=1)
-    
-        elif line_item:
-            hr_service_items = line_item.hr_service_record_line_items.filtered(lambda x: x.operation_mode)
-            if edit_mode in ('1', 1):
-                record_sudo = request.env[line_item.line_model_id.model].sudo().search(
-                    [('id', '=', record_id)], limit=1)
-    
-        # Add necessary libraries and initial HTML
-        primary_template += """
-            <link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />
-            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>
-            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>
-            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>
-            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
-            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-        """
+        currency_ids = request.env['res.currency'].sudo().search([('active','=',True)])
+        service = request.env['hr.service'].sudo().search([('id','=',service_id)],limit=1)
+        model = request.env['ir.model'].sudo().search([('id','=',int(model_id))],limit=1)
         
-        # Add breadcrumb navigation
-        primary_template += f"""
-            <nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar  mt-3 rounded">
-                <ol class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1 row">
-                    <li class="breadcrumb-item ml-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"></i></a></li>
-                    <li class="breadcrumb-item active">{service_id.header_model_id.name}</li>
-                </ol>
-            </nav>
-            <div class="row">
-        """
-        
-        # Group and sort items
-        hr_service_grouped_items = {key: list(group) for key, group in groupby(service_id.field_variant_id.field_variant_line_ids)}
-        keys = sorted(hr_service_grouped_items.keys())
-        
-        for key in keys:
-            group = hr_service_grouped_items[key]
-            col_class = 'col-6' if group[0].display_column == 'col_6' else 'col-12'
-            primary_template += f"<div class='{col_class} p-3 h-100 bg-white'>"
-            if group[0].description:
-                primary_template += f'<div class="mb-2"><h5 class="text-uppercase text-o-color-1">{group[0].description}</h5><hr class="w-100 mx-auto" /></div>'
-            
-            for field in hr_service_items.filtered(lambda x: x.field_variant_line_id.id == key.id):
-                field_domain = []
-                search_fields, label_fields = self._get_search_label_fields(field)
-                domain_filter = str(field.field_domain).replace("'", "&#39;") if field.field_domain else ""
-                
-                required = '1' if field.is_required else ''
-                required_label = '*' if field.is_required else ''
-    
-                if field.operation_mode and record_sudo:
-                    record_val = str(record_sudo[eval(f"'{field.field_name}'")])
-    
-                primary_template += f"""
-                    <div class='form-group mb-2 {"s_website_form_required" if field.is_required else ""}' data-type='char' data-name='{field.field_name}'>
-                        <label class='s_website_form_label' style='width: 200px' for='{field.field_name}'>
-                            <span class='s_website_form_label_content'>{field.field_label}{required_label}</span>
-                        </label>
-                """
-                
-                primary_template += self._generate_field_html(field, record_val, required, search_fields, label_fields, domain_filter)
-                primary_template += "</div>"
-            
-            primary_template += "</div>"
-        
-        # Add footer buttons
-        primary_template += """
-            </div>
-            <nav class="navbar navbar-light navbar-expand-lg border p-2 py-0 mb-2 o_portal_navbar mt-3 rounded">
-                <div class="d-flex flex-row col-6 text-right">
-                    <button type="button" class="btn btn-link p-0 m-0 text-decoration-none" onclick="window.history.back();" style="text-align: left;">Back</button>
-                </div>
-                <div class="d-flex flex-row-reverse col-6">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </nav>
-            <span id="s_website_form_result"></span>
-        """
-    
-        currency_ids = request.env['res.currency'].sudo().search([('active', '=', True)])
-        
-        # Define JavaScript code for form interactions
-        js_code = """
-        <script>
-            $(document).ready(function() {
-                // Detect changes in form elements
-                $('input, select, textarea').change(function() {
-                    // Update related form element's value to '1'
-                    var relatedField = $(this).data('change-field-exp');
-                    if (relatedField) {
-                        $('input[name="' + relatedField + '"]').val('1');
-                    }
-                });
-            });
-
-    
-            function updateForm(formId) {
-                console.log("Function updateForm started");
-                let form = document.getElementById(formId);
-                if (!form) {
-                    console.error("Form not found");
-                    return;
-                }
-    
-                let modelId = document.getElementById("model_id").value;
-                let formData = new FormData(form);
-    
-                formData.append('model_id', modelId);
-                alert(formData);
-    
-                $.ajax({
-                    url: '/custom/get_form_vals',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function (response) {
-                        console.log(response);
-                        for (let fieldName in response) {
-                            if (response.hasOwnProperty(fieldName)) {
-                                let field = form.querySelector(`[name="${fieldName}"]`);
-                                if (field) {
-                                    if (field.tagName === "SELECT") {
-                                        $(field).empty();
-                                        for (let key in response[fieldName]) {
-                                            if (response[fieldName].hasOwnProperty(key)) {
-                                                $(field).append($('<option>', {
-                                                    value: key,
-                                                    text: response[fieldName][key]
-                                                }));
-                                            }
-                                        }
-                                    } else {
-                                        field.value = response[fieldName];
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.error("AJAX request failed: " + textStatus + ", " + errorThrown);
-                    }
-                });
-            }
-    
-            $(document).ready(function() {
-                console.log("Initializing Select2...");
-                $('.select2-dynamic').each(function() {
-                    var model = $(this).data('model');
-                    var field = $(this).data('field');
-                    var searchFields = $(this).data('search-fields');
-                    var domain = $(this).data('domain');
-                    var labelFields = $(this).data('label-fields');
-    
-                    $(this).select2({
-                        ajax: {
-                            url: '/dynamic_search',
-                            dataType: 'json',
-                            delay: 250,
-                            data: function (params) {
-                                return {
-                                    q: params.term,
-                                    model: model,
-                                    field: field,
-                                    search_fields: searchFields,
-                                    domain: domain,
-                                    label_fields: labelFields,
-                                    page: params.page
-                                };
-                            },
-                            processResults: function (data) {
-                                return {
-                                    results: data.items
-                                };
-                            },
-                            cache: true
-                        },
-                        placeholder: 'Search...',
-                        minimumInputLength: 1
-                    });
-                });
-            });
-        </script>
-        """
-
-        
+        primary_template = self._prepare_html_data(service, model, record_id)
         return {
             'currency_ids': currency_ids,
             'template_primary_fields': primary_template,
             'template_extra_fields': extra_template,
-            'service_id': service_id,
+            'service_id': service,
             'record_id': record_id,
-            'model_id': model_id,
+            'model_id': model,
             'edit_mode': edit_mode or 0,
-            'js_code': js_code,            
+            'js_code': js_code,
         }
-    
-    def _get_search_label_fields(self, field):
-        if field.field_id.relation:
-            related_model_name = field.field_id.relation
-            Model = request.env[related_model_name]
-            default_field = 'name' if 'name' in Model._fields else 'id'
-            search_fields = [f.name for f in field.search_fields_ids] or [default_field]
-            label_fields = [f.name for f in field.label_fields_ids] or [default_field]
-        else:
-            search_fields = ''
-            label_fields = ''
-        return search_fields, label_fields
-    
-    def _generate_field_html(self, field, record_val, required, search_fields, label_fields, domain_filter):
-        field_html = ""
-        change_field_exp_attr = f"data-change-field-exp='{field.change_field_exp}'" if field.change_field_exp else ""
-        if field.field_type == 'many2one':
-            field_html += self._generate_many2one_html(field, record_val, required, search_fields, label_fields, domain_filter)
-        elif field.field_type == 'char':
-            field_html += f"<input class='form-control s_website_form_input' type='text' name='{field.field_name}' value='{record_val}' {change_field_exp_attr} {'required' if required else ''}>"
-        elif field.field_type == 'integer':
-            field_html += f"<input class='form-control s_website_form_input' type='number' name='{field.field_name}' value='{record_val}' {change_field_exp_attr} {'required' if required else ''}>"
-        elif field.field_type == 'float':
-            field_html += f"<input class='form-control s_website_form_input' type='number' step='any' name='{field.field_name}' value='{record_val}' {change_field_exp_attr} {'required' if required else ''}>"
-        elif field.field_type == 'monetary':
-            field_html += f"<input class='form-control s_website_form_input' type='number' step='any' name='{field.field_name}' value='{record_val}' {change_field_exp_attr} {'required' if required else ''}>"
-        elif field.field_type == 'date':
-            field_html += f"<input class='form-control s_website_form_input' type='date' name='{field.field_name}' value='{record_val}' {change_field_exp_attr} {'required' if required else ''}>"
-        elif field.field_type == 'datetime':
-            field_html += f"<input class='form-control s_website_form_input' type='datetime-local' name='{field.field_name}' value='{record_val}' {change_field_exp_attr} {'required' if required else ''}>"
-        elif field.field_type == 'boolean':
-            checked = 'checked' if record_val else ''
-            field_html += f"<input class='form-check-input' type='checkbox' name='{field.field_name}' value='True' {checked} {change_field_exp_attr}>"
-        elif field.field_type == 'text':
-            field_html += f"<textarea class='form-control s_website_form_input' name='{field.field_name}' {change_field_exp_attr} {'required' if required else ''}>{record_val}</textarea>"
-        elif field.field_type == 'selection':
-            options = ''.join([f"<option value='{option[0]}' {'selected' if option[0] == record_val else ''}>{option[1]}</option>" for option in field.field_id.selection])
-            field_html += f"<select class='form-control s_website_form_input' name='{field.field_name}' {change_field_exp_attr} {'required' if required else ''}>{options}</select>"
-        elif field.field_type == 'binary':
-            field_html += f"<input class='form-control s_website_form_input' type='file' name='{field.field_name}' {change_field_exp_attr} {'required' if required else ''}>"
-        return field_html
 
-
-    
-    def _generate_many2one_html(self, field, record_val, required, search_fields, label_fields, domain_filter):
-        m2o_html = f"""
-            <select class='form-control s_website_form_input select2-dynamic' data-model='{field.field_id.relation}' data-field='{field.field_name}' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' name='{field.field_name}' {'required' if required else ''}>
-        """
-        if record_val:
-            record = request.env[field.field_id.relation].sudo().search([('id', '=', record_val)], limit=1)
-            if record:
-                m2o_html += f"<option value='{record.id}' selected>{record.name}</option>"
-        m2o_html += "</select>"
-        return m2o_html
-
-    
+    def _prepare_html_data(self, service_id, model_id, record_id):
+        html_template = ''
+        assets_links = [
+            '<link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />',
+            '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>',
+            '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>',
+            '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>',
+            '<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />',
+            '<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>'
+        ]
+        # Concatenate all libraries
+        html_template += "".join(assets_links)
+        return html_template
+        
+    def _get_service_item_records(self, service_id, model_id, record_id, edit_mode):
+        line_item = request.env['hr.service.record.line'].search([('hr_service_id','=',service_id.id),('line_model_id','=',int(model_id))],limit=1)
+        
+        if service_id.header_model_id.id == int(model_id):
+            hr_service_items = service_id.hr_service_items.filtered(lambda x: x.operation_mode)
+            if edit_mode == '1' or edit_mode == 1:
+                record_sudo = request.env[service_id.header_model_id.model].sudo().search([('id','=',record_id)],limit=1)
+                        
+        elif line_item:
+            hr_service_items = line_item.hr_service_record_line_items.filtered(lambda x: x.operation_mode)
+            if edit_mode == '1' or edit_mode == 1:
+                record_sudo = request.env[line_item.line_model_id.model].sudo().search([('id','=',record_id)],limit=1) 
+        
+        return hr_service_items
+        
+    # End Service Record Page
     def _prepare_service_record_page1(self,service_id, model_id, record_id, edit_mode, js_code):
         m2o_id = False
         extra_template = ''
