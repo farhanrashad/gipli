@@ -243,7 +243,7 @@ class CustomerPortal(portal.CustomerPortal):
             for field in hr_service_items.filtered(lambda x: x.field_variant_line_id.id == key.id):
                 record, required, required_label = self._get_field_properties(field, record_sudo)
     
-                primary_template += self._generate_field_template(field, record, required, required_label)
+                primary_template += self._generate_field_template(field, service, record, required, required_label)
     
             primary_template += "</div></div></div>"
     
@@ -311,7 +311,7 @@ class CustomerPortal(portal.CustomerPortal):
         required_label = '*' if field.is_required else ''
         return record_sudo, required, required_label
     
-    def _generate_field_template(self, field, record, required, required_label):
+    def _generate_field_template(self, field, service, record, required, required_label):
         template = '''
         <div class='form-group mb-2 {required_class}' data-type='char' data-name='{field_name}'>
             <label class='s_website_form_label' style='width: 200px' for='{field_name}'>
@@ -325,7 +325,7 @@ class CustomerPortal(portal.CustomerPortal):
         )
     
         if field.field_type == 'many2one':
-            template += self._generate_many2one_field(field, record, required)
+            template += self._generate_many2one_field(field, service, record, required)
         elif field.field_type == 'many2many':
             template += self._generate_many2many_field(field, record, required)
         elif field.field_type == 'selection':
@@ -349,7 +349,7 @@ class CustomerPortal(portal.CustomerPortal):
         template += "</div>"
         return template
     
-    def _generate_many2one_field(self, field, record, required):
+    def _generate_many2one_field(self, field, service, record, required):
         field_domain = self._get_field_domain(field)
         m2o_id = request.env[field.field_model].sudo().search(field_domain)
         domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
@@ -359,8 +359,8 @@ class CustomerPortal(portal.CustomerPortal):
             <input type='file' class='form-control-file mb-2 s_website_form_input' id='{field_name}' name='{field_name}' multiple='1' />
             '''.format(field_name=field.field_name)
     
-        form_params = " onchange='filter_field_vals(this, \"{field_name}\", \"{ref_populate_field}\")'".format(
-            field_name=field.field_name, ref_populate_field=field.ref_populate_field_id.name
+        form_params = " onchange='filter_field_vals(\"{form_id}\", \"{source_field}\", \"{target_field}\")'".format(
+            form_id='form'+str(service.id), source_field=field.field_name, target_field=field.ref_populate_field_id.name
         ) if field.ref_populate_field_id else ""
     
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
@@ -459,8 +459,16 @@ class CustomerPortal(portal.CustomerPortal):
                     allowClear: true,
                 });
             });
-    
-            function filter_field_vals(element_src, field_name, ref_populate_field) {
+
+            function filter_field_vals(form_id, source_field, target_field) {
+                console.log("Function filter_field_vals started");
+                console.log("Form ID:", form_id);
+                console.log("Form Element:", document.getElementById(form_id));
+                console.log("Element Source Name:", source_field);
+                console.log("Element Target Name:", target_field);
+            }
+            
+            function filter_field_vals11(element_src, field_name, ref_populate_field) {
                 console.log("Function filter_field_vals started");
             
                 let fieldValueSrc = element_src.value;
