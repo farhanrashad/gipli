@@ -466,6 +466,29 @@ class CustomerPortal(portal.CustomerPortal):
                 console.log("Form Element:", document.getElementById(form_id));
                 console.log("Element Source Name:", source_field);
                 console.log("Element Target Name:", target_field);
+
+                var formValues = {};
+                var formElements = document.getElementById(form_id);
+
+                // Loop through each form element
+                for (var i = 0; i < formElements.length; i++) {
+                    var element = formElements[i];
+            
+                    // Check if element has a name and avoid non-input elements
+                    if (element.name) {
+                        var elementData = {
+                        id: element.id,
+                        name: element.name,
+                        value: element.value
+                      };
+                      // Add the element data to formValues with name as key
+                      formValues[element.name] = elementData;      
+                    }
+                }
+                // Convert formValues to JSON string (optional)
+                var jsonValues = JSON.stringify(formValues);
+                console.log("Form Values (JSON):", jsonValues);
+
             }
             
             function filter_field_vals11(element_src, field_name, ref_populate_field) {
