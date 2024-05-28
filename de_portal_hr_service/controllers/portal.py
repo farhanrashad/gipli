@@ -241,9 +241,9 @@ class CustomerPortal(portal.CustomerPortal):
             primary_template += self._get_column_template(group)
     
             for field in hr_service_items.filtered(lambda x: x.field_variant_line_id.id == key.id):
-                record_val, required, required_label = self._get_field_properties(field, record_sudo)
+                record, required, required_label = self._get_field_properties(field, record_sudo)
     
-                primary_template += self._generate_field_template(field, record_val, required, required_label)
+                primary_template += self._generate_field_template(field, record, required, required_label)
     
             primary_template += "</div></div></div>"
     
@@ -304,14 +304,14 @@ class CustomerPortal(portal.CustomerPortal):
         return '<div class="mb-2"></div>'
     
     def _get_field_properties(self, field, record_sudo):
-        record_val = ''
+        record = ''
         if record_sudo:
-            record_val = str(record_sudo[field.field_name]) if field.field_type != 'many2one' else record_sudo[field.field_name].id
+            record = str(record_sudo[field.field_name]) if field.field_type != 'many2one' else record_sudo[field.field_name]
         required = '1' if field.is_required else ''
         required_label = '*' if field.is_required else ''
-        return record_val, required, required_label
+        return record_sudo, required, required_label
     
-    def _generate_field_template(self, field, record_val, required, required_label):
+    def _generate_field_template(self, field, record, required, required_label):
         template = '''
         <div class='form-group mb-2 {required_class}' data-type='char' data-name='{field_name}'>
             <label class='s_website_form_label' style='width: 200px' for='{field_name}'>
@@ -325,31 +325,31 @@ class CustomerPortal(portal.CustomerPortal):
         )
     
         if field.field_type == 'many2one':
-            template += self._generate_many2one_field(field, record_val, required)
+            template += self._generate_many2one_field(field, record, required)
         elif field.field_type == 'many2many':
-            template += self._generate_many2many_field(field, record_val, required)
+            template += self._generate_many2many_field(field, record, required)
         elif field.field_type == 'selection':
-            template += self._generate_selection_field(field, record_val, required)
+            template += self._generate_selection_field(field, record, required)
         elif field.field_type == 'date':
-            template += '<input type="date" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_val}" {required}>'.format(
-                field_name=field.field_name, record_val=record_val, required='required="1"' if required else ''
+            template += '<input type="date" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_id}" {required}>'.format(
+                field_name=field.field_name, record_id=record.id, required='required="1"' if required else ''
             )
         elif field.field_type == 'datetime':
-            template += self._generate_datetime_field(field, record_val, required)
+            template += self._generate_datetime_field(field, record, required)
         elif field.field_type in ('char1', 'text1', 'integer', 'float', 'monetary'):
-            template += '<input type="{input_type}" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_val}" {required}>'.format(
+            template += '<input type="{input_type}" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_id}" {required}>'.format(
                 input_type='number' if field.field_type in ('integer', 'float', 'monetary') else 'text',
-                field_name=field.field_name, record_val=record_val, required='required="1"' if required else ''
+                field_name=field.field_name, record_id=record.id, required='required="1"' if required else ''
             )
         else:
             template += '''
-            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="filter_field_vals(this)" value="{record_val}" {required}>
-            '''.format(field_name=field.field_name, record_val=record_val, required='required="1"' if required else '')
+            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="filter_field_vals(this)" value="{record_id}" {required}>
+            '''.format(field_name=field.field_name, record_id=record.id, required='required="1"' if required else '')
     
         template += "</div>"
         return template
     
-    def _generate_many2one_field(self, field, record_val, required):
+    def _generate_many2one_field(self, field, record, required):
         field_domain = self._get_field_domain(field)
         m2o_id = request.env[field.field_model].sudo().search(field_domain)
         domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
@@ -364,21 +364,20 @@ class CustomerPortal(portal.CustomerPortal):
         ) if field.ref_populate_field_id else ""
     
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
-        label_fields = ','.join(field.label_fields_ids.mapped('name'))
     
         select_tag = '''
-        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{form_params}>
+        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{form_params}>
             <option value=''>Select</option>
         '''.format(
             field_name=field.field_name, required='required="1"' if required else '',
-            field_model=field.field_model, search_fields=search_fields, label_fields=label_fields,
+            field_model=field.field_model, search_fields=search_fields, 
             domain_filter=domain_filter, form_params=form_params
         )
     
         for rec in m2o_id:
-            selected = 'selected="selected"' if rec.id == record_val else ''
-            combined_label = ' '.join([str(rec[label]) for label in field.label_fields_ids.mapped('name') if rec[label]])
-            select_tag += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=combined_label)
+            selected = 'selected="selected"' if rec.id == record.id else ''
+            #combined_label = ' '.join([str(rec[label]) for label in field.label_fields_ids.mapped('name') if rec[label]])
+            select_tag += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=rec[field.link_field_id.name])
     
         select_tag += "</select>"
         return select_tag
