@@ -343,7 +343,7 @@ class CustomerPortal(portal.CustomerPortal):
             )
         else:
             template += '''
-            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="updateForm(this)" value="{record_val}" {required}>
+            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="filter_field_vals(this)" value="{record_val}" {required}>
             '''.format(field_name=field.field_name, record_val=record_val, required='required="1"' if required else '')
     
         template += "</div>"
@@ -359,22 +359,30 @@ class CustomerPortal(portal.CustomerPortal):
             <input type='file' class='form-control-file mb-2 s_website_form_input' id='{field_name}' name='{field_name}' multiple='1' />
             '''.format(field_name=field.field_name)
     
-        ref_populate = " onchange='updateForm(this, {ref_populate_field})'".format(ref_populate_field=field.ref_populate_field_id.name) if field.ref_populate_field_id else ""
+        ref_populate = " onchange='filter_field_vals(this, {ref_populate_field})'".format(ref_populate_field=field.ref_populate_field_id.name) if field.ref_populate_field_id else ""
+    
+        search_fields = ','.join(field.search_fields_ids.mapped('name'))
+        label_fields = ','.join(field.label_fields_ids.mapped('name'))
+    
         select_tag = '''
         <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{ref_populate}>
             <option value=''>Select</option>
         '''.format(
             field_name=field.field_name, required='required="1"' if required else '',
-            field_model=field.field_model, search_fields=field.search_fields_ids, label_fields=field.label_fields_ids,
+            field_model=field.field_model, search_fields=search_fields, label_fields=label_fields,
             domain_filter=domain_filter, ref_populate=ref_populate
         )
     
         for rec in m2o_id:
             selected = 'selected="selected"' if rec.id == record_val else ''
-            select_tag += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=rec.display_name)
+            # Combine label fields
+            combined_label = ' '.join([str(rec[label]) for label in field.label_fields_ids.mapped('name') if rec[label]])
+            select_tag += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=combined_label)
     
         select_tag += "</select>"
         return select_tag
+
+
     
     def _generate_many2many_field(self, field, record_val, required):
         field_domain = self._get_field_domain(field)
@@ -387,7 +395,7 @@ class CustomerPortal(portal.CustomerPortal):
         <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='select2-dynamic-multiple selection-search form-control' multiple>
         '''.format(
             field_name=field.field_name, required='required="1"' if required else '',
-            field_model=field.field_model, search_fields=field.search_fields_ids, label_fields=field.label_fields_ids,
+            field_model=field.field_model, search_fields=field.search_fields_ids.ids, label_fields=field.label_fields_ids,
             domain_filter=domain_filter
         )
     
@@ -448,21 +456,14 @@ class CustomerPortal(portal.CustomerPortal):
                     placeholder: 'Select an option',
                     allowClear: true,
                 });
-    
-                $('.select2-dynamic-multiple').select2({
-                    theme: 'bootstrap4',
-                    placeholder: 'Select options',
-                    allowClear: true,
-                    multiple: true,
-                });
             });
-
-            function updateForm(formId) {
-            
+    
+            function filter_field_vals(formId) {
+                // Function implementation
             }
+    
         </script>
         '''
-    
 
     # End Service Record Page
 
@@ -647,9 +648,9 @@ class CustomerPortal(portal.CustomerPortal):
                                     name = field.field_name +"-" + str(service.id) +"-" + field._name
 
                                     if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='updateForm(this, " + field.ref_populate_field_id.name + ")'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
                                     else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='updateForm(this, " + field.ref_populate_field_id.name + ")'>"
+                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
                                 else:
                                     if field.is_required:
                                         primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
@@ -728,7 +729,7 @@ class CustomerPortal(portal.CustomerPortal):
                                 '<input type="text" class="form-control mb-2 s_website_form_input" '
                                 'name="' + field.field_name + '" '
                                 'id="' + field.field_name + '" '
-                                'onchange="updateForm(this)" '
+                                'onchange="filter_field_vals(this)" '
                                 'value="111' + record_val + '" ' +
                                 ('required="1" ' if field.is_required else '') +
                                 '>'
