@@ -169,7 +169,7 @@
        widget="many2many_tags" />
 
 <field name="label_fields_ids" 
-       domain="[('model', '=', field_model), ('store', '=', True), ('ttype', 'in', ['char','integer','text','selection'])]" 
+       domain="[('model', '=', field_model)]" 
        attrs="{'readonly': [('is_model_selected', '=', False)]}" 
        optional="hide" 
        widget="many2many_tags" />

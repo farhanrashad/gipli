@@ -359,28 +359,31 @@ class CustomerPortal(portal.CustomerPortal):
             <input type='file' class='form-control-file mb-2 s_website_form_input' id='{field_name}' name='{field_name}' multiple='1' />
             '''.format(field_name=field.field_name)
     
-        ref_populate = " onchange='filter_field_vals(this, {ref_populate_field})'".format(ref_populate_field=field.ref_populate_field_id.name) if field.ref_populate_field_id else ""
+        form_params = " onchange='filter_field_vals(this, \"{field_name}\", \"{ref_populate_field}\")'".format(
+            field_name=field.field_name, ref_populate_field=field.ref_populate_field_id.name
+        ) if field.ref_populate_field_id else ""
     
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
         label_fields = ','.join(field.label_fields_ids.mapped('name'))
     
         select_tag = '''
-        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{ref_populate}>
+        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{form_params}>
             <option value=''>Select</option>
         '''.format(
             field_name=field.field_name, required='required="1"' if required else '',
             field_model=field.field_model, search_fields=search_fields, label_fields=label_fields,
-            domain_filter=domain_filter, ref_populate=ref_populate
+            domain_filter=domain_filter, form_params=form_params
         )
     
         for rec in m2o_id:
             selected = 'selected="selected"' if rec.id == record_val else ''
-            # Combine label fields
             combined_label = ' '.join([str(rec[label]) for label in field.label_fields_ids.mapped('name') if rec[label]])
             select_tag += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=combined_label)
     
         select_tag += "</select>"
         return select_tag
+
+
 
 
     
@@ -458,9 +461,53 @@ class CustomerPortal(portal.CustomerPortal):
                 });
             });
     
-            function filter_field_vals(formId) {
-                // Function implementation
+            function filter_field_vals(element_src, field_name, ref_populate_field) {
+                console.log("Function filter_field_vals started");
+            
+                let fieldValueSrc = element_src.value;
+                var modelId = document.getElementById("model_id").value;
+            
+                let data = {
+                    'src_field_name': field_name,
+                    'src_field_value': fieldValueSrc,
+                    'target_field_name': ref_populate_field,
+                    'model_id': modelId
+                };
+            
+                console.log("Form data to be sent: ", JSON.stringify(data));
+            
+                $.ajax({
+                    url: '/custom/get_field_vals',
+                    type: 'GET',
+                    data: data,
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log(response);
+            
+                        let targetSelect = document.querySelector(`[name="${ref_populate_field}"]`);
+                        if (!targetSelect) {
+                            console.error("Target field not found");
+                            return;
+                        }
+            
+                        targetSelect.innerHTML = "";
+                        for (let key in response) {
+                            if (response.hasOwnProperty(key)) {
+                                let option = document.createElement("option");
+                                option.value = key;
+                                option.text = response[key];
+                                targetSelect.appendChild(option);
+                            }
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("AJAX request failed: " + textStatus + ", " + errorThrown);
+                    }
+                });
             }
+
+
+
     
         </script>
         '''
