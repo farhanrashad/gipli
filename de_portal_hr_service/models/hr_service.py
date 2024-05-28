@@ -3,6 +3,7 @@
 import base64
 import ast
 import json
+import re
 
 from odoo import api, fields, models, tools, _
 from random import randint
@@ -88,8 +89,20 @@ class HRService(models.Model):
         return {}
     
     def button_validate(self):
+
+        # Test Values
+        non_exp_field_ids = self.hr_service_items.filtered(lambda x: not x.change_field_exp)
+        exp_field_ids = self.hr_service_items.filtered(lambda x: x.change_field_exp)
+
+        for field in exp_field_ids:
+            # Extract field names from the expression
+            expression = field.change_field_exp
+            field_names = re.findall(r'\b\w+\b(?=\.)', expression)            
+            # Filter the service items based on the extracted field names
+            matching_fields = self.hr_service_items.filtered(lambda x: x.field_name in field_names)
+            for f in matching_fields:
+                f.ref_changeable_field_ids = [(4, field.field_id.id)]        
         self.write({'state': 'validate'})
-        return {}
     
     def button_publish(self):
         field_model_ids = self.env['ir.model']
@@ -260,13 +273,24 @@ class HRServiceItems(models.Model):
     ref_populate_field_id = fields.Many2one('ir.model.fields',string='Populate Field',domain="[('id', 'in', ref_populate_field_ids)]")
                 
     ref_populate_field_ids = fields.Many2many('ir.model.fields',
-        string='ref_populate_field_ids',
+        string='Update Fields Values',
         compute='_compute_related_model_for_populate_field',
     )
 
     change_field_exp = fields.Char(string='Expression')
+
+    ref_changeable_field_ids = fields.Many2many('ir.model.fields',
+        string='Changable Fields', readonly=True,
+        #compute='_compute_fields_from_expression',
+    )
+
     
     is_model_selected = fields.Boolean(compute='_compute_is_model_selected')
+
+    #@api.depends('change_field_exp')
+    def _compute_fields_from_expression(self):
+        for record in self:
+            pass
 
     @api.depends('field_model')
     def _compute_is_model_selected(self):

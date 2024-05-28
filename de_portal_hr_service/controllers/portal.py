@@ -359,19 +359,27 @@ class CustomerPortal(portal.CustomerPortal):
             <input type='file' class='form-control-file mb-2 s_website_form_input' id='{field_name}' name='{field_name}' multiple='1' />
             '''.format(field_name=field.field_name)
     
-        form_params = " onchange='filter_field_vals(\"{form_id}\", \"{source_field}\", \"{target_field}\")'".format(
-            form_id='form'+str(service.id), source_field=field.field_name, target_field=field.ref_populate_field_id.name
-        ) if field.ref_populate_field_id else ""
+        #form_params = " onchange='filter_field_vals(\"{form_id}\", \"{source_field}\", \"{target_field}\")'".format(
+        #    form_id='form'+str(service.id), source_field=field.field_name, target_field=field.ref_populate_field_id.name
+        #) if field.ref_populate_field_id else ""
+
+        call_js_on_change = ''
+        if field.ref_changeable_field_ids:
+            changeable_fields = field.ref_changeable_field_ids.mapped('name')
+            call_js_on_change = " onchange='filter_changeable_fields(\"{form_id}\", \"{source_field}\", {target_fields})'".format(
+                form_id='form'+str(service.id), source_field=field.field_name, target_fields=json.dumps(changeable_fields)
+            )
+            
     
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
     
         select_tag = '''
-        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{form_params}>
+        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{call_js_on_change}>
             <option value=''>Select</option>
         '''.format(
             field_name=field.field_name, required='required="1"' if required else '',
             field_model=field.field_model, search_fields=search_fields, 
-            domain_filter=domain_filter, form_params=form_params
+            domain_filter=domain_filter, call_js_on_change=call_js_on_change
         )
     
         for rec in m2o_id:
