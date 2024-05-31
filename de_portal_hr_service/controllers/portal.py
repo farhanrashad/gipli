@@ -359,24 +359,17 @@ class CustomerPortal(portal.CustomerPortal):
             <input type='file' class='form-control-file mb-2 s_website_form_input' id='{field_name}' name='{field_name}' multiple='1' />
             '''.format(field_name=field.field_name)
     
+        #form_params = " onchange='filter_field_vals(\"{form_id}\", \"{source_field}\", \"{target_field}\")'".format(
+        #    form_id='form'+str(service.id), source_field=field.field_name, target_field=field.ref_populate_field_id.name
+        #) if field.ref_populate_field_id else ""
 
-        call_js_on_change = ""
-        recompute_field = field.ref_populate_field_id.name if field.ref_populate_field_id else ""
+        call_js_on_change = ''
         if field.ref_changeable_field_ids:
             changeable_fields = field.ref_changeable_field_ids.mapped('name')
-            call_js_on_change = " onchange='update_fields(\"{form_id}\", \"{source_field}\", {target_fields}, \"{recompute_field}\")'".format(
-                form_id='form'+str(service.id),
-                source_field=field.field_name,
-                target_fields=json.dumps(changeable_fields),
-                recompute_field=recompute_field
+            call_js_on_change = " onchange='filter_changeable_fields(\"{form_id}\", \"{source_field}\", {target_fields})'".format(
+                form_id='form'+str(service.id), source_field=field.field_name, target_fields=json.dumps(changeable_fields)
             )
-
-        call_js_on_change = " onchange='filter_field_vals(\"{form_id}\", \"{source_field}\", \"{target_field}\")'".format(
-            form_id='form'+str(service.id), source_field=field.field_name, target_field=field.ref_populate_field_id.name
-        ) if field.ref_populate_field_id else ""
-
             
-    
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
     
         select_tag = '''
@@ -462,118 +455,56 @@ class CustomerPortal(portal.CustomerPortal):
         if field.field_domain:
             return eval(field.field_domain)
         return []
-
-    @http.route('/recompute_field_values', type='http', auth='public')
-    def recompute_field_values(self, **kwargs):        
-        # Perform any necessary computation based on source_field and recompute_field
-        # For example, query the database or perform a calculation
-        # Once you have the updated values, return them in the response
-
-        # For demonstration purposes, let's assume we're updating a many2one field with new options
-        options = {
-            'id': 1, 
-            'name': 'Option 1'
-                  }
-
-        return json.dumps(options)
-
-        #return {
-        #    'new_options': new_options,
-        #    'recompute_field': recompute_field  # Return the recompute_field value to identify the field to update
-        #}
-        
+    
     def _generate_js_code(self):
         return '''
-
         <script type="text/javascript">
-            $(document).ready(function() {
-                $('.select2-dynamic').select2({
-                    theme: 'bootstrap4',
-                    placeholder: 'Select an option',
-                    allowClear: true,
-                });
-            });
+    $(document).ready(function() {
+        $('.select2-dynamic').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Select an option',
+            allowClear: true
+        });
+    });
 
-            function update_fields(form_id, source_field, target_fields, recompute_field) {
-                console.log("Function filter_field_vals started");
-                console.log("Form ID:", form_id);
-                console.log("Form Element:", document.getElementById(form_id));
-                console.log("Element Source Name:", source_field);
-                console.log("Element Target Name:", target_fields);
-                console.log("Element Recompute Field:", recompute_field);
+    function filter_field_vals(form_id, source_field, target_field) {
+        console.log("Function filter_field_vals started");
+        console.log("Form ID:", form_id);
+        console.log("Form Element:", document.getElementById(form_id));
+        console.log("Element Source Name:", source_field);
+        console.log("Element Target Name:", target_field);
 
-                let data = {
-                    'source_field': source_field,
+        var formValues = {};
+        var formElements = document.getElementById(form_id);
+
+        // Check if formElements is not null
+        if (!formElements) {
+            console.error("No form found with the given ID:", form_id);
+            return;
+        }
+
+        // Loop through each form element
+        for (var i = 0; i < formElements.length; i++) {
+            var element = formElements[i];
+
+            // Check if element has a name and avoid non-input elements
+            if (element.name) {
+                var elementData = {
+                    id: element.id,
+                    name: element.name,
+                    value: element.value
                 };
-
-
-                $.ajax({
-                    url: '/recompute_field_values',
-                    type: 'POST',
-                    data: JSON.stringify(data), // Convert data to JSON string
-                    contentType: 'application/json', // Set content type to JSON
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log("Successful Response:", response);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error);
-                    }
-                });
-                
-               
-
+                // Add the element data to formValues with name as key
+                formValues[element.name] = elementData;
             }
-            
-            function filter_field_vals(element_src, field_name, ref_populate_field) {
-                console.log("Function filter_field_vals started");
-            
-                let fieldValueSrc = element_src.value;
-                var modelId = document.getElementById("model_id").value;
-            
-                let data = {
-                    'src_field_name': field_name,
-                    'src_field_value': fieldValueSrc,
-                    'target_field_name': ref_populate_field,
-                    'model_id': modelId
-                };
-            
-                console.log("Form data to be sent: ", JSON.stringify(data));
-            
-                $.ajax({
-                    url: '/custom/get_field_vals',
-                    type: 'GET',
-                    data: data,
-                    dataType: 'json',
-                    success: function (response) {
-                        console.log(response);
-            
-                        let targetSelect = document.querySelector(`[name="${ref_populate_field}"]`);
-                        if (!targetSelect) {
-                            console.error("Target field not found");
-                            return;
-                        }
-            
-                        targetSelect.innerHTML = "";
-                        for (let key in response) {
-                            if (response.hasOwnProperty(key)) {
-                                let option = document.createElement("option");
-                                option.value = key;
-                                option.text = response[key];
-                                targetSelect.appendChild(option);
-                            }
-                        }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.error("AJAX request failed: " + textStatus + ", " + errorThrown);
-                    }
-                });
-            }
+        }
 
+        // Convert formValues to JSON string (optional)
+        var jsonValues = JSON.stringify(formValues);
+        console.log("Form Values (JSON):", jsonValues);
+    }
+</script>
 
-
-    
-        </script>
         '''
 
     # End Service Record Page
