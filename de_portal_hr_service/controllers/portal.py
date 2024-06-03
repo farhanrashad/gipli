@@ -34,6 +34,8 @@ _logger = logging.getLogger(__name__)
 
 import json
 
+js_script = ""
+
 class CustomerPortal(portal.CustomerPortal):
     """
     @http.route('/dynamic_filter', type='http', auth="user", methods=['GET'])
@@ -203,14 +205,14 @@ class CustomerPortal(portal.CustomerPortal):
     
         hr_service_items, record_sudo = self._get_hr_service_items(service, model_id, record_id, line_item, edit_mode)
     
-        primary_template = self._generate_dynamic_form(service, hr_service_items, record_sudo)
+        template, js_code = self._generate_dynamic_form(service, hr_service_items, record_sudo)
     
         currency_ids = request.env['res.currency'].sudo().search([('active', '=', True)])
-        js_code = self._generate_js_code()
+        #js_code = self._generate_js_code() + js_code
     
         return {
             'currency_ids': currency_ids,
-            'template_primary_fields': primary_template,
+            'template_primary_fields': template,
             'template_extra_fields': '',
             'service_id': service,
             'record_id': record_id,
@@ -234,29 +236,44 @@ class CustomerPortal(portal.CustomerPortal):
         return hr_service_items, record_sudo
     
     def _generate_dynamic_form(self, service, hr_service_items, record_sudo):
-        primary_template = self._get_base_template(service)
+        template = self._get_base_template(service)
+        js_template = ''
     
         hr_service_grouped_items = self._group_service_items(service)
         for key, group in sorted(hr_service_grouped_items.items()):
-            primary_template += self._get_column_template(group)
+            template += self._get_column_template(group)
     
             for field in hr_service_items.filtered(lambda x: x.field_variant_line_id.id == key.id):
                 record, required, required_label = self._get_field_properties(field, record_sudo)
     
-                primary_template += self._generate_field_template(field, service, record, required, required_label)
+                html_data, js_script = self._generate_field_template(field, service, record, required, required_label)
+                template += html_data
+                js_template += js_script
     
-            primary_template += "</div></div></div>"
+            template += "</div></div></div>"
     
-        primary_template += self._get_footer_template()
+        template += self._get_footer_template()
+
+        js_script = """
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $('.select2-dynamic').select2({
+                        theme: 'bootstrap4',
+                        placeholder: 'Select an option',
+                        allowClear: true
+                    });
+                    """ + js_template + """
+                });
+            </script>
+        """
     
-        return primary_template
+        return template, js_script
     
     def _get_base_template(self, service):
         return '''
         <link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />
         <script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>
         <script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>
-        <script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
         <nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar mt-3 rounded">
@@ -312,6 +329,8 @@ class CustomerPortal(portal.CustomerPortal):
         return record_sudo, required, required_label
     
     def _generate_field_template(self, field, service, record, required, required_label):
+        js_script = ''
+        js = ''
         template = '''
         <div class='form-group mb-2 {required_class}' data-type='char' data-name='{field_name}'>
             <label class='s_website_form_label' style='width: 200px' for='{field_name}'>
@@ -325,7 +344,10 @@ class CustomerPortal(portal.CustomerPortal):
         )
     
         if field.field_type == 'many2one':
-            template += self._generate_many2one_field(field, service, record, required)
+            select_tag, js = self._generate_many2one_field(field, service, record, required)
+            template += select_tag
+            js_script += js
+            #template, js_script += self._generate_many2one_field(field, service, record, required)
         elif field.field_type == 'many2many':
             template += self._generate_many2many_field(field, record, required)
         elif field.field_type == 'selection':
@@ -347,7 +369,7 @@ class CustomerPortal(portal.CustomerPortal):
             '''.format(field_name=field.field_name, record_id=record.id, required='required="1"' if required else '')
     
         template += "</div>"
-        return template
+        return template, js_script
     
     def _generate_many2one_field(self, field, service, record, required):
         field_domain = self._get_field_domain(field)
@@ -364,11 +386,33 @@ class CustomerPortal(portal.CustomerPortal):
         #) if field.ref_populate_field_id else ""
 
         call_js_on_change = ''
-        if field.ref_changeable_field_ids:
-            changeable_fields = field.ref_changeable_field_ids.mapped('name')
-            call_js_on_change = " onchange='filter_changeable_fields(\"{form_id}\", \"{source_field}\", {target_fields})'".format(
-                form_id='form'+str(service.id), source_field=field.field_name, target_fields=json.dumps(changeable_fields)
-            )
+
+        
+        #if field.ref_changeable_field_ids:
+        #    changeable_fields = field.ref_changeable_field_ids.mapped('name')
+        #    call_js_on_change = " onchange='update_fields_vals(\"{form_id}\", \"{source_field}\", {target_fields})'".format(
+        #        form_id='form'+str(service.id), source_field=field.field_name, target_fields=json.dumps(changeable_fields)
+        #    )
+
+        js_script = """
+            $('#""" + field.field_name + """').change(function() {
+                $.ajax({
+                    url: '/get/recomputed_values',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log(data);
+                        
+                    },
+                    error: function(error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+                
+            });
+        """
+
+        
             
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
     
@@ -387,7 +431,7 @@ class CustomerPortal(portal.CustomerPortal):
             select_tag += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=rec[field.link_field_id.name])
     
         select_tag += "</select>"
-        return select_tag
+        return select_tag, js_script
 
 
 
@@ -455,56 +499,50 @@ class CustomerPortal(portal.CustomerPortal):
         if field.field_domain:
             return eval(field.field_domain)
         return []
+
+    @http.route('/get/recomputed_values', type='http', auth='public')
+    def recompute_field_values(self, **kwargs):        
+        options = {
+            'id': 1, 
+            'name': 'Option 1'
+                  }
+
+        return json.dumps(options)
     
     def _generate_js_code(self):
         return '''
         <script type="text/javascript">
-    $(document).ready(function() {
-        $('.select2-dynamic').select2({
-            theme: 'bootstrap4',
-            placeholder: 'Select an option',
-            allowClear: true
-        });
-    });
-
-    function filter_field_vals(form_id, source_field, target_field) {
-        console.log("Function filter_field_vals started");
-        console.log("Form ID:", form_id);
-        console.log("Form Element:", document.getElementById(form_id));
-        console.log("Element Source Name:", source_field);
-        console.log("Element Target Name:", target_field);
-
-        var formValues = {};
-        var formElements = document.getElementById(form_id);
-
-        // Check if formElements is not null
-        if (!formElements) {
-            console.error("No form found with the given ID:", form_id);
-            return;
-        }
-
-        // Loop through each form element
-        for (var i = 0; i < formElements.length; i++) {
-            var element = formElements[i];
-
-            // Check if element has a name and avoid non-input elements
-            if (element.name) {
-                var elementData = {
-                    id: element.id,
-                    name: element.name,
-                    value: element.value
-                };
-                // Add the element data to formValues with name as key
-                formValues[element.name] = elementData;
+        function update_fields_vals(form_id, source_field, target_field) {
             }
-        }
+            
+            $(document).ready(function() {
+                $('.select2-dynamic').select2({
+                    theme: 'bootstrap4',
+                    placeholder: 'Select an option',
+                    allowClear: true
+                });
+            
 
-        // Convert formValues to JSON string (optional)
-        var jsonValues = JSON.stringify(formValues);
-        console.log("Form Values (JSON):", jsonValues);
-    }
-</script>
+            
 
+            
+                
+            $('#product_id').change(function() {
+                $.ajax({
+                    url: '/get/recomputed_values',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log(data);
+                        
+                    },
+                    error: function(error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+            });
+        }); 
+        </script>
         '''
 
     # End Service Record Page
