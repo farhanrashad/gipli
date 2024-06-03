@@ -255,17 +255,21 @@ class CustomerPortal(portal.CustomerPortal):
         template += self._get_footer_template()
 
         js_script = """
-            <script type="text/javascript">
-                $(document).ready(function() {
-                    $('.select2-dynamic').select2({
-                        theme: 'bootstrap4',
-                        placeholder: 'Select an option',
-                        allowClear: true
-                    });
-                    """ + js_template + """
-                });
-            </script>
-        """
+        <script type="text/javascript">
+            $(document).ready(function() {{
+                $('.select2-dynamic').select2({{
+                    theme: 'bootstrap4',
+                    placeholder: 'Select an option',
+                    allowClear: true
+                }});
+        
+                {js_template}
+            }});
+        </script>
+        """.format(js_template=js_template)
+
+
+
     
         return template, js_script
     
@@ -394,23 +398,28 @@ class CustomerPortal(portal.CustomerPortal):
         #        form_id='form'+str(service.id), source_field=field.field_name, target_fields=json.dumps(changeable_fields)
         #    )
 
+        data = {
+            'model_id': service.header_model_id.id,
+            'service_id': service.id,
+        }
         js_script = """
-            $('#""" + field.field_name + """').change(function() {
-                $.ajax({
-                    url: '/get/recomputed_values',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data) {
-                        console.log(data);
-                        
-                    },
-                    error: function(error) {
-                        console.error('Error fetching data:', error);
-                    }
-                });
-                
-            });
-        """
+            $(document).ready(function() {{
+                $('#{field_name}').change(function() {{
+                    $.ajax({{
+                        url: '/get/recomputed_values',
+                        type: 'GET',
+                        data: {data},
+                        dataType: 'json',
+                        success: function(data) {{
+                            console.log(data);
+                        }},
+                        error: function(error) {{
+                            console.error('Error fetching data:', error);
+                        }}
+                    }});
+                }});
+            }});
+        """.format(field_name=field.field_name, data=data)
 
         
             
