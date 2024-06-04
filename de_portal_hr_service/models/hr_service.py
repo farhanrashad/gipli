@@ -251,9 +251,46 @@ class HRService(models.Model):
                 model_id = element['value']
             elif element['name'] == 'record_id':
                 record_id = element['value']
-            #elif element['name'] == 'field_name':
-                #field_name = element['value']
-            
+
+        model = self.env['ir.model'].browse(model_id)
+        computed_field_values = []
+        expression_parts = ''
+        changeable_field_names = ''
+
+        service_items = self.env['hr.service.items'].search([('field_id.id','in',changeable_field_ids)])
+        
+        for item in service_items:
+            if item.change_field_exp:
+                expression_parts = item.change_field_exp.split('.')
+
+        
+            #if len(expression_parts) >= 2:
+            #    field_name = expression_parts[1]  # Get the field name after the '.'
+                #field_model = self.env[expression_parts[0]]  # Get the model based on the first part of the expression
+    
+                # Search for the field in form_elements
+            #    field_value = 0
+            #    for element in form_elements:
+            #        if element['name'] == field_name:
+            #            field_value = element['value']
+            #            break
+    
+            #    if field_value:
+            #        field_record = field_model.browse(int(field_value))
+            #        attribute_name = expression_parts[1]
+    
+            #        computed_field_value = getattr(field_record, attribute_name)
+    
+            #        computed_field_values.append({'name': cf.name, 'value': computed_field_value})
+                    
+        """
+                    find before . in cf.change_field_exp expression in hr.service.items model if found then there is a field field_mode get this model and then find this field value in form_elements 
+                    field_record = self.env[field_model].browse(find field value in form_elements of before . expression in change_field_exp
+                    now get after . from the expression and get value field_record[after . value]
+                    repeat this value if multiple values found in expression
+                    e.g product_id.id + product_uom.id
+                    last add the value in the list as like cf.name and the value get
+        """
 
         # Example logic to retrieve changable field values based on provided parameters
         # Replace this with your actual logic to fetch and return the values
@@ -262,6 +299,8 @@ class HRService(models.Model):
             'model_id': model_id,
             'record_id': record_id,
             'field_name': field_name,
+            'changeable_field_ids': changeable_field_ids,
+            'expression_parts': expression_parts,
         }
 
         return changeable_field_values
