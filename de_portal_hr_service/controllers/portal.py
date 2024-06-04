@@ -195,6 +195,7 @@ class CustomerPortal(portal.CustomerPortal):
 
     @http.route('/get/recomputed_values', type='http', auth='public', methods=['GET'], csrf=False)
     def recompute_field_values(self, **kwargs):
+        service_id = kwargs.get('service_id')
         model_id = kwargs.get('model_id')
         record_id = kwargs.get('record_id') or 0
         field_id = kwargs.get('field_id')
@@ -202,25 +203,33 @@ class CustomerPortal(portal.CustomerPortal):
         field_name = kwargs.get('field_name')
         field_value = kwargs.get('field_value')
         populate_field_id = kwargs.get('populate_field_id')
-        
+
+        service = request.env['hr.service'].browse(int(service_id))        
         # Retrieve and parse the many2many field IDs
         changeable_field_ids = json.loads(kwargs.get('changeable_field_ids', '[]'))
         # Fetch the field names from ir.model.fields
-        fields = request.env['ir.model.fields'].browse(changeable_field_ids)
-        field_names = fields.mapped('name')
-
-        
+        fields = request.env['ir.model.fields'].browse(changeable_field_ids)        
         # Fetch the values for these fields from the specified model and record
-        model = request.env[field_model]
-        record = model.browse(int(field_value))
-        
+        #model = request.env[field_model]
+        #record = model.browse(int(field_value))
         # Prepare field data in a loop
         field_data = {}
-        for field in fields:
-            field_name = field.name
-            field_data[field_name] = 1
+        #for field in fields:
+        #    field_name = field.name
+        #    field_data[field_name] = service.get_field_value_from_expression(int(model_id),field_model,field_name, int(field_value),changeable_field_name)#record.id
+
+
+        form_data = request.params
+
+        # Prepare list of dictionaries containing element names and values
+        form_elements = [{'name': name, 'value': form_data[name]} for name in form_data]
+
+        # Convert the list of dictionaries to JSON format
+        form_elements_json = json.dumps(form_elements)
+        
         
         options = {
+            'service_id': service_id,
             'model_id': model_id,
             'record_id': record_id,
             'field_id': field_id,
@@ -228,8 +237,10 @@ class CustomerPortal(portal.CustomerPortal):
             'field_name': field_name,
             'field_value': field_value,
             'populate_field_id': populate_field_id,
-            'changeable_field_ids': changeable_field_ids,
-            'field_data': field_data  # Include field names in the response
+            #'changeable_field_ids': changeable_field_ids,
+            #'field_data': field_data  # Include field names in the response
+            'field_data': service.get_changeable_field_values(form_elements_json, changeable_field_ids, field_name),
+            #'form_elements_json': form_elements_json,
         }
 
         return json.dumps(options)
@@ -443,10 +454,42 @@ class CustomerPortal(portal.CustomerPortal):
             'model_id': service.header_model_id.id,
             'service_id': service.id,
         }
+        form_id = 'form'+ str(service.id)
         js_script = """
+            $(document).ready(function() {{
+                $('#{form_id}').on('change', '#{field_name}', function() {{
+                    let form_data = $('#{form_id}').serialize();  // Serialize the form data
+                    
+            
+                    $.ajax({{
+                        url: '/get/recomputed_values',
+                        type: 'GET',
+                        data: form_data + '&field_id={field_id}&field_name={field_name}&field_model={field_model}&changeable_field_ids={changeable_field_ids}&populate_field_id={populate_field_id}',
+                        dataType: 'json',
+                        success: function(data) {{
+                            console.log(data);
+                            // Update the fields dynamically based on the response
+                            let fieldData = data.field_data;
+                            for (let field in fieldData) {{
+                                if (document.getElementById(field)) {{
+                                    document.getElementById(field).value = fieldData[field];
+                                }}
+                            }}
+                        }},
+                        error: function(error) {{
+                            console.error('Error fetching data:', error);
+                        }}
+                    }});
+                }});
+            }});
+            """.format(form_id=form_id, field_name=field.field_name, field_id=field.id, field_model=field.field_model, changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids), populate_field_id=field.ref_populate_field_id.id)
+
+        
+        js_script1 = """
             $(document).ready(function() {{
                 let model_id = document.getElementById("model_id").value;
                 let record_id = document.getElementById("record_id").value;
+                let service_id = document.getElementById("service_id").value;
                 let field_id = "{field_id}";
                 let field_name = "{field_name}";
                 let field_model = "{field_model}";
@@ -459,6 +502,7 @@ class CustomerPortal(portal.CustomerPortal):
                         url: '/get/recomputed_values',
                         type: 'GET',
                         data: {{
+                            'service_id':service_id,
                             'model_id': model_id,
                             'record_id': record_id,
                             'field_id': field_id,

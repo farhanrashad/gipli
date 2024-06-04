@@ -218,6 +218,53 @@ class HRService(models.Model):
             ('subtype_id','=',self.env.ref('mail.mt_note').id)
         ])
         return message_ids
+
+    #def get_field_value_from_expression(self, model_id, field_model, field_name, field_value, changeable_field_name):
+    def get_field_value_from_expression(self,model_id,changeable_field_ids):
+        model = self.env['ir.model'].browse(model_id)
+        record = self.env[field_model].browse(field_value)
+        if self.header_model_id.id == model_id:
+            field = self.env['hr.service.items'].search([('field_name','=',changeable_field_name)])
+            #if cf.change_field_exp
+            value = 100
+        else:
+            for lm in self.hr_service_record_line:
+                if lm.line_model_id.id == model_id:
+                    value = 50
+        return value
+
+    def get_changeable_field_values(self, form_elements_json, changeable_field_ids, field_name):
+        # Process the form elements JSON data
+        form_elements = json.loads(form_elements_json)
+
+        # Initialize variables for service_id, model_id, and record_id
+        service_id = 0
+        model_id = 0
+        record_id = 0
+        #field_name = ''
+        
+        # Iterate through form elements to find the required IDs
+        for element in form_elements:
+            if element['name'] == 'service_id':
+                service_id = element['value']
+            elif element['name'] == 'model_id':
+                model_id = element['value']
+            elif element['name'] == 'record_id':
+                record_id = element['value']
+            #elif element['name'] == 'field_name':
+                #field_name = element['value']
+            
+
+        # Example logic to retrieve changable field values based on provided parameters
+        # Replace this with your actual logic to fetch and return the values
+        changeable_field_values = {
+            'service_id': service_id,
+            'model_id': model_id,
+            'record_id': record_id,
+            'field_name': field_name,
+        }
+
+        return changeable_field_values
     
 class HRServiceItems(models.Model):
     _name = 'hr.service.items'
