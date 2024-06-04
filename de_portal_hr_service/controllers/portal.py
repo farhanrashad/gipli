@@ -193,6 +193,24 @@ class CustomerPortal(portal.CustomerPortal):
         print("Search Fields:", search_fields)
         print("Domain:", combined_domain)
 
+    @http.route('/get/recomputed_values', type='http', auth='public', methods=['GET'], csrf=False)
+    def recompute_field_values(self, **kwargs):
+        model_id = kwargs.get('model_id')
+        record_id = kwargs.get('record_id') or 0
+        field_name = kwargs.get('field_name')
+        field_value = kwargs.get('field_value')
+        
+        options = {
+            'id': 1,
+            'model_id': model_id,
+            'record_id': record_id,
+            'field_name': field_name,
+            'field_value': field_value,
+        }
+
+        return json.dumps(options)
+
+        
     # ===========================================================
     # =================== Service Page ==========================
     # ===========================================================
@@ -404,11 +422,20 @@ class CustomerPortal(portal.CustomerPortal):
         }
         js_script = """
             $(document).ready(function() {{
+                let model_id = document.getElementById("model_id").value;
+                let record_id = document.getElementById("record_id").value;
+                let field_name = "{field_name}";
                 $('#{field_name}').change(function() {{
+                    let field_value = document.getElementById("{field_name}").value;
                     $.ajax({{
                         url: '/get/recomputed_values',
                         type: 'GET',
-                        data: {data},
+                        data: {{
+                            'model_id': model_id,
+                            'record_id': record_id,
+                            'field_name': field_name,
+                            'field_value': field_value,
+                        }},
                         dataType: 'json',
                         success: function(data) {{
                             console.log(data);
@@ -419,7 +446,8 @@ class CustomerPortal(portal.CustomerPortal):
                     }});
                 }});
             }});
-        """.format(field_name=field.field_name, data=data)
+            """.format(field_name=field.field_name)
+
 
         
             
@@ -509,14 +537,7 @@ class CustomerPortal(portal.CustomerPortal):
             return eval(field.field_domain)
         return []
 
-    @http.route('/get/recomputed_values', type='http', auth='public')
-    def recompute_field_values(self, **kwargs):        
-        options = {
-            'id': 1, 
-            'name': 'Option 1'
-                  }
-
-        return json.dumps(options)
+    
     
     def _generate_js_code(self):
         return '''
