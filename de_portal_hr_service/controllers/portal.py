@@ -199,6 +199,13 @@ class CustomerPortal(portal.CustomerPortal):
         record_id = kwargs.get('record_id') or 0
         field_name = kwargs.get('field_name')
         field_value = kwargs.get('field_value')
+        populate_field_id = kwargs.get('populate_field_id')
+        
+        # Retrieve and parse the many2many field IDs
+        changeable_field_ids = json.loads(kwargs.get('changeable_field_ids', '[]'))
+        # Fetch the field names from ir.model.fields
+        fields = request.env['ir.model.fields'].browse(changeable_field_ids)
+        field_names = fields.mapped('name')
         
         options = {
             'id': 1,
@@ -206,10 +213,12 @@ class CustomerPortal(portal.CustomerPortal):
             'record_id': record_id,
             'field_name': field_name,
             'field_value': field_value,
+            'populate_field_id': populate_field_id,
+            'changeable_field_ids': changeable_field_ids,
+            'field_names': field_names  # Include field names in the response
         }
 
         return json.dumps(options)
-
         
     # ===========================================================
     # =================== Service Page ==========================
@@ -425,6 +434,9 @@ class CustomerPortal(portal.CustomerPortal):
                 let model_id = document.getElementById("model_id").value;
                 let record_id = document.getElementById("record_id").value;
                 let field_name = "{field_name}";
+                let changeable_field_ids = {changeable_field_ids};  // Serialize the list to JSON
+                let populate_field_id = "{populate_field_id}";
+            
                 $('#{field_name}').change(function() {{
                     let field_value = document.getElementById("{field_name}").value;
                     $.ajax({{
@@ -435,10 +447,19 @@ class CustomerPortal(portal.CustomerPortal):
                             'record_id': record_id,
                             'field_name': field_name,
                             'field_value': field_value,
+                            'populate_field_id': populate_field_id,
+                            'changeable_field_ids': JSON.stringify(changeable_field_ids),  // Convert list to JSON string
                         }},
                         dataType: 'json',
                         success: function(data) {{
                             console.log(data);
+                            let fieldNames = data.field_names;
+                            fieldNames.forEach(function(field) {{
+                                if (document.getElementById(field)) {{
+                                    console.log(field);
+                                    document.getElementById(field).value = 10; // Update this value as needed
+                                }}
+                            }});
                         }},
                         error: function(error) {{
                             console.error('Error fetching data:', error);
@@ -446,7 +467,8 @@ class CustomerPortal(portal.CustomerPortal):
                     }});
                 }});
             }});
-            """.format(field_name=field.field_name)
+            """.format(field_name=field.field_name, changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids), populate_field_id=field.ref_populate_field_id.id)
+
 
 
         
