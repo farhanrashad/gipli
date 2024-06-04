@@ -197,6 +197,8 @@ class CustomerPortal(portal.CustomerPortal):
     def recompute_field_values(self, **kwargs):
         model_id = kwargs.get('model_id')
         record_id = kwargs.get('record_id') or 0
+        field_id = kwargs.get('field_id')
+        field_model = kwargs.get('field_model')
         field_name = kwargs.get('field_name')
         field_value = kwargs.get('field_value')
         populate_field_id = kwargs.get('populate_field_id')
@@ -206,16 +208,28 @@ class CustomerPortal(portal.CustomerPortal):
         # Fetch the field names from ir.model.fields
         fields = request.env['ir.model.fields'].browse(changeable_field_ids)
         field_names = fields.mapped('name')
+
+        
+        # Fetch the values for these fields from the specified model and record
+        model = request.env[field_model]
+        record = model.browse(int(field_value))
+        
+        # Prepare field data in a loop
+        field_data = {}
+        for field in fields:
+            field_name = field.name
+            field_data[field_name] = 1
         
         options = {
-            'id': 1,
             'model_id': model_id,
             'record_id': record_id,
+            'field_id': field_id,
+            'field_model': field_model,
             'field_name': field_name,
             'field_value': field_value,
             'populate_field_id': populate_field_id,
             'changeable_field_ids': changeable_field_ids,
-            'field_names': field_names  # Include field names in the response
+            'field_data': field_data  # Include field names in the response
         }
 
         return json.dumps(options)
@@ -433,7 +447,9 @@ class CustomerPortal(portal.CustomerPortal):
             $(document).ready(function() {{
                 let model_id = document.getElementById("model_id").value;
                 let record_id = document.getElementById("record_id").value;
+                let field_id = "{field_id}";
                 let field_name = "{field_name}";
+                let field_model = "{field_model}";
                 let changeable_field_ids = {changeable_field_ids};  // Serialize the list to JSON
                 let populate_field_id = "{populate_field_id}";
             
@@ -445,6 +461,8 @@ class CustomerPortal(portal.CustomerPortal):
                         data: {{
                             'model_id': model_id,
                             'record_id': record_id,
+                            'field_id': field_id,
+                            'field_model': field_model,
                             'field_name': field_name,
                             'field_value': field_value,
                             'populate_field_id': populate_field_id,
@@ -453,13 +471,14 @@ class CustomerPortal(portal.CustomerPortal):
                         dataType: 'json',
                         success: function(data) {{
                             console.log(data);
-                            let fieldNames = data.field_names;
-                            fieldNames.forEach(function(field) {{
+                            // Update the fields dynamically based on the response
+                            let fieldData = data.field_data;
+                            for (let field in fieldData) {{
                                 if (document.getElementById(field)) {{
-                                    console.log(field);
-                                    document.getElementById(field).value = 10; // Update this value as needed
+                                    document.getElementById(field).value = fieldData[field];
                                 }}
-                            }});
+                            }}
+                            
                         }},
                         error: function(error) {{
                             console.error('Error fetching data:', error);
@@ -467,7 +486,7 @@ class CustomerPortal(portal.CustomerPortal):
                     }});
                 }});
             }});
-            """.format(field_name=field.field_name, changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids), populate_field_id=field.ref_populate_field_id.id)
+            """.format(field_name=field.field_name, field_id=field.id, field_model = field.field_model, changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids), populate_field_id=field.ref_populate_field_id.id)
 
 
 
