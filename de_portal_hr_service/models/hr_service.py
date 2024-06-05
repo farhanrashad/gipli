@@ -262,6 +262,13 @@ class HRService(models.Model):
         for item in service_items:
             if item.change_field_exp:
                 expression_parts = item.change_field_exp.split('.')
+                if len(expression_parts) >= 2:
+                    f1 = expression_parts[0]
+                    f2 = expression_parts[1]
+                    computed_field_values.append({
+                        'field1': f1, 
+                        'field2': f2,
+                    })
 
         
             #if len(expression_parts) >= 2:
@@ -300,7 +307,7 @@ class HRService(models.Model):
             'record_id': record_id,
             'field_name': field_name,
             'changeable_field_ids': changeable_field_ids,
-            'expression_parts': expression_parts,
+            'expression_parts': computed_field_values,
         }
 
         return changeable_field_values
