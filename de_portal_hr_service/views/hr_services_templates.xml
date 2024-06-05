@@ -28,7 +28,7 @@
         <!-- --> 
         <template id="portal_my_home" name="Show Types / Services" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
             <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-                <t t-set="services" t-value="request.env['hr.service'].sudo().search([('state','=','publish')])"/>
+                <t t-set="services" t-value="request.env['hr.service'].sudo().search([('state','=','publish')],order='sequence desc')"/>
                 <t t-foreach="services" t-as="service">
                     <t t-set="service_count" t-value="service.get_record_count(request.env.user)" />
                     <!--

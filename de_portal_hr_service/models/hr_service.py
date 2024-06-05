@@ -42,7 +42,8 @@ class HRService(models.Model):
     title_field_id = fields.Many2one('ir.model.fields', string='Title Field', ondelete="cascade", states=READONLY_STATES,)
     state_field_id = fields.Many2one('ir.model.fields', string='State Field', ondelete="cascade", states=READONLY_STATES,)
     filter_field_id = fields.Many2one('ir.model.fields', string='Filter By ',ondelete="cascade")
-    
+
+    sequence = fields.Integer('Sequence', default=0)
     is_create = fields.Boolean(string='Create', help='Allow record creation', states=READONLY_STATES,)
     is_edit = fields.Boolean(string='Edit', help='Allow record edition', states=READONLY_STATES,)
     allow_messages = fields.Boolean(string='Allow Messages', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='Allow messages to user on portal')
