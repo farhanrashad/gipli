@@ -233,7 +233,7 @@ class CustomerPortal(CustomerPortal):
         
         if service_sudo.allow_log_note:
             values.update({
-                'portal_hr_service_record_log_notes': self.portal_hr_service_record_log_notes(service_sudo,record_sudo)
+                'portal_hr_service_record_log_notes': self.portal_hr_service_record_log_notes(service_sudo,model_id, record_sudo)
             })
 
         if not record_sudo:
@@ -254,7 +254,7 @@ class CustomerPortal(CustomerPortal):
     # -------------------------------------------------------------
     # Custom html generation for log Notes
     # -------------------------------------------------------------
-    def portal_hr_service_record_log_notes(self,service_id, record_id):
+    def portal_hr_service_record_log_notes(self,service_id, model_id, record_id):
         output = ''
         output += '<div id="discussion" class="class="d-print-none o_portal_chatter o_not_editable p-0">'
         
@@ -290,6 +290,18 @@ class CustomerPortal(CustomerPortal):
         output += '</div>'
 
         output += '''
+        <form 
+                    action="/my/message/{service_id}/{model_id}/{record_id}" 
+                    method="post" enctype="multipart/form-data" 
+                    class="o_mark_required row" 
+                    data-mark="*" data-success-page=""
+                    t-att-id="'form' + str(service_id.id)"
+                >
+
+    <input type="hidden" class="form-control s_website_form_input" id="service_id" name="service_id" t-att-value="{service_id}" />
+                            <input type="hidden" class="form-control s_website_form_input" id="model_id" name="model_id" t-att-value="{model_id}" />
+                            <input type="hidden" class="form-control s_website_form_input" id="record_id" name="record_id" t-att-value="{record_id}" />
+                            
     <div class="o_portal_chatter_composer">
         <div class="o_portal_chatter_composer">
             <div class="alert alert-danger mb8 d-none o_portal_chatter_composer_error" role="alert">
@@ -300,10 +312,11 @@ class CustomerPortal(CustomerPortal):
                 <div class="flex-grow-1">
                     <div class="o_portal_chatter_composer_input">
                         <div class="o_portal_chatter_composer_body mb32">
-                            <textarea rows="4" name="message" class="form-control" placeholder="Write a message..."></textarea>
+                            <textarea rows="4" name="message" class="form-control" required="1" placeholder="Write a message..."></textarea>
                             <div class="o_portal_chatter_attachments mt-3"></div>
                             <div class="mt8">
                                 <button data-action="/mail/chatter_post" class="o_portal_chatter_composer_btn btn btn-primary" type="submit">Send</button>
+                                                <input type="file" id="fileInput" class="o_portal_chatter_file_input" multiple="multiple">
                                 <button class="o_portal_chatter_attachment_btn btn btn-secondary" type="button" title="Add attachment">
                                     <i class="fa fa-paperclip"></i>
                                 </button>
@@ -312,12 +325,14 @@ class CustomerPortal(CustomerPortal):
                     </div>
                     <div class="d-none">
                         <input type="file" class="o_portal_chatter_file_input" multiple="multiple">
+                        
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    '''
+    </form>
+    '''.format(service_id=service_id.id, model_id=model_id, record_id=record_id.id)
         
         return output
         

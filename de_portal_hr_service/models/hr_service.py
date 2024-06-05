@@ -316,6 +316,18 @@ class HRService(models.Model):
         }
 
         return changeable_field_values
+
+    def create_message(self, model, record, user, message):
+        message_id = self.env['mail.message'].create({
+            'body': message,
+            'model': model.model,
+            'res_id': record.id,
+            'record_name': record.name,
+            'message_type': 'comment',
+            'subtype_id': self.env.ref('mail.mt_comment').id,
+            'author_id': user.partner_id.id
+        })
+        
     
 class HRServiceItems(models.Model):
     _name = 'hr.service.items'

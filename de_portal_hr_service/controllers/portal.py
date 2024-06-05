@@ -1507,4 +1507,25 @@ $(document).ready(function() {
             }
         data = json.dumps(data)
         return data   
+
+    # Message Record
+    @http.route('/my/message/<int:service_id>/<int:model_id>/<int:record_id>', website=True, page=True, auth='public', csrf=False)
+    def user_messsage(self, **kw):
+        service_id = kw.get('service_id')
+        model_id = kw.get('model_id')
+        record_id = kw.get('record_id')
+
+        user = request.env.user
+        
+        message = kw.get('message')
+        
+        service = request.env['hr.service'].sudo().browse(int(service_id))
+        model = request.env['ir.model'].sudo().browse(int(model_id))
+        record = request.env[model.model].sudo().browse(int(record_id))
+
+        service.create_message(model, record, user, message)
+        
+        #raise UserError(message)
+
+        #raise UserError(str(service))
             
