@@ -285,7 +285,7 @@ class CustomerPortal(CustomerPortal):
         # ------ Messages output -------------------
         msg_output = ''
         msg_output += '<div id="discussion" class="class="d-print-none o_portal_chatter o_not_editable p-0">'
-        messages = service_id.get_log_notes(record_id)
+        messages = service_id._get_messages(record_id)
         for message in messages:
             user_avatar_url = f"/web/image/res.partner/{message.author_id.id}/avatar_128"
 
@@ -311,6 +311,7 @@ class CustomerPortal(CustomerPortal):
         msg_output += '</div>'
         
         # ----------- Message form ---------------
+        user_avatar = f"/web/image/res.partner/{request.env.user.partner_id.id}/avatar_128"
         form_html = '''
         <form 
                     action="/my/message/{service_id}/{model_id}/{record_id}" 
@@ -330,7 +331,7 @@ class CustomerPortal(CustomerPortal):
                 Oops! Something went wrong. Try to reload the page and log in.
             </div>
             <div class="d-flex">
-                <img alt="Avatar" class="o_portal_chatter_avatar o_object_fit_cover align-self-start" src="/web/image/res.partner/8/avatar_128">
+                <img alt="Avatar" width="45" height="45" class="o_portal_chatter_avatar o_object_fit_cover align-self-start" src="{user_avatar}">
                 <div class="flex-grow-1">
                     <div class="o_portal_chatter_composer_input">
                         <div class="o_portal_chatter_composer_body mb32">
@@ -338,10 +339,7 @@ class CustomerPortal(CustomerPortal):
                             <div class="o_portal_chatter_attachments mt-3"></div>
                             <div class="mt8">
                                 <button data-action="/mail/chatter_post" class="o_portal_chatter_composer_btn btn btn-primary" type="submit">Send</button>
-                                                <input type="file" id="fileInput" class="o_portal_chatter_file_input" multiple="multiple">
-                                <button class="o_portal_chatter_attachment_btn btn btn-secondary" type="button" title="Add attachment">
-                                    <i class="fa fa-paperclip"></i>
-                                </button>
+                                <input type="file" id="fileInput" class="o_portal_chatter_file_input" multiple="multiple">
                             </div>
                         </div>
                     </div>
@@ -354,7 +352,7 @@ class CustomerPortal(CustomerPortal):
         </div>
     </div>
     </form>
-    '''.format(service_id=service_id.id, model_id=model_id, record_id=record_id.id)
+    '''.format(service_id=service_id.id, model_id=model_id, record_id=record_id.id, user_avatar=user_avatar)
         
         output = ''
         output += '''
@@ -366,6 +364,9 @@ class CustomerPortal(CustomerPortal):
                     <li class="nav-item">
                         <a class="nav-link" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="attachments-tab" data-toggle="tab" href="#attachments" role="tab" aria-controls="attachments" aria-selected="false">Attachments</a>
+                    </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="messages" role="tabpanel" aria-labelledby="messages-tab">
@@ -375,6 +376,9 @@ class CustomerPortal(CustomerPortal):
                         </div>
                     </div>
                     <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+                            {log_output}
+                    </div>
+                    <div class="tab-pane fade" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
                             {log_output}
                     </div>
                 </div>

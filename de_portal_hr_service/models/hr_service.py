@@ -224,6 +224,14 @@ class HRService(models.Model):
         ])
         return message_ids
 
+    def _get_messages(self, record_id):
+        message_ids = self.env['mail.message'].search([
+            ('res_id','=',record_id.id),
+            ('model','=',self.header_model_id.model),
+            ('subtype_id','=',self.env.ref('mail.mt_comment').id)
+        ])
+        return message_ids
+
     #def get_field_value_from_expression(self, model_id, field_model, field_name, field_value, changeable_field_name):
     def get_field_value_from_expression(self,model_id,changeable_field_ids):
         model = self.env['ir.model'].browse(model_id)
