@@ -255,41 +255,63 @@ class CustomerPortal(CustomerPortal):
     # Custom html generation for log Notes
     # -------------------------------------------------------------
     def portal_hr_service_record_log_notes(self,service_id, model_id, record_id):
-        output = ''
-        output += '<div id="discussion" class="class="d-print-none o_portal_chatter o_not_editable p-0">'
-        
-        
+        log_output = ''
+        log_output += '<div id="discussion" class="class="d-print-none o_portal_chatter o_not_editable p-0">'
         messages = service_id.get_log_notes(record_id)
         for message in messages:
             user_avatar_url = f"/web/image/res.partner/{message.author_id.id}/avatar_128"
 
-            #user_avatar_url = f"/web/image?model=res.partner&id={message.author_id.id}&field=avatar_128"
 
-            
-            
-            #user_avatar_url = f"/mail/avatar/mail.message/{message.id}/author_avatar"
-
-            output += '<div class="o_portal_chatter_messages">'
-            output += '<div id="message-"' + str(message.id) + 'class="d-flex o_portal_chatter_message" style="display:inline-block;vertical-align:top;">'
-            output += f'<img class="o_portal_chatter_avatar" width="45" height="45" src="{user_avatar_url}" alt="Avatar" style="margin-right:1rem;"/>'
+            log_output += '<div class="o_portal_chatter_messages">'
+            log_output += '<div id="message-"' + str(message.id) + 'class="d-flex o_portal_chatter_message" style="display:inline-block;vertical-align:top;">'
+            log_output += f'<img class="o_portal_chatter_avatar" width="45" height="45" src="{user_avatar_url}" alt="Avatar" style="margin-right:1rem;"/>'
             #output += f'<img class="o_portal_chatter_avatar" width="45" height="45" t-attf-src="data:image/png;base64,{message.author_avatar}" alt="Avatar" style="margin-right:1rem;"/>'
             #output += '<img t-att-src="data:image/png;base64,' + str(message.author_id.avatar_128)[2:-1] + '"/>'
             
-            output += '</div>'
+            log_output += '</div>'
 
-            output += '<div class="flex-grow-1" style="display:inline-block;width:90%;">'
-            output += '<div class="o_portal_chatter_message_title">'
-            output += f'<h5 class="mb-1">{message.author_id.display_name}</h5>'
-            output += f'<p class="o_portal_chatter_published_date" style="font-size:85%;color:#6C757D;margin:0px;">Published On {message.date}</p>'
-            output += '</div>'
-            output += f'<p>{message.body}</p>'
-            output += '</div>'
+            log_output += '<div class="flex-grow-1" style="display:inline-block;width:90%;">'
+            log_output += '<div class="o_portal_chatter_message_title">'
+            log_output += f'<h5 class="mb-1">{message.author_id.display_name}</h5>'
+            log_output += f'<p class="o_portal_chatter_published_date" style="font-size:85%;color:#6C757D;margin:0px;">Published On {message.date}</p>'
+            log_output += '</div>'
+            log_output += f'<p>{message.body}</p>'
+            log_output += '</div>'
 
             
-            output += '</div>'
-        output += '</div>'
+            log_output += '</div>'
+        log_output += '</div>'
 
-        output += '''
+        # ------ Messages output -------------------
+        msg_output = ''
+        msg_output += '<div id="discussion" class="class="d-print-none o_portal_chatter o_not_editable p-0">'
+        messages = service_id.get_log_notes(record_id)
+        for message in messages:
+            user_avatar_url = f"/web/image/res.partner/{message.author_id.id}/avatar_128"
+
+
+            msg_output += '<div class="o_portal_chatter_messages">'
+            msg_output += '<div id="message-"' + str(message.id) + 'class="d-flex o_portal_chatter_message" style="display:inline-block;vertical-align:top;">'
+            msg_output += f'<img class="o_portal_chatter_avatar" width="45" height="45" src="{user_avatar_url}" alt="Avatar" style="margin-right:1rem;"/>'
+            #output += f'<img class="o_portal_chatter_avatar" width="45" height="45" t-attf-src="data:image/png;base64,{message.author_avatar}" alt="Avatar" style="margin-right:1rem;"/>'
+            #output += '<img t-att-src="data:image/png;base64,' + str(message.author_id.avatar_128)[2:-1] + '"/>'
+            
+            msg_output += '</div>'
+
+            msg_output += '<div class="flex-grow-1" style="display:inline-block;width:90%;">'
+            msg_output += '<div class="o_portal_chatter_message_title">'
+            msg_output += f'<h5 class="mb-1">{message.author_id.display_name}</h5>'
+            msg_output += f'<p class="o_portal_chatter_published_date" style="font-size:85%;color:#6C757D;margin:0px;">Published On {message.date}</p>'
+            msg_output += '</div>'
+            msg_output += f'<p>{message.body}</p>'
+            msg_output += '</div>'
+
+            
+            msg_output += '</div>'
+        msg_output += '</div>'
+        
+        # ----------- Message form ---------------
+        form_html = '''
         <form 
                     action="/my/message/{service_id}/{model_id}/{record_id}" 
                     method="post" enctype="multipart/form-data" 
@@ -333,6 +355,32 @@ class CustomerPortal(CustomerPortal):
     </div>
     </form>
     '''.format(service_id=service_id.id, model_id=model_id, record_id=record_id.id)
+        
+        output = ''
+        output += '''
+            <div class="mt-4">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages" aria-selected="true">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                        <div t-if="allow_messages" class="mt32">
+                            {msg_output}
+                            {form_html}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+                            {log_output}
+                    </div>
+                </div>
+                
+            </div>
+        '''.format(record_id=record_id.id,msg_output=msg_output, log_output=log_output, form_html=form_html)
         
         return output
         

@@ -176,6 +176,8 @@
                 </t>
 
                 <!-- -->
+                <t t-call="de_portal_hr_service.hr_service_record_log_notes_tempalte"/>
+                <!--
                 <div class="mt-4">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item">
@@ -201,7 +203,7 @@
                         </div>
                     </div>
                 </div>
-                
+                -->
                 <!-- -->
                 
             </t>
