@@ -28,6 +28,7 @@ class CustomerPortal(CustomerPortal):
     
     def portal_hr_service_record_actions_template(self,service_id,record_id):
         template = ''
+        domain = []
         service_sudo = request.env['hr.service'].search([('id','=',service_id.id)],limit=1)
         
         if service_sudo.hr_service_action_ids:
@@ -35,9 +36,9 @@ class CustomerPortal(CustomerPortal):
             for action in service_sudo.hr_service_action_ids:
                 # find editable record option
                 # domain to display action buttons
-                if action.action_domain and action.display_mode in ('form','all'):
-                    domain = safe_eval.safe_eval(action.action_domain)
-                    #template += '<h1>' + str(record_id.filtered_domain(domain)) + '</h1>'
+                if action.display_mode in ('form','all'):
+                    if action.action_domain:
+                        domain = safe_eval.safe_eval(action.action_domain)
                     if record_id.filtered_domain(domain):
                         template += "<t class='col-lg-1 mb8 mt8'>"
                         template +=  "<a href='/my/model/record/action/" + str(service_sudo.id) + "/" + str(service_sudo.header_model_id.id) + "/" + str(record_id.id) + "/" + str(action.id) + "' class='btn btn-primary pull-left' >" + str(action.name) + "</a>"
