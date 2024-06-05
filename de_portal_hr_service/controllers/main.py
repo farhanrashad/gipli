@@ -312,16 +312,27 @@ class CustomerPortal(CustomerPortal):
         # ----------- Attachments ----------------
         attach_output = ''
         attachments = service_id._get_attachments(record_id)
-        attach_output += "<ul>"
+        attach_output += '''
+        <div class="o_portal_chatter_attachments">        
+            <div class="row">
+        '''
+                        
         for attach in attachments:
             attach_output += '''
-                <li>
-                    <a href="'/attachment/download?attachment_id=%i' % attach.id">
-                        <span t-esc="attach.name" class="fa fa-download"/>
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                    <div class="o_portal_chatter_attachment mb-2 position-relative text-center" data-id="1287">
+                    <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
+                        <span t-esc="attach_id" class="fa fa-download">
+                            {attach_name}
+                        </span>
                     </a>
-                </li>
-            '''
-        attach_output += "</ul>"
+                    </div>
+                </div>
+            '''.format(attach_id=attach.id, attach_name=attach.name)
+        attach_output += '''        
+            </div>
+        </div>
+        '''
         # ----------- Message form ---------------
         user_avatar = f"/web/image/res.partner/{request.env.user.partner_id.id}/avatar_128"
         form_html = '''
