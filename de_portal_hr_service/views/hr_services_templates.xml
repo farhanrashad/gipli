@@ -192,10 +192,6 @@
                                 
                                 <t t-call="portal.message_thread">
                                     <t t-set="object" t-value="record_id"/>
-                                    <t t-if="record_id.access_token">
-                                        <t t-set="token" t-value="record_id.access_token"/>
-                                    </t>
-                                    
                                 </t>
                                 
                             </div>

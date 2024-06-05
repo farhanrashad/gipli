@@ -218,7 +218,7 @@ class CustomerPortal(CustomerPortal):
         values.update({
             'portal_hr_service_record_dyanmic_page_template': self.portal_hr_service_record_dyanmic_page_template(service_sudo,record_sudo),
             'record_id': record_sudo,
-            #'access_token': record_sudo.access_token,
+            'access_token': record_sudo.access_token,
             'title': record_title.upper(),
             'state': record_state, #record_state.upper(),
             'record_editable': record_editable,
@@ -226,10 +226,10 @@ class CustomerPortal(CustomerPortal):
             'allow_log_note': service_sudo.allow_log_note,
             'show_attachment': service_sudo.show_attachment,
         })
-        if hasattr(record_sudo, 'access_token'):
-            values.update({
-                'access_token': record_sudo.access_token,
-            })
+        #if hasattr(record_sudo, 'access_token'):
+        #    values.update({
+        #        'access_token': record_sudo.access_token,
+        #    })
         
         if service_sudo.allow_log_note:
             values.update({
@@ -238,6 +238,7 @@ class CustomerPortal(CustomerPortal):
 
         if not record_sudo:
             return request.redirect('/my')
+
         return request.render("de_portal_hr_service.portal_my_hr_service_record", values)
 
     
@@ -287,6 +288,36 @@ class CustomerPortal(CustomerPortal):
             
             output += '</div>'
         output += '</div>'
+
+        output += '''
+    <div class="o_portal_chatter_composer">
+        <div class="o_portal_chatter_composer">
+            <div class="alert alert-danger mb8 d-none o_portal_chatter_composer_error" role="alert">
+                Oops! Something went wrong. Try to reload the page and log in.
+            </div>
+            <div class="d-flex">
+                <img alt="Avatar" class="o_portal_chatter_avatar o_object_fit_cover align-self-start" src="/web/image/res.partner/8/avatar_128">
+                <div class="flex-grow-1">
+                    <div class="o_portal_chatter_composer_input">
+                        <div class="o_portal_chatter_composer_body mb32">
+                            <textarea rows="4" name="message" class="form-control" placeholder="Write a message..."></textarea>
+                            <div class="o_portal_chatter_attachments mt-3"></div>
+                            <div class="mt8">
+                                <button data-action="/mail/chatter_post" class="o_portal_chatter_composer_btn btn btn-primary" type="submit">Send</button>
+                                <button class="o_portal_chatter_attachment_btn btn btn-secondary" type="button" title="Add attachment">
+                                    <i class="fa fa-paperclip"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-none">
+                        <input type="file" class="o_portal_chatter_file_input" multiple="multiple">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    '''
         
         return output
         
