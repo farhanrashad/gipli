@@ -257,7 +257,7 @@ class CustomerPortal(CustomerPortal):
     def portal_hr_service_record_log_notes(self,service_id, model_id, record_id):
         log_output = ''
         log_output += '<div id="discussion" class="class="d-print-none o_portal_chatter o_not_editable p-0">'
-        messages = service_id.get_log_notes(record_id)
+        messages = service_id._get_log_notes(record_id)
         for message in messages:
             user_avatar_url = f"/web/image/res.partner/{message.author_id.id}/avatar_128"
 
@@ -309,7 +309,19 @@ class CustomerPortal(CustomerPortal):
             
             msg_output += '</div>'
         msg_output += '</div>'
-        
+        # ----------- Attachments ----------------
+        attach_output = ''
+        attachments = service_id._get_attachments(record_id)
+        attach_output += "<ul>"
+        for attach in attachments:
+            attach_output += '''
+                <li>
+                    <a href="'/attachment/download?attachment_id=%i' % attach.id">
+                        <span t-esc="attach.name" class="fa fa-download"/>
+                    </a>
+                </li>
+            '''
+        attach_output += "</ul>"
         # ----------- Message form ---------------
         user_avatar = f"/web/image/res.partner/{request.env.user.partner_id.id}/avatar_128"
         form_html = '''
@@ -379,12 +391,12 @@ class CustomerPortal(CustomerPortal):
                             {log_output}
                     </div>
                     <div class="tab-pane fade" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
-                            {log_output}
+                            {attach_output}
                     </div>
                 </div>
                 
             </div>
-        '''.format(record_id=record_id.id,msg_output=msg_output, log_output=log_output, form_html=form_html)
+        '''.format(record_id=record_id.id,msg_output=msg_output, log_output=log_output, attach_output=attach_output, form_html=form_html)
         
         return output
         

@@ -216,7 +216,7 @@ class HRService(models.Model):
         return filter_domain
         
 
-    def get_log_notes(self, record_id):
+    def _get_log_notes(self, record_id):
         message_ids = self.env['mail.message'].search([
             ('res_id','=',record_id.id),
             ('model','=',self.header_model_id.model),
@@ -231,6 +231,13 @@ class HRService(models.Model):
             ('subtype_id','=',self.env.ref('mail.mt_comment').id)
         ])
         return message_ids
+
+    def _get_attachments(self, record_id):
+        attachment_ids = self.env['ir.attachment'].search([
+            ('res_id','=',record_id.id),
+            ('res_model','=',self.header_model_id.model),
+        ])
+        return attachment_ids
 
     #def get_field_value_from_expression(self, model_id, field_model, field_name, field_value, changeable_field_name):
     def get_field_value_from_expression(self,model_id,changeable_field_ids):
