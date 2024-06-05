@@ -50,6 +50,8 @@ class HRService(models.Model):
 
     allow_log_note = fields.Boolean(string='Allow Log Note', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='Allow Log Note to user on portal')
 
+    show_attachment = fields.Boolean(string='Show Attachments', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='show attachment on portal')
+
     
     @api.onchange('allow_messages')
     def _onchange_allow_messages(self):
@@ -182,9 +184,11 @@ class HRService(models.Model):
             if records > 0:
                 service.allow_messages = True
                 service.allow_log_note = True
+                service.show_attachment = True
             else:
                 service.allow_messages = False
                 service.allow_log_note = False
+                service.show_attachment = False
 
     def get_record_count(self, user_id):
         domain = []

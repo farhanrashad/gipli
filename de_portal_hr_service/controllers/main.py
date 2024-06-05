@@ -143,8 +143,8 @@ class CustomerPortal(CustomerPortal):
         except (AccessError, MissingError):
             return request.redirect('/my')
         Record = request.env[service_sudo.header_model_id.model]
-        if access_token:
-            Record = Record.sudo()
+        #if access_token:
+        Record = Record.sudo()
         
         line_item = request.env['hr.service.record.line'].search([('hr_service_id','=',service_id),('line_model_id','=',int(model_id))],limit=1)
 
@@ -155,7 +155,7 @@ class CustomerPortal(CustomerPortal):
             record_sudo = Record.search([('id', '=', record_id)], limit=1).sudo()
         #task_sudo.attachment_ids.generate_access_token()
 
-        print(record_sudo)
+        
 
         # record_sudo['expense_line_ids']
         values = self._model_record_get_page_view_values(service_sudo, model_id, record_sudo, access_token, **kw)
@@ -214,21 +214,30 @@ class CustomerPortal(CustomerPortal):
         except Exception as e:
             print(e)
 
-    #   values['record_id']['expense_line_ids'][1]          
+    #   values['record_id']['expense_line_ids'][1]        
         values.update({
             'portal_hr_service_record_dyanmic_page_template': self.portal_hr_service_record_dyanmic_page_template(service_sudo,record_sudo),
             'record_id': record_sudo,
-            'access_token': record_sudo.access_token,
+            #'access_token': record_sudo.access_token,
             'title': record_title.upper(),
             'state': record_state, #record_state.upper(),
             'record_editable': record_editable,
             'allow_messages': service_sudo.allow_messages,
             'allow_log_note': service_sudo.allow_log_note,
+            'show_attachment': service_sudo.show_attachment,
         })
+        if hasattr(record_sudo, 'access_token'):
+            values.update({
+                'access_token': record_sudo.access_token,
+            })
+        
         if service_sudo.allow_log_note:
             values.update({
                 'portal_hr_service_record_log_notes': self.portal_hr_service_record_log_notes(service_sudo,record_sudo)
             })
+
+        if not record_sudo:
+            return request.redirect('/my')
         return request.render("de_portal_hr_service.portal_my_hr_service_record", values)
 
     
@@ -453,7 +462,7 @@ class CustomerPortal(CustomerPortal):
         m2m_ids = False
         fields = ''
         template = ''
-        
+
         
         template += '<link href="/de_portal_hr_service/static/src/datatable.css" rel="stylesheet" />'
         template += '<link href="/de_portal_hr_service/static/src/datatable_export_button.css" rel="stylesheet" />'
@@ -476,8 +485,9 @@ class CustomerPortal(CustomerPortal):
         template += '<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>'
         
         domain = [('id', '=', record_id.id)]
-        record = request.env[service_id.header_model_id.model].search(domain)
-        
+        record = record_id #request.env[service_id.header_model_id.model].search(domain)
+
+        #raise UserError(str(record_id))
         # find editable record
         domain_filter = ''
         if service_id.condition:

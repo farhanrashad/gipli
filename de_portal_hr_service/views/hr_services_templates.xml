@@ -189,10 +189,15 @@
                         <div class="tab-pane fade show active" id="messages" role="tabpanel" aria-labelledby="messages-tab">
                             <div t-if="allow_messages" class="mt32">
                                 <h4><strong>Message and communication history</strong></h4>
+                                
                                 <t t-call="portal.message_thread">
                                     <t t-set="object" t-value="record_id"/>
-                                    <t t-set="token" t-value="record_id.access_token"/>
+                                    <t t-if="record_id.access_token">
+                                        <t t-set="token" t-value="record_id.access_token"/>
+                                    </t>
+                                    
                                 </t>
+                                
                             </div>
                         </div>
                         <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
