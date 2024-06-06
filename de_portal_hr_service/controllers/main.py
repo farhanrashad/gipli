@@ -352,6 +352,8 @@ class CustomerPortal(CustomerPortal):
             msg_output += '</div>'
             msg_output += '</div>'
         msg_output += '</div>'
+
+        
         # ----------- Attachments ----------------
         attach_output = ''
         attachments = service_id._get_attachments(record_id)
@@ -362,7 +364,7 @@ class CustomerPortal(CustomerPortal):
         for attach in attachments:
             attach_output += '''
                 <div class="col-lg-2 col-md-3 col-sm-6">
-                    <div class="o_portal_chatter_attachment mb-2 position-relative text-center" data-id="1287">
+                    <div class="o_portal_chatter_attachment mb-2 position-relative text-left" data-id="1287">
                     <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
                         <span t-esc="attach_id" class="fa fa-download">
                             {attach_name}
@@ -420,6 +422,52 @@ class CustomerPortal(CustomerPortal):
     '''.format(service_id=service_id.id, model_id=model_id, record_id=record_id.id, user_avatar=user_avatar)
 
         # -------------------- Generate Output -----------------------------
+    
+        output = ''
+        messages_tab_link = ''
+        messages_tab_html = ''
+        logs_tab_link = ''
+        logs_tab_html = ''
+        attach_tab_link = ''
+        attach_tab_html = ''
+        
+        if service_id.allow_messages:
+            messages_tab_link = '''
+                <li class="nav-item">
+                    <a class="nav-link active" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages">Messages</a>
+                </li>    
+            '''
+            messages_tab_html = '''
+            <div class="tab-pane fade show active" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                {msg_output}
+                {form_html}
+            </div>
+            '''.format(msg_output=msg_output, form_html=form_html)
+                    
+        if service_id.allow_log_note:
+            logs_tab_link = '''
+            <li class="nav-item">
+                <a class="nav-link" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs">Logs</a>
+            </li>
+            '''
+            logs_tab_html = '''
+            <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+                {log_output}
+            </div>
+            '''.format(log_output=log_output)
+                        
+        if service_id.show_attachment:
+            attach_tab_link = '''
+            <li class="nav-item">
+                <a class="nav-link" id="attach-tab" data-toggle="tab" href="#attach" role="tab" aria-controls="attach" aria-selected="">Attachments</a>
+            </li>
+            '''
+            attach_tab_html = '''
+            <div class="tab-pane fade" id="attach" role="tabpanel" aria-labelledby="attach-tab">
+                {attach_output}
+            </div>
+            '''.format(attach_output=attach_output)
+                    
         output = '''
         <div class="mt-4">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -434,45 +482,14 @@ class CustomerPortal(CustomerPortal):
             </div>
         </div>
         '''.format(
-            messages_tab_link='''
-            <li class="nav-item">
-                <a class="nav-link {messages_active}" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages" aria-selected="true">Messages</a>
-            </li>
-            '''.format(messages_active='active' if service_id.allow_messages else '') if service_id.allow_messages else '',
-            
-            logs_tab_link='''
-            <li class="nav-item">
-                <a class="nav-link {logs_active}" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
-            </li>
-            '''.format(logs_active='active' if not service_id.allow_messages and service_id.allow_log_note else '') if service_id.allow_log_note else '',
-            
-            attach_tab_link='''
-            <li class="nav-item">
-                <a class="nav-link {attach_active}" id="attach-tab" data-toggle="tab" href="#attach" role="tab" aria-controls="attach" aria-selected="false">Attachments</a>
-            </li>
-            '''.format(attach_active='active' if not service_id.allow_messages and not service_id.allow_log_note and service_id.show_attachment else '') if service_id.show_attachment else '',
-            
-            messages_tab_html='''
-            <div class="tab-pane fade show {messages_active}" id="messages" role="tabpanel" aria-labelledby="messages-tab">
-                    {msg_output}
-                    {form_html}
-            </div>
-            '''.format(messages_active='active show' if service_id.allow_messages else '', msg_output=msg_output, form_html=form_html) if service_id.allow_messages else '',
-            
-            logs_tab_html='''
-            <div class="tab-pane fade {logs_active}" id="logs" role="tabpanel" aria-labelledby="logs-tab">
-                    {log_output}
-            </div>
-            '''.format(logs_active='active show' if not service_id.allow_messages and service_id.allow_log_note else '', log_output=log_output) if service_id.allow_log_note else '',
-            
-            attach_tab_html='''
-            <div class="tab-pane fade {attach_active}" id="attach" role="tabpanel" aria-labelledby="attach-tab">
-                {attach_output}
-            </div>
-            '''.format(attach_active='active show' if not service_id.allow_messages and not service_id.allow_log_note and service_id.show_attachment else '', attach_output=attach_output) if service_id.show_attachment else ''
+            messages_tab_link=messages_tab_link, messages_tab_html=messages_tab_html,
+            logs_tab_link=logs_tab_link, logs_tab_html=logs_tab_html,
+            attach_tab_link=attach_tab_link, attach_tab_html=attach_tab_html
         )
         
         return output
+
+
 
         
     # -------------------------------------------

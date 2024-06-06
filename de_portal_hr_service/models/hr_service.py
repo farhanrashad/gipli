@@ -180,15 +180,16 @@ class HRService(models.Model):
     def _compute_allow_messages(self):
         records = 0
         for service in self:
+            service.allow_messages = False
+            service.allow_log_note = False
+            service.show_attachment = False
+            
             records = self.env['ir.model.fields'].search_count([('model_id','=',service.header_model_id.id),('name','=','website_message_ids')])
-            if records > 0:
+            if records:
                 service.allow_messages = True
                 service.allow_log_note = True
                 service.show_attachment = True
-            else:
-                service.allow_messages = False
-                service.allow_log_note = False
-                service.show_attachment = False
+                
 
     def get_record_count(self, user_id):
         domain = []
