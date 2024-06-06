@@ -256,7 +256,7 @@ class CustomerPortal(CustomerPortal):
     # -------------------------------------------------------------
     def portal_hr_service_record_log_notes(self,service_id, model_id, record_id):
         log_output = ''
-        log_output += '<div id="discussion" class="class="d-print-none o_portal_chatter o_not_editable p-0">'
+        log_output += '<div id="discussion" class="mt32">'
         messages = service_id._get_log_notes(record_id)
         for message in messages:
             user_avatar_url = f"/web/image/res.partner/{message.author_id.id}/avatar_128"
@@ -278,18 +278,18 @@ class CustomerPortal(CustomerPortal):
             log_output += f'<p>{message.body}</p>'
 
             log_output += '''
-            <div class="o_portal_chatter_attachments">        
+            <div class="container">        
                 <div class="row">
             '''
             for attach in message.attachment_ids:
                 log_output += '''
                 <div class="col-lg-2 col-md-3 col-sm-6">
-                    <div class="o_portal_chatter_attachment mb-2 position-relative text-center" data-id="1287">
-                    <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
-                        <span t-esc="attach_id" class="fa fa-download">
-                            {attach_name}
-                        </span>
-                    </a>
+                    <div class=" mb-2 position-relative text-center" data-id="1287">
+                        <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
+                            <span t-esc="attach_id" class="fa fa-download">
+                                {attach_name}
+                            </span>
+                        </a>
                     </div>
                 </div>
             '''.format(attach_id=attach.id, attach_name=attach.name)
@@ -329,13 +329,13 @@ class CustomerPortal(CustomerPortal):
 
             
             msg_output += '''
-            <div class="o_portal_chatter_attachments">        
+            <div class="container">        
                 <div class="row">
             '''
             for attach in message.attachment_ids:
                 msg_output += '''
                 <div class="col-lg-2 col-md-3 col-sm-6">
-                    <div class="o_portal_chatter_attachment mb-2 position-relative text-center" data-id="1287">
+                    <div class=" mb-2 position-relative text-center" data-id="1287">
                     <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
                         <span t-esc="attach_id" class="fa fa-download">
                             {attach_name}
@@ -356,10 +356,9 @@ class CustomerPortal(CustomerPortal):
         attach_output = ''
         attachments = service_id._get_attachments(record_id)
         attach_output += '''
-        <div class="o_portal_chatter_attachments">        
+        <div class="o_portal_chatter_attachments mt32">        
             <div class="row">
-        '''
-                        
+        '''             
         for attach in attachments:
             attach_output += '''
                 <div class="col-lg-2 col-md-3 col-sm-6">
@@ -397,7 +396,7 @@ class CustomerPortal(CustomerPortal):
                 Oops! Something went wrong. Try to reload the page and log in.
             </div>
             <div class="d-flex">
-                <img alt="Avatar" width="45" height="45" class="o_portal_chatter_avatar o_object_fit_cover align-self-start" src="{user_avatar}">
+                <img alt="Avatar" width="45" height="45" class="o_portal_chatter_avatar o_object_fit_cover align-self-start mr16" src="{user_avatar}">
                 <div class="flex-grow-1">
                     <div class="o_portal_chatter_composer_input">
                         <div class="o_portal_chatter_composer_body mb32">
@@ -431,7 +430,7 @@ class CustomerPortal(CustomerPortal):
                         <a class="nav-link" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="attachments-tab" data-toggle="tab" href="#attachments" role="tab" aria-controls="attachments" aria-selected="false">Attachments</a>
+                        <a class="nav-link" id="attach-tab" data-toggle="tab" href="#attach" role="tab" aria-controls="attach" aria-selected="false">Attachments</a>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
@@ -444,9 +443,10 @@ class CustomerPortal(CustomerPortal):
                     <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
                             {log_output}
                     </div>
-                    <div class="tab-pane fade" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
-                            {attach_output}
+                    <div class="tab-pane fade " id="attach" role="tabpanel" aria-labelledby="attach-tab">
+                             {attach_output}
                     </div>
+                    
                 </div>
                 
             </div>
