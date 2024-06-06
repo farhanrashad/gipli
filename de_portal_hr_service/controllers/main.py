@@ -306,7 +306,7 @@ class CustomerPortal(CustomerPortal):
 
         # ------ Messages output -------------------
         msg_output = ''
-        msg_output += '<div id="discussion" class="class="d-print-none o_portal_chatter o_not_editable p-0">'
+        msg_output += '<div id="discussion" class="mt32">'
         messages = service_id._get_messages(record_id)
         for message in messages:
             user_avatar_url = f"/web/image/res.partner/{message.author_id.id}/avatar_128"
@@ -418,41 +418,62 @@ class CustomerPortal(CustomerPortal):
     </div>
     </form>
     '''.format(service_id=service_id.id, model_id=model_id, record_id=record_id.id, user_avatar=user_avatar)
-        
-        output = ''
-        output += '''
-            <div class="mt-4">
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages" aria-selected="true">Messages</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="attach-tab" data-toggle="tab" href="#attach" role="tab" aria-controls="attach" aria-selected="false">Attachments</a>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="messages" role="tabpanel" aria-labelledby="messages-tab">
-                        <div t-if="allow_messages" class="mt32">
-                            {msg_output}
-                            {form_html}
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
-                            {log_output}
-                    </div>
-                    <div class="tab-pane fade " id="attach" role="tabpanel" aria-labelledby="attach-tab">
-                             {attach_output}
-                    </div>
-                    
-                </div>
-                
+
+        # -------------------- Generate Output -----------------------------
+        output = '''
+        <div class="mt-4">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                {messages_tab_link}
+                {logs_tab_link}
+                {attach_tab_link}
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                {messages_tab_html}
+                {logs_tab_html}
+                {attach_tab_html}
             </div>
-        '''.format(record_id=record_id.id,msg_output=msg_output, log_output=log_output, attach_output=attach_output, form_html=form_html)
+        </div>
+        '''.format(
+            messages_tab_link='''
+            <li class="nav-item">
+                <a class="nav-link {messages_active}" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages" aria-selected="true">Messages</a>
+            </li>
+            '''.format(messages_active='active' if service_id.allow_messages else '') if service_id.allow_messages else '',
+            
+            logs_tab_link='''
+            <li class="nav-item">
+                <a class="nav-link {logs_active}" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
+            </li>
+            '''.format(logs_active='active' if not service_id.allow_messages and service_id.allow_log_note else '') if service_id.allow_log_note else '',
+            
+            attach_tab_link='''
+            <li class="nav-item">
+                <a class="nav-link {attach_active}" id="attach-tab" data-toggle="tab" href="#attach" role="tab" aria-controls="attach" aria-selected="false">Attachments</a>
+            </li>
+            '''.format(attach_active='active' if not service_id.allow_messages and not service_id.allow_log_note and service_id.show_attachment else '') if service_id.show_attachment else '',
+            
+            messages_tab_html='''
+            <div class="tab-pane fade show {messages_active}" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                    {msg_output}
+                    {form_html}
+            </div>
+            '''.format(messages_active='active show' if service_id.allow_messages else '', msg_output=msg_output, form_html=form_html) if service_id.allow_messages else '',
+            
+            logs_tab_html='''
+            <div class="tab-pane fade {logs_active}" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+                    {log_output}
+            </div>
+            '''.format(logs_active='active show' if not service_id.allow_messages and service_id.allow_log_note else '', log_output=log_output) if service_id.allow_log_note else '',
+            
+            attach_tab_html='''
+            <div class="tab-pane fade {attach_active}" id="attach" role="tabpanel" aria-labelledby="attach-tab">
+                {attach_output}
+            </div>
+            '''.format(attach_active='active show' if not service_id.allow_messages and not service_id.allow_log_note and service_id.show_attachment else '', attach_output=attach_output) if service_id.show_attachment else ''
+        )
         
         return output
+
         
     # -------------------------------------------
     # Custom html generation for list page
