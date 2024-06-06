@@ -276,6 +276,28 @@ class CustomerPortal(CustomerPortal):
             log_output += f'<p class="o_portal_chatter_published_date" style="font-size:85%;color:#6C757D;margin:0px;">Published On {message.date}</p>'
             log_output += '</div>'
             log_output += f'<p>{message.body}</p>'
+
+            log_output += '''
+            <div class="o_portal_chatter_attachments">        
+                <div class="row">
+            '''
+            for attach in message.attachment_ids:
+                log_output += '''
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                    <div class="o_portal_chatter_attachment mb-2 position-relative text-center" data-id="1287">
+                    <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
+                        <span t-esc="attach_id" class="fa fa-download">
+                            {attach_name}
+                        </span>
+                    </a>
+                    </div>
+                </div>
+            '''.format(attach_id=attach.id, attach_name=attach.name)
+            log_output += '''        
+                </div>
+            </div>
+            '''
+            
             log_output += '</div>'
 
             
@@ -304,9 +326,30 @@ class CustomerPortal(CustomerPortal):
             msg_output += f'<p class="o_portal_chatter_published_date" style="font-size:85%;color:#6C757D;margin:0px;">Published On {message.date}</p>'
             msg_output += '</div>'
             msg_output += f'<p>{message.body}</p>'
-            msg_output += '</div>'
 
             
+            msg_output += '''
+            <div class="o_portal_chatter_attachments">        
+                <div class="row">
+            '''
+            for attach in message.attachment_ids:
+                msg_output += '''
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                    <div class="o_portal_chatter_attachment mb-2 position-relative text-center" data-id="1287">
+                    <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
+                        <span t-esc="attach_id" class="fa fa-download">
+                            {attach_name}
+                        </span>
+                    </a>
+                    </div>
+                </div>
+            '''.format(attach_id=attach.id, attach_name=attach.name)
+            msg_output += '''        
+                </div>
+            </div>
+            '''
+            
+            msg_output += '</div>'
             msg_output += '</div>'
         msg_output += '</div>'
         # ----------- Attachments ----------------
