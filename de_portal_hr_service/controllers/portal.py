@@ -195,6 +195,17 @@ class CustomerPortal(portal.CustomerPortal):
 
     @http.route('/get/recomputed_values', type='http', auth='public', methods=['GET'], csrf=False)
     def recompute_field_values(self, **kwargs):
+        """
+        1. Find the realted records from changeable fields
+        2. get the expression values from the related records
+        3. devide the expression into artithmatic operators e.g product_id.list_price + product_uom.id
+        4. get the current web selected values of before dot expression e.g product_id and product_uom
+        5. find the related model of these before dot expression items e.g product_id and product_uom
+        6. get the current record on the basis of point no. 4 and point no. 5
+        7. get the expression values with current record and perform arithmatic operations
+        8. return the values and field names
+        9. update the field values through javascript
+        """
         service_id = kwargs.get('service_id')
         model_id = kwargs.get('model_id')
         record_id = kwargs.get('record_id') or 0

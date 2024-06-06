@@ -278,47 +278,39 @@ class HRService(models.Model):
         expression_parts = ''
         changeable_field_names = ''
 
-        service_items = self.env['hr.service.items'].search([('field_id.id','in',changeable_field_ids)])
-        
+        field_pattern = re.compile(r'(\w+\.\w+|\w+)')
+        # Find the changable field records
+        service_items = self.env['hr.service.items'].search([('field_id.id', 'in', changeable_field_ids)])
         for item in service_items:
             if item.change_field_exp:
-                expression_parts = item.change_field_exp.split('.')
-                if len(expression_parts) >= 2:
-                    f1 = expression_parts[0]
-                    f2 = expression_parts[1]
-                    computed_field_values.append({
-                        'field1': f1, 
-                        'field2': f2,
-                    })
+                matches = field_pattern.findall(item.change_field_exp)
+                if matches:
+                    for match in matches:
+                        if '.' in match:
+                            f1, f2 = match.split('.')
+                        else:
+                            f1 = match
+                            f2 = None
+
+                        f1_value = next((element['value'] for element in form_elements if element['name'] == f1), None)
+                        related_item = self.env['hr.service.items'].search([('field_name', '=', f1)],limit=1)
+                        related_model = related_item.field_model
+
+                        #record = self.env[related_model].browse(int(f1_value))
+                        f2_value = None
+                        if f2:
+                            f2_value = related_item[f2] if related_item and f2 in related_item else None
+
+    
+                        computed_field_values.append({
+                            'field1': f1,
+                            'field2': f2,
+                            'field1_value': f1_value,
+                            'field2_value': related_model,
+                        })
 
         
-            #if len(expression_parts) >= 2:
-            #    field_name = expression_parts[1]  # Get the field name after the '.'
-                #field_model = self.env[expression_parts[0]]  # Get the model based on the first part of the expression
-    
-                # Search for the field in form_elements
-            #    field_value = 0
-            #    for element in form_elements:
-            #        if element['name'] == field_name:
-            #            field_value = element['value']
-            #            break
-    
-            #    if field_value:
-            #        field_record = field_model.browse(int(field_value))
-            #        attribute_name = expression_parts[1]
-    
-            #        computed_field_value = getattr(field_record, attribute_name)
-    
-            #        computed_field_values.append({'name': cf.name, 'value': computed_field_value})
-                    
-        """
-                    find before . in cf.change_field_exp expression in hr.service.items model if found then there is a field field_mode get this model and then find this field value in form_elements 
-                    field_record = self.env[field_model].browse(find field value in form_elements of before . expression in change_field_exp
-                    now get after . from the expression and get value field_record[after . value]
-                    repeat this value if multiple values found in expression
-                    e.g product_id.id + product_uom.id
-                    last add the value in the list as like cf.name and the value get
-        """
+            
 
         # Example logic to retrieve changable field values based on provided parameters
         # Replace this with your actual logic to fetch and return the values
