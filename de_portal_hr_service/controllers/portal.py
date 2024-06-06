@@ -913,9 +913,9 @@ class CustomerPortal(portal.CustomerPortal):
                                 dat_time = datetime.datetime.strptime(stDate,'%Y-%m-%d %H:%M:%S.%f')
                                 primary_template += '<input type="datetime-local" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + dat_time + '"' +  ('required="1"' if field.is_required else '') + ">"
 
-                        elif field.field_type == 'char1':
+                        elif field.field_type == 'char':
                             primary_template += '<input type="text" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        elif field.field_type == 'text1':
+                        elif field.field_type == 'text':
                             primary_template += '<textarea class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + " ></textarea>"
                         elif field.field_type in ('integer','float','monetary'):
                             primary_template += '<input type="number" step="any" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
@@ -1523,9 +1523,27 @@ $(document).ready(function() {
         model = request.env['ir.model'].sudo().browse(int(model_id))
         record = request.env[model.model].sudo().browse(int(record_id))
 
-        service.create_message(model, record, user, message)
-        
-        #raise UserError(message)
+        # Handle file attachments
+        files = request.httprequest.files.getlist('attachments')
 
-        #raise UserError(str(service))
-            
+        attachment_files  = request.httprequest.files.getlist('attachments')
+        #attach = base64.strip('data:application/pdf;base64')
+        
+        #base64 = kw.get('file_attachments')
+        #attach = base64.strip('data:application/pdf;base64')
+        #Attachments = request.env['ir.attachment']
+        #raise UserError(str(attach))
+        
+        
+        #attachment_data = []
+        #for attachment in attachments:
+        #    attachment_data.append({
+        #        'name': attachment.filename,
+        #        'datas': base64.b64encode(attachment.read()),
+        #        'datas_fname': attachment.filename,
+        #        'res_model': model.model,
+        #        'res_id': record.id,
+        #    })
+        
+        service.create_message(model, record, user, message, attachment_files)
+        return request.redirect('/my/model/record/%s/%s/%s' % (service.id,model.id, record.id))

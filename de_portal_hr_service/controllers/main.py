@@ -405,7 +405,7 @@ class CustomerPortal(CustomerPortal):
                             <div class="o_portal_chatter_attachments mt-3"></div>
                             <div class="mt8">
                                 <button data-action="/mail/chatter_post" class="o_portal_chatter_composer_btn btn btn-primary" type="submit">Send</button>
-                                <input type="file" id="fileInput" class="o_portal_chatter_file_input" multiple="multiple">
+                                <input class="file" id="attachments" type="file" name="attachments" multiple="true" data-show-upload="true" data-show-caption="true" accept="image/*,application/pdf,video/*" />                            
                             </div>
                         </div>
                     </div>

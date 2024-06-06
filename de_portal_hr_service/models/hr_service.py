@@ -332,7 +332,22 @@ class HRService(models.Model):
 
         return changeable_field_values
 
-    def create_message(self, model, record, user, message):
+    def create_message(self, model, record, user, message, attachment_files=None):
+        attachment_ids = []
+    
+        if attachment_files:
+            for attachment in attachment_files:
+                attached_file = attachment.read()
+                attachment_id = self.env['ir.attachment'].sudo().create({
+                    'name': attachment.filename,
+                    'res_model': model.model,
+                    'res_id': record.id,
+                    'type': 'binary',
+                    #'datas_fname': attachment.filename,
+                    'datas': base64.b64encode(attached_file).decode('ascii'),
+                })
+                attachment_ids.append(attachment_id.id)
+            
         message_id = self.env['mail.message'].create({
             'body': message,
             'model': model.model,
@@ -340,7 +355,8 @@ class HRService(models.Model):
             'record_name': record.name,
             'message_type': 'comment',
             'subtype_id': self.env.ref('mail.mt_comment').id,
-            'author_id': user.partner_id.id
+            'author_id': user.partner_id.id,
+            'attachment_ids': [(6, 0, attachment_ids)]
         })
         
     
