@@ -249,7 +249,6 @@ class CustomerPortal(portal.CustomerPortal):
             #'field_value': field_value,
             #'populate_field_id': populate_field_id,
             #'changeable_field_ids': changeable_field_ids,
-            #'field_data': field_data  # Include field names in the response
             'field_data': service.get_changeable_field_values(form_elements_json, changeable_field_ids, field_name),
             #'form_elements_json': form_elements_json,
         }

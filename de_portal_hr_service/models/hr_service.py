@@ -259,13 +259,10 @@ class HRService(models.Model):
         # Process the form elements JSON data
         form_elements = json.loads(form_elements_json)
 
-        # Initialize variables for service_id, model_id, and record_id
         service_id = 0
         model_id = 0
         record_id = 0
-        #field_name = ''
         
-        # Iterate through form elements to find the required IDs
         for element in form_elements:
             if element['name'] == 'service_id':
                 service_id = element['value']
@@ -274,24 +271,28 @@ class HRService(models.Model):
             elif element['name'] == 'record_id':
                 record_id = element['value']
 
-        model = self.env['ir.model'].browse(model_id)
+        model = self.env['ir.model'].browse(int(model_id))
         computed_field_values = {}
-        expression_parts = ''
-        changeable_field_names = ''
 
         eval_context = {}
         field_pattern = re.compile(r'(\w+\.\w+|\w+)')
         # Find the changable field records
+        cf_values = []
 
-        service_items = self.env['hr.service.items']
+        service = self.env['hr.service'].browse(service_id)
+        # service_items = self.env['hr.service.items']
         if model.id == self.header_model_id.id:
-            service_items = self.env['hr.service.items']
+            service_items = self.mapped('hr_service_items')
         else:
             service_items = self.hr_service_record_line.mapped('hr_service_record_line_items')
+        #    service_items = self.env['hr.service.items'].search([('field_id.id', 'in', changeable_field_ids)]) #.mapped('hr_service_items')
+            # service_items = service_items.search([('field_id.id', 'in', changeable_field_ids)])
+        #else:
+        #    service_items = self.hr_service_record_line.mapped('hr_service_record_line_items')
+        #    service_items = service_items.search([('field_id.id', 'in', changeable_field_ids)])
     
-        # Search for service items with the specified field IDs
-        service_items = service_items.search([('field_id.id', 'in', changeable_field_ids)])
-    
+        #service_items = service_items.search([('field_id.id', 'in', changeable_field_ids)])
+
         
         for item in service_items:
             if item.change_field_exp:
@@ -316,46 +317,33 @@ class HRService(models.Model):
                                 eval_context[match] = getattr(record, f2)
                             else:
                                 eval_context[f1] = record
-
-                        
+                
+                        cf_values.append({
+                            'field1': f1,
+                            'field1_value': f1_value,
+                            'field2': f2,
+                            'field2_value': record[f2],
+                        })
 
                 
-                        #computed_field_values.append({
-                        #    'field1': f1,
-                        #    'field1_value': f1_value,
-                        #    'field2': f2,
-                        #    'field2_value': record[f2],
-                        #})
-
-                """
-                try:
-                    # Evaluate the expression
-                    result_value = eval(item.change_field_exp, {}, eval_context)
-                    computed_field_values.append({
-                        'field': item.field_name,
-                        'value': result_value
-                    })
-                except Exception as e:
-                    computed_field_values.append({
-                        'field': item.field_name,
-                        'value': 0,
-                    })
-                """
                 try:
                     # Evaluate the expression
                     result_value = eval(item.change_field_exp, {}, eval_context)
                     computed_field_values[item.field_name] = result_value
                 except Exception as e:
                     computed_field_values[item.field_name] = 0
+        
 
-        # Example logic to retrieve changable field values based on provided parameters
-        # Replace this with your actual logic to fetch and return the values
+        # ================= list values ======================================
+        
+
         changeable_field_values = {
-            #'service_id': service_id,
-            #'model_id': model_id,
+            'service_id': service_id,
+            'model_id': model_id,
             #'record_id': record_id,
             #'field_name': field_name,
             #'changeable_field_ids': changeable_field_ids,
+            #'cf_values': cf_values,
             'computed_field_values': computed_field_values,
         }
 
@@ -448,6 +436,7 @@ class HRServiceItems(models.Model):
         compute='_compute_related_model_for_populate_field',
     )
 
+    populate_list_expr = fields.Char(string='List Expr.')
     change_field_exp = fields.Char(string='Expression')
 
     ref_changeable_field_ids = fields.Many2many('ir.model.fields',
@@ -608,6 +597,14 @@ class HRServiceItemsLine(models.Model):
         string='ref_populate_field_ids',
         compute='_compute_related_model_for_populate_field',
     )
+    populate_list_expr = fields.Char(string='List Expr.')
+    change_field_exp = fields.Char(string='Expression')
+
+    ref_changeable_field_ids = fields.Many2many('ir.model.fields',
+        string='Changable Fields', readonly=True,
+        #compute='_compute_fields_from_expression',
+    )
+    
     operation_mode = fields.Selection([
         ('create', "Create"),
         ('edit', "Edit"),

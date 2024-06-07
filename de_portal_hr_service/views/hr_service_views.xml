@@ -186,6 +186,7 @@
 
                                         <field name="ref_populate_field_ids" invisible="1" />
                                         <field name="ref_populate_field_id" />
+                                        <field name="populate_list_expr" />
                                         <field name="change_field_exp" />
                                         <field name="ref_changeable_field_ids" widget="many2many_tags"/>
 
