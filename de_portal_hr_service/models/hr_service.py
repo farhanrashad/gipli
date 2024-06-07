@@ -335,15 +335,76 @@ class HRService(models.Model):
         
 
         # ================= list values ======================================
+        if model.id == self.header_model_id.id:
+            service_items = self.mapped('hr_service_items')
+        else:
+            service_items = self.hr_service_record_line.mapped('hr_service_record_line_items')
+            
+        list_ids = []
+        source_record = 0
+        list_values = {}
+        
+        for item in service_items.filtered(lambda x:x.populate_list_expr):
+            if item.populate_list_expr:
+                # Source fields
+                list_ids = []
+                source_field_item = service_items.search([('field_name', '=', field_name)],limit=1)
+                source_field_model = source_field_item.field_model
+                source_value = next((element['value'] for element in form_elements if element['name'] == field_name), None)
+                source_record = self.env[related_model].browse(int(source_value))
+                
+        
+                #Destinations
+                dest_field_item = service_items.search([],limit=1)
+                dest_field_model = dest_field_item.field_model
+                
+                
+        
+                populate_matches = field_pattern.findall(item.populate_list_expr)
+        
+                for match in populate_matches:
+                    if '.' in match:
+                        f1, f2 = match.split('.')
+                        f1_model = self.env['ir.model.fields'].search([
+                            ('model','=',source_field_model),
+                            ('name','=',f1)
+                        ],limit=1).relation
+                        
+                        dest_field_item = service_items.search([('field_model', '=', f1_model)],limit=1)
+                        dest_field_model = dest_field_item.field_model
+                        dest_field_id = self.env['ir.model.fields'].search([
+                            ('model','=',source_field_model),
+                            ('relation','=',dest_field_model),
+                        ],limit=1)
+                        list_ids = source_record[f1].mapped(f2).ids
+                        dest_records = self.env[dest_field_model].search([(f2, 'in', list_ids)])
+                    else:
+                        f1 = match
+                        f2 = None
+                        dest_field_item = service_items.search([('field_model', '=', f1_model)],limit=1)
+                        dest_field_model = dest_field_item.field_model
+                        dest_field_id = self.env['ir.model.fields'].search([
+                            ('model','=',source_field_model),
+                            ('relation','=',dest_field_model),
+                        ],limit=1)
+                        list_ids = source_record[f1].ids
+                        dest_records = self.env[dest_field_model].search([('id','in',tuple(list_ids))])
+        
+            for record in dest_records:
+                list_values[record.name] = record.id
+
         
 
         changeable_field_values = {
-            'service_id': service_id,
-            'model_id': model_id,
+            #'service_id': service_id,
+            #'model_id': model_id,
             #'record_id': record_id,
             #'field_name': field_name,
             #'changeable_field_ids': changeable_field_ids,
             #'cf_values': cf_values,
+            #'f1': dest_records,
+            #'f2': f2,
+            'list_values': list_values,
             'computed_field_values': computed_field_values,
         }
 
