@@ -282,7 +282,17 @@ class HRService(models.Model):
         eval_context = {}
         field_pattern = re.compile(r'(\w+\.\w+|\w+)')
         # Find the changable field records
-        service_items = self.env['hr.service.items'].search([('field_id.id', 'in', changeable_field_ids)])
+
+        service_items = self.env['hr.service.items']
+        if model.id == self.header_model_id.id:
+            service_items = self.env['hr.service.items']
+        else:
+            service_items = self.hr_service_record_line.mapped('hr_service_record_line_items')
+    
+        # Search for service items with the specified field IDs
+        service_items = service_items.search([('field_id.id', 'in', changeable_field_ids)])
+    
+        
         for item in service_items:
             if item.change_field_exp:
                 matches = field_pattern.findall(item.change_field_exp)
