@@ -240,14 +240,14 @@ class CustomerPortal(portal.CustomerPortal):
         
         
         options = {
-            'service_id': service_id,
-            'model_id': model_id,
-            'record_id': record_id,
-            'field_id': field_id,
-            'field_model': field_model,
-            'field_name': field_name,
-            'field_value': field_value,
-            'populate_field_id': populate_field_id,
+            #'service_id': service_id,
+            #'model_id': model_id,
+            #'record_id': record_id,
+            #'field_id': field_id,
+            #'field_model': field_model,
+            #'field_name': field_name,
+            #'field_value': field_value,
+            #'populate_field_id': populate_field_id,
             #'changeable_field_ids': changeable_field_ids,
             #'field_data': field_data  # Include field names in the response
             'field_data': service.get_changeable_field_values(form_elements_json, changeable_field_ids, field_name),
@@ -480,7 +480,7 @@ class CustomerPortal(portal.CustomerPortal):
                         success: function(data) {{
                             console.log(data);
                             // Update the fields dynamically based on the response
-                            let fieldData = data.field_data;
+                            let fieldData = data.field_data.computed_field_values;
                             for (let field in fieldData) {{
                                 if (document.getElementById(field)) {{
                                     document.getElementById(field).value = fieldData[field];

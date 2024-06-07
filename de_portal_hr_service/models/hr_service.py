@@ -254,6 +254,7 @@ class HRService(models.Model):
                     value = 50
         return value
 
+        
     def get_changeable_field_values(self, form_elements_json, changeable_field_ids, field_name):
         # Process the form elements JSON data
         form_elements = json.loads(form_elements_json)
@@ -274,10 +275,11 @@ class HRService(models.Model):
                 record_id = element['value']
 
         model = self.env['ir.model'].browse(model_id)
-        computed_field_values = []
+        computed_field_values = {}
         expression_parts = ''
         changeable_field_names = ''
 
+        eval_context = {}
         field_pattern = re.compile(r'(\w+\.\w+|\w+)')
         # Find the changable field records
         service_items = self.env['hr.service.items'].search([('field_id.id', 'in', changeable_field_ids)])
@@ -293,36 +295,61 @@ class HRService(models.Model):
                             f2 = None
 
                         f1_value = next((element['value'] for element in form_elements if element['name'] == f1), None)
-                        related_item = self.env['hr.service.items'].search([('field_name', '=', f1)],limit=1)
-                        related_model = related_item.field_model
+                        
+                        if f1_value:
+                            related_item = self.env['hr.service.items'].search([('field_name', '=', f1)],limit=1)
+                            related_model = related_item.field_model
+                            record = self.env[related_model].browse(int(f1_value))
 
-                        #record = self.env[related_model].browse(int(f1_value))
-                        f2_value = None
-                        if f2:
-                            f2_value = related_item[f2] if related_item and f2 in related_item else None
+                            eval_context[f1] = record
+                            if f2:
+                                eval_context[match] = getattr(record, f2)
+                            else:
+                                eval_context[f1] = record
 
-    
-                        computed_field_values.append({
-                            'field1': f1,
-                            'field2': f2,
-                            'field1_value': f1_value,
-                            'field2_value': related_model,
-                        })
+                        
 
-        
-            
+                
+                        #computed_field_values.append({
+                        #    'field1': f1,
+                        #    'field1_value': f1_value,
+                        #    'field2': f2,
+                        #    'field2_value': record[f2],
+                        #})
+
+                """
+                try:
+                    # Evaluate the expression
+                    result_value = eval(item.change_field_exp, {}, eval_context)
+                    computed_field_values.append({
+                        'field': item.field_name,
+                        'value': result_value
+                    })
+                except Exception as e:
+                    computed_field_values.append({
+                        'field': item.field_name,
+                        'value': 0,
+                    })
+                """
+                try:
+                    # Evaluate the expression
+                    result_value = eval(item.change_field_exp, {}, eval_context)
+                    computed_field_values[item.field_name] = result_value
+                except Exception as e:
+                    computed_field_values[item.field_name] = 0
 
         # Example logic to retrieve changable field values based on provided parameters
         # Replace this with your actual logic to fetch and return the values
         changeable_field_values = {
-            'service_id': service_id,
-            'model_id': model_id,
-            'record_id': record_id,
-            'field_name': field_name,
-            'changeable_field_ids': changeable_field_ids,
-            'expression_parts': computed_field_values,
+            #'service_id': service_id,
+            #'model_id': model_id,
+            #'record_id': record_id,
+            #'field_name': field_name,
+            #'changeable_field_ids': changeable_field_ids,
+            'computed_field_values': computed_field_values,
         }
 
+        
         return changeable_field_values
 
     def create_message(self, model, record, user, message, attachment_files=None):
