@@ -537,6 +537,27 @@ class CustomerPortal(portal.CustomerPortal):
                             console.error('Error fetching data:', error);
                         }}
                     }});
+                    // Second AJAX Call Start
+                    $.ajax({{
+                        url: '/get/default_values',
+                        type: 'GET',
+                        data: form_data + '&field_id={field_id}&field_name={field_name}&field_model={field_model}&changeable_field_ids={changeable_field_ids}',
+                        dataType: 'json',
+                        success: function(data) {{
+                            console.log(data);
+                            // Update the fields dynamically based on the response
+                            let fieldData = data.field_data.computed_field_values;
+                            for (let field in fieldData) {{
+                                if (document.getElementById(field)) {{
+                                    document.getElementById(field).value = fieldData[field];
+                                }}
+                            }}
+                        }},
+                        error: function(error) {{
+                            console.error('Error fetching data:', error);
+                        }}
+                    }});
+                    // Second AJAX Call End
                 }});
             }});
             """.format(
