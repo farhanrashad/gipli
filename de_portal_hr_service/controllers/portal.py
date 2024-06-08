@@ -193,6 +193,55 @@ class CustomerPortal(portal.CustomerPortal):
         print("Search Fields:", search_fields)
         print("Domain:", combined_domain)
 
+    @http.route('/get/default_values', type='http', auth='public', methods=['GET'], csrf=False)
+    def _get_default_values(self, **kwargs):
+        service_id = kwargs.get('service_id')
+        model_id = kwargs.get('model_id')
+        record_id = kwargs.get('record_id') or 0
+        field_id = kwargs.get('field_id')
+        field_model = kwargs.get('field_model')
+        field_name = kwargs.get('field_name')
+        field_value = kwargs.get('field_value')
+
+        service = request.env['hr.service'].browse(int(service_id))        
+        changeable_field_ids = json.loads(kwargs.get('changeable_field_ids', '[]'))
+        fields = request.env['ir.model.fields'].browse(changeable_field_ids)
+
+        form_data = request.params
+        form_elements = [{'name': name, 'value': form_data[name]} for name in form_data]
+        form_elements_json = json.dumps(form_elements)
+
+        options = {
+            'field_data': service._get_default_field_values(form_elements_json, changeable_field_ids, field_name),
+        }
+
+        return json.dumps(options)
+        
+
+    @http.route('/get/list_values', type='http', auth='public', methods=['GET'], csrf=False)
+    def _get_list_values(self, **kwargs):
+        service_id = kwargs.get('service_id')
+        model_id = kwargs.get('model_id')
+        record_id = kwargs.get('record_id') or 0
+        field_id = kwargs.get('field_id')
+        field_model = kwargs.get('field_model')
+        field_name = kwargs.get('field_name')
+        field_value = kwargs.get('field_value')
+
+        service = request.env['hr.service'].browse(int(service_id))        
+        changeable_field_ids = json.loads(kwargs.get('changeable_field_ids', '[]'))
+        fields = request.env['ir.model.fields'].browse(changeable_field_ids)
+
+        form_data = request.params
+        form_elements = [{'name': name, 'value': form_data[name]} for name in form_data]
+        form_elements_json = json.dumps(form_elements)
+
+        options = {
+            'field_data': service.get_changeable_field_values(form_elements_json, changeable_field_ids, field_name),
+        }
+
+    
+    
     @http.route('/get/recomputed_values', type='http', auth='public', methods=['GET'], csrf=False)
     def recompute_field_values(self, **kwargs):
         """
@@ -446,25 +495,14 @@ class CustomerPortal(portal.CustomerPortal):
             return '''
             <input type='file' class='form-control-file mb-2 s_website_form_input' id='{field_name}' name='{field_name}' multiple='1' />
             '''.format(field_name=field.field_name)
-    
-        #form_params = " onchange='filter_field_vals(\"{form_id}\", \"{source_field}\", \"{target_field}\")'".format(
-        #    form_id='form'+str(service.id), source_field=field.field_name, target_field=field.ref_populate_field_id.name
-        #) if field.ref_populate_field_id else ""
 
-        call_js_on_change = ''
-
-        
-        #if field.ref_changeable_field_ids:
-        #    changeable_fields = field.ref_changeable_field_ids.mapped('name')
-        #    call_js_on_change = " onchange='update_fields_vals(\"{form_id}\", \"{source_field}\", {target_fields})'".format(
-        #        form_id='form'+str(service.id), source_field=field.field_name, target_fields=json.dumps(changeable_fields)
-        #    )
 
         data = {
             'model_id': service.header_model_id.id,
             'service_id': service.id,
         }
         form_id = 'form'+ str(service.id)
+
         js_script = """
             $(document).ready(function() {{
                 $('#{form_id}').on('change', '#{field_name}', function() {{
@@ -494,57 +532,6 @@ class CustomerPortal(portal.CustomerPortal):
             }});
             """.format(form_id=form_id, field_name=field.field_name, field_id=field.id, field_model=field.field_model, changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids), populate_field_id=field.ref_populate_field_id.id)
 
-        
-        js_script1 = """
-            $(document).ready(function() {{
-                let model_id = document.getElementById("model_id").value;
-                let record_id = document.getElementById("record_id").value;
-                let service_id = document.getElementById("service_id").value;
-                let field_id = "{field_id}";
-                let field_name = "{field_name}";
-                let field_model = "{field_model}";
-                let changeable_field_ids = {changeable_field_ids};  // Serialize the list to JSON
-                let populate_field_id = "{populate_field_id}";
-            
-                $('#{field_name}').change(function() {{
-                    let field_value = document.getElementById("{field_name}").value;
-                    $.ajax({{
-                        url: '/get/recomputed_values',
-                        type: 'GET',
-                        data: {{
-                            'service_id':service_id,
-                            'model_id': model_id,
-                            'record_id': record_id,
-                            'field_id': field_id,
-                            'field_model': field_model,
-                            'field_name': field_name,
-                            'field_value': field_value,
-                            'populate_field_id': populate_field_id,
-                            'changeable_field_ids': JSON.stringify(changeable_field_ids),  // Convert list to JSON string
-                        }},
-                        dataType: 'json',
-                        success: function(data) {{
-                            console.log(data);
-                            // Update the fields dynamically based on the response
-                            let fieldData = data.field_data;
-                            for (let field in fieldData) {{
-                                if (document.getElementById(field)) {{
-                                    document.getElementById(field).value = fieldData[field];
-                                }}
-                            }}
-                            
-                        }},
-                        error: function(error) {{
-                            console.error('Error fetching data:', error);
-                        }}
-                    }});
-                }});
-            }});
-            """.format(field_name=field.field_name, field_id=field.id, field_model = field.field_model, changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids), populate_field_id=field.ref_populate_field_id.id)
-
-
-
-        
             
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
     
