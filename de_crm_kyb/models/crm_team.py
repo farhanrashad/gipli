@@ -51,5 +51,30 @@ class Team(models.Model):
             action_context['default_team_id'] = user_team_id
 
         action['domain'] = [('type','=','opportunity'),('is_kyb', '=', True)]
+
+
+        # Retrieve the view IDs
+        """
+        tree_view_id = self.env.ref('crm.crm_lead_action_pipeline_view_tree').id
+        kanban_view_id = self.env.ref('crm.crm_lead_action_pipeline_view_kanban').id
+        calendar_view_id = self.env.ref('crm.crm_lead_action_pipeline_view_calendar').id
+        pivot_view_id = self.env.ref('crm.crm_lead_action_pipeline_view_pivot').id
+        graph_view_id = self.env.ref('crm.crm_lead_action_pipeline_view_graph').id
+        form_view_id = self.env.ref('de_crm_kyb.crm_lead_kyb_form_view').id
+
+        action['views'] = [
+            (kanban_view_id, 'kanban'),
+            (tree_view_id, 'tree'),
+            (form_view_id, 'form'),
+            (calendar_view_id, 'calendar'),
+            (pivot_view_id, 'pivot'),
+            (graph_view_id, 'graph'),
+            (False, 'activity')  # Activity view is a special case and doesn't need an ID
+        ]
+        """
+
+        # Set the view mode
+        action['view_mode'] = 'kanban,tree,form,calendar,pivot,graph,activity'
+        
         action['context'] = action_context
         return action
