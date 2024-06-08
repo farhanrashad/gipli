@@ -50,6 +50,7 @@ class Team(models.Model):
         if user_team_id:
             action_context['default_team_id'] = user_team_id
 
+        action_context['default_is_kyb'] = True
         action['domain'] = [('type','=','opportunity'),('is_kyb', '=', True)]
 
 
@@ -71,10 +72,9 @@ class Team(models.Model):
             (graph_view_id, 'graph'),
             (False, 'activity')  # Activity view is a special case and doesn't need an ID
         ]
-        """
-
-        # Set the view mode
+        
         action['view_mode'] = 'kanban,tree,form,calendar,pivot,graph,activity'
+        """
         
         action['context'] = action_context
         return action
