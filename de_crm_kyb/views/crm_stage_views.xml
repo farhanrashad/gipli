@@ -1,0 +1,12 @@
+<odoo>
+    <record id="crm_stage_form_inherit_kyb" model="ir.ui.view">
+        <field name="name">crm.stage.inherit.kyb</field>
+        <field name="model">crm.stage</field>
+        <field name="inherit_id" ref="crm.crm_stage_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='team_id']" position="after">
+                <field name="is_kyb" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -19,6 +19,8 @@ _logger = logging.getLogger(__name__)
 class Team(models.Model):
     _inherit = "crm.team"
 
+    is_kyb = fields.Boolean(default=False)
+    
     # ------------------------------------------------------------
     # ACTIONS
     # ------------------------------------------------------------
@@ -34,7 +36,7 @@ class Team(models.Model):
         user_team_id = self.env.user.sale_team_id.id
         if user_team_id:
             # To ensure that the team is readable in multi company
-            user_team_id = self.search([('id', '=', user_team_id)], limit=1).id
+            user_team_id = self.search([('id', '=', user_team_id),('is_kyb', '=', True)], limit=1).id
         else:
             user_team_id = self.search([], limit=1).id
             action['help'] = "<p class='o_view_nocontent_smiling_face'>%s</p><p>" % _("Create an KYB")
@@ -51,7 +53,7 @@ class Team(models.Model):
             action_context['default_team_id'] = user_team_id
 
         action_context['default_is_kyb'] = True
-        action['domain'] = [('type','=','opportunity'),('is_kyb', '=', True)]
+        action['domain'] = [('type','=','opportunity'),('is_kyb', '=', True),('stage_id.is_kyb', '=', True)]
 
 
         # Retrieve the view IDs

@@ -8,53 +8,60 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="replace">
+                <field name="stage_id" widget="statusbar_duration"
+                            options="{'clickable': '1', 'fold_field': 'fold'}"
+                            domain="[('id', 'in', stage_ids)]"
+                            invisible="not active or type == 'lead'"/>
+            </xpath>
             <xpath expr="//group[@name='opportunity_partner']" position="attributes">
-            <attribute name="invisible">type == "lead" or is_kyb == True</attribute>
-          </xpath>
-          <xpath expr="//form[1]/sheet[1]/group[1]/group[not(@name)][1]" position="attributes">
-            <attribute name="invisible">type == "lead" or is_kyb == True</attribute>
-          </xpath>
-          <xpath expr="//form[1]/sheet[1]/group[1]" position="after">
-            <group name="kyb">
-              <group name="company_details" string="Company Details" invisible="is_kyb != True">
-                <field name="partner_name"/>
-                <label for="street" string="Address"/>
-                <div class="o_address_format" name="studio_div_95e972">
-                  <field name="street" placeholder="Street..." class="o_address_street"/>
-                  <field name="street2" placeholder="Street 2..." class="o_address_street"/>
-                  <field name="city" placeholder="City" class="o_address_city"/>
-                  <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}"/>
-                  <field name="zip" placeholder="ZIP" class="o_address_zip"/>
-                  <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
-                </div>
-                  <field name="website" widget="url" placeholder="e.g. https://www.odoo.com"/>
-                  <label for="email_from" class="oe_inline"/>
-                                <div class="o_row o_row_readonly">
-                                    <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger" title="This email is blacklisted for mass mailings. Click to unblacklist." type="object" context="{'default_email': email_from}" groups="base.group_user" invisible="not is_blacklisted"/>
-                                    <field name="email_from" string="Email" widget="email"/>
-                                    <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer email will also be updated." invisible="not partner_email_update"/>
-                                </div>
-                                <label for="phone" class="oe_inline"/>
-                                <div class="o_row o_row_readonly">
-                                    <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': phone}" groups="base.group_user" invisible="not phone_blacklisted"/>
-                                    <field name="phone" widget="phone"/>
-                                    <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer phone number will also be updated." invisible="not partner_phone_update"/>
-                                </div>
-                  <field name="work_type" />
-              </group>
-                <group name="usage_detail" string="Usage Detail" invisible="is_kyb != True">
-                    <field name="usage_est_users" />
-                    <field name="usage_est_spending" />
-                    <field name="usage_card" />
-                    <separator string="Sales Detail" />
-                    <label for="date_deadline">Expected Closing</label>
-                    <div class="o_lead_opportunity_form_inline_fields">
-                        <field name="date_deadline" nolabel="1" class="oe_inline"/>
-                        <field name="priority" widget="priority" nolabel="1" class="oe_inline align-top"/>
-                    </div>
-                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
-                    <field name="user_id" context="{'default_sales_team_id': team_id}" widget="many2one_avatar_user"/>
-              </group>
+                <attribute name="invisible">type == "lead" or is_kyb == True</attribute>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[not(@name)][1]" position="attributes">
+                <attribute name="invisible">type == "lead" or is_kyb == True</attribute>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/group[1]" position="after">
+                <group name="kyb">
+                    <group name="company_details" string="Company Details" invisible="is_kyb != True">
+                        <field name="partner_name"/>
+                        <label for="street" string="Address"/>
+                        <div class="o_address_format" name="studio_div_95e972">
+                          <field name="street" placeholder="Street..." class="o_address_street"/>
+                          <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                          <field name="city" placeholder="City" class="o_address_city"/>
+                          <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}"/>
+                          <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                          <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                        </div>
+                          <field name="website" widget="url" placeholder="e.g. https://www.odoo.com"/>
+                          <label for="email_from" class="oe_inline"/>
+                                        <div class="o_row o_row_readonly">
+                                            <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger" title="This email is blacklisted for mass mailings. Click to unblacklist." type="object" context="{'default_email': email_from}" groups="base.group_user" invisible="not is_blacklisted"/>
+                                            <field name="email_from" string="Email" widget="email"/>
+                                            <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer email will also be updated." invisible="not partner_email_update"/>
+                                        </div>
+                                        <label for="phone" class="oe_inline"/>
+                                        <div class="o_row o_row_readonly">
+                                            <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': phone}" groups="base.group_user" invisible="not phone_blacklisted"/>
+                                            <field name="phone" widget="phone"/>
+                                            <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer phone number will also be updated." invisible="not partner_phone_update"/>
+                                        </div>
+                          <field name="work_type" />
+                    </group>
+                    <group name="usage_detail" string="Usage Detail" invisible="is_kyb != True">
+                        <field name="stage_ids" widget="many2many_tags" />
+                        <field name="usage_est_users" />
+                        <field name="usage_est_spending" />
+                        <field name="usage_card" />
+                        <separator string="Sales Detail" />
+                        <label for="date_deadline">Expected Closing</label>
+                        <div class="o_lead_opportunity_form_inline_fields">
+                            <field name="date_deadline" nolabel="1" class="oe_inline"/>
+                            <field name="priority" widget="priority" nolabel="1" class="oe_inline align-top"/>
+                        </div>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                        <field name="user_id" context="{'default_sales_team_id': team_id}" widget="many2one_avatar_user"/>
+                  </group>
             </group>
           </xpath>
           <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/div[2]" position="after">

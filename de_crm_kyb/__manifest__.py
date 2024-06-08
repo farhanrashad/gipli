@@ -24,6 +24,8 @@ Long description of module's purpose
     'data': [
         # 'security/ir.model.access.csv',
         'data/ir_action_data.xml',
+        'views/crm_team_views.xml',
+        'views/crm_stage_views.xml',
         'views/crm_views.xml',
     ],
     # only loaded in demonstration mode
