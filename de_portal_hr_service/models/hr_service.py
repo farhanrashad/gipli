@@ -271,7 +271,7 @@ class HRService(models.Model):
                 record_id = element['value']
 
         model = self.env['ir.model'].browse(int(model_id))
-        field_values = {}
+        computed_field_values = {}
 
         eval_context = {}
         field_pattern = re.compile(r'(\w+\.\w+|\w+)')
@@ -353,7 +353,7 @@ class HRService(models.Model):
         field_pattern = re.compile(r'(\w+\.\w+|\w+)')
         cf_values = []
 
-        service = self.env['hr.service'].browse(service_id)
+        service = self.env['hr.service'].browse(int(service_id))
         
         if model.id == self.header_model_id.id:
             service_items = self.mapped('hr_service_items')

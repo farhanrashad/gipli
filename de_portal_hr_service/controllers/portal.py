@@ -198,10 +198,10 @@ class CustomerPortal(portal.CustomerPortal):
         service_id = kwargs.get('service_id')
         model_id = kwargs.get('model_id')
         record_id = kwargs.get('record_id') or 0
+        
         field_id = kwargs.get('field_id')
         field_model = kwargs.get('field_model')
         field_name = kwargs.get('field_name')
-        field_value = kwargs.get('field_value')
 
         service = request.env['hr.service'].browse(int(service_id))        
         changeable_field_ids = json.loads(kwargs.get('changeable_field_ids', '[]'))
@@ -223,22 +223,21 @@ class CustomerPortal(portal.CustomerPortal):
         service_id = kwargs.get('service_id')
         model_id = kwargs.get('model_id')
         record_id = kwargs.get('record_id') or 0
+        
         field_id = kwargs.get('field_id')
         field_model = kwargs.get('field_model')
         field_name = kwargs.get('field_name')
-        field_value = kwargs.get('field_value')
 
         service = request.env['hr.service'].browse(int(service_id))        
-        changeable_field_ids = json.loads(kwargs.get('changeable_field_ids', '[]'))
-        fields = request.env['ir.model.fields'].browse(changeable_field_ids)
 
         form_data = request.params
         form_elements = [{'name': name, 'value': form_data[name]} for name in form_data]
         form_elements_json = json.dumps(form_elements)
 
         options = {
-            'field_data': service.get_changeable_field_values(form_elements_json, changeable_field_ids, field_name),
+            'field_data': service._get_list_values(form_elements_json, field_name),
         }
+        return json.dumps(options)
 
     
     
@@ -510,19 +509,29 @@ class CustomerPortal(portal.CustomerPortal):
                     
             
                     $.ajax({{
-                        url: '/get/recomputed_values',
+                        url: '/get/list_values',
                         type: 'GET',
-                        data: form_data + '&field_id={field_id}&field_name={field_name}&field_model={field_model}&changeable_field_ids={changeable_field_ids}&populate_field_id={populate_field_id}',
+                        data: form_data + '&field_id={field_id}&field_name={field_name}&field_model={field_model}&changeable_field_ids={changeable_field_ids}',
                         dataType: 'json',
                         success: function(data) {{
                             console.log(data);
-                            // Update the fields dynamically based on the response
-                            let fieldData = data.field_data.computed_field_values;
-                            for (let field in fieldData) {{
-                                if (document.getElementById(field)) {{
-                                    document.getElementById(field).value = fieldData[field];
+
+                            // Loop through each field in the field_data
+                            for (let field_name in data.field_data) {{
+                                let field_values = data.field_data[field_name];
+                                let fieldElement = $('#' + field_name);
+
+                                if (fieldElement.length) {{
+                                    fieldElement.empty();  // Clear existing options
+
+                                    // Add new options to the select field
+                                    for (let option_text in field_values) {{
+                                        let option_value = field_values[option_text];
+                                        fieldElement.append(new Option(option_text, option_value));
+                                    }}
                                 }}
                             }}
+                            
                         }},
                         error: function(error) {{
                             console.error('Error fetching data:', error);
@@ -530,18 +539,26 @@ class CustomerPortal(portal.CustomerPortal):
                     }});
                 }});
             }});
-            """.format(form_id=form_id, field_name=field.field_name, field_id=field.id, field_model=field.field_model, changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids), populate_field_id=field.ref_populate_field_id.id)
+            """.format(
+                    form_id=form_id, 
+                    field_name=field.field_name, 
+                    field_id=field.id, 
+                    field_model=field.field_model, 
+                    changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids)
+                )
 
             
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
     
         select_tag = '''
-        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'{call_js_on_change}>
+        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'>
             <option value=''>Select</option>
         '''.format(
-            field_name=field.field_name, required='required="1"' if required else '',
-            field_model=field.field_model, search_fields=search_fields, 
-            domain_filter=domain_filter, call_js_on_change=call_js_on_change
+                field_name=field.field_name, 
+                required='required="1"' if required else '',
+                field_model=field.field_model, 
+                search_fields=search_fields, 
+                domain_filter=domain_filter
         )
     
         for rec in m2o_id:
