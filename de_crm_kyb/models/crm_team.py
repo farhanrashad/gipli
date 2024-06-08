@@ -26,7 +26,7 @@ class Team(models.Model):
     #TODO JEM : refactor this stuff with xml action, proper customization,
     @api.model
     def action_my_kyb_pipeline(self):
-        action = self.env["ir.actions.actions"]._for_xml_id("de_crm_kyb.action_crm_kyb_pipeline")
+        action = self.env["ir.actions.actions"]._for_xml_id("crm.crm_lead_action_pipeline")
         return self._action_update_to_kyb_pipeline(action)
 
     @api.model
@@ -50,5 +50,6 @@ class Team(models.Model):
         if user_team_id:
             action_context['default_team_id'] = user_team_id
 
+        action['domain'] = [('type','=','opportunity'),('is_kyb', '=', True)]
         action['context'] = action_context
         return action
