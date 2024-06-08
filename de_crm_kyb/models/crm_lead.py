@@ -24,5 +24,20 @@ class Lead(models.Model):
         ('international', 'International'),
         ('both', 'Both'),
     ],string="Card Usage")
-    work_type = field.Char('Nature of Work')
+    work_type = fields.Char('Nature of Work')
+
+    crc = fields.Binary(string="Commercial Registration Certificate", required=True)
+    crc_filename = fields.Char(string="CRC Filename")
+    
+    aoa = fields.Binary(string="Articles of Association", required=True)
+    aoa_filename = fields.Char(string="AoA Filename")
+    
+    c_card = fields.Binary(string="Computer Card", required=True)
+    cc_filename = fields.Char(string="CC Filename")
+    
+    iban_cert = fields.Binary(string="IBAN Certificate", required=True)
+    iban_cert_filename = fields.Char(string="IBAN Filename")
+    
+    trade_license = fields.Binary(string="Trade License")
+    trade_license_filename = fields.Char(string="TL Filename")
 
