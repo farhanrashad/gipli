@@ -1,0 +1,10 @@
+<odoo>
+  <data>
+    <menuitem
+        id="menu_crm_opportunities"
+        name="My Pipeline"
+        parent="crm_menu_sales"
+        action="de_crm_kyb.action_my_kyb_pipeline"
+        sequence="1"/>
+  </data>
+</odoo>
