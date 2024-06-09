@@ -25,7 +25,7 @@
         'demo/demo.xml',
     ],
      'license': 'OPL-1',
-    'price': 270,
+    'price': 300,
     'currency': 'USD',
     'images': ['static/description/banner.gif'],
     'installable': True,
