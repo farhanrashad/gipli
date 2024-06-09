@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Add Breadcrumb -->
+    <!-- Modify portal templates -->
+    <template id="portal_my_home_menu_sale_subscription" name="Portal layout : subscription menu entry" inherit_id="sale.portal_my_home_menu_sale" priority="10">
+         <li id="portal_breadcrumbs_sale" position="after">
+             <li t-elif="page_name == 'subscription' or sale_order and sale_order.subscription_order" t-attf-class="breadcrumb-item #{'active ' if not sale_order else ''}">
+                <a t-if="sale_order" t-attf-href="/my/suborders?{{ keep_query() }}">Subscriptions</a>
+                <t t-else="">Subscriptions</t>
+            </li>
+         </li>
+    </template>
+
+    
+   
+    <!-- Add Menu -->
+    <template id="portal_my_home_sale_subscription_orer" name="Show Subscription Orders" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-set="portal_client_category_enable" t-value="True"/>
+            <t t-set="portal_alert_category_enable" t-value="True"/>
+        </xpath>
+
+        <div id="portal_client_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/de_subscription/static/description/portal_icon.svg'"/>
+                <t t-set="title">Subscriptions</t>
+                <t t-set="url" t-value="'/my/suborders'"/>
+                <t t-set="text">Manage Your Subscriptions</t>
+                <t t-set="placeholder_count" t-value="'subscription_order_count'"/>
+            </t>
+        </div>
+    </template>
+
+    <!-- List of orders -->
+    <template id="portal_my_subscription_orders" name="My Subscription Orders">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Your Subscriptions</t>
+            </t>
+            <div t-if="not subscription_orders" class="alert alert-warning" role="alert">
+                There are currently no subscriptions for your account.
+            </div>
+            <t t-if="subscription_orders" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th class="">Subscription</th>
+                        <th class="text-center">Recurring Plan</th>
+                        <th class="text-center">Next Invoice Date</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <t t-foreach="subscription_orders" t-as="subscription">
+                    <tr>
+                        <td>
+<!--
+                            <a t-att-href="subscription.get_portal_url()"><t t-out="subscription.name"/></a>
+                            -->
+                            
+                            <a t-attf-href="/my/suborders/#{subscription.id}?access_token=#{subscription.access_token}">
+                                <span t-field="subscription.name"/>
+                                <span t-if="subscription.subscription_type == 'renewal'"> - Renewed </span>
+                                <span t-if="subscription.subscription_type == 'upsell'"> - Upsell </span>
+                                <span t-if="subscription.subscription_type == 'revised'"> - Revised </span>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <span t-field="subscription.subscription_plan_id.sudo().name"/>
+                        </td>
+                        <td class="text-center"><span t-field="subscription.date_next_invoice"/></td>
+                        <td class="text-end"><span t-out ="subscription.amount_total" t-options="{'widget': 'monetary', 'display_currency': subscription.currency_id}"/></td>
+                        <td class="text-center" id="subscription_status">
+                            <t t-if="subscription.subscription_status == 'progress' and subscription.date_next_invoice &lt; datetime.date.today()">
+                                <span class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
+                            </t>
+                            <t t-elif="subscription.subscription_status == 'progress'">
+                                <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> In Progress</span>
+                            </t>
+                            <t t-elif="subscription.subscription_status == 'paused'">
+                                <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> Paused</span>
+                            </t>
+                            <t t-elif="subscription.subscription_status == 'close'">
+                                <span class="badge rounded-pill text-bg-dark"><i class="fa fa-fw fa-remove"/> Closed</span>
+                            </t>
+                            <t t-else="">
+                                <span class="badge rounded-pill text-bg-info"><span t-field="subscription.subscription_status"/></span>
+                            </t>
+                        </td>
+                    </tr>
+                </t>
+            </t>
+            <p t-else="">There are currently no subscriptions for your account.</p>
+        </t>
+    </template>
+
+    
+
+    <!-- Sale order Subscription Page -->
+    <template id="sale_subscription_order_portal_template" inherit_id="sale.sale_order_portal_template" primary="True">
+        <xpath expr="//div[hasclass('o_portal_sale_sidebar')]/t/t/div/div" position="inside">
+            <t t-call="de_subscription.sale_subscription_order_portal_sidebar"/>
+        </xpath>
+
+        
+    </template>
+
+    
+    <template id="model_sale_subscription_close_template">
+        <div role="dialog" class="modal fade" id="modal-close-sale_subscription" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h4 class="modal-title">
+                                Close Subscription <span t-field="sale_order.display_name" class="text-primary"/>
+                            </h4>
+                        </header>
+                        <form method="post" t-attf-action="/my/suborders/close/#{sale_order.id}?access_token=#{sale_order.access_token}">
+                            <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <main class="modal-body">
+                                <t t-set="reason_ids" t-value="request.env['sale.sub.close.reason'].sudo().search([('publish_portal','=',True)])"/>
+                                <select id="subscription-change-plan-select" required="1" class="form-select" name="close_reason">
+                                    <option value="">Select reason for close</option>
+                                    <t t-foreach="reason_ids" t-as="reason">
+                                        <option t-att-value="reason.id" t-out="reason.name"/>
+                                    </t>
+                                </select>
+                            </main>
+                            <footer class="modal-footer">
+                                <button class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            </footer>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </template>
+
+    <template id="model_sale_subscription_change_plan_template">
+        <div role="dialog" t-attf-class="modal fade" id="modal-subscription_change-plan" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h4 class="modal-title">
+                                Change Plan for <span t-field="sale_order.display_name" class="text-primary"/>
+                            </h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+                        </header>
+                        <form method="post" t-attf-action="/my/suborders/change_plan/#{sale_order.id}?access_token=#{sale_order.access_token}">
+                            <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <main class="modal-body">
+                                <t t-set="plan_ids" t-value="request.env['sale.recur.plan'].sudo().search([('active','=',True)])"/>
+                                <select id="subscription-change-plan-select" class="form-select" name="plan_id">
+                                    <t t-foreach="plan_ids" t-as="plan">
+                                        <option t-att-value="plan.id" t-out="plan.name" t-if="sale_order.subscription_plan_id.id == plan.id" selected="selected"/>
+                                        <option t-att-value="plan.id" t-out="plan.name" t-if="sale_order.subscription_plan_id.id != plan.id"/>
+                                    </t>
+                                </select>
+                            </main>
+                            <footer class="modal-footer">
+                                <button class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            </footer>
+                        </form>
+                    </div>
+                </div>
+        </div>
+    </template>
+
+    <template id="model_sale_subscription_upsell_template">
+        <div role="dialog" t-attf-class="modal fade" id="modal-subscription-upsell" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <header class="modal-header">
+                            <h4 class="modal-title">
+                                Select Upselling Products <span t-field="sale_order.display_name" class="text-primary"/>
+                            </h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+                        </header>
+                        <form method="post" t-attf-action="/my/suborders/upsell/#{sale_order.id}?access_token=#{sale_order.access_token}">
+                            <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <main class="modal-body">
+                                <t t-set="product_ids" t-value="request.env['product.product'].sudo().search([('active','=',True),('id','in',sale_order.subscription_plan_id.upsell_portal_product_ids.ids)])"/>
+                                <t t-foreach="product_ids" t-as="product">
+                                    <input type="checkbox" 
+                                        class="mr8"
+                                        t-out="product.name" 
+                                        t-att-value="product.id"
+                                        t-att-name="'product_' + str(product.id)"
+                                    /><br/>
+                                </t>
+                            </main>
+                            <footer class="modal-footer">
+                                <button class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            </footer>
+                        </form>
+                    </div>
+                </div>
+        </div>
+    </template>
+
+    
+
+    
+    <template id="sale_subscription_order_portal_sidebar" name="Sale Subscription sidebar">
+        <t t-call="de_subscription.model_sale_subscription_close_template"/>
+        <t t-call="de_subscription.model_sale_subscription_change_plan_template" />
+        <t t-call="de_subscription.model_sale_subscription_upsell_template" />
+        <div class="d-flex flex-wrap flex-column">
+            <div class="flex-grow-1" id="" >
+
+                <a role="button" 
+                    t-if="sale_order.subscription_order and sale_order.portal_renew" 
+                    class="btn btn-primary w-100 mt8" 
+                    t-attf-href="/my/suborders/renew/#{sale_order.id}?access_token=#{sale_order.access_token}"
+                >
+                    Renew Subscription
+                </a>
+    
+                <button role="button" 
+                    t-if="sale_order.subscription_order and sale_order.portal_change_plan" 
+                    class="mt8 btn btn-primary w-100" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#modal-subscription_change-plan" 
+                    href="#"
+                    id="o_change_plan"
+                >
+                    Change Plan
+                </button>
+
+                <button role="button" 
+                    t-if="sale_order.subscription_order and sale_order.portal_upsell" 
+                    class="mt8 btn btn-primary w-100" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#modal-subscription-upsell" 
+                    href="#"
+                    id="o_subscription_upsell"
+                >
+                    Upsell Quotation
+                </button>
+                
+                <a role="button" 
+                    t-if="sale_order.subscription_order and sale_order.portal_close" 
+                    class="mt8 btn btn-secondary w-100" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#modal-close-sale_subscription" 
+                    href="#"
+                >
+                    Close Subscription
+                </a>
+            </div>
+        </div>
+    </template>
+
+
+    
+    <template id="sale_order_portal_content_inherit" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//div[@id='sale_info']/span[@id='sale_info_title']" position="attributes">
+            <attribute name="t-if">not sale_order.subscription_order</attribute>
+        </xpath>
+        <xpath expr="//div[@id='sale_info']/table[1]" position="attributes">
+            <attribute name="t-if">not sale_order.subscription_order</attribute>
+        </xpath>
+
+        <xpath expr="//div[@id='intro_row']/h2" position="inside">
+            <span t-if="sale_order.subscription_type == 'renewal'"> - Renewed </span>
+            <span t-if="sale_order.subscription_type == 'upsell'"> - Upsell </span>
+            <span t-if="sale_order.subscription_type == 'revised'"> - Revised </span>
+        </xpath>
+        <xpath expr="//div[@id='intro_row']" position="inside">
+            <div class="col-12 col-lg flex-grow-0 text-lg-end mb-1 mb-lg-0" t-if="sale_order.subscription_order">
+                <t t-if="sale_order.subscription_status == 'progress' and sale_order.date_next_invoice &lt; datetime.date.today()">
+                    <span class="badge rounded-pill text-bg-danger"><i class="fa fa-fw fa-repeat"/> To Renew</span>
+                </t>
+                <t t-elif="sale_order.subscription_status == 'progress'">
+                    <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> In Progress</span>
+                </t>
+                <t t-elif="sale_order.subscription_status == 'paused'">
+                    <span class="badge rounded-pill text-bg-success"><i class="fa fa-fw fa-check"/> Paused</span>
+                </t>
+                <t t-elif="sale_order.subscription_status == 'close'">
+                    <span class="badge rounded-pill text-bg-dark"><i class="fa fa-fw fa-remove"/> Closed</span>
+                </t>
+                <t t-else="">
+                    <span class="badge rounded-pill text-bg-info"><span t-field="sale_order.subscription_status"/></span>
+                </t>
+            </div>
+        </xpath>
+        <xpath expr="//div[@id='sale_info']" position="inside">
+            <span id="subscription_info_title" t-if="sale_order.subscription_order">
+                <h4 class="mb-1">Subscription Information</h4>
+                <hr class="mt-1 mb-2"/>
+            </span>
+            <table class="table table-borderless table-sm" t-if="sale_order.subscription_order">
+                <tbody style="white-space:nowrap" id="sale_info_table">
+                    <tr t-if="sale_order.subscription_status == 'draft'">
+                        <th class="ps-0 pb-0">Order Date:</th>
+                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.date_order" t-options='{"widget": "date"}'/></td>
+                    </tr>
+                    <tr t-if="sale_order.subscription_plan_id">
+                        <th class="ps-0 pb-0">Expiration Date:</th>
+                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.validity_date" t-options='{"widget": "date"}'/></td>
+                    </tr>
+                    
+                    <tr t-if="sale_order.subscription_plan_id">
+                        <th class="ps-0 pb-0">Recurring Plan:</th>
+                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.subscription_plan_id.name" /></td>
+                    </tr>
+                    <tr t-if="sale_order.date_next_invoice">
+                        <th class="ps-0 pb-0">Next Billing Date:</th>
+                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.date_next_invoice" t-options='{"widget": "date"}'/></td>
+                    </tr>
+                    <tr t-if="sale_order.date_start">
+                        <th class="ps-0 pb-0">Start Date:</th>
+                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.date_start" t-options='{"widget": "date"}'/></td>
+                    </tr>
+                    <tr t-if="sale_order.date_end">
+                        <th class="ps-0 pb-0">End Date:</th>
+                        <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.date_end" t-options='{"widget": "date"}'/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </xpath>
+
+        <xpath expr="//table[@id='sales_order_table']/thead/tr" position="inside">
+            <th/>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- add fields in report related to subscription -->
+
+    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document" priority="50">
+
+        <xpath expr="//div[hasclass('page')]/h2[1]" position="replace">
+            <h2 class="mt-4">
+                <t t-if="doc.subscription_order">
+                    <span t-if="doc.state in ['draft','sent','sale']">Subscription # </span>
+                    <span t-else="">Subscription # </span>
+                    <span t-field="doc.name">SO0000</span>
+                </t>
+                <t t-else="">
+                    <span t-if="env.context.get('proforma', False) or is_pro_forma">Pro-Forma Invoice # </span>
+                    <span t-elif="doc.state in ['draft','sent']">Quotation # </span>
+                    <span t-else="">Order # </span>
+                    <span t-field="doc.name">SO0000</span>
+                </t>
+            </h2>
+        </xpath>
+        <xpath expr="//div[@name='informations_reference']" position="before">
+            <div t-if="doc.subscription_order" class="col-auto col-3 mw-100 mb-2" name="subscription_plan">
+                <strong>Recurring Plan:</strong><br/>
+                <span class="m-0" t-field="doc.subscription_plan_id.name"/>
+            </div>
+            <div t-if="doc.subscription_order" class="col-auto col-3 mw-100 mb-2" name="subscription_plan">
+                <strong>Next Invoice Date:</strong><br/>
+                <span class="m-0" t-field="doc.date_next_invoice" t-options='{"widget": "date"}'>2023-12-31</span>
+            </div>
+        </xpath>
+        
+    </template>
+
+</odoo>
