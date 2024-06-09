@@ -285,7 +285,7 @@ class CustomerPortal(CustomerPortal):
                 log_output += '''
                 <div class="col-lg-2 col-md-3 col-sm-6">
                     <div class=" mb-2 position-relative text-center" data-id="1287">
-                        <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
+                        <a href="/attachment/download?attachment_id={attach_id}" >
                             <span t-esc="attach_id" class="fa fa-download">
                                 {attach_name}
                             </span>
@@ -336,7 +336,7 @@ class CustomerPortal(CustomerPortal):
                 msg_output += '''
                 <div class="col-lg-2 col-md-3 col-sm-6">
                     <div class=" mb-2 position-relative text-center" data-id="1287">
-                    <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
+                    <a href="/attachment/download?attachment_id={attach_id}">
                         <span t-esc="attach_id" class="fa fa-download">
                             {attach_name}
                         </span>
@@ -365,7 +365,7 @@ class CustomerPortal(CustomerPortal):
             attach_output += '''
                 <div class="col-lg-2 col-md-3 col-sm-6">
                     <div class="o_portal_chatter_attachment mb-2 position-relative text-left" data-id="1287">
-                    <a href="/attachment/download?attachment_id={attach_id}" target="_blank">
+                    <a href="/attachment/download?attachment_id={attach_id}">
                         <span t-esc="attach_id" class="fa fa-download">
                             {attach_name}
                         </span>
