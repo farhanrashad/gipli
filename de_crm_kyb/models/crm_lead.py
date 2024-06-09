@@ -55,7 +55,10 @@ class Lead(models.Model):
     def _compute_stage_id(self):
         for lead in self:
             if not lead.stage_id:
-                domain = ['|', ('is_kyb', '=', lead.team_id.is_kyb), ('is_kyb', '=', False)] if lead.team_id else [('fold', '=', False)]
+                if lead.team_id.is_kyb:
+                    domain = [('is_kyb', '=', True)] if lead.team_id else [('fold', '=', False)]
+                else:
+                    domain = [('is_kyb', '=', False)] if lead.team_id else [('fold', '=', False)]
                 lead.stage_id = lead._stage_find(domain=domain).id
 
     @api.model
@@ -82,6 +85,9 @@ class Lead(models.Model):
     def _compute_conditional_tage_ids(self):
         stage_ids = self.env['crm.stage']
         for record in self:
-            stage_ids = self.env['crm.stage'].search([('is_kyb','=',record.team_id.is_kyb)])
+            if record.team_id.is_kyb:
+                stage_ids = self.env['crm.stage'].search([('is_kyb','=',True)])
+            else:
+                stage_ids = self.env['crm.stage'].search([('is_kyb','!=',True)])
             record.stage_ids = stage_ids
 
