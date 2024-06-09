@@ -214,11 +214,17 @@ class CustomerPortal(CustomerPortal):
         except Exception as e:
             print(e)
 
+        access_token = ''
+        try:
+            access_token = record_sudo.access_token
+        except:
+            access_token = ''
+
     #   values['record_id']['expense_line_ids'][1]        
         values.update({
             'portal_hr_service_record_dyanmic_page_template': self.portal_hr_service_record_dyanmic_page_template(service_sudo,record_sudo),
             'record_id': record_sudo,
-            'access_token': record_sudo.access_token,
+            'access_token': access_token,
             'title': record_title.upper(),
             'state': record_state, #record_state.upper(),
             'record_editable': record_editable,
@@ -709,6 +715,21 @@ class CustomerPortal(CustomerPortal):
             template += "<strong>" + header.field_label + ": </strong>"
             
             if header.field_type == 'many2one':
+                if header.field_model == 'ir.attachment':
+
+                    template += '''
+                        <a href="/attachment/download?attachment_id={attach_id}">
+                            <span t-esc="attach_id" class="fa fa-download">
+                                {attach_name}
+                            </span>
+                        </a>
+                    '''.format(attach_id=record[eval("'" + header.field_name + "'")].id, attach_name=header.field_name)
+                    
+                else:
+                    template += str(record[eval("'" + header.field_name + "'")].name) \
+                        if record[eval("'" + header.field_name + "'")].check_access_rights('read', raise_exception=False) else ''
+
+                
                 template += "<span>" + str(record[eval("'" + header.sudo().field_name + "'")].sudo().name) + "</span>"
             elif header.field_type == 'many2many':
                 m2m_ids = request.env[header.field_model].sudo().search([('id','in',record[eval("'" + header.field_name + "'")].ids)])
