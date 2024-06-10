@@ -51,7 +51,7 @@ class Lead(models.Model):
     trade_license = fields.Binary(string="Trade License")
     trade_license_filename = fields.Char(string="TL Filename")
 
-    @api.depends('team_id', 'type')
+    @api.depends('team_id', 'type','stage_ids','is_kyb')
     def _compute_stage_id(self):
         for lead in self:
             if not lead.stage_id:
