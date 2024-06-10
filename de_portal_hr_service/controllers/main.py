@@ -569,6 +569,21 @@ class CustomerPortal(CustomerPortal):
 
 
 
+    @http.route('/my/records/search', type='http', auth='public', website=True, csrf=False)
+    def custom_search(self, **kw):
+        search_params = []
+        for key, value in kw.items():
+            if key.startswith('field_'):
+                index = key.split('_')[1]
+                field = kw.get(f'field_{index}')
+                operator = kw.get(f'operator_{index}')
+                search_value = kw.get(f'value_{index}')
+                if field and operator and search_value:
+                    search_params.append((field, operator, search_value))
+        # Perform search with search_params
+        records = request.env['your.model'].search(search_params)
+        return request.render('your_module.template_id', {'records': records})
+
         
     # -------------------------------------------
     # Custom html generation for list page
@@ -626,20 +641,22 @@ class CustomerPortal(CustomerPortal):
                         const container = document.getElementById('dynamic-form-container');
                         const fieldOptions = fields.map(field => `<option value="${field.name}">${field.field_description}</option>`).join('');
 
-                        const andOrSelect = rowCount > 1 ? `<select name="and_or_row${rowCount}" class="form-control1" style="width: 10%%; margin-right: 10px;">
+                        const andOrSelect = rowCount > 1 ? `<select name="and_or_row${rowCount}" class="form-control" style="width: 100px; margin-right: 10px;">
                                                             <option value="AND">AND</option>
                                                             <option value="OR">OR</option>
                                                         </select>` : '';
                                                         
                         const newRow = document.createElement('div');
                         newRow.className = 'form-row';
+                        newRow.style.padding = '5px';
                         newRow.innerHTML = `
+                        <div style="display: flex;">
                             ${andOrSelect}
-                            <select name="field1_row${rowCount}" class="form-control1" style="width: 30%%; margin-right: 10px;">
+                            <select name="field1_row${rowCount}" class="form-control" style="width: 300px; margin-right: 10px;">
                                 ${fieldOptions}
                             </select>
                         
-                            <select class="o_input o_generator_menu_operator" name="field2_row${rowCount}" >
+                            <select class="form-control" style="width: 200px; margin-right: 10px;" name="field2_row${rowCount}" >
                                 <option value="ilike">contains</option>
                                 <option value="not ilike">doesn't contain</option>
                                 <option value="=">is equal to</option>
@@ -648,10 +665,11 @@ class CustomerPortal(CustomerPortal):
                                 <option value="=">is not set</option>
                             </select>
                 
-                            <input type="text" name="field3_row${rowCount}" placeholder="Field 3">
+                            <input type="text" class="form-control" style="width: 300px; margin-right: 10px;" name="field3_row${rowCount}" placeholder="Field 3">
+                            </div>
                         `;
                         if (rowCount === 1) {
-                            newRow.style.marginLeft = '75px';
+                            newRow.style.marginLeft = '66px';
                         }
                         container.appendChild(newRow);
                     }
@@ -675,6 +693,7 @@ class CustomerPortal(CustomerPortal):
                         .then(response => response.json())
                         .then(data => {
                             console.log('Success:', data);
+                            $('#modal-filter').modal('hide');
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -695,7 +714,7 @@ class CustomerPortal(CustomerPortal):
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <form method="post" action="/my/custom/search" id="dynamic-form">
+                        <form method="post" action="/my/records/search" id="dynamic-form">
                             <div class="modal-body">
                                 <div id="dynamic-form-container">
                                     <!-- Initial Row -->
