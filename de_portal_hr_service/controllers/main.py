@@ -14,6 +14,7 @@ from odoo.tools import groupby as groupbyelem
 from odoo.tools import safe_eval
 
 from odoo.osv.expression import OR
+import json
 
 
 class CustomerPortal(CustomerPortal):
@@ -609,26 +610,106 @@ class CustomerPortal(CustomerPortal):
         template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/main_datatable.js"></script>'
 
         # ------------------ Filter Model -----------------------
+        filter_fields = request.env['ir.model.fields'].sudo().search([
+            ('model_id', '=', service_id.header_model_id.id)
+        ])
+        filter_fields_list = [{'name': field.name, 'field_description': field.field_description} for field in filter_fields]
+    
         template += '''
-            <template id="model_filter_template">
-                <div role="dialog" class="modal fade" id="modal-filter" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <header class="modal-header">
-                                <h4 class="modal-title">
-                                </h4>
-                            </header>
-                            <form method="post" >
-                                <footer class="modal-footer">
-                                        <button class="btn btn-primary">Close Ticket</button>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <script type="text/javascript">
+                document.addEventListener('DOMContentLoaded', function () {
+                    const fields = %s;
+                    let rowCount = 0;
+                
+                    function addRow() {
+                        rowCount++;
+                        const container = document.getElementById('dynamic-form-container');
+                        const fieldOptions = fields.map(field => `<option value="${field.name}">${field.field_description}</option>`).join('');
+
+                        const andOrSelect = rowCount > 1 ? `<select name="and_or_row${rowCount}" class="form-control1" style="width: 10%%; margin-right: 10px;">
+                                                            <option value="AND">AND</option>
+                                                            <option value="OR">OR</option>
+                                                        </select>` : '';
+                                                        
+                        const newRow = document.createElement('div');
+                        newRow.className = 'form-row';
+                        newRow.innerHTML = `
+                            ${andOrSelect}
+                            <select name="field1_row${rowCount}" class="form-control1" style="width: 30%%; margin-right: 10px;">
+                                ${fieldOptions}
+                            </select>
+                        
+                            <select class="o_input o_generator_menu_operator" name="field2_row${rowCount}" >
+                                <option value="ilike">contains</option>
+                                <option value="not ilike">doesn't contain</option>
+                                <option value="=">is equal to</option>
+                                <option value="!=">is not equal to</option>
+                                <option value="!=">is set</option>
+                                <option value="=">is not set</option>
+                            </select>
+                
+                            <input type="text" name="field3_row${rowCount}" placeholder="Field 3">
+                        `;
+                        if (rowCount === 1) {
+                            newRow.style.marginLeft = '75px';
+                        }
+                        container.appendChild(newRow);
+                    }
+                
+                    addRow();
+                
+                    document.getElementById('add-row-btn').addEventListener('click', function () {
+                        addRow();
+                    });
+                
+                    // Handle form submission
+                    document.getElementById('dynamic-form').addEventListener('submit', function (e) {
+                        e.preventDefault();
+                
+                        const formData = new FormData(this);
+                
+                        fetch(this.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Success:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    });
+                });
+
+            </script>
+        '''% json.dumps(filter_fields_list)
         
-                                    </footer>
-                            </form>
+        template += '''
+            <div class="modal fade" id="modal-filter" tabindex="-1" role="dialog" aria-labelledby="modal-filter-label" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal-filter-label">Filter Options</h5>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
+                        <form method="post" action="/my/custom/search" id="dynamic-form">
+                            <div class="modal-body">
+                                <div id="dynamic-form-container">
+                                    <!-- Initial Row -->
+                                </div>
+                                <a type="button" class="" id="add-row-btn">New Rule</a>
+                            </div>
+                            <footer class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </footer>
+                        </form>
                     </div>
                 </div>
-            </template>
+            </div>
         '''
         # -------------------------------------------------------
 
@@ -636,14 +717,13 @@ class CustomerPortal(CustomerPortal):
         if service_id.is_create:
             template +=  "<a href='/my/model/record/" + str(service_id.id) + "/" + str(service_id.header_model_id.id) + "/0/0" + "' class='btn btn-primary pull-left' >Create " + str(service_id.name) + "</a>"
 
-        """
+        
         template += '''
             <a role="button" class="btn btn-secondary pull-left" data-bs-toggle="modal" data-bs-target="#modal-filter" href="#">
-                <i class="fa fa-check"/>Filter
+                Filter
             </a>                                
-        '''.format(
-        )
-        """
+        '''
+        
         
         template += "<br></br></t>"
         
