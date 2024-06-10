@@ -1553,6 +1553,9 @@ $(document).ready(function() {
         user = request.env.user
         
         message = kw.get('message')
+        #user_ids = kw.get('user_ids[]')
+        user_ids = request.httprequest.form.getlist('user_ids')
+
         
         service = request.env['hr.service'].sudo().browse(int(service_id))
         model = request.env['ir.model'].sudo().browse(int(model_id))
@@ -1562,23 +1565,7 @@ $(document).ready(function() {
         files = request.httprequest.files.getlist('attachments')
 
         attachment_files  = request.httprequest.files.getlist('attachments')
-        #attach = base64.strip('data:application/pdf;base64')
-        
-        #base64 = kw.get('file_attachments')
-        #attach = base64.strip('data:application/pdf;base64')
-        #Attachments = request.env['ir.attachment']
-        #raise UserError(str(attach))
         
         
-        #attachment_data = []
-        #for attachment in attachments:
-        #    attachment_data.append({
-        #        'name': attachment.filename,
-        #        'datas': base64.b64encode(attachment.read()),
-        #        'datas_fname': attachment.filename,
-        #        'res_model': model.model,
-        #        'res_id': record.id,
-        #    })
-        
-        service.create_message(model, record, user, message, attachment_files)
+        service.create_message(model, record, user, message, attachment_files, user_ids)
         return request.redirect('/my/model/record/%s/%s/%s' % (service.id,model.id, record.id))

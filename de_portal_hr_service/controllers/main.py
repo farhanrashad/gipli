@@ -239,7 +239,7 @@ class CustomerPortal(CustomerPortal):
         
         if service_sudo.allow_log_note:
             values.update({
-                'portal_hr_service_record_log_notes': self.portal_hr_service_record_log_notes(service_sudo,model_id, record_sudo)
+                'portal_hr_service_record_log_notes': self.portal_hr_service_record_log_notes(service_sudo,model_id, record_sudo,access_token)
             })
 
         if not record_sudo:
@@ -260,7 +260,7 @@ class CustomerPortal(CustomerPortal):
     # -------------------------------------------------------------
     # Custom html generation for log Notes
     # -------------------------------------------------------------
-    def portal_hr_service_record_log_notes(self,service_id, model_id, record_id):
+    def portal_hr_service_record_log_notes(self,service_id, model_id, record_id,access_token):
         log_output = ''
         log_output += '<div id="discussion" class="mt32">'
         messages = service_id._get_log_notes(record_id)
@@ -289,16 +289,15 @@ class CustomerPortal(CustomerPortal):
             '''
             for attach in message.attachment_ids:
                 log_output += '''
-                <div class="col-lg-2 col-md-3 col-sm-6">
-                    <div class=" mb-2 position-relative text-center" data-id="1287">
-                        <a href="/attachment/download?attachment_id={attach_id}" >
-                            <span t-esc="attach_id" class="fa fa-download">
-                                {attach_name}
-                            </span>
-                        </a>
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <div class="o_portal_chatter_attachment mb-2 position-relative text-left" data-id="1287">
+                            <a href='/web/content/{attach_id}?download=true&access_token={access_token}' title='Download'>
+                                <i class='fa fa-download'></i> {attach_name}
+                            </a>
+                        </div>
                     </div>
-                </div>
-            '''.format(attach_id=attach.id, attach_name=attach.name)
+                    '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(25, attach.id))
+                
             log_output += '''        
                 </div>
             </div>
@@ -340,16 +339,15 @@ class CustomerPortal(CustomerPortal):
             '''
             for attach in message.attachment_ids:
                 msg_output += '''
-                <div class="col-lg-2 col-md-3 col-sm-6">
-                    <div class=" mb-2 position-relative text-center" data-id="1287">
-                    <a href="/attachment/download?attachment_id={attach_id}">
-                        <span t-esc="attach_id" class="fa fa-download">
-                            {attach_name}
-                        </span>
-                    </a>
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <div class="o_portal_chatter_attachment mb-2 position-relative text-left" data-id="1287">
+                            <a href='/web/content/{attach_id}?download=true&access_token={access_token}' title='Download'>
+                                <i class='fa fa-download'></i> {attach_name}
+                            </a>
+                        </div>
                     </div>
-                </div>
-            '''.format(attach_id=attach.id, attach_name=attach.name)
+                    '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(25, attach.id))
+
             msg_output += '''        
                 </div>
             </div>
@@ -367,7 +365,25 @@ class CustomerPortal(CustomerPortal):
         <div class="o_portal_chatter_attachments mt32">        
             <div class="row">
         '''             
+        #at = service_id.sudo()._get_service_record_access_token(25,260919)
+        #raise UserError(at)
+        
+        #attach_output += '''
+        #<a href='/web/content/" + '260919' + "?download=true&access_token='" + at + " title='Dowload'><i class='fa fa-download'></i></a><br/><br/>'''.format(attach_id=attach.id, attach_name=attach.name, access_token=at)
+        
         for attach in attachments:
+            attach_output += '''
+            <div class="col-lg-2 col-md-3 col-sm-6">
+                <div class="o_portal_chatter_attachment mb-2 position-relative text-left" data-id="1287">
+                    <a href='/web/content/{attach_id}?download=true&access_token={access_token}' title='Download'>
+                        <i class='fa fa-download'></i> {attach_name}
+                    </a>
+                </div>
+            </div>
+            '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(25, attach.id))
+
+
+            """
             attach_output += '''
                 <div class="col-lg-2 col-md-3 col-sm-6">
                     <div class="o_portal_chatter_attachment mb-2 position-relative text-left" data-id="1287">
@@ -379,13 +395,55 @@ class CustomerPortal(CustomerPortal):
                     </div>
                 </div>
             '''.format(attach_id=attach.id, attach_name=attach.name)
-        attach_output += '''        
+            """
+        attach_output += '''
             </div>
         </div>
         '''
+
         # ----------- Message form ---------------
+        js_script = '''
+            <script type="text/javascript">
+                $(function () {
+                  $('select').each(function () {
+                    $(this).select2({
+                      theme: 'classic',
+                      width: 'style',
+                      placeholder: $(this).attr('placeholder'),
+                      allowClear: Boolean($(this).data('allow-clear')),
+                    });
+                  });
+                });
+            </script>
+        '''
         user_avatar = f"/web/image/res.partner/{request.env.user.partner_id.id}/avatar_128"
+        user_ids = request.env['res.users'].search([('active','=',True)])
+
+        user_html = '''
+        <label for="user_ids">Mentions</label>
+        <select id='{field_name}' name='{field_name}' data-model='{field_model}' data-field='name'  class='select2-dynamic-multiple selection-search form-control' multiple>
+        '''.format(
+                field_name='user_ids', 
+                field_model='res.users'
+            )
+        for user in user_ids:
+            user_html += "<option value='{id}'>{name}</option>".format(id=user.id, name=user.name)
+            
+        user_html += "</select>"
+
+        
         form_html = '''
+            
+        <link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />
+        <script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>
+        <script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+        <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet">
+        <link href="/de_portal_hr_service/static/src/select2-bootstrap4.css" rel="stylesheet" />
+        
+        
         <form 
                     action="/my/message/{service_id}/{model_id}/{record_id}" 
                     method="post" enctype="multipart/form-data" 
@@ -393,6 +451,8 @@ class CustomerPortal(CustomerPortal):
                     data-mark="*" data-success-page=""
                     t-att-id="'form' + str(service_id.id)"
                 >
+
+        
 
     <input type="hidden" class="form-control s_website_form_input" id="service_id" name="service_id" t-att-value="{service_id}" />
                             <input type="hidden" class="form-control s_website_form_input" id="model_id" name="model_id" t-att-value="{model_id}" />
@@ -411,6 +471,9 @@ class CustomerPortal(CustomerPortal):
                             <textarea rows="4" name="message" class="form-control" required="1" placeholder="Write a message..."></textarea>
                             <div class="o_portal_chatter_attachments mt-3"></div>
                             <div class="mt8">
+                                {user_html}
+                            </div>
+                            <div class="mt8">
                                 <button data-action="/mail/chatter_post" class="o_portal_chatter_composer_btn btn btn-primary" type="submit">Send</button>
                                 <input class="file" id="attachments" type="file" name="attachments" multiple="true" data-show-upload="true" data-show-caption="true" accept="image/*,application/pdf,video/*" />                            
                             </div>
@@ -425,7 +488,13 @@ class CustomerPortal(CustomerPortal):
         </div>
     </div>
     </form>
-    '''.format(service_id=service_id.id, model_id=model_id, record_id=record_id.id, user_avatar=user_avatar)
+    '''.format(
+            service_id=service_id.id, 
+            model_id=model_id, 
+            record_id=record_id.id, 
+            user_avatar=user_avatar,
+            user_html=user_html
+        )
 
         # -------------------- Generate Output -----------------------------
     
@@ -475,6 +544,7 @@ class CustomerPortal(CustomerPortal):
             '''.format(attach_output=attach_output)
                     
         output = '''
+        {js_script}
         <div class="mt-4">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 {messages_tab_link}
@@ -490,7 +560,8 @@ class CustomerPortal(CustomerPortal):
         '''.format(
             messages_tab_link=messages_tab_link, messages_tab_html=messages_tab_html,
             logs_tab_link=logs_tab_link, logs_tab_html=logs_tab_html,
-            attach_tab_link=attach_tab_link, attach_tab_html=attach_tab_html
+            attach_tab_link=attach_tab_link, attach_tab_html=attach_tab_html,
+            js_script=js_script
         )
         
         return output
@@ -537,12 +608,45 @@ class CustomerPortal(CustomerPortal):
 
         template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/main_datatable.js"></script>'
 
+        # ------------------ Filter Model -----------------------
+        template += '''
+            <template id="model_filter_template">
+                <div role="dialog" class="modal fade" id="modal-filter" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <header class="modal-header">
+                                <h4 class="modal-title">
+                                </h4>
+                            </header>
+                            <form method="post" >
+                                <footer class="modal-footer">
+                                        <button class="btn btn-primary">Close Ticket</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         
-        if service_id.is_create:
-            template += "<t class='col-lg-6 col-md-4 mb16 mt32'>"
-            template +=  "<a href='/my/model/record/" + str(service_id.id) + "/" + str(service_id.header_model_id.id) + "/0/0" + "' class='btn btn-primary pull-left' >Create " + str(service_id.name) + "</a>"
-            template += "<br></br></t>"
+                                    </footer>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        '''
+        # -------------------------------------------------------
 
+        template += "<t class='col-lg-6 col-md-4 mb16 mt32'>"
+        if service_id.is_create:
+            template +=  "<a href='/my/model/record/" + str(service_id.id) + "/" + str(service_id.header_model_id.id) + "/0/0" + "' class='btn btn-primary pull-left' >Create " + str(service_id.name) + "</a>"
+
+        """
+        template += '''
+            <a role="button" class="btn btn-secondary pull-left" data-bs-toggle="modal" data-bs-target="#modal-filter" href="#">
+                <i class="fa fa-check"/>Filter
+            </a>                                
+        '''.format(
+        )
+        """
+        
+        template += "<br></br></t>"
+        
         model_id = service_id.header_model_id.id
         # template += "<div class = 'card-body'>"
         template += "<table class='myTable mt-2 cell-border '>"
@@ -621,7 +725,7 @@ class CustomerPortal(CustomerPortal):
                 template +=    '<a href="/my/model/record/' + str(service_id.id) + '/' + str(service_id.header_model_id.id) + '/' + str(rec_id) + '">'
 
             if f.field_id.id == service_id.state_field_id.id:
-                template += '<span class="badge badge-pill badge-secondary">'
+                template += '<span class="">'
 
             """
             =================================================================================
@@ -716,7 +820,8 @@ class CustomerPortal(CustomerPortal):
             
             if header.field_type == 'many2one':
                 if header.field_model == 'ir.attachment':
-
+                    
+                    """
                     template += '''
                         <a href="/attachment/download?attachment_id={attach_id}">
                             <span t-esc="attach_id" class="fa fa-download">
@@ -724,6 +829,18 @@ class CustomerPortal(CustomerPortal):
                             </span>
                         </a>
                     '''.format(attach_id=record[eval("'" + header.field_name + "'")].id, attach_name=header.field_name)
+                    """
+
+                    #raise UserError(record[eval("'" + header.field_name + "'")])
+                    attachments = record[eval("'" + header.field_name + "'")] #service_id._get_attachments(record[eval("'" + header.field_name + "'")])
+                    for attach in attachments:
+                        a_token = service_id.sudo()._get_service_record_access_token(25, attach.id)
+                        template += '''
+                                <a href='/web/content/{attach_id}?download=true&access_token={access_token}' title='{attach_name}'>
+                                    <i class='fa fa-download'></i>
+                                </a>
+                        '''.format(attach_id=attach.id, attach_name=attach.name, access_token=a_token)
+                    
                     
                 else:
                     template += str(record[eval("'" + header.field_name + "'")].name) \

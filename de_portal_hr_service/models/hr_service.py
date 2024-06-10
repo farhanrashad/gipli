@@ -581,22 +581,42 @@ class HRService(models.Model):
         
         return changeable_field_values
 
-    def create_message(self, model, record, user, message, attachment_files=None):
+    def create_message(self, model, record, user, message, attachment_files=None, user_ids=None):
         attachment_ids = []
     
         if attachment_files:
             for attachment in attachment_files:
                 attached_file = attachment.read()
-                attachment_id = self.env['ir.attachment'].sudo().create({
-                    'name': attachment.filename,
-                    'res_model': model.model,
-                    'res_id': record.id,
-                    'type': 'binary',
-                    #'datas_fname': attachment.filename,
-                    'datas': base64.b64encode(attached_file).decode('ascii'),
-                })
-                attachment_ids.append(attachment_id.id)
+                if attached_file:  # Ensure the attachment is not empty
+                    attachment_id = self.env['ir.attachment'].sudo().create({
+                        'name': attachment.filename,
+                        'res_model': model.model,
+                        'res_id': record.id,
+                        'type': 'binary',
+                        'datas': base64.b64encode(attached_file).decode('ascii'),
+                    })
+                    attachment_ids.append(attachment_id.id)
+
+        # Create a linkable user list
+        user_links = ''
+        if user_ids:
+            follower_ids = []
+            for user_id in user_ids:
+                user_rec = self.env['res.users'].sudo().browse(int(user_id))
+                user_links += f'<a href="/web#model=res.partner&id={user_rec.partner_id.id}">{user_rec.partner_id.name}</a>, '
+                follower_ids.append(user_rec.partner_id.id)
             
+            # Remove the trailing comma and space
+            if user_links:
+                user_links = user_links[:-2]
+            
+            # Add users as followers of the document
+            record.message_subscribe(partner_ids=follower_ids)
+    
+        # Add users to the message body
+        if user_links:
+            message = f'{user_links}<br/><br/>{message}'
+        
         message_id = self.env['mail.message'].create({
             'body': message,
             'model': model.model,
@@ -607,7 +627,13 @@ class HRService(models.Model):
             'author_id': user.partner_id.id,
             'attachment_ids': [(6, 0, attachment_ids)]
         })
-        
+
+    def _get_service_record_access_token(self, model_id, record_id):
+        model = self.env['ir.model'].browse(int(model_id))
+        record = self.env[model.model].browse(record_id)
+        if not record.access_token:
+            return record.generate_access_token()
+        return record.access_token
     
 class HRServiceItems(models.Model):
     _name = 'hr.service.items'
