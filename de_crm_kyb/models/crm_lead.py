@@ -6,16 +6,19 @@ from odoo import api, fields, models, tools, SUPERUSER_ID
 class Lead(models.Model):
     _inherit = "crm.lead"
 
-    is_kyb = fields.Boolean(default=False)
+    is_kyb = fields.Boolean(default=False, compute='_compute_kyb', store=True)
     
     stage_id = fields.Many2one(
         'crm.stage', string='Stage', index=True, tracking=True,
-        compute='_compute_stage_id', readonly=False, store=True,
-        copy=False, group_expand='_read_group_stage_ids', ondelete='restrict',
+        compute='_compute_stage_id', 
+        readonly=False, store=True,
+        copy=False, 
+        group_expand='_read_group_stage_ids', 
+        ondelete='restrict',
         domain="[('id', 'in', stage_ids)]"
     )
     stage_ids = fields.Many2many('crm.stage', compute='_compute_conditional_tage_ids')
-
+    allow_verify = fields.Boolean(related='stage_id.allow_verify')
     
     usage_est_users = fields.Selection([
         ('1', 'Just Me'), 
@@ -51,14 +54,19 @@ class Lead(models.Model):
     trade_license = fields.Binary(string="Trade License")
     trade_license_filename = fields.Char(string="TL Filename")
 
+    @api.depends('team_id','stage_id')
+    def _compute_kyb(self):
+        for lead in self:
+            lead.is_kyb = lead.team_id.is_kyb
+            
     @api.depends('team_id', 'type','stage_ids','is_kyb')
     def _compute_stage_id(self):
         for lead in self:
             if not lead.stage_id:
-                if lead.team_id.is_kyb:
+                if lead.team_id.is_kyb or lead.is_kyb:
                     domain = [('is_kyb', '=', True)] if lead.team_id else [('fold', '=', False)]
                 else:
-                    domain = [('is_kyb', '=', False)] if lead.team_id else [('fold', '=', False)]
+                    domain = [('is_kyb', '!=', True)] if lead.team_id else [('fold', '=', False)]
                 lead.stage_id = lead._stage_find(domain=domain).id
 
     @api.model
@@ -69,13 +77,15 @@ class Lead(models.Model):
         # - OR ('team_ids', '=', team_id), ('fold', '=', False) if team_id: add team columns that are not folded
         team_id = self._context.get('default_team_id')
         team = self.env['crm.team'].browse(team_id)
+        search_domain = []
         if team:
             if team.is_kyb:
                 search_domain = [('is_kyb', '=', True)]
             else:
-                search_domain = ['|', ('id', 'in', stages.ids), '|', ('team_id', '=', False), ('team_id', '=', team_id),('is_kyb', '!=', True)]
-        else:
-            search_domain = ['|', ('id', 'in', stages.ids), ('team_id', '=', False)]
+                search_domain = [('is_kyb', '!=', True)]
+                #search_domain = ['|', ('id', 'in', stages.ids), '|', ('team_id', '=', False), ('team_id', '=', team_id),('is_kyb', '!=', True)]
+        #else:
+        #    search_domain = ['|', ('id', 'in', stages.ids), ('team_id', '=', 100)]
 
         # perform search
         stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
@@ -90,4 +100,7 @@ class Lead(models.Model):
             else:
                 stage_ids = self.env['crm.stage'].search([('is_kyb','!=',True)])
             record.stage_ids = stage_ids
+
+    def action_verification(self):
+        pass
 

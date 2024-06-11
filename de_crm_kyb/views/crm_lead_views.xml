@@ -8,6 +8,15 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <field name="is_kyb" invisible="1"/>
+                <field name="allow_verify" invisible="1"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_verification" string="Verify"
+                            type="object" class="oe_highlight" data-hotkey="w" title="Verify"
+                            invisible="not allow_verify"/>
+            </xpath>
             <xpath expr="//field[@name='stage_id']" position="replace">
                 <field name="stage_id" widget="statusbar_duration"
                             options="{'clickable': '1', 'fold_field': 'fold'}"
@@ -90,6 +99,20 @@
 
             
             
+        </field>
+    </record>
+
+    <!-- Kanban view -->
+    <record id="crm_case_kanban_view_leads_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.kanban.view.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="replace">
+                <field name="stage_ids" invisible="1" />
+                <field name="stage_id" domain="[('id', 'in', stage_ids)]"
+                    options='{"group_by_tooltip": {"requirements": "Description"}}'/>
+            </xpath>
         </field>
     </record>
     

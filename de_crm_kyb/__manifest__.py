@@ -26,7 +26,7 @@ Long description of module's purpose
         'data/ir_action_data.xml',
         'views/crm_team_views.xml',
         'views/crm_stage_views.xml',
-        'views/crm_views.xml',
+        'views/crm_lead_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

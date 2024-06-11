@@ -7,3 +7,6 @@ class Stage(models.Model):
     _inherit = "crm.stage"
 
     is_kyb = fields.Boolean(default=False)
+
+    allow_verify = fields.Boolean(default=False)
+    
