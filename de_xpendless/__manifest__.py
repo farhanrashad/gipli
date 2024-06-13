@@ -20,12 +20,11 @@ Long description of module's purpose
     # any module necessary for this one to work correctly
     'depends': ['base'],
 
-    # always loaded
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/menu_views.xml',
-        'views/templates.xml',
+        'views/instance_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
