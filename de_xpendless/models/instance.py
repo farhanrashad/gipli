@@ -22,7 +22,7 @@ class XplInstance(models.Model):
     name = fields.Char(string='Name', required=True, readonly=False, states=READONLY_FIELD_STATES)
     api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=False, states=READONLY_FIELD_STATES)
     url = fields.Char(string='URL', required=True, readonly=False, states=READONLY_FIELD_STATES)
-    url_sample = fields.Char(default='https://api.apollo.io/api/v1/')
+    url_sample = fields.Char(default='https://api.xpendless.com/')
     
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states=READONLY_FIELD_STATES, default=lambda self: self.env.company)
 
