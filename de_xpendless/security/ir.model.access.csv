@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_de_xpendless_de_xpendless,de_xpendless.de_xpendless,model_de_xpendless_de_xpendless,base.group_user,1,1,1,1
+access_xpendless_manager,xpendless.instance.manager,model_xpl_instance,de_xpendless.group_xpendless_manager,1,1,1,1
+access_xpendless_user,xpendless.user,model_xpl_instance,de_xpendless.group_xpendless_user,1,1,1,0
