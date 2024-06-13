@@ -26,6 +26,7 @@ Long description of module's purpose
         'views/menu_views.xml',
         'views/instance_views.xml',
         'views/res_partner_views.xml',
+        'views/expense_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

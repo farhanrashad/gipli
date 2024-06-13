@@ -10,21 +10,16 @@ import json
 from urllib.parse import urlparse
 
 
-READONLY_FIELD_STATES = {
-    state: [('readonly', True)]
-    for state in {'verified', 'active'}
-}
-
 class XplInstance(models.Model):
     _name = 'xpl.instance'
     _description = 'Xpendless Instance'
 
-    name = fields.Char(string='Name', required=True, readonly=False, states=READONLY_FIELD_STATES)
-    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=False, states=READONLY_FIELD_STATES)
-    url = fields.Char(string='URL', required=True, readonly=False, states=READONLY_FIELD_STATES)
+    name = fields.Char(string='Name', required=True, readonly=False)
+    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=False)
+    url = fields.Char(string='URL', required=True, readonly=False, )
     url_sample = fields.Char(default='https://api.xpendless.com/')
     
-    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, states=READONLY_FIELD_STATES, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, default=lambda self: self.env.company)
 
 
     state = fields.Selection([

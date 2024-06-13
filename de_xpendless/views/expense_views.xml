@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view -->
+        <record id="xpendless_expense_form_view" model="ir.ui.view">
+            <field name="name">xpendless.expense.form.view</field>
+            <field name="model">xpl.expense</field>
+            <field name="arch" type="xml">
+                <form string="Xpendless Expense">
+                    <header>
+                        <field name="state" widget="statusbar" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Xpendless Connection" force_save="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date" />
+                                
+                            </group>
+                            <group>
+                                <field name="partner_id" options="{'no_edit':True, 'no_create':True}" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    <!-- Tree view -->
+        <record id="xpendless_expense_tree_view" model="ir.ui.view">
+            <field name="name">xpendless.expense.tree.view</field>
+            <field name="model">xpl.expense</field>
+            <field name="arch" type="xml">
+                <tree string="Xpendless Instances">
+                    <field name="name"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+    
+    <record id="action_xpendless_expenses" model="ir.actions.act_window">
+            <field name="name">Xpendless Epenses</field>
+            <field name="res_model">xpl.expense</field>
+            <field name="view_mode">tree,form</field>
+    </record>
+    
+    <menuitem name="Expense" 
+        id="menu_xpendless_main_expense"
+        parent="menu_xpendless_main" 
+        action="action_xpendless_expenses"
+        sequence="100"
+    />
+    
+</odoo>
