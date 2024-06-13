@@ -13,7 +13,7 @@
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
                             <h1>
-                                <field name="name" placeholder="e.g. Xpendless Connection" force_save="1"/>
+                                <field name="name" placeholder="e.g. E091001" force_save="1"/>
                             </h1>
                         </div>
                         <group>
@@ -23,6 +23,7 @@
                             </group>
                             <group>
                                 <field name="partner_id" options="{'no_edit':True, 'no_create':True}" />
+                                <field name="xpl_id" />
                             </group>
                         </group>
                     </sheet>

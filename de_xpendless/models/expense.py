@@ -17,3 +17,4 @@ class Expenses(models.Model):
         ('active', 'Active')], 
         string='Status',default='draft', required=True
     )
+    xpl_id = fields.Char(string='XPL ID', required=True, readonly=True)
