@@ -572,17 +572,93 @@ class CustomerPortal(CustomerPortal):
     @http.route('/my/records/search', type='http', auth='public', website=True, csrf=False)
     def custom_search(self, **kw):
         search_params = []
+        
         for key, value in kw.items():
-            if key.startswith('field_'):
-                index = key.split('_')[1]
-                field = kw.get(f'field_{index}')
-                operator = kw.get(f'operator_{index}')
-                search_value = kw.get(f'value_{index}')
+            if key.startswith('field1_row'):
+                index = key.split('_')[1].replace('row', '')
+                field = kw.get(f'field1_row{index}')
+                operator = kw.get(f'field2_row{index}')
+                search_value = kw.get(f'field3_row{index}')
                 if field and operator and search_value:
                     search_params.append((field, operator, search_value))
+
+        service_id = kw.get('service_id')
+        service = request.env['hr.service'].browse(int(service_id))
+        
+        records = request.env['sale.order.line'].search([]) #search(search_params)
+            
+        records_data = [{'id': record.id, 'name': record.name} for record in records]
+
+        try:
+            service_sudo = self._document_check_access('hr.service', service, access_token)
+        except (AccessError, MissingError):
+            return request.redirect('/my')
+            
+
+        values = self._service_records_get_page_view_values(service_sudo, access_token, **kw)
+        values.update({
+            'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service_sudo),
+        })  
+        return request.render("de_portal_hr_service.portal_my_hr_service", values)
+        
+
+        #return request.make_response(json.dumps({'status': 'success', 'records': records_data}), headers={'Content-Type': 'application/json'})
+
+        """
+        return json.dumps({'status': 'success', 'records': search_params})
+        
+        service_id = kw.get('service_id')
+        service = request.env['hr.service'].browse(int(service_id))
+        
+        records = request.env[service_id.header_model_id.model].search(search_params)
+        
+        result = []
+        for record in records:
+            result.append({
+                'id': record.id,
+                'name': record.name,
+                # Add other necessary fields here
+            })
+        
+        return request.make_response(
+            json.dumps({'status': 'success', 'data': result}),
+            headers=[('Content-Type', 'application/json')]
+        )
+
+        """
+        #return json.dumps({'status': 'success', 'records': 1})
+
+        
+        """
+        service_id = form_data.get('service_id')
+        service = request.env['hr.service'].browse(int(service_id)) if service_id else None
+
+        records = request.env[service.header_model_id.model].search(search_params) if service else []
+
+        record_list = []
+        for record in records:
+            record_list.append({
+                'id': record.id,
+                'name': record.name,  # Adjust field names as necessary
+                # Add more fields as required
+            })
+
+        """
+        # raise UserError(str(form_elements))
+        #return json.dumps({'status': 'success', 'records': form_data})
+
+        
         # Perform search with search_params
-        records = request.env['your.model'].search(search_params)
-        return request.render('your_module.template_id', {'records': records})
+        #records = request.env['your.model'].search(search_params)
+        #return request.render('your_module.template_id', {'records': records})
+
+    
+        #values = self._service_records_get_page_view_values(service_sudo, access_token, **kw)
+        #values.update({
+        #    'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service_sudo),
+        #})  
+        #return request.render("de_portal_hr_service.portal_my_hr_service", values)
+        
 
         
     # -------------------------------------------
@@ -608,7 +684,24 @@ class CustomerPortal(CustomerPortal):
         records = request.env[service_id.header_model_id.model].sudo().browse(service_id._get_records_filter_by_domain(request.env.user.partner_id.id))
 
 
-      
+
+        template += '''
+
+            <link href="/de_portal_hr_service/static/src/datatable.css" rel="stylesheet" />
+            <link href="/de_portal_hr_service/static/src/datatable_export_button.css" rel="stylesheet" />
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/datatable.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_buttons.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_jszip.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_pdfmake.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_vfs_fonts.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_btn_html5.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_print.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_select.js"></script>
+            <script type="text/javascript" src="/de_portal_hr_service/static/src/js/main_datatable.js"></script>
+            
+        '''
+        """
         template += '<link href="/de_portal_hr_service/static/src/datatable.css" rel="stylesheet" />'
         template += '<link href="/de_portal_hr_service/static/src/datatable_export_button.css" rel="stylesheet" />'
         template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
@@ -623,10 +716,12 @@ class CustomerPortal(CustomerPortal):
         template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/js_export/datatable_select.js"></script>'
 
         template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/main_datatable.js"></script>'
+        """
 
         # ------------------ Filter Model -----------------------
         filter_fields = request.env['ir.model.fields'].sudo().search([
-            ('model_id', '=', service_id.header_model_id.id)
+            ('model_id', '=', service_id.header_model_id.id),
+            ('store','=',True)
         ])
         filter_fields_list = [{'name': field.name, 'field_description': field.field_description} for field in filter_fields]
     
@@ -665,7 +760,7 @@ class CustomerPortal(CustomerPortal):
                                 <option value="=">is not set</option>
                             </select>
                 
-                            <input type="text" class="form-control" style="width: 300px; margin-right: 10px;" name="field3_row${rowCount}" placeholder="Field 3">
+                            <input type="text" class="form-control" style="width: 300px; margin-right: 10px;" name="field3_row${rowCount}" placeholder="Value">
                             </div>
                         `;
                         if (rowCount === 1) {
@@ -679,12 +774,31 @@ class CustomerPortal(CustomerPortal):
                     document.getElementById('add-row-btn').addEventListener('click', function () {
                         addRow();
                     });
-                
+
+
+                    // Handle form submission
                     // Handle form submission
                     document.getElementById('dynamic-form').addEventListener('submit', function (e) {
                         e.preventDefault();
+                        
+                        // Create a FormData object
+                        const formData = new FormData();
+                        
+                        // Append service_id
+                        formData.append('service_id', document.getElementById('service_id').value);
                 
-                        const formData = new FormData(this);
+                        // Append dynamically generated form fields
+                        for (let i = 1; i <= rowCount; i++) {
+                            const andOr = document.querySelector(`[name="and_or_row${i}"]`);
+                            const field1 = document.querySelector(`[name="field1_row${i}"]`);
+                            const field2 = document.querySelector(`[name="field2_row${i}"]`);
+                            const field3 = document.querySelector(`[name="field3_row${i}"]`);
+                
+                            if (andOr) formData.append(`and_or_row${i}`, andOr.value);
+                            if (field1) formData.append(`field1_row${i}`, field1.value);
+                            if (field2) formData.append(`field2_row${i}`, field2.value);
+                            if (field3) formData.append(`field3_row${i}`, field3.value);
+                        }
                 
                         fetch(this.action, {
                             method: 'POST',
@@ -693,12 +807,16 @@ class CustomerPortal(CustomerPortal):
                         .then(response => response.json())
                         .then(data => {
                             console.log('Success:', data);
+                            // Close the modal after successful form submission
                             $('#modal-filter').modal('hide');
                         })
                         .catch(error => {
                             console.error('Error:', error);
                         });
                     });
+        
+                
+                    
                 });
 
             </script>
@@ -714,7 +832,10 @@ class CustomerPortal(CustomerPortal):
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
+                        
                         <form method="post" action="/my/records/search" id="dynamic-form">
+                            <input type="hidden" id="service_id" name="service_id" value="{service_id}" />
+
                             <div class="modal-body">
                                 <div id="dynamic-form-container">
                                     <!-- Initial Row -->
@@ -729,7 +850,9 @@ class CustomerPortal(CustomerPortal):
                     </div>
                 </div>
             </div>
-        '''
+        '''.format(
+            service_id=service_id.id,
+        )
         # -------------------------------------------------------
 
         template += "<t class='col-lg-6 col-md-4 mb16 mt32'>"
