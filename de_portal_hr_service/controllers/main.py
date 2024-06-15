@@ -572,6 +572,8 @@ class CustomerPortal(CustomerPortal):
     @http.route('/my/records/search', type='http', auth='public', website=True, csrf=False)
     def custom_search(self, **kw):
         search_params = []
+
+        raise UserError(kw)
         
         for key, value in kw.items():
             if key.startswith('field1_row'):
@@ -595,6 +597,8 @@ class CustomerPortal(CustomerPortal):
             return request.redirect('/my')
             
 
+        return request.redirect('/my')
+        
         values = self._service_records_get_page_view_values(service_sudo, access_token, **kw)
         values.update({
             'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service_sudo),
@@ -777,7 +781,46 @@ class CustomerPortal(CustomerPortal):
 
 
                     // Handle form submission
+                    document.getElementById('dynamic-form').addEventListener('submit', function (e) {
+                        e.preventDefault();
+            
+                        // Create a FormData object
+                        const formData = new FormData(this);
+            
+                        // Append dynamically generated form fields
+                        for (let i = 1; i <= rowCount; i++) {
+                            const andOr = document.querySelector(`[name="and_or_row${i}"]`);
+                            const field1 = document.querySelector(`[name="field1_row${i}"]`);
+                            const field2 = document.querySelector(`[name="field2_row${i}"]`);
+                            const field3 = document.querySelector(`[name="field3_row${i}"]`);
+            
+                            if (andOr) formData.append(`and_or_row${i}`, andOr.value);
+                            if (field1) formData.append(`field1_row${i}`, field1.value);
+                            if (field2) formData.append(`field2_row${i}`, field2.value);
+                            if (field3) formData.append(`field3_row${i}`, field3.value);
+                        }
+            
+                        // Create a form element to submit the data
+                        const formElement = document.createElement('form');
+                        formElement.style.display = 'none';
+                        formElement.method = 'POST';
+                        formElement.action = this.action;
+            
+                        formData.forEach((value, key) => {
+                            const inputElement = document.createElement('input');
+                            inputElement.type = 'hidden';
+                            inputElement.name = key;
+                            inputElement.value = value;
+                            formElement.appendChild(inputElement);
+                        });
+            
+                        document.body.appendChild(formElement);
+                        formElement.submit();
+                    });
+
+    
                     // Handle form submission
+                    /**
                     document.getElementById('dynamic-form').addEventListener('submit', function (e) {
                         e.preventDefault();
                         
@@ -800,6 +843,7 @@ class CustomerPortal(CustomerPortal):
                             if (field3) formData.append(`field3_row${i}`, field3.value);
                         }
                 
+                        
                         fetch(this.action, {
                             method: 'POST',
                             body: formData
@@ -809,12 +853,15 @@ class CustomerPortal(CustomerPortal):
                             console.log('Success:', data);
                             // Close the modal after successful form submission
                             $('#modal-filter').modal('hide');
+                            let queryParams = new URLSearchParams(formData).toString();
+                            window.location.href = `/my/records/search_results?${queryParams}`;
                         })
                         .catch(error => {
                             console.error('Error:', error);
                         });
+                        
                     });
-        
+                **/
                 
                     
                 });
