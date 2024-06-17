@@ -572,24 +572,40 @@ class CustomerPortal(CustomerPortal):
     @http.route('/my/records/search', type='http', auth='public', website=True, csrf=False)
     def custom_search(self, **kw):
         search_params = []
-
-        raise UserError(kw)
-        
+        current_condition = '&'  # Default condition
+    
         for key, value in kw.items():
-            if key.startswith('field1_row'):
+            if key.startswith('and_or_row'):
+                current_condition = value
+            elif key.startswith('field1_row'):
                 index = key.split('_')[1].replace('row', '')
                 field = kw.get(f'field1_row{index}')
                 operator = kw.get(f'field2_row{index}')
                 search_value = kw.get(f'field3_row{index}')
                 if field and operator and search_value:
+                    # Add the current condition before the new search parameter
+                    if search_params:
+                        search_params.append(current_condition)
                     search_params.append((field, operator, search_value))
-
+        
+        # Convert search_params to the format expected by Odoo
+        domain = []
+        for param in search_params:
+            if isinstance(param, str):
+                domain.append(param)  # Add the condition (& or |)
+            else:
+                domain.append(param)
+    
+        
+        
         service_id = kw.get('service_id')
         service = request.env['hr.service'].browse(int(service_id))
         
-        records = request.env['sale.order.line'].search([]) #search(search_params)
+        records = request.env[service.header_model_id.model].search(search_params)
             
         records_data = [{'id': record.id, 'name': record.name} for record in records]
+
+        raise UserError(str(records))  # For debugging, remove this in production
 
         try:
             service_sudo = self._document_check_access('hr.service', service, access_token)
@@ -597,7 +613,6 @@ class CustomerPortal(CustomerPortal):
             return request.redirect('/my')
             
 
-        return request.redirect('/my')
         
         values = self._service_records_get_page_view_values(service_sudo, access_token, **kw)
         values.update({
@@ -741,8 +756,8 @@ class CustomerPortal(CustomerPortal):
                         const fieldOptions = fields.map(field => `<option value="${field.name}">${field.field_description}</option>`).join('');
 
                         const andOrSelect = rowCount > 1 ? `<select name="and_or_row${rowCount}" class="form-control" style="width: 100px; margin-right: 10px;">
-                                                            <option value="AND">AND</option>
-                                                            <option value="OR">OR</option>
+                                                            <option value="&">AND</option>
+                                                            <option value="|">OR</option>
                                                         </select>` : '';
                                                         
                         const newRow = document.createElement('div');
