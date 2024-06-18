@@ -402,6 +402,37 @@ class CustomerPortal(CustomerPortal):
         </div>
         '''
 
+        # ----------- activities ----------------
+        activities_output = ''
+        activities = service_id._get_activities(record_id)
+
+        activities_output += """
+            <table class='itemsTable table table-sm'>
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Activity Type</th>
+                        <th>Assigned To</th>
+                        <th>Due On</th>
+                        <th>Summary</th>
+                    </tr>
+                </thead>
+                <tbody>
+            
+        """
+        for activity in activities:
+            activities_output += "<tr>"
+            activities_output += f'<td class="mb-1">{activity.display_name}</td>'
+            activities_output += f'<td class="mb-1">{activity.activity_type_id.name}</td>'
+            activities_output += f'<td class="mb-1">{activity.user_id.partner_id.name}</td>'
+            activities_output += f'<td class="mb-1">{activity.date_deadline}</td>'
+            activities_output += f'<td class="mb-1">{activity.summary}</td>'
+            activities_output += "</tr>"
+        activities_output += """
+            </tbody>
+            </table>
+        """
+        
         # ----------- Message form ---------------
         js_script = '''
             <script type="text/javascript">
@@ -543,6 +574,18 @@ class CustomerPortal(CustomerPortal):
                 {attach_output}
             </div>
             '''.format(attach_output=attach_output)
+
+        if service_id.show_activities:
+            activities_tab_link = '''
+            <li class="nav-item">
+                <a class="nav-link" id="attach-tab" data-toggle="tab" href="#activities" role="tab" aria-controls="activities" aria-selected="">Activities</a>
+            </li>
+            '''
+            activities_tab_html = '''
+            <div class="tab-pane fade" id="activities" role="tabpanel" aria-labelledby="activities-tab">
+                {activities_output}
+            </div>
+            '''.format(activities_output=activities_output)
                     
         output = '''
         {js_script}
@@ -551,17 +594,20 @@ class CustomerPortal(CustomerPortal):
                 {messages_tab_link}
                 {logs_tab_link}
                 {attach_tab_link}
+                {activities_tab_link}
             </ul>
             <div class="tab-content" id="myTabContent">
                 {messages_tab_html}
                 {logs_tab_html}
                 {attach_tab_html}
+                {activities_tab_html}
             </div>
         </div>
         '''.format(
             messages_tab_link=messages_tab_link, messages_tab_html=messages_tab_html,
             logs_tab_link=logs_tab_link, logs_tab_html=logs_tab_html,
             attach_tab_link=attach_tab_link, attach_tab_html=attach_tab_html,
+            activities_tab_link=activities_tab_link, activities_tab_html=activities_tab_html,
             js_script=js_script
         )
         

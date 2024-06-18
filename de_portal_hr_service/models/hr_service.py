@@ -48,9 +48,11 @@ class HRService(models.Model):
     is_edit = fields.Boolean(string='Edit', help='Allow record edition', states=READONLY_STATES,)
     allow_messages = fields.Boolean(string='Allow Messages', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='Allow messages to user on portal')
 
-    allow_log_note = fields.Boolean(string='Allow Log Note', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='Allow Log Note to user on portal')
+    allow_log_note = fields.Boolean(string='Allow Log Note', store=True, compute='_compute_allow_log_note', readonly=False, states=READONLY_STATES, help='Allow Log Note to user on portal')
 
-    show_attachment = fields.Boolean(string='Show Attachments', store=True, compute='_compute_allow_messages', readonly=False, states=READONLY_STATES, help='show attachment on portal')
+    show_attachment = fields.Boolean(string='Show Attachments', store=True, compute='_compute_show_attachment', readonly=False, states=READONLY_STATES, help='show attachment on portal')
+
+    show_activities = fields.Boolean(string='Show Activities', store=True, compute='_compute_show_activities', readonly=False, states=READONLY_STATES, help='show activities on portal')
 
     
     @api.onchange('allow_messages')
@@ -170,6 +172,19 @@ class HRService(models.Model):
                 
         #raise UserError(_(vals))
         self.write({'state': 'publish'})
+
+        if self.show_activities:
+            self._compute_show_activities()
+
+        if self.allow_messages:
+            self._compute_allow_messages()
+
+        if self.allow_log_note:
+            self._compute_allow_log_note()
+
+        if self.show_attachment:
+            self._compute_show_attachment()
+            
         return {}
 
     
@@ -180,16 +195,50 @@ class HRService(models.Model):
     def _compute_allow_messages(self):
         records = 0
         for service in self:
-            service.allow_messages = False
-            service.allow_log_note = False
-            service.show_attachment = False
-            
-            records = self.env['ir.model.fields'].search_count([('model_id','=',service.header_model_id.id),('name','=','website_message_ids')])
+            service.allow_messages = False            
+            records = self.env['ir.model.fields'].search_count([
+                ('model_id','=',service.header_model_id.id),
+                ('relation','=','mail.message')
+            ],limit=1)
             if records:
                 service.allow_messages = True
+
+    @api.depends('header_model_id')
+    def _compute_allow_log_note(self):
+        records = 0
+        for service in self:
+            service.allow_log_note = False
+            
+            records = self.env['ir.model.fields'].search_count([
+                ('model_id','=',service.header_model_id.id),
+                ('relation','=','mail.message')
+            ],limit=1)
+            if records:
                 service.allow_log_note = True
+
+    @api.depends('header_model_id')
+    def _compute_show_attachment(self):
+        records = 0
+        for service in self:
+            service.show_attachment = False
+            records = self.env['ir.model.fields'].search_count([
+                ('model_id','=',service.header_model_id.id),
+                ('relation','=','mail.message')
+            ],limit=1)
+            if records:
                 service.show_attachment = True
-                
+
+    @api.depends('header_model_id')
+    def _compute_show_activities(self):
+        for record in self:
+            field = self.env['ir.model.fields'].search([
+                ('model_id','=',record.header_model_id.id),
+                ('relation','=', 'mail.activity'),
+            ],limit=1)
+            if field:
+                record.show_activities = True
+            else:
+                record.show_activities = False
 
     def get_record_count(self, user_id):
         domain = []
@@ -242,6 +291,15 @@ class HRService(models.Model):
             ('res_model','=',self.header_model_id.model),
         ])
         return attachment_ids
+
+    def _get_activities(self, record_id):
+        for record in self:
+            field = self.env['ir.model.fields'].search([
+                ('model_id','=',record.header_model_id.id),
+                ('relation','=', 'mail.activity'),
+            ],limit=1)
+            activities = record_id[field.name]
+            return activities
 
     #def get_field_value_from_expression(self, model_id, field_model, field_name, field_value, changeable_field_name):
     def get_field_value_from_expression(self,model_id,changeable_field_ids):

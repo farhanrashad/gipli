@@ -125,6 +125,7 @@
                             <field name="allow_messages" />
                             <field name="allow_log_note" />
                             <field name="show_attachment" />
+                            <field name="show_activities" />
                         </group>
                     </group>
                         
