@@ -573,6 +573,12 @@ class CustomerPortal(CustomerPortal):
     def custom_search(self, **kw):
         search_params = []
         current_condition = '&'  # Default condition
+
+        service_id = kw.get('service_id')
+        service = request.env['hr.service'].browse(int(service_id))
+
+        fields = request.env['ir.model.fields'].search([('model', '=', service.header_model_id.model)])
+        field_types = {field.name: field.ttype for field in fields}
     
         for key, value in kw.items():
             if key.startswith('and_or_row'):
@@ -582,11 +588,32 @@ class CustomerPortal(CustomerPortal):
                 field = kw.get(f'field1_row{index}')
                 operator = kw.get(f'field2_row{index}')
                 search_value = kw.get(f'field3_row{index}')
-                if field and operator and search_value:
-                    # Add the current condition before the new search parameter
+                # if field and operator and search_value:
+                #    if search_params:
+                #        search_params.append(current_condition)
+                #    search_params.append((field, operator, search_value))
+                
+                if field and operator:
                     if search_params:
                         search_params.append(current_condition)
-                    search_params.append((field, operator, search_value))
+                    if operator == '0':
+                        search_params.append((field, '=', False))
+                    elif operator == '1':
+                        search_params.append((field, '=', True))
+                    else:
+                        field_type = field_types.get(field)
+                        if field_type in ['integer', 'float', 'monetary']:
+                            try:
+                                if field_type == 'integer':
+                                    search_value = int(search_value.replace(',', '').replace(' ', ''))
+                                elif field_type == 'float' or field_type == 'monetary':
+                                    search_value = float(search_value.replace(',', '').replace(' ', ''))
+                            except ValueError:
+                                # Skip this condition if conversion fails
+                                continue
+                        search_params.append((field, operator, search_value))
+                    
+                    
         
         # Convert search_params to the format expected by Odoo
         domain = []
@@ -598,28 +625,11 @@ class CustomerPortal(CustomerPortal):
     
         
         
-        service_id = kw.get('service_id')
-        service = request.env['hr.service'].browse(int(service_id))
         
-        #records = request.env[service.header_model_id.model].sudo().search(search_params)
-
-        #records = request.env[service.header_model_id.model].search([('state', '=', 'draft')])
         
-        #records_data = [{'id': record.id, 'name': record.name} for record in records]
-
-        # Debug: Check if sample domain works
-        #sample_records = request.env['sale.order'].sudo().search([('state', '=', 'sale')])
-        
-
         records = service.sudo()._get_records_search_by_domain(search_params)
         #sample_records = request.env[service.header_model_id.model].sudo().browse(records)
-        #raise UserError(str(sample_records))
-
-        #try:
-        #    service_sudo = self._document_check_access('hr.service', service, access_token)
-        #except (AccessError, MissingError):
-        #    return request.redirect('/my')
-            
+        #raise UserError(str(search_params))
 
         
         values = self._service_records_get_page_view_values(service, access_token=False, **kw)
@@ -739,8 +749,8 @@ class CustomerPortal(CustomerPortal):
                                 <option value="not ilike">doesn't contain</option>
                                 <option value="=">is equal to</option>
                                 <option value="!=">is not equal to</option>
-                                <option value="!=">is set</option>
-                                <option value="=">is not set</option>
+                                <option value="1">is set</option>
+                                <option value="0">is not set</option>
                             </select>
                 
                             <input type="text" class="form-control" style="width: 300px; margin-right: 10px;" name="field3_row${rowCount}" placeholder="Value">
@@ -750,6 +760,19 @@ class CustomerPortal(CustomerPortal):
                             newRow.style.marginLeft = '66px';
                         }
                         container.appendChild(newRow);
+
+                        // Add event listener for field2
+                        const field2Select = newRow.querySelector(`[name="field2_row${rowCount}"]`);
+                        const field3Input = newRow.querySelector(`[name="field3_row${rowCount}"]`);
+                        field2Select.addEventListener('change', function () {
+                            if (this.value === '0' || this.value === '1') {
+                                field3Input.style.display = 'none';
+                                field3Input.value = null;
+                            } else {
+                                field3Input.style.display = 'block';
+                            }
+                        });
+                
                     }
                 
                     addRow();
