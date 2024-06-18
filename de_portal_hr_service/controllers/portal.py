@@ -1569,3 +1569,34 @@ $(document).ready(function() {
         
         service.create_message(model, record, user, message, attachment_files, user_ids)
         return request.redirect('/my/model/record/%s/%s/%s' % (service.id,model.id, record.id))
+
+
+    @http.route('/my/record/schedule-activity', type='http', auth='public', website=True, csrf=False)
+    def schedule_activity(self, **kwargs):
+        service_id = int(kwargs.get('service_id'))
+        record_id = int(kwargs.get('record_id'))
+        model_id = int(kwargs.get('model_id'))
+        activity_type_id = int(kwargs.get('activity_type'))
+        due_date = kwargs.get('due_date')
+        summary = kwargs.get('summary')
+        user_id = kwargs.get('user_id')
+        details = kwargs.get('details')
+            
+        if due_date:
+            due_date = datetime.datetime.strptime(due_date, '%Y-%m-%d')
+            
+        model = request.env['ir.model'].browse(model_id).model
+
+        # Create the activity
+        activity_vals = {
+                'res_model_id': model_id,
+                'res_id': record_id,
+                'activity_type_id': activity_type_id,
+                'summary': summary,
+                'user_id': user_id,
+                'note': details,
+                'date_deadline': due_date,
+        }
+        
+        request.env['mail.activity'].sudo().create(activity_vals)
+        return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))

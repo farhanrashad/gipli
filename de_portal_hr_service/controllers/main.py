@@ -407,6 +407,14 @@ class CustomerPortal(CustomerPortal):
         # =======================================================================================
         # --------------------- Activity model --------------------------------
         activities_output = ''
+
+        activity_types = service_id.sudo()._get_activity_types(model_id)
+        activity_options = ''.join(f'<option value="{activity.id}">{activity.name}</option>' for activity in activity_types)
+
+        users = service_id.sudo()._get_users_list()
+        user_options = ''.join(f'<option value="{user.id}">{user.partner_id.name}</option>' for user in users)
+
+        #raise UserError(activity_types.mapped('name'))
         
         activities_output += '''
             <div class="modal fade" id="modal-activity" tabindex="-1" role="dialog" aria-labelledby="modal-activity-label" aria-hidden="true">
@@ -419,14 +427,44 @@ class CustomerPortal(CustomerPortal):
                             </button>
                         </div>
                         
-                        <form method="post" action="/my/record/scedule-acitivity" id="dynamic-form">
+                        <form method="post" action="/my/record/schedule-activity" id="dynamic-form">
                             <input type="hidden" id="service_id" name="service_id" value="{service_id}" />
                             <input type="hidden" id="record_id" name="record_id" value="{record_id}" />
                             <input type="hidden" id="model_id" name="model_id" value="{model_id}" />
 
                             <div class="modal-body">
                                 <div id="activity-form-container">
-                                    <!-- Initial Row -->
+                                    <div class="form-group">
+                                        <label for="activity_type">Activity Type</label>
+                                        <select class="form-control" id="activity_type" required="1" name="activity_type">
+                                            {activity_options}
+                                        </select>
+                                    </div>
+
+                                    <!-- Due Date Field -->
+                                    <div class="form-group">
+                                        <label for="due_date">Due Date</label>
+                                        <input type="date" class="form-control" required="1" id="due_date" name="due_date">
+                                    </div>
+                                    <!-- Summary Field -->
+                                    <div class="form-group">
+                                        <label for="summary">Summary</label>
+                                        <input type="text" class="form-control" required="1" id="summary" name="summary">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="user_id">Assigned to</label>
+                                        <select class="form-control" id="user_id" required="1" name="user_id">
+                                            {user_options}
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Details Field -->
+                                    <div class="form-group">
+                                        <label for="details">Details</label>
+                                        <textarea class="form-control" id="details" name="details" rows="4"></textarea>
+                                    </div>
+                            
                                 </div>
                             </div>
                             <footer class="modal-footer">
@@ -440,10 +478,11 @@ class CustomerPortal(CustomerPortal):
         '''.format(
             service_id=service_id.id,
             model_id=model_id,
-            record_id=record_id.id
+            record_id=record_id.id,
+            activity_options=activity_options,
+            user_options=user_options
         )
-        activity_types = service_id._get_activity_types(model_id)
-        raise UserError(activity_types)
+        
         activities = service_id._get_activities(record_id)
 
         activities_output += """
