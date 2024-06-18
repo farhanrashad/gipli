@@ -402,8 +402,48 @@ class CustomerPortal(CustomerPortal):
         </div>
         '''
 
+        # =======================================================================================
         # ----------- activities ----------------
+        # =======================================================================================
+        # --------------------- Activity model --------------------------------
         activities_output = ''
+        
+        activities_output += '''
+            <div class="modal fade" id="modal-activity" tabindex="-1" role="dialog" aria-labelledby="modal-activity-label" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal-activity-label">Schedule Activity</h5>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        
+                        <form method="post" action="/my/record/scedule-acitivity" id="dynamic-form">
+                            <input type="hidden" id="service_id" name="service_id" value="{service_id}" />
+                            <input type="hidden" id="record_id" name="record_id" value="{record_id}" />
+                            <input type="hidden" id="model_id" name="model_id" value="{model_id}" />
+
+                            <div class="modal-body">
+                                <div id="activity-form-container">
+                                    <!-- Initial Row -->
+                                </div>
+                            </div>
+                            <footer class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Schedule</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </footer>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        '''.format(
+            service_id=service_id.id,
+            model_id=model_id,
+            record_id=record_id.id
+        )
+        activity_types = service_id._get_activity_types(model_id)
+        raise UserError(activity_types)
         activities = service_id._get_activities(record_id)
 
         activities_output += """
@@ -432,6 +472,13 @@ class CustomerPortal(CustomerPortal):
             </tbody>
             </table>
         """
+        activities_output += """
+            <a role="button" class="btn btn-primary pull-left" data-bs-toggle="modal" data-bs-target="#modal-activity" href="#">
+                Schedule Activity
+            </a>     
+            
+        """
+        
         
         # ----------- Message form ---------------
         js_script = '''

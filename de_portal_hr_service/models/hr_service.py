@@ -300,6 +300,13 @@ class HRService(models.Model):
             ],limit=1)
             activities = record_id[field.name]
             return activities
+            
+    def _get_activity_types(self, model_id):
+        model = self.env['ir.model'].browse(model_id)
+        types = self.env['mail.activity.type'].search([
+            ('res_model','=', self.header_model_id.model),
+        ])
+        return types
 
     #def get_field_value_from_expression(self, model_id, field_model, field_name, field_value, changeable_field_name):
     def get_field_value_from_expression(self,model_id,changeable_field_ids):
