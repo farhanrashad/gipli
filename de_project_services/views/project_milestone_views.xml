@@ -1,0 +1,13 @@
+<odoo>
+    <record id="project_milestone_view_tree_inherit" model="ir.ui.view">
+        <field name="name">project.milestone.view.tree.inherit</field>
+        <field name="model">project.milestone</field>
+        <field name="inherit_id" ref="project.project_milestone_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="is_service_project_template" column_invisible="1"/>
+                <field name="days_completion" invisible="not is_service_project_template"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
