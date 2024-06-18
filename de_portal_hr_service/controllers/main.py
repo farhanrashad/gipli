@@ -105,7 +105,7 @@ class CustomerPortal(CustomerPortal):
         #raise UserError(str(service_sudo.name))
         values = self._service_records_get_page_view_values(service_sudo, access_token, **kw)
         values.update({
-            'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service_sudo),
+            'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service_sudo,[]),
         })
 
         service_id = request.env['hr.service'].sudo().search([('id','=',service_id)],limit=1)
@@ -601,90 +601,49 @@ class CustomerPortal(CustomerPortal):
         service_id = kw.get('service_id')
         service = request.env['hr.service'].browse(int(service_id))
         
-        records = request.env[service.header_model_id.model].search(search_params)
-            
-        records_data = [{'id': record.id, 'name': record.name} for record in records]
+        #records = request.env[service.header_model_id.model].sudo().search(search_params)
 
-        raise UserError(str(records))  # For debugging, remove this in production
+        #records = request.env[service.header_model_id.model].search([('state', '=', 'draft')])
+        
+        #records_data = [{'id': record.id, 'name': record.name} for record in records]
 
-        try:
-            service_sudo = self._document_check_access('hr.service', service, access_token)
-        except (AccessError, MissingError):
-            return request.redirect('/my')
+        # Debug: Check if sample domain works
+        #sample_records = request.env['sale.order'].sudo().search([('state', '=', 'sale')])
+        
+
+        records = service.sudo()._get_records_search_by_domain(search_params)
+        #sample_records = request.env[service.header_model_id.model].sudo().browse(records)
+        #raise UserError(str(sample_records))
+
+        #try:
+        #    service_sudo = self._document_check_access('hr.service', service, access_token)
+        #except (AccessError, MissingError):
+        #    return request.redirect('/my')
             
 
         
-        values = self._service_records_get_page_view_values(service_sudo, access_token, **kw)
+        values = self._service_records_get_page_view_values(service, access_token=False, **kw)
         values.update({
-            'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service_sudo),
+            'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service,records),
         })  
         return request.render("de_portal_hr_service.portal_my_hr_service", values)
         
 
         #return request.make_response(json.dumps({'status': 'success', 'records': records_data}), headers={'Content-Type': 'application/json'})
 
-        """
-        return json.dumps({'status': 'success', 'records': search_params})
+        # return json.dumps({'status': 'success', 'records': search_params})
         
-        service_id = kw.get('service_id')
-        service = request.env['hr.service'].browse(int(service_id))
         
-        records = request.env[service_id.header_model_id.model].search(search_params)
         
-        result = []
-        for record in records:
-            result.append({
-                'id': record.id,
-                'name': record.name,
-                # Add other necessary fields here
-            })
-        
-        return request.make_response(
-            json.dumps({'status': 'success', 'data': result}),
-            headers=[('Content-Type', 'application/json')]
-        )
-
-        """
-        #return json.dumps({'status': 'success', 'records': 1})
-
-        
-        """
-        service_id = form_data.get('service_id')
-        service = request.env['hr.service'].browse(int(service_id)) if service_id else None
-
-        records = request.env[service.header_model_id.model].search(search_params) if service else []
-
-        record_list = []
-        for record in records:
-            record_list.append({
-                'id': record.id,
-                'name': record.name,  # Adjust field names as necessary
-                # Add more fields as required
-            })
-
-        """
-        # raise UserError(str(form_elements))
-        #return json.dumps({'status': 'success', 'records': form_data})
-
-        
-        # Perform search with search_params
-        #records = request.env['your.model'].search(search_params)
-        #return request.render('your_module.template_id', {'records': records})
-
-    
-        #values = self._service_records_get_page_view_values(service_sudo, access_token, **kw)
-        #values.update({
-        #    'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service_sudo),
-        #})  
-        #return request.render("de_portal_hr_service.portal_my_hr_service", values)
         
 
         
     # -------------------------------------------
     # Custom html generation for list page
     # -------------------------------------------
-    def portal_hr_service_dyanmic_page_template(self,service_id):
+    def portal_hr_service_dyanmic_page_template(self,service_id, record_ids):
         # TEMPORARY RETURNS CONSTANT FOR DEVELOPMENT PURPOSE
+        
         m2m_ids = False
         fields = ''
         template = ''
@@ -699,8 +658,13 @@ class CustomerPortal(CustomerPortal):
         employee_id = request.env['ir.model.fields'].sudo().search([('name','=','employee_id'),('model','=',service_id.header_model_id.model)],limit=1)
         
         partner_id = request.env['ir.model.fields'].sudo().search([('name','=','partner_id'),('model','=',service_id.header_model_id.model)],limit=1)
-        
-        records = request.env[service_id.header_model_id.model].sudo().browse(service_id._get_records_filter_by_domain(request.env.user.partner_id.id))
+
+        records = request.env[service_id.header_model_id.model]
+
+        if record_ids:
+            records = request.env[service_id.header_model_id.model].sudo().browse(record_ids)
+        else:
+            records = request.env[service_id.header_model_id.model].sudo().browse(service_id._get_records_filter_by_domain(request.env.user.partner_id.id))
 
 
 

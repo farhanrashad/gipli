@@ -196,11 +196,14 @@ class HRService(models.Model):
         domain += expression.AND([self._get_user_domain(user_id.partner_id.id), self._get_filter_domain()])
         records = self.env[self.header_model_id.model].search_count(domain)
         return records
+
+    def _get_records_search_by_domain(self,domain):
+        records = self.env[self.header_model_id.model].search(domain).ids
+        return records
         
     def _get_records_filter_by_domain(self,partner_id):
         domain = []
         domain += expression.AND([self._get_user_domain(partner_id), self._get_filter_domain()])
-        #domain = user_domain + filter_domain
         records = self.env[self.header_model_id.model].search(domain).ids
         return records
 
