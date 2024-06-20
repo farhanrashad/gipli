@@ -1,0 +1,65 @@
+<odoo>
+
+    <record id="action_partner_kyb_comapnies" model="ir.actions.act_window">
+            <field name="name">Companies</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{
+                'search_default_customer': 1,
+                'res_partner_search_mode': 'customer', 
+                'default_company_type': 'company',
+                'default_customer_rank': 1,
+                'default_is_xpendless': 1,
+                }
+            </field>
+            <field name="domain">[
+                ('is_xpendless', '=', True),
+                ('company_type', '=', 'company'),
+                ]
+            </field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a Company in your address book for KYB Verification
+              </p>
+            </field>
+    </record>
+    
+    <menuitem
+        id="menu_crm_kyb_comapnies"
+        name="Companies"
+        parent="de_crm_kyb.crm_menu_kyb"
+        action="action_partner_kyb_comapnies"
+        sequence="2"/>
+
+    <record id="action_partner_kyb_contacts" model="ir.actions.act_window">
+            <field name="name">Companies</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{
+                'search_default_customer': 1,
+                'res_partner_search_mode': 'customer', 
+                'default_company_type': 'person',
+                'default_customer_rank': 1,
+                'default_is_xpendless': 1,
+                }
+            </field>
+            <field name="domain">[
+                ('is_xpendless', '=', True),
+                ('company_type', '=', 'person'),
+                ]
+            </field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a Contact in your address book for Xpendless
+              </p>
+            </field>
+    </record>
+    
+    <menuitem
+        id="menu_crm_kyb_contacts"
+        name="Contacts"
+        parent="de_crm_kyb.crm_menu_kyb"
+        action="action_partner_kyb_contacts"
+        sequence="3"/>
+      
+</odoo>

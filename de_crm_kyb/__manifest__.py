@@ -18,7 +18,10 @@ Long description of module's purpose
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','crm'],
+    'depends': [
+        'crm',
+        'de_xpendless',
+    ],
 
     # always loaded
     'data': [
@@ -27,6 +30,7 @@ Long description of module's purpose
         'views/crm_team_views.xml',
         'views/crm_stage_views.xml',
         'views/crm_lead_views.xml',
+        'views/res_partner_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
