@@ -32,24 +32,26 @@ class FeeSlip(models.Model):
     fee_struct_id = fields.Many2one(
         'oe.fee.struct', string='Fee Structure',
         compute='_compute_struct_id', store=True, readonly=False,
-        states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]},
-        help='Defines the rules that have to be applied to this feeslip, according '
-             'to the contract chosen. If the contract is empty, this field isn\'t '
-             'mandatory anymore and all the valid rules of the structures '
-             'of the employee\'s contracts will be applied.')
+    )
     #struct_type_id = fields.Many2one('hr.payroll.structure.type', related='struct_id.type_id')
     #wage_type = fields.Selection(related='struct_type_id.wage_type')
     name = fields.Char(
-        string='Feeslip Name', required=True,
-        compute='_compute_name', store=True, readonly=False,
-        states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+        string='Feeslip Name', 
+        compute='_compute_name', store=True, readonly=True,
+    )
     number = fields.Char(
-        string='Reference', readonly=True, copy=False,
-        states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
+        string='Reference', readonly=False, copy=False,
+    )
+    
     student_id = fields.Many2one(
-        'res.partner', string='Student', required=True, readonly=True,
-        states={'draft': [('readonly', False)], 'verify': [('readonly', False)]},
+        'res.partner', string='Student', required=True, readonly=False,
         domain="[('is_student', '=', True), ('active', '=', True)]")
+
+    image_128 = fields.Image(related='student_id.image_128')
+    image_1920 = fields.Image(related='student_id.image_1920')
+    avatar_128 = fields.Image(related='student_id.avatar_128')
+    avatar_1920 = fields.Image(related='student_id.avatar_1920')
+    
     course_id = fields.Many2one('oe.school.course',related='student_id.course_id')
     batch_id = fields.Many2one('oe.school.course.batch',related='student_id.batch_id')
     
@@ -58,14 +60,14 @@ class FeeSlip(models.Model):
         #domain=lambda self: self._compute_enrol_order_domain(),
         domain="[('partner_id', '=', student_id), ('enrol_status', '=', 'open'), ('is_enrol_order', '=', True)]",
         store=True, readonly=False,
-        states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+    )
     
     date_from = fields.Date(
-        string='From', readonly=True, required=True,
-        states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
+        string='From', required=True,
+    )
     date_to = fields.Date(
-        string='To', readonly=True, required=True,
-        states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
+        string='To', required=True,
+    )
     state = fields.Selection([
         ('draft', 'Draft'),
         ('verify', 'Waiting'),
@@ -80,39 +82,46 @@ class FeeSlip(models.Model):
                 \n* When user cancel feeslip the status is \'Rejected\'.""")
     line_ids = fields.One2many(
         'oe.feeslip.line', 'feeslip_id', string='Feeslip Lines',
-        compute='_compute_line_ids', store=True, readonly=True, copy=True,
-        states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
+        compute='_compute_line_ids', store=True, readonly=False, copy=True,
+    )
     company_id = fields.Many2one(
         'res.company', string='Company', copy=False, required=True,
-       store=True, readonly=False,
         default=lambda self: self.env.company,
-        states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
+    )
     country_id = fields.Many2one(
         'res.country', string='Country',
         related='company_id.country_id', readonly=True
     )
     country_code = fields.Char(related='country_id.code', readonly=True)
+    
     enrol_order_line_ids = fields.One2many(
         'oe.feeslip.enrol.order.line', 'feeslip_id', string='feeslip Contract Lines', copy=True,
         compute='_compute_enrol_order_line_ids', store=True, readonly=False,
-        states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+    )
+
+    account_move_slip_line_ids = fields.One2many(
+        'oe.feeslip.account.move.slip.line', 'feeslip_id', string='Invoice Lines', copy=True,
+        compute='_compute_account_move_slip_line_ids', store=True, readonly=False,
+    )
+    
     input_line_ids = fields.One2many(
         'oe.feeslip.input.line', 'feeslip_id', string='Feeslip Inputs', store=True,
         compute='_compute_input_line_ids', 
-        readonly=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)], 'paid': [('readonly', True)]})
+        readonly=False
+    )
     paid = fields.Boolean(
         string='Made Payment Order ? ', readonly=True, copy=False,
         states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
-    note = fields.Text(string='Internal Note', readonly=True, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
+    note = fields.Text(string='Internal Note', readonly=False)
    
     credit_note = fields.Boolean(
-        string='Credit Note', readonly=True,
-        states={'draft': [('readonly', False)], 'verify': [('readonly', False)]},
+        string='Credit Note', readonly=False,
         help="Indicates this feeslip has a refund of another")
     has_refund_slip = fields.Boolean(compute='_compute_has_refund_slip')
     feeslip_run_id = fields.Many2one('oe.feeslip.run', string='Batch Name', readonly=True,
-    copy=False, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]}, ondelete='cascade',
-    domain="[('company_id', '=', company_id)]")
+        copy=False, ondelete='cascade',
+        domain="[('company_id', '=', company_id)]"
+    )
     compute_date = fields.Date('Computed On')
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
     amount_total = fields.Monetary(string="Total", store=True, compute="_compute_amount_total")
@@ -122,7 +131,7 @@ class FeeSlip(models.Model):
     queued_for_pdf = fields.Boolean(default=False)
 
     account_move_id = fields.Many2one('account.move', 'Accounting Entry', readonly=True, copy=False)
-    date = fields.Date('Date Account', states={'draft': [('readonly', False)], 'verify': [('readonly', False)]}, readonly=True, help="Keep empty to use the period of the validation(Feeslip) date.")
+    date = fields.Date('Date Account', help="Keep empty to use the period of the validation(Feeslip) date.")
 
     
     
@@ -713,29 +722,18 @@ class FeeSlip(models.Model):
         valid_slips = self.filtered(lambda p: p.student_id)
         if not valid_slips:
             return
-        # Make sure to reset invalid payslip's worked days line
         self.update({'enrol_order_line_ids': [(5, 0, 0)]})
         if not valid_slips:
             return
 
         for slip in valid_slips:
-            #if not slip.struct_id.use_worked_day_lines:
-            #    continue
-            # YTI Note: We can't use a batched create here as the payslip may not exist
             slip.update({'enrol_order_line_ids': slip._get_new_enrol_order_lines()})
 
 
     def _get_new_enrol_order_lines(self):
-        # Retrieve the related sale.order
         sale_order = self.enrol_order_id
         if sale_order:
-            # Get the sale.order lines related to the sale.order
             sale_order_lines = sale_order.order_line
-
-            # You may want to filter or modify the sale_order_lines based on your specific criteria
-            # In this example, we're including all lines.
-            
-            # Create a list of tuples for updating the enrol_order_line_ids field
             enrol_order_line_data = [(0, 0, {
                 'name': line.name,
                 'sequence': 10,
@@ -752,21 +750,50 @@ class FeeSlip(models.Model):
             return enrol_order_line_data
         return []
 
+    @api.depends('student_id')
+    def _compute_account_move_slip_line_ids(self):
+        valid_slips = self.filtered(lambda p: p.student_id)
+        if not valid_slips:
+            return
+        self.update({'account_move_slip_line_ids': [(5, 0, 0)]})
+        if not valid_slips:
+            return
+
+        for slip in valid_slips:
+            slip.update({'account_move_slip_line_ids': slip._get_open_invoice_lines()})
+
+    def _get_open_invoice_lines(self):
+        account_move_ids = self.env['account.move'].search([
+            ('partner_id','=', self.student_id.id)
+        ])
+        if account_move_ids:
+            move_lines = account_move_ids
+            move_data = [(0, 0, {
+                'name': line.name,
+                'sequence': 10,
+                'product_id': line.product_id.id,
+                'code': line.product_id.default_code,
+                'amount': line.price_total,
+                'quantity': line.product_uom_qty,
+                'price_unit': line.price_unit,
+                'qty_invoiced': line.qty_invoiced,
+                'qty_to_invoice': line.qty_to_invoice,
+                'order_line_id': line.id,
+            }) for line in move_lines]
+
+            return move_data
+        return []
         
     @api.depends('student_id', 'fee_struct_id')
     def _compute_input_line_ids(self):
         valid_slips = self.filtered(lambda p: p.student_id and p.fee_struct_id)
         if not valid_slips:
             return
-        # Make sure to reset invalid payslip's worked days line
         self.update({'input_line_ids': [(5, 0, 0)]})
         if not valid_slips:
             return
 
         for slip in valid_slips:
-            #if not slip.struct_id.use_worked_day_lines:
-            #    continue
-            # YTI Note: We can't use a batched create here as the payslip may not exist
             slip.update({'input_line_ids': slip._get_new_input_lines()})
 
     def _get_new_input_lines(self):

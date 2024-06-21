@@ -92,10 +92,18 @@
                         </button>
                         -->
                     </div>
-                    <div class="oe_title" name="title">
-                        <h1><field name="student_id" placeholder="Student" context="{'form_view_ref':'de_school.student_primary_form_view'}"/></h1>
-                        <h2><field name="number" invisible="state == 'draft'"/></h2>
+                    <div class="row justify-content-between position-relative w-100 m-0">
+                        <div class="oe_title mw-75 ps-0 pe-2" name="title">
+                            <h1 class="d-flex flex-row align-items-center">
+                                <field name="student_id" placeholder="Student" readonly="state not in ['draft', 'verify']"/>
+                            </h1>
+                            <h2 invisible="state == 'draft'"><field name="number" readonly="state not in ['draft', 'verify']"/></h2>
+                        </div>
+                        <div class="o_partner_avatar mw-25 m-0 p-0">
+                            <field name="image_1920" widget='image' class="oe_avatar m-0" options='{"zoom": true, "preview_image":"avatar_128"}'/>
+                        </div>
                     </div>
+                    
                     
                     <group>
                         <group>
@@ -108,6 +116,7 @@
                             </div>
                             <field name="country_id" invisible="1"/>
                             <field name="country_code" invisible="1"/>
+                            <field name="number" />
                         </group>
                         <group>
                         <!--
@@ -137,24 +146,25 @@
                                         <field name="amount" />
                                         <field name="qty_invoiced" optional="hide" />
                                         <field name="qty_to_invoice" optional="hide" />
-                                        <field name="currency_id" invisible="1" />
-                                        <field name="order_line_id" invisible="1" />
+                                        <field name="currency_id" column_invisible="1" />
+                                        <field name="order_line_id" column_invisible="1" />
+                                    </tree>
+                                </field>
+                            <separator string="Invoice Lines"/>
+                                <field name="enrol_order_line_ids" colspan="4" nolabel="1">
+                                    <tree string="Enrolment Lines" editable="bottom" create="0" delete="0">
+                                        <field name="name"/>
                                     </tree>
                                 </field>
                             <separator string="Other Fee Inputs"/>
                             <field name="input_line_ids" colspan="4" nolabel="1">
                                 <tree string="Input Data" editable="bottom">
-                                    <!--
-                                        Required 0 to force client to send on change request even when not defined
-                                        Salary Attachments would otherwise not properly be computed and feeslip_id is
-                                        required for _allowed_input_type_ids to work..
-                                    -->
-                                    <field name="feeslip_id" invisible="1" required="0"/>
-                                    <field name="_allowed_input_type_ids" invisible="1"/>
+                                    <field name="feeslip_id" column_invisible="1" required="0"/>
+                                    <field name="_allowed_input_type_ids" column_invisible="1"/>
                                     <field name="input_type_id"/>
                                     <field name="name"/>
                                     <field name="amount"/>
-                                    <field name="sequence" invisible="True"/>
+                                    <field name="sequence" column_invisible="True"/>
                                 </tree>
                                 <form string="Feeslip Line">
                                     <group col="4">
@@ -170,17 +180,17 @@
                         </page>
                         <page string="Fee Computation" name="fee_computation">
                             <field name="line_ids" colspan="4" nolabel="1">
-                                <tree string="Computation" editable="bottom" create="0" delete="0">
+                                <tree string="Computation" >
                                     <field name="name" string="Description"/>
-                                    <field name="code"/>
+                                    <field name="code" column_invisible="True"/>
                                     <field name="quantity" />
                                     <field name="rate" />
                                     <field name="amount" />
-                                    <field name="sequence" invisible="True"/>
+                                    <field name="sequence" column_invisible="True"/>
                                     <field name="appears_on_feeslip"/>
-                                    <field name="fee_rule_id" invisible="1"/>
-                                    <field name="category_id" invisible="1"/>
-                                    <field name="feeslip_id" invisible="1"/>
+                                    <field name="fee_rule_id" column_invisible="1"/>
+                                    <field name="category_id" column_invisible="1"/>
+                                    <field name="feeslip_id" column_invisible="1"/>
                                     <field name="total"/>
                                 </tree>
                                 <form string="Feeslip Line">
@@ -241,5 +251,31 @@
             </form>
         </field>
     </record>
+
+    <record id="action_feeslip" model="ir.actions.act_window">
+        <field name="name">Feeslips</field>
+        <field name="res_model">oe.feeslip</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <record id="action_feeslip" model="ir.actions.act_window">
+            <field name="name">Feeslips</field>
+            <field name="res_model">oe.feeslip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new fee slip
+                </p>
+            </field>
+        </record>
+    
+
+    <menuitem
+        id="menu_school_feeslip"
+        name="Feeslips"
+        parent="menu_school_fees_main"
+        sequence="2"
+        action="action_feeslip"
+        />
 
 </odoo>

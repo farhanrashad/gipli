@@ -131,7 +131,7 @@ action = records._generate_feeslips()
         id="menu_school_fee_collection_batches"
         name="Batches"
         parent="menu_school_fees_main"
-        sequence="50"
+        sequence="1"
         action="action_feeslip_run"
         groups="account.group_account_invoice"/>
 </odoo>
