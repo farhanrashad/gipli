@@ -51,7 +51,7 @@
         <field name="arch" type="xml">
             <form string="Fee Structure">
             <sheet>
-                <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active == True"/>
                 <div class="oe_title">
                     <label for="name" string="Structure Name"/>
                     <h1><field name="name" placeholder="e.g. Regular Feeslip"/></h1>
@@ -66,10 +66,10 @@
                     <group>
                         <field name="course_id" options="{'no_create': True, 'no_open': True}"/>
                         <field name="batch_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"/>
-                        <div class="o_td_label" attrs="{'invisible': [('pay_one_time', '=', True)]}">
+                        <div class="o_td_label" invisible="pay_one_time == True">
                             <label for="schedule_pay_duration" string="Schedule Pay" />
                         </div>
-                        <div name="schedule_pay_duration" attrs="{'invisible': [('pay_one_time', '=', True)]}">
+                        <div name="schedule_pay_duration" invisible="pay_one_time == True">
                             <span class="ml8">Every </span>
                             <field name="schedule_pay_duration" nolabel="1" style="width: 8rem;" />
                             <span class="ml8"> Month(s)</span>
@@ -80,7 +80,7 @@
                 </group>
                 <notebook colspan="4">
                      <page name="fee_rules" string="Particulars">
-                       <field name="rule_ids" attrs="{'readonly': [('id', '=', False)]}">
+                       <field name="rule_ids" readonly="id == False">
                          <tree>
                             <field name="name"/>
                             <field name="code"/>
