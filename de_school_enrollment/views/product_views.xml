@@ -6,6 +6,7 @@
             <field name="model">product.product</field>
             <field name="arch" type="xml">
                 <form string="Fee Categories">
+                    <field name="fee_product" invisible="1" />
                     <sheet>
                         <widget name="web_ribbon" title="Archived" bg_color="bg-danger" 
                             invisible="active == True"/>
@@ -27,7 +28,7 @@
                                 <field name="uom_po_id" invisible="1"/>
                                 <label for="default_code"/>
                                 <div>
-                                    <field name="default_code"/>
+                                    <field name="default_code" required="fee_product"/>
                                     <span class="d-inline-block"><i class="text-muted">Use this reference as a subject prefix when submitting by email.</i></span>
                                 </div>
                                 <field name="company_id" groups="base.group_multi_company"/>
