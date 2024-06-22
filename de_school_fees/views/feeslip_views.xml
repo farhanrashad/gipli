@@ -150,12 +150,19 @@
                                         <field name="order_line_id" column_invisible="1" />
                                     </tree>
                                 </field>
+                            <!--
                             <separator string="Invoice Lines"/>
-                                <field name="enrol_order_line_ids" colspan="4" nolabel="1">
-                                    <tree string="Enrolment Lines" editable="bottom" create="0" delete="0">
+                                <field name="account_move_slip_line_ids" colspan="4" nolabel="1">
+                                    <tree string="Invoice Lines">
                                         <field name="name"/>
+                                        <field name="amount_total_signed"/>
+                                        <field name="amount_total" optional="hide" />
+                                        <field name="amount_residual_signed"/>
+                                        <field name="amount_residual" optional="hide" />
+                                        <field name="currency_id" column_invisible="1" />
                                     </tree>
                                 </field>
+                            -->
                             <separator string="Other Fee Inputs"/>
                             <field name="input_line_ids" colspan="4" nolabel="1">
                                 <tree string="Input Data" editable="bottom">

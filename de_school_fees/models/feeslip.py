@@ -96,13 +96,13 @@ class FeeSlip(models.Model):
     
     enrol_order_line_ids = fields.One2many(
         'oe.feeslip.enrol.order.line', 'feeslip_id', string='feeslip Contract Lines', copy=True,
-        compute='_compute_enrol_order_line_ids', store=True, readonly=False,
+        compute='_compute_enrol_order_line_ids', store=True, readonly=True,
     )
 
-    account_move_slip_line_ids = fields.One2many(
-        'oe.feeslip.account.move.slip.line', 'feeslip_id', string='Invoice Lines', copy=True,
-        compute='_compute_account_move_slip_line_ids', store=True, readonly=False,
-    )
+    #account_move_slip_line_ids = fields.One2many(
+    #    'oe.feeslip.account.move.slip.line', 'feeslip_id', string='Invoice Lines', copy=True,
+    #    compute='_compute_account_move_slip_line_ids', store=True, readonly=True,
+    #)
     
     input_line_ids = fields.One2many(
         'oe.feeslip.input.line', 'feeslip_id', string='Feeslip Inputs', store=True,
@@ -771,16 +771,12 @@ class FeeSlip(models.Model):
             move_data = [(0, 0, {
                 'name': line.name,
                 'sequence': 10,
-                'product_id': line.product_id.id,
-                'code': line.product_id.default_code,
-                'amount': line.price_total,
-                'quantity': line.product_uom_qty,
-                'price_unit': line.price_unit,
-                'qty_invoiced': line.qty_invoiced,
-                'qty_to_invoice': line.qty_to_invoice,
-                'order_line_id': line.id,
+                'feeslip_id': self.id,
+                'amount_total': line.amount_total,
+                'amount_total_signed': line.amount_total_signed,
+                'amount_residual': line.amount_residual,
+                'amount_residual_signed': line.amount_residual_signed,
             }) for line in move_lines]
-
             return move_data
         return []
         

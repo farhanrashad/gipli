@@ -12,3 +12,4 @@ class FeeslipInputType(models.Model):
     code = fields.Char(required=True, help="The code that can be used in the salary rules")
     struct_ids = fields.Many2many('oe.fee.struct', string='Availability in Structure', help='This input will be only available in those structure. If empty, it will be available in all feeslip.')
     country_id = fields.Many2one('res.country', string='Country', default=lambda self: self.env.company.country_id)
+    account_journal_id = fields.Many2one('account.journal',string='Journal')

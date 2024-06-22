@@ -15,8 +15,6 @@ access_feeslip_line_manager,access.feeslip.line.manager,model_oe_feeslip_line,ac
 access_feeslip_enrol_order_line,access.feeslip.enrol.order.line,model_oe_feeslip_enrol_order_line,account.group_account_invoice,1,1,1,1
 access_feeslip_enrol_order_line_manager,access.feeslip.enrol.order.line.manager,model_oe_feeslip_enrol_order_line,account.group_account_manager,1,1,1,1
 
-access_feeslip_account_move_slip_line,access.oe.feeslip.account.move.slip.line,model_oe_feeslip_account_move_slip_line,account.group_account_invoice,1,1,1,1
-access_feeslip_account_move_slip_line_manager,access.oe.feeslip.account.move.slip.line.manager,model_oe_feeslip_account_move_slip_line,account.group_account_manager,1,1,1,1
 
 
 access_feeslip_input_line,access.feeslip.input.line,model_oe_feeslip_input_line,account.group_account_invoice,1,1,1,1
