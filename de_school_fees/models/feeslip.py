@@ -793,26 +793,49 @@ class FeeSlip(models.Model):
             slip.update({'input_line_ids': slip._get_new_input_lines()})
 
     def _get_new_input_lines(self):
-        # Retrieve the related sale.order
         struct_id = self.fee_struct_id
         if struct_id:
-            # Get the sale.order lines related to the sale.order
             other_lines = struct_id.input_line_type_ids
-
-            # You may want to filter or modify the sale_order_lines based on your specific criteria
-            # In this example, we're including all lines.
+            other_line_data = []
+    
+            for line in other_lines:
+                if line.account_journal_id:
+                    moves = self.env['account.move'].search([
+                        ('partner_id', '=', self.student_id.id),
+                        ('journal_id', '=', line.account_journal_id.id),
+                        ('state', '=', 'posted'),
+                        ('payment_state', 'not in', ['paid', 'reversed'])
+                    ])
+                    if moves:
+                        due_amount = sum(moves.mapped('amount_residual_signed'))
+                        description = f"Due Amount for {line.name}"
+                        other_line_data.append((0, 0, {
+                            'name': description,
+                            'sequence': 10,
+                            'input_type_id': line.id,
+                            'code': line.code,
+                            'amount': due_amount,
+                        }))
+                    else:
+                        other_line_data.append((0, 0, {
+                            'name': line.name,
+                            'sequence': 10,
+                            'input_type_id': line.id,
+                            'code': line.code,
+                            'amount': 0,
+                        }))
+                else:
+                    other_line_data.append((0, 0, {
+                        'name': line.name,
+                        'sequence': 10,
+                        'input_type_id': line.id,
+                        'code': line.code,
+                        'amount': 0,
+                    }))
             
-            # Create a list of tuples for updating the enrol_order_line_ids field
-            other_line_data = [(0, 0, {
-                'name': line.name,
-                'sequence': 10,
-                'input_type_id': line.id,
-                'code': line.code,
-               
-            }) for line in other_lines]
-
             return other_line_data
         return []
+
 
 
     
