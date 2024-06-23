@@ -70,11 +70,10 @@ result = rules.NET > categories.NET * 0.10''',
                     #----------------------
                     # feeslip: object containing the feeslips - oe.feeslip
                     # student: res.partner object
-                    # enrol_order: sale.order object for enrollment contract
                     # rules: object containing the rules code (previously computed)
                     # categories: object containing the computed fee rule categories (sum of amount of all rules belonging to that category).
                     # inputfee: object containing the computed inputs.
-                    # order_fee: object containing the fee line of student enrollment contract
+                    # order_fee: object containing the fee line of student enrollment contract e.g order_fee['ADM'].amount
 
                     # Note: returned value have to be set in the variable 'result'
 

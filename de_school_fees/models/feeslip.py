@@ -177,10 +177,11 @@ class FeeSlip(models.Model):
                     ], limit=1)
 
                 #raise UserError(fee_schedule_id)
-                record.write({
-                        'date_from': fee_schedule_id.date_from,
-                        'date_to': fee_schedule_id.date_to
-                })
+                if not record.date_from:
+                    record.write({
+                            'date_from': fee_schedule_id.date_from,
+                            'date_to': fee_schedule_id.date_to
+                    })
         else:
             # Handle the case where there is no current slip
             pass
@@ -605,7 +606,6 @@ class FeeSlip(models.Model):
                 'order_fee': OrderFeeLines(student.id, order_fee_lines_dict, self.env),
                 'inputfee': InputFees(student.id, inputs_dict, self.env),
                 'student': student,
-                'enrol_order': enrol_order,
                 'result_rules': ResultRules(student.id, {}, self.env)
             }
         }
