@@ -16,6 +16,17 @@
                 <field name="is_kyb" invisible="1"/>
                 <field name="allow_verify" invisible="1"/>
             </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page name="xpendless" string="Xpendless" invisible="not is_kyb">
+                    <group>
+                        <group>
+                            <field name="xpl_id" />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            
             <xpath expr="//header" position="inside">
                 <button name="action_verification" string="Verify"
                             type="object" class="oe_highlight" data-hotkey="w" title="Verify"
