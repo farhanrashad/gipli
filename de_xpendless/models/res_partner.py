@@ -6,3 +6,4 @@ class Member(models.Model):
 
 
     is_xpendless = fields.Boolean('Xpendless Contact')
+    xpl_id = fields.Char('Xpendless ID', readonly=True)
