@@ -83,7 +83,12 @@ result = rules.NET > categories.NET * 0.10''',
         help="Eventual third party involved in the fee payment of the employees.")
     note = fields.Html(string='Description')
 
-    product_id = fields.Many2one('product.product', string='Fee Product', domain="[('type','=','service'),('fee_product','=',True)]")
+    analytic_account_id = fields.Many2one(
+        'account.analytic.account', 'Analytic Account', company_dependent=True)
+    debit_account_id = fields.Many2one(
+        'account.account', 'Debit Account', company_dependent=True, domain=[('deprecated', '=', False)])
+    credit_account_id = fields.Many2one(
+        'account.account', 'Credit Account', company_dependent=True, domain=[('deprecated', '=', False)])
 
     def _raise_error(self, localdict, error_type, e):
         raise UserError(_("""%s:

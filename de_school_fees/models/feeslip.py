@@ -424,7 +424,46 @@ class FeeSlip(models.Model):
     def action_feeslip_paid(self):
         if any(slip.state != 'done' for slip in self):
             raise UserError(_('Cannot mark feeslip as paid if not confirmed.'))
-        self.write({'state': 'paid'})
+
+        # Create account.move record
+        move_vals = {
+            'journal_id': self.fee_struct_id.journal_id.id,
+            'date': fields.Date.today(),
+            'ref': self.number,
+            'company_id': self.company_id.id,
+            # Add other required fields for account.move creation
+        }
+        move = self.env['account.move'].create(move_vals)
+
+        # Create account.move.line records
+        for line in self.line_ids:
+            debit_amount = line.amount if line.fee_rule_id.debit_account_id else 0.0
+            credit_amount = line.amount if line.fee_rule_id.credit_account_id else 0.0
+
+            if debit_amount:
+                move_line_vals = {
+                    'move_id': move.id,
+                    'account_id': line.fee_rule_id.debit_account_id.id,
+                    'name': line.name,
+                    'debit': debit_amount,
+                    'credit': 0.0,
+                    # Add other required fields for account.move.line creation
+                }
+                self.env['account.move.line'].create(move_line_vals)
+
+            if credit_amount:
+                move_line_vals = {
+                    'move_id': move.id,
+                    'account_id': line.fee_rule_id.credit_account_id.id,
+                    'name': line.name,
+                    'debit': 0.0,
+                    'credit': credit_amount,
+                    # Add other required fields for account.move.line creation
+                }
+                self.env['account.move.line'].create(move_line_vals)    
+        
+        # Update account_move_id field in FeeSlip
+        self.write({'state': 'paid', 'account_move_id': move.id})
 
     def action_open_work_entries(self):
         self.ensure_one()
