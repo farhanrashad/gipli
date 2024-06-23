@@ -140,7 +140,6 @@
                                     <tree string="Enrolment Lines" editable="bottom" create="0" delete="0">
                                         <field name="name"/>
                                         <field name="code"/>
-                                        <field name="product_id" optional="hide"/>
                                         <field name="quantity" />
                                         <field name="price_unit" />
                                         <field name="amount" />
@@ -214,6 +213,14 @@
                                     </group>
                                 </form>
                             </field>
+                        </page>
+                        <page name="other_info" string="Other Info" invisible="state not in  ('done','paid')">
+                            <group>
+                                <group>
+                                    <field name="account_move_id" />
+                                    <field name="company_id" />
+                                </group>
+                            </group>
                         </page>
                         <!--
                         <page string="Notes">

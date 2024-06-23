@@ -285,25 +285,16 @@ class FeeSlip(models.Model):
                     template.send_mail(feeslip.id, notif_layout='mail.mail_notification_light')
         self.env['ir.attachment'].sudo().create(attachments_vals_list)
 
-    # Fee slip done start
-
     def action_feeslip_done(self):
-        self._validate_feeslips()
-        self.write({'state': 'done'})
-        self._handle_feeslip_pdf_generation()
-        self._action_create_fee_invoice()
-        return True
-
-    def _validate_feeslips(self):
         invalid_feeslips = self.filtered(lambda p: not p.enrol_order_id)
         if invalid_feeslips:
-            raise ValidationError(_('The following students have an enrol order outside of the feeslip period:\n%s', '\n'.join(invalid_feeslips.mapped('student_id.name'))))
+            raise ValidationError(_('The following students have a enrol order outside of the feeslip period:\n%s', '\n'.join(invalid_feeslips.mapped('student_id.name'))))
         if any(slip.enrol_order_id.state == 'cancel' for slip in self):
-            raise ValidationError(_('You cannot validate a feeslip on which the contract is cancelled'))
+            raise ValidationError(_('You cannot valide a feeslip on which the contract is cancelled'))
         if any(slip.state == 'cancel' for slip in self):
             raise ValidationError(_("You can't validate a cancelled feeslip."))
-
-    def _handle_feeslip_pdf_generation(self):
+        self.write({'state' : 'done'})
+        
         if self.env.context.get('feeslip_generate_pdf'):
             if self.env.context.get('feeslip_generate_pdf_direct'):
                 self._generate_pdf()
@@ -313,116 +304,98 @@ class FeeSlip(models.Model):
                 if feeslip_cron:
                     feeslip_cron._trigger()
 
+        self._action_create_fee_invoice()
+    
     def _action_create_fee_invoice(self):
-        feeslips_to_post = self._get_feeslips_to_post()
-        self._validate_journals(feeslips_to_post)
-        
-        slip_mapped_data = self._map_feeslips_by_journal(feeslips_to_post)
-
-        for journal_id, slips in slip_mapped_data.items():
-            move_dict = self._prepare_move_dict(journal_id, slips)
-            line_ids = self._prepare_all_slip_lines(slips, move_dict['date'])
-            move_dict['line_ids'] = [(0, 0, line_vals) for line_vals in line_ids]
-
-            move = self._create_account_move(move_dict)
-            self._assign_account_move_to_slips(slips, move)
-
-    def _get_feeslips_to_post(self):
+        precision = self.env['decimal.precision'].precision_get('Fee')
+    
+        # Add feeslip without run
         feeslips_to_post = self.filtered(lambda slip: not slip.feeslip_run_id)
-
+    
+        # Adding fee slips from a batch and deleting fee slips with a batch that is not ready for validation.
         feeslip_runs = (self - feeslips_to_post).mapped('feeslip_run_id')
         for run in feeslip_runs:
             if run._are_feeslips_ready():
                 feeslips_to_post |= run.slip_ids
-
+    
+        # A feeslip needs to have a done state and not an accounting move.
         feeslips_to_post = feeslips_to_post.filtered(lambda slip: slip.state == 'done' and not slip.account_move_id)
-        return feeslips_to_post
-
-    def _validate_journals(self, feeslips_to_post):
+    
+        # Check that a journal exists on all the structures
         if any(not feeslip.fee_struct_id for feeslip in feeslips_to_post):
-            raise ValidationError(_('One of the contracts for these feeslips has no structure type.'))
+            raise ValidationError(_('One of the contract for these feeslips has no structure type.'))
         if any(not structure.journal_id for structure in feeslips_to_post.mapped('fee_struct_id')):
             raise ValidationError(_('One of the feeslips structures has no account journal defined on it.'))
-
-    def _map_feeslips_by_journal(self, feeslips_to_post):
+    
+        # Map all feeslips by structure journal
+        # {'journal_id': [slip_ids]}
         slip_mapped_data = defaultdict(list)
         for slip in feeslips_to_post:
+            # Append slip to the list for the specific journal_id.
             slip_mapped_data[slip.fee_struct_id.journal_id.id].append(slip)
-        return slip_mapped_data
+    
+        for journal_id in slip_mapped_data:
+            line_ids = []
+            #debit_sum = 0.0
+            #credit_sum = 0.0
+            date = fields.Date().end_of(slip.date_to, 'month')
+            move_dict = {
+                'narration': '',
+                'ref': date.strftime('%B %Y'),
+                'journal_id': journal_id,
+                'move_type': 'out_invoice',
+                'date': date,
+                'invoice_date': date,
+                'partner_id': self.student_id.id,
+            }
+            for slip in slip_mapped_data[journal_id]:
+                move_dict['narration'] += plaintext2html(slip.number or '' + ' - ' + slip.student_id.name or '')
+                move_dict['narration'] += Markup('<br/>')
+                slip_lines = slip._prepare_slip_lines(date)
+                line_ids.extend(slip_lines)
+    
+            # Add accounting lines in the move
+            move_dict['line_ids'] = [(0, 0, line_vals) for line_vals in line_ids]
+            #raise UserError(move_dict)
+            move = self._create_account_move(move_dict)
+            for slip in slip_mapped_data[journal_id]:
+                slip.write({'account_move_id': move.id, 'date': date})
+        return True
 
-    def _prepare_move_dict(self, journal_id, slips):
-        date = fields.Date().end_of(slips[0].date_to, 'month')
-        move_dict = {
-            'narration': '',
-            'ref': date.strftime('%B %Y'),
-            'journal_id': journal_id,
-            'move_type': 'out_invoice',
-            'date': date,
-            'invoice_date': date,
-            'partner_id': slips[0].student_id.id,
-        }
-        for slip in slips:
-            move_dict['narration'] += plaintext2html(slip.number or '' + ' - ' + slip.student_id.name or '')
-            move_dict['narration'] += Markup('<br/>')
-        return move_dict
-
-    def _prepare_all_slip_lines(self, slips, date):
-        line_ids = []
-        for slip in slips:
-            slip_lines = slip._prepare_slip_lines(date)
-            line_ids.extend(slip_lines)
-        return line_ids
 
     def _prepare_line_values(self, line, product_id, date, quantity, price_unit):
-        sale_line_id = self.env['sale.order.line'].search([
-            ('order_id', '=', line.feeslip_id.enrol_order_id.id),
-            ('product_id', '=', product_id)
-        ], limit=1)
-
-        if not sale_line_id:
-            sale_order_line_values = {
-                'order_id': line.feeslip_id.enrol_order_id.id,
-                'product_id': product_id,
-                'name': line.name,
-                'product_uom_qty': quantity,
-                'price_unit': price_unit,
-                'qty_delivered': 0.0,
-                'qty_invoiced': quantity,
-                'is_downpayment': True,
-            }
-            sale_line_id = self.env['sale.order.line'].create(sale_order_line_values)
-
+        feeslip_order_lines = self.env['oe.feeslip.enrol.order.line'].search([
+            ('feeslip_id','=',line.feeslip_id.id)
+        ])
+        sale_line_ids = [(4, order_line.id) for order_line in feeslip_order_lines.order_line_id]
         return {
             'name': line.name,
-            'partner_id': line.student_id.id,
+            'partner_id': line.partner_id.id,
             'journal_id': line.feeslip_id.fee_struct_id.journal_id.id,
             'date': date,
             'product_id': product_id,
             'quantity': quantity,
             'price_unit': price_unit,
-            'sale_line_ids': [(4, sale_line_id.id)],
+            'sale_line_ids': sale_line_ids,
+            #'analytic_distribution': (line.salary_rule_id.analytic_account_id and {line.salary_rule_id.analytic_account_id.id: 100}) or
+            #                         (line.slip_id.contract_id.analytic_account_id.id and {line.slip_id.contract_id.analytic_account_id.id: 100})
         }
-
+        
     def _prepare_slip_lines(self, date):
         self.ensure_one()
+        precision = self.env['decimal.precision'].precision_get('FEE')
         new_lines = []
-        for line in self.line_ids.filtered(lambda x: x.fee_rule_id.product_id):
+        for line in self.line_ids.filtered(lambda x:x.fee_rule_id.product_id):
             product_id = line.fee_rule_id.product_id.id
             quantity = line.quantity
             price_unit = line.total
             fee_line = self._prepare_line_values(line, product_id, date, quantity, price_unit)
+            #fee_line['tax_ids'] = [(4, tax_id) for tax_id in line.fee_rule_id.product_id.taxes_id.ids]
             new_lines.append(fee_line)
         return new_lines
 
     def _create_account_move(self, values):
         return self.env['account.move'].sudo().create(values)
-
-    def _assign_account_move_to_slips(self, slips, move):
-        date = move.date
-        for slip in slips:
-            slip.write({'account_move_id': move.id, 'date': date})
-            
-    # fee slip done end
         
         
     def action_feeslip_cancel(self):
