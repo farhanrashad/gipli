@@ -735,9 +735,8 @@ class HRService(models.Model):
     def _get_service_record_access_token(self, model_id, record_id):
         model = self.env['ir.model'].browse(int(model_id))
         record = self.env[model.model].browse(record_id)
-        #if not record.access_token:
-        #    return record.generate_access_token()
-        return False #record.access_token
+        if not record.access_token:
+            return record.generate_access_token()
     
 class HRServiceItems(models.Model):
     _name = 'hr.service.items'
