@@ -34,44 +34,10 @@ _logger = logging.getLogger(__name__)
 
 import json
 
+js_script = ""
+
 class CustomerPortal(portal.CustomerPortal):
-    """
-    @http.route('/dynamic_filter', type='http', auth="user", methods=['GET'])
-    def dynamic_filter(self, model, field, search_fields, domain, label_fields, q):
-        Model = request.env[model]
-        domain = ast.literal_eval(domain) if domain else []
-        search_domain = [('name', 'ilike', q)]
-        for search_field in search_fields.split(','):
-            search_domain.append((search_field, 'ilike', q))
-        domain = ['|' * (len(search_domain) - 1)] + search_domain + domain
-        records = Model.search(domain, limit=10)
-        
-        label_fields_list = label_fields.split(',')
-        results = []
-        for record in records:
-            label = ' - '.join([str(getattr(record, f)) for f in label_fields_list])
-            results.append({'id': record.id, 'text': label})
-
-        return json.dumps(results)
-    """
-
-    """
-    @http.route('/dynamic_search', type='http', auth="user", methods=['GET'])
-    def dynamic_search(self, **kwargs):
-        q = kwargs.get('q', '')
-        model = kwargs.get('model', '')
-        field = kwargs.get('field', '')
-        page = int(kwargs.get('page', 1))
-        
-        limit = 20
-        offset = (page - 1) * limit
-        domain = [(field, 'ilike', q)]
-        
-        records = request.env[model].sudo().search(domain, limit=limit, offset=offset)
-        items = [{'id': record.id, 'text': getattr(record, field)} for record in records]
-        
-        return Response(json.dumps({'items': items}), content_type='application/json;charset=utf-8', status=200)
-    """
+    
     @http.route('/dynamic_search', type='http', auth="user", methods=['GET'])
     def dynamic_search(self, **kwargs):
         q = kwargs.get('q', '')
@@ -118,6 +84,24 @@ class CustomerPortal(portal.CustomerPortal):
         
         return Response(json.dumps({'items': items}), content_type='application/json;charset=utf-8', status=200)
 
+    @http.route('/custom/get_form_vals', type='http', auth='public', website=True)
+    def get_form_vals(self, **kwargs):
+
+        src_field_name = request.form.get('src_field_name')
+        src_field_value = request.form.get('src_field_value')
+        model_id = kwargs.get('model_id')
+
+        response_data = {}
+        if src_field_name in field_values:
+            response_data[src_field_name] = field_values[src_field_name]
+        
+        # Assuming we want to update a select field
+        response_data['selectField'] = field_values['selectField']
+    
+        return jsonify(response_data)
+
+
+        
     @http.route('/custom/get_field_vals', type='http', auth='public', website=True)
     def get_field_vals(self, **kwargs):
 
@@ -173,420 +157,486 @@ class CustomerPortal(portal.CustomerPortal):
         print("Search Fields:", search_fields)
         print("Domain:", combined_domain)
 
+    @http.route('/get/default_values', type='http', auth='public', methods=['GET'], csrf=False)
+    def _get_default_values(self, **kwargs):
+        service_id = kwargs.get('service_id')
+        model_id = kwargs.get('model_id')
+        record_id = kwargs.get('record_id') or 0
+        
+        field_id = kwargs.get('field_id')
+        field_model = kwargs.get('field_model')
+        field_name = kwargs.get('field_name')
+
+        service = request.env['hr.service'].browse(int(service_id))        
+        changeable_field_ids = json.loads(kwargs.get('changeable_field_ids', '[]'))
+        fields = request.env['ir.model.fields'].browse(changeable_field_ids)
+
+        form_data = request.params
+        form_elements = [{'name': name, 'value': form_data[name]} for name in form_data]
+        form_elements_json = json.dumps(form_elements)
+
+        options = {
+            'field_data': service._get_default_field_values(form_elements_json, changeable_field_ids, field_name),
+        }
+
+        return json.dumps(options)
+        
+
+    @http.route('/get/list_values', type='http', auth='public', methods=['GET'], csrf=False)
+    def _get_list_values(self, **kwargs):
+        service_id = kwargs.get('service_id')
+        model_id = kwargs.get('model_id')
+        record_id = kwargs.get('record_id') or 0
+        
+        field_id = kwargs.get('field_id')
+        field_model = kwargs.get('field_model')
+        field_name = kwargs.get('field_name')
+
+        service = request.env['hr.service'].browse(int(service_id))        
+
+        form_data = request.params
+        form_elements = [{'name': name, 'value': form_data[name]} for name in form_data]
+        form_elements_json = json.dumps(form_elements)
+
+        options = {
+            'field_data': service._get_list_values(form_elements_json, field_name),
+            #'form_data': form_elements_json,
+            #'field_name': field_name,
+        }
+        #options = {
+        #    'unit':1,
+        #    'kg':2,
+        #}
+        return json.dumps(options)
 
     
-    def _prepare_service_record_page(self,service_id, model_id, record_id, edit_mode, js_code):
-        m2o_id = False
-        extra_template = ''
-        primary_template = ''
-        rec_id = 0
-        #record_id = 0
-        service_id = request.env['hr.service'].sudo().search([('id','=',service_id)],limit=1)
-        hr_service_items = False
-        record_sudo = False
-        record_val = ''
-        
-        field_val = ''
-        field_domain = []
-        
-        required = '0'
-        required_label = ''
-        
-        data_pre = stDate = dat_time = ''
-        
-        line_item = request.env['hr.service.record.line'].search([('hr_service_id','=',service_id.id),('line_model_id','=',int(model_id))],limit=1)
-        
-        if service_id.header_model_id.id == int(model_id):
-            #record_id = request.env[service_id.header_model_id.model].sudo().search([('id','=',int(rec_id))],limit=1).id
-            hr_service_items = service_id.hr_service_items.filtered(lambda x: x.operation_mode)
-            if edit_mode == '1' or edit_mode == 1:
-                record_sudo = request.env[service_id.header_model_id.model].sudo().search([('id','=',record_id)],limit=1)
-                        
-        elif line_item:
-            #record_id = request.env[service_id.line_model_id.model].sudo().search([('id','=',int(rec_id))],limit=1).id
-            #hr_service_items = line_model_id.hr_service_record_line_items #service_id.hr_service_items_line
-            hr_service_items = line_item.hr_service_record_line_items.filtered(lambda x: x.operation_mode)
-            if edit_mode == '1' or edit_mode == 1:
-                record_sudo = request.env[line_item.line_model_id.model].sudo().search([('id','=',record_id)],limit=1)            
 
-                
-        
-        # ----------------------------------------------------
-        # ------------- Generate Dynamic Form ----------------
-        # ----------------------------------------------------
-        for service in service_id:
-            primary_template += '<link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />'
-            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>'
-            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>'
-            primary_template += '<script type="text/javascript" src="/de_portal_hr_service/static/src/js/dynamic_form.js"></script>'
-
-            # libraries used for dynamic search 
-            primary_template += '<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />'
-            primary_template += '<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>'
-            
-        
-            primary_template += '<nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar  mt-3 rounded">'
-            primary_template += '<ol class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1 row">'
-            primary_template += '<li class="breadcrumb-item ml-1" data-oe-model="ir.ui.view" data-oe-id="1049" data-oe-field="arch" data-oe-xpath="/t[1]/ol[1]/li[1]"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"></i></a></li>'
-            primary_template += '<li class="breadcrumb-item active ">' + service_id.header_model_id.name + '</li>'
-            primary_template += '</ol>'
-            primary_template += '</nav>'
-            
-            primary_template += '<div class="row" style="">'
-            
-            
-            hr_service_grouped_items = {}
-            for key, group in groupby(service_id.field_variant_id.field_variant_line_ids):
-                hr_service_grouped_items[key] = list(group)
-            keys = sorted(hr_service_grouped_items.keys())
-            
-            for key in keys:
-                group = hr_service_grouped_items[key]
-                if group[0].display_column == 'col_6':
-                    # primary_template += "<div class='col-6' style='padding:16px;background-color:#FFFFFF;'>"
-                    primary_template += "<div class='col-6 ' >"
-                    primary_template += "<div class='p-3 h-100 bg-white' style=''>"
-                    if group[0].description:
-                        primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].description + '</h5>'
-                        primary_template += '<hr class="w-100 mx-auto" />'
-                        primary_template += '</div>'
-                    else:
-                        primary_template += '<div class="mb-2"></div>'
-                        
-                    primary_template += '<div class="" style=" border-radius: 10px;">'
-
-                if group[0].display_column == 'col_12':
-                    primary_template += "<div class='col-12'>"
-                    primary_template += "<div class='p-3 h-100 bg-white' style=''>"
-                    if group[0].description:
-                        primary_template += '<div class="mb-2"><h5 class="text-uppercase text-o-color-1">' + group[0].description + '</h5>'
-                    else:
-                        primary_template += '<div class="mb-2"></div>'
-                        
-                    primary_template += '<div class="" style="border-radius: 10px;">'
-                
-                for field in hr_service_items.filtered(lambda x:x.field_variant_line_id.id == key.id):
-                    # find the record value
-                    field_domain = []
-
-                    #Search and label fields 
-                    if field.field_id.relation:
-                        related_model_name = field.field_id.relation
-                        Model = request.env[related_model_name]
-                        default_field = 'name' if 'name' in Model._fields else 'id'
-                        # Assuming you've already fetched the field record in some manner
-                        search_fields = [f.name for f in field.search_fields_ids] or [default_field]
-                        label_fields = [f.name for f in field.label_fields_ids] or [default_field]
-                    else:
-                        search_fields = ''
-                        label_fields = ''
-                    #search_fields = ','.join([f.name for f in field.search_fields_ids])
-                    #label_fields = ','.join([f.name for f in field.label_fields_ids])
-
-                    # check the domain
-                    domain_filter = str(field.field_domain).replace("'", "&#39;") if field.field_domain else ""
-                    
-                    if field.is_required:
-                        required = '1'
-                        required_label = '*'
-                    else:
-                        required = ''
-                        required_label = ''
-
-                    if field.operation_mode:
-                        if record_sudo:
-                            if field.sudo().field_id.ttype == 'many2one':
-                                record_val = record_sudo[eval("'" + field.field_name + "'")].id
-                            else:
-                                record_val = str(record_sudo[eval("'" + field.field_name + "'")])
-                            #primary_template += "<h1>" + str(record_sudo[eval("'" + field.field_name + "'")]) + "=value</h1>"
-                    
-                        if field.is_required:
-                            primary_template += "<div class='form-group mb-2 s_website_form_required' data-type='char' data-name='" + field.field_name + "'>"
-                        else:
-                            primary_template += "<div class='form-group mb-2 ' data-type='char' data-name='" + field.field_name + "'>"                        
-                        primary_template += "<label class='s_website_form_label' style='width: 200px' for='" + field.field_name + "'>"
-                        primary_template += "<span class='s_website_form_label_content'>" + field.field_label + required_label + "</span>"
-                        primary_template += "</label>"
-                    
-                        # Many2one Field
-                        if field.field_type == 'many2one':
-                            if field.field_model == 'ir.attachment':
-                                primary_template += "<input type='file' class='form-control-file mb-2 s_website_form_input' id='" + field.field_name + "' name='" + field.field_name + "' multiple='1' />"
-                            else:
-                                if field.field_domain:
-                                    try:
-                                        if 'employee' in field.field_domain:
-                                            field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
-                                        elif 'user' in field.field_domain:
-                                            field_domain = eval(field.field_domain, {"user": request.env.user.id})
-                                        elif 'partner' in field.field_domain:
-                                            field_domain = eval(field.field_domain, {"partner": request.env.user.partner_id.id})
-                                        else:
-                                            field_domain = safe_eval.safe_eval(field.field_domain)
-                                    except Exception:
-                                        field_domain = []
-                                    
-                                m2o_id = request.env[field.field_model].sudo().search(field_domain)
     
-                                if field.ref_populate_field_id:
-                                    response_field_name = field.ref_populate_field_id.name
-                                    response_field  = hr_service_items.filtered(lambda x:x.field_model == field.ref_populate_field_id.relation)
-                                    responce_model = response_field.field_model
-                                    model_fields = request.env[field.field_model]._fields
-                                    model_fields_dict = dict(model_fields)
-
-                                    model_related_field = None                                
-                                    for key, value in model_fields_dict.items():
-                                        if value.comodel_name == responce_model:
-                                            model_related_field=key
-
-                                    result = model_related_field + '-' + response_field_name
-                                
-                                    #primary_template += "<input type='hidden'  id='join_fields' name='" + result + "' />"
-                                    name = field.field_name +"-" + str(service.id) +"-" + field._name
-
-                                    if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
-                                    else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'" +  " onchange='filter_field_vals(this, " + field.ref_populate_field_id.name + ")'>"
-                                else:
-                                    if field.is_required:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
-                                    else:
-                                        primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='mb-2 select2-dynamic selection-search form-control'>"
-                                primary_template += "<option value='' >Select </option>"
-
-                                for m in m2o_id:
-                                    primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
-                                    #template += "<t t-esc='t" + m.name + "'/>"
-                                    primary_template += m.name
-                                    primary_template += "</option>"
-                                primary_template += "</select>"
-                        # Many2many field
-                        elif field.field_type == 'many2many':
-                            if field.field_domain:
-                                try:
-                                    if 'employee' in field.field_domain:
-                                        field_domain = eval(field.field_domain, {"employee": request.env.user.employee_id.id})
-                                    elif 'user' in field.field_domain:
-                                        field_domain = eval(field.field_domain, {"user": request.env.user.id})
-                                    elif 'partner' in field.field_domain:
-                                        field_domain = eval(field.field_domain, {"partner": request.env.user.partner_id.id})
-                                    else:
-                                        field_domain = safe_eval.safe_eval(field.field_domain)
-                                except Exception:
-                                    field_domain = []
-                            m2m_id = request.env[field.field_model].sudo().search(field_domain) 
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + field.field_id.relation + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic selection-search' multiple='multiple'>"
-                            for m in m2m_id:
-                                primary_template += "<option value='' >Select </option>"
-                                primary_template += "<option value='" + str(m.id) + "' " + (" selected" if record_val == m.id else " ") + ">"
-                                primary_template += m.name
-                                primary_template += "</option>"
-                            primary_template += "</select>"
-
-                        # Selection field
-                        elif field.field_type == 'selection':
-                            sel_ids = request.env['ir.model.fields.selection'].sudo().search([('field_id','=',field.field_id.id)])
-                            primary_template += "<select id='" + field.field_name + "' name='" + field.field_name + "' required='" + required + "' data-model='" + str(field.field_id.relation) + "' data-field='" + 'name' + "' data-search-fields='" + ','.join(search_fields) + "' data-label-fields='" + ','.join(label_fields) + "' data-domain='" + domain_filter + "'class='form-control mb-2 select2-dynamic ' >"
-                            for sel in sel_ids:
-                                primary_template += "<option value='" + str(sel.value) + "' " + (" selected" if str(record_val) == sel.value else " ") + ">"
-                                primary_template += sel.name
-                                primary_template += "</option>"
-                            primary_template += "</select>"
-                    
-                        # Date Field
-                        elif field.field_type == 'date':
-                            primary_template += '<input type="date" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        elif field.field_type == 'datetime':
-                            if record_val:
-                                data_pre = record_val.strip().split(',')
-                                stDate = data_pre[0].replace("\"", "")
-                                dat_time = datetime.datetime.strptime(stDate,'%Y-%m-%d %H:%M:%S.%f')
-                            try:
-                                primary_template += '<input type="datetime-local" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + dat_time + '"' +  ('required="1"' if field.is_required else '') + ">"
-                            except:
-                                stDate = stDate + ".4"
-                                dat_time = datetime.datetime.strptime(stDate,'%Y-%m-%d %H:%M:%S.%f')
-                                primary_template += '<input type="datetime-local" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + dat_time + '"' +  ('required="1"' if field.is_required else '') + ">"
-
-                        elif field.field_type == 'char':
-                            primary_template += '<input type="text" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        elif field.field_type == 'text':
-                            primary_template += '<textarea class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + " ></textarea>"
-                        elif field.field_type in ('integer','float','monetary'):
-                            primary_template += '<input type="number" step="any" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        else:
-                            primary_template += '<input type="text" class="form-control mb-2 s_website_form_input"' + 'name="' + field.field_name + '"' + ' id="' + field.field_name + '"' + 'value="' + record_val + '"' +  ('required="1"' if field.is_required else '') + ">"
-                        primary_template += "</div>"
-                primary_template += "</div>"                
-                primary_template += "</div>"
-                
-                
-                    
-                primary_template += "</div>"
-            primary_template += '</div>'
-            # add seperator and button
-            primary_template += '<nav class="navbar navbar-light navbar-expand-lg border p-2 py-0 mb-2 o_portal_navbar  mt-3 rounded">'
-            primary_template += '<div class="d-flex flex-row col-6 text-right"/>'
-            primary_template += '<button type="button" class="btn btn-link p-0 m-0 text-decoration-none" onclick="window.history.back();"  style="text-align: left;">Back</button>'
-            primary_template += '</div>'
-            primary_template += '<div class="d-flex flex-row-reverse col-6"/>'
-            primary_template += '<button type="submit" class="btn btn-primary">Submit</button>'
-            primary_template += '</div>'
-            primary_template += '</nav>'
-            primary_template += '<span id="s_website_form_result"/>'
-            
-            
-        currency_ids = request.env['res.currency'].sudo().search([('active','=',True)])
-        # JavaScript code as a string
-        js_code = """
-<script>
-    function filter_field_vals(element_src, element_target) {
-        console.log("Function filter_field_vals started");
-
-        let fieldNameSrc = element_src.name;  // Get the target element's name
-        let fieldValueSrc = element_src.value;  // Get the element's value
-        let FieldNameTarget = element_target.name // get the target element's name
-        var modelId = document.getElementById("model_id").value;
-
-        let data = {
-            'src_field_name': fieldNameSrc,   // Send the field name
-            'src_field_value': fieldValueSrc, // Send the field value
-            'target_field_name': FieldNameTarget,  // Send the target field name
-            'model_id': modelId // Send Model id
-        };
-
-        //alert(typeof target_field_name);
-        //alert("Name: " + fieldNameSrc + ", Value: " + fieldValueSrc + ", Target Name: " + FieldNameTarget + ",Model: " + modelId );
-
-        $.ajax({
-            url: '/custom/get_field_vals',
-            type: 'GET',
-            data: data,
-            dataType: 'json',  // Explicitly expect JSON
-            success: function (data) {
-                console.log(data);
-                //let targetSelect = $('#' + element_target);
-                let targetSelect;
-                if (typeof element_target === "string") {
-                    targetSelect = $('#' + element_target);
-                } else if (element_target instanceof HTMLElement) {
-                    targetSelect = $(element_target);
-                } else {
-                    console.error("Invalid target provided");
-                    return;
-                }
     
-                targetSelect.empty();
-                for (let key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        targetSelect.append($('<option>', {
-                            value: key,
-                            text: data[key]
-                        }));
-                    }
-                }
-
-                //$.each(data, function (key, value) {
-                //    targetSelect.append($('<option>', {
-                //        value: key,
-                //        text: value
-                //    }));
-                //});
-            },
-        });
-    }
-
-// Dynamic Search JS Code
-/*
-$(document).ready(function() {
-    $('.select2-dynamic').each(function() {
-        var model = $(this).data('model');
-        var field = $(this).data('field');
-        
-        $(this).select2({
-            ajax: {
-                url: '/dynamic_search',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        q: params.term, // search term
-                        model: model,
-                        field: field,
-                        page: params.page
-                    };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.items
-                    };
-                },
-                cache: true
-            },
-            placeholder: 'Search...',
-            minimumInputLength: 1
-        });
-    });
-});
-*/
-$(document).ready(function() {
-    console.log("Initializing Select2...");
-    $('.select2-dynamic').each(function() {
-        var model = $(this).data('model');
-        var field = $(this).data('field');
-        var searchFields = $(this).data('search-fields');
-        var domain = $(this).data('domain');
-        var labelFields = $(this).data('label-fields');
-        
-        $(this).select2({
-            ajax: {
-                url: '/dynamic_search',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        q: params.term,
-                        model: model,
-                        field: field,
-                        search_fields: searchFields,
-                        domain: domain,
-                        label_fields: labelFields,
-                        page: params.page
-                    };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.items
-                    };
-                },
-                cache: true
-            },
-            placeholder: 'Search...',
-            minimumInputLength: 1
-        });
-    });
-});
-
-
-
-</script>
-
+    @http.route('/get/recomputed_values', type='http', auth='public', methods=['GET'], csrf=False)
+    def recompute_field_values(self, **kwargs):
         """
-        #js_code = ''
+        1. Find the realted records from changeable fields
+        2. get the expression values from the related records
+        3. devide the expression into artithmatic operators e.g product_id.list_price + product_uom.id
+        4. get the current web selected values of before dot expression e.g product_id and product_uom
+        5. find the related model of these before dot expression items e.g product_id and product_uom
+        6. get the current record on the basis of point no. 4 and point no. 5
+        7. get the expression values with current record and perform arithmatic operations
+        8. return the values and field names
+        9. update the field values through javascript
+        """
+        service_id = kwargs.get('service_id')
+        model_id = kwargs.get('model_id')
+        record_id = kwargs.get('record_id') or 0
+        field_id = kwargs.get('field_id')
+        field_model = kwargs.get('field_model')
+        field_name = kwargs.get('field_name')
+        field_value = kwargs.get('field_value')
+        populate_field_id = kwargs.get('populate_field_id')
 
+        service = request.env['hr.service'].browse(int(service_id))        
+        # Retrieve and parse the many2many field IDs
+        changeable_field_ids = json.loads(kwargs.get('changeable_field_ids', '[]'))
+        # Fetch the field names from ir.model.fields
+        fields = request.env['ir.model.fields'].browse(changeable_field_ids)        
+        # Fetch the values for these fields from the specified model and record
+        #model = request.env[field_model]
+        #record = model.browse(int(field_value))
+        # Prepare field data in a loop
+        field_data = {}
+        #for field in fields:
+        #    field_name = field.name
+        #    field_data[field_name] = service.get_field_value_from_expression(int(model_id),field_model,field_name, int(field_value),changeable_field_name)#record.id
+
+
+        form_data = request.params
+
+        # Prepare list of dictionaries containing element names and values
+        form_elements = [{'name': name, 'value': form_data[name]} for name in form_data]
+
+        # Convert the list of dictionaries to JSON format
+        form_elements_json = json.dumps(form_elements)
+        
+        
+        options = {
+            #'service_id': service_id,
+            #'model_id': model_id,
+            #'record_id': record_id,
+            #'field_id': field_id,
+            #'field_model': field_model,
+            #'field_name': field_name,
+            #'field_value': field_value,
+            #'populate_field_id': populate_field_id,
+            #'changeable_field_ids': changeable_field_ids,
+            'field_data': service.get_changeable_field_values(form_elements_json, changeable_field_ids, field_name),
+            #'form_elements_json': form_elements_json,
+        }
+
+        return json.dumps(options)
+        
+    # ===========================================================
+    # =================== Service Page ==========================
+    # ===========================================================
+    def _prepare_service_record_page(self, service_id, model_id, record_id, edit_mode, js_code):
+        service = request.env['hr.service'].sudo().browse(service_id)
+        line_item = request.env['hr.service.record.line'].search([
+            ('hr_service_id', '=', service.id),
+            ('line_model_id', '=', int(model_id))
+        ], limit=1)
+    
+        hr_service_items, record_sudo = self._get_hr_service_items(service, model_id, record_id, line_item, edit_mode)
+    
+        template, js_code = self._generate_dynamic_form(service, hr_service_items, record_sudo)
+    
+        currency_ids = request.env['res.currency'].sudo().search([('active', '=', True)])
+        #js_code = self._generate_js_code() + js_code
+    
         return {
             'currency_ids': currency_ids,
-            'template_primary_fields': primary_template,
-            'template_extra_fields': extra_template,
-            'service_id': service_id,
+            'template_primary_fields': template,
+            'template_extra_fields': '',
+            'service_id': service,
             'record_id': record_id,
             'model_id': model_id,
-            'edit_mode': edit_mode or 0,
+            'edit_mode': edit_mode,
             'js_code': js_code,
         }
+    
+    def _get_hr_service_items(self, service, model_id, record_id, line_item, edit_mode):
+        record_sudo = request.env[service.header_model_id.model]
+        if service.header_model_id.id == int(model_id):
+            hr_service_items = service.hr_service_items.filtered(lambda x: x.operation_mode)
+            if edit_mode in ('1', 1):
+                record_sudo = request.env[service.header_model_id.model].sudo().browse(record_id)
+        elif line_item:
+            hr_service_items = line_item.hr_service_record_line_items.filtered(lambda x: x.operation_mode)
+            if edit_mode in ('1', 1):
+                record_sudo = request.env[line_item.line_model_id.model].sudo().browse(record_id)
+        else:
+            hr_service_items = record_sudo = False
+        return hr_service_items, record_sudo
+    
+    def _generate_dynamic_form(self, service, hr_service_items, record_sudo):
+        template = self._get_base_template(service)
+        js_template = ''
+    
+        hr_service_grouped_items = self._group_service_items(service)
+        for key, group in sorted(hr_service_grouped_items.items()):
+            template += self._get_column_template(group)
+    
+            for field in hr_service_items.filtered(lambda x: x.field_variant_line_id.id == key.id):
+                record, required, required_label = self._get_field_properties(field, record_sudo)
+    
+                html_data, js_script = self._generate_field_template(field, service, record, required, required_label)
+                template += html_data
+                js_template += js_script
+    
+            template += "</div></div></div>"
+    
+        template += self._get_footer_template()
+
+        js_script = """
+        <script type="text/javascript">
+            $(document).ready(function() {{
+                $('.select2-dynamic').select2({{
+                    theme: 'bootstrap4',
+                    placeholder: 'Select an option',
+                    allowClear: true
+                }});
+        
+                {js_template}
+            }});
+        </script>
+        """.format(js_template=js_template)
+
+
+
+    
+        return template, js_script
+    
+    def _get_base_template(self, service):
+        return '''
+        <link href="/de_portal_hr_service/static/src/select_two.css" rel="stylesheet" />
+        <script type="text/javascript" src="/de_portal_hr_service/static/src/js/jquery.js"></script>
+        <script type="text/javascript" src="/de_portal_hr_service/static/src/js/select_two.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+        <nav class="navbar navbar-light navbar-expand-lg border py-0 mb-2 o_portal_navbar mt-3 rounded">
+            <ol class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1 row">
+                <li class="breadcrumb-item ml-1">
+                    <a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"></i></a>
+                </li>
+                <li class="breadcrumb-item active">{header_model_name}</li>
+            </ol>
+        </nav>
+        <div class="row" style="">
+        '''.format(header_model_name=service.header_model_id.name)
+    
+    def _group_service_items(self, service):
+        hr_service_grouped_items = {}
+        for key, group in groupby(service.field_variant_id.field_variant_line_ids):
+            hr_service_grouped_items[key] = list(group)
+        return hr_service_grouped_items
+    
+    def _get_column_template(self, group):
+        if group[0].display_column == 'col_6':
+            return '''
+            <div class='col-6'>
+                <div class='p-3 h-100 bg-white'>
+                    {header}
+                    <div style="border-radius: 10px;">
+            '''.format(header=self._get_column_header(group))
+        elif group[0].display_column == 'col_12':
+            return '''
+            <div class='col-12'>
+                <div class='p-3 h-100 bg-white'>
+                    {header}
+                    <div style="border-radius: 10px;">
+            '''.format(header=self._get_column_header(group))
+        return ''
+    
+    def _get_column_header(self, group):
+        if group[0].description:
+            return '''
+            <div class="mb-2">
+                <h5 class="text-uppercase text-o-color-1">{description}</h5>
+                <hr class="w-100 mx-auto" />
+            </div>
+            '''.format(description=group[0].description)
+        return '<div class="mb-2"></div>'
+    
+    def _get_field_properties(self, field, record_sudo):
+        record = ''
+        if record_sudo:
+            record = str(record_sudo[field.field_name]) if field.field_type != 'many2one' else record_sudo[field.field_name]
+        required = '1' if field.is_required else ''
+        required_label = '*' if field.is_required else ''
+        return record_sudo, required, required_label
+    
+    def _generate_field_template(self, field, service, record, required, required_label):
+        js_script = ''
+        js = ''
+        template = '''
+        <div class='form-group mb-2 {required_class}' data-type='char' data-name='{field_name}'>
+            <label class='s_website_form_label' style='width: 200px' for='{field_name}'>
+                <span class='s_website_form_label_content'>{field_label}{required_label}</span>
+            </label>
+        '''.format(
+            required_class='s_website_form_required' if required else '',
+            field_name=field.field_name,
+            field_label=field.field_label,
+            required_label=required_label
+        )
+    
+        if field.field_type == 'many2one':
+            select_tag, js = self._generate_many2one_field(field, service, record, required)
+            template += select_tag
+            js_script += js
+            #template, js_script += self._generate_many2one_field(field, service, record, required)
+        elif field.field_type == 'many2many':
+            template += self._generate_many2many_field(field, record, required)
+        elif field.field_type == 'selection':
+            template += self._generate_selection_field(field, record, required)
+        elif field.field_type == 'date':
+            template += '<input type="date" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_id}" {required}>'.format(
+                field_name=field.field_name, record_id=record.id, required='required="1"' if required else ''
+            )
+        elif field.field_type == 'datetime':
+            template += self._generate_datetime_field(field, record, required)
+        elif field.field_type in ('char1', 'text1', 'integer', 'float', 'monetary'):
+            template += '<input type="{input_type}" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_id}" {required}>'.format(
+                input_type='number' if field.field_type in ('integer', 'float', 'monetary') else 'text',
+                field_name=field.field_name, record_id=record.id, required='required="1"' if required else ''
+            )
+        else:
+            template += '''
+            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="filter_field_vals(this)" value="{record_id}" {required}>
+            '''.format(field_name=field.field_name, record_id=record.id, required='required="1"' if required else '')
+    
+        template += "</div>"
+        return template, js_script
+    
+    def _generate_many2one_field(self, field, service, record, required):
+        field_domain = self._get_field_domain(field)
+        m2o_id = request.env[field.field_model].sudo().search(field_domain)
+        domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
+    
+        if field.field_model == 'ir.attachment':
+            return '''
+            <input type='file' class='form-control-file mb-2 s_website_form_input' id='{field_name}' name='{field_name}' multiple='1' />
+            '''.format(field_name=field.field_name)
+
+
+        data = {
+            'model_id': service.header_model_id.id,
+            'service_id': service.id,
+        }
+        form_id = 'form'+ str(service.id)
+
+        js_script = """
+            $(document).ready(function() {{
+                $('#{form_id}').on('change', '#{field_name}', function() {{
+                    let form_data = $('#{form_id}').serialize();  // Serialize the form data
+                    
+            
+                    $.ajax({{
+                        url: '/get/list_values',
+                        type: 'GET',
+                        data: form_data + '&field_id={field_id}&field_name={field_name}&field_model={field_model}&changeable_field_ids={changeable_field_ids}',
+                        dataType: 'json',
+                        success: function(data) {{
+                            console.log(data);
+
+                            // Loop through each field in the field_data
+                            for (let field_name in data.field_data) {{
+                                let field_values = data.field_data[field_name];
+                                let fieldElement = $('#' + field_name);
+
+                                if (fieldElement.length) {{
+                                    fieldElement.empty();  // Clear existing options
+
+                                    // Add new options to the select field
+                                    for (let option_text in field_values) {{
+                                        let option_value = field_values[option_text];
+                                        fieldElement.append(new Option(option_text, option_value));
+                                    }}
+                                }}
+                            }}
+                            
+                        }},
+                        error: function(error) {{
+                            console.error('Error fetching data:', error);
+                        }}
+                    }});
+                    // Second AJAX Call Start
+                    $.ajax({{
+                        url: '/get/default_values',
+                        type: 'GET',
+                        data: form_data + '&field_id={field_id}&field_name={field_name}&field_model={field_model}&changeable_field_ids={changeable_field_ids}',
+                        dataType: 'json',
+                        success: function(data) {{
+                            console.log(data);
+                            // Update the fields dynamically based on the response
+                            let fieldData = data.field_data.computed_field_values;
+                            for (let field in fieldData) {{
+                                if (document.getElementById(field)) {{
+                                    document.getElementById(field).value = fieldData[field];
+                                }}
+                            }}
+                        }},
+                        error: function(error) {{
+                            console.error('Error fetching data:', error);
+                        }}
+                    }});
+                    // Second AJAX Call End
+                }});
+            }});
+            """.format(
+                    form_id=form_id, 
+                    field_name=field.field_name, 
+                    field_id=field.id, 
+                    field_model=field.field_model, 
+                    changeable_field_ids=json.dumps(field.ref_changeable_field_ids.ids)
+                )
+
+            
+        search_fields = ','.join(field.search_fields_ids.mapped('name'))
+    
+        select_tag = '''
+        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'>
+            <option value=''>Select</option>
+        '''.format(
+                field_name=field.field_name, 
+                required='required="1"' if required else '',
+                field_model=field.field_model, 
+                search_fields=search_fields, 
+                domain_filter=domain_filter
+        )
+    
+        for rec in m2o_id:
+            selected = 'selected="selected"' if rec.id == record.id else ''
+            #combined_label = ' '.join([str(rec[label]) for label in field.label_fields_ids.mapped('name') if rec[label]])
+            select_tag += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=rec[field.link_field_id.name])
+    
+        select_tag += "</select>"
+        return select_tag, js_script
+
+
+
+
+    
+    def _generate_many2many_field(self, field, record_val, required):
+        field_domain = self._get_field_domain(field)
+        m2m_ids = request.env[field.field_model].sudo().search(field_domain)
+        domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
+    
+        selected_ids = record_val if record_val else []
+    
+        m2m_template = '''
+        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='select2-dynamic-multiple selection-search form-control' multiple>
+        '''.format(
+            field_name=field.field_name, required='required="1"' if required else '',
+            field_model=field.field_model, search_fields=field.search_fields_ids.ids, label_fields=field.label_fields_ids,
+            domain_filter=domain_filter
+        )
+    
+        for rec in m2m_ids:
+            selected = 'selected="selected"' if rec.id in selected_ids else ''
+            m2m_template += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=rec.name)
+    
+        m2m_template += "</select>"
+        return m2m_template
+    
+    def _generate_selection_field(self, field, record_val, required):
+        selection_template = '''
+        <select id='{field_name}' name='{field_name}' {required} class='selection-search form-control mb-2'>
+        '''.format(field_name=field.field_name, required='required="1"' if required else '')
+    
+        for val, label in eval(field.field_selection):
+            selected = 'selected="selected"' if val == record_val else ''
+            selection_template += "<option value='{val}' {selected}>{label}</option>".format(val=val, selected=selected, label=label)
+    
+        selection_template += "</select>"
+        return selection_template
+    
+    def _generate_datetime_field(self, field, record_val, required):
+        return '''
+        <input type="datetime-local" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_val}" {required}>
+        '''.format(field_name=field.field_name, record_val=record_val, required='required="1"' if required else '')
+    
+    def _get_footer_template(self):
+        return '''
+        </div></div>
+        <div class="col-12">
+            <div class="bg-white rounded">
+                <div class="row m-0">
+                    <div class="col-12">
+                        <div class="bg-light p-3 mt-3 rounded">
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <a href="#" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        '''
+    
+    def _get_field_domain(self, field):
+        if field.field_domain:
+            return eval(field.field_domain)
+        return []
+
+    
+    
+    
+
+    # End Service Record Page
+
+    
+    
     
     @http.route(['/my/model/record/<int:service_id>/<int:model_id>/<int:record_id>/<int:edit_mode>'
                 ], type='http', auth="user", website=True)        
@@ -622,13 +672,17 @@ $(document).ready(function() {
             partner_id = request.env['ir.model.fields'].sudo().search([('name','=','partner_id'),('model','=',service_id.header_model_id.model)],limit=1)
 
 
-            if service_id.filter_field_id:
-                domain = [(service_id.filter_field_id.name, 'child_of', [request.env.user.partner_id.id]),
-                (service_id.filter_field_id.name, '=', [request.env.user.partner_id.id])]
+            #if service_id.filter_field_id:
+            #    domain = [(service_id.filter_field_id.name, 'child_of', [request.env.user.partner_id.id]),
+            #    (service_id.filter_field_id.name, '=', [request.env.user.partner_id.id])]
    
-            if service_id.filter_domain:
-                domain = safe_eval.safe_eval(service_id.filter_domain) + domain
-            model_records = request.env[service_id.header_model_id.model].sudo().search(domain).ids
+            #if service_id.filter_domain:
+            #    domain = safe_eval.safe_eval(service_id.filter_domain) + domain
+
+            
+            #model_records = request.env[service_id.header_model_id.model].sudo().search(domain).ids
+            model_records = service_id._get_records_filter_by_domain(request.env.user.partner_id.id)
+            
             rec_id = None
             if btn == 'next':
                 rec_id = next(dropwhile(lambda x: x <= int(record), sorted(model_records)), None)
@@ -788,15 +842,12 @@ $(document).ready(function() {
                     vals.update({
                         field.field_name: int(kw.get(field.field_name))
                     })
-                elif field.field_type in ('datetime'):
-                    if 'T' in kw.get(field.field_name):
-                        vals.update({
-                            field.field_name: datetime.datetime.strptime(kw.get(field.field_name),'%Y-%m-%dT%H:%M')
-                        })
-                    else:
-                        vals.update({
-                            field.field_name: datetime.datetime.strptime(kw.get(field.field_name),'%Y-%m-%d')
-                        })
+                elif field.field_type == 'datetime':
+                    raise UserError(field.field_type)
+                    vals.update({
+                        field.field_name: datetime.datetime.strptime(kw.get(field.field_name),'%Y-%m-%dT%H:%M')
+                        #(kw.get(field.field_name))
+                    })
                 else:
                     vals.update({
                         field.field_name: kw.get(field.field_name)
@@ -819,6 +870,7 @@ $(document).ready(function() {
         if service_id.header_model_id.id == int(model_id):
             if edit_mode == '0' or edit_mode == 0 or not edit_mode:
                 record_sudo = request.env[service_id.header_model_id.model].sudo().create(vals)
+                #record_sudo.message_subscribe(partner_ids=[request.env.user.partner_id.id])
             else:
                 record_sudo.sudo().write(vals)
             record = record_sudo
@@ -938,4 +990,61 @@ $(document).ready(function() {
             }
         data = json.dumps(data)
         return data   
+
+    # Message Record
+    @http.route('/my/message/<int:service_id>/<int:model_id>/<int:record_id>', website=True, page=True, auth='public', csrf=False)
+    def user_messsage(self, **kw):
+        service_id = kw.get('service_id')
+        model_id = kw.get('model_id')
+        record_id = kw.get('record_id')
+
+        user = request.env.user
+        
+        message = kw.get('message')
+        #user_ids = kw.get('user_ids[]')
+        user_ids = request.httprequest.form.getlist('user_ids')
+
+        
+        service = request.env['hr.service'].sudo().browse(int(service_id))
+        model = request.env['ir.model'].sudo().browse(int(model_id))
+        record = request.env[model.model].sudo().browse(int(record_id))
+
+        # Handle file attachments
+        files = request.httprequest.files.getlist('attachments')
+
+        attachment_files  = request.httprequest.files.getlist('attachments')
+        
+        
+        service.create_message(model, record, user, message, attachment_files, user_ids)
+        return request.redirect('/my/model/record/%s/%s/%s' % (service.id,model.id, record.id))
+
+
+    @http.route('/my/record/schedule-activity', type='http', auth='public', website=True, csrf=False)
+    def schedule_activity(self, **kwargs):
+        service_id = int(kwargs.get('service_id'))
+        record_id = int(kwargs.get('record_id'))
+        model_id = int(kwargs.get('model_id'))
+        activity_type_id = int(kwargs.get('activity_type'))
+        due_date = kwargs.get('due_date')
+        summary = kwargs.get('summary')
+        user_id = kwargs.get('user_id')
+        details = kwargs.get('details')
             
+        if due_date:
+            due_date = datetime.datetime.strptime(due_date, '%Y-%m-%d')
+            
+        model = request.env['ir.model'].browse(model_id).model
+
+        # Create the activity
+        activity_vals = {
+                'res_model_id': model_id,
+                'res_id': record_id,
+                'activity_type_id': activity_type_id,
+                'summary': summary,
+                'user_id': user_id,
+                'note': details,
+                'date_deadline': due_date,
+        }
+        
+        request.env['mail.activity'].sudo().create(activity_vals)
+        return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))

@@ -8,20 +8,22 @@
             <field name="priority">1000</field>
             <field name="arch" type="xml">
                 <tree editable="bottom" >
-                    <field name="field_store" column_invisible="1"/>
-                    <field name="field_readonly" column_invisible="1"/>
-                    <field name="is_model_selected" column_invisible="1"/>
-                    <field name="ref_populate_field_ids" column_invisible="1" />
+                    <field name="field_store" invisible="1"/>
+                    <field name="field_readonly" invisible="1"/>
+                    <field name="is_model_selected" invisible="1"/>
                     
-                    <field name="hr_service_id" column_invisible="1" force_save="1"/>
-                    <field name="hr_service_record_line_id" column_invisible="1" force_save="1"/>
+                    <field name="hr_service_id" invisible="1" force_save="1"/>
+                    <field name="hr_service_record_line_id" invisible="1" force_save="1"/>
                     <field name="sequence" widget="handle" />
                     <field name="field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" />
                     <field name="field_name" />
                     <field name="field_label" />
                     <field name="link_field_id" domain="[('model', '=', field_model)]" 
-                        required="field_type == 'many2one' and field_type not in ['many2one','many2many']"/>
-                    <field name="field_domain" optional="hide" readonly="field_type == 'many2one'"/>
+                        required="field_type == 'many2one'"
+                        readonly="field_type not in ['many2one','many2many']"
+                    />
+                    <field name="field_domain" optional="hide" 
+                        readonly="field_type != 'many2one'"/>
 
                     <field name="search_fields_ids" 
        domain="[('model', '=', field_model), ('store', '=', True), ('ttype', 'in', ['char','integer','text','selection'])]" 
@@ -34,17 +36,23 @@
        readonly="is_model_selected == False" 
        optional="hide" 
        widget="many2many_tags" />
+
+
+                    
                     <field name="field_type" optional="hide"/>
                     <field name="field_model" optional="hide"/>
                     <field name="is_required" readonly="field_store == False"/>
                     <field name="operation_mode" readonly="field_store == False"/>
-                    <field name="field_variant_id"  column_invisible="1"/>
+                    <field name="field_variant_id"  invisible="1"/>
                     <field name="field_variant_line_id" domain="[('field_variant_id','=',field_variant_id)]"  />
                     
                     <field name="ref_field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                     
-                    <field name="ref_populate_field_id" domain="[('id', 'in', ref_populate_field_ids)]"/>
 
+                    <field name="populate_list_expr" />
+                    <field name="change_field_exp" placeholder="e.g product_id.list_price + product_uom.ratio"/>
+                    <field name="ref_changeable_field_ids" optional="hide" widget="many2many_tags"/>
+                    
                     
                 </tree>
             </field>
@@ -88,55 +96,68 @@
                     <header>
                         <button name="button_validate" type="object" invisible="state != 'draft'" string="Validate" class="oe_highlight" id="validate" data-hotkey="v"/>
                         <button name="button_publish" type="object" invisible="state != 'validate'" string="Publish" class="oe_highlight" id="validate" data-hotkey="p"/>
-                        <button name="button_draft" invisible="state != 'cancel'" string="Set to Draft" type="object" data-hotkey="o"/>
-                        <button name="button_cancel" invisible="state != 'publish' and state != 'validate'" string="Cancel" type="object" data-hotkey="x" />
+                        <button name="button_draft" invisible="state not in ('validate','publish','cancel')" string="Set to Draft" type="object" data-hotkey="o"/>
+                        <button name="button_cancel" invisible="state not in ('draft','validate','publish')" string="Cancel" type="object" data-hotkey="x" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,validate,publish" readonly="1"/>
                     </header>
                     <sheet>                  
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>
                         <h1>
-                            <field name="name" placeholder="Entry Type Name"/>
+                            <field name="name" 
+                                placeholder="Entry Type Name"
+                                readonly="state != 'draft'"
+                            />
                         </h1>
                        
                     </div>
                     <group>
                         <field name="description" placeholder="Define instructions for your team about service."/>
-
                         <field name="web_icon_data"/>
-
                     </group>
                     <group>
                         <group name="model" string="Header">
-                            <field name="header_model_id"/>
+                            <field name="header_model_id" readonly="state != 'draft'"/>
                             <field name="header_model_name" invisible="0"/>
                             <field name="title_field_id" domain="[('model_id', '=', header_model_id),('ttype','!=','one2many')]"/>
-                            <field name="state_field_id" domain="[('model_id', '=', header_model_id),('ttype','!=','one2many')]"/>
-                            <field name="filter_field_id" domain="[('model_id', '=', header_model_id),('relation','=','res.partner')]"/>
-
-                            <field name="group_id" required="1"/>
-                            <field name="field_variant_id" required="1" string="Field Variant" />
-
+                            <field name="state_field_id" readonly="state != 'draft'" domain="[('model_id', '=', header_model_id),('ttype','!=','one2many')]"/>
+                            <field name="filter_field_id" readonly="state != 'draft'" domain="[('model_id', '=', header_model_id),('relation','=','res.partner')]"/>
+                            <field name="group_id" readonly="state != 'draft'"/>
+                            <field name="sequence" readonly="state != 'draft'"/>
+                            <field name="field_variant_id" string="Field Variant" />
                         </group>
                         <group string="Operations">
-                            <field name="filter_domain" widget="domain" string="Filter Domain" options="{'model': 'header_model_name', 'in_dialog': True}"/>
-                            <field name="is_create" />
-                            <field name="is_edit" />
-                            <field name="condition" widget="domain" string="Edit Domain" options="{'model': 'header_model_name', 'in_dialog': True}"/>
-                            <field name="allow_messages" />
                             
+                            <field name="filter_domain" widget="domain" string="Filter Domain" options="{'model': 'header_model_name', 'in_dialog': True}" readonly="state != 'draft'"/>
+                            <field name="is_create" readonly="state != 'draft'"/>
+                            <field name="is_edit" readonly="state != 'draft'"/>
+                            <field name="condition" widget="domain" string="Edit Domain" options="{'model': 'header_model_name', 'in_dialog': True}"/>
+                            <field name="allow_messages" readonly="state != 'draft'"/>
+                            <field name="allow_log_note" readonly="state != 'draft'"/>
+                            <field name="show_attachment" readonly="state != 'draft'"/>
+                            <field name="show_activities" readonly="state != 'draft'"/>
                         </group>
                     </group>
                         
                         <notebook>
                             <page string="Service Item Fields" name="header_fields">
-                                <field name="hr_service_items" >
+                                <field name="hr_service_items" readonly="state != 'draft'">
+                                    <form>
+                                        <!-- <field name="display_type" invisible="1"/> -->
+                                        <field name="sequence" column_invisible="1"/>
+                                        <group>
+                                            <group>
+                                            </group>
+                                        </group>
+                                       
+                                    </form>
                                     <tree string="Service Items" editable="bottom">
                                         <control>
                                             <create name="add_product_control" string="Add a field"/>
                                            
                                         </control>
                                 
+                                        <!-- <field name="display_type" invisible="1"/> -->
                                         <field name="sequence" widget="handle" />
                                         <field name="hr_service_id" column_invisible="1" />
                                         <field
@@ -152,7 +173,9 @@
                                        
                                         <field name="field_label" />
                                         <field name="link_field_id" domain="[('model', '=', field_model)]" 
-                                            required="field_type == 'many2one' and field_type not in ['many2one','many2many']"/>
+                                            required="field_type == 'many2one'"
+                                            readonly="field_type not in ['many2one','many2many']"
+                                        />
                                          <field name="link_record" />
                                         <field name="field_domain" optional="hide" 
                                             readonly="field_type != 'many2one'"/>
@@ -164,7 +187,7 @@
        widget="many2many_tags" />
 
 <field name="label_fields_ids" 
-       domain="[('model', '=', field_model), ('store', '=', True), ('ttype', 'in', ['char','integer','text','selection'])]" 
+       domain="[('model', '=', field_model)]" 
        readonly="is_model_selected == False" 
        optional="hide" 
        widget="many2many_tags" />
@@ -174,10 +197,17 @@
                                         <field name="is_required" readonly="field_store == False"/>
                                         <field name="operation_mode" readonly="field_store == False"/>
                                         <field name="display_option" />
-                                        <field name="field_variant_line_id" domain="[('field_variant_id','=',parent.field_variant_id)]" readonly="field_store ==False"/>
+                                        <field name="field_variant_line_id" domain="[('field_variant_id','=',parent.field_variant_id)]" 
+                                            readonly="field_store == False"/>
 
-                                        <field name="ref_populate_field_ids" column_invisible="1" />
-                                        <field name="ref_populate_field_id" />
+                                        <!--
+                                        <field name="ref_populate_field_ids" invisible="1" />
+                                        <field name="ref_populate_field_id" optional="hide" />
+                                        -->
+                                        
+                                        <field name="populate_list_expr" />
+                                        <field name="change_field_exp" placeholder="e.g product_id.list_price + product_uom.ratio"/>
+                                        <field name="ref_changeable_field_ids" optional="hide" widget="many2many_tags"/>
 
                                         <field name="field_store" column_invisible="1"/>
                                         <field name="field_readonly" column_invisible="1"/>
@@ -187,7 +217,7 @@
                             </field>
                         </page>
                     <page string="Record Lines" name="record_lines">
-                        <field name="hr_service_record_line" >
+                        <field name="hr_service_record_line" readonly="state != 'draft'">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle" />
                                 <field name="header_model_id" column_invisible="1"/>
@@ -195,7 +225,7 @@
                                 <field name="line_model_id" string="Model" readonly="1"/>
                                 <field name="parent_relational_field_id" domain="[('model_id', '=', line_model_id),('ttype','=','many2one')]"/>
                                 <field name="allow_import" />
-                                <field name="file_attachment" invisible="allow_import != True"/>
+                                <field name="file_attachment" column_invisible="allow_import != True" />
                                 <button name="action_create_record_line_items" type="object" icon="fa-list" width="0.1" options="{&quot;warn&quot;: true}"/>
                             </tree>
                         </field>
