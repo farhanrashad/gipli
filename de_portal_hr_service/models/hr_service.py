@@ -744,6 +744,7 @@ class HRService(models.Model):
         if not record.access_token:
             return record.generate_access_token()
         return record.access_token
+        #return False
     
 class HRServiceItems(models.Model):
     _name = 'hr.service.items'

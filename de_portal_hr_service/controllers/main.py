@@ -265,6 +265,10 @@ class CustomerPortal(CustomerPortal):
         log_output = ''
         log_output += '<div id="discussion" class="mt32">'
         messages = service_id._get_log_notes(record_id)
+
+        attachment_model_id = request.env['ir.model'].search([
+            ('model','=','ir.attachment')
+        ],limit=1)
         for message in messages:
             user_avatar_url = f"/web/image/res.partner/{message.author_id.id}/avatar_128"
 
@@ -297,7 +301,7 @@ class CustomerPortal(CustomerPortal):
                             </a>
                         </div>
                     </div>
-                    '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(25, attach.id))
+                    '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(attachment_model_id.id, attach.id))
                 
             log_output += '''        
                 </div>
@@ -347,7 +351,7 @@ class CustomerPortal(CustomerPortal):
                             </a>
                         </div>
                     </div>
-                    '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(25, attach.id))
+                    '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(attachment_model_id.id, attach.id))
 
             msg_output += '''        
                 </div>
@@ -366,11 +370,6 @@ class CustomerPortal(CustomerPortal):
         <div class="o_portal_chatter_attachments mt32">        
             <div class="row">
         '''             
-        #at = service_id.sudo()._get_service_record_access_token(25,260919)
-        #raise UserError(at)
-        
-        #attach_output += '''
-        #<a href='/web/content/" + '260919' + "?download=true&access_token='" + at + " title='Dowload'><i class='fa fa-download'></i></a><br/><br/>'''.format(attach_id=attach.id, attach_name=attach.name, access_token=at)
         
         for attach in attachments:
             attach_output += '''
@@ -381,7 +380,7 @@ class CustomerPortal(CustomerPortal):
                     </a>
                 </div>
             </div>
-            '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(25, attach.id))
+            '''.format(attach_id=attach.id, attach_name=attach.name, access_token=service_id.sudo()._get_service_record_access_token(attachment_model_id.id, attach.id))
 
 
             """
@@ -1237,7 +1236,7 @@ class CustomerPortal(CustomerPortal):
                     #raise UserError(record[eval("'" + header.field_name + "'")])
                     attachments = record[eval("'" + header.field_name + "'")] #service_id._get_attachments(record[eval("'" + header.field_name + "'")])
                     for attach in attachments:
-                        a_token = service_id.sudo()._get_service_record_access_token(25, attach.id)
+                        a_token = service_id.sudo()._get_service_record_access_token(attachment_model_id.id, attach.id)
                         template += '''
                                 <a href='/web/content/{attach_id}?download=true&access_token={access_token}' title='{attach_name}'>
                                     <i class='fa fa-download'></i>
