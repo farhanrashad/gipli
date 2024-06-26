@@ -534,7 +534,7 @@ class CustomerPortal(CustomerPortal):
             </script>
         '''
         user_avatar = f"/web/image/res.partner/{request.env.user.partner_id.id}/avatar_128"
-        user_ids = request.env['res.users'].search([('active','=',True)])
+        user_ids = request.env['res.users'].sudo().search([('active','=',True)])
 
         user_html = '''
         <label for="user_ids">Mentions</label>
