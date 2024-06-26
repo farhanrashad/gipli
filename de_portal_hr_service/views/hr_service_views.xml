@@ -11,7 +11,6 @@
                     <field name="field_store" invisible="1"/>
                     <field name="field_readonly" invisible="1"/>
                     <field name="is_model_selected" invisible="1"/>
-                    <field name="ref_populate_field_ids" invisible="1" />
                     
                     <field name="hr_service_id" invisible="1" force_save="1"/>
                     <field name="hr_service_record_line_id" invisible="1" force_save="1"/>
@@ -45,7 +44,10 @@
                     
                     <field name="ref_field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                     
-                    <field name="ref_populate_field_id" domain="[('id', 'in', ref_populate_field_ids)]"/>
+
+                    <field name="populate_list_expr" />
+                    <field name="change_field_exp" placeholder="e.g product_id.list_price + product_uom.ratio"/>
+                    <field name="ref_changeable_field_ids" optional="hide" widget="many2many_tags"/>
                     
                     
                 </tree>
@@ -185,11 +187,14 @@
                                         <field name="display_option" />
                                         <field name="field_variant_line_id" domain="[('field_variant_id','=',parent.field_variant_id)]" attrs="{'readonly':[('field_store','=',False)]}"/>
 
+                                        <!--
                                         <field name="ref_populate_field_ids" invisible="1" />
-                                        <field name="ref_populate_field_id" />
+                                        <field name="ref_populate_field_id" optional="hide" />
+                                        -->
+                                        
                                         <field name="populate_list_expr" />
-                                        <field name="change_field_exp" />
-                                        <field name="ref_changeable_field_ids" widget="many2many_tags"/>
+                                        <field name="change_field_exp" placeholder="e.g product_id.list_price + product_uom.ratio"/>
+                                        <field name="ref_changeable_field_ids" optional="hide" widget="many2many_tags"/>
 
                                         <field name="field_store" invisible="1"/>
                                         <field name="field_readonly" invisible="1"/>

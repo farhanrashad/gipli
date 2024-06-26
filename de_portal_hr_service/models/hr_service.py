@@ -436,17 +436,22 @@ class HRService(models.Model):
         list_ids = []
         source_record = 0
         list_values = {}
+
+        
         
         for item in service_items.filtered(lambda x:x.populate_list_expr):
             if item.populate_list_expr:
                 # Source fields
                 list_ids = []
-                source_field_item = service_items.search([('field_name', '=', field_name)],limit=1)
+                
+                source_field_item = item.filtered(lambda x:x.field_name==field_name) #service_items.search([('field_name', '=', field_name)],limit=1)
                 source_field_model = source_field_item.field_model
+                
                 source_value = next((element['value'] for element in form_elements if element['name'] == field_name), None)
                 source_record = self.env[source_field_model].browse(int(source_value))
                 
-        
+                
+                
                 #Destinations
                 dest_field_item = service_items.search([],limit=1)
                 dest_field_model = dest_field_item.field_model
@@ -454,14 +459,18 @@ class HRService(models.Model):
                 
         
                 populate_matches = field_pattern.findall(item.populate_list_expr)
-        
+
+                
                 for match in populate_matches:
                     if '.' in match:
                         f1, f2 = match.split('.')
+                        
                         f1_model = self.env['ir.model.fields'].search([
                             ('model','=',source_field_model),
                             ('name','=',f1)
                         ],limit=1).relation
+
+                        #raise UserError(f1_model)
                         
                         dest_field_item = service_items.search([('field_model', '=', f1_model)],limit=1)
                         dest_field_model = dest_field_item.field_model
@@ -474,6 +483,12 @@ class HRService(models.Model):
                     else:
                         f1 = match
                         f2 = None
+
+                        f1_model = self.env['ir.model.fields'].search([
+                            ('model','=',source_field_model),
+                            ('name','=',f1)
+                        ],limit=1).relation
+                        
                         dest_field_item = service_items.search([('field_model', '=', f1_model)],limit=1)
                         dest_field_model = dest_field_item.field_model
                         dest_field_id = self.env['ir.model.fields'].search([
@@ -487,8 +502,9 @@ class HRService(models.Model):
                 list_values[record.name] = record.id
 
         
-
         computed_list_values = {
+            #'f1': f1,
+            #'f2': f2,
             dest_field_item.field_name: list_values,
         }
 
@@ -496,7 +512,28 @@ class HRService(models.Model):
         return computed_list_values
 
 
-    
+    def _get_sample_form_data(self):
+        """
+         - Write the below code in server action to test the method
+                service = env['hr.service'].browse(2)
+                raise UserError(str(service._get_list_values(service._get_sample_form_data()[1], service._get_sample_form_data()[0])))
+
+        """
+        form_data = [
+            {"name": "csrf_token", "value": "{{ csrf_token() }}"},
+            {"name": "service_id", "value": "2"},
+            {"name": "model_id", "value": "551"},
+            {"name": "record_id", "value": ""},
+            {"name": "edit_mode", "value": ""},
+            {"name": "product_id", "value": "48"},
+            {"name": "product_uom", "value": ""},
+            {"name": "field_id", "value": "5"},
+            {"name": "field_name", "value": "product_id"},
+            {"name": "field_model", "value": "product.product"},
+            {"name": "changeable_field_ids", "value": "[]"}
+        ]
+        form_elements_json = json.dumps(form_data)
+        return 'product_id', form_elements_json
         
     def get_changeable_field_values(self, form_elements_json, changeable_field_ids, field_name):
         # Process the form elements JSON data
@@ -759,15 +796,19 @@ class HRServiceItems(models.Model):
         ], string='Display View')
     
     #ref_populate_field_id = fields.Many2one('ir.model.fields',string='Filter Reference')
-    ref_populate_field_id = fields.Many2one('ir.model.fields',string='Populate Field',domain="[('id', 'in', ref_populate_field_ids)]")
+    #ref_populate_field_id = fields.Many2one('ir.model.fields',string='Populate Field',domain="[('id', 'in', ref_populate_field_ids)]")
                 
-    ref_populate_field_ids = fields.Many2many('ir.model.fields',
-        string='Update Fields Values',
-        compute='_compute_related_model_for_populate_field',
-    )
+    #ref_populate_field_ids = fields.Many2many('ir.model.fields',
+    #    string='Update Fields Values',
+    #    compute='_compute_related_model_for_populate_field',
+    #)
 
-    populate_list_expr = fields.Char(string='List Expr.')
-    change_field_exp = fields.Char(string='Expression')
+    populate_list_expr = fields.Char(string='List Expr.',
+        help='sample expression: uom_id.category_id'
+                                    )
+    change_field_exp = fields.Char(string='Expression', 
+            help='e.g product_id.list_price + product_uom.ratio'
+                                  )
 
     ref_changeable_field_ids = fields.Many2many('ir.model.fields',
         string='Changable Fields', readonly=True,
@@ -788,11 +829,11 @@ class HRServiceItems(models.Model):
             record.is_model_selected = bool(record.field_model)
 
 
-    @api.depends('field_id')
-    def _compute_related_model_for_populate_field(self):
-        for record in self:
-            related_fields = self.env['ir.model.fields'].search([('model', '=', record.hr_service_id.header_model_id.model), ('ttype', '=', 'many2one')])
-            record.ref_populate_field_ids = related_fields         
+    #@api.depends('field_id')
+    #def _compute_related_model_for_populate_field(self):
+    #    for record in self:
+    #        related_fields = self.env['ir.model.fields'].search([('model', '=', record.hr_service_id.header_model_id.model), ('ttype', '=', 'many2one')])
+    #        record.ref_populate_field_ids = related_fields         
 
     @api.depends('field_id')
     def _compute_label_from_field(self):
@@ -921,15 +962,18 @@ class HRServiceItemsLine(models.Model):
     
     field_variant_id = fields.Many2one('hr.service.field.variant',related='hr_service_id.field_variant_id')
     field_variant_line_id = fields.Many2one('hr.service.field.variant.line')
-    ref_populate_field_id = fields.Many2one('ir.model.fields',string='Populate Field',domain="[('id', 'in', ref_populate_field_ids)]")
+    #ref_populate_field_id = fields.Many2one('ir.model.fields',string='Populate Field',domain="[('id', 'in', ref_populate_field_ids)]")
                 
-    ref_populate_field_ids = fields.Many2many('ir.model.fields',
-        string='ref_populate_field_ids',
-        compute='_compute_related_model_for_populate_field',
-    )
-    populate_list_expr = fields.Char(string='List Expr.')
-    change_field_exp = fields.Char(string='Expression')
-
+    #ref_populate_field_ids = fields.Many2many('ir.model.fields',
+    #    string='ref_populate_field_ids',
+    #    compute='_compute_related_model_for_populate_field',
+    #)
+    populate_list_expr = fields.Char(string='List Expr.',
+        help='sample expression: uom_id.category_id'
+                                    )
+    change_field_exp = fields.Char(string='Expression', 
+            help='e.g product_id.list_price + product_uom.ratio'
+                                  )
     ref_changeable_field_ids = fields.Many2many('ir.model.fields',
         string='Changable Fields', readonly=True,
         #compute='_compute_fields_from_expression',
@@ -954,11 +998,11 @@ class HRServiceItemsLine(models.Model):
         for line in self:
             line.field_label = line.field_id.field_description
 
-    @api.depends('field_id')
-    def _compute_related_model_for_populate_field(self):
-        for record in self:
-            related_fields = self.env['ir.model.fields'].search([('model', '=', record.hr_service_record_line_id.line_model_id.model), ('ttype', '=', 'many2one')])
-            record.ref_populate_field_ids = related_fields 
+    #@api.depends('field_id')
+    #def _compute_related_model_for_populate_field(self):
+    #    for record in self:
+    #        related_fields = self.env['ir.model.fields'].search([('model', '=', record.hr_service_record_line_id.line_model_id.model), ('ttype', '=', 'many2one')])
+    #        record.ref_populate_field_ids = related_fields 
             
     @api.onchange('field_model')
     def _onchange_field_model(self):
