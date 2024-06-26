@@ -15,7 +15,7 @@ from odoo.tools import safe_eval
 
 from odoo.osv.expression import OR
 import json
-
+from odoo.osv import expression
 
 class CustomerPortal(CustomerPortal):
     
@@ -710,7 +710,7 @@ class CustomerPortal(CustomerPortal):
 
         fields = request.env['ir.model.fields'].search([('model', '=', service.header_model_id.model)])
         field_types = {field.name: field.ttype for field in fields}
-    
+
         for key, value in kw.items():
             if key.startswith('and_or_row'):
                 current_condition = value
@@ -719,57 +719,46 @@ class CustomerPortal(CustomerPortal):
                 field = kw.get(f'field1_row{index}')
                 operator = kw.get(f'field2_row{index}')
                 search_value = kw.get(f'field3_row{index}')
-                # if field and operator and search_value:
-                #    if search_params:
-                #        search_params.append(current_condition)
-                #    search_params.append((field, operator, search_value))
                 
                 if field and operator:
-                    if search_params:
-                        search_params.append(current_condition)
                     if operator == '0':
-                        search_params.append((field, '=', False))
+                        condition = (field, '=', False)
                     elif operator == '1':
-                        search_params.append((field, '=', True))
+                        condition = (field, '=', True)
                     else:
                         field_type = field_types.get(field)
                         if field_type in ['integer', 'float', 'monetary']:
                             try:
                                 if field_type == 'integer':
                                     search_value = int(search_value.replace(',', '').replace(' ', ''))
-                                elif field_type == 'float' or field_type == 'monetary':
+                                elif field_type in ['float', 'monetary']:
                                     search_value = float(search_value.replace(',', '').replace(' ', ''))
                             except ValueError:
-                                # Skip this condition if conversion fails
                                 continue
-                        search_params.append((field, operator, search_value))
-                    
-                    
-        
-        # Convert search_params to the format expected by Odoo
-        domain = []
-        for param in search_params:
-            if isinstance(param, str):
-                domain.append(param)  # Add the condition (& or |)
-            else:
-                domain.append(param)
-    
-        
-        
-        
-        
-        records = service.sudo()._get_records_search_by_domain(search_params)
-        #sample_records = request.env[service.header_model_id.model].sudo().browse(records)
-        #raise UserError(str(search_params))
+                        condition = (field, operator, search_value)
 
+                    if search_params:
+                        search_params.append((current_condition,))
+                    search_params.append(condition)
+
+        # Adjust the domain to ensure operators are correctly placed
+        domain = []
+        if search_params:
+            domain.append(search_params.pop(0))
+            while search_params:
+                if isinstance(search_params[0], tuple) and len(search_params[0]) == 1:
+                    domain.insert(0, search_params.pop(0)[0])
+                domain.append(search_params.pop(0))
+
+        #raise UserError(str(domain))
         
+        records = service.sudo()._get_records_search_by_domain(domain)
+
         values = self._service_records_get_page_view_values(service, access_token=False, **kw)
         values.update({
-            'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service,records),
+            'portal_hr_service_dyanmic_page_template': self.portal_hr_service_dyanmic_page_template(service, records),
         })  
         return request.render("de_portal_hr_service.portal_my_hr_service", values)
-        
-
         #return request.make_response(json.dumps({'status': 'success', 'records': records_data}), headers={'Content-Type': 'application/json'})
 
         # return json.dumps({'status': 'success', 'records': search_params})
