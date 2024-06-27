@@ -32,7 +32,7 @@ class FeeSlip(models.Model):
 
     fee_struct_id = fields.Many2one(
         'oe.fee.struct', string='Fee Structure',
-        compute='_compute_struct_id', store=True, readonly=False,
+        compute='_compute_struct_id', store=True, readonly=False, required=True,
     )
     currency_id = fields.Many2one('res.currency', store=True, 
                                   compute='_compute_currency', readonly=False

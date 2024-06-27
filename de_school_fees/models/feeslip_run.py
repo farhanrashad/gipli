@@ -14,29 +14,43 @@ class FeeslipRun(models.Model):
     _description = 'Feeslip Batches'
     _order = 'date_end desc'
 
-    name = fields.Char(required=True, readonly=True, states={'draft': [('readonly', False)]})
-    slip_ids = fields.One2many('oe.feeslip', 'feeslip_run_id', string='Feeslips', readonly=True,
-        states={'draft': [('readonly', False)]})
+    name = fields.Char(required=True,)
+    slip_ids = fields.One2many('oe.feeslip', 'feeslip_run_id', string='Feeslips', readonly=True,)
     state = fields.Selection([
         ('draft', 'New'),
         ('verify', 'Confirmed'),
         ('close', 'Done'),
         ('paid', 'Paid'),
     ], string='Status', index=True, readonly=True, copy=False, default='draft', store=True, compute='_compute_state_change')
-    date_start = fields.Date(string='Date From', required=True, readonly=True,
-        states={'draft': [('readonly', False)]}, default=lambda self: fields.Date.to_string(date.today().replace(day=1)))
-    date_end = fields.Date(string='Date To', required=True, readonly=True,
-        states={'draft': [('readonly', False)]},
+    date_start = fields.Date(string='Date From', required=True, 
+        default=lambda self: fields.Date.to_string(date.today().replace(day=1)))
+    date_end = fields.Date(string='Date To', required=True, 
         default=lambda self: fields.Date.to_string((datetime.now() + relativedelta(months=+1, day=1, days=-1)).date()))
-    feeslip_count = fields.Integer(compute='_compute_feeslip_count')
-    company_id = fields.Many2one('res.company', string='Company', readonly=True, required=True,
-        default=lambda self: self.env.company)
-    country_id = fields.Many2one(
-        'res.country', string='Country',
-        related='company_id.country_id', readonly=True
-    )
-    country_code = fields.Char(related='country_id.code', depends=['country_id'], readonly=True)
 
+    fee_struct_id = fields.Many2one(
+        'oe.fee.struct', string='Fee Structure',
+        store=True, readonly=False, required=True,
+    )
+    
+    feeslip_count = fields.Integer(compute='_compute_feeslip_count')
+    company_id = fields.Many2one('res.company', string='Company', 
+        default=lambda self: self.env.company)
+
+    @api.onchange('fee_struct_id')
+    def _onchange_fee_struct_id(self):
+        today = datetime.today()
+        first_day_of_month = today.replace(day=1)
+
+        if self.fee_struct_id:
+            self.date_start = first_day_of_month
+            schedule_pay_duration = self.fee_struct_id.schedule_pay_duration
+            date_to = first_day_of_month + relativedelta(months=schedule_pay_duration)
+            self.date_end = date_to - relativedelta(days=1)  # To get the last day of the calculated month
+        else:
+            self.date_start = first_day_of_month
+            last_day_of_month = first_day_of_month + relativedelta(months=1) - relativedelta(days=1)
+            self.date_end = last_day_of_month
+            
     def _compute_feeslip_count(self):
         for feeslip_run in self:
             feeslip_run.feeslip_count = len(feeslip_run.slip_ids)
@@ -103,3 +117,12 @@ class FeeslipRun(models.Model):
 
     def _are_feeslips_ready(self):
         return all(slip.state in ['done', 'cancel'] for slip in self.mapped('slip_ids'))
+
+    def action_feeslip_by_students(self):
+        return {
+            'name': 'Generate Feeslips',
+            'view_mode': 'form',
+            'res_model': 'oe.feeslip.students',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }

@@ -16,18 +16,18 @@ class FeeslipStudents(models.TransientModel):
     _name = 'oe.feeslip.students'
     _description = 'Generate feeslips for all selected students'
 
-    def _get_available_contracts_domain(self):
-        return [('contract_ids.state', 'in', ('open', 'close')), ('company_id', '=', self.env.company.id)]
+    def _get_available_student_domain(self):
+        return [('is_student', '=', True)]
 
-    def _get_employees(self):
-        active_employee_ids = self.env.context.get('active_employee_ids', False)
-        if active_employee_ids:
-            return self.env['hr.employee'].browse(active_employee_ids)
+    def _get_students(self):
+        active_student_ids = self.env.context.get('active_student_ids', False)
+        if active_student_ids:
+            return self.env['res.partner'].browse(active_student_ids)
         # YTI check dates too
-        return self.env['hr.employee'].search(self._get_available_contracts_domain())
+        return self.env['res.partner'].search(self._get_available_student_domain())
 
     student_ids = fields.Many2many('res.partner', 'oe_student_group_rel', 'feeslip_id', 'student_id', 'Students',
-                                    default=lambda self: self._get_employees(), required=True,
+                                    default=lambda self: self._get_students(), required=True,
                                     #compute='_compute_student_ids', 
                                    store=True, readonly=False)
     fee_struct_id = fields.Many2one('oe.fee.struct', string='Fee Structure')

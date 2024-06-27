@@ -67,7 +67,7 @@
         <field name="arch" type="xml">
             <form string="Feeslips Batches">
             <header>
-                <button name="%(action_feeslip_by_students)d" type="action" invisible="state != 'draft'" string="Generate Feeslips" class="oe_highlight"/>
+                <button name="action_feeslip_by_students" type="object" invisible="state != 'draft'" string="Generate Feeslips" class="oe_highlight"/>
                 <button name="action_validate" type="object" string="Validate" invisible="state!='verify'" class="oe_highlight" context="{'feeslip_generate_pdf': True}"/>
                 <button string="Mark as paid" name="action_paid" type="object" invisible="state != 'close'" class="oe_highlight"/>
                 <button string="Set to Draft" name="action_draft" type="object" invisible="state not in ('verify','close')"/>
@@ -88,15 +88,14 @@
                 </h1>
                 <group>
                     <group>
+                        <field name="fee_struct_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                    <group>
                         <label for="date_start" string="Period"/>
                         <div class="o_row">
                             <field name="date_start" class="oe_inline o_hr_narrow_field"/> - <field name="date_end" class="oe_inline o_hr_narrow_field"/>
                         </div>
-                    </group>
-                    <group>
-                        <field name="company_id" groups="base.group_multi_company"/>
-                        <field name="country_id" invisible="1"/>
-                        <field name="country_code" invisible="1"/>
                     </group>
                 </group>
             </sheet>
