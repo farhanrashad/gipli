@@ -71,7 +71,7 @@ class EnrollmentContract(models.Model):
     def _compute_admission_team_id(self):
         cached_teams = {}
         for order in self:
-            default_team_id = order.admission_team_id.id
+            default_team_id = order.admission_team_id.id if order.admission_team_id else None
             user_id = order.user_id.id
             company_id = order.company_id.id
             key = (default_team_id, user_id, company_id)
