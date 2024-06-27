@@ -8,9 +8,8 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="category_id"/>
-                <field name="fee_struct_id" invisible="1"/>
-                <field name="sequence" invisible="1"/>
-                <field name="partner_id"/>
+                <field name="fee_struct_id" column_invisible="1"/>
+                <field name="sequence" column_invisible="1"/>
             </tree>
         </field>
     </record>
@@ -91,9 +90,7 @@
                             <group colspan="4">
                                 <field colspan="4" name="amount_python_compute" invisible="amount_select !='code'" required="amount_select == 'code'"/>
                             </group>
-                            <group string="Company Contribution">
-                                <field name="partner_id"/>
-                            </group>
+                            
                         </group>
                     </page>
                     <page name="description" string="Description">

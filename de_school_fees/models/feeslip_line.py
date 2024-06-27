@@ -18,6 +18,7 @@ class FeeslipLine(models.Model):
                        help="The code of salary rules can be used as reference in computation of other rules. "
                        "In that case, it is case sensitive.")
     feeslip_id = fields.Many2one('oe.feeslip', string='Fee Slip', required=True, ondelete='cascade')
+    currency_id = fields.Many2one('res.currency',related='feeslip_id.currency_id')
     fee_rule_id = fields.Many2one('oe.fee.rule', string='Rule', required=True)
     #contract_id = fields.Many2one('hr.contract', string='Contract', required=True, index=True)
     student_id = fields.Many2one('res.partner', string='Student', required=True)
@@ -31,7 +32,6 @@ class FeeslipLine(models.Model):
     amount_percentage = fields.Float(related='fee_rule_id.amount_percentage', readonly=True)
     appears_on_feeslip = fields.Boolean(related='fee_rule_id.appears_on_feeslip', readonly=True)
     category_id = fields.Many2one(related='fee_rule_id.category_id', readonly=True, store=True)
-    partner_id = fields.Many2one(related='fee_rule_id.partner_id', readonly=True, store=True)
 
     date_from = fields.Date(string='From', related="feeslip_id.date_from", store=True)
     date_to = fields.Date(string='To', related="feeslip_id.date_to", store=True)

@@ -79,8 +79,6 @@ result = rules.NET > categories.NET * 0.10''',
 
                     result = enrol_order.amount_total * 0.10''')
     amount_percentage_base = fields.Char(string='Percentage based on', help='result will be affected to a variable')
-    partner_id = fields.Many2one('res.partner', string='Partner',
-        help="Eventual third party involved in the fee payment of the employees.")
     note = fields.Html(string='Description')
 
     analytic_account_id = fields.Many2one(

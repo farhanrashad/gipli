@@ -21,7 +21,7 @@ class FeeStructure(models.Model):
     code = fields.Char()
     active = fields.Boolean(default=True)
     #type_id = fields.Many2one('hr.payroll.structure.type', required=True)
-    country_id = fields.Many2one('res.country', string='Country', default=lambda self: self.env.company.country_id)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
     note = fields.Html(string='Description')
     rule_ids = fields.One2many(
         'oe.fee.rule', 'fee_struct_id',

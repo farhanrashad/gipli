@@ -8,7 +8,9 @@
             <tree string="Fee Structure">
                 <field name="name"/>
                 <field name="rule_ids"/>
-                <field name="country_id" options="{'no_create': True}"/>
+                <field name="company_id" options="{'no_create': True}"
+                    groups="base.group_multi_company"
+                />
             </tree>
         </field>
     </record>
@@ -57,15 +59,19 @@
                     <h1><field name="name" placeholder="e.g. Regular Feeslip"/></h1>
                 </div>
                 <group>
-                    <group name="fee_details">
-                        <field name="active" invisible="1"/>
-                        <field name="id" invisible="1"/>
-                        <field name="use_enrol_contract_lines"/>
-                        <field name="country_id" options="{'no_create': True, 'no_open': True}"/>
-                    </group>
                     <group>
                         <field name="course_id" options="{'no_create': True, 'no_open': True}"/>
                         <field name="batch_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="company_id" 
+                            options="{'no_create': True, 'no_open': True}"
+                            groups="base.group_multi_company"
+                        />
+                        
+                        <field name="journal_id" options="{'no_create': True, 'no_open': True}"/>
+                    </group>
+                    <group name="fee_details">
+                        <field name="active" invisible="1"/>
+                        <field name="id" invisible="1"/>
                         <div class="o_td_label" invisible="pay_one_time == True">
                             <label for="schedule_pay_duration" string="Schedule Pay" />
                         </div>
@@ -75,21 +81,21 @@
                             <span class="ml8"> Month(s)</span>
                         </div>
                         <field name="pay_one_time" />
-                        <field name="journal_id" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="use_enrol_contract_lines"/>
+                        
                     </group>
                 </group>
                 <notebook colspan="4">
                      <page name="fee_rules" string="Particulars">
                        <field name="rule_ids" readonly="id == False">
                          <tree>
+                            <field name="sequence" widget="handle"/>
                             <field name="name"/>
                             <field name="code"/>
                             <field name="category_id"/>
                              <field name="quantity"/>
                              <field name="amount_fix" />
-                             <field name="amount_total" sum="Amount"/>
-                            <field name="sequence" invisible="1"/>
-                            <field name="partner_id"/>
+                             <field name="amount_total" sum="Amount"/>                            
                          </tree>
                       </field>
                      </page>

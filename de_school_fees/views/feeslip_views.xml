@@ -6,7 +6,7 @@
         <field name="model">oe.feeslip</field>
         <field name="arch" type="xml">
             <tree string="Feeslips" js_class="hr_payroll_feeslip_tree" sample="1" multi_edit="1">
-                <field name="currency_id" invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
                 <field name="number" decoration-bf="1"/>
                 <field name="student_id" />
                 <!--
@@ -15,7 +15,7 @@
                 <field name="fee_struct_id" optional="hide"/>
                 <field name="date_from" optional="hide"/>
                 <field name="date_to" optional="hide"/>
-                <field name="company_id" invisible="1"/>
+                <field name="company_id" column_invisible="1"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'verify'" decoration-success="state in ('done','paid')"/>
                 <field name="amount_total" />
@@ -67,19 +67,26 @@
             <form string="Feeslip">
                 <header>
                     <button string="Confirm" name="action_feeslip_done" type="object" invisible="state != 'verify'" class="oe_highlight" context="{'feeslip_generate_pdf': True}"/>
+
+                    <!--
                     <button string="Mark as paid" name="action_feeslip_paid" type="object" invisible="state != 'done'" class="oe_highlight"/>
-                    <button string="Refund" name="refund_sheet" type="object" invisible="has_refund_slip == True or credit_note == True or state not in ('done', 'paid')"/>
-                    <button string="Refund" name="refund_sheet" type="object" invisible="has_refund_slip == False or credit_note == True or state not in ('done', 'paid')" confirm="Another refund feeslip with the same amount has been found. Do you want to create a new one?"/>
+                    -->
+                    
+                    <button string="Refund" name="refund_sheet" type="object" invisible="state not in ('paid')"/>
                     <button string="Set to Draft" name="action_feeslip_draft" type="object" invisible="state !='cancel'"/>
-                    <button string="Compute Sheet" name="compute_sheet" type="object" invisible="state != 'draft' or credit_note == True" class="oe_highlight" help="Recompute the feeslip lines only, not the worked days / input lines"/>
-                    <button string="Compute Sheet" name="compute_sheet" type="object" invisible="state != 'verify' or credit_note == True" help="Recompute the feeslip lines only, not the worked days / input lines"/>
+                    <button string="Compute Sheet" name="compute_sheet" type="object" invisible="state != 'draft'" class="oe_highlight" help="Recompute the feeslip lines only, not the worked days / input lines"/>
+                    
                     <button string="Cancel" name="action_feeslip_cancel" type="object" invisible="state not in ('draft','done','verify')"/>
+                    <!--
                     <button string="Print" name="action_print_feeslip" type="object"/>
+                    -->
+                    
                     <button string="Export Feeslip" name="action_export_feeslip" type="object" invisible="is_superuser == False"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done,paid"/>
                 </header>
                 <sheet>
                     <!-- invisible Feilds -->
+                    <field name="use_enrol_contract_lines" invisible="1" />
                     <field name="currency_id" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
                         <!--
@@ -95,9 +102,13 @@
                     <div class="row justify-content-between position-relative w-100 m-0">
                         <div class="oe_title mw-75 ps-0 pe-2" name="title">
                             <h1 class="d-flex flex-row align-items-center">
-                                <field name="student_id" placeholder="Student" readonly="state not in ['draft', 'verify']"/>
+                                <field name="student_id" 
+                                    placeholder="Student" 
+                                    readonly="state != 'draft'"
+                                />
                             </h1>
-                            <h2 invisible="state == 'draft'"><field name="number" readonly="state not in ['draft', 'verify']"/></h2>
+                            <h2 invisible="state == 'draft'">
+                                <field name="number" readonly="state != 'draft'"/></h2>
                         </div>
                         <div class="o_partner_avatar mw-25 m-0 p-0">
                             <field name="image_1920" widget='image' class="oe_avatar m-0" options='{"zoom": true, "preview_image":"avatar_128"}'/>
@@ -110,23 +121,17 @@
                             <field name="course_id" />
                             <field name="batch_id" />
                             
-                            <label for="date_from" string="Period"/>
+                            <label for="date_from" string="Period" />
                             <div>
-                                <field name="date_from" class="oe_inline"/> - <field name="date_to" class="oe_inline"/>
+                                <field name="date_from" readonly="state != 'draft'" class="oe_inline"/> - <field name="date_to" readonly="state != 'draft'" class="oe_inline"/>
                             </div>
-                            <field name="country_id" invisible="1"/>
-                            <field name="country_code" invisible="1"/>
-                            <field name="number" />
                         </group>
                         <group>
-                        <!--
-                            <field name="feeslip_run_id" string="Batch"/>
-                        -->
-                            <field name="enrol_order_id" options="{'no_create': True}" context="{'form_view_ref':'de_school_enrollment.enrol_contract_primary_form_view'}"/>
-                            <field name="fee_struct_id" options="{'no_create': True}"/>
-                        <!--
-                        <field name="salary_attachment_ids" invisible="1" force_save="1"/>
-                        -->
+                        
+                            <field name="enrol_order_id" readonly="state != 'draft'" options="{'no_create': True}" context="{'form_view_ref':'de_school_enrollment.enrol_contract_primary_form_view'}"/>
+                            <field name="fee_struct_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="currency_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                        
                             
                             <field name="credit_note" invisible="1"/>
                             <field name="is_superuser" invisible="1"/>
@@ -136,7 +141,7 @@
                     <notebook>
                         <page string="Fee Lines" name="fee_lines">
                             <separator string="Contract Lines"/>
-                                <field name="enrol_order_line_ids" colspan="4" nolabel="1">
+                                <field name="enrol_order_line_ids" invisible="not use_enrol_contract_lines" colspan="4" nolabel="1">
                                     <tree string="Enrolment Lines" editable="bottom" create="0" delete="0">
                                         <field name="name"/>
                                         <field name="code"/>
@@ -163,7 +168,7 @@
                                 </field>
                             -->
                             <separator string="Other Fee Inputs"/>
-                            <field name="input_line_ids" colspan="4" nolabel="1">
+                            <field name="input_line_ids" readonly="state != 'draft'" colspan="4" nolabel="1">
                                 <tree string="Input Data" editable="bottom">
                                     <field name="feeslip_id" column_invisible="1" required="0"/>
                                     <field name="_allowed_input_type_ids" column_invisible="1"/>
@@ -191,13 +196,14 @@
                                     <field name="code" column_invisible="True"/>
                                     <field name="quantity" />
                                     <field name="rate" />
-                                    <field name="amount" />
+                                    <field name="amount" sum="amount"/>
                                     <field name="sequence" column_invisible="True"/>
-                                    <field name="appears_on_feeslip"/>
+                                    <field name="appears_on_feeslip" column_invisible="1"/>
                                     <field name="fee_rule_id" column_invisible="1"/>
                                     <field name="category_id" column_invisible="1"/>
                                     <field name="feeslip_id" column_invisible="1"/>
-                                    <field name="total"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="total" sum="total"/>
                                 </tree>
                                 <form string="Feeslip Line">
                                     <group col="4">
@@ -219,6 +225,9 @@
                                 <group>
                                     <field name="account_move_id" />
                                     <field name="company_id" />
+                                </group>
+                                <group>
+                                    <field name="feeslip_run_id" string="Batch"/>
                                 </group>
                             </group>
                         </page>
