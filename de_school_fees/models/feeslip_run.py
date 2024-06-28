@@ -64,6 +64,7 @@ class FeeslipRun(models.Model):
     def action_draft(self):
         if self.slip_ids.filtered(lambda s: s.state == 'paid'):
             raise ValidationError(_('You cannot reset a batch to draft if some of the feeslips have already been paid.'))
+        self.slip_ids.sudo().unlink()
         self.write({'state': 'draft'})
         self.slip_ids.write({'state': 'draft'})
 

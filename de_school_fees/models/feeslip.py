@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import base64
 import logging
@@ -457,7 +456,8 @@ class FeeSlip(models.Model):
             number = feeslip.number or self.env['ir.sequence'].next_by_code('fee.slip')
             lines = [(0, 0, line) for line in feeslip._get_feeslip_lines()]
             feeslip.write({'line_ids': lines, 'number': number, 'state': 'verify', 'compute_date': fields.Date.today()})
-        return True
+        
+        #return True
 
     def _get_base_local_dict(self):
         return {
@@ -491,6 +491,8 @@ class FeeSlip(models.Model):
         self.ensure_one()
 
         localdict = self.env.context.get('force_feeslip_localdict', None)
+
+        
         if localdict is None:
             localdict = self._get_localdict()
 

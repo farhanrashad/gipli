@@ -11,6 +11,7 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import format_date
 
+from odoo.osv import expression
 
 class FeeslipStudents(models.TransientModel):
     _name = 'oe.feeslip.students'
@@ -26,128 +27,83 @@ class FeeslipStudents(models.TransientModel):
         # YTI check dates too
         return self.env['res.partner'].search(self._get_available_student_domain())
 
+    
+    feeslip_run_id = fields.Many2one('oe.feeslip.run', string='Batch Name', readonly=True,
+        default=lambda self: self.env.context.get('active_id')
+    )
+
+    student_ids_domain = fields.Many2many('res.partner', compute='_compute_student_ids_domain')
     student_ids = fields.Many2many('res.partner', 'oe_student_group_rel', 'feeslip_id', 'student_id', 'Students',
-                                    default=lambda self: self._get_students(), required=True,
-                                    #compute='_compute_student_ids', 
-                                   store=True, readonly=False)
+                               store=True, readonly=False,
+                               )
+
+    
     fee_struct_id = fields.Many2one('oe.fee.struct', string='Fee Structure')
     #department_id = fields.Many2one('hr.department')
 
-    #@api.depends('department_id')
-    def _compute_employee_ids(self):
-        for wizard in self:
-            domain = wizard._get_available_contracts_domain()
-            if wizard.department_id:
-                domain = expression.AND([
-                    domain,
-                    [('department_id', 'child_of', self.department_id.id)]
-                ])
-            wizard.employee_ids = self.env['hr.employee'].search(domain)
+    @api.model
+    def default_get(self, fields):
+        res = super(FeeslipStudents, self).default_get(fields)
+        if 'fee_struct_id' in self._context:
+            res['fee_struct_id'] = self._context.get('fee_struct_id')
+        return res
 
-    def _check_undefined_slots(self, work_entries, feeslip_run):
-        """
-        Check if a time slot in the contract's calendar is not covered by a work entry
-        """
-        work_entries_by_contract = defaultdict(lambda: self.env['hr.work.entry'])
-        for work_entry in work_entries:
-            work_entries_by_contract[work_entry.contract_id] |= work_entry
+    @api.onchange('feeslip_run_id')
+    def _onchange_feeslip_run_id(self):
+        for record in self:
+            record.fee_struct_id = record.feeslip_run_id.fee_struct_id.id
+            
+            domain = [('course_id', '=', record.feeslip_run_id.fee_struct_id.course_id.id)]
+        
+            if record.feeslip_run_id.fee_struct_id.batch_ids:
+                batch_domain = [('batch_id', 'in', record.feeslip_run_id.fee_struct_id.batch_ids.ids)]
+                domain = expression.AND([domain, batch_domain])
+    
+            record.student_ids = self.env['res.partner'].search(domain)
 
-        for contract, work_entries in work_entries_by_contract.items():
-            if contract.work_entry_source != 'calendar':
-                continue
-            calendar_start = pytz.utc.localize(datetime.combine(max(contract.date_start, feeslip_run.date_start), time.min))
-            calendar_end = pytz.utc.localize(datetime.combine(min(contract.date_end or date.max, feeslip_run.date_end), time.max))
-            outside = contract.resource_calendar_id._attendance_intervals_batch(calendar_start, calendar_end)[False] - work_entries._to_intervals()
-            if outside:
-                time_intervals_str = "\n - ".join(['', *["%s -> %s" % (s[0], s[1]) for s in outside._items]])
-                raise UserError(_("Some part of %s's calendar is not covered by any work entry. Please complete the schedule. Time intervals to look for:%s") % (contract.employee_id.name, time_intervals_str))
+    @api.depends('feeslip_run_id')
+    def _compute_student_ids_domain(self):
+        for record in self:
+            domain = record._get_student_domain()
+            students = self.env['res.partner'].search(domain)
+            record.student_ids_domain = [(6, 0, students.ids)]
 
-    def _filter_contracts(self, contracts):
-        # Could be overriden to avoid having 2 'end of the year bonus' feeslips, etc.
-        return contracts
+    def _get_student_domain(self):
+        self.ensure_one()
+        domain = [('course_id', '=', self.feeslip_run_id.fee_struct_id.course_id.id)]
+        if self.feeslip_run_id.fee_struct_id.batch_ids:
+            batch_domain = [('batch_id', 'in', self.feeslip_run_id.fee_struct_id.batch_ids.ids)]
+            domain = expression.AND([domain, batch_domain])
+        return domain
 
     def compute_sheet(self):
-        self.ensure_one()
-        if not self.env.context.get('active_id'):
-            from_date = fields.Date.to_date(self.env.context.get('default_date_start'))
-            end_date = fields.Date.to_date(self.env.context.get('default_date_end'))
-            today = fields.date.today()
-            first_day = today + relativedelta(day=1)
-            last_day = today + relativedelta(day=31)
-            if from_date == first_day and end_date == last_day:
-                batch_name = from_date.strftime('%B %Y')
-            else:
-                batch_name = _('From %s to %s', format_date(self.env, from_date), format_date(self.env, end_date))
-            feeslip_run = self.env['oe.feeslip.run'].create({
-                'name': batch_name,
-                'date_start': from_date,
-                'date_end': end_date,
-            })
-        else:
-            feeslip_run = self.env['oe.feeslip.run'].browse(self.env.context.get('active_id'))
+        feeslips = self.env['oe.feeslip']
+        Feeslip = self.env['oe.feeslip']
+        
+        if not self.student_ids:
+            raise UserError(_("No students selected. Please select students to generate feeslips."))
 
-        employees = self.with_context(active_test=False).employee_ids
-        if not employees:
-            raise UserError(_("You must select employee(s) to generate feeslip(s)."))
+        default_values = Feeslip.default_get(Feeslip.fields_get())
+        feeslips_vals = []
 
-        #Prevent a feeslip_run from having multiple feeslips for the same employee
-        employees -= feeslip_run.slip_ids.employee_id
+        
         success_result = {
             'type': 'ir.actions.act_window',
             'res_model': 'oe.feeslip.run',
             'views': [[False, 'form']],
-            'res_id': feeslip_run.id,
+            'res_id': self.feeslip_run_id.id,
         }
-        if not employees:
+        if not self.student_ids:
             return success_result
-
-        feeslips = self.env['oe.feeslip']
-        Feeslip = self.env['oe.feeslip']
-
-        #contracts = employees._get_contracts(
-        #    payslip_run.date_start, payslip_run.date_end, states=['open', 'close']
-        #).filtered(lambda c: c.active)
-        #contracts._generate_work_entries(payslip_run.date_start, payslip_run.date_end)
-        #work_entries = self.env['hr.work.entry'].search([
-        #    ('date_start', '<=', payslip_run.date_end),
-        #    ('date_stop', '>=', payslip_run.date_start),
-        #    ('employee_id', 'in', employees.ids),
-        #])
-        #self._check_undefined_slots(work_entries, payslip_run)
-
-        if(self.structure_id.type_id.default_struct_id == self.structure_id):
-            work_entries = work_entries.filtered(lambda work_entry: work_entry.state != 'validated')
-            if work_entries._check_if_error():
-                work_entries_by_contract = defaultdict(lambda: self.env['hr.work.entry'])
-
-                for work_entry in work_entries.filtered(lambda w: w.state == 'conflict'):
-                    work_entries_by_contract[work_entry.contract_id] |= work_entry
-
-                for contract, work_entries in work_entries_by_contract.items():
-                    conflicts = work_entries._to_intervals()
-                    time_intervals_str = "\n - ".join(['', *["%s -> %s" % (s[0], s[1]) for s in conflicts._items]])
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Some work entries could not be validated.'),
-                        'message': _('Time intervals to look for:%s', time_intervals_str),
-                        'sticky': False,
-                    }
-                }
-
-
-        default_values = Feeslip.default_get(Feeslip.fields_get())
-        feeslips_vals = []
-        for contract in self._filter_contracts(contracts):
+            
+        for student in self.student_ids:
             values = dict(default_values, **{
                 'name': _('New Feeslip'),
-                'employee_id': contract.employee_id.id,
-                'feeslip_run_id': feeslip_run.id,
-                'date_from': feeslip_run.date_start,
-                'date_to': feeslip_run.date_end,
-                'contract_id': contract.id,
-                'struct_id': self.structure_id.id or contract.structure_type_id.default_struct_id.id,
+                'student_id': student.id,
+                'feeslip_run_id': self.feeslip_run_id.id,
+                'date_from': self.feeslip_run_id.date_start,
+                'date_to': self.feeslip_run_id.date_end,
+                'fee_struct_id': self.feeslip_run_id.fee_struct_id.id,
             })
             feeslips_vals.append(values)
         feeslips = Feeslip.with_context(tracking_disable=True).create(feeslips_vals)
@@ -156,3 +112,34 @@ class FeeslipStudents(models.TransientModel):
         feeslip_run.state = 'verify'
 
         return success_result
+
+    def compute_sheet_backup(self):
+        feeslip_obj = self.env['oe.feeslip']
+        for student in self.student_ids:
+            vals = {
+                #'name': student.name,
+                'student_id': student.id,
+                'feeslip_run_id': self.feeslip_run_id.id,
+                'date_from': self.feeslip_run_id.date_start,
+                'date_to': self.feeslip_run_id.date_end,
+                'fee_struct_id': self.feeslip_run_id.fee_struct_id.id,
+                # Add other relevant fields based on your requirements
+            }
+            payslips = Payslip.with_context(tracking_disable=True).create(payslips_vals)
+        payslips._compute_name()
+        payslips.compute_sheet()
+        
+        feeslip_obj.create(vals)
+        try:
+            feeslip_obj.compute_sheet()
+        except Exception as e:
+            # Log or print the exception for debugging purposes
+            raise UserError(f"Error computing feeslip for student {student.name}: {e}")
+            
+            #feeslip_obj.sudo().compute_sheet()
+        
+        #return {
+        #    'type': 'ir.actions.client',
+        #    'tag': 'reload',  # Reload the current view after creating feeslips
+        #}
+        

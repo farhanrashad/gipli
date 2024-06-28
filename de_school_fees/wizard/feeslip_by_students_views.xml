@@ -6,18 +6,12 @@
             <field name="model">oe.feeslip.students</field>
             <field name="arch" type="xml">
                 <form string="Feeslips by Students">
-                    <span nolabel="1" colspan="2">This wizard will generate payslips for all selected students(s) based on the dates and credit note specified on Payslips Run.</span>
-                    <separator string="Fee Structure"/>
-                    <div class="o_row">
-                        <p class="text-muted w-50">Set a specific structure if you wish to make an extra payslip (eg: End of the year bonus). If you leave this field empty, a regular payslip will be generated for all the selected students, based on their contracts configuration.</p>
-                        <field name="fee_struct_id" nolabel="1"/>
-                    </div>
-                    <separator string="Department" colspan="2"/>
-                    <div class="o_row">
-                        <p class="text-muted w-50">Set a specific department if you wish to select all the students from this department (and subdepartments) at once.</p>
-                    </div>
+                    <field name="feeslip_run_id" invisible="0"/>
+                    <field name="student_ids_domain" widget="man2many_tags" invisible="0"/>
+                    <span nolabel="1" colspan="2">This wizard will generate feeslips for all selected students(s) based on the dates and fee structure specified on Feeslips Run.</span>
                     <separator string="Students"/>
-                    <field name="student_ids" nolabel="1">
+                    
+                    <field name="student_ids" domain="[('id','in',student_ids_domain)]" nolabel="1">
                         <tree>
                             <field name="name"/>
                             <field name="email"/>
