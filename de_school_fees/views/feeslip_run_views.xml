@@ -70,7 +70,9 @@
                 <button name="action_feeslip_by_students" type="object" invisible="state != 'draft'" string="Generate Feeslips" class="oe_highlight"/>
                 <button name="action_validate" type="object" string="Validate" invisible="state!='verify'" class="oe_highlight" context="{'feeslip_generate_pdf': True}"/>
                 <button string="Mark as paid" name="action_paid" type="object" invisible="state != 'close'" class="oe_highlight"/>
-                <button string="Set to Draft" name="action_draft" type="object" invisible="state not in ('verify','close')"/>
+                <button string="Set to Draft" name="action_draft" type="object" invisible="state not in ('cancel')"/>
+                <button string="cancel" name="action_cancel" type="object" invisible="state not in ('verify','close')"/>
+                
                 <field name="state" widget="statusbar"/>
             </header>
             <sheet>

@@ -6,8 +6,8 @@
             <field name="model">oe.feeslip.students</field>
             <field name="arch" type="xml">
                 <form string="Feeslips by Students">
-                    <field name="feeslip_run_id" invisible="0"/>
-                    <field name="student_ids_domain" widget="man2many_tags" invisible="0"/>
+                    <field name="feeslip_run_id" invisible="1"/>
+                    <field name="student_ids_domain" widget="man2many_tags" invisible="1"/>
                     <span nolabel="1" colspan="2">This wizard will generate feeslips for all selected students(s) based on the dates and fee structure specified on Feeslips Run.</span>
                     <separator string="Students"/>
                     

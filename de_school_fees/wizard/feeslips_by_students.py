@@ -109,7 +109,7 @@ class FeeslipStudents(models.TransientModel):
         feeslips = Feeslip.with_context(tracking_disable=True).create(feeslips_vals)
         feeslips._compute_name()
         feeslips.compute_sheet()
-        feeslip_run.state = 'verify'
+        self.feeslip_run_id.state = 'verify'
 
         return success_result
 

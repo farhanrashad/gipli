@@ -20,7 +20,7 @@ class FeeslipRun(models.Model):
         ('draft', 'New'),
         ('verify', 'Confirmed'),
         ('close', 'Done'),
-        ('paid', 'Paid'),
+        ('cancel', 'Cancel'),
     ], string='Status', index=True, readonly=True, copy=False, default='draft', store=True, compute='_compute_state_change')
     date_start = fields.Date(string='Date From', required=True, 
         default=lambda self: fields.Date.to_string(date.today().replace(day=1)))
@@ -63,11 +63,18 @@ class FeeslipRun(models.Model):
 
     def action_draft(self):
         if self.slip_ids.filtered(lambda s: s.state == 'paid'):
-            raise ValidationError(_('You cannot reset a batch to draft if some of the feeslips have already been paid.'))
+            raise ValidationError(_('You cannot reset a batch to draft if some of the feeslips have already been confirmed.'))
         self.slip_ids.sudo().unlink()
         self.write({'state': 'draft'})
         self.slip_ids.write({'state': 'draft'})
 
+    def action_cancel(self):
+        if self.slip_ids.filtered(lambda s: s.state == 'paid'):
+            raise ValidationError(_('You cannot cancel a batch if some of the feeslips have already been confirmed.'))
+        self.slip_ids.sudo().action_feeslip_cancel()
+        self.slip_ids.write({'state': 'cancel'})
+        self.write({'state': 'cancel'})
+        
     def action_open(self):
         self.write({'state': 'verify'})
 
