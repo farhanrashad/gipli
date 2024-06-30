@@ -15,7 +15,9 @@ class XplInstance(models.Model):
     _description = 'Xpendless Instance'
 
     name = fields.Char(string='Name', required=True, readonly=False)
-    api_key = fields.Char(string='API Key', required=True, help='Secret API Key', readonly=False)
+    api_key = fields.Char(string='API Key', required=True, help='API Key', readonly=False)
+    api_secret = fields.Char(string='Secret', required=True, help=' API Secret', readonly=False)
+    access_token = fields.Char(string='Token')
     url = fields.Char(string='URL', required=True, readonly=False, )
     url_sample = fields.Char(default='https://api.xpendless.com/')
     
@@ -30,12 +32,12 @@ class XplInstance(models.Model):
     )
 
     # operations fields
-    apl_date_import_contacts = fields.Datetime(string='Contacts import date')
-    apl_date_import_accounts = fields.Datetime(string='Accounts import date')
-    apl_date_import_leads = fields.Datetime(string='Leads import date')
+    apl_date_import_companies = fields.Datetime(string='Companies import date')
+    apl_date_import_employees = fields.Datetime(string='Employees import date')
+    apl_date_import_expenses = fields.Datetime(string='Expenses import date')
 
-    apl_date_export_contacts = fields.Datetime(string='Contacts export date')
-    apl_date_export_leads = fields.Datetime(string='Leads export date')
+    apl_date_export_companies = fields.Datetime(string='Companies export date')
+    apl_date_export_employees = fields.Datetime(string='Employees export date')
 
     def button_draft(self):
         self.write({
@@ -46,8 +48,13 @@ class XplInstance(models.Model):
         self.write({
             'state':'active'
         })
-        
+
     def connection_test(self):
+        self.write({
+                'state': 'verified'
+            })
+        
+    def connection_test1(self):
         
         notification = {
             'type': 'ir.actions.client',
@@ -152,10 +159,10 @@ class XplInstance(models.Model):
             'default_op_name': self.name,
         }
         return {
-            'name': 'Apollo Operations',
+            'name': 'Operations',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'apl.ops.wizard',
+            'res_model': 'xpl.ops.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
             'context': context,

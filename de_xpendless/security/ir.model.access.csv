@@ -4,3 +4,6 @@ access_xpendless_user,xpendless.user,model_xpl_instance,de_xpendless.group_xpend
 
 access_xpl_expense,access.xpl.expense,model_xpl_expense,,0,0,0,1
 access_xpl_expense_manager,access.xpl.expense.manager,model_xpl_expense,de_xpendless.group_xpendless_user,1,1,1,1
+
+
+access_xpl_ops_wizard_manager,access.xpl.ops.wizard.manager,model_xpl_ops_wizard,de_xpendless.group_xpendless_user,1,1,1,1

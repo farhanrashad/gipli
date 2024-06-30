@@ -28,11 +28,14 @@
                         </div>
                         <group>
                             <group>
+                                <field name="api_key" password="True" />
+                                <field name="access_token" password="True" />
                                 <field name="url" />
                                 <field name="url_sample" class="text-muted" nolabel="1" readonly="1"/>
+                                
                             </group>
                             <group>
-                                <field name="api_key" password="True" string="API Key"/>
+                                <field name="api_secret" password="True" />
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                         </group>
@@ -40,94 +43,94 @@
                         <notebook>
                             <page string="Settings" name="settings" invisible="state  != 'active'">
                                 <group>
-                                    <group name="group_import_operations" string="Import Operations" col="1" class="row mt16 o_settings_container" groups="sales_team.group_sale_manager">
+                                    <group name="group_import_operations" string="Import Operations" col="1" class="row mt16 o_settings_container" >
                                         <div>
                                             <!-- Import Contacts -->
-                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                            <div class="o_setting_box" id="instance_imports" >
                                                 <div class="o_setting_left_pane">
                                                 </div>
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_import" context="{'op_name':'contacts'}" icon="fa-arrow-right" type="object" string="Import Contacts" class="btn-primary"/>
+                                                            <button name="button_import" context="{'op_name':'companies'}" icon="fa-arrow-right" type="object" string="Import Companies" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_import_contacts" class="fw-bold o_form_label" string="The last contacts were imported on "/>
-                                                    <b><field name="apl_date_import_contacts" nolabel="1"/></b>
+                                                    <label for="apl_date_import_companies" class="fw-bold o_form_label" string="The last companies were imported on "/>
+                                                    <b><field name="apl_date_import_companies" nolabel="1"/></b>
                                                     <div class="text-muted">
-                                                        Seamlessly import individual contacts from Apollo into Odoo contacts.
+                                                        Seamlessly import Companies from Xpendless into Odoo contacts.
                                                     </div>
                                                 </div>
                                             </div>
                                             <!-- Import Accounts -->
-                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                            <div class="o_setting_box" id="instance_imports" >
                                                 <div class="o_setting_left_pane">
                                                 </div>
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_import" context="{'op_name':'accounts'}" icon="fa-arrow-right" type="object" string="Import Accounts" class="btn-primary"/>
+                                                            <button name="button_import" context="{'op_name':'accounts'}" icon="fa-arrow-right" type="object" string="Import Employees" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_import_accounts" class="fw-bold o_form_label" string="The last accounts were imported on "/>
-                                                    <b><field name="apl_date_import_accounts" nolabel="1"/></b>
+                                                    <label for="apl_date_import_employees" class="fw-bold o_form_label" string="The last employees were imported on "/>
+                                                    <b><field name="apl_date_import_employees" nolabel="1"/></b>
                                                     <div class="text-muted">
-                                                        Seamlessly import companies from Apollo into Odoo contacts.
+                                                        Seamlessly import employees from Xpendless into Odoo contacts.
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- import Opportunities -->
-                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                            <!-- import Expenses -->
+                                            <div class="o_setting_box" id="instance_imports">
                                                 <div class="o_setting_left_pane">
                                                 </div>
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_import" icon="fa-arrow-right" type="object" string="Import Leads" context="{'op_name':'leads'}" class="btn-primary"/>
+                                                            <button name="button_import" icon="fa-arrow-right" type="object" string="Import expenses" context="{'op_name':'expenses'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_import_leads" class="fw-bold o_form_label" string="The last leads were imported on "/>
-                                                    <b><field name="apl_date_import_leads" nolabel="1"/></b>
+                                                    <label for="apl_date_import_expenses" class="fw-bold o_form_label" string="The last Expenses were imported on "/>
+                                                    <b><field name="apl_date_import_expenses" nolabel="1"/></b>
                                                     <div class="text-muted">
-                                                        Seamlessly import leads or opportunities from Apollo into Odoo leads.
+                                                        Seamlessly import expenses from Xpendless into Odoo.
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </group>
-                                    <group name="group_export_operations" string="Export Operations" col="1" class="row mt16 o_settings_container" groups="sales_team.group_sale_manager">
+                                    <group name="group_export_operations" string="Export Operations" col="1" class="row mt16 o_settings_container" >
                                         <div>
                                             <!-- Export Contacts -->
-                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                            <div class="o_setting_box" id="instance_imports" >
                                                 <div class="o_setting_left_pane">
                                                 </div>
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Contacts" context="{'op_name':'contacts'}" class="btn-primary"/>
+                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Companies" context="{'op_name':'comapnies'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_export_contacts" class="fw-bold o_form_label" string="The last contacts were exported on "/>
-                                                    <b><field name="apl_date_export_contacts" nolabel="1"/></b>
+                                                    <label for="apl_date_export_companies" class="fw-bold o_form_label" string="The last comapnies were exported on "/>
+                                                    <b><field name="apl_date_export_companies" nolabel="1"/></b>
                                                     <div class="text-muted">
-                                                        Seamlessly export individual and company contacts into Apollo contacts and accounts.
+                                                        Seamlessly export company contacts into Xpendess.
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- Export Opportunities -->
-                                            <div class="o_setting_box" id="instance_imports" groups="sales_team.group_sale_manager">
+                                            <!-- Export Employees -->
+                                            <div class="o_setting_box" id="instance_imports">
                                                 <div class="o_setting_left_pane">
                                                 </div>
                                                 <div class="o_setting_right_pane">
                                                     <div class="content-group">
                                                         <div class="mt8">
-                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Leads" context="{'op_name':'leads'}" class="btn-primary"/>
+                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Employees" context="{'op_name':'employees'}" class="btn-primary"/>
                                                         </div>
                                                     </div>
-                                                    <label for="apl_date_export_leads" class="fw-bold o_form_label" string="The last leads were exported on "/>
-                                                    <b><field name="apl_date_export_leads" nolabel="1"/></b>
+                                                    <label for="apl_date_export_employees" class="fw-bold o_form_label" string="The last Employees were exported on "/>
+                                                    <b><field name="apl_date_export_employees" nolabel="1"/></b>
                                                     <div class="text-muted">
-                                                        Seamlessly export leads or opportunities into Xpendless opportunities.
+                                                        Seamlessly export employees into Xpendless.
                                                     </div>
                                                 </div>
                                             </div>
