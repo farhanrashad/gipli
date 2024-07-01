@@ -154,7 +154,7 @@ class XplInstance(models.Model):
 
                         
     def button_import(self):
-        
+        raise UserError(self._get_sample_api_data())
         context = {
             'default_op_name': self.name,
         }
@@ -226,34 +226,81 @@ class XplInstance(models.Model):
             raise e
 
     @api.model
-    def _get_api_data(self, api_name, api_data=None):
+    def _get_sample_api_data(self):
         # Define the sample JSON data
         sample_json_data = '''
-        {
-          "name": "Acme Corporation",
-          "registration_number": "123456789",
-          "address": "123 Main St",
-          "city": "Metropolis",
-          "email": "info@acme-corp.com",
-          "phone": "+1234567890",
-          "zip": "12345",
-          "employees": [
             {
-              "name": "Alice Johnson",
-              "email": "alice.johnson@acme-corp.com"
-            },
-            {
-              "name": "Bob Smith",
-              "email": "bob.smith@acme-corp.com"
-            },
-            {
-              "name": "Charlie Brown",
-              "email": "charlie.brown@acme-corp.com"
-            }
-          ]
-        }
-        '''
+  "companyId": 123456,
+  "companyName": "Tech Innovations Ltd",
+  "registrationNumber": "REG987654",
+  "addressLine1": "123 Tech Park",
+  "addressLine2": "Suite 400",
+  "city": "Innovate City",
+  "postalCode": "12345",
+  "companyEmail": "info@techinnovations.com",
+  "companyPhone": "+1234567890",
+  "blockingReason": "None",
+  "crCreationDate": "2021-01-15T00:00:00Z",
+  "crExpiryDate": "2023-01-14T00:00:00Z",
+  "activationDate": "2021-02-01T00:00:00Z",
+  "subscribingDate": "2021-01-20T00:00:00Z",
+  "createdAt": "2021-01-15T00:00:00Z",
+  "updateAt": "2022-12-20T00:00:00Z",
+  "status": "Active",
+  "kybStatus": "Verified",
+  "termsConditions": "Accepted",
+  "submittedFields": [
+    "companyName",
+    "registrationNumber",
+    "address",
+    "contactInfo"
+  ],
+  "attachments": [
+    {
+      "companyDocId": 123,
+      "companyId": 123456,
+      "attachmentTypeId": 1,
+      "attachmentPath": "/documents/registration.pdf",
+      "isActive": true,
+      "createdAt": "2021-01-15T00:00:00Z",
+      "updatedAt": "2021-01-15T00:00:00Z"
+    },
+    {
+      "companyDocId": 124,
+      "companyId": 123456,
+      "attachmentTypeId": 2,
+      "attachmentPath": "/documents/tax_certificate.pdf",
+      "isActive": true,
+      "createdAt": "2021-01-15T00:00:00Z",
+      "updatedAt": "2021-01-15T00:00:00Z"
+    }
+  ],
+  "CompanySettings": {
+    "companySettingId": 123,
+    "companyId": 123456,
+    "companyUrl": "https://www.techinnovations.com",
+    "companyLogo": "/images/logo.png"
+  },
+  "Owners": [
+    {
+      "employeeId": 1001,
+      "fullName": "John Doe",
+      "email": "john.doe@techinnovations.com",
+      "mobileNumber": "+1234567891"
+    },
+    {
+      "employeeId": 1002,
+      "fullName": "Jane Smith",
+      "email": "jane.smith@techinnovations.com",
+      "mobileNumber": "+1234567892"
+    }
+  ]
+}
 
+        '''
+        return sample_json_data
+    @api.model
+    def _get_api_data(self, api_name, api_data=None):
         headers = {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json'
