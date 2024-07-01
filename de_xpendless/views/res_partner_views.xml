@@ -8,7 +8,7 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
-                <field name="is_xpendless" invisible="1" />
+                <field name="is_xpendless" invisible="not is_xpendless" />
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="xpendless" string="Xpendless" invisible="not is_xpendless">
