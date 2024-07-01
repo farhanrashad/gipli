@@ -111,3 +111,101 @@ class Lead(models.Model):
     # Actions
     def _cron_import_company_from_xpl(self):
         raise UserError('hello')
+
+    from odoo import models, fields, api
+
+class CrmLead(models.Model):
+    _inherit = 'crm.lead'
+
+    @api.model
+    def create_or_update_opportunity(self, json_data):
+        opportunity_values = {}
+
+        companyId = int(json_data.get('id'))
+        companyName = json_data.get('companyName')
+        registrationNumber = json_data.get('registrationNumber')
+        addressLine1 = json_data.get('addressLine1')
+        addressLine2 = json_data.get('addressLine2')
+        city = json_data.get('city')
+        postalCode = json_data.get('postalCode')
+        companyEmail = json_data.get('companyEmail')
+        companyPhone = json_data.get('companyPhone')
+        crCreationDate = json_data.get('crCreationDate')
+        crExpiryDate = json_data.get('crExpiryDate')
+        activationDate = json_data.get('activationDate')
+        subscribingDate = json_data.get('subscribingDate')
+        createdAt = json_data.get('createdAt')
+        updatedAt = json_data.get('updateAt')
+        status = json_data.get('status')
+        kybStatus = json_data.get('kybStatus')
+        termsConditions = json_data.get('termsConditions')
+        submittedFields = json_data.get('submittedFields', [])
+        attachments = json_data.get('attachments', [])
+        companySettings = json_data.get('CompanySettings', {})
+        owners = json_data.get('Owners', [])
+
+        team_id = self.env['crm.team'].sudo().search([
+            ('is_kyb','=',True)
+        ],limit=1)
+        # Example: Creating or updating an Opportunity record
+        opportunity_values = {
+            'name': companyName,
+            'partner_name': companyName,
+            'reg_no': registrationNumber,
+            'phone': companyPhone,
+            'email_from': companyEmail,
+            'street': f"{addressLine1}, {addressLine2}" if addressLine2 else addressLine1,
+            'city': city,
+            'zip': postalCode,
+            #'date_open': crCreationDate,
+            #'date_deadline': crExpiryDate,
+            #'date_action': activationDate,
+            #'date_conversion': subscribingDate,
+            #'create_date': createdAt,
+            #'write_date': updatedAt,
+            #'state': status,
+            #'kyb_status': kybStatus,
+            #'terms_conditions': termsConditions,
+        }
+
+
+        opportunity_values.update({
+                'xpl_id': companyId,
+                'is_kyb': True,
+                'type': 'opportunity',
+        })
+            
+        lead_id = opportunity = self.env['crm.lead']
+        
+        existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', companyId)], limit=1)
+        if existing_lead:
+            lead_id = opportunity.write(opportunity_values)
+        else:
+            opportunity_values.update({
+                'xpl_id': companyId,
+                'is_kyb': True,
+                'type': 'lead',
+                #'team_id': team_id.id,
+                #'user_id': 1,
+            })
+            
+            lead_id = opportunity.create(opportunity_values)
+
+        opportunity_values.update({
+                'xpl_id': companyId,
+                'is_kyb': True,
+                'type': 'lead',
+                #'team_id': team_id.id,
+                #'user_id': 1,
+            })
+            
+        lead_id = opportunity.create(opportunity_values)
+
+        # Example: Handling attachments and owners
+        #attachments = json_data.get('result', {}).get('attachments', [])
+        #owners = json_data.get('result', {}).get('Owners', [])
+
+        # Further processing of attachments and owners if needed
+        
+        return lead_id
+
