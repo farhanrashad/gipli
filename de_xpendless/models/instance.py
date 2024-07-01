@@ -60,13 +60,13 @@ class XplInstance(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Connection to Apollo successful; explore its capabilities now.'),
+                'title': _('Connection to Expendless successful; explore its capabilities now.'),
                 'type': 'warning',
                 'sticky': False,  #True/False will display for few seconds if false
             },
         }
 
-        url = self.url + 'auth/health' #"https://api.apollo.io/v1/auth/health"
+        url = self.url + 'auth/health' #"https://api.expendless.io/v1/auth/health"
         querystring = {
             "api_key": self.api_key
         }
@@ -80,7 +80,7 @@ class XplInstance(models.Model):
                 'state': 'verified'
             })
             notification['params'].update({
-                'title': _('The connection to Apollo was successful.'),
+                'title': _('The connection to Expendless was successful.'),
                 'type': 'success',
                 'next': {'type': 'ir.actions.act_window_close'},
             })
@@ -95,14 +95,14 @@ class XplInstance(models.Model):
         for record in self:
             if record.state != 'draft':
                 raise UserError("You cannot delete a record with a state other than 'draft'.")
-        return super(ApolloInstance, self).unlink()
+        return super(XplInstance, self).unlink()
 
         
     def button_import_labels(self):
         data = {
             #'api_key': 'GbYvCle7WbRW0lFKYXlArw',
         }
-        tags_data = self._get_apollo_data('labels', data)
+        tags_data = self._get_api_data('labels', data)
         category_id = self.env['res.partner.category']
         crm_tag_id = self.env['crm.tag']
         for tag in tags_data:
@@ -131,7 +131,7 @@ class XplInstance(models.Model):
 
     def button_import_stages(self):
         data = {}
-        stages_data = self._get_apollo_data('opportunity_stages', data)
+        stages_data = self._get_api_data('opportunity_stages', data)
         #raise UserError(stages_data.get('opportunity_stages', []))
         stage_id = self.env['crm.stage']
         for stage in stages_data.get('opportunity_stages', []):
@@ -172,16 +172,16 @@ class XplInstance(models.Model):
     def button_export(self):
         #partners = self.env['res.partner'].search([('active', '=', True), '|', ('apl_id', '=', False), ('apl_date', '<', fields.Datetime.now())])
         if self._context.get('op_name') == 'contacts':
-            partner_ids = self.env['res.partner'].search([('active', '=', True),('update_required_for_apollo', '=', True)])
+            partner_ids = self.env['res.partner'].search([('active', '=', True),('update_required_for_xpendless', '=', True)])
             for partner in partner_ids:
-                partner._send_to_apollo(self)
+                partner._send_to_xpendless(self)
             self.write({
                 'apl_date_export_contacts': self.env.cr.now(),
             })
         elif self._context.get('op_name') == 'leads':
-            lead_ids = self.env['crm.lead'].search([('active', '=', True),('update_required_for_apollo', '=', True)])
+            lead_ids = self.env['crm.lead'].search([('active', '=', True),('update_required_for_expendless', '=', True)])
             for lead in lead_ids:
-                lead._send_to_apollo(self)
+                lead._send_to_xpendless(self)
             self.write({
                 'apl_date_export_leads': self.env.cr.now(),
             })
@@ -190,17 +190,12 @@ class XplInstance(models.Model):
 
 
     # ---------------------------------------------------------
-    # ---------------------- Operations for Apollo ------------
+    # ---------------------- Operations for Expendless ------------
     # ---------------------------------------------------------
     
     @api.model
-    def _post_apollo_data(self, api_name, api_data=None):
-        """
-        Fetch JSON data from a given URL with optional data payload.
-        :param url: The URL to send the request to.
-        :param data: Optional data to send with the request.
-        :return: JSON data received in the response.
-        """
+    def _post_api_data(self, api_name, api_data=None):
+        
         headers = {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json'
@@ -231,7 +226,34 @@ class XplInstance(models.Model):
             raise e
 
     @api.model
-    def _get_apollo_data(self, api_name, api_data=None):
+    def _get_api_data(self, api_name, api_data=None):
+        # Define the sample JSON data
+        sample_json_data = '''
+        {
+          "name": "Acme Corporation",
+          "registration_number": "123456789",
+          "address": "123 Main St",
+          "city": "Metropolis",
+          "email": "info@acme-corp.com",
+          "phone": "+1234567890",
+          "zip": "12345",
+          "employees": [
+            {
+              "name": "Alice Johnson",
+              "email": "alice.johnson@acme-corp.com"
+            },
+            {
+              "name": "Bob Smith",
+              "email": "bob.smith@acme-corp.com"
+            },
+            {
+              "name": "Charlie Brown",
+              "email": "charlie.brown@acme-corp.com"
+            }
+          ]
+        }
+        '''
+
         headers = {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json'
@@ -259,7 +281,7 @@ class XplInstance(models.Model):
             raise e
 
     @api.model
-    def _put_apollo_data(self, api_name, api_data=None):
+    def _put_api_data(self, api_name, api_data=None):
         headers = {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json'

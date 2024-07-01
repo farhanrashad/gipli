@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# from odoo import http
+from odoo import http
+from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 
 
-# class DeXpendless(http.Controller):
+class TicketCustomerPortal(CustomerPortal):
 #     @http.route('/de_xpendless/de_xpendless', auth='public')
 #     def index(self, **kw):
 #         return "Hello, world"

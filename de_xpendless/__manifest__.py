@@ -12,7 +12,7 @@ Base module of Xpendless Integration
     'website': "https://www.xpendless.com",
 
     'category': 'Sales',
-    'version': '17.0.0.2',
+    'version': '17.0.0.3',
 
     'depends': ['base'],
 
