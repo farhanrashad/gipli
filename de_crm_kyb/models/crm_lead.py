@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, tools, SUPERUSER_ID
+from odoo.exceptions import UserError, ValidationError
 
 
 class Lead(models.Model):
@@ -105,3 +106,6 @@ class Lead(models.Model):
     def action_verification(self):
         pass
 
+    # Actions
+    def _cron_import_company_from_xpl(self):
+        raise UserError('hello')
