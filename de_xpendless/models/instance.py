@@ -170,6 +170,9 @@ class XplInstance(models.Model):
         #for partner in partners:
 
     def button_export(self):
+        self.send_data_to_webhook()
+        
+    def button_export1(self):
         #partners = self.env['res.partner'].search([('active', '=', True), '|', ('apl_id', '=', False), ('apl_date', '<', fields.Datetime.now())])
         if self._context.get('op_name') == 'contacts':
             partner_ids = self.env['res.partner'].search([('active', '=', True),('update_required_for_xpendless', '=', True)])
@@ -225,6 +228,22 @@ class XplInstance(models.Model):
             # Handle JSON decoding errors
             raise e
 
+    api.model
+    def send_data_to_webhook(self):
+        webhook_url = "https://g2020-xpl-13945246.dev.odoo.com/webhook/company"
+        headers = {'Content-Type': 'application/json'}
+        json_data = self._get_sample_api_data() #json.dumps(data)
+
+        try:
+            response = requests.post(webhook_url, headers=headers, data=json_data)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+
+            # Handle response if needed
+            return response.text  # Example: Return response text
+        except requests.exceptions.RequestException as e:
+            # Handle exception
+            return {'error': str(e)}  # Example: Return error message
+            
     @api.model
     def _get_sample_api_data(self):
         # Define the sample JSON data
