@@ -21,6 +21,8 @@ class Lead(models.Model):
     )
     stage_ids = fields.Many2many('crm.stage', compute='_compute_conditional_tage_ids')
     allow_verify = fields.Boolean(related='stage_id.allow_verify')
+
+    reg_no = fields.Char(related='partner_id.reg_no', readonly=False)
     
     usage_est_users = fields.Selection([
         ('1', 'Just Me'), 

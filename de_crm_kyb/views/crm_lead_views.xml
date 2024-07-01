@@ -48,6 +48,7 @@
                 <group name="kyb">
                     <group name="company_details" string="Company Details" invisible="is_kyb != True">
                         <field name="partner_name"/>
+                        <field name="reg_no"/>
                         <label for="street" string="Address"/>
                         <div class="o_address_format" name="studio_div_95e972">
                           <field name="street" placeholder="Street..." class="o_address_street"/>

@@ -1,5 +1,17 @@
 <odoo>
 
+    <!-- form view -->
+    <record id="res_partner_inherit_kyb" model="ir.ui.view">
+        <field name="name">res.partner.inherit.kyb</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="reg_no" invisible="1" />
+            </xpath>
+        </field>
+    </record>
+    
     <record id="action_partner_kyb_comapnies" model="ir.actions.act_window">
             <field name="name">Companies</field>
             <field name="res_model">res.partner</field>
