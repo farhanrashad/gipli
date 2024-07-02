@@ -22,7 +22,7 @@ class Lead(models.Model):
     stage_ids = fields.Many2many('crm.stage', compute='_compute_conditional_tage_ids')
     allow_verify = fields.Boolean(related='stage_id.allow_verify')
 
-    reg_no = fields.Char(related='partner_id.reg_no', readonly=False)
+    reg_no = fields.Char(string='Reg. No.')
     
     usage_est_users = fields.Selection([
         ('1', 'Just Me'), 
@@ -121,6 +121,8 @@ class CrmLead(models.Model):
     def create_or_update_opportunity(self, json_data):
         opportunity_values = {}
 
+        partner_vals = {}
+        
         companyId = int(json_data.get('id'))
         companyName = json_data.get('companyName')
         registrationNumber = json_data.get('registrationNumber')
@@ -142,6 +144,7 @@ class CrmLead(models.Model):
         submittedFields = json_data.get('submittedFields', [])
         attachments = json_data.get('attachments', [])
         companySettings = json_data.get('CompanySettings', {})
+        
         owners = json_data.get('Owners', [])
 
         team_id = self.env['crm.team'].sudo().search([
@@ -169,11 +172,7 @@ class CrmLead(models.Model):
         }
 
 
-        opportunity_values.update({
-                'xpl_id': companyId,
-                'is_kyb': True,
-                'type': 'opportunity',
-        })
+       
             
         lead_id = opportunity = self.env['crm.lead']
         
@@ -184,28 +183,39 @@ class CrmLead(models.Model):
             opportunity_values.update({
                 'xpl_id': companyId,
                 'is_kyb': True,
-                'type': 'lead',
+                'type': 'opportunity',
                 #'team_id': team_id.id,
                 #'user_id': 1,
             })
             
             lead_id = opportunity.create(opportunity_values)
-
-        opportunity_values.update({
-                'xpl_id': companyId,
-                'is_kyb': True,
-                'type': 'lead',
-                #'team_id': team_id.id,
-                #'user_id': 1,
+            lead_id.partner_id = self.env['res.partner'].create({
+                'name': companyName,
+                'company_type': 'company',
+                'is_xpendless': True,
+                'xpl_id': lead_id.xpl_id,
+                
             })
+            lead_id.convert_opportunity(lead_id.partner_id, user_ids=[1], team_id=team_id.id)
+            for owner in owners:
+                partner_vals = {
+                    'name': owner.get('fullName'),
+                    'email': owner.get('email'),
+                    'mobile': owner.get('mobileNumber'),
+                    'xpl_id': owner.get('employeeId'),
+                    'parent_id': lead_id.partner_id.id,
+                    'company_type': 'person',
+                    'type': 'other',
+                    'is_xpendless':True,
+                }
             
-        lead_id = opportunity.create(opportunity_values)
-
-        # Example: Handling attachments and owners
-        #attachments = json_data.get('result', {}).get('attachments', [])
-        #owners = json_data.get('result', {}).get('Owners', [])
-
-        # Further processing of attachments and owners if needed
-        
+                # Check if partner already exists
+                existing_partner = self.env['res.partner'].search([('xpl_id', '=', owner.get('employeeId'))], limit=1)
+                if existing_partner:
+                    existing_partner.write(partner_vals)
+                else:
+                    self.env['res.partner'].create(partner_vals)
+                
+           
         return lead_id
 
