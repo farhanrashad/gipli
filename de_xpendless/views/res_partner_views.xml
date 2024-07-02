@@ -15,6 +15,7 @@
                     <group>
                         <group>
                             <field name="xpl_id" />
+                            <field name="xpl_owner" />
                         </group>
                     </group>
                 </page>
