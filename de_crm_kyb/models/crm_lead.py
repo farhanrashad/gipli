@@ -58,6 +58,16 @@ class Lead(models.Model):
     trade_license = fields.Binary(string="Trade License")
     trade_license_filename = fields.Char(string="TL Filename")
 
+    count_contacts = fields.Integer('Contacts', computer='_compute_contacts_count')
+
+    def _compute_contacts_count(self):
+        partner_ids = self.env['res.partner']
+        for record in self:
+            partner_ids = self.env['res.partner'].search([
+                ('parent_id','=',record.partner_id.id)
+            ])
+            record.count_contacts = len(partner_ids)
+            
     @api.depends('team_id','stage_id')
     def _compute_kyb(self):
         for lead in self:
@@ -108,7 +118,24 @@ class Lead(models.Model):
     def action_verification(self):
         pass
 
+    # -------------------------------------------------------------
     # Actions
+    # -------------------------------------------------------------
+    def action_open_employees(self):
+        action = self.env.ref('de_crm_kyb.action_partner_kyb_contacts').read()[0]
+        action.update({
+            'name': 'Employees',
+            'view_mode': 'tree,form',
+            'res_model': 'res.partner',
+            'type': 'ir.actions.act_window',
+            'domain': [('parent_id','=',self.partner_id.id)],
+            'context': {
+                'create': False,
+                'edit': False,
+            },
+        })
+        return action
+        
     def _cron_import_company_from_xpl(self):
         raise UserError('hello')
 
@@ -150,6 +177,11 @@ class CrmLead(models.Model):
         team_id = self.env['crm.team'].sudo().search([
             ('is_kyb','=',True)
         ],limit=1)
+
+        stage_id = self.env['crm.stage'].sudo().search([
+            ('is_kyb','=',True)
+        ],order='sequence',limit=1)
+        
         # Example: Creating or updating an Opportunity record
         opportunity_values = {
             'name': companyName,
@@ -196,6 +228,10 @@ class CrmLead(models.Model):
                 'xpl_id': lead_id.xpl_id,
                 
             })
+            if stage_id:
+                lead_id.write({
+                    'stage_id': stage_id.id,
+                })
             lead_id.convert_opportunity(lead_id.partner_id, user_ids=[1], team_id=team_id.id)
             for owner in owners:
                 partner_vals = {

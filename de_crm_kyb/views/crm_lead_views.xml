@@ -17,6 +17,17 @@
                 <field name="allow_verify" invisible="1"/>
             </xpath>
 
+            <xpath expr="//div[hasclass('oe_button_box')]/button[1]" position="before">
+                    <button name="action_open_employees" 
+                        type="object" 
+                        icon="fa-users" 
+                        class="oe_stat_button"
+                        invisible="not partner_id"
+                    >
+                            <field string="Employees" name="count_contacts" widget="statinfo"/>
+                    </button>
+            </xpath>
+
             <xpath expr="//notebook" position="inside">
                 <page name="xpendless" string="Xpendless" invisible="not is_kyb">
                     <group>

@@ -17,7 +17,6 @@
             <field name="res_model">res.partner</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="context">{
-                'search_default_customer': 1,
                 'default_company_type': 'company',
                 'default_is_xpendless': 1,
                 }
@@ -46,10 +45,7 @@
             <field name="res_model">res.partner</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="context">{
-                'search_default_customer': 1,
-                'res_partner_search_mode': 'customer', 
                 'default_company_type': 'person',
-                'default_customer_rank': 1,
                 'default_is_xpendless': 1,
                 }
             </field>
