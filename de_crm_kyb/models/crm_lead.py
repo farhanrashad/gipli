@@ -2,7 +2,8 @@
 
 from odoo import api, fields, models, tools, SUPERUSER_ID
 from odoo.exceptions import UserError, ValidationError
-
+import base64
+import requests
 
 class Lead(models.Model):
     _inherit = "crm.lead"
@@ -173,6 +174,7 @@ class CrmLead(models.Model):
         companySettings = json_data.get('CompanySettings', {})
         
         owners = json_data.get('Owners', [])
+        attachments = json_data.get('attachments', [])
 
         team_id = self.env['crm.team'].sudo().search([
             ('is_kyb','=',True)
@@ -252,6 +254,51 @@ class CrmLead(models.Model):
                 else:
                     self.env['res.partner'].create(partner_vals)
                 
-           
+        # Create attachment
+        """
+        for attachment in attachments:
+            attached_file = attachment.read()
+            if attached_file:  # Ensure the attachment is not empty
+                attachment_id = self.env['ir.attachment'].sudo().create({
+                    'name': attachment.filename,
+                    'res_model': 'crm.lead',
+                    'res_id': lead_id.id,
+                    'type': 'binary',
+                    'datas': base64.b64encode(attached_file).decode('ascii'),
+                })
+                attachment_ids.append(attachment_id.id)
+
+        """
+        attachment_ids = []
+        for attachment in attachments:
+            response = requests.get(attachment['attachmentPath'])
+            if response.status_code == 200:
+                attachment_vals = {
+                        'name': f"{attachment['companyDocId']}_{companyName}.pdf",
+                        'datas': base64.b64encode(response.content),
+                        'res_model': 'crm.lead',
+                        'res_id': lead_id.id,
+                        'mimetype': 'application/pdf'
+                }
+                attachment_id = self.env['ir.attachment'].create(attachment_vals)
+                attachment_ids.append(attachment_id.id)
+        
+        
+        if attachment_ids:
+            message_id = self.env['mail.message'].create({
+                'body': 'Attached documents for the company.',
+                'model': 'crm.lead',
+                'res_id': lead_id.id,
+                'record_name': lead_id.name,
+                'message_type': 'comment',
+                'subtype_id': self.env.ref('mail.mt_comment').id,
+                'author_id': 1,
+                'attachment_ids': [(6, 0, attachment_ids)]
+            })
+        #    lead_id.message_post(
+        #        body="Attached documents for the company.",
+        #        attachment_ids=attachment_ids
+        #    )
+        
         return lead_id
 
