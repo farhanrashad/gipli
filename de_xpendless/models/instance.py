@@ -279,7 +279,7 @@ class XplInstance(models.Model):
       "companyDocId": 123,
       "companyId": 123456,
       "attachmentTypeId": 1,
-      "attachmentPath": "/documents/registration.pdf",
+      "attachmentPath": "https://www.nationalparalegal.edu/Slides_New/Legal_Document_Prep/SH/Slides_01.pdf",
       "isActive": true,
       "createdAt": "2021-01-15T00:00:00Z",
       "updatedAt": "2021-01-15T00:00:00Z"
@@ -288,7 +288,7 @@ class XplInstance(models.Model):
       "companyDocId": 124,
       "companyId": 123456,
       "attachmentTypeId": 2,
-      "attachmentPath": "/documents/tax_certificate.pdf",
+      "attachmentPath": "https://www.safetyforward.com/docs/legal.pdf",
       "isActive": true,
       "createdAt": "2021-01-15T00:00:00Z",
       "updatedAt": "2021-01-15T00:00:00Z"
