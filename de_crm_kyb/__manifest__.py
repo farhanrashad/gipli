@@ -16,6 +16,7 @@ Long description of module's purpose
 
     'depends': [
         'crm',
+        'sale_crm',
         'de_xpendless',
     ],
 

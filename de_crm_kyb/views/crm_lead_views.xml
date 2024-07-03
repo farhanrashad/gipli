@@ -5,6 +5,16 @@
         parent="crm.crm_menu_root"
         sequence="2"/>
 
+    <record id="sale_crm_case_form_inherit_kyb" model="ir.ui.view">
+        <field name="name">sale.crm.case.form.inherit.kyb</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_sale_quotation']" position="attributes">
+                <attribute name="invisible">type == "lead" or is_kyb == True</attribute>
+            </xpath>
+        </field>
+    </record>
 
     <!-- form view -->
     <record id="crm_lead_view_form_inherit_kyb" model="ir.ui.view">
@@ -12,11 +22,48 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+
+            
             <xpath expr="//sheet" position="inside">
                 <field name="is_kyb" invisible="1"/>
                 <field name="allow_verify" invisible="1"/>
             </xpath>
 
+            <xpath expr="//header" position="attributes">
+                <attribute name="invisible">is_kyb</attribute>
+            </xpath>
+
+             <xpath expr="//sheet" position="before">
+                 <header invisible="not is_kyb">
+                      <button name="action_accept_kyb_lead" string="Accept"
+                            type="object" class="oe_highlight" data-hotkey="w" title="Accept"
+                            invisible="not is_kyb"/>
+
+                <button name="%(crm.crm_lead_lost_action)d" string="Reject" data-hotkey="l" title="Reject"
+                            type="action" invisible="not is_kyb"/>
+                 </header>
+             </xpath>
+            
+
+            <!--
+            <xpath expr="//button[@name='action_set_won_rainbowman']" position="attributes">
+                <attribute name="invisible">not active or probability == 100 or type == 'lead' or is_kyb</attribute>
+            </xpath>
+
+            <xpath expr="//form[1]/header[1]/button[2]" position="attributes">
+                <attribute name="invisible">type == "lead" or ( not active and probability &lt; 100 ) or is_kyb</attribute>
+          </xpath>
+            
+            <xpath expr="//header" position="inside">
+                <button name="action_accept_kyb_lead" string="Accept"
+                            type="object" class="oe_highlight" data-hotkey="w" title="Accept"
+                            invisible="not is_kyb"/>
+
+                <button name="%(crm.crm_lead_lost_action)d" string="Reject" data-hotkey="l" title="Reject"
+                            type="action" invisible="not is_kyb"/>
+                
+            </xpath>
+            -->
             <xpath expr="//div[hasclass('oe_button_box')]/button[1]" position="before">
                     <button name="action_open_employees" 
                         type="object" 

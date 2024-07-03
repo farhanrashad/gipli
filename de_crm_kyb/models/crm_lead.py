@@ -122,6 +122,9 @@ class Lead(models.Model):
     # -------------------------------------------------------------
     # Actions
     # -------------------------------------------------------------
+    def action_accept_kyb_lead(self):
+        pass
+        
     def action_open_employees(self):
         action = self.env.ref('de_crm_kyb.action_partner_kyb_contacts').read()[0]
         action.update({
