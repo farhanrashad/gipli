@@ -1,0 +1,16 @@
+<odoo>
+    <!-- Top menu item -->
+    <menuitem name="Hostel"
+        id="menu_school_hostel"
+        groups="de_school_hostel.group_hostel_user,de_school_hostel.group_hostel_manager"
+        web_icon="de_school_hostel,static/description/icon.png"
+        sequence="57" />
+
+
+        <menuitem name="Configuration" id="menu_school_hostel_menu_config"
+			parent="menu_school_hostel" 
+              sequence = "100"
+			groups="de_school_hostel.group_hostel_manager" />
+
+    
+</odoo>
