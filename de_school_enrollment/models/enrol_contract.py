@@ -80,7 +80,9 @@ class EnrollmentContract(models.Model):
                     default_team_id=default_team_id
                 )._get_default_team_id(
                     user_id=user_id, domain=[('company_id', 'in', [company_id, False])])
-            order.admission_team_id = cached_teams[key]
+            # Ensure we're assigning the ID and not the record itself
+            order.admission_team_id = cached_teams[key].id if cached_teams[key] else False
+
 
     @api.depends(
         'state',
