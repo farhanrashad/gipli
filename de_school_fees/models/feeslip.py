@@ -101,7 +101,6 @@ class FeeSlip(models.Model):
         compute='_compute_enrol_order_line_ids', store=True, readonly=True,
     )
 
-    
     input_line_ids = fields.One2many(
         'oe.feeslip.input.line', 'feeslip_id', string='Feeslip Inputs', store=True,
         compute='_compute_input_line_ids', 
