@@ -1,13 +1,26 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "School Fees",
+    'name': "Openrol - Fee Managment",
 
     'summary': """
-    Fee Management
+    All-in-One Fee Solution
         """,
 
     'description': """
-        Fees Managment
+Openrol - Fee Management App
+================================
+Features:
+- **Fee Structure:** Define customizable fee structures tailored to your institution's needs.
+- **Fee Particulars:** Organize and track specific fee components with ease and transparency.
+- **Schedule Fees:** Plan and automate fee scheduling for timely collections.
+- **Late Fees & Fine Management:** Automate calculations and management of late fees and fines.
+- **Arrear Management:** Track and manage outstanding fee payments effectively.
+- **Fee Variations & Adjustments:** Accommodate fee variations and make necessary adjustments seamlessly.
+- **Feeslips:** Generate detailed and accurate feeslips for clear record-keeping.
+- **Uncollected Fees:** Monitor and manage uncollected fees to improve collection rates.
+- **Fee Analysis:** Gain insights into fee collection trends and optimize strategies.
+- **Fee Details:** Access comprehensive details of all fees for transparency and accuracy.
+- **Batch Processing:** Streamline fee transactions in bulk for efficiency.
     """,
 
     'author': "Dynexcel",
@@ -47,4 +60,9 @@
     'demo': [
         'demo/demo.xml',
     ],
+    'license': 'LGPL-3',
+    'images': ['static/description/banner.gif'],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
