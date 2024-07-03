@@ -34,13 +34,17 @@
             </xpath>
 
              <xpath expr="//sheet" position="before">
-                 <header invisible="not is_kyb">
-                      <button name="action_accept_kyb_lead" string="Accept"
-                            type="object" class="oe_highlight" data-hotkey="w" title="Accept"
-                            invisible="not is_kyb"/>
-
-                <button name="%(crm.crm_lead_lost_action)d" string="Reject" data-hotkey="l" title="Reject"
-                            type="action" invisible="not is_kyb"/>
+                     <header invisible="not is_kyb">
+                          <button name="action_accept_kyb_lead" string="Accept"
+                                type="object" class="oe_highlight" data-hotkey="w" title="Accept"
+                                invisible="not is_kyb"/>
+    
+                    <button name="%(crm.crm_lead_lost_action)d" string="Reject" data-hotkey="l" title="Reject"
+                                type="action" invisible="not is_kyb"/>
+                     <field name="stage_id" widget="statusbar_duration"
+                            options="{'clickable': '1', 'fold_field': 'fold'}"
+                            domain="[('id', 'in', stage_ids)]"
+                            invisible="not active or type == 'lead'"/>
                  </header>
              </xpath>
             
@@ -90,12 +94,7 @@
                             type="object" class="oe_highlight" data-hotkey="w" title="Verify"
                             invisible="not allow_verify"/>
             </xpath>
-            <xpath expr="//field[@name='stage_id']" position="replace">
-                <field name="stage_id" widget="statusbar_duration"
-                            options="{'clickable': '1', 'fold_field': 'fold'}"
-                            domain="[('id', 'in', stage_ids)]"
-                            invisible="not active or type == 'lead'"/>
-            </xpath>
+            
             <xpath expr="//group[@name='opportunity_partner']" position="attributes">
                 <attribute name="invisible">type == "lead" or is_kyb == True</attribute>
             </xpath>
@@ -133,7 +132,7 @@
                           <field name="work_type" />
                     </group>
                     <group name="usage_detail" string="Usage Detail" invisible="is_kyb != True">
-                        <field name="stage_ids" widget="many2many_tags" />
+                        <field name="stage_ids" widget="many2many_tags" invisible="1"/>
                         <field name="usage_est_users" />
                         <field name="usage_est_spending" />
                         <field name="usage_card" />
