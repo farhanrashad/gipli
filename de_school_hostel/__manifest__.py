@@ -23,7 +23,7 @@ Long description of module's purpose
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/hostel_menu.xml',
-        'views/room_views.xml',
+        'views/unit_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
