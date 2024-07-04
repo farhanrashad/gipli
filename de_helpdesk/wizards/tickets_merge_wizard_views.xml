@@ -16,13 +16,12 @@
                         <field name="merge_method" widget="radio"/>
                         <field name="target_ticket_id"
                             options="{'no_create':True, 'no_edit':True}"
-                            required="merge_method == 'ticket'"
-                            invisible="merge_method != 'ticket'"
+                            attrs="{'invisible': [('merge_method','!=','ticket')], 'required':[('merge_method','=','ticket')]}"
                         />
                         <field name="user_ids" 
                             options="{'no_create':True, 'no_edit':True}"
                             widget="many2many_tags"
-                            required="merge_method == 'new'"
+                            attrs="{'required':[('merge_method','=','new')]}"
                         />
                     </group>
                     

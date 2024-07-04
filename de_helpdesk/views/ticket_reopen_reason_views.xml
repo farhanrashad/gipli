@@ -3,17 +3,18 @@
 	<data>
         <!-- Reopen Reason -->
         <record id="ticket_reopen_reason_tree_view" model="ir.ui.view">
-			<field name="name">project.ticket.reopen.reason.tree.view</field>
-			<field name="model">project.ticket.reopen</field>
-			<field name="arch" type="xml">
-				<tree string="Reopen Reason" editable="bottom">
-					<field name="name"/>
-                    <field name="reopen_by" />
-                    <field name="ticket_id" column_invisible="1" />
+            <field name="name">project.ticket.reopen.reason.tree.view</field>
+            <field name="model">project.ticket.reopen</field>
+            <field name="arch" type="xml">
+                <tree string="Reopen Reason" editable="bottom">
+                    <field name="name"/>
+                    <field name="reopen_by"/>
+                    <field name="ticket_id" invisible="1"/>
                     <field name="create_uid" string="Opened By"/>
-				</tree>
-			</field>
-		</record>
+                </tree>
+            </field>
+        </record>
+
         <record id="action_ticket_reopen_reason" model="ir.actions.act_window">
             <field name="name">Ticket Reopen</field>
             <field name="res_model">project.ticket.reopen</field>

@@ -9,7 +9,7 @@
                 <field name="name"/>
                 <field name="sequence" widget="handle"/>
                 <field name="color"/>
-                <field name="alias_email"/>
+                <field name="alias_value"/>
                 <templates>
                     <t t-name="kanban-menu">
                         <div class="container">
@@ -49,8 +49,8 @@
                             <div t-attf-class="o_kanban_card_header">
                                 <div class="o_kanban_card_header_title">
                                     <div class="o_primary"><field name="display_name"/></div>
-                                     <small t-if="record.alias_email.value">
-                                        <a t-att-href="'mailto:' + record.alias_email.value"><i class="fa fa-envelope-o" title="Domain alias" role="img" aria-label="Domain alias"></i>&amp;nbsp; <t t-out="record.alias_email.value"/></a>
+                                     <small t-if="record.alias_value.value">
+                                        <a t-att-href="'mailto:' + record.alias_value.value"><i class="fa fa-envelope-o" title="Domain alias" role="img" aria-label="Domain alias"></i>&amp;nbsp; <t t-out="record.alias_value.value"/></a>
                                     </small>
                                 </div>
                                 

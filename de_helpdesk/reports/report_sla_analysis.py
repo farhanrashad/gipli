@@ -76,7 +76,7 @@ class HelpdeskSLAReport(models.Model):
                 t.partner_email as partner_email,
                 t.partner_phone as partner_phone,
                 t.company_id,
-                t.state as kanban_state,
+                t.kanban_state as kanban_state,
                 t.ticket_priority as priority,
                 stage.fold as ticket_closed,
                 sla.stage_id as sla_stage_id,

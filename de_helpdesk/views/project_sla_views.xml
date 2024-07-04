@@ -6,13 +6,14 @@
         <field name="model">project.sla</field>
         <field name="arch" type="xml">
             <tree string="SLA Policies" multi_edit="1" sample="1" default_order="project_id">
-                <field name="company_id" column_invisible="True"/>
+                <field name="company_id" invisible="1"/>
                 <field name="name"/>
-                <field name="project_id" optional="show" readonly="1"/>
-                <field name="priority" optional="show" widget="priority"/>
+                <field name="project_id" readonly="1"/>
+                <field name="priority" widget="priority"/>
             </tree>
         </field>
     </record>
+
 
     
     <record id="project_helpdesk_sla_search_view" model="ir.ui.view">
@@ -37,9 +38,9 @@
         <field name="arch" type="xml">
             <form string="SLA Policy">
                 <sheet>
-                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible':[('active','=',True)]}"/>
                     <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" type="object" name="action_open_helpdesk_ticket" icon="fa-life-ring" invisible="ticket_count == 0">
+                        <button class="oe_stat_button" type="object" name="action_open_helpdesk_ticket" icon="fa-life-ring" attrs="{'invisible':[('ticket_count','=',0)]}">
                             <field name="ticket_count" widget="statinfo" string="Tickets"/>
                         </button>
                     </div>

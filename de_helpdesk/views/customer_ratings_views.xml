@@ -42,28 +42,29 @@
                                 <div class="row oe_kanban_details">
                                     <div class="col-4 my-auto">
                                         <div class="o_field_widget o_readonly text-success fw-bolder"
-                                            invisible="customer_rating != '5'"
+                                            attrs="{'invisible':[('customer_rating','!=','5')]}"
+                                            
                                              
                                         >
                                             <i class="fa fa-6x fa-smile-o" role="img" aria-label="Excellent" />
                                         </div>
                                         <div class="o_field_widget o_readonly text-primary fw-bolder"
-                                            invisible="customer_rating != '4'"
+                                            attrs="{'invisible':[('customer_rating','!=','4')]}"
                                         >
                                             <i class="fa fa-6x fa-smile-o"/>
                                         </div>
                                         <div class="o_field_widget o_readonly text-info fw-bolder"
-                                            invisible="customer_rating != '3'"
+                                            attrs="{'invisible':[('customer_rating','!=','3')]}"
                                         >
                                             <i class="fa fa-6x fa-smile-o"/>
                                         </div>
                                         <div class="o_field_widget o_readonly text-warning fw-bolder"
-                                            invisible="customer_rating != '2'"
+                                            attrs="{'invisible':[('customer_rating','!=','2')]}"
                                         >
                                             <i class="fa fa-6x fa-meh-o"/>
                                         </div>
                                         <div class="o_field_widget o_readonly text-danger fw-bolder"
-                                            invisible="customer_rating != '1'"
+                                            attrs="{'invisible':[('customer_rating','!=','1')]}"
                                         >
                                             <i class="fa fa-6x fa-frown-o"/>
                                         </div>
@@ -111,13 +112,13 @@
         <field name="model">project.task</field>
         <field name="arch" type="xml">
             <tree string="Customer Rating" >
-                <field name="company_id" column_invisible="True"/>
+                <field name="company_id" invisible="True"/>
                 <field name="ticket_no" />
                  <field name="name" string="Name"/>
                 <field name="project_id" string="Helpdesk Team" />
                 <field name="user_ids" optional="show" widget="many2many_avatar_user"/>
                 <field name="partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" optional="show" options="{'no_open': True}"/>
-                <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1" column_invisible="context.get('default_project_id', False)"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1" />
                 <field name="customer_rating" 
                     class="fw-bold" widget="badge"
                     decoration-success="customer_rating == '5'"

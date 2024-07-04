@@ -2,74 +2,70 @@
 <odoo>
 
     <record id="ticket_stage_form_view" model="ir.ui.view">
-            <field name="name">ticket.stage.form.view</field>
-            <field name="model">project.task.type</field>
-            <field name="arch" type="xml">
-                <form string="Ticket Stage" delete="0">
-                    <field name="active" invisible="1" />
-                    <sheet>
-                        <field name="ticket_approvals" invisible="1" />
-                        <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
+        <field name="name">ticket.stage.form.view</field>
+        <field name="model">project.task.type</field>
+        <field name="arch" type="xml">
+            <form string="Ticket Stage" delete="0">
+                <field name="active" invisible="1" />
+                <sheet>
+                    <field name="ticket_approvals" invisible="1" />
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
+                    <group>
                         <group>
-                            <group>
-                                <field name="name" placeholder="e.g. To Do"/>
-                                <field name="user_id" invisible="True"/>
-                                <field name="mail_template_id" context="{'default_model': 'project.task'}" invisible="user_id"/>
-                                
-                                <field name="sequence" groups="base.group_no_one"/>
-                            </group>
-                            <group>
-                                <field name="fold"/>
-                                <field name="project_ids" widget="many2many_tags" options="{'color_field': 'color'}"
-                                    domain="[('is_helpdesk_team','=',True)]"
-                                       invisible="user_id"
-                                       required="not user_id"/>
-                            </group>
+                            <field name="name" placeholder="e.g. To Do"/>
+                            <field name="user_id" invisible="1"/>
+                            <field name="mail_template_id" context="{'default_model': 'project.task'}" attrs="{'invisible': [('user_id', '=', True)]}"/>
+                            <field name="sequence" groups="base.group_no_one"/>
                         </group>
-                        <notebook>
-                            <page string="Approvals" 
-                                name="ticket_approvals" 
-                                groups="de_helpdesk.group_project_ticket_approvals"
-                                invisible="not ticket_approvals"
-                            >
-                                <field name="ticket_stage_approval_ids" >
-                                    <tree editable="bottom" string="Ticket Approvals" create="0" delete="0">
-                                        <field name="ticket_approval_type" column_invisible="1" />
-                                        <field name="project_id" 
-                                            options="{'no_edit':True, 'no_create':True}" 
-                                             domain="[('is_helpdesk_team','=',True)]"
-                                        />
-                                        <field name="group_ids" widget="many2many_tags"
-                                            options="{'no_edit':True, 'no_create':True}" 
-                                            readonly="ticket_approval_type != 'group'"
-                                        />
-                                        <field name="user_ids" widget="many2many_tags"
-                                            options="{'no_edit':True, 'no_create':True}" 
-                                            readonly="ticket_approval_type != 'user'"
-                                        />
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-    
-    
+                        <group>
+                            <field name="fold"/>
+                            <field name="project_ids" widget="many2many_tags" options="{'color_field': 'color'}"
+                                   domain="[('is_helpdesk_team','=',True)]"
+                                   attrs="{'invisible': [('user_id', '=', True)], 'required': [('user_id', '!=', True)]}" 
+                            />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Approvals" 
+                            name="ticket_approvals" 
+                            groups="de_helpdesk.group_project_ticket_approvals"
+                            attrs="{'invisible': [('ticket_approvals', '=', False)]}"
+                        >
+                            <field name="ticket_stage_approval_ids" >
+                                <tree editable="bottom" string="Ticket Approvals" create="0" delete="0">
+                                    <field name="ticket_approval_type" column_invisible="1" />
+                                    <field name="project_id" 
+                                        options="{'no_edit': True, 'no_create': True}" 
+                                        domain="[('is_helpdesk_team','=',True)]"
+                                    />
+                                    <field name="group_ids" widget="many2many_tags"
+                                        options="{'no_edit': True, 'no_create': True}" 
+                                        attrs="{'readonly': [('ticket_approval_type', '!=', 'group')]}"
+                                    />
+                                    <field name="user_ids" widget="many2many_tags"
+                                        options="{'no_edit': True, 'no_create': True}" 
+                                        attrs="{'readonly': [('ticket_approval_type', '!=', 'user')]}"
+                                    />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
     
     <record id="ticket_stage_tree_view" model="ir.ui.view">
-            <field name="name">ticket.stage.tree.view</field>
-            <field name="model">project.task.type</field>
-            <field name="arch" type="xml">
-                <tree string="Ticket Stage" >
-                    <field name="sequence" widget="handle" optional="show"/>
-                    <field name="name" placeholder="e.g. To Do"/>
-                    <field name="fold" optional="show"/>
-                </tree>
-            </field>
-        </record>
-
+        <field name="name">ticket.stage.tree.view</field>
+        <field name="model">project.task.type</field>
+        <field name="arch" type="xml">
+            <tree string="Ticket Stage" >
+                <field name="sequence" widget="handle" optional="show"/>
+                <field name="name" placeholder="e.g. To Do"/>
+                <field name="fold" optional="show"/>
+            </tree>
+        </field>
+    </record>
 
     <record id="action_ticket_stage" model="ir.actions.act_window">
         <field name="name">Ticket Stages</field>
@@ -108,8 +104,8 @@
     </record>
     
     <menuitem name="Stages" id="menu_helpdesk_config_ticket_stages"
-            parent="menu_helpdesk_config" 
-            action="action_ticket_stage"
-            sequence="50"
-        />
+        parent="menu_helpdesk_config" 
+        action="action_ticket_stage"
+        sequence="50"
+    />
 </odoo>

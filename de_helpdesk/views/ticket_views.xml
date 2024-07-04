@@ -17,21 +17,25 @@
                 <field name="ticket_no" 
                     nolabel="1" 
                     readonly="1"
-                    invisible="not is_ticket"
+                    attrs="{'invisible':[('is_ticket','!=',True)]}"
                 />
             </xpath>
 
             <xpath expr="//div[hasclass('oe_title')]" position="after">
-                <div class="d-flex mb-4" invisible="not ticket_sla_ids" groups="de_helpdesk.group_project_sla_enabled">
+                <div class="d-flex mb-4" 
+                    attrs="{'invisible':[('ticket_sla_ids','!=',True)]}"
+                    groups="de_helpdesk.group_project_sla_enabled">
                     <field name="ticket_sla_ids" 
                         widget="many2many_tags" 
-                        invisible="not is_sla" 
+                        attrs="{'invisible':[('is_sla','!=',True)]}"
                         class="mb-0" readonly="1" 
                         groups="de_helpdesk.group_project_sla_enabled"
                         options="{'color_field': 'color', 'no_edit_color': True}"
                     />
     
-                    <div invisible="not sla_date_deadline or not is_sla" groups="de_helpdesk.group_project_sla_enabled" class="mx-2 text-muted d-inline-flex align-items-center h-100">
+                    <div 
+                        attrs="{'invisible':['|',('sla_date_deadline','=',False),('is_sla','!=',True)]}"
+                        groups="de_helpdesk.group_project_sla_enabled" class="mx-2 text-muted d-inline-flex align-items-center h-100">
                             <i class="fa fa-lg fa-clock-o me-2 mt-1" aria-label="Sla Deadline" title="Sla Deadline"/>
                             <field name="sla_date_deadline" class="mb-0" widget="remaining_days"/>
                         </div>
@@ -40,12 +44,13 @@
             
             <xpath expr="//header" position="inside">
                 <button string="Reopen Ticket" name="action_reopen_tickets" type="object"
-                            invisible="not allow_reopen" 
+                    attrs="{'invisible':[('allow_reopen','!=',True)]}"
                             groups="de_helpdesk.group_project_ticket_reopen"
                         />
             </xpath>
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-                <button invisible="count_reopen == 0"
+                <button 
+                    attrs="{'invisible':[('count_reopen','=',0)]}"
                     name="open_reopen_ticket_reaons"
                     class="oe_stat_button"
                     icon="fa-file-text-o"
@@ -54,7 +59,8 @@
                     <field name="count_reopen" widget="statinfo" string="Reopen Reasons"/>
                 </button>
 
-                <button invisible="count_ticket_history == 0"
+                <button 
+                    attrs="{'invisible':[('count_ticket_history','=',0)]}"
                     name="open_ticket_history"
                     class="oe_stat_button"
                     icon="fa-history"
@@ -68,12 +74,12 @@
                 <field name="project_id" 
                     domain="[('active', '=', True), '|', ('company_id', '=', False), ('company_id', '=?', company_id)]"
                     widget="project"
-                    invisible="is_ticket"
+                    attrs="{'invisible':[('is_ticket','=',True)]}"
                 />
                  <field name="project_id" 
                     required="1" 
                     string="Helpdesk Team" 
-                     invisible="not is_ticket"
+                     attrs="{'invisible':[('is_ticket','!=',True)]}"
                     domain="[('is_helpdesk_team', '=', True), ('active', '=', True), '|', ('company_id', '=', False), ('company_id', '=?', company_id)]"
                     context="{
                         'kanban_view_ref': 'helpdesk.helpdesk_team_view_kanban_mobile', 
@@ -82,36 +88,36 @@
                 />
             </xpath>
             <xpath expr="//field[@name='project_id']" position="attributes">
-                <attribute name="required">is_ticket</attribute>
+                <attribute name="attrs">{'required':[('is_ticket','=',True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='milestone_id']" position="attributes">
-                <attribute name="invisible">is_ticket</attribute>
+                <attribute name="attrs">{'invisible':[('is_ticket','=',True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='date_deadline']" position="attributes">
-                <attribute name="invisible">is_ticket</attribute>
+                <attribute name="attrs">{'invisible':[('is_ticket','=',True)]}</attribute>
             </xpath>
             <xpath expr="//page[@name='sub_tasks_page']" position="attributes">
-                <attribute name="invisible">is_ticket</attribute>
+                <attribute name="attrs">{'invisible':[('is_ticket','=',True)]}</attribute>
             </xpath>
             <xpath expr="//page[@name='extra_info']//field[@name='parent_id']" position="attributes">
-                <attribute name="invisible">is_ticket</attribute>
+                <attribute name="attrs">{'invisible':[('is_ticket','=',True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='priority']" position="attributes">
-                <attribute name="invisible">is_ticket</attribute>
+                <attribute name="attrs">{'invisible':[('is_ticket','=',True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='user_ids']" position="after">
                 <field name="ticket_priority" widget="priority"
-                    invisible="not is_ticket"
+                    attrs="{'invisible':[('is_ticket','!=',True)]}"
                     />
                 <field name="prj_ticket_type_id" options="{'no_create':True,'no_edit':True}"
-                    invisible="not is_ticket"
+                    attrs="{'invisible':[('is_ticket','!=',True)]}"
                     />
                 
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="SLA" name="ticket_sla" 
                     groups="de_helpdesk.group_project_sla_enabled"
-                    invisible="not is_sla"
+                    attrs="{'invisible':[('is_sla','!=',True)]}"
                 >
                     
                     <field name="ticket_sla_ids" 
@@ -132,7 +138,7 @@
                 </page>
                 <page string="Customer Feedback" name="customer_feedback" 
                     groups="de_helpdesk.group_project_ticket_customer_ratings"
-                    invisible="not allow_customer_rating"
+                    attrs="{'invisible':[('allow_customer_rating','!=',True)]}"
                 >
                     <field name="allow_customer_rating" invisible="1" />
                     <group>
@@ -156,22 +162,22 @@
         <field name="model">project.task</field>
         <field name="arch" type="xml">
             <tree string="Tickets" multi_edit="1" sample="1" default_order="ticket_priority desc, sla_date_deadline, id">
-                <field name="company_id" column_invisible="True"/>
+                <field name="company_id" invisible="True"/>
                 
-                <field name="is_sla" column_invisible="True"/>
+                <field name="is_sla" invisible="True"/>
                 <field name="ticket_no" />
                 <field name="ticket_priority" optional="show" widget="priority"/>
                  <field name="name" string="Name"/>
                 <field name="project_id" string="Helpdesk Team" />
                 <field name="user_ids" optional="show" widget="many2many_avatar_user"/>
                 <field name="partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" optional="show" options="{'no_open': True}"/>
-                <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1" column_invisible="context.get('default_project_id', False)"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1" />
                 <field name="activity_ids" widget="list_activity" optional="show"/>
-                <field name="sla_date_deadline" invisible="not is_sla" optional="show" widget="remaining_days"/>
+                <field name="sla_date_deadline" attrs="{'invisible': [('is_sla', '!=', True)]}" optional="show" widget="remaining_days"/>
                 <field name="create_date" optional="hide" readonly="1" string="Creation Date"/>
                 <field name="write_date" optional="hide" readonly="1"/>
-                <field name="state" nolabel="1" optional="show" widget="state_selection"/>
-                <field name="stage_id" widget="badge" optional="show" readonly="not context.get('default_project_id', False)"/>
+                <field name="kanban_state" nolabel="1" optional="show" widget="state_selection"/>
+                <field name="stage_id" widget="badge" optional="show" />
             </tree>
         </field>
     </record>
@@ -186,11 +192,11 @@
                 <field name="tag_ids"/>
                 <field name="partner_id" filter_domain="['|', '|', '|', ('partner_id', 'ilike', self), ('partner_email', 'ilike', self), ('partner_phone', 'ilike', self), ('partner_name', 'ilike', self)]"/>
 
-                <field name="project_id" string="Team" invisible="context.get('default_project_id', False)"/>
+                <field name="project_id" string="Team" />
                 <field name="prj_ticket_type_id"/>
                 <field name="stage_id"/>
                 <field name="ticket_sla_ids" groups="de_helpdesk.group_project_sla_enabled"/>
-                <field name="company_id" groups="base.group_multi_company" invisible="context.get('default_project_id', False)"/>
+                <field name="company_id" groups="base.group_multi_company" />
                 <field name="description"/>
                 
                 <field name="ticket_priority" invisible="1"/>
@@ -236,7 +242,7 @@
                     <filter string="Assignee" name="group_assignee" context="{'group_by':'user_ids'}"/>
                     <filter string="Helpdesk Team" name="group_team" context="{'group_by':'project_id'}"/>
                     <filter string="Stage" name="group_stage" context="{'group_by':'stage_id'}"/>
-                    <filter string="Status" name="group_kanban_state" context="{'group_by': 'state'}"/>
+                    <filter string="Status" name="group_kanban_state" context="{'group_by': 'kanban_state'}"/>
                     <filter string="Type" name="group_ticket_type" context="{'group_by':'prj_ticket_type_id'}"/>
                     <filter string="Tags" name="group_tag" context="{'group_by': 'tag_ids'}"/>
                     <filter string="Priority" name="group_priority" context="{'group_by': 'ticket_priority'}"/>
@@ -292,22 +298,22 @@
             </xpath>
             <xpath expr="//div[hasclass('o_kanban_record_headings')]/strong" position="inside">
                 (<field name="ticket_no" 
-                    invisible="not is_ticket"
+                     attrs="{'invisible':[('is_ticket','!=',True)]}"
                 />)
             </xpath>
             <xpath expr="//div[hasclass('o_kanban_record_body')]" position="inside">
                 <field name="prj_ticket_type_id" 
-                    invisible="not is_ticket"
+                    attrs="{'invisible':[('is_ticket','!=',True)]}"
                 />
             </xpath>
             <xpath expr="//div[hasclass('oe_kanban_bottom_left')]//field[@name='priority']" position="attributes">
-                <attribute name="invisible">is_ticket</attribute>
+                <attribute name="attrs">{'invisible':[('is_ticket','=',True)]}</attribute>
             </xpath>
             <xpath expr="//div[hasclass('oe_kanban_bottom_left')]//field[@name='priority']" position="after">
                 <field name="ticket_priority" 
                     widget="priority" 
                     style="margin-right: 5px;"
-                    invisible="not is_ticket"
+                    attrs="{'invisible':[('is_ticket','!=',True)]}"
                 />
             </xpath>
       </field>

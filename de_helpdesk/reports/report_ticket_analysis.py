@@ -79,7 +79,7 @@ class TicketAnalysis(models.Model):
                    t.active AS active,
                    t.project_id AS team_id,
                    t.company_id AS company_id,
-                   t.state AS kanban_state,
+                   t.kanban_state AS kanban_state,
                    CASE
                        WHEN (t.sla_date_deadline IS NOT NULL AND t.sla_date_deadline > NOW() AT TIME ZONE 'UTC') THEN TRUE ELSE FALSE
                    END AS sla_success
