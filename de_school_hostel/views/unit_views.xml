@@ -24,6 +24,11 @@
                             <field name="unit_type"/>
                             <field name="building_type" invisible="unit_type != 'building'"/>
                             <field name="room_type" invisible="unit_type != 'room'"/>
+                            
+                        </group>
+                        <group >
+                            <field name="location" invisible="unit_type != 'building'"/>
+
                             <field name="floor_capacity" invisible="unit_type != 'building'"/>
                              <field name="room_capacity" string="Total Rooms" 
                                 invisible="(unit_type == 'building' and floor_capacity &lt;= 0) or unit_type == 'room'"
@@ -37,27 +42,20 @@
                             <field name="capacity" string="Total Beds" invisible="unit_type not in ('room')"/>
                             
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                            
                         </group>
-                        <group invisible="unit_type != 'building'">
-                            <label for="street" string="Address"/>
-                            <div class="o_address_format">
-                                <field name="street" placeholder="Street..." class="o_address_street"/>
-                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
-                                <field name="city" placeholder="City" class="o_address_city"/>
-                                <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True}'/>
-                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
-                                <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
-                            </div>
-                        </group>
-                        <group invisible="unit_type != 'floor'">
-                        </group>
-                        <group invisible="unit_type != 'room'">
-                        </group>
+                        
                     </group>
                     <notebook>
                         <page string="Description">
                             <field colspan="4" name="description" nolabel="1" 
                                 placeholder="This note is only for internal purposes."
+                            />
+                        </page>
+                        <page string="Facilities" name="facilities">
+                            <field name="unit_facility_ids" colspan="2" columns="2"
+                                domain="[('usage','=',unit_type)]"
+                                widget="many2many_checkboxes"
                             />
                         </page>
                     </notebook>
@@ -117,7 +115,7 @@
     </record>
 
     <menuitem action="action_hostel_unit" id="menu_school_hostel_unit_config"
-        parent="menu_school_hostel_menu_config" sequence="2" />
+        parent="menu_school_hostel_menu_config" sequence="5" />
       
   </data>
 </odoo>

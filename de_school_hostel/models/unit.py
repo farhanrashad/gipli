@@ -1,18 +1,8 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, AccessError
 
-# Subset of partner fields: sync all or none to avoid mixed addresses
-PARTNER_ADDRESS_FIELDS_TO_SYNC = [
-    'street',
-    'street2',
-    'city',
-    'zip',
-    'state_id',
-    'country_id',
-]
 
 class HostelUnit(models.Model):
     _name = 'oe.hostel.unit'
@@ -51,30 +41,28 @@ class HostelUnit(models.Model):
     capacity = fields.Integer(string='Capacity', required=True, default=10)
     description = fields.Text(string='Description', help="Detailed description of the building")
 
+    #unit_line = fields.One2many(
+    #    comodel_name='oe.hostel.unit.line',
+    #    inverse_name='unit_id',
+    #    string="Unit Lines",
+    #    copy=True, auto_join=True)
+
+    unit_facility_ids = fields.Many2many(
+        'oe.hostel.unit.facility',
+        string='Facilities'
+    )
+
+    
     room_capacity = fields.Integer(string='Number of Rooms')
     
     # Building Attributes
-    #location = fields.Char(string='Location')
+    location = fields.Char(string='Location')
     floor_capacity = fields.Integer(string='Number of Floors')
     building_type = fields.Selection([
         ('hostel', 'Hostel'),
         ('dormitory', 'Dormitory'),
         ('residential', 'Residential'),
     ], string='Building Type')
-    # Address fields
-    partner_id = fields.Many2one(
-        'res.partner', string='Customer', check_company=True, index=True, tracking=10,)
-    street = fields.Char('Street', compute='_compute_partner_address_values', readonly=False, store=True)
-    street2 = fields.Char('Street2', compute='_compute_partner_address_values', readonly=False, store=True)
-    zip = fields.Char('Zip', change_default=True, compute='_compute_partner_address_values', readonly=False, store=True)
-    city = fields.Char('City', compute='_compute_partner_address_values', readonly=False, store=True)
-    state_id = fields.Many2one(
-        "res.country.state", string='State',
-        compute='_compute_partner_address_values', readonly=False, store=True,
-        domain="[('country_id', '=?', country_id)]")
-    country_id = fields.Many2one(
-        'res.country', string='Country',
-        compute='_compute_partner_address_values', readonly=False, store=True)
     
 
     # Floor Attributes
@@ -108,16 +96,3 @@ class HostelUnit(models.Model):
                 unit.complete_name = '%s/%s' % (unit.unit_id.complete_name, unit.name)
             else:
                 unit.complete_name = unit.name
-
-    # Address Related Methods
-    @api.depends('partner_id')
-    def _compute_partner_address_values(self):
-        for unit in self:
-            unit.update(unit._prepare_address_values_from_partner(unit.partner_id))
-
-    def _prepare_address_values_from_partner(self, partner):
-        if any(partner[f] for f in PARTNER_ADDRESS_FIELDS_TO_SYNC):
-            values = {f: partner[f] for f in PARTNER_ADDRESS_FIELDS_TO_SYNC}
-        else:
-            values = {f: self[f] for f in PARTNER_ADDRESS_FIELDS_TO_SYNC}
-        return values
