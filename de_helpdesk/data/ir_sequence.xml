@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="sequence_project_task_ticket_no" model="ir.sequence">
+            <field name="name">Project Task Ticket Number Sequence</field>
+            <field name="code">project.task.ticket.no</field>
+            <field name="prefix">TKT/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Pivot view -->
+    <menuitem name="Customer Ratings" id="menu_report_customer_ratings"
+            parent="menu_helpdesk_reports" 
+            action="action_ticket_customer_rating"
+            sequence="30"
+        groups="group_project_ticket_customer_ratings"
+        />
+</odoo>

@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="de_helpdesk.HelpdeskDashboard" owl="1">
+        <div class="o_helpdesk_dashboard container-fluid py-4 border-bottom bg-white">
+            <div class="row">
+                <div class="col-6">
+                    <table class="o_helpdesk_banner_table table table-sm table-borderless px-3 mb-0 text-center">
+                        <tbody>
+                            <tr class="">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    <h3 class="o_highlight">My Tickets</h3>
+                                    Open Tickets
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-primary"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['count_my_tickets']"/>Tickets
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-primary"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_high':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['count_my_high_tickets']"/>High Priority
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-primary"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_urgent':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                        <span class="d-block mb-0 fs-2" t-out="helpdeskData['count_my_urgent_tickets']"/>Urgent
+                                    </a>
+                                </td> 
+                            </tr>
+                            <tr class="">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    Avg Open Hours
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_analysis_open_hours"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                        
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['avg_open_hours']"/>
+                                        
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_analysis_open_hours"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_high':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['avg_open_hours_high']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_analysis_open_hours"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_urgent':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['avg_open_hours_urgent']"/>
+                                    </a>
+                                </td> 
+                            </tr>
+                            <tr class="">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    Failed Tickets
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_sla_failed':1,
+                                            'search_default_open_tickets':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['count_sla_failed']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_sla_failed':1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_high':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['count_sla_failed_high']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_sla_failed':1,
+                                            'search_default_open_tickets':1,
+                                            'search_default_priority_urgent':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['count_sla_failed_urgent']"/>
+                                    </a>
+                                </td> 
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-6">
+                    <table class="o_helpdesk_banner_table table table-sm table-borderless px-3 mb-0 text-center">
+                        <tbody>
+                            <tr class="">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    <h3 class="o_highlight">My Performance</h3>
+                                    Today
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_close_tickets':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                        <div class="p-1">
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['today_closed_tickets']"/>
+                                            Closed Tickets
+                                        </div>
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_sla_success':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                        <div class="p-1">
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['today_closed_sla_success']"/>
+                                            SLA Success Rate
+                                        </div>
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_customer_rating"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal"
+                                        title="Customer Ratings"
+                                        context="{
+                                            'search_default_my_ratings': 1,
+                                            'search_default_rating_today':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                        <div class="p-1">
+                                            <h2 class="mb-0 text-reset" t-out="helpdeskData['today_closed_rating']"/>
+                                            Average Rating
+                                        </div>
+                                    </a>
+                                </td> 
+                            </tr>
+                            <tr class="">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    Avg Last 7 Days
+                                </td>
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_closed_last_7days':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['closed_last_7days']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_ticket_all"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning"
+                                        title="My Tickets"
+                                        context="{
+                                            'search_default_my_ticket': 1,
+                                            'search_default_closed_last_7days':1,
+                                            'search_default_sla_success':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['closed_success_last_7days']"/>
+                                    </a>
+                                </td> 
+                                <td t-attf-class="col-3 px-1">
+                                    <a href="#" 
+                                        name="de_helpdesk.action_dashboard_customer_rating"
+                                        class="btn w-100 p-2 border-0 text-capitalize fw-normal btn-warning"
+                                        title="Customer Ratings"
+                                        context="{
+                                            'search_default_my_ratings': 1,
+                                            'search_default_rating_last_7_days':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="mb-0 text-reset" t-out="helpdeskData['closed_rating_last_7days']"/>
+                                    </a>
+                                </td> 
+                                
+                            </tr>
+                            <tr class="">
+                                <td class="col-3 px-1 o_text py-2 text-start align-middle">
+                                    Daily Target / 
+                                    <a href="#" 
+                                        name="de_helpdesk.action_set_target"
+                                        class="btn p-2 border-0 text-capitalize fw-normal"
+                                        title="Set Target"
+                                        context="{
+                                            'search_default_my_ratings': 1,
+                                            'search_default_rating_last_7_days':1,
+                                            'search_view_ref': 'context_search',
+                                        }"
+                                        t-on-click="onActionClicked"
+                                    >
+                                            <span class="text-primary">Set Target</span>
+                                    </a>
+                                </td>
+                                <td t-attf-class="col-3 px-1 align-middle">
+                                    <span class="mb-0 text-reset" t-out="helpdeskData['target_ticket_closed']"/>
+                                </td> 
+                                <td t-attf-class="col-3 px-1 align-middle">
+                                    <span class="mb-0 text-reset" t-out="helpdeskData['target_ticket_success']"/>
+                                </td> 
+                                <td t-attf-class="col-3 px-1 align-middle">
+                                    <span class="mb-0 text-reset" t-out="helpdeskData['target_ticket_rating']"/>
+                                </td> 
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
