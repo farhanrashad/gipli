@@ -86,7 +86,7 @@ class HostelUnit(models.Model):
         ('triple', 'Triple'),
         ('suite', 'Suite'),
         ('dormitory', 'Dormitory'),
-    ], string='Room Type', required=True)
+    ], string='Room Type', )
 
 
     @api.depends('name', 'unit_id.complete_name', 'unit_type')
