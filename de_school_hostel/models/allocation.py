@@ -8,6 +8,8 @@ class HostelRoomAllocate(models.Model):
     _order = 'date_order desc, id desc'
     _check_company_auto = True
 
+    
+            
     name = fields.Char(
         string="Order Reference",
         required=True, copy=False, readonly=False,
@@ -20,7 +22,7 @@ class HostelRoomAllocate(models.Model):
         default=fields.Datetime.now)
 
 
-    date_start = fields.Date(string='Start Date', required=True)
+    date_start = fields.Date(string='Start Date', required=True, default=fields.Datetime.now)
     date_end = fields.Date(string='End Date', compute='_compute_end_date', store=True)
     
     duration = fields.Integer(string='Duration', required=True, default=1)
@@ -29,11 +31,20 @@ class HostelRoomAllocate(models.Model):
         comodel_name='res.company',
         required=True, index=True,
         default=lambda self: self.env.company)
-    
+
+    @api.model
+    def _default_domain_partner_ids(self):
+        teacher_ids = self.env['hr.employee'].search([('is_teacher', '=', True)])
+        student_ids = self.env['res.partner'].search([('is_student', '=', True)]).ids
+        return teacher_ids.mapped('user_id.partner_id.id') + teacher_ids.mapped('address_id.id') + student_ids
+        
     partner_id = fields.Many2one('res.partner', string='Resident', required=True,
-                                 domain="[('id','in',domain_partners)]"
+                                 domain="[('id','in',domain_partner_ids)]"
                                 )
-    domain_partners = fields.Many2many('res.partner', compute='_compute_partners_domain')
+    domain_partner_ids = fields.Many2many('res.partner', 
+                                default=lambda self: self._default_domain_partner_ids(),
+                                #compute='_compute_partners_domain'
+                                         )
     building_id = fields.Many2one('oe.hostel.unit', string='Building', required=True,
                                   domain="[('unit_type','=','building')]"
                                  )
@@ -62,11 +73,16 @@ class HostelRoomAllocate(models.Model):
                 end_date = start_date + relativedelta(months=allocation.duration)
                 allocation.date_end = end_date
 
+    #@api.depends_context('id')
+    @api.model
     def _compute_partners_domain(self):
+        #raise UserError('helo')
         for record in self:
             teacher_ids = self.env['hr.employee'].search([('is_teacher','=',True)])
-            student_ids = self.env['res.partner'].sudo().search([('is_student','=',True)])
-            record.domain_partners = 1
-            raise UserError('hello')
+            student_ids = self.env['res.partner'].sudo().search([])
+            record.write({
+                'domain_partner_ids': student_ids.ids
+            })
+    
             
     
