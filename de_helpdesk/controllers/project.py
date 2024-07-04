@@ -20,6 +20,7 @@ class ProjectCustomerPortal(CustomerPortal):
         domain += [('is_helpdesk_team', '=', False)]
         return domain
 
+    """
     def _prepare_tasks_values(self, page, date_begin, date_end, sortby, search, search_in, groupby, url="/my/tasks", domain=None, su=False, project=False):
         # Apply your custom domain
         if domain is None:
@@ -31,3 +32,4 @@ class ProjectCustomerPortal(CustomerPortal):
         values = super()._prepare_tasks_values(page, date_begin, date_end, sortby, search, search_in, groupby, url, domain, su, project)
 
         return values
+    """

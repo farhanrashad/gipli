@@ -16,7 +16,7 @@ class TicketCustomerPortal(CustomerPortal):
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
         if 'tickets_count' in counters:
-            values['tickets_count'] = request.env['project.task'].search_count([('project_id', '!=', False)]) \
+            values['tickets_count'] = request.env['project.task'].search_count([('is_ticket', '=', True)]) \
                 if request.env['project.task'].check_access_rights('read', raise_exception=False) else 0
         return values
 
