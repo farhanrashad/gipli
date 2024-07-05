@@ -1,0 +1,89 @@
+<odoo>
+
+    <record id="unit_location_form_view" model="ir.ui.view">
+        <field name="name">unit.location.form.view</field>
+        <field name="model">stock.location</field>
+        <field name="arch" type="xml">
+            <form string="Stock Location">
+                <field name="company_id" invisible="1"/>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        
+                        <button string="Current Stock"
+                                class="oe_stat_button"
+                                icon="fa-cubes" name="%(stock.location_open_quants)d" type="action"/>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <label for="name"/>
+                    <h1><field name="name" placeholder="e.g. Spare Stock"/></h1>
+                    <label for="location_id"/>
+                    <h2><field name="location_id" placeholder="e.g. Physical Locations" options="{'no_create': True}"/></h2>
+
+                    <group>
+                        <group string="Additional Information" name="additional_info">
+                            <field name="active" invisible="1"/>
+                            <field name="usage" invisible="1"/>
+                            <field name="unit_type" />
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Cyclic Counting" >
+                        </group>
+                        
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field colspan="4" name="comment" nolabel="1" 
+                                placeholder="This note is only for internal purposes."
+                            />
+                        </page>
+                        <page string="Facilities" name="facilities">
+                            <field name="unit_facility_ids" colspan="2" columns="2"
+                                domain="[('usage','=',unit_type)]"
+                                widget="many2many_checkboxes"
+                            />
+                        </page>
+                    </notebook>
+                    
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="unit_location_tree_view" model="ir.ui.view">
+        <field name="name">unit.location.tree.view</field>
+        <field name="model">stock.location</field>
+        <field name="priority" eval="2"/>
+        <field name="arch" type="xml">
+            <tree string="Stock Location" decoration-info="usage=='view'" decoration-danger="usage=='internal'" multi_edit="1">
+                <field name="company_id" column_invisible="True"/>
+                <field name="active" column_invisible="True"/>
+                <field name="complete_name" string="Unit Location"/>
+                <field name="usage" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_unit_location" model="ir.actions.act_window">
+        <field name="name">Unit Locations</field>
+        <field name="res_model">stock.location</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="unit_location_tree_view"/>
+        <field name="search_view_id" ref="stock.view_location_search"/>
+        <field name="context">
+            {
+                'search_default_prod_inv_location': 1,
+                'default_is_hostel':1,
+            }
+        </field>
+        <field name="domain">[('is_hostel','=','True')]</field>
+        <field name="view_ids"
+				eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('unit_location_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('unit_location_form_view')})]" />
+    </record>
+
+    <menuitem action="action_unit_location" id="menu_unit_location_config"
+        parent="menu_school_hostel_menu_config" sequence="2"/>
+
+</odoo>

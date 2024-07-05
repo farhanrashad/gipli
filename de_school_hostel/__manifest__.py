@@ -16,7 +16,8 @@ Long description of module's purpose
 
     # any module necessary for this one to work correctly
     'depends': [
-        'de_school'
+        'de_school',
+        'stock'
     ],
 
     'data': [
@@ -25,9 +26,10 @@ Long description of module's purpose
         'data/facility_data.xml',
         'data/ir_sequence_data.xml',
         'views/hostel_menu.xml',
-        'views/unit_views.xml',
+        #'views/unit_views.xml',
         'views/unit_facility_views.xml',
-        'views/room_allocation_views.xml',
+        'views/stock_location_views.xml',
+        #'views/room_allocation_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
