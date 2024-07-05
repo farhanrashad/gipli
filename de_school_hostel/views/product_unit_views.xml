@@ -1,0 +1,92 @@
+<odoo>
+
+    <record id="hostel_unit_form_view" model="ir.ui.view">
+            <field name="name">hostel.unit.form.view</field>
+            <field name="model">product.product</field>
+            <field name="arch" type="xml">
+                <form string="Units">
+                    <field name="is_hostel_unit" invisible="1" />
+                    <sheet>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" 
+                            invisible="active == True"/>
+                        <field name='product_variant_count' invisible='1'/>
+                        <field name="id" invisible="True"/>
+                        <field name="image_1920" widget="image" class="oe_avatar" options="{'image_preview': 'image_128'}"/>
+                        <field name="detailed_type" invisible="1"/>
+                        <div class="oe_title">
+                            <label for="name" string="Unit Name" />
+                            <h1><field name="name" placeholder="e.g. Room 01"/></h1>
+                        </div>
+                        <group name="unit_details">
+                            <group string="General Information">
+                                <field name="active" invisible="1"/>
+                                <field name="type" invisible="1"/>
+                                <field name="detailed_type" invisible="1"/>
+                                <field name="lst_price" help="sale price for the fee product"/>
+                                <field name="uom_id" groups="uom.group_uom" options="{'no_create': True}"/>
+                                <field name="uom_po_id" invisible="1"/>
+                                <label for="default_code"/>
+                                <div>
+                                    <field name="default_code" />
+                                    <span class="d-inline-block"><i class="text-muted">Use this reference as a subject prefix when submitting by email.</i></span>
+                                </div>
+                                <field name="company_id" 
+                                    groups="base.group_multi_company"
+                                />
+                            </group>
+                            
+                        </group>
+                        <notebook>
+                            <page string="Internal Note" name="internal_note">
+                                <field name="description" placeholder="This note will be shown to users when they select this expense product."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    
+    <record model="ir.ui.view" id="hostel_unit_tree_view">
+            <field name="name">hostel.unit.tree.view</field>
+            <field name="model">product.product</field>
+            <field name="arch" type="xml">
+                <tree class="o_hotel_units">
+                    <field name="name" string="Unit" readonly="1"/>
+                    <field name="default_code" optional="show" readonly="1"/>
+                </tree>
+            </field>
+    </record>
+
+    <record id="action_hostel_unit" model="ir.actions.act_window">
+        <field name="name">Units</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">
+            {
+                'default_is_hostel_unit':1,
+                'default_company_id': allowed_company_ids[0],
+            }
+        </field>
+        <field name="domain">[('is_hostel_unit','=','True')]</field>
+        <field name="view_ids"
+				eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('hostel_unit_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('hostel_unit_form_view')})]" />
+    </record>
+
+    <menuitem action="action_hostel_unit" id="menu_school_hostel_units_unit"
+        parent="menu_school_hostel_units" sequence="1" />
+
+    <record id="action_product_unit_all" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new unit
+            </p>
+        </field>
+    </record>
+
+</odoo>

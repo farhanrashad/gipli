@@ -28,7 +28,9 @@ Long description of module's purpose
         'views/hostel_menu.xml',
         #'views/unit_views.xml',
         'views/unit_facility_views.xml',
-        'views/stock_location_views.xml',
+        'views/product_unit_views.xml',
+        'views/unit_category_views.xml',
+        'views/unit_location_views.xml',
         #'views/room_allocation_views.xml',
     ],
     # only loaded in demonstration mode

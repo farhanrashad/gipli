@@ -17,15 +17,17 @@ class Location(models.Model):
 
     is_hostel = fields.Boolean(default=False)
 
-    unit_type = fields.Selection([
-        ('building', 'Building'),
-        ('floor', 'Floor'),
-        ('room', 'Room'),
-    ], string='Type',
-        default='room', index=True, required=True,
-    )
+    unit_usage = fields.Selection([
+        ('view', 'View'),
+        ('internal', 'Location'),
+    ], string='Location Type',
+        default='internal', index=True, required=True,
+                            )
     
     unit_facility_ids = fields.Many2many(
         'oe.hostel.unit.facility',
         string='Facilities'
     )
+
+    # Building Attributes
+    location = fields.Char(string='Location')

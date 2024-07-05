@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="unit_category_form_view" model="ir.ui.view">
+        <field name="name">unit.category.form.view</field>
+        <field name="model">product.category</field>
+        <field name="arch" type="xml">
+            <form class="oe_form_configuration">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                            name="open_products_units"
+                            icon="fa-th-list"
+                            type="object"
+                            context="{'search_default_categ_id': id, 'default_categ_id': id, 'group_expand': True}">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="product_count"/></span>
+                                <span class="o_stat_text"> Units</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Category"/>
+                        <h1><field name="name" placeholder="e.g. Floor 01"/></h1>
+                    </div>
+                    <group name="first" col="2">
+                        <field name="parent_id" class="oe_inline"
+                            domain="[('is_hostel','=',True)]"
+                            placeholder="e.g. Building 01"
+                        />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="unit_category_list_view" model="ir.ui.view">
+        <field name="name">unit.category.list</field>
+        <field name="model">product.category</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <tree string="Unit Categories">
+                <field name="display_name" string="Unit Category"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_product_unit_category" model="ir.actions.act_window">
+        <field name="name">Category</field>
+        <field name="res_model">product.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="product.product_category_search_view"/>
+        <field name="context">
+            {
+                'default_is_hostel':1,
+            }
+        </field>
+        <field name="domain">[('is_hostel','=','True')]</field>
+        <field name="view_ids"
+				eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('unit_category_list_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('unit_category_form_view')})]" />
+    </record>
+    
+
+    <menuitem action="action_product_unit_category" id="menu_school_hostel_unit_config"
+        parent="menu_hostel_config_units" sequence="1" />
+
+
+    
+
+</odoo>
