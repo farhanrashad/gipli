@@ -21,8 +21,7 @@
                             <group string="General Information">
                                 <field name="active" invisible="1"/>
                                 <field name="type" invisible="1"/>
-                                <field name="detailed_type" invisible="1"/>
-                                <field name="lst_price" help="sale price for the fee product"/>
+                                <field name="detailed_type" readonly="1"/>
                                 <field name="uom_id" groups="uom.group_uom" options="{'no_create': True}"/>
                                 <field name="uom_po_id" invisible="1"/>
                                 <label for="default_code"/>
@@ -33,6 +32,13 @@
                                 <field name="company_id" 
                                     groups="base.group_multi_company"
                                 />
+                            </group>
+                            <group>
+                                <field name="categ_id" string="Unit Category"
+                                    domain="[('is_hostel','=',True)]"
+                                    options="{'no_create':True,'no_edit':True}"
+                                />
+                                <field name="tracking_serial" />
                             </group>
                             
                         </group>
@@ -65,6 +71,8 @@
             {
                 'default_is_hostel_unit':1,
                 'default_company_id': allowed_company_ids[0],
+                'default_detailed_type': 'product',
+                'default_categ_id': False,
             }
         </field>
         <field name="domain">[('is_hostel_unit','=','True')]</field>

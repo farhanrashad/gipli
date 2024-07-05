@@ -21,8 +21,11 @@
               sequence = "100"
 			groups="de_school_hostel.group_hostel_manager" />
 
-            <menuitem id="menu_hostel_config_units" name="Units"
+            <menuitem id="menu_unit_facility_config" name="Facilities"
                 parent="menu_school_hostel_menu_config" sequence="2" />
+    
+            <menuitem id="menu_hostel_config_units" name="Units"
+                parent="menu_school_hostel_menu_config" sequence="3" />
 
     
 </odoo>

@@ -14,3 +14,19 @@ class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     is_hostel_unit = fields.Boolean(default=False)
+
+    tracking_serial = fields.Boolean(string='Tracking Serial', compute='_compute_tracking_serial', inverse='_inverse_tracking_serial')
+
+   
+    @api.depends('tracking')
+    def _compute_tracking_serial(self):
+        for record in self:
+            record.tracking_serial = record.tracking == 'serial'
+
+    def _inverse_tracking_serial(self):
+        for record in self:
+            if record.tracking_serial:
+                record.tracking = 'serial'
+            else:
+                record.tracking = 'none'
+            
