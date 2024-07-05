@@ -1,0 +1,245 @@
+<odoo>
+    <!-- Building Facility Types -->
+    <record model="oe.hostel.unit.facility.type" id="facility_type_1">
+        <field name="name">Structural</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_2">
+        <field name="name">Security</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_3">
+        <field name="name">Utilities</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_4">
+        <field name="name">Common Areas</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_5">
+        <field name="name">Recreational</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_6">
+        <field name="name">Dining</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_7">
+        <field name="name">Medical</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_8">
+        <field name="name">Storage</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_9">
+        <field name="name">Parking</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_10">
+        <field name="name">Administrative</field>
+    </record>
+    
+    <!-- Floor Facility Types -->
+    <record model="oe.hostel.unit.facility.type" id="facility_type_11">
+        <field name="name">Restrooms</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_12">
+        <field name="name">Common Areas</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_13">
+        <field name="name">Emergency</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_14">
+        <field name="name">Utilities</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_15">
+        <field name="name">Cleaning</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_16">
+        <field name="name">Recreational</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_17">
+        <field name="name">Storage</field>
+    </record>
+    
+    <!-- Room Facility Types -->
+    <record model="oe.hostel.unit.facility.type" id="facility_type_18">
+        <field name="name">Furniture</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_19">
+        <field name="name">Appliances</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_20">
+        <field name="name">Fixtures</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_21">
+        <field name="name">Bedding</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_22">
+        <field name="name">Electronics</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_23">
+        <field name="name">Bathroom</field>
+    </record>
+    <record model="oe.hostel.unit.facility.type" id="facility_type_24">
+        <field name="name">Decor</field>
+    </record>
+
+    <!-- Building Facilities -->
+    <record model="oe.hostel.unit.facility" id="facility_1">
+        <field name="name">Wi-Fi</field>
+        <field name="facility_type_id" ref="facility_type_3"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_2">
+        <field name="name">Common Room</field>
+        <field name="facility_type_id" ref="facility_type_4"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_3">
+        <field name="name">Laundry Room</field>
+        <field name="facility_type_id" ref="facility_type_4"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_4">
+        <field name="name">Cafeteria</field>
+        <field name="facility_type_id" ref="facility_type_6"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_5">
+        <field name="name">Security</field>
+        <field name="facility_type_id" ref="facility_type_2"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_6">
+        <field name="name">Parking</field>
+        <field name="facility_type_id" ref="facility_type_9"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_7">
+        <field name="name">Elevator</field>
+        <field name="facility_type_id" ref="facility_type_3"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_8">
+        <field name="name">Gym</field>
+        <field name="facility_type_id" ref="facility_type_5"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_9">
+        <field name="name">Library</field>
+        <field name="facility_type_id" ref="facility_type_5"/>
+        <field name="usage">building</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_10">
+        <field name="name">Medical Room</field>
+        <field name="facility_type_id" ref="facility_type_7"/>
+        <field name="usage">building</field>
+    </record>
+
+    <!-- Floor Facilities -->
+    <record model="oe.hostel.unit.facility" id="facility_11">
+        <field name="name">Common Area</field>
+        <field name="facility_type_id" ref="facility_type_12"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_12">
+        <field name="name">Shared Bathroom</field>
+        <field name="facility_type_id" ref="facility_type_11"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_13">
+        <field name="name">Kitchenette</field>
+        <field name="facility_type_id" ref="facility_type_14"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_14">
+        <field name="name">Water Dispenser</field>
+        <field name="facility_type_id" ref="facility_type_14"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_15">
+        <field name="name">Fire Extinguishers</field>
+        <field name="facility_type_id" ref="facility_type_13"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_16">
+        <field name="name">Emergency Exit</field>
+        <field name="facility_type_id" ref="facility_type_13"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_17">
+        <field name="name">Housekeeping</field>
+        <field name="facility_type_id" ref="facility_type_15"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_18">
+        <field name="name">Trash Disposal</field>
+        <field name="facility_type_id" ref="facility_type_15"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_19">
+        <field name="name">Study Area</field>
+        <field name="facility_type_id" ref="facility_type_16"/>
+        <field name="usage">floor</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_20">
+        <field name="name">Laundry Chute</field>
+        <field name="facility_type_id" ref="facility_type_17"/>
+        <field name="usage">floor</field>
+    </record>
+
+    <!-- Room Facilities -->
+    <record model="oe.hostel.unit.facility" id="facility_21">
+        <field name="name">Bed</field>
+        <field name="facility_type_id" ref="facility_type_18"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_22">
+        <field name="name">Desk</field>
+        <field name="facility_type_id" ref="facility_type_18"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_23">
+        <field name="name">Wardrobe</field>
+        <field name="facility_type_id" ref="facility_type_18"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_24">
+        <field name="name">Chair</field>
+        <field name="facility_type_id" ref="facility_type_18"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_25">
+        <field name="name">Lamp</field>
+        <field name="facility_type_id" ref="facility_type_22"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_26">
+        <field name="name">Fan/AC</field>
+        <field name="facility_type_id" ref="facility_type_19"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_27">
+        <field name="name">Heater</field>
+        <field name="facility_type_id" ref="facility_type_19"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_28">
+        <field name="name">Private Bathroom</field>
+        <field name="facility_type_id" ref="facility_type_23"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_29">
+        <field name="name">Shelves</field>
+        <field name="facility_type_id" ref="facility_type_20"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_30">
+        <field name="name">Curtains/Blinds</field>
+        <field name="facility_type_id" ref="facility_type_24"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_31">
+        <field name="name">Power Outlets</field>
+        <field name="facility_type_id" ref="facility_type_22"/>
+        <field name="usage">room</field>
+    </record>
+    <record model="oe.hostel.unit.facility" id="facility_32">
+        <field name="name">Mirror</field>
+        <field name="facility_type_id" ref="facility_type_21"/>
+        <field name="usage">room</field>
+    </record>
+</odoo>
