@@ -23,6 +23,7 @@ Long description of module's purpose
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/facility_data.xml',
+        'data/ir_sequence_data.xml',
         'views/hostel_menu.xml',
         'views/unit_views.xml',
         'views/unit_facility_views.xml',

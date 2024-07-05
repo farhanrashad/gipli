@@ -3,6 +3,18 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, AccessError
 
+class HostelUnitType(models.Model):
+    _name = 'oe.hostel.unit.type'
+    _description = 'Unit Type'
+
+    name = fields.Char(required=True)
+    usage = fields.Selection([
+        ('building', 'Building'),
+        ('floor', 'Floor'),
+        ('room', 'Room'),
+    ], string='Usage',
+        default='room', index=True, required=True,
+    )
 
 class HostelUnit(models.Model):
     _name = 'oe.hostel.unit'
@@ -35,17 +47,20 @@ class HostelUnit(models.Model):
         default=lambda self: self.env.company, index=True,
         help='Let this field empty if this unit is shared between companies')
 
-
+    status = fields.Selection([
+        ('available', 'Available'), 
+        ('reserve', 'Reserved'), 
+        ('use', 'In Use'),
+        ('out_of_service', 'Out of Service'),
+    ], string='Status', default='available')
 
     code = fields.Char(string=' Code', size=5, required=True)  # Define size as needed
-    capacity = fields.Integer(string='Capacity', required=True, default=10)
+    capacity = fields.Integer(string='Capacity', required=True, 
+                              store=True, compute='_compute_unit_capacity', readonly=False,
+                             )
+    
     description = fields.Text(string='Description', help="Detailed description of the building")
 
-    #unit_line = fields.One2many(
-    #    comodel_name='oe.hostel.unit.line',
-    #    inverse_name='unit_id',
-    #    string="Unit Lines",
-    #    copy=True, auto_join=True)
 
     unit_facility_ids = fields.Many2many(
         'oe.hostel.unit.facility',
@@ -53,11 +68,8 @@ class HostelUnit(models.Model):
     )
 
     
-    room_capacity = fields.Integer(string='Number of Rooms')
-    
     # Building Attributes
     location = fields.Char(string='Location')
-    floor_capacity = fields.Integer(string='Number of Floors')
     building_type = fields.Selection([
         ('hostel', 'Hostel'),
         ('dormitory', 'Dormitory'),
@@ -66,17 +78,7 @@ class HostelUnit(models.Model):
     
 
     # Floor Attributes
-    floor_number = fields.Integer(string='Floor Number')
-    cleanliness_status = fields.Selection([
-        ('clean', 'Clean'),
-        ('average', 'Average'),
-        ('dirty', 'Dirty'),
-    ], string='Cleanliness Status')
-    occupancy_status = fields.Selection([
-        ('occupied', 'Occupied'),
-        ('vacant', 'Vacant'),
-        ('under_maintenance', 'Under Maintenance'),
-    ], string='Occupancy Status')
+    
     
 
     # Room Fields
@@ -96,3 +98,33 @@ class HostelUnit(models.Model):
                 unit.complete_name = '%s/%s' % (unit.unit_id.complete_name, unit.name)
             else:
                 unit.complete_name = unit.name
+
+    @api.depends('name', 'unit_id.complete_name', 'unit_type', 'child_ids.capacity')
+    def _compute_unit_capacity(self):
+        def propagate_capacity_up(unit):
+            if unit.unit_type == 'building':
+                children_capacity = sum(child.capacity for child in unit.child_ids)
+                unit.capacity = children_capacity
+            elif unit.unit_type == 'floor':
+                children_capacity = sum(child.capacity for child in unit.child_ids if child.unit_type == 'room')
+                unit.capacity = children_capacity
+            elif unit.unit_type == 'room':
+                unit.capacity = unit.room_capacity or 0
+    
+            if unit.unit_id:
+                propagate_capacity_up(unit.unit_id)
+    
+        for record in self:
+            propagate_capacity_up(record)
+
+                
+    # Action 
+    def action_reserve(self):
+        self.write({
+            'status': 'reserve',
+        })
+
+    def action_out_of_service(self):
+        self.write({
+            'status': 'out_of_service',
+        })

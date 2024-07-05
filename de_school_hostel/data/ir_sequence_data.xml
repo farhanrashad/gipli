@@ -1,0 +1,12 @@
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Room Allocation Orders -->
+        <record id="seq_room_allocation_order" model="ir.sequence">
+            <field name="name">Room Allocation Order</field>
+            <field name="code">room.allocation.order</field>
+            <field name="prefix">RAO</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

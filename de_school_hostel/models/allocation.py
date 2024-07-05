@@ -64,6 +64,20 @@ class HostelRoomAllocate(models.Model):
         ('close', 'Closed'),
     ], string='Status', default='draft', required=True)
 
+    #=== CRUD METHODS ===#
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'company_id' in vals:
+                self = self.with_company(vals['company_id'])
+            if vals.get('name', _("New")) == _("New"):
+                vals['name'] = self.env['ir.sequence'].next_by_code(
+                    'room.allocation.order') or _("New")
+
+        return super().create(vals_list)
+
+    
     @api.depends('date_start', 'duration')
     def _compute_end_date(self):
         for allocation in self:
@@ -84,5 +98,13 @@ class HostelRoomAllocate(models.Model):
                 'domain_partner_ids': student_ids.ids
             })
     
-            
+    # Actions
+    def action_reserve(self):
+        self.write({
+            'state': 'reserve'
+        })
+    def action_confirm(self):
+        self.write({
+            'state': 'allocate'
+        })
     

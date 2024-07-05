@@ -9,8 +9,15 @@
             <form string="Stock Location">
                 <field name="company_id" invisible="1"/>
                 <field name="active" invisible="1"/>
+                <field name="status" invisible="1"/>
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <widget name="web_ribbon" title="Available" bg_color="text-bg-success" invisible="status != 'available' or not active or unit_type != 'room' "/>
+                    <widget name="web_ribbon" title="Reserved" bg_color="text-bg-primary" invisible="status != 'reserve' or not active or unit_type != 'room' "/>
+                    <widget name="web_ribbon" title="In Use" bg_color="text-bg-warning" invisible="status != 'use' or not active or unit_type != 'room'"/>
+
+                    <widget name="web_ribbon" title="Our of Service" bg_color="text-bg-danger" invisible="status != 'out_of_service' or not active or unit_type != 'room'"/>
+
                     <label for="name"/>
                     <h1><field name="name" placeholder="e.g. Unit 1"/></h1>
                     <label for="unit_id"/>
@@ -28,12 +35,6 @@
                         </group>
                         <group >
                             <field name="location" invisible="unit_type != 'building'"/>
-
-                            <field name="floor_capacity" invisible="unit_type != 'building'"/>
-                             <field name="room_capacity" string="Total Rooms" 
-                                invisible="(unit_type == 'building' and floor_capacity &lt;= 0) or unit_type == 'room'"
-                                readonly="(unit_type == 'building' and floor_capacity &gt;= 0)"
-                            />
                             
                             <field name="capacity" string="Total Beds" 
                                 readonly="unit_type in ('building','floor')"

@@ -6,6 +6,19 @@
             <field name="arch" type="xml">
                 <form string="Hostel Room Allocation">
                     <header>
+                        <button name="action_reserve" id="action_reserve"
+                            string="Reserve" class="btn-primary" type="object"
+                            invisible="state != 'draft'"
+                        />
+                        <button name="action_confirm" id="action_confirm"
+                            string="Confirm" type="object"
+                            invisible="state != 'draft'"
+                        />
+                        
+                        <button name="action_confirm" id="action_confirm"
+                            string="Confirm" class="btn-primary" type="object"
+                            invisible="state != 'reserve'"
+                        />
                         <field name="state" widget="statusbar" statusbar_visible="draft,reserve,allocate"/>
                     </header>
                     <sheet>
@@ -17,21 +30,24 @@
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id"/>
-                                <field name="building_id"/>
-                                <field name="room_id"/>
+                                <field name="partner_id" readonly="state != 'draft'"/>
+                                <field name="building_id" readonly="state != 'draft'"/>
+                                <field name="room_id" readonly="state != 'draft'"/>
                             </group>
                             <group>
-                                <field name="date_order" />
-                                <field name="date_start" />
-                                <field name="duration" string="Month(s)"/>
-                                <field name="date_end" />
-                                <field name="company_id" groups="base.group_multi_company" />
+                                <field name="date_order" readonly="state != 'draft'"/>
+                                <field name="date_start" readonly="state != 'draft'"/>
+                                <field name="duration" string="Month(s)" readonly="state != 'draft'"/>
+                                <field name="date_end" readonly="state != 'draft'"/>
+                                <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
                             </group>
                         </group>
                         <group name="note_group" col="6" class="mt-2 mt-md-0">
                             <group colspan="4">
-                                <field colspan="2" name="note" nolabel="1" placeholder="Terms and conditions..."/>
+                                <field colspan="2" name="note" nolabel="1" 
+                                    placeholder="Terms and conditions..."
+                                    readonly="state != 'draft'"/>
+                                />
                             </group>
                             
                             <div class="clearfix"/>
