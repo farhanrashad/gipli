@@ -52,7 +52,7 @@
         id="menu_xpendless_main_expense"
         parent="menu_xpendless_main" 
         action="action_xpendless_expenses"
-        sequence="100"
+        sequence="1"
     />
     
 </odoo>

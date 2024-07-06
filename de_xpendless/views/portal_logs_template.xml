@@ -1,0 +1,28 @@
+<!-- your_module/views/portal_xpendless_logs_template.xml -->
+<odoo>
+    <template id="portal_xpendless_logs">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h1>Xpendless Logs</h1>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Log Message</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="logs" t-as="log">
+                            <tr>
+                                <td><t t-esc="log['id']"/></td>
+                                <td><t t-esc="log['message']"/></td>
+                                <td><t t-esc="log['timestamp']"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -7,3 +7,4 @@ access_xpl_expense_manager,access.xpl.expense.manager,model_xpl_expense,de_xpend
 
 
 access_xpl_ops_wizard_manager,access.xpl.ops.wizard.manager,model_xpl_ops_wizard,de_xpendless.group_xpendless_user,1,1,1,1
+access_xpl_logs_wizard_manager,access.xpl.logs.wizard.manager,model_xpl_logs_wizard,de_xpendless.group_xpendless_user,1,1,1,1

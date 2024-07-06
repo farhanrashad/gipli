@@ -23,7 +23,9 @@ Base module of Xpendless Integration
         'views/instance_views.xml',
         'views/res_partner_views.xml',
         'views/expense_views.xml',
+        'views/portal_logs_template.xml',
         'wizards/ops_wizard_views.xml',
+        'wizards/logs_wizard_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
