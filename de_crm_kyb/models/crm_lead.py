@@ -149,8 +149,8 @@ class Lead(models.Model):
         partner_vals = {}
 
         # Access the payload part of the JSON data
-        #payload = json_data.get('payload', {})
-        payload = json_data
+        payload = json_data.get('payload', {})
+        #payload = json_data
 
         companyId = int(payload.get('companyId'))
         companyName = payload.get('companyName')
