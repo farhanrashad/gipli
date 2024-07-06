@@ -10,6 +10,9 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
         <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <field name="is_kyb" invisible="1"/>
+            </xpath>
             <xpath expr="//button[@name='action_view_sale_quotation']" position="attributes">
                 <attribute name="invisible">type == "lead" or is_kyb == True</attribute>
             </xpath>

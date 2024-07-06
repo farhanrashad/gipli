@@ -143,51 +143,47 @@ class Lead(models.Model):
     def _cron_import_company_from_xpl(self):
         raise UserError('hello')
 
-    from odoo import models, fields, api
-
-class CrmLead(models.Model):
-    _inherit = 'crm.lead'
-
     @api.model
     def create_or_update_opportunity(self, json_data):
         opportunity_values = {}
-
         partner_vals = {}
-        
-        companyId = int(json_data.get('id'))
-        companyName = json_data.get('companyName')
-        registrationNumber = json_data.get('registrationNumber')
-        addressLine1 = json_data.get('addressLine1')
-        addressLine2 = json_data.get('addressLine2')
-        city = json_data.get('city')
-        postalCode = json_data.get('postalCode')
-        companyEmail = json_data.get('companyEmail')
-        companyPhone = json_data.get('companyPhone')
-        crCreationDate = json_data.get('crCreationDate')
-        crExpiryDate = json_data.get('crExpiryDate')
-        activationDate = json_data.get('activationDate')
-        subscribingDate = json_data.get('subscribingDate')
-        createdAt = json_data.get('createdAt')
-        updatedAt = json_data.get('updateAt')
-        status = json_data.get('status')
-        kybStatus = json_data.get('kybStatus')
-        termsConditions = json_data.get('termsConditions')
-        submittedFields = json_data.get('submittedFields', [])
-        attachments = json_data.get('attachments', [])
-        companySettings = json_data.get('CompanySettings', {})
-        
-        owners = json_data.get('Owners', [])
-        attachments = json_data.get('attachments', [])
+
+        # Access the payload part of the JSON data
+        #payload = json_data.get('payload', {})
+        payload = json_data
+
+        companyId = int(payload.get('companyId'))
+        companyName = payload.get('companyName')
+        registrationNumber = payload.get('registrationNumber')
+        addressLine1 = payload.get('addressLine1')
+        addressLine2 = payload.get('addressLine2')
+        city = payload.get('city')
+        postalCode = payload.get('postalCode')
+        companyEmail = payload.get('companyEmail')
+        companyPhone = payload.get('companyPhone')
+        crCreationDate = payload.get('crCreationDate')
+        crExpiryDate = payload.get('crExpiryDate')
+        activationDate = payload.get('activationDate')
+        subscribingDate = payload.get('subscribingDate')
+        createdAt = payload.get('createdAt')
+        updatedAt = payload.get('updateAt')
+        status = payload.get('status')
+        kybStatus = payload.get('kybStatus')
+        termsConditions = payload.get('termsConditions')
+        submittedFields = payload.get('submittedFields', [])
+        attachments = payload.get('attachments', [])
+        companySettings = payload.get('CompanySettings', {})
+        owners = payload.get('Owners', [])
+        attachments = payload.get('attachments', [])
 
         team_id = self.env['crm.team'].sudo().search([
-            ('is_kyb','=',True)
-        ],limit=1)
+            ('is_kyb', '=', True)
+        ], limit=1)
 
         stage_id = self.env['crm.stage'].sudo().search([
-            ('is_kyb','=',True)
-        ],order='sequence',limit=1)
-        
-        # Example: Creating or updating an Opportunity record
+            ('is_kyb', '=', True)
+        ], order='sequence', limit=1)
+
         opportunity_values = {
             'name': companyName,
             'partner_name': companyName,
@@ -208,11 +204,8 @@ class CrmLead(models.Model):
             #'terms_conditions': termsConditions,
         }
 
-
-       
-            
         lead_id = opportunity = self.env['crm.lead']
-        
+
         existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', companyId)], limit=1)
         if existing_lead:
             lead_id = opportunity.write(opportunity_values)
@@ -224,20 +217,20 @@ class CrmLead(models.Model):
                 #'team_id': team_id.id,
                 #'user_id': 1,
             })
-            
+
             lead_id = opportunity.create(opportunity_values)
             lead_id.partner_id = self.env['res.partner'].create({
                 'name': companyName,
                 'company_type': 'company',
                 'is_xpendless': True,
                 'xpl_id': lead_id.xpl_id,
-                
             })
             if stage_id:
                 lead_id.write({
                     'stage_id': stage_id.id,
                 })
             lead_id.convert_opportunity(lead_id.partner_id, user_ids=[1], team_id=team_id.id)
+
             for owner in owners:
                 partner_vals = {
                     'name': owner.get('fullName'),
@@ -247,46 +240,29 @@ class CrmLead(models.Model):
                     'parent_id': lead_id.partner_id.id,
                     'company_type': 'person',
                     'type': 'other',
-                    'is_xpendless':True,
+                    'is_xpendless': True,
                 }
-            
-                # Check if partner already exists
+
                 existing_partner = self.env['res.partner'].search([('xpl_id', '=', owner.get('employeeId'))], limit=1)
                 if existing_partner:
                     existing_partner.write(partner_vals)
                 else:
                     self.env['res.partner'].create(partner_vals)
-                
-        # Create attachment
-        """
-        for attachment in attachments:
-            attached_file = attachment.read()
-            if attached_file:  # Ensure the attachment is not empty
-                attachment_id = self.env['ir.attachment'].sudo().create({
-                    'name': attachment.filename,
-                    'res_model': 'crm.lead',
-                    'res_id': lead_id.id,
-                    'type': 'binary',
-                    'datas': base64.b64encode(attached_file).decode('ascii'),
-                })
-                attachment_ids.append(attachment_id.id)
 
-        """
         attachment_ids = []
         for attachment in attachments:
             response = requests.get(attachment['attachmentPath'])
             if response.status_code == 200:
                 attachment_vals = {
-                        'name': f"{attachment['companyDocId']}_{companyName}.pdf",
-                        'datas': base64.b64encode(response.content),
-                        'res_model': 'crm.lead',
-                        'res_id': lead_id.id,
-                        'mimetype': 'application/pdf'
+                    'name': f"{attachment['companyDocId']}_{companyName}.pdf",
+                    'datas': base64.b64encode(response.content),
+                    'res_model': 'crm.lead',
+                    'res_id': lead_id.id,
+                    'mimetype': 'application/pdf'
                 }
                 attachment_id = self.env['ir.attachment'].create(attachment_vals)
                 attachment_ids.append(attachment_id.id)
-        
-        
+
         if attachment_ids:
             message_id = self.env['mail.message'].create({
                 'body': 'Attached documents for the company.',
@@ -298,10 +274,5 @@ class CrmLead(models.Model):
                 'author_id': 1,
                 'attachment_ids': [(6, 0, attachment_ids)]
             })
-        #    lead_id.message_post(
-        #        body="Attached documents for the company.",
-        #        attachment_ids=attachment_ids
-        #    )
-        
-        return lead_id
 
+        return lead_id
