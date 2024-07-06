@@ -29,6 +29,12 @@
                             placeholder="e.g. Building 01"
                         />
                     </group>
+                    <group>
+                        <group >
+                            <field name="sequence_code" required="1"/>
+                            <field name="sequence_id" readonly="1"/>
+                        </group>
+                    </group>
                 </sheet>
             </form>
         </field>

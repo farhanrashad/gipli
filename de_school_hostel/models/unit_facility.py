@@ -15,11 +15,5 @@ class HostelUnit(models.Model):
 
     name = fields.Char(required=True)
     facility_type_id = fields.Many2one('oe.hostel.unit.facility.type', string='Facility Type', required=True)
-    usage = fields.Selection([
-        ('building', 'Building'),
-        ('floor', 'Floor'),
-        ('room', 'Room'),
-    ], string='Usage',
-        default='room', index=True, required=True,
-    )
+    use_unit = fields.Boolean('Used for Unit')
     active = fields.Boolean(default=True)

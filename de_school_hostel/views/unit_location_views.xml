@@ -23,7 +23,7 @@
                         <group  name="additional_info">
                             <field name="active" invisible="1"/>
                             <field name="usage" invisible="1"/>
-                            <field name="unit_usage" />
+                            <field name="unit_usage" required="1" />
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                         </group>
                         <group  >
@@ -77,7 +77,10 @@
                 'default_is_hostel':1,
             }
         </field>
-        <field name="domain">[('is_hostel','=','True')]</field>
+        <field name="domain">[
+            ('is_hostel','=',True),
+            ('unit_usage','!=',False)
+        ]</field>
         <field name="view_ids"
 				eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('unit_location_tree_view')}),

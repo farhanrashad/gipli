@@ -6,7 +6,7 @@
         web_icon="de_school_hostel,static/description/icon.png"
         sequence="57" />
 
-        <menuitem name="Allocation" id="menu_school_hostel_main"
+        <menuitem name="Room Assignments" id="menu_school_hostel_main"
 			parent="menu_school_hostel" 
               sequence = "1"
 			/>

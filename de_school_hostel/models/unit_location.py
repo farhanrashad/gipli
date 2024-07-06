@@ -21,13 +21,19 @@ class Location(models.Model):
         ('view', 'View'),
         ('internal', 'Location'),
     ], string='Location Type',
-        default='internal', index=True, required=True,
+        default='internal', 
                             )
     
     unit_facility_ids = fields.Many2many(
         'oe.hostel.unit.facility',
-        string='Facilities'
+        string='Facilities',
+        domain="[('use_unit','!=',True)]"
     )
 
     # Building Attributes
     location = fields.Char(string='Location')
+
+    @api.onchange('unit_usage')
+    def _onchange_unit_usage(self):
+        if self.unit_usage:
+            self.usage = self.unit_usage

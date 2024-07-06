@@ -1,10 +1,10 @@
 <odoo>
     <data>
-        <record model="ir.ui.view" id="view_hostel_room_allocate_form">
-            <field name="name">oe.hostel.room.allocate.form</field>
-            <field name="model">oe.hostel.room.allocate</field>
+        <record model="ir.ui.view" id="view_hostel_room_assignment_form">
+            <field name="name">oe.hostel.room.assignment.form</field>
+            <field name="model">oe.hostel.room.assign</field>
             <field name="arch" type="xml">
-                <form string="Hostel Room Allocation">
+                <form string="Hostel Room Assignment">
                     <header>
                         <button name="action_reserve" id="action_reserve"
                             string="Reserve" class="btn-primary" type="object"
@@ -19,7 +19,7 @@
                             string="Confirm" class="btn-primary" type="object"
                             invisible="state != 'reserve'"
                         />
-                        <field name="state" widget="statusbar" statusbar_visible="draft,reserve,allocate"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,reserve,assign"/>
                     </header>
                     <sheet>
                         <field name="domain_partner_ids" invisible="1" />
@@ -30,9 +30,15 @@
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id" readonly="state != 'draft'"/>
-                                <field name="building_id" readonly="state != 'draft'"/>
-                                <field name="room_id" readonly="state != 'draft'"/>
+                                <field name="partner_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    readonly="state != 'draft'"/>
+                                <field name="location_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    readonly="state != 'draft'"/>
+                                <field name="product_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    readonly="state != 'draft'"/>
                             </group>
                             <group>
                                 <field name="date_order" readonly="state != 'draft'"/>
@@ -57,30 +63,29 @@
             </field>
         </record>
 
-        <!-- Tree View for Hostel Room Allocation -->
-        <record model="ir.ui.view" id="view_hostel_room_allocate_tree">
-            <field name="name">oe.hostel.room.allocate.tree</field>
-            <field name="model">oe.hostel.room.allocate</field>
+        <!-- Tree View for Hostel Room Assignment -->
+        <record model="ir.ui.view" id="view_hostel_room_assignment_tree">
+            <field name="name">oe.hostel.room.assignment.tree</field>
+            <field name="model">oe.hostel.room.assign</field>
             <field name="arch" type="xml">
-                <tree string="Hostel Room Allocation">
+                <tree string="Hostel Room Assignment">
                     <field name="partner_id"/>
-                    <field name="room_id"/>
                 </tree>
             </field>
         </record>
 
-        <!-- Action for Hostel Room Allocation -->
-        <record model="ir.actions.act_window" id="action_hostel_room_allocate">
-            <field name="name">Allocation</field>
-            <field name="res_model">oe.hostel.room.allocate</field>
+        <!-- Action for Hostel Room Assignment -->
+        <record model="ir.actions.act_window" id="action_hostel_room_assignment">
+            <field name="name">Room Assignment</field>
+            <field name="res_model">oe.hostel.room.assign</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_hostel_room_allocate_tree"/>
+            <field name="view_id" ref="view_hostel_room_assignment_tree"/>
         </record>
 
-        <!-- Menu Item for Hostel Room Allocation -->
-        <menuitem id="menu_hostel_room_allocate" 
+        <!-- Menu Item for Hostel Room Assignment -->
+        <menuitem id="menu_hostel_room_assignment" 
                   parent="menu_school_hostel_main" 
-            action="action_hostel_room_allocate"
+            action="action_hostel_room_assignment"
             sequence="1"
         />
     </data>

@@ -2,17 +2,36 @@
 
     <record id="hostel_unit_form_view" model="ir.ui.view">
             <field name="name">hostel.unit.form.view</field>
-            <field name="model">product.product</field>
+            <field name="model">product.template</field>
             <field name="arch" type="xml">
                 <form string="Units">
                     <field name="is_hostel_unit" invisible="1" />
+                    <field name="sequence_id" invisible="1" />
+                    <field name="detailed_type" invisible="1"/>
+                    <field name="product_variant_count" invisible="1"/>
+                    <field name="tracking" invisible="True"/>
+                    <field name="company_id" invisible="True"/>
+                    <header>
+                        <button name="generate_unit_serial" string="Generate Serial"
+                        type="object" class="btn-primary" 
+                            invisible="not tracking_serial or not sequence_id"
+                        />
+                    </header>
                     <sheet>
                         <widget name="web_ribbon" title="Archived" bg_color="bg-danger" 
                             invisible="active == True"/>
-                        <field name='product_variant_count' invisible='1'/>
-                        <field name="id" invisible="True"/>
+                        
                         <field name="image_1920" widget="image" class="oe_avatar" options="{'image_preview': 'image_128'}"/>
-                        <field name="detailed_type" invisible="1"/>
+                        <div class="oe_button_box" name="button_box">
+                            <button type="object"
+                                name="action_open_subunits"
+                                invisible="tracking == 'none'"
+                                class="oe_stat_button" icon="fa-bars">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Sub-Units</span>
+                                </div>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <label for="name" string="Unit Name" />
                             <h1><field name="name" placeholder="e.g. Room 01"/></h1>
@@ -46,6 +65,14 @@
                             <page string="Internal Note" name="internal_note">
                                 <field name="description" placeholder="This note will be shown to users when they select this expense product."/>
                             </page>
+                            <page string="Facilities" name="facilities">
+                                <field name="unit_facility_ids" >
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="facility_type_id" />
+                                    </tree>
+                                </field>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>
@@ -54,7 +81,7 @@
     
     <record model="ir.ui.view" id="hostel_unit_tree_view">
             <field name="name">hostel.unit.tree.view</field>
-            <field name="model">product.product</field>
+            <field name="model">product.template</field>
             <field name="arch" type="xml">
                 <tree class="o_hotel_units">
                     <field name="name" string="Unit" readonly="1"/>
@@ -65,7 +92,7 @@
 
     <record id="action_hostel_unit" model="ir.actions.act_window">
         <field name="name">Units</field>
-        <field name="res_model">product.product</field>
+        <field name="res_model">product.template</field>
         <field name="view_mode">tree,form</field>
         <field name="context">
             {

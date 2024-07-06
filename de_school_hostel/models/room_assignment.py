@@ -2,13 +2,11 @@ from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import AccessError, UserError, ValidationError
 
-class HostelRoomAllocate(models.Model):
-    _name = 'oe.hostel.room.allocate'
-    _description = 'Hostel Room Allocation'
+class HostelRoomAssign(models.Model):
+    _name = 'oe.hostel.room.assign'
+    _description = 'Hostel Room Assignment'
     _order = 'date_order desc, id desc'
     _check_company_auto = True
-
-    
             
     name = fields.Char(
         string="Order Reference",
@@ -17,7 +15,7 @@ class HostelRoomAllocate(models.Model):
         default=lambda self: _('New'))
 
     date_order = fields.Datetime(
-        string="Allocation Date",
+        string="Assignment Date",
         required=True, copy=False,
         default=fields.Datetime.now)
 
@@ -45,12 +43,22 @@ class HostelRoomAllocate(models.Model):
                                 default=lambda self: self._default_domain_partner_ids(),
                                 #compute='_compute_partners_domain'
                                          )
-    building_id = fields.Many2one('oe.hostel.unit', string='Building', required=True,
-                                  domain="[('unit_type','=','building')]"
+
+    location_id = fields.Many2one('stock.location',string='Dormitory', required=True, 
+                                  domain = "[('is_hostel','=',True),('unit_usage','=','internal')]"
                                  )
-    room_id = fields.Many2one('oe.hostel.unit', string='Room', required=True,
-                              domain="[('unit_id','child_of',building_id),('unit_type','=','room')]"
-                             )
+    product_id = fields.Many2one('product.product', string='Unit', required=True,
+                                 domain ="[('is_hostel_unit','=',True)]"
+                                )
+
+    product_tracking = fields.Selection(related='product_id.tracking')
+    
+    #building_id = fields.Many2one('oe.hostel.unit', string='Building', required=True,
+    #                              domain="[('unit_type','=','building')]"
+    #                             )
+    #room_id = fields.Many2one('oe.hostel.unit', string='Room', required=True,
+    #                          domain="[('unit_id','child_of',building_id),('unit_type','=','room')]"
+    #                         )
     
     fee = fields.Float(string='Fee')
     deposit = fields.Float(string='Deposit')
@@ -59,7 +67,7 @@ class HostelRoomAllocate(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('reserve', 'Reserved'),
-        ('allocate', 'Allocated'),
+        ('assign', 'Assigned'),
         ('cancel', 'Cancelled'),
         ('close', 'Closed'),
     ], string='Status', default='draft', required=True)
@@ -73,7 +81,7 @@ class HostelRoomAllocate(models.Model):
                 self = self.with_company(vals['company_id'])
             if vals.get('name', _("New")) == _("New"):
                 vals['name'] = self.env['ir.sequence'].next_by_code(
-                    'room.allocation.order') or _("New")
+                    'room.assignment.order') or _("New")
 
         return super().create(vals_list)
 
