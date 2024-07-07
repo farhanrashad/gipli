@@ -46,10 +46,12 @@ class ProductTemplate(models.Model):
         }
 
     def action_open_subunits(self):
-        self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id("stock.action_product_production_lot_form")
-        action['domain'] = [('id', '=', self.id)]
+        product_id = self.env['product.product'].search([('product_tmpl_id','=',self.id)],limit=1)
+        action['domain'] = [('product_id', 'in', self.product_variant_ids.ids)]
         action['context'] = {
+            'default_product_id': product_id.id,
             'default_company_id': (self.company_id or self.env.company).id,
         }
+        
         return action
