@@ -10,19 +10,33 @@
                             string="Reserve" class="btn-primary" type="object"
                             invisible="state != 'draft'"
                         />
-                        <button name="action_confirm" id="action_confirm"
-                            string="Confirm" type="object"
-                            invisible="state != 'draft'"
-                        />
                         
                         <button name="action_confirm" id="action_confirm"
-                            string="Confirm" class="btn-primary" type="object"
+                            string="Validate" class="btn-primary" type="object"
                             invisible="state != 'reserve'"
                         />
+
+                        <button name="action_draft" id="action_draft"
+                            string="Set to Draft" type="object"
+                            invisible="state not in ('reserve','confirm')"
+                        />
+                        
                         <field name="state" widget="statusbar" statusbar_visible="draft,reserve,assign"/>
                     </header>
                     <sheet>
                         <field name="domain_partner_ids" invisible="1" />
+                        <field name="product_tracking" invisible="1" />
+
+                        <div class="oe_button_box" name="button_box">
+                            <button type="object"
+                                name="action_open_all_room_moves"
+                                class="oe_stat_button" icon="fa-truck">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Dormitory Moves</span>
+                                </div>
+                            </button>
+                        </div>
+                        
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -38,6 +52,11 @@
                                     readonly="state != 'draft'"/>
                                 <field name="product_id" 
                                     options="{'no_create':True, 'no_edit':True}"
+                                    readonly="state != 'draft'"/>
+                                <field name="lot_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    invisible="product_tracking != 'serial'"
+                                    required="product_tracking == 'serial'"
                                     readonly="state != 'draft'"/>
                             </group>
                             <group>
@@ -69,7 +88,16 @@
             <field name="model">oe.hostel.room.assign</field>
             <field name="arch" type="xml">
                 <tree string="Hostel Room Assignment">
+                    <field name="name" />
                     <field name="partner_id"/>
+                    <field name="date_order" />
+                    <field name="location_id"/>
+                    <field name="product_id"/>
+                    <field name="lot_id"/>
+                    <field name="date_start" optional="hide"/>
+                    <field name="date_end" optional="hide"/>
+                    <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+                    <field name="state" />
                 </tree>
             </field>
         </record>

@@ -31,6 +31,7 @@ Long description of module's purpose
         'views/product_unit_views.xml',
         'views/unit_category_views.xml',
         'views/unit_location_views.xml',
+        'views/stock_move_views.xml',
         'views/room_assignment_views.xml',
         'wizards/stock_lot_generate_wizard_views.xml',
     ],
