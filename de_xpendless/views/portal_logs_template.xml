@@ -7,17 +7,33 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Log Message</th>
-                            <th>Timestamp</th>
+                            <th>Webhook Log ID</th>
+                            <th>Event Name</th>
+                            <th>Status</th>
+                            <th>Type</th>
+                            <th>Endpoint</th>
+                            <th>Max Retries</th>
+                            <th>Retries</th>
+                            <th>Infinity Retries</th>
+                            <th>Retry Interval</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
                         </tr>
                     </thead>
                     <tbody>
                         <t t-foreach="logs" t-as="log">
                             <tr>
-                                <td><t t-esc="log['id']"/></td>
-                                <td><t t-esc="log['message']"/></td>
-                                <td><t t-esc="log['timestamp']"/></td>
+                                <td><t t-esc="log['webhookLogId']"/></td>
+                                <td><t t-esc="log['eventName']"/></td>
+                                <td><t t-esc="log['status']"/></td>
+                                <td><t t-esc="log['type']"/></td>
+                                <td><t t-esc="log['endpoint']"/></td>
+                                <td><t t-esc="log['maxRetries']"/></td>
+                                <td><t t-esc="log['retries']"/></td>
+                                <td><t t-esc="log['isInfinityRetries']"/></td>
+                                <td><t t-esc="log['retryInterval']"/></td>
+                                <td><t t-esc="log['createdAt']"/></td>
+                                <td><t t-esc="log['updatedAt']"/></td>
                             </tr>
                         </t>
                     </tbody>

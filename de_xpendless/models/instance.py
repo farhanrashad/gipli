@@ -15,10 +15,13 @@ class XplInstance(models.Model):
     _description = 'Xpendless Instance'
 
     name = fields.Char(string='Name', required=True, readonly=False)
-    api_key = fields.Char(string='API Key', required=True, help='API Key', readonly=False)
-    api_secret = fields.Char(string='Secret', required=True, help=' API Secret', readonly=False)
-    access_token = fields.Char(string='Token')
-    url = fields.Char(string='URL', required=True, readonly=False, )
+    api_key = fields.Char(string='API Key', related='company_id.xpl_api_key', 
+                          required=True, help='API Key', readonly=False)
+    api_secret = fields.Char(string='Secret',  related='company_id.xpl_api_secret', 
+                             required=True, help=' API Secret', readonly=False)
+    access_token = fields.Char(string='Token',  related='company_id.xpl_access_token', readonly=False)
+    url = fields.Char(string='URL',  related='company_id.xpl_url', 
+                      required=True, readonly=False, )
     url_sample = fields.Char(default='https://api.xpendless.com/')
     
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, default=lambda self: self.env.company)
@@ -40,6 +43,10 @@ class XplInstance(models.Model):
     apl_date_export_employees = fields.Datetime(string='Employees export date')
 
     def button_draft(self):
+        
+        json_data = self._get_api_data('webhook/logs', api_data=None)
+        json_formatted_str = json.dumps(json_data, indent=4)  # Convert dictionary to JSON string with indentation
+        raise UserError(json_formatted_str)
         self.write({
             'state':'draft'
         })
@@ -244,85 +251,14 @@ class XplInstance(models.Model):
             # Handle exception
             return {'error': str(e)}  # Example: Return error message
             
-    @api.model
-    def _get_sample_api_data(self):
-        # Define the sample JSON data
-        sample_json_data = '''
-            {
-  "companyId": 123456,
-  "companyName": "Tech Innovations Ltd",
-  "registrationNumber": "REG987654",
-  "addressLine1": "123 Tech Park",
-  "addressLine2": "Suite 400",
-  "city": "Innovate City",
-  "postalCode": "12345",
-  "companyEmail": "info@techinnovations.com",
-  "companyPhone": "+1234567890",
-  "blockingReason": "None",
-  "crCreationDate": "2021-01-15T00:00:00Z",
-  "crExpiryDate": "2023-01-14T00:00:00Z",
-  "activationDate": "2021-02-01T00:00:00Z",
-  "subscribingDate": "2021-01-20T00:00:00Z",
-  "createdAt": "2021-01-15T00:00:00Z",
-  "updateAt": "2022-12-20T00:00:00Z",
-  "status": "Active",
-  "kybStatus": "Verified",
-  "termsConditions": "Accepted",
-  "submittedFields": [
-    "companyName",
-    "registrationNumber",
-    "address",
-    "contactInfo"
-  ],
-  "attachments": [
-    {
-      "companyDocId": 123,
-      "companyId": 123456,
-      "attachmentTypeId": 1,
-      "attachmentPath": "https://www.nationalparalegal.edu/Slides_New/Legal_Document_Prep/SH/Slides_01.pdf",
-      "isActive": true,
-      "createdAt": "2021-01-15T00:00:00Z",
-      "updatedAt": "2021-01-15T00:00:00Z"
-    },
-    {
-      "companyDocId": 124,
-      "companyId": 123456,
-      "attachmentTypeId": 2,
-      "attachmentPath": "https://www.safetyforward.com/docs/legal.pdf",
-      "isActive": true,
-      "createdAt": "2021-01-15T00:00:00Z",
-      "updatedAt": "2021-01-15T00:00:00Z"
-    }
-  ],
-  "CompanySettings": {
-    "companySettingId": 123,
-    "companyId": 123456,
-    "companyUrl": "https://www.techinnovations.com",
-    "companyLogo": "/images/logo.png"
-  },
-  "Owners": [
-    {
-      "employeeId": 1001,
-      "fullName": "John Doe",
-      "email": "john.doe@techinnovations.com",
-      "mobileNumber": "+1234567891"
-    },
-    {
-      "employeeId": 1002,
-      "fullName": "Jane Smith",
-      "email": "jane.smith@techinnovations.com",
-      "mobileNumber": "+1234567892"
-    }
-  ]
-}
 
-        '''
-        return sample_json_data
     @api.model
     def _get_api_data(self, api_name, api_data=None):
+        token = self.access_token
+        # Set the headers for the request
         headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
+            'Authorization': f"Bearer {token}",
+            'Content-Type': 'application/json',
         }
         try:
             url = self.url + api_name
