@@ -837,9 +837,10 @@ class CustomerPortal(CustomerPortal):
         # ------------------ Filter Model -----------------------
         filter_fields = request.env['ir.model.fields'].sudo().search([
             ('model_id', '=', service_id.header_model_id.id),
-            ('store','=',True)
-        ])
-        filter_fields_list = [{'name': field.name, 'field_description': field.field_description} for field in filter_fields]
+            ('store', '=', True)
+        ], order='name')
+
+        filter_fields_list = [{'name': field.name, 'field_description': field.field_description, 'type': field.ttype} for field in filter_fields]
     
         template += '''
             <script type="text/javascript">
@@ -850,7 +851,13 @@ class CustomerPortal(CustomerPortal):
                     function addRow() {
                         rowCount++;
                         const container = document.getElementById('dynamic-form-container');
-                        const fieldOptions = fields.map(field => `<option value="${field.name}">${field.field_description}</option>`).join('');
+                        const sortedFields = fields.sort((a, b) => a.field_description.localeCompare(b.field_description)); // Sort fields by field_description
+
+                        const fieldOptions = sortedFields.map(field => `<option value="${field.name}" data-type="${field.type}">${field.field_description}</option>`).join('');
+
+                        // const fieldOptions = fields.map(field => `<option value="${field.name}" data-type="${field.type}">${field.field_description}</option>`).join('');
+                        
+
 
                         const andOrSelect = rowCount > 1 ? `<select name="and_or_row${rowCount}" class="form-control" style="width: 100px; margin-right: 10px;">
                                                             <option value="&">AND</option>
@@ -872,6 +879,8 @@ class CustomerPortal(CustomerPortal):
                                 <option value="not ilike">doesn't contain</option>
                                 <option value="=">is equal to</option>
                                 <option value="!=">is not equal to</option>
+                                <option value=">">greater than</option>
+                                <option value="<">less than</option>
                                 <option value="1">is set</option>
                                 <option value="0">is not set</option>
                             </select>
@@ -885,13 +894,34 @@ class CustomerPortal(CustomerPortal):
                         container.appendChild(newRow);
 
                         // Add event listener for field2
+                        // ADD: Event listener for field1 select to change input type if necessary
+                        const field1Select = newRow.querySelector(`[name="field1_row${rowCount}"]`);
                         const field2Select = newRow.querySelector(`[name="field2_row${rowCount}"]`);
                         const field3Input = newRow.querySelector(`[name="field3_row${rowCount}"]`);
+                        
+                        field1Select.addEventListener('change', function () {
+                            const selectedOption = field1Select.options[field1Select.selectedIndex];
+                            const fieldType = selectedOption.getAttribute('data-type');
+                            
+                            if (fieldType === 'date') {
+                                field3Input.type = 'date';
+                                field3Input.placeholder = 'Select a date';
+                            } else if (fieldType === 'datetime') {
+                                field3Input.type = 'datetime-local';
+                                field3Input.placeholder = 'Select date and time';
+                            } else {
+                                field3Input.type = 'text';
+                                field3Input.placeholder = 'Value';
+                            }
+    
+                        });
+            
                         field2Select.addEventListener('change', function () {
                             if (this.value === '0' || this.value === '1') {
                                 field3Input.style.display = 'none';
                                 field3Input.value = null;
-                            } else {
+                            } 
+                            else {
                                 field3Input.style.display = 'block';
                             }
                         });
