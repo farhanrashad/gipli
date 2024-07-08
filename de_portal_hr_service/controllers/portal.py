@@ -326,9 +326,9 @@ class CustomerPortal(portal.CustomerPortal):
             template += self._get_column_template(group)
     
             for field in hr_service_items.filtered(lambda x: x.field_variant_line_id.id == key.id):
-                record, required, required_label = self._get_field_properties(field, record_sudo)
+                record, required, required_label, readonly = self._get_field_properties(field, record_sudo)
     
-                html_data, js_script = self._generate_field_template(field, service, record, required, required_label)
+                html_data, js_script = self._generate_field_template(field, service, record, required, required_label, readonly)
                 template += html_data
                 js_template += js_script
     
@@ -412,9 +412,10 @@ class CustomerPortal(portal.CustomerPortal):
             record = str(record_sudo[field.field_name]) if field.field_type != 'many2one' else record_sudo[field.field_name]
         required = '1' if field.is_required else ''
         required_label = '*' if field.is_required else ''
-        return record_sudo, required, required_label
+        readonly = "readonly=1" if field.field_readonly else ''
+        return record_sudo, required, required_label, readonly
     
-    def _generate_field_template(self, field, service, record, required, required_label):
+    def _generate_field_template(self, field, service, record, required, required_label, readonly):
         js_script = ''
         js = ''
         template = '''
@@ -430,34 +431,43 @@ class CustomerPortal(portal.CustomerPortal):
         )
     
         if field.field_type == 'many2one':
-            select_tag, js = self._generate_many2one_field(field, service, record, required)
+            select_tag, js = self._generate_many2one_field(field, service, record, required,readonly)
             template += select_tag
             js_script += js
-            #template, js_script += self._generate_many2one_field(field, service, record, required)
         elif field.field_type == 'many2many':
             template += self._generate_many2many_field(field, record, required)
         elif field.field_type == 'selection':
             template += self._generate_selection_field(field, record, required)
         elif field.field_type == 'date':
-            template += '<input type="date" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_id}" {required}>'.format(
-                field_name=field.field_name, record_id=record.id, required='required="1"' if required else ''
+            template += '<input type="date" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_id}" {required} {readonly}>'.format(
+                field_name=field.field_name, 
+                record_id=record.id, 
+                required='required="1"' if required else '',
+                readonly=readonly
             )
         elif field.field_type == 'datetime':
-            template += self._generate_datetime_field(field, record, required)
-        elif field.field_type in ('char1', 'text1', 'integer', 'float', 'monetary'):
-            template += '<input type="{input_type}" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_id}" {required}>'.format(
+            template += self._generate_datetime_field(field, record, required,readonly)
+        elif field.field_type in ('integer', 'float', 'monetary'):
+            template += '<input type="{input_type}" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_id}" {required} {readonly}>'.format(
                 input_type='number' if field.field_type in ('integer', 'float', 'monetary') else 'text',
-                field_name=field.field_name, record_id=record.id, required='required="1"' if required else ''
+                field_name=field.field_name, 
+                record_id=record.id, 
+                required='required="1"' if required else '',
+                readonly=readonly
             )
         else:
             template += '''
-            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="filter_field_vals(this)" value="{record_id}" {required}>
-            '''.format(field_name=field.field_name, record_id=record.id, required='required="1"' if required else '')
+            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="filter_field_vals(this)" value="{record_id}" {required} {readonly}>
+            '''.format(field_name=field.field_name, 
+                       record_id=record.id, 
+                       required='required="1"' if required else '',
+                       readonly=readonly
+                    )
     
         template += "</div>"
         return template, js_script
     
-    def _generate_many2one_field(self, field, service, record, required):
+    def _generate_many2one_field(self, field, service, record, required,readonly):
         field_domain = self._get_field_domain(field)
         m2o_id = request.env[field.field_model].sudo().search(field_domain)
         domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
@@ -544,11 +554,12 @@ class CustomerPortal(portal.CustomerPortal):
         search_fields = ','.join(field.search_fields_ids.mapped('name'))
     
         select_tag = '''
-        <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'>
+        <select id='{field_name}' name='{field_name}' {required} {readonly} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-domain='{domain_filter}' class='mb-2 select2-dynamic selection-search form-control'>
             <option value=''>Select</option>
         '''.format(
                 field_name=field.field_name, 
                 required='required="1"' if required else '',
+                readonly=readonly,
                 field_model=field.field_model, 
                 search_fields=search_fields, 
                 domain_filter=domain_filter
@@ -588,10 +599,14 @@ class CustomerPortal(portal.CustomerPortal):
         m2m_template += "</select>"
         return m2m_template
     
-    def _generate_selection_field(self, field, record_val, required):
+    def _generate_selection_field(self, field, record_val, required, readonly):
         selection_template = '''
-        <select id='{field_name}' name='{field_name}' {required} class='selection-search form-control mb-2'>
-        '''.format(field_name=field.field_name, required='required="1"' if required else '')
+        <select id='{field_name}' name='{field_name}' {required} {readonly} class='selection-search form-control mb-2'>
+        '''.format(
+                field_name=field.field_name, 
+                required='required="1"' if required else '',
+                readonly=readonly
+            )
     
         for val, label in eval(field.field_selection):
             selected = 'selected="selected"' if val == record_val else ''
@@ -600,10 +615,15 @@ class CustomerPortal(portal.CustomerPortal):
         selection_template += "</select>"
         return selection_template
     
-    def _generate_datetime_field(self, field, record_val, required):
+    def _generate_datetime_field(self, field, record_val, required,readonly):
         return '''
-        <input type="datetime-local" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_val}" {required}>
-        '''.format(field_name=field.field_name, record_val=record_val, required='required="1"' if required else '')
+        <input type="datetime-local" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" value="{record_val}" {required} {readonly}>
+        '''.format(
+                field_name=field.field_name, 
+                record_val=record_val, 
+                required='required="1"' if required else '',
+                readonly=readonly
+            )
     
     def _get_footer_template(self):
         return '''
