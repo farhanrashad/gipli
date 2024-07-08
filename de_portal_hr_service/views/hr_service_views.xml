@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <tree editable="bottom" >
                     <field name="field_store" invisible="1"/>
-                    <field name="field_readonly" invisible="1"/>
+                    <field name="field_readonly" />
                     <field name="is_model_selected" invisible="1"/>
                     
                     <field name="hr_service_id" invisible="1" force_save="1"/>
@@ -197,7 +197,7 @@
                                         <field name="ref_changeable_field_ids" optional="hide" widget="many2many_tags"/>
 
                                         <field name="field_store" invisible="1"/>
-                                        <field name="field_readonly" invisible="1"/>
+                                        <field name="field_readonly"/>
                                         
                                         <field name="ref_field_id" domain="[('model_id', '=', parent.header_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                                     </tree>

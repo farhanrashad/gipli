@@ -762,7 +762,7 @@ class HRServiceItems(models.Model):
     field_type = fields.Selection(related='field_id.ttype')
     field_model = fields.Char(related='field_id.relation')
     field_store = fields.Boolean(related='field_id.store')
-    field_readonly = fields.Boolean(related='field_id.readonly')
+    field_readonly = fields.Boolean(compute='_compute_field_readonly', store=True, readonly=False)
     field_domain = fields.Char(string='Domain Filter', help="Domain to filter records for the frontend. Use Odoo domain format.")
     search_fields_ids = fields.Many2many(
         'ir.model.fields', string='Search Fields',
@@ -830,6 +830,11 @@ class HRServiceItems(models.Model):
             record.is_model_selected = bool(record.field_model)
 
 
+    @api.depends('field_id', 'field_id.readonly')
+    def _compute_field_readonly(self):
+        for record in self:
+            record.field_readonly = record.field_id.readonly
+            
     #@api.depends('field_id')
     #def _compute_related_model_for_populate_field(self):
     #    for record in self:
@@ -939,7 +944,7 @@ class HRServiceItemsLine(models.Model):
     field_type = fields.Selection(related='field_id.ttype')
     field_model = fields.Char(related='field_id.relation')
     field_store = fields.Boolean(related='field_id.store')
-    field_readonly = fields.Boolean(related='field_id.readonly')
+    field_readonly = fields.Boolean(compute='_compute_field_readonly', store=True, readonly=False)
     field_domain = fields.Char(string='Domain Filter', help="Domain to filter records for the frontend. Use Odoo domain format.")
     search_fields_ids = fields.Many2many(
         'ir.model.fields', string='Search Fields',
@@ -999,6 +1004,11 @@ class HRServiceItemsLine(models.Model):
         for line in self:
             line.field_label = line.field_id.field_description
 
+    @api.depends('field_id', 'field_id.readonly')
+    def _compute_field_readonly(self):
+        for record in self:
+            record.field_readonly = record.field_id.readonly
+    
     #@api.depends('field_id')
     #def _compute_related_model_for_populate_field(self):
     #    for record in self:
