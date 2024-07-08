@@ -626,7 +626,10 @@ class CustomerPortal(portal.CustomerPortal):
     
     def _get_field_domain(self, field):
         if field.field_domain:
-            return eval(field.field_domain)
+            try:
+                return eval(field.field_domain)
+            except:
+                return []
         return []
 
     
