@@ -14,4 +14,6 @@ access_hostel_room_assignment,access.hostel.room.assignment,model_oe_hostel_room
 access_hostel_room_assignment_user,access.hostel.room.assignment.user,model_oe_hostel_room_assign,de_school_hostel.group_hostel_user,1,1,1,0
 access_hostel_room_assignment_manager,access.hostel.room.assignment.manager,model_oe_hostel_room_assign,de_school_hostel.group_hostel_manager,1,1,1,1
 
-access_stock_lot_generate_wizard,access.stock.lot.generate.wizard,model_stock_lot_generate_wizard,stock.group_stock_user,1,1,1,1
+access_stock_lot_generate_wizard,access.stock.lot.generate.wizard,model_oe_hostel_lot_generate_wizard,stock.group_stock_user,1,1,1,1
+
+access_transfer_unit_wizard,access.transfer.unit.wizard,model_oe_hostel_transfer_unit_wizard,stock.group_stock_user,1,1,1,1

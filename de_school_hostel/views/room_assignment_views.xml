@@ -16,6 +16,11 @@
                             invisible="state != 'reserve'"
                         />
 
+                        <button name="action_transfer" id="action_transfer"
+                            string="Transfer" type="object"
+                            invisible="state != 'assign'"
+                        />
+
                         <button name="action_draft" id="action_draft"
                             string="Set to Draft" type="object"
                             invisible="state not in ('cancel')"
@@ -30,7 +35,7 @@
                     </header>
                     <sheet>
                         <field name="domain_partner_ids" invisible="1" />
-                        <field name="product_tracking" invisible="1" />
+                        <field name="product_id_tracking" invisible="1" />
                         <field name="entry_type" invisible="1" />
 
                         <div class="oe_button_box" name="button_box">
@@ -71,31 +76,13 @@
                                 />
                                 -->
                                 
-                                <field name="location_dest_id" 
+                                <field name="location_id" 
                                     options="{'no_create':True, 'no_edit':True}"
                                     domain="[('is_hostel','=',True),('unit_usage','=','internal')]"
                                     readonly="state != 'draft'"
                                     invisible="entry_type not in ('assign')"
                                     required="entry_type in ('assign')"
                                 />
-
-                                <!-- location fields for room transfer -->
-                                <!--
-                                <field name="location_id" 
-                                    options="{'no_create':True, 'no_edit':True}"
-                                    domain="[('is_hostel','=',True),('unit_usage','=','internal')]"
-                                    readonly="state != 'draft'"
-                                    invisible="entry_type != 'transfer'"
-                                    required="entry_type == 'transfer'"
-                                />
-                                -->
-                                <!--
-                                <field name="location_dest_id" 
-                                    options="{'no_create':True, 'no_edit':True}"
-                                    readonly="state != 'draft'"
-                                    invisible="entry_type == 'transfer'"
-                                />
-                                -->
                                 
                                 <field name="product_id" 
                                     options="{'no_create':True, 'no_edit':True}"
@@ -104,17 +91,12 @@
 
                                 <field name="lot_id" 
                                     options="{'no_create':True, 'no_edit':True}"
-                                    invisible="product_tracking != 'serial' or entry_type != 'transfer'"
-                                    required="product_tracking == 'serial' and entry_type == 'transfer'"
+                                    invisible="product_id_tracking != 'serial'"
+                                    required="product_id_tracking == 'serial'"
                                     readonly="state != 'draft'"
                                 />
                                 
-                                <field name="lot_dest_id" 
-                                    options="{'no_create':True, 'no_edit':True}"
-                                    invisible="product_tracking != 'serial'"
-                                    required="product_tracking == 'serial'"
-                                    readonly="state != 'draft'"
-                                />
+                                
                             </group>
                             <group>
                                 <field name="date_order" readonly="state != 'draft'"/>
@@ -135,6 +117,11 @@
                             <div class="clearfix"/>
                         </group>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </form>
             </field>
         </record>

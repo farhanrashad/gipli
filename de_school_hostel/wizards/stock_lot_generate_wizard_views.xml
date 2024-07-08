@@ -2,7 +2,7 @@
 <odoo>
         <record id="stock_lot_generate_wizard_view" model="ir.ui.view">
             <field name="name">Generate Lot</field>
-            <field name="model">stock.lot.generate.wizard</field>
+            <field name="model">oe.hostel.lot.generate.wizard</field>
             <field name="arch" type="xml">
                 <form string="Generate Lot">
                     <p class="oe_grey">
@@ -32,7 +32,7 @@
         <record id="action_stock_lot_generate_wizard" model="ir.actions.act_window">
             <field name="name">Generate Serial</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">stock.lot.generate.wizard</field>
+            <field name="res_model">oe.hostel.lot.generate.wizard</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
             <!-- TODO: check if we need this -->

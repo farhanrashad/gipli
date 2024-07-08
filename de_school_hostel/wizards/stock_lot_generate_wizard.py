@@ -4,7 +4,7 @@
 from odoo import _, api, fields, models
 
 class GenerateLotWizard(models.TransientModel):
-    _name = "stock.lot.generate.wizard"
+    _name = "oe.hostel.lot.generate.wizard"
     _description = "Lot Generation Wizard"
     
     product_tmpl_id = fields.Many2one('product.template', string='Unit',

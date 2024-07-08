@@ -7,6 +7,7 @@ class HostelRoomAssign(models.Model):
     _description = 'Hostel Room Assignment'
     _order = 'date_order desc, id desc'
     _check_company_auto = True
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     @api.model
     def _default_domain_partner_ids(self):
@@ -42,35 +43,24 @@ class HostelRoomAssign(models.Model):
                                 #compute='_compute_partners_domain'
                                          )
 
-    location_id = fields.Many2one('stock.location',string='Dormitory Out',
+    location_id = fields.Many2one('stock.location',string='Dormitory',
                                   domain = "[('is_hostel','=',True),('unit_usage','=','internal')]",
                                   default=lambda self: self._get_default_location_id(),
                                  )
 
-    location_dest_id = fields.Many2one('stock.location',string='Dormitory In', 
-                                  domain = "[('is_hostel','=',True),('unit_usage','=','internal')]"
-                                 )
 
-    product_id = fields.Many2one('product.product', string='From Unit',
+    product_id = fields.Many2one('product.product', string='Unit',
                                  domain ="[('is_hostel_unit','=',True)]"
                                 )
     
-    product_dest_id = fields.Many2one('product.product', string='To Unit',
-                                 domain ="[('is_hostel_unit','=',True)]"
-                                )
 
-    product_tracking = fields.Selection(compute='_compute_product_tracking')
+    product_id_tracking = fields.Selection(related='product_id.tracking')
 
-    lot_id = fields.Many2one('stock.lot', string='From Sub-Unit',
+    lot_id = fields.Many2one('stock.lot', string='Sub-Unit',
                                  domain ="[('product_id','=',product_id)]"
                                 )
     
-    lot_dest_id = fields.Many2one('stock.lot', string='To Sub-Unit',
-                                 domain ="[('product_id','=',product_id)]"
-                                )
     
-    fee = fields.Float(string='Fee')
-    deposit = fields.Float(string='Deposit')
     note = fields.Text(string='Note')
 
     state = fields.Selection([
@@ -79,7 +69,9 @@ class HostelRoomAssign(models.Model):
         ('assign', 'Assigned'),
         ('cancel', 'Cancelled'),
         ('close', 'Closed'),
-    ], string='Status', default='draft', required=True)
+    ], copy=False, index=True, readonly=True, store=True, tracking=True,
+                             string='Status', default='draft', 
+    )
 
     entry_type = fields.Selection([
         ('assign', 'Assigned'),
@@ -113,6 +105,11 @@ class HostelRoomAssign(models.Model):
                     'room.assignment.order') or _("New")
 
         return super().create(vals_list)
+
+    def unlink(self):
+        for record in self:
+            if record.state != 'draft':
+                raise UserError('You cannot delete the posted record.')
 
 
     # Compute Methods
@@ -154,17 +151,23 @@ class HostelRoomAssign(models.Model):
             raise UserError(_("Hostel location is not set in the company settings."))
 
         lot_count = self.env['stock.move.line'].search_count([
-            ('lot_id','=',self.lot_dest_id.id),
+            ('lot_id','=',self.lot_id.id),
             ('state','!=','cancel'),
             ('room_assign_id', '!=', self.id),
-            ('location_dest_id', '=', self.location_dest_id.id)
+            ('location_dest_id', '=', self.location_id.id)
         ])
         #raise UserError(lot_count)
         if lot_count > 0:
-            raise UserError(_("Room %s is not available.") % self.lot_dest_id.name)
+            raise UserError(_("Unit %s is not available.") % self.lot_id.name)
 
-        if self.partner_id.id in move_line_ids.mapped('owner_id.id'):
-            raise UserError(_("Hostel location is not set in the company settings."))
+        unit_assign = self.env['stock.move.line'].search_count([
+            ('owner_id','=',self.partner_id.id),
+            ('state','!=','cancel'),
+            ('room_assign_id', '!=', self.id),
+            ('location_dest_id', '=', self.location_id.id)
+        ])
+        if unit_assign > 0:
+            raise UserError(_("Unit is already assigned."))
 
         
             
@@ -194,8 +197,8 @@ class HostelRoomAssign(models.Model):
             'room_assign_id': self.id,
             'move_ids': [(0, 0, {
                 'name': self.name,
-                'product_id': self.product_dest_id.id,
-                'product_uom': self.product_dest_id.uom_id.id,
+                'product_id': self.product_id.id,
+                'product_uom': self.product_id.uom_id.id,
                 'product_uom_qty': 1.0,
                 'location_id': location_id,
                 'location_dest_id': location_dest_id,
@@ -209,12 +212,12 @@ class HostelRoomAssign(models.Model):
         return {
             'picking_id': move.picking_id.id,
             'move_id': move.id,
-            'product_id': move.product_dest_id.id,
+            'product_id': move.product_id.id,
             'product_uom_id': move.product_uom.id,
             'quantity': move.product_uom_qty,
             'location_id': from_location.id,
-            'location_dest_id': move.location_dest_id.id,
-            'lot_id': self.lot_dest_id.id,
+            'location_dest_id': move.location_id.id,
+            'lot_id': self.lot_id.id,
             'room_assign_id': self.id,
             'owner_id': self.partner_id.id,
         }
@@ -231,6 +234,8 @@ class HostelRoomAssign(models.Model):
     def action_cancel(self):
         self.assign_picking_ids.sudo().action_cancel()
         self.write({'state': 'cancel'})
+
+    
         
     def action_open_all_room_moves(self):
         action = self.env["ir.actions.actions"]._for_xml_id("de_school_hostel.action_dormitory_stock_move_lines")
@@ -244,4 +249,13 @@ class HostelRoomAssign(models.Model):
         }
         
         return action
+
+    def action_transfer(self):
+        return {
+            'name': 'Transfer Unit',
+            'view_mode': 'form',
+            'res_model': 'oe.hostel.transfer.unit.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
     

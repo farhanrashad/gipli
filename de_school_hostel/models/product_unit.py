@@ -40,7 +40,7 @@ class ProductTemplate(models.Model):
         return {
             'name': 'Generate Sub-Units',
             'view_mode': 'form',
-            'res_model': 'stock.lot.generate.wizard',
+            'res_model': 'oe.hostel.lot.generate.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
