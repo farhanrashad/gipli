@@ -6,5 +6,6 @@ from . import unit_category
 from . import unit_location
 from . import product_unit
 from . import room_assignment
+from . import stock_picking
 from . import stock_move
 from . import stock_move_line

@@ -15,7 +15,7 @@
                     </div>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <label for="name"/>
-                    <h1><field name="name" placeholder="e.g. Room 01"/></h1>
+                    <h1><field name="name" placeholder="e.g. Building 01"/></h1>
                     <label for="location_id"/>
                     <h2><field name="location_id" placeholder="e.g. Building 01" options="{'no_create': True}"/></h2>
 
@@ -75,11 +75,12 @@
         <field name="context">
             {
                 'default_is_hostel':1,
+                'default_unit_usage':'internal',
             }
         </field>
         <field name="domain">[
             ('is_hostel','=',True),
-            ('unit_usage','!=',False)
+            ('unit_usage','in',['internal','view'])
         ]</field>
         <field name="view_ids"
 				eval="[(5, 0, 0),

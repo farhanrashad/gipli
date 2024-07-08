@@ -23,8 +23,8 @@ class ResCompany(models.Model):
         parent_location = self.env.ref('de_school_hostel.hostel_location_locations', raise_if_not_found=False)
         for company in self:
             hostel_location = self.env['stock.location'].create({
-                'name': _('Hostel Location'),
-                'usage': 'internal',
+                'name': _('Reservation Pool'),
+                'usage': 'transit',
                 #'location_id': parent_location.id,
                 'company_id': company.id,
                 'is_hostel': True,

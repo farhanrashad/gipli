@@ -20,8 +20,7 @@ class Location(models.Model):
     unit_usage = fields.Selection([
         ('view', 'View'),
         ('internal', 'Location'),
-    ], string='Location Type',
-        default='internal', 
+    ], string='Location Type', 
                             )
     
     unit_facility_ids = fields.Many2many(

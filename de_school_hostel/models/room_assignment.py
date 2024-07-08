@@ -42,9 +42,15 @@ class HostelRoomAssign(models.Model):
                                 #compute='_compute_partners_domain'
                                          )
 
-    location_id = fields.Many2one('stock.location',string='Dormitory', required=True, 
+    location_id = fields.Many2one('stock.location',string='Dormitory Out', required=True, 
+                                  domain = "[('is_hostel','=',True),('unit_usage','=','internal')]",
+                                  default=lambda self: self.env.company.hostel_location_id.id
+                                 )
+
+    location_dest_id = fields.Many2one('stock.location',string='Dormitory In', required=True, 
                                   domain = "[('is_hostel','=',True),('unit_usage','=','internal')]"
                                  )
+    
     product_id = fields.Many2one('product.product', string='Unit', required=True,
                                  domain ="[('is_hostel_unit','=',True)]"
                                 )
@@ -67,6 +73,16 @@ class HostelRoomAssign(models.Model):
         ('close', 'Closed'),
     ], string='Status', default='draft', required=True)
 
+    entry_type = fields.Selection([
+        ('assign', 'Assigned'),
+        ('transfer', 'Transfer Room'),
+        ('unassign', 'Unassigned'),
+    ], string='Entry Type')
+
+    assign_picking_ids = fields.One2many(
+        'stock.picking', 'room_assign_id', 'Room Assignments',
+        copy=False,
+    )
     assign_move_ids = fields.One2many(
         'stock.move', 'room_assign_id', 'Room Assignments',
         copy=False,
@@ -119,15 +135,26 @@ class HostelRoomAssign(models.Model):
         if not from_location:
             raise UserError(_("Hostel location is not set in the company settings."))
 
+        move_line_ids = self.assign_move_line_ids.filtered(lambda x: x.state != 'cancel')
+        if self.lot_id.id in move_line_ids.mapped('lot_id.id'):
+            raise UserError(_("Room %s is not available.") % self.lot_id.name)
+
+        move_line_ids = self.assign_move_line_ids.filtered(lambda x: x.state != 'cancel')
+        if self.partner_id.id in move_line_ids.mapped('owner_id.id'):
+            raise UserError(_("Hostel location is not set in the company settings."))
+
+        
+            
         #stock_move = self._create_stock_move(from_location)
         #stock_move_line = self._create_stock_move_line(stock_move, from_location)
-        #self.write({'state': 'reserve'})
+        
         picking_id = self.env['stock.picking'].create(self._prepare_picking_values())
         picking_id.sudo().action_confirm()
         for move in picking_id.move_ids:
             self.env['stock.move.line'].create(self._prepare_stock_move_line(move, from_location))
 
-        picking_id.sudo().button_validate()
+        self.write({'state': 'reserve'})
+        
 
     def _prepare_picking_values(self):
         picking_type_id = self.env.ref('stock.picking_type_internal').id
@@ -141,6 +168,7 @@ class HostelRoomAssign(models.Model):
             'partner_id': self.partner_id.id,
             'state': 'draft',
             'origin': self.name,
+            'room_assign_id': self.id,
             'move_ids': [(0, 0, {
                 'name': self.name,
                 'product_id': self.product_id.id,
@@ -169,10 +197,8 @@ class HostelRoomAssign(models.Model):
         }
 
     def action_confirm(self):
-        #self.assign_move_ids._action_confirm()
-        moves_to_confirm = self.env['stock.move'].browse(sorted(self.assign_move_ids.ids))
-        
-        #moves_to_confirm._action_confirm(merge=False)
+        picking_to_confirm = self.assign_picking_ids.filtered(lambda p: p.state not in ('cancel','done'))
+        picking_to_confirm.sudo().button_validate()
         self.write({'state': 'assign'})
 
     def action_draft(self):
