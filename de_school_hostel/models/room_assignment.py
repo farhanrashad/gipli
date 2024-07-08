@@ -42,22 +42,30 @@ class HostelRoomAssign(models.Model):
                                 #compute='_compute_partners_domain'
                                          )
 
-    location_id = fields.Many2one('stock.location',string='Dormitory Out', required=True, 
+    location_id = fields.Many2one('stock.location',string='Dormitory Out',
                                   domain = "[('is_hostel','=',True),('unit_usage','=','internal')]",
-                                  default=lambda self: self.env.company.hostel_location_id.id
+                                  default=lambda self: self._get_default_location_id(),
                                  )
 
-    location_dest_id = fields.Many2one('stock.location',string='Dormitory In', required=True, 
+    location_dest_id = fields.Many2one('stock.location',string='Dormitory In', 
                                   domain = "[('is_hostel','=',True),('unit_usage','=','internal')]"
                                  )
+
+    product_id = fields.Many2one('product.product', string='From Unit',
+                                 domain ="[('is_hostel_unit','=',True)]"
+                                )
     
-    product_id = fields.Many2one('product.product', string='Unit', required=True,
+    product_dest_id = fields.Many2one('product.product', string='To Unit',
                                  domain ="[('is_hostel_unit','=',True)]"
                                 )
 
-    product_tracking = fields.Selection(related='product_id.tracking')
+    product_tracking = fields.Selection(compute='_compute_product_tracking')
 
-    lot_id = fields.Many2one('stock.lot', string='Sub-Unit', required=True,
+    lot_id = fields.Many2one('stock.lot', string='From Sub-Unit',
+                                 domain ="[('product_id','=',product_id)]"
+                                )
+    
+    lot_dest_id = fields.Many2one('stock.lot', string='To Sub-Unit',
                                  domain ="[('product_id','=',product_id)]"
                                 )
     
@@ -91,7 +99,7 @@ class HostelRoomAssign(models.Model):
         'stock.move.line', 'room_assign_id', 'Room Assignments',
         copy=False,
     )
-
+    room_assign_id = fields.Many2one('oe.hostel.room.assign', string='Room Assignment', )
     
     #=== CRUD METHODS ===#
 
@@ -106,6 +114,16 @@ class HostelRoomAssign(models.Model):
 
         return super().create(vals_list)
 
+
+    # Compute Methods
+    @api.depends_context('entry_type')
+    def _get_default_location_id(self):
+        if self.env.context.get('entry_type') == 'assign':
+            return self.env.company.hostel_location_id.id
+        return False
+
+    def _compute_product_tracking(self):
+        pass
     
     @api.depends('date_start', 'duration')
     def _compute_end_date(self):
@@ -128,18 +146,23 @@ class HostelRoomAssign(models.Model):
             })
     
     # Actions
-    def action_reserve(self):
+    def action_confirm(self):
         self.ensure_one()
         from_location = self.company_id.hostel_location_id
 
         if not from_location:
             raise UserError(_("Hostel location is not set in the company settings."))
 
-        move_line_ids = self.assign_move_line_ids.filtered(lambda x: x.state != 'cancel')
-        if self.lot_id.id in move_line_ids.mapped('lot_id.id'):
-            raise UserError(_("Room %s is not available.") % self.lot_id.name)
+        lot_count = self.env['stock.move.line'].search_count([
+            ('lot_id','=',self.lot_dest_id.id),
+            ('state','!=','cancel'),
+            ('room_assign_id', '!=', self.id),
+            ('location_dest_id', '=', self.location_dest_id.id)
+        ])
+        #raise UserError(lot_count)
+        if lot_count > 0:
+            raise UserError(_("Room %s is not available.") % self.lot_dest_id.name)
 
-        move_line_ids = self.assign_move_line_ids.filtered(lambda x: x.state != 'cancel')
         if self.partner_id.id in move_line_ids.mapped('owner_id.id'):
             raise UserError(_("Hostel location is not set in the company settings."))
 
@@ -171,8 +194,8 @@ class HostelRoomAssign(models.Model):
             'room_assign_id': self.id,
             'move_ids': [(0, 0, {
                 'name': self.name,
-                'product_id': self.product_id.id,
-                'product_uom': self.product_id.uom_id.id,
+                'product_id': self.product_dest_id.id,
+                'product_uom': self.product_dest_id.uom_id.id,
                 'product_uom_qty': 1.0,
                 'location_id': location_id,
                 'location_dest_id': location_dest_id,
@@ -186,17 +209,17 @@ class HostelRoomAssign(models.Model):
         return {
             'picking_id': move.picking_id.id,
             'move_id': move.id,
-            'product_id': move.product_id.id,
+            'product_id': move.product_dest_id.id,
             'product_uom_id': move.product_uom.id,
             'quantity': move.product_uom_qty,
             'location_id': from_location.id,
             'location_dest_id': move.location_dest_id.id,
-            'lot_id': self.lot_id.id,
+            'lot_id': self.lot_dest_id.id,
             'room_assign_id': self.id,
             'owner_id': self.partner_id.id,
         }
 
-    def action_confirm(self):
+    def action_validate(self):
         picking_to_confirm = self.assign_picking_ids.filtered(lambda p: p.state not in ('cancel','done'))
         picking_to_confirm.sudo().button_validate()
         self.write({'state': 'assign'})
@@ -205,6 +228,10 @@ class HostelRoomAssign(models.Model):
         self.assign_move_ids._action_cancel()
         self.write({'state': 'draft'})
 
+    def action_cancel(self):
+        self.assign_picking_ids.sudo().action_cancel()
+        self.write({'state': 'cancel'})
+        
     def action_open_all_room_moves(self):
         action = self.env["ir.actions.actions"]._for_xml_id("de_school_hostel.action_dormitory_stock_move_lines")
         action['domain'] = [('room_assign_id', '=', self.id)]

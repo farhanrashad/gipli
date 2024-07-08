@@ -6,18 +6,23 @@
             <field name="arch" type="xml">
                 <form string="Hostel Room Assignment">
                     <header>
-                        <button name="action_reserve" id="action_reserve"
-                            string="Reserve" class="btn-primary" type="object"
+                        <button name="action_confirm" id="action_reserve"
+                            string="Confirm" class="btn-primary" type="object"
                             invisible="state != 'draft'"
                         />
                         
-                        <button name="action_confirm" id="action_confirm"
+                        <button name="action_validate" id="action_confirm"
                             string="Validate" class="btn-primary" type="object"
                             invisible="state != 'reserve'"
                         />
 
                         <button name="action_draft" id="action_draft"
                             string="Set to Draft" type="object"
+                            invisible="state not in ('cancel')"
+                        />
+                        
+                        <button name="action_cancel" id="action_cancel"
+                            string="Cancel" type="object"
                             invisible="state not in ('reserve','confirm')"
                         />
                         
@@ -26,6 +31,7 @@
                     <sheet>
                         <field name="domain_partner_ids" invisible="1" />
                         <field name="product_tracking" invisible="1" />
+                        <field name="entry_type" invisible="1" />
 
                         <div class="oe_button_box" name="button_box">
                             <button type="object"
@@ -47,17 +53,68 @@
                                 <field name="partner_id" 
                                     options="{'no_create':True, 'no_edit':True}"
                                     readonly="state != 'draft'"/>
+
+                                <field name="room_assign_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    required="entry_type == 'transfer'"
+                                    readonly="state != 'draft'"
+                                    invisible="entry_type != 'transfer'"
+                                    domain="[('partner_id','=',partner_id),('state','=','assign')]"
+                                />
+
+                                <!-- location fields for room assignment -->
+                                <!--
                                 <field name="location_id" 
                                     options="{'no_create':True, 'no_edit':True}"
-                                    readonly="state != 'draft'"/>
+                                    readonly="state != 'draft'"
+                                    invisible="entry_type == 'assign'"
+                                />
+                                -->
+                                
+                                <field name="location_dest_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    domain="[('is_hostel','=',True),('unit_usage','=','internal')]"
+                                    readonly="state != 'draft'"
+                                    invisible="entry_type not in ('assign')"
+                                    required="entry_type in ('assign')"
+                                />
+
+                                <!-- location fields for room transfer -->
+                                <!--
+                                <field name="location_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    domain="[('is_hostel','=',True),('unit_usage','=','internal')]"
+                                    readonly="state != 'draft'"
+                                    invisible="entry_type != 'transfer'"
+                                    required="entry_type == 'transfer'"
+                                />
+                                -->
+                                <!--
+                                <field name="location_dest_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    readonly="state != 'draft'"
+                                    invisible="entry_type == 'transfer'"
+                                />
+                                -->
+                                
                                 <field name="product_id" 
                                     options="{'no_create':True, 'no_edit':True}"
-                                    readonly="state != 'draft'"/>
+                                    readonly="state != 'draft'"
+                                />
+
                                 <field name="lot_id" 
+                                    options="{'no_create':True, 'no_edit':True}"
+                                    invisible="product_tracking != 'serial' or entry_type != 'transfer'"
+                                    required="product_tracking == 'serial' and entry_type == 'transfer'"
+                                    readonly="state != 'draft'"
+                                />
+                                
+                                <field name="lot_dest_id" 
                                     options="{'no_create':True, 'no_edit':True}"
                                     invisible="product_tracking != 'serial'"
                                     required="product_tracking == 'serial'"
-                                    readonly="state != 'draft'"/>
+                                    readonly="state != 'draft'"
+                                />
                             </group>
                             <group>
                                 <field name="date_order" readonly="state != 'draft'"/>
@@ -108,6 +165,12 @@
             <field name="res_model">oe.hostel.room.assign</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_hostel_room_assignment_tree"/>
+            <field name="context">
+                {
+                    'default_entry_type': 'assign',
+                }
+            </field>
+            <field name="domain">[('entry_type','=','assign')]</field>
         </record>
 
         <!-- Menu Item for Hostel Room Assignment -->
@@ -115,6 +178,27 @@
                   parent="menu_school_hostel_main" 
             action="action_hostel_room_assignment"
             sequence="1"
+        />
+
+        <!-- Action for Hostel Room Transfer -->
+        <record model="ir.actions.act_window" id="action_hostel_room_transfer">
+            <field name="name">Room Transfer</field>
+            <field name="res_model">oe.hostel.room.assign</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hostel_room_assignment_tree"/>
+            <field name="context">
+                {
+                    'default_entry_type': 'transfer',
+                }
+            </field>
+            <field name="domain">[('entry_type','=','transfer')]</field>
+        </record>
+
+        <!-- Menu Item for Hostel Room Assignment -->
+        <menuitem id="menu_hostel_room_transfer" 
+                  parent="menu_school_hostel_main" 
+            action="action_hostel_room_transfer"
+            sequence="2"
         />
     </data>
 </odoo>

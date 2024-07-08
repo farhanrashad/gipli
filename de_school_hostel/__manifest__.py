@@ -12,7 +12,7 @@ Long description of module's purpose
     'website': "https://www.dynexcel.com",
 
     'category': 'School/Industries',
-    'version': '17.0.0.1',
+    'version': '17.0.0.2',
 
     # any module necessary for this one to work correctly
     'depends': [
