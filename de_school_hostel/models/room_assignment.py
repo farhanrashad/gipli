@@ -72,13 +72,6 @@ class HostelRoomAssign(models.Model):
     ], copy=False, index=True, readonly=True, store=True, tracking=True,
                              string='Status', default='draft', 
     )
-
-    entry_type = fields.Selection([
-        ('assign', 'Assigned'),
-        ('transfer', 'Transfer Room'),
-        ('unassign', 'Unassigned'),
-    ], string='Entry Type')
-
     assign_picking_ids = fields.One2many(
         'stock.picking', 'room_assign_id', 'Room Assignments',
         copy=False,
@@ -113,11 +106,8 @@ class HostelRoomAssign(models.Model):
 
 
     # Compute Methods
-    @api.depends_context('entry_type')
     def _get_default_location_id(self):
-        if self.env.context.get('entry_type') == 'assign':
-            return self.env.company.hostel_location_id.id
-        return False
+        return self.env.company.hostel_location_id.id
 
     def _compute_product_tracking(self):
         pass
@@ -177,7 +167,7 @@ class HostelRoomAssign(models.Model):
         picking_id = self.env['stock.picking'].create(self._prepare_picking_values())
         picking_id.sudo().action_confirm()
         for move in picking_id.move_ids:
-            self.env['stock.move.line'].create(self._prepare_stock_move_line(move, from_location))
+            self.env['stock.move.line'].create(self._prepare_stock_move_line(move))
 
         self.write({'state': 'reserve'})
         
@@ -208,15 +198,15 @@ class HostelRoomAssign(models.Model):
         }
         return picking_values
 
-    def _prepare_stock_move_line(self, move, from_location):
+    def _prepare_stock_move_line(self, move):
         return {
             'picking_id': move.picking_id.id,
             'move_id': move.id,
             'product_id': move.product_id.id,
             'product_uom_id': move.product_uom.id,
             'quantity': move.product_uom_qty,
-            'location_id': from_location.id,
-            'location_dest_id': move.location_id.id,
+            'location_id': move.location_id.id,
+            'location_dest_id': move.location_dest_id.id,
             'lot_id': self.lot_id.id,
             'room_assign_id': self.id,
             'owner_id': self.partner_id.id,

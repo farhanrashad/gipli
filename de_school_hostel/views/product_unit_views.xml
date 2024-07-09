@@ -12,7 +12,7 @@
                     <field name="tracking" invisible="True"/>
                     <field name="company_id" invisible="True"/>
                     <header>
-                        <button name="generate_unit_serial" string="Generate Serial"
+                        <button name="generate_unit_serial" string="Generate Sub-Units"
                         type="object" class="btn-primary" 
                             invisible="not tracking_serial or not sequence_id"
                         />

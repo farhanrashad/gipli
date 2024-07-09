@@ -45,16 +45,39 @@ class TicketReopen(models.TransientModel):
 
     def _action_picking_return(self):
         location_id = self.room_assign_id.location_id.id
-        location_dest_id = self.company_id.hostel_location_id.id
+        location_dest_id = self.room_assign_id.company_id.hostel_location_id.id
 
-        picking_id = self.env['stock.picking'].create(
-            self._prepare_picking_values(location_id, location_dest_id, product_id)                                             
-        )
+        new_room_assign_id = self.env['oe.hostel.room.assign'].create(self._prepare_room_assignment())
+
+        raise UserError(new_room_assign_id)
+        
+        #picking_id = self.env['stock.picking'].create(
+        #    self._prepare_picking_values(location_id, location_dest_id, self.src_product_id)
+        #)
+        #picking_id.sudo().action_confirm()
+        #for move in picking_id.move_ids:
+        #    self.env['stock.move.line'].create(self.room_assign_id._prepare_stock_move_line(move))
 
     def _action_picking(self):
         location_id = self.room_assign_id.location_id
-        location_dest_id = self.company_id.hostel_location_id.id
-        
+        location_dest_id = self.room_assign_id.company_id.hostel_location_id.id
+
+    def _prepare_room_assignment(self):
+        return {
+            'partner_id': self.room_assign_id.partner_id.id,
+            'location_id': self.room_assign_id.location_id.id,
+            'product_id': self.room_assign_id.product_id.id,
+            'lot_id': self.room_assign_id.lot_id.id,
+            'date_order': fields.Datetime.today(),
+            'date_start': fields.Datetime.today(),
+            'duration': self.room_assign_id.duration,
+            'date_end': self.room_assign_id.date_end,
+            'company_id': self.room_assign_id.company_id.id,
+            'state': 'draft',
+            'room_assign_id': self.room_assign_id.id,
+        }
+
+    
     def _prepare_picking_values(self, location_id, location_dest_id, product_id):
         picking_type_id = self.env.ref('stock.picking_type_internal').id
         picking_values = {

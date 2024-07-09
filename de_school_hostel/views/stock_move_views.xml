@@ -13,7 +13,7 @@
                        column_invisible="context.get('no_reference', False)"/>
                 <field name="product_id" string="Unit"/>
                 <field name="lot_id" string="Sub Unit" groups="stock.group_production_lot"/>
-                <field name="location_id" optional="hide"/>
+                <field name="location_id"/>
                 <field name="location_dest_id"/>
                 <field name="company_id" optional="hide" groups="base.group_multi_company" force_save="1"/>
                 <field name="quantity" string="Quantity"
