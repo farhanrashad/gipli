@@ -8,12 +8,11 @@
             <field name="priority">1000</field>
             <field name="arch" type="xml">
                 <tree editable="bottom" >
-                    <field name="field_store" invisible="1"/>
-                    <field name="field_readonly" invisible="1"/>
-                    <field name="is_model_selected" invisible="1"/>
+                    <field name="field_store" column_invisible="1"/>
+                    <field name="is_model_selected" column_invisible="1"/>
                     
-                    <field name="hr_service_id" invisible="1" force_save="1"/>
-                    <field name="hr_service_record_line_id" invisible="1" force_save="1"/>
+                    <field name="hr_service_id" column_invisible="1" force_save="1"/>
+                    <field name="hr_service_record_line_id" column_invisible="1" force_save="1"/>
                     <field name="sequence" widget="handle" />
                     <field name="field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" />
                     <field name="field_name" />
@@ -43,7 +42,7 @@
                     <field name="field_model" optional="hide"/>
                     <field name="is_required" readonly="field_store == False"/>
                     <field name="operation_mode" readonly="field_store == False"/>
-                    <field name="field_variant_id"  invisible="1"/>
+                    <field name="field_variant_id"  column_invisible="1"/>
                     <field name="field_variant_line_id" domain="[('field_variant_id','=',field_variant_id)]"  />
                     
                     <field name="ref_field_id" domain="[('model_id', '=', parent.line_model_id)]" options="{'no_edit_create':True}" optional="hide" />
@@ -52,7 +51,7 @@
                     <field name="populate_list_expr" />
                     <field name="change_field_exp" placeholder="e.g product_id.list_price + product_uom.ratio"/>
                     <field name="ref_changeable_field_ids" optional="hide" widget="many2many_tags"/>
-                    
+                    <field name="field_readonly" />
                     
                 </tree>
             </field>
@@ -210,7 +209,7 @@
                                         <field name="ref_changeable_field_ids" optional="hide" widget="many2many_tags"/>
 
                                         <field name="field_store" column_invisible="1"/>
-                                        <field name="field_readonly" column_invisible="1"/>
+                                        <field name="field_readonly" />
                                         
                                         <field name="ref_field_id" domain="[('model_id', '=', parent.header_model_id)]" options="{'no_edit_create':True}" optional="hide" />
                                     </tree>
