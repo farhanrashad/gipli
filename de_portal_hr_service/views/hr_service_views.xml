@@ -224,7 +224,7 @@
                                 <field name="line_model_id" string="Model" readonly="1"/>
                                 <field name="parent_relational_field_id" domain="[('model_id', '=', line_model_id),('ttype','=','many2one')]"/>
                                 <field name="allow_import" />
-                                <field name="file_attachment" column_invisible="allow_import != True" />
+                                <field name="file_attachment" invisible="allow_import != True" />
                                 <button name="action_create_record_line_items" type="object" icon="fa-list" width="0.1" options="{&quot;warn&quot;: true}"/>
                             </tree>
                         </field>

@@ -457,7 +457,7 @@ class CustomerPortal(portal.CustomerPortal):
             )
         else:
             template += '''
-            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}" onchange="filter_field_vals(this)" value="{record_id}" {required} {readonly}>
+            <input type="text" class="form-control mb-2 s_website_form_input" name="{field_name}" id="{field_name}"  value="{record_id}" {required} {readonly}>
             '''.format(field_name=field.field_name, 
                        record_id=record.id, 
                        required='required="1"' if required else '',
