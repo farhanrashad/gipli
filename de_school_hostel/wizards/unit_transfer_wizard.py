@@ -40,41 +40,54 @@ class TicketReopen(models.TransientModel):
             record.location_id = record.room_assign_id.location_id.id
             
     def action_transfer(self):
+        new_room_assign_id = self._action_transfer()
         self._action_picking_return()
-        self._action_picking()
+        self.room_assign_id._action_open_transfer(new_room_assign_id)
 
+    def _action_transfer(self):
+        new_room_assign_id = self.env['oe.hostel.room.assign'].create(self._prepare_room_assignment())
+        self.room_assign_id.write({
+            'room_assign_id': new_room_assign_id.id,
+            'state': 'cancel'
+        })
+        new_room_assign_id.action_confirm()
+        new_room_assign_id.action_validate()
+        return new_room_assign_id
+        
     def _action_picking_return(self):
+        
         location_id = self.room_assign_id.location_id.id
         location_dest_id = self.room_assign_id.company_id.hostel_location_id.id
 
-        new_room_assign_id = self.env['oe.hostel.room.assign'].create(self._prepare_room_assignment())
+        old_picking_id = self.room_assign_id.assign_picking_ids.filtered(lambda x:x.state == 'done')
+        picking_id = self.env['stock.picking'].create(
+            self._prepare_picking_values(location_id, location_dest_id, self.src_product_id)
+        )
+        picking_id.sudo().action_confirm()
+        for move in picking_id.move_ids:
+            self.env['stock.move.line'].create(self.room_assign_id._prepare_stock_move_line(move))
+        picking_id.sudo().button_validate()
 
-        raise UserError(new_room_assign_id)
+        for pk in old_picking_id:
+            pk.write({
+                'return_id': picking_id.id,
+            })
         
-        #picking_id = self.env['stock.picking'].create(
-        #    self._prepare_picking_values(location_id, location_dest_id, self.src_product_id)
-        #)
-        #picking_id.sudo().action_confirm()
-        #for move in picking_id.move_ids:
-        #    self.env['stock.move.line'].create(self.room_assign_id._prepare_stock_move_line(move))
 
-    def _action_picking(self):
-        location_id = self.room_assign_id.location_id
-        location_dest_id = self.room_assign_id.company_id.hostel_location_id.id
 
     def _prepare_room_assignment(self):
         return {
             'partner_id': self.room_assign_id.partner_id.id,
-            'location_id': self.room_assign_id.location_id.id,
-            'product_id': self.room_assign_id.product_id.id,
-            'lot_id': self.room_assign_id.lot_id.id,
+            'location_id': self.location_id.id,
+            'product_id': self.product_id.id,
+            'lot_id': self.lot_id.id,
             'date_order': fields.Datetime.today(),
             'date_start': fields.Datetime.today(),
             'duration': self.room_assign_id.duration,
             'date_end': self.room_assign_id.date_end,
             'company_id': self.room_assign_id.company_id.id,
             'state': 'draft',
-            'room_assign_id': self.room_assign_id.id,
+            #'room_assign_id': self.room_assign_id.id,
         }
 
     

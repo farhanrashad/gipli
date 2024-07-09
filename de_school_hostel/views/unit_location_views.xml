@@ -17,7 +17,13 @@
                     <label for="name"/>
                     <h1><field name="name" placeholder="e.g. Building 01"/></h1>
                     <label for="location_id"/>
-                    <h2><field name="location_id" placeholder="e.g. Building 01" options="{'no_create': True}"/></h2>
+                    <h2>
+                        <field name="location_id" 
+                            placeholder="e.g. Building 01" 
+                            options="{'no_create': True}"
+                            domain="[('unit_usage','!=',False)]"
+                        />
+                    </h2>
 
                     <group>
                         <group  name="additional_info">

@@ -1,7 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import AccessError, UserError, ValidationError
-
+from odoo.osv import expression
 class HostelRoomAssign(models.Model):
     _name = 'oe.hostel.room.assign'
     _description = 'Hostel Room Assignment'
@@ -34,7 +34,15 @@ class HostelRoomAssign(models.Model):
         comodel_name='res.company',
         required=True, index=True,
         default=lambda self: self.env.company)
-        
+
+    user_id = fields.Many2one(
+        comodel_name='res.users',
+        string="Responsible",
+        store=True, readonly=False, index=True,
+        tracking=2,
+        default=lambda self: self.env.user
+    )
+    
     partner_id = fields.Many2one('res.partner', string='Resident', required=True,
                                  domain="[('id','in',domain_partner_ids)]"
                                 )
@@ -45,7 +53,6 @@ class HostelRoomAssign(models.Model):
 
     location_id = fields.Many2one('stock.location',string='Dormitory',
                                   domain = "[('is_hostel','=',True),('unit_usage','=','internal')]",
-                                  default=lambda self: self._get_default_location_id(),
                                  )
 
 
@@ -99,15 +106,18 @@ class HostelRoomAssign(models.Model):
 
         return super().create(vals_list)
 
-    def unlink(self):
+    #def unlink(self):
+    #    for record in self:
+    #        if record.state != 'draft':
+    #            raise UserError('You cannot delete the posted record.')
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_draft_or_cancel(self):
         for record in self:
-            if record.state != 'draft':
-                raise UserError('You cannot delete the posted record.')
-
-
-    # Compute Methods
-    def _get_default_location_id(self):
-        return self.env.company.hostel_location_id.id
+            if record.state not in ('draft', 'cancel') or record.room_assign_id:
+                raise UserError(_(
+                    "You can not delete a assigned record."
+                    " You must first cancel it."))
 
     def _compute_product_tracking(self):
         pass
@@ -140,24 +150,33 @@ class HostelRoomAssign(models.Model):
         if not from_location:
             raise UserError(_("Hostel location is not set in the company settings."))
 
-        lot_count = self.env['stock.move.line'].search_count([
-            ('lot_id','=',self.lot_id.id),
-            ('state','!=','cancel'),
-            ('room_assign_id', '!=', self.id),
-            ('location_dest_id', '=', self.location_id.id)
-        ])
-        #raise UserError(lot_count)
-        if lot_count > 0:
-            raise UserError(_("Unit %s is not available.") % self.lot_id.name)
+        domain = [
+            ('product_id', '=', self.product_id.id),
+            ('state', '=', 'done'),
+        ]
+        
+        if self.lot_id:
+            domain = expression.AND([domain, [('lot_id', '=', self.lot_id.id)]])
+        
+        domain_in = expression.AND([domain, [('location_dest_id', '=', self.location_id.id)]])
+        domain_out = expression.AND([domain, [('location_id', '=', self.location_id.id)]])
+        
+        ml_ids = self.env['stock.move.line']
+        quantity_in = sum(ml_ids.search(domain_in).mapped('quantity'))
+        quantity_out = sum(ml_ids.search(domain_out).mapped('quantity'))
+        stock = quantity_in - quantity_out
+        
+        if stock > 0:
+            raise UserError(_("Unit %s is not available.") % (self.lot_id.name if self.lot_id else "Unknown"))
 
-        unit_assign = self.env['stock.move.line'].search_count([
-            ('owner_id','=',self.partner_id.id),
-            ('state','!=','cancel'),
-            ('room_assign_id', '!=', self.id),
-            ('location_dest_id', '=', self.location_id.id)
-        ])
-        if unit_assign > 0:
-            raise UserError(_("Unit is already assigned."))
+        #unit_assign = self.env['stock.move.line'].search_count([
+        #    ('owner_id','=',self.partner_id.id),
+        #    ('state','!=','cancel'),
+        #    ('room_assign_id', '!=', self.id),
+        #    ('location_dest_id', '=', self.location_id.id)
+        #])
+        #if unit_assign > 0:
+        #    raise UserError(_("Unit is already assigned."))
 
         
             
@@ -248,4 +267,14 @@ class HostelRoomAssign(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
+
+    def _action_open_transfer(self, room_assign_id):
+        action = self.env['ir.actions.actions']._for_xml_id('de_school_hostel.action_hostel_room_assignment')
+        action['domain'] = [('id', '=', room_assign_id.id)]
+        action['views'] = [(self.env.ref('de_school_hostel.view_hostel_room_assignment_form').id, 'form')]
+        action['res_id'] = room_assign_id.id
+        context = {}
+        action['context'] = context
+        return action
+        
     
