@@ -5,28 +5,15 @@
         <field name="model">hr.service</field>
         <field name="inherit_id" ref="de_portal_hr_service.hr_service_form_view"/>
         <field name="arch" type="xml">
-            <!--
-            <xpath expr="//header" position="inside">
-                <button name="button_test_method" type="object" string="test method" class="oe_highlight" id="validate" data-hotkey="v"/>
-
-            </xpath>
-
-            <xpath expr="//group[2]/group[2]" position="inside">
-                <field name="method" />
-                <field name="action_server_id" />
-                <field name="code" widget="ace" options="{'mode': 'python'}" placeholder="Enter Python code here. Help about Python expression is available in the help tab of this document."/>
-
-            </xpath>
--->
             <xpath expr="//notebook" position="inside">
                <page string="Service Actions" name="header_fields">
                     <field name="hr_service_action_ids" >
                         <tree editable="bottom">
                             <field name="sequence" widget="handle" />
-                            <field name="hr_service_id" invisible="1" />
+                            <field name="hr_service_id" column_invisible="1" />
                             <field name="name" />
                             <field name="link_class" />
-                            <field name="header_model_id" invisible="1"/>
+                            <field name="header_model_id" column_invisible="1"/>
                             <field name="method" />
                             <field name="action_server_id" domain="[('model_id', '=', header_model_id)]" context="{'default_model_id': header_model_id}"/>
                             <field name="mail_template_id" domain="[('model_id', '=', header_model_id)]"/>

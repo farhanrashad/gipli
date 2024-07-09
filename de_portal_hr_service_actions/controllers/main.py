@@ -15,6 +15,9 @@ import base64
 from odoo.tools import safe_eval
 
 from odoo.addons.de_portal_hr_service.controllers.portal import CustomerPortal
+import ast
+import re
+from odoo.osv import expression
 
 
 class CustomerPortal(CustomerPortal):
@@ -38,7 +41,7 @@ class CustomerPortal(CustomerPortal):
                 # domain to display action buttons
                 if action.display_mode in ('form','all'):
                     if action.action_domain:
-                        domain = safe_eval.safe_eval(action.action_domain)
+                        domain = ast.literal_eval(action.action_domain) #safe_eval.safe_eval(action.action_domain)
                     if record_id.filtered_domain(domain):
                         template += "<t class='col-lg-1 mb8 mt8'>"
                         template +=  "<a href='/my/model/record/action/" + str(service_sudo.id) + "/" + str(service_sudo.header_model_id.id) + "/" + str(record_id.id) + "/" + str(action.id) + "' class='btn btn-primary pull-left' >" + str(action.name) + "</a>"
@@ -60,12 +63,13 @@ class CustomerPortal(CustomerPortal):
         if service_sudo.hr_service_action_ids:
             for action in service_sudo.hr_service_action_ids:
                 if action.action_domain and action.display_mode in ('tree','all'):
-                    domain = safe_eval.safe_eval(action.action_domain)
-                if record_id.filtered_domain(domain):
-                    template += '<td>'
-                    template +=  "<a href='/my/model/record/action/" + str(service_sudo.id) + "/" + str(service_sudo.header_model_id.id) + "/" + str(record_id.id) + "/" + str(action.id) + "' class='btn btn-primary'> <i class='" + action.link_class + "' ></i>" + "</a>"
-                    template += '</td>'
-                    col = True
+                    record = service_id.sudo()._get_current_record_with_domain(record_id,action.action_domain)
+                    if record:
+                        template += '<td>'
+                        template +=  "<a href='/my/model/record/action/" + str(service_sudo.id) + "/" + str(service_sudo.header_model_id.id) + "/" + str(record_id.id) + "/" + str(action.id) + "' class='btn btn-primary'> <i class='" + str(action.link_class) + "' ></i>" + str(action.name) + "</a>"
+                        template += '</td>'
+                        
+                        col = True
         if col == False:
             template += '<td></td>'
         return template

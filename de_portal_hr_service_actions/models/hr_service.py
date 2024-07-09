@@ -15,7 +15,6 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-from odoo.exceptions import Warning
 from odoo import models, fields, exceptions, api, _
 import io
 import tempfile
