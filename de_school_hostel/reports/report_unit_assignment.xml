@@ -1,0 +1,76 @@
+<odoo>
+    <data>
+        <template id="unit_assignment_template_report_view">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <br/>
+                    <div class="oe_structure"/>
+                    <div class="mt-4">
+                        <h2>Request No.: <span t-field="o.name"/></h2>
+                    </div>
+
+                    <div id="information_block" class="row mt-4 mb32">
+                        <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
+                    </div>
+
+                    <div id="basic_info" class="row mt-4 mb32">
+                        <div t-if="o.date_order" class="col-3 bm-2">
+                            <strong>Request On</strong>
+                            <p t-field="o.date_order" class="m-0"/>
+                        </div>
+                        <div t-if="o.date_start" class="col-3 bm-2">
+                            <strong>From Date</strong>
+                            <p t-field="o.date_start" class="m-0"/>
+                        </div>
+                        <div t-if="o.duration" class="col-3 bm-2">
+                            <strong>Duration</strong>
+                            <p t-field="o.duration" class="m-0"/>
+                        </div>
+                        <div t-if="o.date_end" class="col-3 bm-2">
+                            <strong>To Date</strong>
+                            <p t-field="o.date_end" class="m-0"/>
+                        </div>
+                    </div>
+                    
+                    <div id="location_info" class="row mt-4 mb32">
+                        <div t-if="o.location_id" class="col-3 bm-2">
+                            <strong>Dormitory</strong>
+                            <p t-field="o.location_id" class="m-0"/>
+                        </div>
+                        <div t-if="o.product_id" class="col-3 bm-2">
+                            <strong>Unit</strong>
+                            <p t-field="o.product_id" class="m-0"/>
+                        </div>
+                        <div t-if="o.lot_id" class="col-3 bm-2">
+                            <strong>Sub-Unit</strong>
+                            <p t-field="o.lot_id" class="m-0"/>
+                        </div>
+                        <div t-if="o.user_id" class="col-3 bm-2">
+                            <strong>Responsible</strong>
+                            <p t-field="o.user_id" class="m-0"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+        
+        <template id="unit_assignment_report_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="de_school_hostel.unit_assignment_template_report_view" />
+                </t>
+            </t>
+        </template>
+        <!--  Hostel Room Report  -->
+        <record id="unit_assignment_report" model="ir.actions.report">
+            <field name="name">Print Unit Assignment</field>
+            <field name="model">oe.hostel.room.assign</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">de_school_hostel.unit_assignment_report_template</field>
+            <field name="report_file">de_school_hostel.unit_assignment_report_template</field>
+            <field name="print_report_name">'Exam Session Details'</field>
+            <field name="binding_model_id" ref="de_school_hostel.model_oe_hostel_room_assign"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

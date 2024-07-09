@@ -35,6 +35,7 @@ Long description of module's purpose
         'views/room_assignment_views.xml',
         'wizards/stock_lot_generate_wizard_views.xml',
         'wizards/unit_transfer_wizard_views.xml',
+        'reports/report_unit_assignment.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
