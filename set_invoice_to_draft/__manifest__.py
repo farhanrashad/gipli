@@ -7,7 +7,7 @@
     'author': "Ahmed Gaber",
     'license': 'AGPL-3',
     'category': 'account',
-    'version': '13.0',
+    'version': '1.0',
     'depends': ['account'],
     'data': [
         'security/security.xml',

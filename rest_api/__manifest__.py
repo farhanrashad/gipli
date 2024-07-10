@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Professional REST API',
-    'version': '14.0.1.14.3',
+    'version': '17.1.1.3',
     'category': 'Extra Tools',
     'author': 'AVS SP',
     'support': 'avs3.ua@gmail.com',

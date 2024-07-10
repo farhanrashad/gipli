@@ -22,7 +22,7 @@
 ###################################################################################
 {
     'name': 'Open HRMS Employee Insurance',
-    'version': '16.0.1.0.0',
+    'version': '17.0.0.1',
     'summary': """Employee Insurance Management for Open HRMS.""",
     'description': """Manages insurance amounts for employees to be deducted from salary""",
     'category': 'Generic Modules/Human Resources',
