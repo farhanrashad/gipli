@@ -2,7 +2,7 @@
 
 {
     "name": "Egyptian Electronic Invoice",
-    "version": "14",
+    "version": "1.0",
     "author": "Ideal Solutions - Saad El Wardany",
     "category": "Accounting",
     "depends": ["account","uom"],
