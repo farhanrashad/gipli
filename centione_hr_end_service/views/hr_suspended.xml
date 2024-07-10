@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hr_suspended_form" model="ir.ui.view">
+            <field name="name">hr.suspended.form</field>
+            <field name="model">hr.suspended</field>
+            <field name="arch" type="xml">
+                <form string="MODEL">
+                    <header>
+                        <button name="action_approved" string="Confirm" type="object" groups="hr.group_hr_manager" attrs="{'invisible':[('state','=','approved')]}"/>
+                        <button name="action_cancel" string="Cancel" type="object" groups="hr.group_hr_manager" attrs="{'invisible':[('state','=','approved')]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="employee_id" required="True"/>
+<!--                                <field name="attendance_id" readonly="True"/>-->
+                                <field name="responsible_id" required="True"/>
+                                <field name="date_from" required="True"/>
+                                <field name="reason" required="True"/>
+                            </group>
+                            <group>
+                                <field name="department_id"/>
+                                <field name="job_id"/>
+                                <field name="date_to" required="True"/>
+                                <field name="approve_date" readonly="True"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_hr_suspended_tree" model="ir.ui.view">
+            <field name="name">hr.suspended.tree</field>
+            <field name="model">hr.suspended</field>
+            <field name="arch" type="xml">
+                <tree string="MODEL">
+                    <field name="employee_id"/>
+<!--                    <field name="attendance_id"/>-->
+                    <field name="responsible_id"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="reason"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_hr_suspended_action" model="ir.actions.act_window">
+            <field name="name">Suspension</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.suspended</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="employee_suspend_menu" name="Suspensions" parent="hr.menu_hr_root" action="view_hr_suspended_action" sequence="20"/>
+
+    </data>
+</odoo>

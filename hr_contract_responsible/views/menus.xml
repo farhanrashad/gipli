@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="menu_address_hr_forms_menu" name="Hr Forms" parent="hr.menu_human_resources_configuration"
+                  sequence="200"/>
+
+        <menuitem id="menu_job_family_action" name="Job Family" parent="menu_address_hr_forms_menu"
+                  action="action_job_family" sequence="1"/>
+        <menuitem name="Social Insurance" id="social_insurance_menu" parent="menu_address_hr_forms_menu" sequence="2"
+                  action="social_insurance_act_window"/>
+        <menuitem id="menu_medical_level_action" name="Job Levels" parent="menu_address_hr_forms_menu"
+                  action="action_medical_level" sequence="3"/>
+         <menuitem id="medical_insurance_categ" name="Medical Insurance Contract"
+                  parent="menu_address_hr_forms_menu" action="action_medical_insurance" sequence="4"/>
+        <menuitem name="Medical History" id="medical_history_menu" parent="menu_address_hr_forms_menu"
+                  action="medical_history_act_window" sequence="5"/>
+
+
+    </data>
+</odoo>

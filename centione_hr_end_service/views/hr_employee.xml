@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+         
+         <record id="view_hr_employee_status_form_inherit" model="ir.ui.view">
+             <field name="name">hr.employee.form.inherit</field>
+             <field name="model">hr.employee</field>
+             <field name="inherit_id" ref="hr.view_employee_form"/>
+             <field name="arch" type="xml">
+                 
+
+                <xpath expr="//sheet" position="before">
+                    <header>
+                        <button name="action_active" attrs="{'invisible':[('state','=','active')]}" string="Return To Work" type="object" groups="hr.group_hr_manager"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                </xpath>
+
+                 <xpath expr="//notebook" position="inside">
+                     <page string="Termination Info" attrs="{'invisible':[('state','!=','terminated')]}">
+                         <group>
+                             <field name="termination_id"/>
+                             <field name="termination_date" readonly="True"/>
+                             <field name="termination_reason" readonly="True"/>
+                         </group>
+                     </page>
+                     <!--<page string="Resignation Info" attrs="{'invisible':[('state','!=','resigned')]}">-->
+                         <!--<group>-->
+                             <!--<field name="resignation_id"/>-->
+                             <!--<field name="resignation_date" readonly="True"/>-->
+                             <!--<field name="resignation_reason" readonly="True"/>-->
+                         <!--</group>-->
+                     <!--</page>-->
+                     <page string="Suspension Info" attrs="{'invisible':[('state','!=','suspended')]}">
+                         <field name="suspended_ids">
+                             <tree create="0" edit="0">
+                                 <field name="responsible_id"/>
+                                 <field name="date_from"/>
+                                 <field name="date_to"/>
+                                 <field name="reason"/>
+                             </tree>
+                         </field>
+                     </page>
+                 </xpath>
+                 
+             </field>
+         </record>
+    
+    </data>
+</odoo>

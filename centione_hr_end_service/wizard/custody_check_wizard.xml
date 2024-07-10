@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_model_name_form" model="ir.ui.view">
+            <field name="name">model.name.form</field>
+            <field name="model">model.name</field>
+            <field name="arch" type="xml">
+                <form string="MODEL">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_model_name_action" model="ir.actions.act_window">
+            <field name="name">model.name.action</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">model.name</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

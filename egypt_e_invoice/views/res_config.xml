@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_e_invoice" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.purchase</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="25"/>
+            <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <field name="has_chart_of_accounts" position="before">
+                    <div id="e_invoice">
+                        <h2>E-Invoice</h2>
+                        <div class="row mt16 o_settings_container" name="e_invoice_setting_container">
+                            <div class="col-12 col-lg-6 o_setting_box" id="paper_format_setting">
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Settings</span>
+                                    <div class="content-group">
+                                        <div class="mt16 row">
+                                            <label for="e_invoice_environment" string="Environment" class="col-lg-3 o_light_label"/>
+                                            <field name="e_invoice_environment"  required="1"/>
+                                        </div>
+                                        <div class="mt16 row">
+                                            <label for="e_invoice_version" string="Document Version" class="col-lg-3 o_light_label"/>
+                                            <field name="e_invoice_version"  required="1"/>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6 o_setting_box" id="paper_format_setting">
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">E-Signature</span>
+                                    <div class="content-group">
+                                        <div class="mt16 row">
+                                            <label for="e_invoice_signature_type" string="Signature Type" class="col-lg-3 o_light_label"/>
+                                            <field name="e_invoice_signature_type"  required="1"/>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Same Server')]}" >
+                                        <button string="Get Card Info" type="object" name="get_card_info" class="oe_highlight"/>
+                                    </div>
+                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Same Server')]}" >
+                                        <div class="mt16 row">
+                                            <label for="e_invoice_card_name" string="Card Name" class="col-lg-3 o_light_label"/>
+                                            <field name="e_invoice_card_name" class="oe_inline" />
+                                        </div>
+                                    </div>
+                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Same Server')]}" >
+                                        <div class="mt16 row">
+                                            <label for="e_invoice_certificate" string="Certificate subjectCN" class="col-lg-3 o_light_label"/>
+                                            <field name="e_invoice_certificate"  class="oe_inline" />
+                                        </div>
+                                    </div>
+                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Same Server')]}" >
+                                        <div class="mt16 row">
+                                            <label for="e_invoice_token_pin" string="Token Pin" class="col-lg-3 o_light_label"/>
+                                            <field name="e_invoice_token_pin" password="True" class="col-5 oe_inline" />
+                                        </div>
+                                    </div>
+
+                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Middleware With Accessable IP')]}" >
+                                        <div class="mt16 row">
+                                            <label for="middleware_url" string="Middleware URL" class="col-lg-3 o_light_label"/>
+                                            <field name="middleware_url"  class="col-5 oe_inline" />
+                                        </div>
+                                    </div>
+                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Middleware With Accessable IP')]}" >
+                                        <div class="mt16 row">
+                                            <label for="middleware_database" string="Middleware Database" class="col-lg-3 o_light_label"/>
+                                            <field name="middleware_database"  class="col-5 oe_inline" />
+                                        </div>
+                                    </div>
+                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Middleware With Accessable IP')]}" >
+                                        <div class="mt16 row">
+                                            <label for="middleware_user" string="Middleware User" class="col-lg-3 o_light_label"/>
+                                            <field name="middleware_user"  class="col-5 oe_inline" />
+                                        </div>
+                                    </div>
+
+                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Middleware With Accessable IP')]}" >
+                                        <div class="mt16 row">
+                                            <label for="middleware_pass" string="Middleware Pass" class="col-lg-3 o_light_label"/>
+                                            <field name="middleware_pass" password="True" class="col-5 oe_inline" />
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box" id="paper_format_setting">
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Credentials</span>
+                                    <div class="content-group">
+                                        <div class="mt16 row">
+                                            <label for="e_invoice_client_id" string="Client ID" class="col-3 col-lg-3 o_light_label"/>
+                                            <field name="e_invoice_client_id" class="oe_inline" required="1"/>
+                                        </div>
+                                        <div class="mt16 row">
+                                            <label for="e_invoice_client_pass" string="Client Secret" class="col-3 col-lg-3 o_light_label"/>
+                                            <field name="e_invoice_client_pass" password="True" class="oe_inline" required="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

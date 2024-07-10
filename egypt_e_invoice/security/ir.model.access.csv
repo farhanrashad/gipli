@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_einvoice_uom,einvoice.uom,model_einvoice_uom,,1,0,0,0
+access_einvoice_activity_type,einvoice.activity.type,model_einvoice_activity_type,,1,0,0,0
+access_einvoice_tax_type,einvoice.tax.type,model_einvoice_tax_type,,1,0,0,0
+access_einvoice-tax_subtype,einvoice.tax.subtype,model_einvoice_tax_subtype,,1,0,0,0

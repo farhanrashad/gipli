@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hr_job_form" model="ir.ui.view">
+            <field name="name">hr.job.form</field>
+            <field name="model">hr.job</field>
+            <field name="inherit_id" ref="hr.view_hr_job_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group" position="inside">
+                    <group>
+                        <field name="job_family_id" options='{"no_edit": True, "no_create": True}'/>
+                        <field name="job_level_id" options='{"no_edit": True, "no_create": True}'/>
+                        <field name="medical_insurance_id"
+                               domain="[('end_date','>=', ((context_today()).strftime('%Y-%m-%d'))),('start_date','&lt;=', ((context_today()).strftime('%Y-%m-%d')))]"
+                               options='{"no_edit": True, "no_create": True}'/>
+                        <field name="provider_id"/>
+                    </group>
+
+                </xpath>
+
+            </field>
+        </record>
+        <record id="view_employee_form" model="ir.ui.view">
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group" position="inside">
+                    <group>
+                        <field name="job_level_id" options='{"no_edit": True, "no_create": True}'/>
+                        <field name="package_name_ids"  widget="many2many_tags" invisible="1"/>
+                        <field name="package_name_id" domain="[('id','in',package_name_ids)]"  options='{"no_edit": True, "no_create": True}' />
+                    </group>
+
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="view_job_family_form" model="ir.ui.view">
+            <field name="name">job.family.form</field>
+            <field name="model">job.family</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id"/>
+                            <field name="salary_range"/>
+                            <field name="from_"/>
+                            <field name="to_"/>
+                            <field name="social_insurance_id" options='{"no_edit": True, "no_create": True}'/>
+                            <field name="alert"/>
+                            <field name="other_employees" widget="many2many_tags"/>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_medical_level_form" model="ir.ui.view">
+            <field name="name">medical.insurance.line.form</field>
+            <field name="model">medical.insurance.line</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="job_level_id"/>
+                            <field name="package_name_id"/>
+                            <field name="cover_age_price"/>
+                            <field name="employee_percentage"/>
+                            <field name="amount"/>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_job_family_tree" model="ir.ui.view">
+            <field name="name">job.family.tree</field>
+            <field name="model">job.family</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="company_id"/>
+                    <field name="salary_range"/>
+                    <field name="from_"/>
+                    <field name="to_"/>
+                    <field name="social_insurance_id"/>
+                    <field name="alert"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_medical_level_tree" model="ir.ui.view">
+            <field name="name">medical.insurance.line.tree</field>
+            <field name="model">medical.insurance.line</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="job_level_id"/>
+                    <field name="package_name_id"/>
+                    <field name="cover_age_price"/>
+                    <field name="employee_percentage"/>
+                    <field name="amount"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_job_family" model="ir.actions.act_window">
+            <field name="name">Job Family</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">job.family</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+        <record id="action_medical_level" model="ir.actions.act_window">
+            <field name="name">Job Levels</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">medical.insurance.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

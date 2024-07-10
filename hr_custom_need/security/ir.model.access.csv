@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_cluster,hr.cluster,model_hr_cluster,,1,1,1,1
+access_job_code,job.code,model_job_code,,1,1,1,1
+access_pay_scal,pay.scal,model_pay_scal,,1,1,1,1

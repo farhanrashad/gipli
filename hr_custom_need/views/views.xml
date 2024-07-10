@@ -1,0 +1,52 @@
+<odoo>
+    <data>
+        <record id="cluster_view_tree" model="ir.ui.view">
+            <field name="name">Cluster</field>
+            <field name="model">hr.cluster</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="prefix"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="cluster_view_form" model="ir.ui.view">
+            <field name="name">Cluster</field>
+            <field name="model">hr.cluster</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="prefix"/>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="cluster_action_vew" model="ir.actions.act_window">
+            <field name="name">Cluster</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.cluster</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
+
+        <!-- This Menu Item Must have a parent -->
+        <!-- This Menu Item will appear in the Upper bar, That's why It needs NO parent or action -->
+        <menuitem id="cluster_menu" name="Clusters" parent="hr.menu_hr_root" />
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="cluster_menu_1" name="Cluster" parent="cluster_menu" action="cluster_action_vew"/>
+
+
+    </data>
+</odoo>

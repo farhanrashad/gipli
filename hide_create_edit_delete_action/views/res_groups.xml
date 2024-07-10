@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_edit_button_hide_groups" model="ir.ui.view">
+            <field name="name">res.groups.form.inherit</field>
+            <field name="model">res.groups</field>
+            <field name="inherit_id"
+                   ref="base.view_groups_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Hide Create Models">
+                        <group >
+                            <field name="hide_create_objects" />
+                        </group>
+                    </page>
+                    <page string="Hide Edit Models">
+                        <group >
+                            <field name="hide_edit_objects" />
+                        </group>
+                    </page>
+                    <page string="Hide Delete Models">
+                        <group >
+                            <field name="hide_delete_objects" />
+                        </group>
+                    </page>
+                </notebook>
+
+            </field>
+        </record>
+    </data>
+</odoo>

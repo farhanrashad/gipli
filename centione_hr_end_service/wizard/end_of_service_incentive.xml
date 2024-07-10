@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_end_service_incentive_form" model="ir.ui.view">
+            <field name="name">end.service.incentive.form</field>
+            <field name="model">end.service.incentive</field>
+            <field name="arch" type="xml">
+                <form string="MODEL">
+                    <sheet>
+                        <group>
+                            <field name="is_incentive_calc" invisible="True"/>
+                            <field name="end_incentive" attrs="{'invisible':[('is_incentive_calc','=',True)]}"/>
+                            <field name="end_incentive_month" attrs="{'invisible':[('is_incentive_calc','=',False)]}"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_approved" string="Confirm" type="object" groups="hr.group_hr_manager"/>
+
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_end_service_incentive_action" model="ir.actions.act_window">
+            <field name="name">End Of Service Incentive</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">end.service.incentive</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        
+    
+    </data>
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+
+         <record id="group_hr_contract_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="base.module_category_human_resources_contracts"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('hr.group_hr_user')), (4, ref('hr_contract.group_hr_contract_manager'))]"/>
+        </record>
+
+
+
+        <record id="view_own_contract_rule" model="ir.rule">
+            <field name="name">View Own Hr Contracts</field>
+            <field ref="hr_contract.model_hr_contract" name="model_id"/>
+            <field name="domain_force">[('hr_responsible_ids', '=',user.id)] if user.has_group('hr_contract_responsible.group_hr_contract_user') else []</field>
+            <field name="global" eval="1"/>
+        </record>
+
+
+    </data>
+</odoo>

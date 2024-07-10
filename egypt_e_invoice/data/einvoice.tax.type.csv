@@ -1,0 +1,21 @@
+id,code,name,name_ar
+T1,T1,(T1) Value added tax,ضريبه القيمه المضافه
+T2,T2,(T2) Table tax (percentage),ضريبه الجدول (نسبيه)
+T3,T3,(T3) Table tax (Fixed Amount),ضريبه الجدول (قطعيه)
+T4,T4,(T4) Withholding tax (WHT),الخصم تحت حساب الضريبه
+T5,T5,(T5) Stamping tax (percentage),ضريبه الدمغه (نسبيه)
+T6,T6,(T6) Stamping Tax (amount),ضريبه الدمغه (قطعيه بمقدار ثابت )
+T7,T7,(T7) Entertainment tax,ضريبة الملاهى
+T8,T8,(T8) Resource development fee,رسم تنميه الموارد
+T9,T9,(T9) Table tax (percentage),رسم خدمة
+T10,T10,(T10) Municipality Fees,رسم المحليات
+T11,T11,(T11) Medical insurance fee,رسم التامين الصحى
+T12,T12,(T12) Other fees,رسوم أخري
+T13,T13,(T13) Stamping tax (percentage),ضريبه الدمغه (نسبيه)
+T14,T14,(T14) Stamping Tax (amount),ضريبه الدمغه (قطعيه بمقدار ثابت )
+T15,T15,(T15) Entertainment tax,ضريبة الملاهى
+T16,T16,(T16) Resource development fee,رسم تنميه الموارد
+T17,T17,(T17) Table tax (percentage),رسم خدمة
+T18,T18,(T18) Municipality Fees,رسم المحليات
+T19,T19,(T19) Medical insurance fee,رسم التامين الصحى
+T20,T20,(T20) Other fees,رسوم أخرى

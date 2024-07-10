@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+hr_manager_access_hr_insurance_year,HR Manager Access Insurance Configuration,model_hr_insurance_year,,1,1,1,1

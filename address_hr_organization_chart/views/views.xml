@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+
+<odoo>
+    <data>
+
+
+         
+         <record id="view_hr_employee_form_inherit" model="ir.ui.view">
+             <field name="name">hr.employee.form.inherit</field>
+             <field name="model">hr.employee</field>
+             <field name="inherit_id" ref="hr.view_employee_form"/>
+             <field name="arch" type="xml">
+                 
+                 <xpath expr="//div[@class='oe_button_box']" position="inside">
+                      <button name="get_org_chart" type="object" string="Org Chart" icon="fa-sitemap"/>
+                 </xpath>
+                 
+             </field>
+         </record>
+
+         <record id="organization_chart_url" model="ir.actions.act_url">
+                <field name="name">org chart</field>
+                <field name="type">ir.actions.act_url</field>
+                <field name="target">self</field>
+                <field name="url">/page/organization_chart</field>
+        </record>
+
+
+        <menuitem id="menu_org_chart" name="Organization Chart" parent="hr.menu_hr_root" action="organization_chart_url" sequence="10"/>
+
+
+
+    </data>
+</odoo>

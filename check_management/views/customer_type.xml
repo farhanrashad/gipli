@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="customer_types_view_tree" model="ir.ui.view">
+            <field name="name">Customer Types</field>
+            <field name="model">customer.types</field>
+            <field name="arch" type="xml">
+                <tree string="_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="accounts_account1_view_tree" model="ir.ui.view">
+            <field name="name">Account1</field>
+            <field name="model">accounts.account1</field>
+            <field name="arch" type="xml">
+                <tree string="_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="accounts_account2_view_tree" model="ir.ui.view">
+            <field name="name">Account2</field>
+            <field name="model">accounts.account2</field>
+            <field name="arch" type="xml">
+                <tree string="_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="accounts_account3_view_tree" model="ir.ui.view">
+            <field name="name">Account3</field>
+            <field name="model">accounts.account3</field>
+            <field name="arch" type="xml">
+                <tree string="_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="dimensions_parent_view_tree" model="ir.ui.view">
+            <field name="name">Dimensions Parent</field>
+            <field name="model">dimensions.parent</field>
+            <field name="arch" type="xml">
+                <tree string="_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="dimensions_name_view_tree" model="ir.ui.view">
+            <field name="name">Dimensions Names</field>
+            <field name="model">dimensions.name</field>
+            <field name="arch" type="xml">
+                <tree string="_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="customer_types_action" model="ir.actions.act_window">
+            <field name="name">Customer Types</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">customer.types</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="accounts_account1_action" model="ir.actions.act_window">
+            <field name="name">Account1</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">accounts.account1</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="accounts_account2_action" model="ir.actions.act_window">
+            <field name="name">Account2</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">accounts.account2</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="accounts_account3_action" model="ir.actions.act_window">
+            <field name="name">Account3</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">accounts.account3</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="dimensions_parent_action" model="ir.actions.act_window">
+            <field name="name">Dimensions Parent</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">dimensions.parent</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="dimensions_name_action" model="ir.actions.act_window">
+            <field name="name">Dimensions name</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">dimensions.name</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="customer_types_menu"  parent="account.menu_finance_configuration" action="customer_types_action" sequence="10000"/>
+        <menuitem id="accounts_account1_menu"  parent="account.menu_finance_configuration" action="accounts_account1_action" sequence="10000"/>
+        <menuitem id="accounts_account2_menu"  parent="account.menu_finance_configuration" action="accounts_account2_action" sequence="10000"/>
+        <menuitem id="accounts_account3_menu"  parent="account.menu_finance_configuration" action="accounts_account3_action" sequence="10000"/>
+        <menuitem id="dimensions_parent_menu"  parent="account.menu_finance_configuration" action="dimensions_parent_action" sequence="10000"/>
+        <menuitem id="dimensions_name_menu"  parent="account.menu_finance_configuration" action="dimensions_name_action" sequence="10000"/>
+
+
+    </data>
+</odoo>

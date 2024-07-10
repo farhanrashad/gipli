@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_units_import,units_import,model_units_import,,1,1,1,1
+access_units_download,units_download,model_units_download,,1,1,1,1

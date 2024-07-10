@@ -1,0 +1,57 @@
+id,code,name,name_ar,einvoice_tax_type_id:id
+V001,V001,Export,تصدير للخارج,egypt_e_invoice.T1
+V002,V002,Export to free areas and other areas,تصدير مناطق حرة وأخرى,egypt_e_invoice.T1
+V003,V003,Exempted good or service,سلعة أو خدمة معفاة,egypt_e_invoice.T1
+V004,V004,A non-taxable good or service,سلعة أو خدمة غير خاضعة للضريبة,egypt_e_invoice.T1
+V005,V005,"Exemptions for diplomats, consulates and embassies",إعفاءات دبلوماسين والقنصليات والسفارات,egypt_e_invoice.T1
+V006,V006,Defence and National security Exemptions,إعفاءات الدفاع والأمن القومى,egypt_e_invoice.T1
+V007,V007,Agreements exemptions,إعفاءات اتفاقيات,egypt_e_invoice.T1
+V008,V008,Special Exemptios and other reasons,إعفاءات خاصة و أخرى,egypt_e_invoice.T1
+V009,V009,General Item sales,سلع عامة,egypt_e_invoice.T1
+V010,V010,Other Rates,نسب ضريبة أخرى,egypt_e_invoice.T1
+Tbl01,Tbl01,Table tax (percentage),ضريبه الجدول (نسبيه),egypt_e_invoice.T2
+Tbl02,Tbl02,Table tax (Fixed Amount),ضريبه الجدول (النوعية),egypt_e_invoice.T3
+W001,W001,Contracting,المقاولات,egypt_e_invoice.T4
+W002,W002,Supplies,التوريدات,egypt_e_invoice.T4
+W003,W003,Purachases,المشتريات,egypt_e_invoice.T4
+W004,W004,Services,الخدمات,egypt_e_invoice.T4
+W005,W005,Sumspaid by the cooperative societies for car transportation to their members,المبالغالتي تدفعها الجميعات التعاونية للنقل بالسيارات لاعضائها,egypt_e_invoice.T4
+W006,W006,Commissionagency & brokerage,الوكالةبالعمولة والسمسرة,egypt_e_invoice.T4
+W007,W007,Discounts& grants & additional exceptional incentives granted by smoke &cement companies,الخصوماتوالمنح والحوافز الاستثنائية ةالاضافية التي تمنحها شركات الدخان والاسمنت ,egypt_e_invoice.T4
+W008,W008,Alldiscounts & grants & commissions granted by petroleum &telecommunications & other companies,جميعالخصومات والمنح والعمولات  التيتمنحها  شركات البترول والاتصالات ...وغيرها من الشركات المخاطبة بنظام الخصم,egypt_e_invoice.T4
+W009,W009,Supporting export subsidies,مساندة دعم الصادرات التي يمنحها صندوق تنمية الصادرات ,egypt_e_invoice.T4
+W010,W010,Professional fees,اتعاب مهنية,egypt_e_invoice.T4
+W011,W011,Commission & brokerage _A_57,العمولة والسمسرة _م_57,egypt_e_invoice.T4
+W012,W012,Hospitals collecting from doctors,تحصيل المستشفيات من الاطباء,egypt_e_invoice.T4
+W013,W013,Royalties,الاتاوات,egypt_e_invoice.T4
+W014,W014,Customs clearance,تخليص جمركي ,egypt_e_invoice.T4
+W015,W015,Exemption,أعفاء,egypt_e_invoice.T4
+W016,W016,advance payments,دفعات مقدمه,egypt_e_invoice.T4
+ST01,ST01,Stamping tax (percentage),ضريبه الدمغه (نسبيه),egypt_e_invoice.T5
+ST02,ST02,Stamping Tax (amount),ضريبه الدمغه (قطعيه بمقدار ثابت),egypt_e_invoice.T6
+Ent01,Ent01,Entertainment tax (rate),ضريبة الملاهى (نسبة),egypt_e_invoice.T7
+Ent02,Ent02,Entertainment tax (amount),ضريبة الملاهى (قطعية),egypt_e_invoice.T7
+RD01,RD01,Resource development fee (rate),رسم تنميه الموارد (نسبة),egypt_e_invoice.T8
+RD02,RD02,Resource development fee (amount),رسم تنميه الموارد (قطعية),egypt_e_invoice.T8
+SC01,SC01,Service charges (rate),رسم خدمة (نسبة),egypt_e_invoice.T9
+SC02,SC02,Service charges (amount),رسم خدمة (قطعية),egypt_e_invoice.T9
+Mn01,Mn01,Municipality Fees (rate),رسم المحليات (نسبة),egypt_e_invoice.T10
+Mn02,Mn02,Municipality Fees (amount),رسم المحليات (قطعية),egypt_e_invoice.T10
+MI01,MI01,Medical insurance fee (rate),رسم التامين الصحى (نسبة),egypt_e_invoice.T11
+MI02,MI02,Medical insurance fee (amount),رسم التامين الصحى (قطعية),egypt_e_invoice.T11
+OF01,OF01,Other fees (rate),رسوم أخرى (نسبة),egypt_e_invoice.T12
+OF02,OF02,Other fees (amount),رسوم أخرى (قطعية),egypt_e_invoice.T12
+ST03,ST03,Stamping tax (percentage),ضريبه الدمغه (نسبيه),egypt_e_invoice.T13
+ST04,ST04,Stamping Tax (amount),ضريبه الدمغه (قطعيه بمقدار ثابت),egypt_e_invoice.T14
+Ent03,Ent03,Entertainment tax (rate),ضريبة الملاهى (نسبة),egypt_e_invoice.T15
+Ent04,Ent04,Entertainment tax (amount),ضريبة الملاهى (قطعية),egypt_e_invoice.T15
+RD03,RD03,Resource development fee (rate),رسم تنميه الموارد (نسبة),egypt_e_invoice.T16
+RD04,RD04,Resource development fee (amount),رسم تنميه الموارد (قطعية),egypt_e_invoice.T16
+SC03,SC03,Service charges (rate),رسم خدمة (نسبة),egypt_e_invoice.T17
+SC04,SC04,Service charges (amount),رسم خدمة (قطعية),egypt_e_invoice.T17
+Mn03,Mn03,Municipality Fees (rate),رسم المحليات (نسبة),egypt_e_invoice.T18
+Mn04,Mn04,Municipality Fees (amount),رسم المحليات (قطعية),egypt_e_invoice.T18
+MI03,MI03,Medical insurance fee (rate),رسم التامين الصحى (نسبة),egypt_e_invoice.T19
+MI04,MI04,Medical insurance fee (amount),رسم التامين الصحى (قطعية),egypt_e_invoice.T19
+OF03,OF03,Other fees (rate),رسوم أخرى (نسبة),egypt_e_invoice.T20
+OF04,OF04,Other fees (amount),رسوم أخرى (قطعية),egypt_e_invoice.T20

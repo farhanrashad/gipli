@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_hr_insurance_year_form" model="ir.ui.view">
+            <field name="name">hr.insurance.year.form</field>
+            <field name="model">hr.insurance.year</field>
+            <field name="arch" type="xml">
+                <form string="MODEL">
+                    <sheet>
+                        <group>
+                            <field name="name" required="True"/>
+                            <field name="insurance_amount_min" required="True"/>
+                            <field name="insurance_amount_max" required="True"/>
+                            <field name="year" required="True"/>
+                            <field name="type" required="True" invisible="1"/>
+                            <field name="employee_ratio" required="True"/>
+                            <field name="company_ratio" required="True"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        
+        <record id="view_hr_insurance_year_tree" model="ir.ui.view">
+            <field name="name">hr.insurance.year.tree</field>
+            <field name="model">hr.insurance.year</field>
+            <field name="arch" type="xml">
+                <tree string="MODEL">
+                    <field name="name"/>
+                    <field name="insurance_amount_min"/>
+                    <field name="insurance_amount_max"/>
+                    <field name="year"/>
+                    <field name="type" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_hr_insurance_year_action" model="ir.actions.act_window">
+            <field name="name">Insurance Configuration</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.insurance.year</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_insurance_configuration" name="Insurance Configuration"
+                                    parent="hr_work_entry_contract_enterprise.menu_hr_payroll_configuration"
+                  action="view_hr_insurance_year_action" sequence="5"/>
+    
+    </data>
+</odoo>

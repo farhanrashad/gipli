@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="org_chart_template">
+              <link rel="stylesheet" type="text/css" href="/web/static/lib/fontawesome/css/font-awesome.css"/>
+              <link rel="stylesheet" href="/address_hr_organization_chart/static/lib/css/jquery.orgchart.css"/>
+              <link rel="stylesheet" href="/address_hr_organization_chart/static/lib/css/style.css"/>
+
+              <script type="text/javascript" src="/address_hr_organization_chart/static/lib/js/jquery.min.js"></script>
+              <script type="text/javascript" src="/address_hr_organization_chart/static/lib/js/jquery.orgchart.js"></script>
+              <script type="text/javascript" src="/address_hr_organization_chart/static/lib/js/jquery.mockjax.min.js"></script>
+              <script type="text/javascript" src="/address_hr_organization_chart/static/lib/js/html2canvas.min.js"></script>
+              <script type="text/javascript" src="/address_hr_organization_chart/static/lib/js/jspdf.min.js"></script>
+
+
+
+                    <h2 style="{text-align:center;}">Capital Organization Chart</h2>
+                    <br/>
+                    <div class="organization_chart" id="chart-container">
+                        <script>
+                              <t t-raw="data"/>;
+                              console.log(d);
+                              var department = "<t t-raw="department"/>";
+                              $('h2').html(department);
+                              var nodeTemplate = function(data) {
+                                  return `
+                                    <div class="image">${data.image}</div>
+                                    <div class="title">${data.name}</div>
+                                    <div class="content">${data.title}</div>
+                                  `;
+                                };
+                              $('.organization_chart').orgchart({'nodeTemplate': nodeTemplate,'data' :d,'exportButton': true,'exportFilename': department,'zoom': true});
+                        </script>
+
+
+
+
+
+                    </div>
+        </template>
+
+
+
+    </data>
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="0">
+
+        <record id="categ_hide_actions" model="ir.module.category">
+            <field name="name">Hide Actions</field>
+        </record>
+        <record id="group_hide_create_button" model="res.groups">
+            <field name="name">Hide Create</field>
+            <field name="category_id" ref="hide_create_edit_delete_action.categ_hide_actions"/>
+        </record>
+        <record id="group_hide_edit_button" model="res.groups">
+            <field name="name">Hide Edit</field>
+            <field name="category_id" ref="hide_create_edit_delete_action.categ_hide_actions"/>
+        </record>
+
+      <record id="group_hide_delete_button" model="res.groups">
+            <field name="name">Hide Delete</field>
+            <field name="category_id" ref="hide_create_edit_delete_action.categ_hide_actions"/>
+        </record>
+
+</data>
+</odoo>

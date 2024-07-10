@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_resignation,access_hr_resignation,model_hr_resignation,hr.group_hr_manager,1,1,1,1
+access_hr_termination,access_hr_termination,model_hr_termination,hr.group_hr_manager,1,1,1,1
+access_hr_termination_reason,access_hr_termination_reason,model_hr_termination_reason,hr.group_hr_manager,1,1,1,1
+access_hr_suspended,access_hr_suspended,model_hr_suspended,hr.group_hr_manager,1,1,1,1
+access_hr_retirement,access_hr_retirement,model_hr_retirement,hr.group_hr_manager,1,1,1,1
+access_turnover_reason,access_turnover_reason,model_turnover_reason,hr.group_hr_manager,1,1,1,1
