@@ -1,30 +1,24 @@
 <odoo>
     <data>
-        <template id="account_move_template_report_view">
+        <template id="account_move_com_template_report_view">
             <t t-call="web.external_layout">
                 <div class="page">
                     <div class="oe_structure"/>
-                    <table class="table table-bordered  mt-4" style="width:50%;text-align:right;float:right;">
+                    <table class="table table-borderless mt-4" >
                         <tbody>
                             <tr>
-                                <td>Date</td>
-                                <td><span t-field="o.date"/></td>
-                            </tr>
-                            <tr>
-                                <td>Invoice #</td>
-                                <td><span t-field="o.name"/></td>
-                            </tr>
-                            <tr>
-                                <td>Discount</td>
-                                <td>0</td>
-                            </tr>
-                            <tr>
-                                <td>PO #</td>
-                                <td><span t-field="o.ref"/></td>
-                            </tr>
-                            <tr>
-                                <td>PO Date</td>
-                                <td></td>
+                                <td style="width:10%;"><strong>Date</strong></td>
+                                <td style="width:40%;">
+                                    <div t-if="o.invoice_date" class="">
+                                        <span t-field="o.invoice_date" class="m-0"/>
+                                    </div>
+                                </td>
+                                <td style="width:10%;"><strong>Invoice #</strong></td>
+                                <td >
+                                    <div t-if="o.name" class="">
+                                        <span t-field="o.name" class="m-0"/>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -117,21 +111,21 @@
             </t>
         </template>
         
-        <template id="account_move_report_template">
+        <template id="account_move_com_report_template">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <t t-call="de_spa_docs.account_move_template_report_view" />
+                    <t t-call="de_spa_docs.account_move_com_template_report_view" />
                 </t>
             </t>
         </template>
         <!--  account invoice Report  -->
-        <record id="account_invoice_report" model="ir.actions.report">
-            <field name="name">Print Invoice</field>
+        <record id="account_invoice_com_report" model="ir.actions.report">
+            <field name="name">Commercial Invoice</field>
             <field name="model">account.move</field>
             <field name="report_type">qweb-pdf</field>
-            <field name="report_name">de_spa_docs.account_move_report_template</field>
-            <field name="report_file">de_spa_docs.account_move_report_template</field>
-            <field name="print_report_name">'Invoice'</field>
+            <field name="report_name">de_spa_docs.account_move_com_report_template</field>
+            <field name="report_file">de_spa_docs.account_move_com_report_template</field>
+            <field name="print_report_name">'Commercial Invoice'</field>
             <field name="binding_model_id" ref="account.model_account_move"/>
             <field name="binding_type">report</field>
         </record>

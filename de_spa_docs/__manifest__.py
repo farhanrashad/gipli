@@ -27,7 +27,7 @@ Spa Document Formats
     'data': [
         # 'security/ir.model.access.csv',
         'reports/report_account_invoice.xml',
-        'views/templates.xml',
+        'reports/report_account_commercial_invoice.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
