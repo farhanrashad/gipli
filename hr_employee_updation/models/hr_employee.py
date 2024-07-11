@@ -86,7 +86,7 @@ class HrEmployee(models.Model):
 
     personal_mobile = fields.Char(
         string='Mobile',
-        related='address_home_id.mobile', store=True,
+        related='address_id.mobile', store=True,
         help="Personal mobile number of the employee")
     joining_date = fields.Date(
         string='Joining Date',
