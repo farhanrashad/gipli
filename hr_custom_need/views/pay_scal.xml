@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="pay_scal_tree" model="ir.ui.view">
+            <field name="name">PayScal</field>
+            <field name="model">pay.scal</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="min"/>
+                    <field name="max"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="pay_scal_form" model="ir.ui.view">
+            <field name="name">PayScal</field>
+            <field name="model">pay.scal</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="min"/>
+                            <field name="max"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="pay_scal_action" model="ir.actions.act_window">
+            <field name="name">PayScal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pay.scal</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
+
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="pay_scal_menu" name="PayScal" parent="cluster_menu" action="pay_scal_action"/>
+
+
+    </data>
+</odoo>

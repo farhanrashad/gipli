@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="medical_history_form_view" model="ir.ui.view">
+            <field name="name">medical.history.form</field>
+            <field name="model">medical.history</field>
+            <field name="arch" type="xml">
+                <form string="Medical History">
+                    <sheet>
+
+                        <group>
+                            <group>
+                                <field name="employee_id"/>
+                                <field name="date"/>
+                            </group>
+                            <group>
+                                <field name="action"/>
+                                <field name="provider_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="medical_history_tree_view" model="ir.ui.view">
+            <field name="name">medical.history.tree</field>
+            <field name="model">medical.history</field>
+            <field name="arch" type="xml">
+                <tree string="Medical History">
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                    <field name="action"/>
+                    <field name="provider_id"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="medical_history_act_window" model="ir.actions.act_window">
+            <field name="name">Medical History</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">medical.history</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    There is no examples click here to add new Medical History.
+                </p>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

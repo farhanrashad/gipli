@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_job_family,job_family,model_job_family,,1,1,1,1
+access_medical_history,medical_history,model_medical_history,,1,1,1,1
+access_social_insurance,social_insurance,model_social_insurance,,1,1,1,1
+access_medical_insurance,medical_insurance,model_medical_insurance,,1,1,1,1
+access_medical_insurance_line,medical_insurance_line,model_medical_insurance_line,,1,1,1,1
+access_medical_package_name,medical_package_name,model_medical_package_name,,1,1,1,1
+access_medical_job_level,medical_job_level,model_medical_job_level,,1,1,1,1

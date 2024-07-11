@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="hr_job_form" model="ir.ui.view">
+            <field name="name">hr.job.form</field>
+            <field name="model">hr.job</field>
+            <field name="inherit_id" ref="hr.view_hr_job_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='contract_type_id']" position="after">
+                    <field name="job_code_id"/>
+                    <field name="cluster_id"/>
+                    <field name="payscal_id"/>
+                    <field name="payscal_attribute"/>
+                    <field name="grade"/>
+
+                </xpath>
+
+            </field>
+        </record>
+        <record id="job_code_tree" model="ir.ui.view">
+            <field name="name">Job Code</field>
+            <field name="model">job.code</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="numeric_grade"/>
+                    <field name="cluster_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="job_code_form" model="ir.ui.view">
+            <field name="name">Job Code</field>
+            <field name="model">job.code</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="numeric_grade"/>
+                            <field name="cluster_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="job_code_action" model="ir.actions.act_window">
+            <field name="name">Job Code</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">job.code</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="job_code_menu" name="Job Code" parent="cluster_menu" action="job_code_action"/>
+
+<!--        &lt;!&ndash; Inherit Form View to Modify it &ndash;&gt;-->
+<!--        <record id="view_employee_form3333" model="ir.ui.view">-->
+<!--            <field name="name">hr.employee.form</field>-->
+<!--            <field name="model">hr.employee</field>-->
+<!--            <field name="inherit_id" ref="hr.view_employee_form"/>-->
+<!--            <field name="arch" type="xml">-->
+
+<!--                <xpath expr="//field[@name='passport_id']" position="after">-->
+<!--                    <field name="military_status"/>-->
+<!--                </xpath>-->
+
+<!--            </field>-->
+<!--        </record>-->
+
+
+    </data>
+</odoo>
