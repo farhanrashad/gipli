@@ -4,19 +4,77 @@
             <t t-call="web.external_layout">
                 <div class="page">
                     <div class="oe_structure"/>
+
+                    <div class="mb-4 mt-3">
+                        <div id="basic_info" class="row mt-4 mb32">
+                            <div t-if="o.invoice_date" class="col-6 bm-2">
+                                <div class="mr8 mr-8" style="display:table-cell;width:30%;"><strong >Request On</strong></div>
+                                <span t-field="o.invoice_date" class="m-0"/>
+                            </div>
+                            <div t-if="o.name" class="col-6 bm-2">
+                                <strong>From Date</strong>
+                                <p t-field="o.name" class="m-0"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row m-0 mt-0 mb0">
+                        <div id="basic_info" class="col-6 mt-4 mb32">
+                            <span style="width:25%;"><strong>Date</strong></span>
+                            <div t-if="o.invoice_date" class="">
+                                <span t-field="o.invoice_date" class="m-0"/>
+                            </div>
+                            <span style="width:25%;"><strong>Invoice #</strong></span>
+                            <div t-if="o.name" class="">
+                                <span t-field="o.name" class="m-0"/>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <br/><br/>
                     <table class="table table-borderless mt-4" >
                         <tbody>
-                            <tr>
-                                <td style="width:10%;"><strong>Date</strong></td>
+                            <tr class="row m-0 mt-0 mb0">
+                                <div id="basic_info" class="col-6 mt-4 mb32">
+                                    <td style="width:25%;"><strong>Date</strong></td>
+                                    <td style="width:40%;">
+                                        <div t-if="o.invoice_date" class="">
+                                            <span t-field="o.invoice_date" class="m-0"/>
+                                        </div>
+                                    </td>
+                                    <td style="width:10%;"><strong>Invoice #</strong></td>
+                                    <td >
+                                        <div t-if="o.name" class="">
+                                            <span t-field="o.name" class="m-0"/>
+                                        </div>
+                                    </td>
+                                </div>
+                                <div id="basic_info" class="col-6 mt-4 mb32">
+                                    <td style="width:10%;"><strong>Date1</strong></td>
+                                    <td style="width:40%;">
+                                        <div t-if="o.invoice_date" class="">
+                                            <span t-field="o.invoice_date" class="m-0"/>
+                                        </div>
+                                    </td>
+                                    <td style="width:10%;"><strong>Invoice #1</strong></td>
+                                    <td >
+                                        <div t-if="o.name" class="">
+                                            <span t-field="o.name" class="m-0"/>
+                                        </div>
+                                    </td>
+                                </div>
+                            </tr>
+                            <tr class="m-0 mt-0 mb0">
+                                <td style="width:10%;"><strong>Seller Name</strong></td>
                                 <td style="width:40%;">
-                                    <div t-if="o.invoice_date" class="">
-                                        <span t-field="o.invoice_date" class="m-0"/>
+                                    <div t-if="o.company_id" class="">
+                                        <span t-field="o.company_id.name" class="m-0"/>
                                     </div>
                                 </td>
-                                <td style="width:10%;"><strong>Invoice #</strong></td>
+                                <td style="width:10%;"><strong>Buyer Name</strong></td>
                                 <td >
-                                    <div t-if="o.name" class="">
-                                        <span t-field="o.name" class="m-0"/>
+                                    <div t-if="o.partner_id" class="">
+                                        <span t-field="o.partner_id.name" class="m-0"/>
                                     </div>
                                 </td>
                             </tr>
