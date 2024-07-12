@@ -1,6 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="project_ticket_form_view2" model="ir.ui.view">
+            <field name="name">project.ticket.form.view</field>
+            <field name="model">project.task</field>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <form string="Task" class="o_form_project_tasks" js_class="project_task_form">
+                    <field name="recurrence_id" invisible="1" />
+                    <field name="allow_task_dependencies" invisible="1" />
+                    <field name="rating_last_value" invisible="1"/>
+                    <field name="rating_count" invisible="1"/>
+                    <field name="allow_milestones" invisible="1" />
+                    <field name="parent_id" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="project_id" invisible="1"/>
+                    <field name="is_ticket" invisible="1"/>
+                <field name="is_sla" invisible="1"/>
+                <field name="allow_reopen" invisible="1"/>
+                <field name="allow_history" invisible="1"/>
+                    <header>
+                        <button string="Reopen Ticket" name="action_reopen_tickets" type="object"
+                            invisible="not allow_reopen" 
+                            groups="de_helpdesk.group_project_ticket_reopen"
+                        />
+                        <field name="stage_id" widget="statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}" invisible="not project_id and not stage_id"/>
+                        <field name="state" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" invisible="1"/>
+                        <field name="personal_stage_type_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" invisible="project_id" domain="[('user_id', '=', uid)]" string="Personal Stage"/>
+                    </header>
+                    <sheet string="Task">
+                    <div class="oe_button_box" name="button_box">
+                        <button invisible="count_reopen == 0"
+                            name="open_reopen_ticket_reaons"
+                            class="oe_stat_button"
+                            icon="fa-file-text-o"
+                            type="object"
+                        >
+                            <field name="count_reopen" widget="statinfo" string="Reopen Reasons"/>
+                        </button>
+        
+                        <button invisible="count_ticket_history == 0"
+                            name="open_ticket_history"
+                            class="oe_stat_button"
+                            icon="fa-history"
+                            type="object"
+                        >
+                            <field name="count_ticket_history" widget="statinfo" string="History"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title pe-0">
+                        <h3>
+                            <field name="ticket_no" 
+                                nolabel="1" 
+                                readonly="1"
+                                invisible="not is_ticket"
+                            />
+                        </h3>
+                        <h1 class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex w-100">
+                                <field name="name" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="e.g Product arrived damaged"/>
+                            </div>
+                            <div class="d-flex justify-content-end o_state_container" invisible="not active">
+                                <field name="state" widget="project_task_state_selection" class="o_task_state_widget" />
+                            </div>
+                            <div class="d-flex justify-content-start o_state_container w-100 w-md-50 w-lg-25" invisible="active">
+                                <field name="state" widget="project_task_state_selection" class="o_task_state_widget" />
+                            </div>
+                        </h1>
+                        <div class="d-flex mb-4" invisible="not ticket_sla_ids" groups="de_helpdesk.group_project_sla_enabled">
+                            <field name="ticket_sla_ids" 
+                                widget="many2many_tags" 
+                                invisible="not is_sla" 
+                                class="mb-0" readonly="1" 
+                                groups="de_helpdesk.group_project_sla_enabled"
+                                options="{'color_field': 'color', 'no_edit_color': True}"
+                            />
+        
+                            <div invisible="not sla_date_deadline or not is_sla" groups="de_helpdesk.group_project_sla_enabled" class="mx-2 text-muted d-inline-flex align-items-center h-100">
+                                <i class="fa fa-lg fa-clock-o me-2 mt-1" aria-label="Sla Deadline" title="Sla Deadline"/>
+                                <field name="sla_date_deadline" class="mb-0" widget="remaining_days"/>
+                            </div>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="display_in_project" invisible="1" force_save="1"/>
+                           <field name="project_id" 
+                                required="1" 
+                                string="Helpdesk Team" 
+                                 invisible="not is_ticket"
+                                domain="[('is_helpdesk_team', '=', True), ('active', '=', True), '|', ('company_id', '=', False), ('company_id', '=?', company_id)]"
+                                context="{
+                                    'kanban_view_ref': 'helpdesk.helpdesk_team_view_kanban_mobile', 
+                                    'default_is_helpdesk_team': True
+                                }"
+                            />
+                            <field name="display_in_project" invisible="True" force_save="1"/>
+                            
+                            <field name="user_ids"
+                                class="o_task_user_field"
+                                options="{'no_open': True, 'no_quick_create': True}"
+                                widget="many2many_avatar_user"/>
+
+                            <field name="ticket_priority" widget="priority"
+                                invisible="not is_ticket"
+                                />
+                            <field name="prj_ticket_type_id" options="{'no_create':True,'no_edit':True}"
+                                invisible="not is_ticket"
+                                />
+                            
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" context="{'project_id': project_id}"/>
+                        </group>
+                        <group>
+                            <field name="active" invisible="1"/>
+                            <field name="partner_id" nolabel="0" widget="res_partner_many2one" class="o_task_customer_field" invisible="not project_id"/>
+                            <label for="date_deadline"/>
+                            <div id="date_deadline_and_recurring_task" class="d-inline-flex w-100">
+                                <field name="date_deadline" nolabel="1" decoration-danger="date_deadline &lt; current_date and state not in ['1_done', '1_canceled']"/>
+                                <field name="recurring_task" nolabel="1" class="ms-0" style="width: fit-content;"
+                                       widget="boolean_icon" options="{'icon': 'fa-repeat'}"
+                                       invisible="not active or parent_id"
+                                       groups="project.group_project_recurring_tasks"/>
+                            </div>
+                            <label for="repeat_interval" groups="project.group_project_recurring_tasks" invisible="not recurring_task" />
+                            <div invisible="not recurring_task" class="d-flex" groups="project.group_project_recurring_tasks">
+                                <field name="repeat_interval" required="recurring_task"
+                                       class="me-2" style="max-width: 2rem !important;" />
+                                <field name="repeat_unit" required="recurring_task"
+                                       class="me-2" style="max-width: 4rem !important;" />
+                                <field name="repeat_type" required="recurring_task"
+                                       class="me-2" style="max-width: 15rem !important;" />
+                                <field name="repeat_until" invisible="repeat_type != 'until'" required="repeat_type == 'until'"
+                                       class="me-2" />
+                            </div>
+                        </group>
+                    </group>
+                        <field name="task_properties" columns="2"/>
+                    <notebook>
+                        <page name="description_page" string="Description">
+                            <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Add details about this task..."/>
+                        </page>
+                        <page string="SLA" name="ticket_sla" 
+                            groups="de_helpdesk.group_project_sla_enabled"
+                            invisible="not is_sla">
+                            <field name="ticket_sla_ids" >
+                                <tree 
+                                    decoration-success="status=='reached'"
+                                    decoration-danger="status=='failed'"
+                                    editable="bottom" >
+                                    <field name="prj_sla_id" />
+                                    <field name="date_deadline" />
+                                    <field name="date_reached" />
+                                    <field name="sla_stage_id" />
+                                    <field name="sla_time" widget="float_time" />
+                                    <field name="status" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Customer Feedback" name="customer_feedback" 
+                            groups="de_helpdesk.group_project_ticket_customer_ratings"
+                            invisible="not allow_customer_rating">
+                            <field name="allow_customer_rating" invisible="1" />
+                            <group>
+                                <group>
+                                    <field name="customer_rating" readonly="0"/>
+                                </group>
+                                <group>
+                                    <field name="closed_by" readonly="1"/>
+                                </group>
+                                <field name="rating_comment" readonly="1" />
+                            </group>
+                        </page>
+
+
+                        
+                        
+                        <page name="extra_info" string="Extra Info" groups="base.group_no_one">
+                            <group>
+                                <group>
+                                    <field name="parent_id" groups="base.group_no_one" context="{'search_view_ref' : 'project.view_task_search_form','search_default_project_id': project_id}"/>
+                                    <field name="analytic_account_id" groups="analytic.group_analytic_accounting" context="{'default_partner_id': partner_id, 'default_company_id': company_id}"/>
+                                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                                    <field name="sequence" groups="base.group_no_one"/>
+                                    <field name="email_cc" groups="base.group_no_one"/>
+                                    <field name="displayed_image_id" groups="base.group_no_one" options="{'no_create': True}"/>
+                                </group>
+                                <group>
+                                    <field name="date_assign" groups="base.group_no_one"/>
+                                    <field name="date_last_stage_update" groups="base.group_no_one"/>
+                                </group>
+                                <group string="Working Time to Assign" invisible="working_hours_open == 0.0">
+                                    <field name="working_hours_open" widget="float_time" string="Hours"/>
+                                    <field name="working_days_open" string="Days"/>
+                                </group>
+                                <group string="Working Time to Close" invisible="working_hours_close == 0.0">
+                                    <field name="working_hours_close" widget="float_time" string="Hours"/>
+                                    <field name="working_days_close" string="Days"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" options="{'post_refresh':True}" groups="base.group_user"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+    
     <!-- Form view -->
     <record id="project_ticket_form_view" model="ir.ui.view">
         <field name="name">iedit.project.inherit</field>
@@ -323,7 +533,7 @@
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('project.view_task_kanban')}),
                 (0, 0, {'view_mode': 'pivot', 'view_id': ref('project_ticket_pivot_view')}),
                 (0, 0, {'view_mode': 'graph', 'view_id': ref('project_ticket_graph_view')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('project_ticket_form_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('project_ticket_form_view2')}),
             
             ]"/>
         <field name="domain">[

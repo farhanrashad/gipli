@@ -445,15 +445,7 @@ class Project(models.Model):
             },
         })
         return action
-        
-    def action_view_tickets(self):
-        pass
 
-    def action_view_ticket_analysis(self):
-        pass
-
-    def action_view_sla_analysis(self):
-        pass
 
     # JS Dashbaord
     @api.model
