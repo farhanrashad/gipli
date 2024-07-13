@@ -58,15 +58,14 @@
                                     <field name="date"/>
                                     <field name="payment_method_id" domain="[('payment_type','=','inbound')]"/>
                                     <field name="due_date" 
-                                        required="payment_method_code == 'batch_payment'"/>
+                                        />
 
                                     <field name="amount"/>
-                                    <field name="payment_method_code" invisible="1"/>
                                     <field name="bank_name_id"   options="{'no_create': True, 'no_open': True}"
-                                           required="payment_method_code == 'batch_payment'"
+                                           
                                     />
                                     <field name="check_number" 
-                                        required="payment_method_code == 'batch_payment'"
+                                        
                                     />
 
                                 </tree>
@@ -80,12 +79,11 @@
                                     <field name="due_date"/>
                                     <field name="amount"/>
                                     <field name="payment_method_id"/>
-                                    <field name="payment_method_code" invisible="1"/>
                                     <field name="bank_name_id"  options="{'no_create': True, 'no_open': True}"
-                                           required="payment_method_code == 'batch_payment'"
+                                           
                                     />
                                     <field name="check_number" 
-                                        required="payment_method_code == 'batch_payment'"
+                                        
                                     />
                                 </form>
                                 </field>
@@ -149,15 +147,14 @@
                                     <field name="date"/>
                                                                         <field name="payment_method_id" domain="[('payment_type','=','outbound')]"/>
 
-                                    <field name="due_date" invisible="payment_method_code != check_printing"                                                       required="payment_method_code == 'check_printing'"/>
+                                    <field name="due_date"                                                        />
                                     <field name="amount"/>
-                                    <field name="payment_method_code" invisible="1"/>
-                                     <field name="bank_name_id"   options="{'no_create': True, 'no_open': True}"                                                     required="payment_method_code == 'batch_payment'"
+                                     <field name="bank_name_id"   options="{'no_create': True, 'no_open': True}"                                                     
                                     />
                                     <field name="multi_check_payment" invisible="1"/>
-                                    <field name="cheque_books_id"  invisible="payment_method_code != 'check_printing'" required="payment_method_code == 'check_printing'"
+                                    <field name="cheque_books_id"  
                                     />
-                                    <field name="cheque_number" invisible="payment_method_code != 'check_printing'"                                            required="payment_method_code == 'check_printing'"
+                                    <field name="cheque_number" 
                                     />
 
                                 </tree>
@@ -171,15 +168,14 @@
                                     <field name="due_date"/>
                                     <field name="amount"/>
                                     <field name="payment_method_id" domain="[('payment_type','=','outbound')]"/>
-                                    <field name="payment_method_code" invisible="1"/>
-                                     <field name="bank_name_id"   options="{'no_create': True, 'no_open': True}"                                                        required="payment_method_code == 'batch_payment'"
+                                     <field name="bank_name_id"   options="{'no_create': True, 'no_open': True}"                                                       
                                     />
                                     <field name="multi_check_payment" invisible="1"/>
-                                    <field name="cheque_books_id"  invisible="payment_method_code != 'check_printing'"
-                                                       required="payment_method_code == 'check_printing'"
+                                    <field name="cheque_books_id"  
+                                                       
                                     />
-                                    <field name="cheque_number" invisible="payment_method_code != 'check_printing'"
-                                                       required="payment_method_code == 'check_printing'"
+                                    <field name="cheque_number" 
+                                                       
                                     />
                                 </form>
                                 </field>

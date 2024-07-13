@@ -329,8 +329,8 @@ class MergeCustomerLineWizard(models.TransientModel):
     payment_method_id = fields.Many2one(comodel_name='account.payment.method', string='Payment Method',
                                         required=True,
                                         help="The payment method used by the payments in this batch.")
-    payment_method_code = fields.Char(related='payment_method_id.code',
-        help="Technical field used to adapt the interface to the payment type selected.", readonly=True)
+    #payment_method_code = fields.Char(related='payment_method_id.code',
+    #    help="Technical field used to adapt the interface to the payment type selected.", readonly=True)
     active_cheque_number = fields.Char(related='journal_id.check_next_number')
 
     cheque_number = fields.Integer(copy=False)
@@ -545,8 +545,8 @@ class MergeVendorLineWizard(models.TransientModel):
     payment_method_id = fields.Many2one(comodel_name='account.payment.method', string='Payment Method',
     required=True,
      help="The payment method used by the payments in this batch.")
-    payment_method_code = fields.Char(related='payment_method_id.code',
-        help="Technical field used to adapt the interface to the payment type selected.", readonly=True)
+    #payment_method_code = fields.Char(related='payment_method_id.code',
+    #    help="Technical field used to adapt the interface to the payment type selected.", readonly=True)
     cheque_books_id = fields.Many2one(comodel_name='cheque.books', domain=lambda self: self.get_cheque_number())
     cheque_number_rel = fields.Char()
     multi_check_payment = fields.Boolean(related='journal_id.multi_cheque_book')

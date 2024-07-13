@@ -112,7 +112,9 @@
         <record id="crm_team_view_tree" model="ir.ui.view">
             <field name="name">company.team.tree</field>
             <field name="model">company.team</field>
+            <!--
             <field name="field_parent">child_ids</field>
+            -->
             <field name="arch" type="xml">
                 <tree string="Company Team">
                     <field name="sequence" widget="handle"/>

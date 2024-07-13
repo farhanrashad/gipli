@@ -11,7 +11,7 @@
                         <button name="convert_to_reserved" type="object" string="Convert To Reserved"
                                 invisible="state != 'draft'" status="draft"/>
                         <button class="btn btn-primary" name="create_reservation" type="object"
-                                string="Create Reservation" invisible="state not in ['reserved'])"/>
+                                string="Create Reservation" invisible="state not in ['reserved']"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>

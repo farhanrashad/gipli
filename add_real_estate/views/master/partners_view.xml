@@ -45,7 +45,7 @@
                     <field name="is_broker"/>
                     <field name="nationality"/>
                     <field name="id_def"
-                           invisible = is_broker == True and is_supplier == False and is_customer == False"/>
+                           invisible="is_broker == True and is_supplier == False and is_customer == False"/>
                     <field name="social_status"
                            invisible="is_broker == True and is_supplier == False and is_customer == False"/>
                     <label for="national_issue_date_month" string="National Issue Date"
@@ -58,7 +58,7 @@
                     <field name="work_side"
                            invisible="is_broker == True and is_supplier == False and is_customer == False"/>
                     <field name="partner_ttype_id" optional="{'no_create': True,'no_open': True}"
-                           invisible=is_supplier == False"/>
+                           invisible="is_supplier == False"/>
                     <field name="c_r" invisible="is_broker == False"/>
                     <field name="acc_manager" invisible="is_broker == False"/>
                 </xpath>
@@ -113,8 +113,8 @@
                     <field name="is_eoi" invisible="is_customer == False"/>
 
 
-                    <field name="engineering_services" invisible="is_supplier','=',False)]}"/>
-                    <field name="marketing" invisible=is_supplier == False"/>
+                    <field name="engineering_services" invisible="is_supplier == False"/>
+                    <field name="marketing" invisible="is_supplier == False"/>
                     <field name="generally" invisible="is_supplier == False"/>
                 </xpath>
 

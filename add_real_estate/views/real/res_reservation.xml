@@ -18,7 +18,7 @@
                                 help="Canceled" class="oe_highlight"
                                 invisible="state not in ['reserved','draft','income']"/>
                         <button name="convert_to_reserved" type="object" string="Convert To Reserved"
-                                invisible="state', 'not in', ['draft','initial_contracted'])]}" status="draft"/>
+                                invisible="state not in ['draft','initial_contracted']" status="draft"/>
                         <button class="btn btn-primary" name="create_initial_contract" type="object" string="Create initial Contract"
                                 invisible="counter_contract_reservation !=  0"/>
                         <button class="btn btn-primary" name="create_initial_income" type="object" string="Create Income" invisible="is_create_contract ==  True or state != 'initial_contracted'"/>
