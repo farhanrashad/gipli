@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <menuitem
+            id="menu_einvoice_config"
+            parent="account.menu_finance_configuration"
+            sequence="20"
+            name="Einvoice Config"
+        />
+        <!--/////////////////////////////////////////-->
+        <record id="view_einvoice_uom_tree" model="ir.ui.view">
+            <field name="model">einvoice.uom</field>
+            <field name="arch" type="xml">
+                <tree string="Einvoice UOM" >
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="name_ar" />
+                </tree>
+            </field>
+        </record>
+        <record id="view_einvoice_uom_form" model="ir.ui.view">
+            <field name="model">einvoice.uom</field>
+            <field name="arch" type="xml">
+                <form string="Einvoice UOM">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" />
+                        <group>
+                            <field name="code" />
+                            <field name="name" />
+                            <field name="name_ar" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_einvoice_uom_search" model="ir.ui.view">
+            <field name="model">einvoice.uom</field>
+            <field name="arch" type="xml">
+                <search string="Einvoice UOM">
+                    <field name="name" />
+                </search>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_einvoice_uom_view">
+            <field name="name">Einvoice UOM</field>
+            <field name="res_model">einvoice.uom</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem
+            id="menu_einvoice_uom"
+            parent="menu_einvoice_config"
+            sequence="1"
+            action="action_einvoice_uom_view"
+        />
+        <!--/////////////////////////////////////////-->
+        <record id="view_einvoice_activity_tree" model="ir.ui.view">
+            <field name="model">einvoice.activity.type</field>
+            <field name="arch" type="xml">
+                <tree string="Einvoice Activity Type" >
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="name_ar" />
+                </tree>
+            </field>
+        </record>
+        <record id="view_einvoice_activity_type_form" model="ir.ui.view">
+            <field name="model">einvoice.activity.type</field>
+            <field name="arch" type="xml">
+                <form string="Einvoice Acivity Type">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" />
+                        <group>
+                            <field name="code" />
+                            <field name="name" />
+                            <field name="name_ar" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_einvoice_activity_type_search" model="ir.ui.view">
+            <field name="model">einvoice.activity.type</field>
+            <field name="arch" type="xml">
+                <search string="Einvoice Activity Type">
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="name_ar" />
+                </search>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_einvoice_activity_type_view">
+            <field name="name">Einvoice Activity Type</field>
+            <field name="res_model">einvoice.activity.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem
+            id="menu_einvoice_activity_type"
+            parent="menu_einvoice_config"
+            sequence="1"
+            action="action_einvoice_activity_type_view"
+        />
+        <!-- ////////////////////////////       -->
+        <record id="view_einvoice_tax_type_tree" model="ir.ui.view">
+            <field name="model">einvoice.tax.type</field>
+            <field name="arch" type="xml">
+                <tree string="Einvoice Tax Type" >
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="name_ar" />
+                </tree>
+            </field>
+        </record>
+        <record id="view_einvoice_tax_type_form" model="ir.ui.view">
+            <field name="model">einvoice.tax.type</field>
+            <field name="arch" type="xml">
+                <form string="Einvoice Tax Type">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" />
+                        <group>
+                            <field name="code" />
+                            <field name="name" />
+                            <field name="name_ar" />
+                        </group>
+                        <notebook>
+                            <page string="Subtypes">
+                                <field name="subtype_ids" />
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_einvoice_tax_type_search" model="ir.ui.view">
+            <field name="model">einvoice.tax.type</field>
+            <field name="arch" type="xml">
+                <search string="Einvoice Tax Type">
+                    <field name="name" />
+                </search>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_einvoice_tax_type_view">
+            <field name="name">Einvoice Tax Type</field>
+            <field name="res_model">einvoice.tax.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem
+            id="menu_einvoice_tax_type"
+            parent="menu_einvoice_config"
+            sequence="2"
+            action="action_einvoice_tax_type_view"
+        />
+        <!-- ////////////////////////////       -->
+        <record id="view_einvoice_tax_subtype_tree" model="ir.ui.view">
+            <field name="model">einvoice.tax.subtype</field>
+            <field name="arch" type="xml">
+                <tree string="Einvoice Tax Subtype" >
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="name_ar" />
+                    <field name="einvoice_tax_type_id" />
+                </tree>
+            </field>
+        </record>
+        <record id="view_einvoice_tax_subtype_form" model="ir.ui.view">
+            <field name="model">einvoice.tax.subtype</field>
+            <field name="arch" type="xml">
+                <form string="Einvoice Tax Subtype">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" />
+                        <group>
+                            <field name="code" />
+                            <field name="name" />
+                            <field name="name_ar" />
+                            <field name="einvoice_tax_type_id" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_einvoice_tax_subtype_search" model="ir.ui.view">
+            <field name="model">einvoice.tax.subtype</field>
+            <field name="arch" type="xml">
+                <search string="Einvoice Tax Subtype">
+                    <field name="name" />
+                </search>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_einvoice_tax_subtype_view">
+            <field name="name">Einvoice Tax Subtype</field>
+            <field name="res_model">einvoice.tax.subtype</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem
+            id="menu_einvoice_tax_subtype"
+            parent="menu_einvoice_config"
+            sequence="3"
+            action="action_einvoice_tax_subtype_view"
+        />
+        <!-- ////////////////////////////       -->
+
+        <record id="product_uom_form_view_custom" model="ir.ui.view">
+            <field name="name">uom.uom.form</field>
+            <field name="model">uom.uom</field>
+            <field name="inherit_id" ref="uom.product_uom_form_view" />
+            <field name="arch" type="xml">
+                <group name="uom_details" position="inside">
+                    <field name="einvoice_uom_id" required="1" />
+                </group>
+            </field>
+        </record>
+
+        <!-- ////////////////////////////       -->
+
+        <record id="view_tax_form_custom" model="ir.ui.view">
+            <field name="name">account.tax.form</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_form" />
+            <field name="arch" type="xml">
+                <field name="active" position="after">
+                    <field name="einvoice_tax_type_id" required="1" />
+                    <field name="einvoice_tax_subtype_id" required="1" domain="[('einvoice_tax_type_id','=',einvoice_tax_type_id)]" />
+                </field>
+            </field>
+        </record>
+
+        <!-- ////////////////////////////       -->
+
+        <record id="view_company_form_custom" model="ir.ui.view">
+            <field name="name">res.company.form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form" />
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="E-invoice Activity Types">
+                        <field name="einvoice_activity_ids" />
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <record id="view_partner_form_custom" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <field name="vat" position="after">
+                    <field name="einvoice_branch_number" />
+                    <field name="einvoice_partner_type" />
+                    <field name="einvoice_partner_number" />
+                </field>
+            </field>
+        </record>
+
+
+        <record id="product_template_form_view_custom" model="ir.ui.view">
+            <field name="name">product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view" />
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="E-invoice">
+                        <group>
+                            <group>
+                                <field name="einvoice_code_type" />
+                                <field name="einvoice_code" />
+                            </group>
+                            <group>
+
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+
+
+
+
+
+
+
+
+    </data>
+</odoo>
