@@ -1,0 +1,109 @@
+<odoo>
+
+    <record id="notify_disc_sequence" model="ir.sequence">
+        <field name="name">Notify Disc</field>
+        <field name="code">notify.disc.seq</field>
+        <field name="padding">4</field>
+        <field name="prefix">WHT</field>
+        <field name="number_increment">1</field>
+    </record>
+
+
+    <record id="notify_disc_form" model="ir.ui.view">
+        <field name="name">notify.disc.form</field>
+        <field name="model">notify.disc</field>
+        <field name="arch" type="xml">
+            <form string="Notify Disc">
+                <group col="4">
+
+                    <field name="invoice_id"/>
+                    <field name="date"/>
+                    <field name="serial" invisible="1"/>
+                    <field name="user_id" invisible="1"/>
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="amount" />
+                    <field name="vendor_id" />
+                </group>
+                <group  col="4">
+                    <field name="national_id" />
+                    <field name="file_no" />
+                    <field name="task" />
+                    <field name="value" />
+                    <field name="value2" />
+                    <field name="value3" />
+                </group>
+                <group  col="4">
+                    <field name="value_deserved" />
+                    <field name="invoice" />
+                    <field name="responsible" />
+                </group>
+                    <br/>
+                    <br/>
+                    <div class="text-center">
+                        <strong>عند توريد مشتريات / خدمات تطبيقا لاحكام المادة 59 لقانون 91 لسنه 2005</strong></div>
+            </form>
+        </field>
+    </record>
+
+    <record id="notify_disc_list" model="ir.ui.view">
+        <field name="name">notify.disc.list</field>
+        <field name="model">notify.disc</field>
+        <field name="arch" type="xml">
+            <tree string="Notify Disc">
+                <field name="date"/>
+                <field name="serial" />
+                <field name="amount" />
+                <field name="vendor_id" />
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_notify_disc" model="ir.actions.act_window">
+        <field name="name">Notify Disc</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">notify.disc</field>
+        <field name="view_mode">form,tree</field>
+        <field name="view_ids" eval="[(5,0,0),
+                          (0,0,{'view_mode':'tree', 'view_id': ref('notify_disc_list')}),
+                          (0,0,{'view_mode':'form', 'view_id': ref('notify_disc_form')})]"/>
+    </record>
+
+
+    <menuitem id="sub_menu_notify_disc"
+              name="Notify Discount"
+              sequence='2'
+              parent="account.menu_finance_payables"
+              action="action_notify_disc" />
+
+      <record id="view_move_form_button" model="ir.ui.view">
+        <field name="name">vendor.bill.form.add.button</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button string="Create Notify Discount" name="create_notify" type="object"
+                         class="btn-primary" attrs="{'invisible':['|',('state', '!=', 'posted'),('move_type', '!=', 'in_invoice')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']//tree//field[@name='name']" position="after">
+                <field name="payment_id"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']//tree//field[@name='tax_tag_invert']" position="after">
+                <button name="%(add_real_estate.edit_analytic_account_after_post_action)d"
+                        context="{'default_line_id':id}"
+                        type="action" string="Edit Analytic"
+                class="oe_highlight" groups="add_real_estate.group_edit_analytic_account_after_post" attrs="{'column_invisible':[('parent.state', '!=', 'posted')]}"
+                />
+            </xpath>
+
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="is_required_elect_no"/>
+                <field name="required_elect_no" attrs="{'required':[('is_required_elect_no','=',True)]}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
+
+</odoo>

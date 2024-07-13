@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_create_payment_lines" model="ir.ui.view">
+            <field name="name">Add Payment Strategy Lines</field>
+            <field name="model">create.payments.lines</field>
+            <field name="arch" type="xml">
+                <form string="cancel">
+                    <sheet>
+                        <group>
+                        <group>
+                            <field name="reservation_id" readonly="1" />
+                            <field name="type" widget="radio"/>
+                            <field name="payment_type"/>
+                            <field name="payment_method_id"/>
+                            <field name="amount_by"/>
+                            <field name="value"/>
+                            <field name="duration"/>
+                        </group>
+                        <group>
+                            <field name="no_of_cheques"/>
+                            <field name="cheque_start_date"/>
+                            <field name="cheque_no_start" attrs="{'invisible':[('type','=','cash')],'required':[('type','=','visa')]}"/>
+                            <field name="state_payment" />
+                            <field name="bank_name" />
+                            <field name="add_to_paid_amount" />
+                            <field name="merge_in_one_installment" />
+                            <field name="due_amount" readonly="1"  attrs="{'invisible':[('add_to_paid_amount','=',False)]}"/>
+                            <field name="amount" readonly="1"/>
+                            <field name="receipt_date" readonly="0"/>
+
+                        </group>
+                    </group>
+                        <button name="action_apply" string="Add Line" type="object" class="btn-primary"/>
+                        <notebook>
+                            <page string="Lines">
+                                <field name="lines"  widget="section_and_note_one2many">
+                                    <tree editable="bottom" create="0" >
+                                        <field name="display_type" invisible="1"/>
+                                        <field name="name" widget="section_and_note_text" />
+                                        <field name="description"  />
+                                        <field name="journal_id"/>
+                                        <field name="state_payment"/>
+                                        <field name="date"/>
+                                        <field name="receipt_date"/>
+                                        <field name="bank_name"/>
+                                        <field name="cheque"/>
+                                        <field name="is_maintainance"/>
+                                        <field name="merge_in_one_installment"/>
+                                        <field name="amount"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <footer>
+                        <button name="approve" string="Approve" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_create_payment_lines" model="ir.actions.act_window">
+            <field name="name">Add Payment Strategy Lines</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">create.payments.lines</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_create_payment_lines"/>
+            <field name="target">new</field>
+        </record>
+
+
+    </data>
+</odoo>

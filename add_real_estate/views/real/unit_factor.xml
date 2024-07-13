@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_unit_factor_form" model="ir.ui.view">
+            <field name="name">Unit Price Factor</field>
+            <field name="model">unit.price.factor</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="is_print"/>
+                            <field name="is_finish"/>
+                            <field name="finish_of_property_id" attrs="{'invisible':[('is_finish','=',False)]}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_unit_factor_tree" model="ir.ui.view">
+            <field name="name">Unit Price Factor</field>
+            <field name="model">unit.price.factor</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="is_print"/>
+                    <field name="is_finish"/>
+                    <field name="finish_of_property_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_unit_factor" model="ir.actions.act_window">
+            <field name="name">Unit Price Factor</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">unit.price.factor</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_unit_factor_action" name="Unit Price Factor" parent="configuration_sub"
+                  action="action_unit_factor" sequence="200"/>
+
+        <record id="view_factor_line_price_form" model="ir.ui.view">
+            <field name="name">Unit Price Factors</field>
+            <field name="model">unit.price.lines</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="unit_id"/>
+                            <field name="factor_id"/>
+                            <field name="space"/>
+                            <field name="price"/>
+                            <field name="total" sum="Total"/>
+                            <field name="is_print"/>
+                        </group>
+
+                    </sheet>
+                          <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record id="view_factor_line_price_tree" model="ir.ui.view">
+            <field name="name">Unit Price Factors</field>
+            <field name="model">unit.price.lines</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="unit_id"/>
+                    <field name="factor_id"/>
+                    <field name="space"/>
+                    <field name="price"/>
+                    <field name="total" sum="Total"/>
+                    <field name="is_print"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_factor_line_price" model="ir.actions.act_window">
+            <field name="name">Unit Price Factors</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">unit.price.lines</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

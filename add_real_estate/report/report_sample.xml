@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="0">
+        <!--        <report-->
+        <!--                id="report_request_reservation_id"-->
+        <!--                string="Request Reservation"-->
+        <!--                model="request.reservation"-->
+        <!--                report_type="qweb-pdf"-->
+        <!--                file="add_real_estate.report_request_reservation_test"-->
+        <!--                name="add_real_estate.report_request_reservation_test"-->
+        <!--                groups="add_real_estate.group_print_request_reservation_action"-->
+        <!--        />-->
+
+        <record id="report_request_reservation_id" model="ir.actions.report">
+            <field name="name">Request Reservation</field>
+            <field name="model">request.reservation</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.report_request_reservation_test</field>
+            <field name="report_file">add_real_estate.report_request_reservation_test</field>
+            <field name="binding_model_id" ref="add_real_estate.model_request_reservation"/>
+            <field name="binding_type">report</field>
+            <field name="groups_id" eval="[(4, ref('add_real_estate.group_print_request_reservation_action'))]"/>
+
+        </record>
+
+        <!--        <report-->
+        <!--                id="report_reservation_base"-->
+        <!--                string="Reservation"-->
+        <!--                model="res.reservation"-->
+        <!--                report_type="qweb-pdf"-->
+        <!--                file="add_real_estate.report_reservation"-->
+        <!--                name="add_real_estate.report_reservation"-->
+        <!--                groups="add_real_estate.group_print_request_reservation_action"-->
+        <!--        />-->
+        <record id="report_reservation_base" model="ir.actions.report">
+            <field name="name">Reservation</field>
+            <field name="model">res.reservation</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.report_reservation</field>
+            <field name="report_file">add_real_estate.report_reservation</field>
+            <field name="binding_model_id" ref="add_real_estate.model_res_reservation"/>
+            <field name="binding_type">report</field>
+            <field name="groups_id" eval="[(4, ref('add_real_estate.group_print_request_reservation_action'))]"/>
+        </record>
+        <!--        <report-->
+        <!--                id="report_payment_base"-->
+        <!--                string="Payments"-->
+        <!--                model="res.reservation"-->
+        <!--                report_type="qweb-pdf"-->
+        <!--                file="add_real_estate.report_payment"-->
+        <!--                name="add_real_estate.report_payment"-->
+        <!--                groups="add_real_estate.group_print_payments_reservation_action"-->
+        <!--        />-->
+        <record id="report_payment_base" model="ir.actions.report">
+            <field name="name">Payments</field>
+            <field name="model">res.reservation</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.report_payment</field>
+            <field name="report_file">add_real_estate.report_payment</field>
+            <field name="binding_model_id" ref="add_real_estate.model_res_reservation"/>
+            <field name="binding_type">report</field>
+            <field name="groups_id" eval="[(4, ref('add_real_estate.group_print_payments_reservation_action'))]"/>
+        </record>
+
+<!--        <report-->
+<!--                id="report_payment_receipt_base"-->
+<!--                string="Payments Receipt"-->
+<!--                model="res.reservation"-->
+<!--                report_type="qweb-pdf"-->
+<!--                file="add_real_estate.report_receipt_payment"-->
+<!--                name="add_real_estate.report_receipt_payment"-->
+<!--                groups="add_real_estate.group_print_payments_reservation_action"-->
+<!--        />-->
+        <record id="report_payment_receipt_base" model="ir.actions.report">
+            <field name="name">Payments Receipt</field>
+            <field name="model">res.reservation</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.report_receipt_payment</field>
+            <field name="report_file">add_real_estate.report_receipt_payment</field>
+            <field name="binding_model_id" ref="add_real_estate.model_res_reservation"/>
+            <field name="binding_type">report</field>
+            <field name="groups_id" eval="[(4, ref('add_real_estate.group_print_payments_reservation_action'))]"/>
+        </record>
+
+<!--        <report-->
+<!--                id="report_customer_payment_base"-->
+<!--                string="Customer Payments"-->
+<!--                model="customer.payment"-->
+<!--                report_type="qweb-pdf"-->
+<!--                file="add_real_estate.report_customer_payment"-->
+<!--                name="add_real_estate.report_customer_payment"-->
+<!--        />-->
+
+        <record id="report_customer_payment_base" model="ir.actions.report">
+            <field name="name">Customer Payments</field>
+            <field name="model">customer.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.report_customer_payment</field>
+            <field name="report_file">add_real_estate.report_customer_payment</field>
+            <field name="binding_model_id" ref="add_real_estate.model_customer_payment"/>
+            <field name="binding_type">report</field>
+        </record>
+
+<!--        <report-->
+<!--                id="payment_request_report_id"-->
+<!--                model="request.reservation"-->
+<!--                string="Payment Request Report"-->
+<!--                name="add_real_estate.payment_request_report_template"-->
+<!--                file="add_real_estate.payment_request_report_template"-->
+<!--                report_type="qweb-pdf"-->
+<!--                menu="False"-->
+<!--        />-->
+
+        <record id="payment_request_report_id" model="ir.actions.report">
+            <field name="name">Payment Request Report</field>
+            <field name="model">request.reservation</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.payment_request_report_template</field>
+            <field name="report_file">add_real_estate.payment_request_report_template</field>
+            <field name="binding_model_id" ref="add_real_estate.model_request_reservation"/>
+            <field name="binding_type">report</field>
+        </record>
+
+<!--        <report-->
+<!--                id="payment_reservation_report_id"-->
+<!--                model="res.reservation"-->
+<!--                string="Payment Reservation Report"-->
+<!--                name="add_real_estate.payment_reservation_report_template"-->
+<!--                file="add_real_estate.payment_reservation_report_template"-->
+<!--                report_type="qweb-pdf"-->
+<!--                menu="False"-->
+<!--        />-->
+        <record id="payment_reservation_report_id" model="ir.actions.report">
+            <field name="name">Payment Reservation Report</field>
+            <field name="model">res.reservation</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.payment_reservation_report_template</field>
+            <field name="report_file">add_real_estate.payment_reservation_report_template</field>
+            <field name="binding_model_id" ref="add_real_estate.model_res_reservation"/>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>
+

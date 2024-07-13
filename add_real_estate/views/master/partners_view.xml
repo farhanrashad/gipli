@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+                <record id='inherit_view_partner_form' model='ir.ui.view'>
+            <field name='name'>view.partner.form</field>
+            <field name='model'>res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name='arch' type='xml'>
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="national_issue_date"/>
+                </xpath>
+                <xpath expr="//group[@name='sale']/field[@name='user_id']" position="before">
+                    <field name="is_customer"/>
+                    <field name="is_salesperson"/>
+                </xpath>
+                <xpath expr="//group[@name='purchase']/field[@name='property_supplier_payment_term_id']"
+                       position="before">
+                    <field name="is_supplier"/>
+                </xpath>
+
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="nationality"/>
+                    <field name="id" string="Data Base ID" optional="hide"/>
+                    <field name="id_def"
+                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                    <field name="social_status"
+                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                    <label for="national_issue_date_month" string="National Issue Date"
+                    />
+                    <div class="o_row">
+                        <field name="national_issue_date_month" placeholder="Month"/>
+                        <field name="national_issue_date_year" placeholder="Year"/>
+                    </div>
+                    <field name="positon"/>
+                    <field name="work_side"
+                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                    <field name="partner_ttype_id" optional="{'no_create': True,'no_open': True}"
+                           attrs="{'invisible':[('is_supplier','=',False)]}"/>
+                    <field name="c_r" attrs="{'invisible':[('is_broker','=',False)]}"/>
+                    <field name="acc_manager" attrs="{'invisible':[('is_broker','=',False)]}"/>
+                </xpath>
+                <xpath expr="//field[@name='child_ids']//form//field[@name='comment']" position="after">
+                    <field name="is_customer"/>
+                    <field name="is_supplier"/>
+                    <field name="is_broker"/>
+                    <field name="nationality"/>
+                    <field name="id_def"
+                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                    <field name="social_status"
+                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                    <label for="national_issue_date_month" string="National Issue Date"
+                    />
+                    <div class="o_row">
+                        <field name="national_issue_date_month" placeholder="Month"/>
+                        <field name="national_issue_date_year" placeholder="Year"/>
+                    </div>
+                    <field name="positon"/>
+                    <field name="work_side"
+                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                    <field name="partner_ttype_id" optional="{'no_create': True,'no_open': True}"
+                           attrs="{'invisible':[('is_supplier','=',False)]}"/>
+                    <field name="c_r" attrs="{'invisible':[('is_broker','=',False)]}"/>
+                    <field name="acc_manager" attrs="{'invisible':[('is_broker','=',False)]}"/>
+                </xpath>
+                <xpath expr="//notebook/page[2]/group/group/field[@name='property_supplier_payment_term_id']"
+                       position="after">
+                    <field name="id" string="Data Base ID"/>
+                    <field name="is_broker"/>
+                </xpath>
+                <xpath expr="//field[@name='function']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='website']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('is_supplier','=',False)]}</attribute>
+                </xpath>
+<!--                <xpath expr="//field[@name='lang']" position="attributes">-->
+<!--                    <attribute name="attrs">{'invisible':[('is_supplier','=',False)]}</attribute>-->
+<!--                </xpath>-->
+<!--                <xpath expr="//label[@for='lang']" position="attributes">-->
+<!--                    <attribute name="attrs">{'invisible':[('is_supplier','=',False)]}</attribute>-->
+<!--                </xpath>-->
+<!--                <xpath expr="//button[@name='%(base.res_lang_act_window)d']" position="attributes">-->
+<!--                    <attribute name="attrs">{'invisible':[('is_supplier','=',False)]}</attribute>-->
+<!--                </xpath>-->
+                <xpath expr="//field[@name='city']" position="attributes">
+                    <attribute name="attrs">
+                        {'invisible':[('is_customer','=',True),('is_supplier','=',False),('is_broker','=',False)]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='zip']" position="attributes">
+                    <attribute name="attrs">
+                        {'invisible':[('is_customer','=',True),('is_supplier','=',False),('is_broker','=',False)]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='state_id']" position="attributes">
+                    <attribute name="attrs">
+                        {'invisible':[('is_customer','=',True),('is_supplier','=',False),('is_broker','=',False)]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//group[@name='purchase']/field[@name='property_supplier_payment_term_id']"
+                       position="before">
+                    <field name="partner_file_no"/>
+                    <field name="partner_mamoria"/>
+                    <field name="partner_tx_code"/>
+                </xpath>
+                <xpath expr="//field[@name='property_account_payable_id']" position="after">
+                    <field name="is_employee"/>
+                    <field name="petty_account" attrs="{'invisible':[('is_employee','=',False)]}"
+                           domain="[('petty','=',True)]"/>
+                    <field name="custody_account" attrs="{'invisible':[('is_employee','=',False)]}"
+                           domain="[('custody','=',True)]"/>
+                    <field name="accrued_account" attrs="{'invisible':[('is_employee','=',False)]}"
+                           domain="[('accrued','=',True)]"/>
+                    <field name="other_account" attrs="{'invisible':[('is_employee','=',False)]}"
+                           domain="[('other','=',True)]"/>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="is_unit_payments" attrs="{'invisible':[('is_customer','=',False)]}"/>
+                    <field name="is_business_insurance" attrs="{'invisible':[('is_customer','=',False)]}"/>
+                    <field name="is_maintenance" attrs="{'invisible':[('is_customer','=',False)]}"/>
+                    <field name="is_eoi" attrs="{'invisible':[('is_customer','=',False)]}"/>
+
+
+                    <field name="engineering_services" attrs="{'invisible':[('is_supplier','=',False)]}"/>
+                    <field name="marketing" attrs="{'invisible':[('is_supplier','=',False)]}"/>
+                    <field name="generally" attrs="{'invisible':[('is_supplier','=',False)]}"/>
+                </xpath>
+
+
+            </field>
+        </record>
+        <record id="view_res_partner_filter_tfproperty_account_prepayableree_search" model="ir.ui.view">
+            <field name="name">res.partner.inherit.search</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="mobile" string="Mobile" filter_domain="[('mobile','ilike', self)]"/>
+                    <filter name="group_partner_ttype_id" string="partner Type"
+                            context="{'group_by': 'partner_ttype_id'}"/>
+                </field>
+                <xpath expr="//filter[@name='inactive']" position="before">
+                    <filter string="Customer Invoices" name="customer"
+                            domain="['|',('customer_rank','>', 0),('is_customer','=',True)]"/>
+                    <filter string="Vendor Bills" name="supplier"
+                            domain="['|',('supplier_rank','>', 0),('is_supplier','=',True)]"/>
+                    <filter string="SalesPerson" name="is_salesperson" domain="[('is_salesperson','=',True)]"/>
+                    <separator/>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="action_broker_form" model="ir.actions.act_window">
+            <field name="name">Brokers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <!--            <field name="view_type">form</field>-->
+            <field name="domain">[('is_broker','=',1)]</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{'default_is_broker':1,'default_customer':0}</field>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Click to add a Broker.</p>
+                <p>
+                    Odoo helps you easily track all activities related to a Brokers
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem parent="configuration_sub"
+                  id="menu_brokers"
+                  name="Brokers"
+                  action="add_real_estate.action_broker_form"/>
+
+
+        <record id="action_partner_type" model="ir.actions.act_window">
+            <field name="name">Partner Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">partner.ttype</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_partner_type_action_" name="Partner Type" parent="contacts.res_partner_menu_config"
+                  action="action_partner_type" sequence="300"/>
+
+
+        <record id="view_partner_tree_7000" model="ir.ui.view">
+            <field name="name">res.partner.tree</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='phone']" position="after">
+                    <field name="mobile" optional="hide"/>
+                    <field name="is_customer_char" optional="hide"/>
+                    <field name="is_supplier_char" optional="hide"/>
+                    <field name="id" string="Data Base ID" optional="hide"/>
+                    <field name="category_id" widget="many2many_tags" optional="hide"/>
+                    <field name="ref" optional="hide"/>
+                </xpath>
+
+            </field>
+        </record>
+        <record id="base.view_partner_tree" model="ir.ui.view">
+            <field name="name">res.partner.tree</field>
+            <field name="model">res.partner</field>
+            <field eval="8" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="Contacts">
+                    <field name="display_name" string="Name" optional="show"/>
+                    <field name="function" invisible="1"/>
+                    <field name="phone" class="o_force_ltr" optional="show"/>
+                    <field name="email" optional="show"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                    <field name="city" optional="hide"/>
+                    <field name="state_id" optional="hide"/>
+                    <field name="country_id" optional="hide"/>
+                    <field name="vat" optional="hide"/>
+                    <field name="user_id" invisible="1"/>
+                    <field name="is_company" invisible="1"/>
+                    <field name="parent_id" invisible="1"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+        <record id="account.res_partner_action_customer" model="ir.actions.act_window">
+            <field name="name">Customers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{'search_default_customer': 1,'res_partner_search_mode': 'customer',
+                'default_is_company': True, 'default_customer_rank': 1, 'default_is_customer': True}
+            </field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new customer in your address book
+                </p>
+                <p>
+                    Odoo helps you easily track all activities related to a customer.
+                </p>
+            </field>
+        </record>
+        <record id="account.res_partner_action_supplier" model="ir.actions.act_window">
+            <field name="name">Vendors</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{'search_default_supplier': 1,'res_partner_search_mode': 'supplier',
+                'default_is_company': True, 'default_supplier_rank': 1, 'default_is_supplier': True}
+            </field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new supplier in your address book
+                </p>
+                <p>
+                    Odoo helps you easily track all activities related to a supplier.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_customer" model="ir.actions.act_window">
+            <field name="name">Customer</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[('is_customer', '=', True)]</field>
+            <field name="context">{'default_is_customer': '1'}</field>
+            <field name="view_mode">kanban,tree,form</field>
+        </record>
+        <menuitem action="action_customer" id="customer_menu_item" name="Customer"
+                  parent="add_real_estate.configuration_sub" sequence="99"/>
+
+
+    </data>
+</odoo>

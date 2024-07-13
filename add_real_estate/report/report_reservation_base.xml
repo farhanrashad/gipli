@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_reservation_document">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600')
+            </style>
+            <t t-call="add_real_estate.header_footer_template"/>
+
+            <t t-call="web.external_layout">
+                <!--			<t t-set="o" t-value="o.with_context(lang=o.customer_id.lang)"/>-->
+
+                <div class="page" style="font-size: 14px;text-align:right;font-family: 'Cairo';" dir="rtl">
+                    <div class="text-center" style="font-size: 14px;text-align:right;">
+                        <!--						<h3>استمارة حجز وحدة بمشروع <span t-field="o.project_id"/> </h3>-->
+                        <span style="font-weight: bolder;">استمارة
+                            حجز وحدة بمشروع
+                            <span t-field="o.project_id"/>
+                        </span>
+                        <br/>
+                        <span style="font-weight: bolder;">شركة
+                            <span t-field="o.company_id.name"/>
+                        </span>
+                    </div>
+
+                    <div>التاريخ :
+                        <span t-field="o.date"/>
+                        بموجب هذه الاستمارة تم الاتفاق بين كل من :-
+                    </div>
+                    <div style="font-weight: bolder;" class="for_inheit">
+                       <span>اولا :- </span>
+                           <span t-esc="request.env['real.company.data'].search([('name','=',o.company_id.id)],limit=1).company_details"/>
+
+                    </div>
+
+                    <!--					بيانات العميل-->
+                    <span style="font-weight: bolder;">ثانيا - بيانات
+                        العميل :-
+                    </span>
+                    <br/>
+
+                    <!--                    <br/>-->
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-6">
+                                الاسم :-
+                                <span t-field="o.customer_id"/>
+                            </div>
+                            <div class="col-6">
+                                الجنسية :-
+                                <span t-field="o.customer_id.nationality"/>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <br/>-->
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-6">
+                                العنوان :-
+                                <span t-field="o.address"/>
+                            </div>
+                            <div class="col-3">
+                                الهاتف1:-
+                                <span t-field="o.phone"/>
+                            </div>
+                             <div class="col-3" t-if="o.mobile">
+                                    الهاتف2 :-
+                                    <span t-field="o.mobile"/>
+                                </div>
+                        </div>
+                    </div>
+                    <!--                    <br/>-->
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-6">
+                                الرقم القومى / جواز السفر :-
+                                <span t-field="o.customer_id.id_def"/>
+                            </div>
+                            <div class="col-6">
+                                تاريخ الاصدار :-
+                                <span t-esc="o.national_issue_date_month"/>/
+                                <span t-esc="o.national_issue_date_year"/>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <br/>-->
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-6">
+                                البريد الالكترونى :-
+                                <span t-field="o.email"/>
+                            </div>
+                            <div class="col-6">
+                                الحالة الاجتماعية :-
+                                <span t-field="o.social_status"/>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-6">
+                                الوظيفة :-
+                                <span t-esc="o.customer_id.positon"/>
+                            </div>
+                            <div class="col-6">
+                                جهة العمل :-
+                                <span t-field="o.work_side"/>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <br/>-->
+
+                    <t t-foreach="o.more_owner_ids" t-as="child">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-6">
+                                    الاسم :-
+                                    <span t-field="child.name"/>
+                                </div>
+                                <div class="col-6">
+                                    الجنسية :-
+                                    <span t-field="child.nationality"/>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--                    <br/>-->
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-6">
+                                    العنوان :-
+                                    <span t-field="child.street"/>
+                                </div>
+                                <div class="col-3">
+                                    الهاتف1 :-
+                                    <span t-field="child.phone"/>
+                                </div>
+                                  <div class="col-3" t-if="child.mobile">
+                                    الهاتف2 :-
+                                    <span t-field="child.mobile"/>
+                                </div>
+                            </div>
+                        </div>
+                        <!--                    <br/>-->
+
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-6">
+                                    الرقم القومى / جواز السفر :-
+                                    <span t-field="child.id_def"/>
+                                </div>
+                                <div class="col-6">
+                                    تاريخ الاصدار :-
+                                    <span t-esc="child.national_issue_date_month"/>/
+                                    <span t-esc="child.national_issue_date_year"/>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--                    <br/>-->
+
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-6">
+                                    البريد الالكترونى :-
+                                    <span t-field="child.email"/>
+                                </div>
+                                <div class="col-6">
+                                    الحالة الاجتماعية :-
+                                    <span t-field="child.social_status"/>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-6">
+                                    الوظيفة :-
+                                    <span t-esc="child.positon"/>
+                                </div>
+                                <div class="col-6">
+                                    جهة العمل :-
+                                    <span t-field="child.work_side"/>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--                    <br/>-->
+
+                    </t>
+
+
+                    <!--					بيانات الوحدة -->
+                    <span style="font-weight: bolder;">ثالثاَ - بيانات الوحدة :-</span>
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-4">
+                                الوحدة رقم :-
+                                <span t-field="o.property_code"/>
+                            </div>
+                            <div class="col-4">
+                                من نموذج رقم :-
+                                <span t-field="o.sudo().property_id.type_of_property_id.name"/>
+
+                            </div>
+                            <div class="col-4">
+                                نوع التشطيب :-
+                                <span t-field="o.finish_of_property"/>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--                    <br/>-->
+
+                    <!--					اجمالى المساحة -->
+                    <span style="font-weight: bolder;">والبالغ اجمالى مساحتها تحت العجز و الزيادة كالتالى :-</span>
+                    <br/>
+                    <t t-if="o.property_id.unit_price_lines">
+                        <t t-foreach="list(o.chunks(o.property_id.unit_price_lines,3))" t-as="uuint">
+
+                            <div class="container">
+                                <div class="row">
+                                    <t t-foreach="uuint" t-as="prod">
+                                        <t t-if="prod.is_print">
+                                            <div class="col-4">
+                                                  متر مربع
+                                                <span t-esc="prod.factor_id.name"/>
+                                                -:
+                                                <span t-field="prod.space"/>
+
+                                            </div>
+                                        </t>
+
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <div class="container">
+                        <div class="row">
+                            <div class="col-4">
+                                مساحة الارض :-
+                                <span t-field="o.property_id.plot_area"/>
+
+                            </div>
+                            <div class="col-4">
+                                مساحة المبانى :-
+                                <span t-field="o.property_id.sellable"/>
+
+                            </div>
+                            <div class="col-4" t-if="o.property_id.is_pool">
+                                حمام السباحة :-
+                                <span t-field="o.property_id.number_of_pool"/>
+
+                            </div>
+                        </div>
+                    </div>
+                        <!--                    <div name="garden"></div>-->
+
+                    </t>
+<!--                        <div class="container">-->
+<!--                            <div class="row">-->
+<!--                                <div class="col-6" name="garden" t-if="o.show_garden" style="display:none">-->
+<!--                                    حديقة اضافية حق انتفاع بمساحة (-->
+<!--                                    <span t-field="o.property_id.front_yard"/>-->
+<!--                                    ) متر مربع-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+<!--                        </div>-->
+
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-4" style="font-weight: bolder;">
+                                اجمالى قيمة الوحدة :-
+                                <!--                                <span t-field="o.net_price"/>-->
+                                <span t-field="o.net_price"/>
+                            </div>
+                            <div class="col-8">
+                                مبلغ و قدره :
+                                <span t-esc="o.ar_amount_to_text(o.net_price)"/>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!--					نظام السداد -->
+                    <span style="font-weight: bolder;">رابعاَ - نظام السداد :-</span>
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <span t-field="o.Description_payment_description"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--					نظام السداد -->
+                    <span style="font-weight: bolder;">خامساَ - شروط الحجز :-</span>
+
+                    <div class="container">
+                        <div class="row">
+                            <span t-field="o.project_id.condition_terms"/>
+                        </div>
+                    </div>
+
+                    <span t-if="o.sales_type == 'Broker'" style="font-weight: bolder;">سادساَ - بيانات البيع غير مباشر
+                        :-
+                    </span>
+
+                    <div class="container" t-if="o.sales_type == 'Broker'">
+                        <div class="row">
+
+                            <div class="col-6" style="font-weight: bolder;">
+                                اسم الوسيط :-
+                                <span t-field="o.broker_id.name"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-4">
+                                مسئول المبيعات :
+                                <br/>
+                                <span t-field="o.sale_person_2_id.name"/>
+
+                            </div>
+                            <div class="col-4">
+                                أعتماد مدير المبيعات :
+                                <br/>
+                                <!--                                            <span t-field="o.manager_tesm_2_id.name"/>-->
+                            </div>
+                            <div class="col-4">
+                                العميل :-
+                                <br/>
+                                <span t-field="o.customer_id.name"/>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </t>
+        </template>
+
+        <template id="report_reservation">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+
+                    <t t-call="add_real_estate.report_reservation_document"/>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

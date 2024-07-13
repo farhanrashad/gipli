@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+
+                <template id="report_payment_document_all_check">
+
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600')
+            </style>
+
+            <t t-call="web.external_layout">
+                <!--			<t t-set="o" t-value="o.with_context(lang=o.customer_id.lang)"/>-->
+                <div class="page" style="font-size: 14px;font-family: 'Cairo';" dir="rtl">
+
+                    <t t-if="docs">
+                        <div class="text-right">
+                        <h5>
+                            <span t-esc="docs[0].company_id.name_arabic"/>
+                        </h5>
+                        <div class="container part1 text-right">
+                            <div class="row">
+                                <div class="col-6">
+                                    <span t-field="docs[0].create_uid.name_Branch"/>
+                                </div>
+                                <!--                            <div class="col-6 text-left">-->
+                                <!--                                أذن رقم  :- -->
+                                <!--                                <span t-field="o.payment_code"/>-->
+
+                                <!--                            </div>-->
+                            </div>
+                        </div>
+                        <!--						<h5>-->
+                        <!--							<span t-field="o.create_uid.name_Branch"/>-->
+                        <!--						</h5>-->
+                    </div>
+                        <div class="text-center" style="font-size: 14px;text-align:right;">
+                               <span style="border-bottom: 1px solid black;padding-bottom: 3px;font-weight: bolder;">
+                                    ايصالات استلام
+                                </span>
+
+                    </div>
+                        <br/>
+                                            <div class="container part1 text-right">
+                        <div class="row">
+                            <div class="col-6">
+                                التاريخ :-
+                                <span t-field="docs[0].payment_date"/>
+                            </div>
+                            <div class="col-6 text-left">
+                                مبلغ :-
+                                #<span
+                                    t-esc="sum(docs.mapped(lambda line:line.get_convert_amount2()))"
+                                    t-options='{"widget": "integer", "decimal_precision": "Product Unit of Measure"}'/>#
+
+                            </div>
+                        </div>
+                    </div>
+                                            <div class="container part2 text-right">
+                        <div class="row">
+                            <div class="col-6">
+                                استلمت من السيد /
+                                <span t-field="docs[0].partner_id.name"/>
+
+                                <t t-foreach="docs[0].partner_id.child_ids" t-as="child">
+                                   - <span t-field="child.name"/>
+                                </t>
+                            </div>
+                            <div class="col-6 text-left">
+                                عدد :-
+                                <span t-esc="len(docs)"/>
+
+                            </div>
+                        </div>
+                    </div>
+                                            <div class="container part3 text-right">
+                        <div class="row">
+                            <div class="col-12">
+                                مبلغ و قدره :
+                                <span t-esc="docs[0].ar_amount_to_text(sum(docs.mapped(lambda line:line.get_convert_amount2())))"/>
+                            </div>
+                        </div>
+                    </div>
+                                            <br/>
+
+                    <table style="border-collapse: collapse;border: thin solid black;" width="100%">
+                        <thead style="border-collapse: collapse; border: thin solid black;">
+                            <th class="text-center" style="border-collapse: collapse;border: thin solid black;">
+                                <strong>م</strong>
+                            </th>
+
+
+                            <th class="text-center" style="border-collapse: collapse;border: thin solid black;">
+                                <strong>رقم </strong>
+                            </th>
+                            <th class="text-center" style="border-collapse: collapse;border: thin solid black;">
+                                <strong>المبلغ</strong>
+                            </th>
+                            <th class="text-center" style="border-collapse: collapse;border: thin solid black;">
+                                <strong> تاريخ الاستحقاق </strong>
+                            </th>
+                            <th class="text-center" style="border-collapse: collapse;border: thin solid black;">
+                                <strong>البنك</strong>
+                            </th>
+                        </thead>
+                        <tbody style="border-collapse: collapse;border: thin solid black;">
+
+                            <t t-foreach="docs" t-as="line">
+                                                                   <tr>
+                                        <td style="border-collapse: collapse;border: thin solid black;"
+                                            class="text-center">
+                                            <span t-esc="line_index+1"/>
+                                        </td>
+
+                                        <td style="border-collapse: collapse;border: thin solid black;"
+                                            class="text-center">
+                                            <span t-esc="line.check_id.check_number"/>
+                                        </td>
+                                        <td style="border-collapse: collapse;border: thin solid black;"
+                                            class="text-center">
+                                            <span t-esc="line.get_convert_amount2()"
+                                                  t-options='{"widget": "integer", "decimal_precision": "Product Unit of Measure"}'/>
+                                        </td>
+                                        <td style="border-collapse: collapse;border: thin solid black;"
+                                            class="text-center">
+                                            <span t-esc="line.check_id.check_date"/>
+                                        </td>
+                                        <td style="border-collapse: collapse;border: thin solid black;"
+                                            class="text-center">
+                                            <span t-esc="line.check_id.check_bank.name"/>
+                                        </td>
+
+                                    </tr>
+
+                            </t>
+
+                        </tbody>
+                    </table>
+
+                    <hr/>
+
+                    <div class="container last text-right">
+                        <div class="row">
+                            <div class="col-6">
+                                محاسب :
+                            </div>
+                            <div class="col-6">
+                                اعتماد :
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    </t>
+
+
+
+
+
+
+
+                </div>
+            </t>
+        </template>
+
+
+       <template id="report_payment_all_cehck">
+            <t t-call="web.html_container">
+                    <t t-call="check_management.report_payment_document_all_check"/>
+            </t>
+        </template>
+
+
+            <report
+            id="report_payment_base_all_check"
+            string="ايصال مجمع"
+            model="normal.payments"
+            report_type="qweb-pdf"
+            file="check_management.report_payment_all_cehck"
+            name="check_management.report_payment_all_cehck"
+        />
+    </data>
+</odoo>

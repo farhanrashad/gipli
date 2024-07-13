@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="account_batch_deposit_id" model="ir.ui.view">
+            <field name="name">account batch deposit</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_form"/>
+            <field name="arch" type="xml">
+
+
+                <xpath expr="//field[@name='deprecated']" position="after">
+                    <field name="is_batch_deposit"/>
+                    <field name="expenses_for_unit_check"/>
+                    <field name="petty"/>
+                    <field name="custody"/>
+                    <field name="accrued"/>
+                    <field name="other"/>
+                    <field name="accounting_allocation"/>
+                    <field name="partner_required_in_journal_entry"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+        <record id="view_move_form520" model="ir.ui.view">
+            <field name="name">account.move.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='line_ids']//tree//field[@name='name']" position="after">
+                    <field name="cheque_number_line"/>
+                </xpath>
+
+
+                <xpath expr="//button[@name='action_post'][1]" position="attributes">
+                    <attribute name="groups">add_real_estate.group_show_post_button</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_post'][2]" position="attributes">
+                    <attribute name="groups">add_real_estate.group_show_post_button</attribute>
+                </xpath>
+
+                  <xpath expr="//button[@name='button_draft']" position="attributes">
+                    <attribute name="groups">add_real_estate.group_resest_to_draft_inv</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='line_ids']//field[@name='account_id']" position="before">
+                    <field name="serial_no"/>
+                </xpath>
+                <xpath expr="//button[@name='action_reverse']" position="attributes">
+                    <attribute name="groups">add_real_estate.group_add_credit_note</attribute>
+                </xpath>
+                <xpath expr="//field[@name='team_id']" position="after">
+                    <field name="source_doc_readonly" invisible="1"/>
+                    <field name="source_doc" attrs="{'readonly':[('source_doc_readonly','=',True)]}"/>
+                    <field name="tax_code" force_save="1" readonly="0"/>
+                    <field name="deal" force_save="1" readonly="0"/>
+                    <field name="tax_discount_percentage" force_save="1" readonly="0"/>
+                    <field name="new_discount_type" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="discount_code"/>
+                </xpath>
+                <xpath expr="//field[@name='ref']" position="after">
+                    <field name="draft_no" readonly="1"/>
+
+
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Invoice Details">
+                        <field name="invoice_details">
+                            <tree editable="bottom">
+                                <field name="header_1"/>
+                                <field name="header_2"/>
+
+                            </tree>
+                        </field>
+                    </page>
+
+                </xpath>
+                <xpath expr="//label[@for='invoice_date']" position="attributes">
+                    <attribute name="string">Date Accounting</attribute>
+                </xpath>
+                <xpath expr="//field[@name='invoice_date']" position="after">
+                    <field name="custom_invoice_date" required="0"/>
+                </xpath>
+
+                <xpath expr="//field[@name='ref']" position="after">
+
+                    <field name="installment_type"/>
+                     <field name="reservation_id" readonly="1"/>
+                    <field name="property_id" readonly="1"/>
+                    <field name="state_payment"/>
+                    <field name="cheque"/>
+                    <field name="deposite"/>
+                    <field name="is_maintainance"/>
+                    <field name="statement_ref"/>
+                    <field name="document_type_id"
+                           options="{'no_quick_create': True, 'no_create_edit' : True,'on_open   ' : True}"/>
+                    <field name="external_document_number"/>
+                    <field name="external_document_type"/>
+                    <field name="payment_papers"/>
+                    <field name="muayada"/>
+                </xpath>
+                <xpath expr="//field[@name='line_ids']//tree//field[@name='name']" position="after">
+                    <field name="date_maturity" optional="hide"/>
+                    <field name="reservation_id" optional="hide" readonly="1"/>
+                    <field name="property_id" optional="hide" readonly="1"/>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+                    <field name="reservation_id" optional="hide" readonly="1"/>
+                    <field name="property_id" optional="hide" readonly="1"/>
+                </xpath>
+
+
+
+            </field>
+        </record>
+        <record id="view_move_line_tree5205" model="ir.ui.view">
+            <field name="name">account.move.line.tree</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_move_line_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='account_id']" position="before">
+                    <field name="serial_no"/>
+                </xpath>
+                   <xpath expr="//field[@name='name']" position="after">
+                    <field name="cheque_number_line"/>
+                    <field name="reservation_id"/>
+                    <field name="property_id"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
+        <record id="view_account_form_52880" model="ir.ui.view">
+            <field name="name">account.account.form</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='deprecated']" position="after">
+                    <label for="account_ref"/>
+                    <div class="o_row">
+                        <field name="account_ref"/>
+                        <field name="account_ref_id" attrs="{'invisible':[('account_ref','=',False)]}"/>
+                    </div>
+                    <field name="paid_or_no"/>
+
+                </xpath>
+            </field>
+        </record>
+        <!--        <record id="view_bank_statement_form_52880" model="ir.ui.view">-->
+        <!--            <field name="name">account.bank.statement.form</field>-->
+        <!--            <field name="model">account.bank.statement</field>-->
+        <!--            <field name="inherit_id" ref="account.view_bank_statement_form"/>-->
+        <!--            <field name="arch" type="xml">-->
+
+        <!--                <xpath expr="//field[@name='ref']" position="before">-->
+        <!--                    <field name="account_id" readonly="1" force_save="1"/>-->
+        <!--                    <field name="account_ref_id" options="{'no_create':True, 'no_edit':True, 'no_open':True}"/>-->
+        <!--                    <field name="analytic_account_id" options="{'no_create':True, 'no_edit':True, 'no_open':True}"/>-->
+        <!--                    <field name="analytic_tag_ids" options="{'no_create':True, 'no_edit':True, 'no_open':True}"-->
+        <!--                           widget="many2many_tags"/>-->
+
+        <!--                </xpath>-->
+        <!--                <xpath expr="//button[@name='check_confirm_bank']" position="attributes">-->
+        <!--                    <attribute name="string">Convert To Journal Entry</attribute>-->
+        <!--                </xpath>-->
+        <!--                <xpath expr="//header" position="inside">-->
+        <!--                    <button name="makeconfirm" string="Validate" type="object" class="oe_highlight"-->
+        <!--                            attrs="{'invisible':['|','|',('all_lines_reconciled','=',False),('line_ids','=',[]),('state', '!=', 'open')]}"/>-->
+        <!--                </xpath>-->
+        <!--                <xpath expr="//field[@name='journal_id']" position="after">-->
+        <!--                    <field name="document_type_id"-->
+        <!--                           options="{'no_quick_create': True, 'no_create_edit' : True,'on_open   ' : True}"/>-->
+        <!--                    <field name="external_document_number"/>-->
+        <!--                    <field name="external_document_type"/>-->
+        <!--                </xpath>-->
+        <!--            </field>-->
+        <!--        </record>-->
+
+        <record id="view_bank_statement_search_520" model="ir.ui.view">
+            <field name="name">account.bank.statement.search</field>
+            <field name="model">account.bank.statement</field>
+            <field name="inherit_id" ref="account.view_bank_statement_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <filter string="Posted Move" name="posted_move" domain="[('move_stat','=','posted')]"/>
+                    <filter string="Draft Move" name="draft_move" domain="[('move_stat','=','draft')]"/>
+
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_move_line_filter" model="ir.ui.view">
+            <field name="name">account.move.line.search</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//search" position="inside">
+                    <field name="reservation_id"/>
+                    <field name="property_id"/>
+                </xpath>
+                <xpath expr="//search" position="inside">
+                    <field name="external_document_number"/>
+
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="inv_dis_type_action" model="ir.actions.act_window">
+            <field name="name">نوع الخصم</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">inv.dis.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="inv_dis_type_action_menu" name="نوع الخصم " parent="account.menu_finance_configuration"
+                  action="inv_dis_type_action" sequence="400"/>
+
+
+        <record id="action_move_doc_type" model="ir.actions.act_window">
+            <field name="name">نوع المستندات</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">move.doc.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+        <menuitem id="menu_real_estate_move_doc_type_action" name="نوع المستندات" parent="account.root_payment_menu"
+                  action="action_move_doc_type" sequence="401"/>
+
+
+        <record id="view_account_move_line_filter_410" model="ir.ui.view">
+            <field name="name">account.move.line.search</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//search" position="inside">
+                    <field name="payment_id" string="Check Number" filter_domain="['|',
+                    ('payment_id.check_number', '=', self),
+                    ('payment_id.check_number', 'ilike', self)]"/>
+                    <field name="payment_id" string="Cheque Number" filter_domain="['|',
+                    ('payment_id.cheque_number', '=', self),
+                    ('payment_id.cheque_number', 'ilike', self)]"/>
+                    <field name="cheque_number_line" string="New Check Number" filter_domain="['|',
+                    ('cheque_number_line', '=', self),
+                    ('cheque_number_line', 'ilike', self)]"/>
+
+                    <filter string="State Payment-Cash" name="state_payment_cash"
+                            domain="[('payment_id.state_payment2', '=', 'cash')]"/>
+                    <filter string="State Payment-Visa" name="state_payment_bank"
+                            domain="[('payment_id.state_payment2', '=', 'visa')]"/>
+                    <filter string="State Payment-Cheque" name="state_payment_cheque"
+                            domain="[('payment_id.state_payment2', '=', 'cheque')]"/>
+                    <filter string="State Payment-Bank" name="state_payment_cheque"
+                            domain="[('payment_id.state_payment2', '=', 'bank')]"/>
+
+                </xpath>
+
+            </field>
+        </record>
+
+<!--           <record id="view_move_line_tree_grouped140" model="ir.ui.view">-->
+<!--            <field name="name">account.move.line.tree.grouped</field>-->
+<!--            <field name="model">account.move.line</field>-->
+<!--            <field name="inherit_id" ref="account.view_move_line_tree_grouped"/>-->
+<!--            <field name="arch" type="xml">-->
+<!--               <xpath expr="//field[@name='name']" position="after">-->
+<!--                    <field name="cheque_number_line"/>-->
+<!--                </xpath>-->
+
+<!--            </field>-->
+<!--        </record>-->
+
+        <record id="view_invoice_tree" model="ir.ui.view">
+            <field name="name">account.invoice.tree</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="external_document_number"/>
+                    <field name="draft_no"/>
+                    <field name="vat_tax_amount"/>
+                    <field name="withholding_tax_amount"/>
+                    <field name="check_payment_state"/>
+                </xpath>
+
+            </field>
+        </record>
+        <record id="view_out_invoice_tree" model="ir.ui.view">
+            <field name="name">account.move.line.tree</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_move_line_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='debit']" position="before">
+                    <field name="vat_tax_amount"/>
+                    <field name="withholding_tax_amount"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

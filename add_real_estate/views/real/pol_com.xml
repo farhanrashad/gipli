@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="pol_commm_view_tree" model="ir.ui.view">
+            <field name="name">policy.commision</field>
+            <field name="model">policy.commision</field>
+            <field name="arch" type="xml">
+                <tree string="pol_commm_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="pol_bonous_view_tree" model="ir.ui.view">
+            <field name="name">policy.commision</field>
+            <field name="model">policy.bonous</field>
+            <field name="arch" type="xml">
+                <tree string="pol_commm_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="pol_nts_view_tree" model="ir.ui.view">
+            <field name="name">policy.commision</field>
+            <field name="model">policy.nts</field>
+            <field name="arch" type="xml">
+                <tree string="pol_commm_tree">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+                <menuitem id="pol_bonous_nts_menu" name="Policy&amp;Commission" parent="account.root_payment_menu" sequence="401" />
+
+
+        <record id="pol_bonous_action" model="ir.actions.act_window">
+            <field name="name">Bonous</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">policy.bonous</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="pol_bonous_action_menu" name="Bonous" parent="add_real_estate.pol_bonous_nts_menu" action="pol_bonous_action"/>
+
+         <record id="pol_commm_action" model="ir.actions.act_window">
+            <field name="name">Commission</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">policy.commision</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="pol_commm_action_menu" name="Commission" parent="add_real_estate.pol_bonous_nts_menu" action="pol_commm_action"/>
+
+         <record id="pol_nts_action" model="ir.actions.act_window">
+            <field name="name">Nts</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">policy.nts</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="pol_nts_action_menu" name="Nts" parent="add_real_estate.pol_bonous_nts_menu" action="pol_nts_action"/>
+
+
+    </data>
+</odoo>

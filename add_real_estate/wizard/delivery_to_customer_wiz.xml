@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="delivery_to_customer_wiz_view_form" model="ir.ui.view">
+            <field name="name">delivery_to_customer_wiz_view_form</field>
+            <field name="model">delivery.to_customer.wiz</field>
+            <field name="arch" type="xml">
+                <form string="delivery_to_customer_wiz_form">
+                    <sheet>
+                        <group>
+                            <field name="delivery_to_customer_date"/>
+
+                        </group>
+                    </sheet>
+                       <footer>
+                            <button name="to_delivery_to_customer" string="Apply" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                </form>
+            </field>
+        </record>
+        <record id="delivery_to_vendor_wiz_view_form" model="ir.ui.view">
+            <field name="name">delivery_to_vendor_wiz_view_form</field>
+            <field name="model">delivery.to_vendor.wiz</field>
+            <field name="arch" type="xml">
+                <form string="delivery_to_customer_wiz_form">
+                    <sheet>
+                        <group>
+                            <field name="delivery_to_vendor_date"/>
+
+                        </group>
+                    </sheet>
+                       <footer>
+                            <button name="to_delivery_to_vendor" string="Apply" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                </form>
+            </field>
+        </record>
+        <record id="refund_notes_wiz_view_form" model="ir.ui.view">
+            <field name="name">refund.notes.wiz</field>
+            <field name="model">refund.notes.wiz</field>
+            <field name="arch" type="xml">
+                <form string="refund_notes_wiz">
+                    <sheet>
+                        <group>
+                            <field name="move_date"/>
+
+                        </group>
+                    </sheet>
+                       <footer>
+                            <button name="refund_notes" string="Apply" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                </form>
+            </field>
+        </record>
+        <record id="bank_withdrawal_wiz_view_form" model="ir.ui.view">
+            <field name="name">bank.withdrawal.wiz</field>
+            <field name="model">bank.withdrawal.wiz</field>
+            <field name="arch" type="xml">
+                <form string="refund_notes_wiz">
+                    <sheet>
+                        <group>
+                            <field name="withdrawal_date"/>
+
+                        </group>
+                    </sheet>
+                       <footer>
+                            <button name="to_withdrawal" string="Apply" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                </form>
+            </field>
+        </record>
+
+
+       <act_window
+            name="Delivery To Customer"
+            id="delivery_to_customer_wiz_action"
+            res_model="delivery.to_customer.wiz"
+            binding_model="account.payment"
+            view_id="delivery_to_customer_wiz_view_form"
+              target="new"/>
+       <act_window
+            name="Delivery Check Vendor"
+            id="delivery_to_vendor_wiz_action"
+            res_model="delivery.to_vendor.wiz"
+            binding_model="account.payment"
+            view_id="delivery_to_vendor_wiz_view_form"
+              target="new"/>
+       <act_window
+            name="Refund Notes"
+            id="refund_notes_wiz_action"
+            res_model="refund.notes.wiz"
+            binding_model="account.payment"
+            view_id="refund_notes_wiz_view_form"
+              target="new"/>
+       <act_window
+            name="Bank Withdrawal"
+            id="bank_withdrawal_wiz_action"
+            res_model="bank.withdrawal.wiz"
+            binding_model="account.payment"
+            view_id="bank_withdrawal_wiz_view_form"
+              target="new"/>
+
+
+
+    </data>
+</odoo>

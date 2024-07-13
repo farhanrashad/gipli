@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="account.view_account_payment_tree" model="ir.ui.view">
+            <field name="name">account.payment.new</field>
+            <field name="model">account.payment</field>
+            <field name="arch" type="xml">
+                 <tree edit="false" sample="1" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
+                    <header>
+                        <button name="action_post" type="object" string="Confirm"/>
+                    </header>
+                    <field name="date"/>
+                    <field name="check_number"/>
+                    <field name="due_date"/>
+                    <field name="amount" sum="Amount"/>
+                    <field name="partner_id" string="Customer"/>
+                    <field name="state"/>
+                    <field name="bank_name"/>
+                    <field name="create_date"/>
+                    <field name="reconciled_invoice_ids"/>
+                    <field name="payment_type"/>
+                    <field name="display_name"/>
+                    <field name="create_uid"/>
+                    <field name="name"/>
+                    <field name="payment_method_id"/>
+                    <field name="payment_method_code"/>
+                    <field name="journal_id"/>
+                    <field name="id" />
+                    <field name="cheque_number"/>
+                    <field name="is_main"/>
+                    <field name="split_amount"/>
+                    <field name="reservation_id"/>
+                    <field name="ref_coll_vendor"/>
+                    <field name="withdrawal_date"/>
+                    <field name="cheque_number_rel"/>
+                    <field name="parent_id_split"/>
+                    <field name="property_id"/>
+                    <field name="collected_by"/>
+                    <field name="state_property_id"/>
+
+                </tree>
+
+            </field>
+        </record>
+        <record id="Contract_payment_list_action" model="ir.actions.act_window">
+            <field name="name">Payments</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{
+                'default_payment_type': 'inbound',
+                'default_partner_type': 'customer',
+                'search_default_inbound_filter': 1,
+                'res_partner_search_mode': 'customer',
+            }</field>
+                                <field name="domain">[('is_contract', '=', True)]</field>
+
+            <field name="view_id" ref="account.view_account_payment_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                  Register a payment
+                </p><p>
+                  Payments are used to register liquidity movements. You can process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+        </record>
+        <menuitem id="payment_contract_menu_item"
+                  name="Payments"
+                  parent="payment_sub"
+                  action="Contract_payment_list_action" sequence="3"/>
+
+
+
+    </data>
+</odoo>

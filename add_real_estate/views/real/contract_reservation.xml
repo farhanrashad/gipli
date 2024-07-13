@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_contract_reservation_form" model="ir.ui.view">
+            <field name="name">contract.form</field>
+            <field name="model">contract.reservation</field>
+            <field name="arch" type="xml">
+                <form string="">
+                     <header>
+                        <button name="reset_to_draft" type="object" string="Reset To Draft" states="cancel,confirmed" groups="add_real_estate.group_contract_manager"/>
+                        <button name="confirmed" type="object" string="Confirmed" states="draft"  groups="add_real_estate.group_contract_manager"/>
+                        <button name="cancel" type="object" string="Cancel" states="draft,confirmed"  groups="add_real_estate.group_contract_manager"/>
+                         <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="day_name"/>
+                            <field name="date"/>
+                                <field name="partner_id" readonly="1" widget="res_partner_many2one"  context="{                                             'res_partner_search_mode': (context.get('default_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,                                             'show_address': 1, 'default_is_company': True, 'show_vat': True}" options="{&quot;always_reload&quot;: True, &quot;no_quick_create&quot;: True}" />
+                            <field name="property_id" readonly="1"/>
+                            <field name="property_price" readonly="1"/>
+                            <field name="property_space"/>
+                        </group>
+                    </sheet>
+                        <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_contract_reservation_tree" model="ir.ui.view">
+            <field name="name">contract.tree</field>
+            <field name="model">contract.reservation</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="day_name"/>
+                    <field name="date"/>
+                    <field name="partner_id"/>
+                    <field name="property_id"/>
+                    <field name="property_price"/>
+                    <field name="property_space"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_contract_reservation" model="ir.actions.act_window">
+            <field name="name">Contract</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">contract.reservation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+          <menuitem id="contract_reservation_menu"
+                  name="Contracts"
+                  parent="contract_sub"
+                  action="action_contract_reservation" sequence="2"/>
+
+
+    </data>
+</odoo>

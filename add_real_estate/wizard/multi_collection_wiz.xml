@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="multi_collection_wiz_form" model="ir.ui.view">
+            <field name="name">multi.collection.wiz</field>
+            <field name="model">multi.collection.wiz</field>
+            <field name="arch" type="xml">
+                <form string="delivery_to_customer_wiz_form">
+                    <sheet>
+                        <group>
+                            <field name="ref_coll_batch"/>
+
+                        </group>
+                    </sheet>
+                       <footer>
+                            <button name="muli_collection" string="Multi Collection" type="object" class="btn-primary"/>
+                            <button name="muli_refund" string="Multi  Refund" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                </form>
+            </field>
+        </record>
+
+         <act_window
+            name="Multi Collection &amp; Refund"
+            id="bank_withdrawal_wiz_action2"
+            res_model="multi.collection.wiz"
+            binding_model="account.payment"
+            view_id="multi_collection_wiz_form"
+              target="new"/>
+
+
+
+    </data>
+</odoo>

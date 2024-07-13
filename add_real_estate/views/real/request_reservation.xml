@@ -1,0 +1,317 @@
+<odoo>
+    <data>
+        <record id="request_reservation_reservation_form_view" model="ir.ui.view">
+            <field name="name">request.reservation</field>
+            <field name="model">request.reservation</field>
+            <field name="arch" type="xml">
+                <form string="Request Form">
+                    <header>
+                        <button name="convert_to_block" type="object" string="Canceled"
+                                attrs="{'invisible': [('state', 'not in', ['reserved','draft'])]}"/>
+                        <button name="convert_to_reserved" type="object" string="Convert To Reserved"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}" status="draft"/>
+                        <button class="btn btn-primary" name="create_reservation" type="object"
+                                string="Create Reservation" attrs="{'invisible': [('state', 'not in', ['reserved'])]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button type="object" class="oe_stat_button" icon="fa-pencil-square-o"
+                                    name="action_view_partner_reservation"
+                            >
+                                <div class="o_form_field o_stat_info">
+                                    <span class="o_stat_value">
+                                    </span>
+                                    <span class="o_stat_text">Reservation</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h2>
+                                <field name="reservation_code" placeholder="Request Reservation Code" force_save="1"/>
+                                <field name="customer_details_readonly" invisible="1"/>
+                            </h2>
+                            <!--                            <h2><field name="name" placeholder="Request Reservation Name"/></h2>-->
+                        </div>
+                        <field name="project_id" invisible="1"/>
+                        <group groups="add_real_estate.group_real_state_inventory">
+                            <group colspan="1" string="Property Details">
+                                <field name="date"/>
+                                <field name="project_id" attrs="{'required' : [('is_eoi', '!=',True )]}"/>
+                                <field name="phase_id" attrs="{'required' : [('is_eoi', '!=',True )]}"/>
+                                <field name="property_id" attrs="{'required' : [('is_eoi', '!=',True )]}"
+                                       options="{'no_quick_create': True, 'no_create_edit' : True,'no_open':True}"
+                                       />
+                                <field name="property_code"/>
+                                <field name="finish_of_property"/>
+                                <field name="property_price"/>
+                                <field name="payment_due"/>
+                            </group>
+                            <group colspan="1" string="Sales Details">
+                                <field name="sales_type"/>
+                                <field name="broker_id"
+                                       attrs="{'invisible' : [('sales_type', '=', 'direct')]}"
+                                       options="{'no_create': True,'no_open': True}" domain="[('is_broker','=',True)]"/>
+                                <field name="is_eoi"/>
+
+                            </group>
+
+                        </group>
+                        <!--                        <group>-->
+                        <!--                            <group colspan="2" string="Payment Details">-->
+                        <!--                            <field name="pay_strategy_id"/>-->
+                        <!--                            <field name="payment_strg_name"/>-->
+                        <!--                            <field name="payment_term_discount"/>-->
+                        <!--                        </group>-->
+                        <!--                        </group>-->
+                                                    <group colspan="1" string="Customer Details">
+                                <label for="customer_id"/>
+                                <div class="o_row">
+                                      <field name="customer_id"
+                                           domain="[('is_customer','=',True)]"
+                                       attrs="{'readonly' : ['|',('state', 'in',['contracted','release'] ),('customer_details_readonly','=',True)]}"/>
+<!--                                    <button name="get_childs_of_contact" type="object" string="Other Owners"-->
+<!--                                    />-->
+                                </div>
+
+                                <field name="address"
+                                       readonly="1"/>
+                                <field name="phone"
+                                       readonly="1"/>
+                                <field name="mobile"
+                                       readonly="1"/>
+                                <field name="email"
+                                       readonly="1"/>
+                                <field name="nationality"
+                                       readonly="1"/>
+                                <field name="id_def" readonly="1"/>
+<!--                                <field name="national_issue_date" readonly="1"/>-->
+                                  <label for="national_issue_date_month" string="National Issue Date"/>
+                                <div class="o_row">
+                                    <field name="national_issue_date_month" readonly="1" placeholder="Month"/>
+                                    <field name="national_issue_date_year" readonly="1" placeholder="Year"/>
+                                </div>
+                                <field name="positon" readonly="1"/>
+                                <field name="work_side" readonly="1"/>
+                                <field name="social_status"
+                                       readonly="1"/>
+                                                        <field name="more_owner_ids" widget="many2many_tags"/>
+
+                            </group>
+
+                        <group groups="add_real_estate.group_real_state_inventory">
+                            <group colspan="1" string="Sales Details">
+                                <field name="sale_person_id_2" domain="[('is_salesperson','=',True)]"/>
+                                <field name="Sales_Teams_2_id"/>
+                                <field name="manager_tesm_2_id"/>
+
+                            </group>
+
+                        </group>
+                        <group invisible="1" string="Attachments" style="color:#893b74;"/>
+                        <group invisible="1">
+                            <field name="id_no"
+                                   attrs="{'readonly' : [('state', '=', 'create_so')]}"/>
+                            <field name="id_type"
+                                   attrs="{'readonly' : [('state', '=', 'create_so')]}"/>
+                            <field name="id_photo"
+                                   attrs="{'readonly' : [('state', '=', 'create_so')]}"/>
+                        </group>
+                        <notebook groups="add_real_estate.group_real_state_payment">
+                            <page name="payment" string="Payment">
+                                <ul class="list-inline">
+                                    <!--                                   <li class="list-inline-item">-->
+                                    <!--                                       <button name="%(fill_payment_wizard_action)d"-->
+                                    <!--                                        string="Update Bank and check Number"-->
+                                    <!--                                        type="action"-->
+                                    <!--                                        class="btn-primary"-->
+                                    <!--                                               context="{'default_reservation_id':active_id,}"/></li>-->
+                                    <li class="list-inline-item">
+                                        <button name="create_payment_lines_selected" type="object"
+                                                string="Create Payment" class="btn btn-primary"/>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <button name="button_delete_lines_selected" type="object" string="Delete"
+                                                class="btn btn-primary"/>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <button groups="add_real_estate.group_Receive_Reservation"
+                                                name="button_receive_lines_selected" type="object" string="Receive"
+                                                class="btn btn-primary"/>
+                                    </li>
+                                    <!--                                    <li class="list-inline-item"><button name="button_pay_lines_selected" type="object" string="Pay" class="btn btn-primary"/></li>-->
+                                    <li class="list-inline-item">
+                                        <button name="generate_report" type="object" string="Print"
+                                                class="btn btn-primary"/>
+                                    </li>
+                                </ul>
+
+
+                                <field name="payment_strg_ids"
+                                       widget="section_and_note_one2many"
+                                       class="oe_inline oe_no_button"
+                                       context="{'default_project_id':project_id}"
+                                >
+                                    <tree string="payment" widget="section_and_note_one2many"
+                                          editable="buttom">
+                                          <control>
+                                        <create name="add_product_control" string="Add a Payment"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                    </control>
+                                          <field name="display_type" invisible="1"/>
+                                        <field name="name" widget="section_and_note_text" />
+                                        <field name="is_selected_to_action"
+                                        />
+                                        <field name="payment_code" readonly="1"/>
+                                        <field name="move_check"
+                                               invisible="1"/>
+                                        <field name="project_id"
+                                               invisible="1"/>
+                                        <field name="payment_method_id"
+                                               invisible="1"/>
+                                        <field name="type"
+                                               invisible="1"/>
+                                        <field name="cancelled"
+                                               invisible="1"/>
+                                        <field name="description"
+                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                        <field name="currency_id"
+                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                        <field name="amount_currency"
+                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                        <field name="amount"
+                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                        <field name="base_amount" invisible="1"
+                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                        <field name="amount_due" invisible="1"
+                                               readonly="1"/>
+                                        <field name="amount_pay" invisible="1"
+                                               readonly="1"/>
+                                        <field name="is_part"
+                                               invisible="1"/>
+                                        <field name="date"
+                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                        <field name="add_to_paid_amount"/>
+                                        <field name="journal_id"
+                                               domain="[('type','in',['bank', 'cash'])]"
+                                               string="Payment Method"
+                                               attrs="{'readonly' : [('move_check', '=', True)]}"/>
+                                        <field name="state_payment"
+                                               string="State Payment" optional="show" required="1"/>
+                                        <field name="is_cheque"/>
+                                        <field name="Due_Date"
+                                               attrs="{'readonly':[('is_cheque','!=',True)],'required':[('is_cheque','=',True)]}"/>
+                                        <field name="bank_name"
+                                               attrs="{'readonly':[('is_cheque','!=',True)],'required':[('is_cheque','=',True)]}"/>
+                                        <field name="cheque"
+                                               attrs="{'readonly':[('is_cheque','!=',True)],'required':[('is_cheque','=',True)]}"/>
+                                        <field name="deposite"
+                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                        <field name="add_extension"
+                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                        <!--                                        <field name="maintainance_fees"-->
+                                        <!--                                               attrs="{'readonly':[('add_extension','=',True)]}"/>-->
+                                        <!--                                        <field name="move_id"-->
+                                        <!--                                               readonly="1"/>-->
+                                                                                                                        <field name="is_receive" />
+
+                                        <field name="is_pay"/>
+                                        <field name="is_create_payment"/>
+                                        <field name="bank_ids" widget="many2many_tags"/>
+
+
+                                    </tree>
+                                </field>
+                                <group class="oe_right">
+                                    <group class="oe_subtotal_footer"
+                                    >
+                                        <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                                        <field name="amount_residual" class="oe_subtotal_footer_separator"/>
+                                    </group>
+
+                                </group>
+                            </page>
+                             <page string="Notes">
+                                <group>
+                                    <field name="notes_cash"/>
+                                    <field name="notes_visa"/>
+                                    <field name="notes_cheque"/>
+                                    <field name="notes_bank"/>
+                                </group>
+                            </page>
+                        </notebook>
+
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record id="request_reservation_tree_view" model="ir.ui.view">
+            <field name="name">request.reservation.reservation.tree view</field>
+            <field name="model">request.reservation</field>
+            <field name="arch" type="xml">
+                <tree string="Request Reservation" default_order="date desc">
+                    <field name="date"/>
+                    <field name="reservation_code"/>
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="sale_person_id"/>
+                    <field name="sales_type"/>
+                    <field name="sales_type"/>
+                    <field name="broker_id"/>
+                    <field name="phase_id"/>
+                    <field name="property_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="rsreservation_list_action">
+            <field name="name">Request Reservations</field>
+            <field name="res_model">request.reservation</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+           <record id="equest_reservation_filter_view" model="ir.ui.view">
+            <field name="name">request.reservation</field>
+            <field name="model">request.reservation</field>
+            <field name="arch" type="xml">
+                <search string="Search ">
+<!--                    <field name="name" string="Reservation Code" filter_domain="[('name','ilike',self)]"/>-->
+                    <field name="property_id" string="Unit"/>
+                    <field name="customer_id" string="Customer"/>
+
+                </search>
+            </field>
+        </record>
+        <menuitem id="request_reservation"
+                  name="Request Reservation"
+                  parent="transaction_sub"
+                  action="rsreservation_list_action" sequence="1"/>
+
+
+        <!--        <record model="ir.ui.view" id="req_reservation_view_buttons">-->
+        <!--            <field name="name">req.reservation.view.buttons</field>-->
+        <!--            <field name="model">request.reservation</field>-->
+        <!--            <field name="inherit_id" ref="add_real_estate.request_reservation_reservation_form_view" />-->
+        <!--            <field name="priority" eval="11"/>-->
+        <!--            <field name="arch" type="xml">-->
+        <!--                <div name="button_box" position="inside">-->
+        <!--                    <button type="object" class="oe_stat_button" icon="fa-pencil-square-o" name="action_view_partner_reservation"-->
+        <!--                        >-->
+        <!--                        <div class="o_form_field o_stat_info">-->
+        <!--                            <span class="o_stat_value">-->
+        <!--                            </span>-->
+        <!--                            <span class="o_stat_text">Reservation</span>-->
+        <!--                        </div>-->
+        <!--                    </button>-->
+        <!--                </div>-->
+
+        <!--            </field>-->
+        <!--        </record>-->
+
+    </data>
+</odoo>

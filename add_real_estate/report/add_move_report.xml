@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+
+
+        <template id="address_move_template">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <t t-set="company" t-value="user.company_id"/>
+            <t t-call="web.external_layout">
+                <div class="page" dir="rtl">
+                    <table class="table table-bordered mb64">
+                        <thead>
+                            <tr style="background-color:#87CEFA;">
+                                <th class="text-center">‫‪Journal‬‬ ‫‪Name‬‬</th>
+                                <th class="text-center">‫‪Journal‬‬ ‫‪Entry‬‬</th>
+                                <th class="text-center">تاريخ</th>
+                                <th class="text-center">نوع المستند</th>
+                                <th class="text-center">نوع المستند الخارجي</th>
+                                <th class="text-center">رقم المستند الخارجي</th>
+                                <th class="text-center">Company Name</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">
+                                    <span t-field="o.journal_id"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.name"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.date"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.document_type_id"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.external_document_type"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.external_document_number"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.company_id"/>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <table class="table table-bordered mb64">
+                        <thead>
+                            <tr style="background-color:#87CEFA;">
+                                <th class="text-center">كود الحساب</th>
+                                <th class="text-center">اسم الحساب</th>
+                                <th class="text-center">‫بيان‬</th>
+                                <th class="text-center">‫توجيه‬</th>
+                                <th class="text-center">‫‪Debit‬‬</th>
+                                <th class="text-center">Credit</th>
+                                <th class="text-center">‫‪Partner‬‬</th>
+                                <th class="text-center">Analytic Account</th>
+                                <th class="text-center">‫‪Amount‬‬ ‫‪in‬‬ ‫‪Currency‬‬</th>
+                                <th class="text-center">‫‪Currency‬‬ E‪exchange‬‬ Rate</th>
+                                <th class="text-center">‫‪Cheque‬‬ ‫‪No.‬‬</th>
+                                <th class="text-center">‫‪Due‬‬ ‫‪Date‬‬</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="total_debit" t-value="0"/>
+                            <t t-set="total_credit" t-value="0"/>
+                            <t t-foreach="o.line_ids" t-as="line">
+                                <t t-set="total_debit" t-value="total_debit+line.debit"/>
+                                <t t-set="total_credit" t-value="total_credit+line.credit"/>
+                                <tr>
+                                    <td class="text-center">
+                                        <span t-field="line.account_id.code"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.account_id.name"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-esc="line.name or o.ref"/>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span t-if="line.debit>0">‫مدين‬</span>
+                                        <span t-if="line.credit>0">‫دائن‬</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.debit"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.credit"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.partner_id"/>
+                                    </td>
+                                    <td class="text-center">
+                                       		<span>
+									<t t-if="line.analytic_distribution">
+												<div t-foreach="line.analytic_distribution" t-as="distribution">
+                                       	<t t-esc="line.env['account.analytic.account'].browse(int(distribution))[0].name"/>: <t t-esc="line.analytic_distribution.get(distribution)"/>
+                                    </div>
+
+									</t>
+
+                                </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.amount_currency"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <t t-if="line.amount_currency">
+                                            <span t-esc="line.balance/line.amount_currency"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span>0</span>
+                                        </t>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.cheque_number_line"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.date_maturity"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <tr style="background-color:#FA8072">
+                                <th class="text-center" colspan="5"></th>
+                                <th class="text-center">
+                                    <span t-esc="'{:,}'.format(total_debit)"/>
+                                </th>
+                                <th class="text-center">
+                                    <span t-esc="'{:,}'.format(total_credit)"/>
+                                </th>
+                                <th class="text-center" colspan="5"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                </div>
+            </t>
+        </template>
+        <template id="address_move_report">
+            <t t-set="data_report_landscape" t-value="True"/>
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="add_real_estate.address_move_template" t-lang="en_US"/>
+
+                </t>
+            </t>
+        </template>
+<!--        <report-->
+<!--                id="address_move_report_action"-->
+<!--                model="account.move"-->
+<!--                string="طباعة القيد"-->
+<!--                report_type="qweb-pdf"-->
+<!--                name="add_real_estate.address_move_report"-->
+<!--                file="add_real_estate.address_move_report"-->
+<!--                print_report_name="object.name"-->
+
+
+<!--        />-->
+
+        <record id="address_move_report_action" model="ir.actions.report">
+            <field name="name">طباعة القيد</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.address_move_report</field>
+            <field name="report_file">add_real_estate.address_move_report</field>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+            <field name="binding_type">report</field>
+        </record>
+
+
+
+          <template id="address_move_batch_template">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <t t-set="company" t-value="user.company_id"/>
+            <t t-call="web.external_layout">
+                <div class="page" dir="rtl">
+                    <table class="table table-bordered mb64">
+                        <thead>
+                            <tr style="background-color:#87CEFA;">
+                                <th class="text-center">‫‪Journal‬‬ ‫‪Name‬‬</th>
+                                <th class="text-center">‫‪Journal‬‬ ‫‪Entry‬‬</th>
+                                <th class="text-center">تاريخ</th>
+                                <th class="text-center">نوع المستند</th>
+                                <th class="text-center">نوع المستند الخارجي</th>
+                                <th class="text-center">رقم المستند الخارجي</th>
+                                <th class="text-center">Company Name</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="move_line" t-value="request.env['account.move.line'].search([('payment_id','in',o.payment_ids.ids),('date','=',o.date)],limit=1)"/>
+                            <t t-set="total_amount" t-value="sum(o.payment_ids.mapped('amount'))"/>
+                            <tr>
+                                <td class="text-center">
+                                    <span t-field="o.journal_id"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.name"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.date"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="move_line.move_id.document_type_id"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="move_line.move_id.external_document_type"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="move_line.move_id.external_document_number"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="move_line.move_id.company_id"/>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <table class="table table-bordered mb64">
+                        <thead>
+                            <tr style="background-color:#87CEFA;">
+                                <th class="text-center">كود الحساب</th>
+                                <th class="text-center">اسم الحساب</th>
+                                <th class="text-center">‫بيان‬</th>
+                                <th class="text-center">‫توجيه‬</th>
+                                <th class="text-center">‫‪Debit‬‬</th>
+                                <th class="text-center">Credit</th>
+                                <th class="text-center">‫‪Partner‬‬</th>
+                                <th class="text-center">Analytic Account</th>
+                                <th class="text-center">‫‪Amount‬‬ ‫‪in‬‬ ‫‪Currency‬‬</th>
+                                <th class="text-center">‫‪Currency‬‬ E‪exchange‬‬ Rate</th>
+                                <th class="text-center">‫‪Cheque‬‬ ‫‪No.‬‬</th>
+                                <th class="text-center">‫‪Due‬‬ ‫‪Date‬‬</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="partners" t-value="o.payment_ids.mapped('partner_id.id')"/>
+                            <t t-foreach="move_line.move_id.line_ids" t-as="line">
+                                <tr>
+                                    <td class="text-center">
+                                        <span t-field="line.account_id.code"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.account_id.name"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-esc="line.name or o.ref"/>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span t-if="line.debit>0">‫مدين‬</span>
+                                        <span t-if="line.credit>0">‫دائن‬</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <t t-if="line.debit>0">
+                                            <span t-esc="total_amount"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span>0.0</span>
+                                        </t>
+                                    </td>
+                                    <td class="text-center">
+                                          <t t-if="line.credit>0">
+                                            <span t-esc="total_amount"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span>0.0</span>
+                                        </t>
+                                    </td>
+                                    <td class="text-center">
+                                        <t t-if="len(partners)>1">
+                                           <span></span>
+                                        </t>
+                                        <t t-else="">
+                                             <span t-field="line.partner_id"/>
+                                        </t>
+
+                                    </td>
+                                    <td class="text-center">
+                                        		<span>
+									<t t-if="line.analytic_distribution">
+												<div t-foreach="line.analytic_distribution" t-as="distribution">
+                                       	<t t-esc="line.env['account.analytic.account'].browse(int(distribution))[0].name"/>: <t t-esc="line.analytic_distribution.get(distribution)"/>
+                                    </div>
+
+									</t>
+
+                                </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.amount_currency"/>
+                                    </td>
+                                    <td class="text-center">
+                                            <span t-esc="total_amount"/>
+
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.cheque_number_line"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.date_maturity"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <tr style="background-color:#FA8072">
+                                <th class="text-center" colspan="5"></th>
+                                <th class="text-center">
+                                    <span t-esc="'{:,}'.format(total_amount)"/>
+                                </th>
+                                <th class="text-center">
+                                    <span t-esc="'{:,}'.format(total_amount)"/>
+                                </th>
+                                <th class="text-center" colspan="5"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                </div>
+            </t>
+        </template>
+        <template id="address_move_batch_report">
+            <t t-set="data_report_landscape" t-value="True"/>
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="add_real_estate.address_move_batch_template" t-lang="en_US"/>
+
+                </t>
+            </t>
+        </template>
+<!--        <report-->
+<!--                id="address_move_batch_report_action"-->
+<!--                model="account.batch.payment"-->
+<!--                string="طباعة القيد"-->
+<!--                report_type="qweb-pdf"-->
+<!--                name="add_real_estate.address_move_batch_report"-->
+<!--                file="add_real_estate.address_move_batch_report"-->
+<!--                print_report_name="object.name"-->
+
+
+<!--        />-->
+
+        <record id="address_move_batch_report_action" model="ir.actions.report">
+            <field name="name">طباعة القيد</field>
+            <field name="model">account.batch.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">add_real_estate.address_move_batch_report</field>
+            <field name="report_file">add_real_estate.address_move_batch_report</field>
+            <field name="binding_model_id" ref="account_batch_payment.model_account_batch_payment"/>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>

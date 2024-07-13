@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_company_form" model="ir.ui.view">
+            <field name="name">res.company</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='currency_id']" position="after">
+                    <field name="tax_file_no"/>
+                    <field name="taxxx_id"/>
+                    <field name="payment_journal_id"/>
+                    <field name="invoice_journal_id"/>
+                </xpath>
+                <xpath expr="//label[@for='name']" position="before">
+                    <label for="name_arabic" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name_arabic"/>
+                    </h1>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <record id="view_company_details_form" model="ir.ui.view">
+            <field name="name">بيانات الشركة</field>
+            <field name="model">real.company.data</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_details"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_company_details_tree" model="ir.ui.view">
+            <field name="name">بيانات الشركة</field>
+            <field name="model">real.company.data</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="company_details"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_company_details" model="ir.actions.act_window">
+            <field name="name">بيانات الشركة</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">real.company.data</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_company_details_action"
+                  groups="add_real_estate.group_company_details"
+                  name="بيانات الشركة" parent="add_real_estate.configuration_sub" action="action_company_details"
+                  sequence="300"/>
+
+
+    </data>
+</odoo>

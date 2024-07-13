@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+                <record id="view_sepa_cheque_search" model="ir.ui.view">
+            <field name="name">account.sepa.credit.transfer.search</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='journal_id']" position="after">
+                    <field name="property_id"/>
+                    <field name="check_number" string="Cheque Number ( Customer )"/>
+                    <field name="cheque_number" string="Cheque Number ( Vendor )"/>
+                    <filter string="Is Spilt" name="is_spilt" domain="[('is_spilt', '=', True)]"/>
+                    <filter string="From Spilt" name="parent_id_split" domain="[('parent_id_split', '!=', False)]"/>
+
+                </xpath>
+                  <xpath expr="//field[@name='journal_id']" position="after">
+                    <field name="external_document_number" />
+
+                </xpath>
+            </field>
+        </record>
+
+
+
+
+    </data>
+</odoo>

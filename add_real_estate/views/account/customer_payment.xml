@@ -1,0 +1,126 @@
+<odoo>
+    <data>
+        <record id="customer_payment_form_view" model="ir.ui.view">
+            <field name="name">customer.payment</field>
+            <field name="model">customer.payment</field>
+            <field name="arch" type="xml">
+                <form string="Customer Payment">
+                    <header>
+                        <button name="approved" type="object" string="Approved" attrs="{'invisible': [('state', '!=', 'draft')]}" status="draft"/>
+                        <field name="state" widget="statusbar" />
+                    </header>
+                    <sheet>
+                             <div class="oe_button_box" name="button_box">
+                             <button name="action_view_payments"
+                                    type="object" class="oe_stat_button" icon="fa-calender">
+                                <field name="counter_payments" string="Payments" widget="statinfo"/>
+                            </button>
+
+                             </div>
+                        <div class="oe_title" >
+
+                            <h2><field name="name" placeholder="Payment Name" readonly="1"/></h2>
+                    </div>
+                        <group>
+                            <group colspan="2" >
+                            <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="state_payment" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="accounting_allocation"   attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="journal_id" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="ref" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="partner_id" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name="cancel_res" invisible="1"/>
+                            <field name="reservation_id"  attrs="{'readonly': [('state', '!=', 'draft')],'invisible':[('cancel_res', '=', False)]}"
+                                   />
+                            <field name="reservation_id"  attrs="{'readonly': [('state', '!=', 'draft')],'invisible':[('cancel_res', '=', True)]}"
+                                   />
+                        </group>
+                        <group colspan="2">
+                            <field name="bank_name" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="start_cheque" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="end_cheque" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <button name="update_bank_data"    attrs="{'readonly': [('state', '!=', 'draft')]}" type="object" string="Update Bank and check Number"  />
+                        </group>
+                        <group colspan="2">
+                            <field name="is_select_all" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        </group>
+
+                        </group>
+
+                        <notebook>
+                            <page name="payment" string="Payment">
+
+                                <field name="loan_line"
+                                       widget="one2many_list"
+                                       nolabel="1"
+                                       class="oe_inline oe_no_button"
+                                       attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                >
+                                    <tree string="Payment"
+                                          editable="buttom">
+                                        <field name="is_pay"/>
+                                        <field name="date"/>
+                                        <field name="description"/>
+                                        <field name="state_payment"/>
+                                        <field name="type"/>
+                                        <field name="bank_name"/>
+                                        <field name="cheque"/>
+<!--                                        <field name="payment_strg_id"/>-->
+                                        <field name="is_main"/>
+                                        <field name="installment_line_id"/>
+                                        <field name="currency_id"/>
+                                        <field name="amount_currency"/>
+                                        <field name="amount"/>
+                                        <field name="amount_due" readonly="1" force_save="1" />
+                                        <button name="button_journal_entries" type="object" string="Journal Items"  attrs="{'column_invisible': [('parent.state', '!=', 'approved')]}" />
+                                    </tree>
+                                </field>
+                            </page>
+                                                    </notebook>
+                        <group colspan="2">
+                            <field name="total_amount"/>
+                            <field name="total_count"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="customer_payment_tree_view" model="ir.ui.view">
+            <field name="name">customer.paymentres.reservation.reservation.tree view</field>
+            <field name="model">customer.payment</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Payment">
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="journal_id"/>
+                            <field name="partner_id"/>
+                            <field name="reservation_id"/>
+                            <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="customer_payment_list_action">
+            <field name="name">Customer Payment</field>
+            <field name="res_model">customer.payment</field>
+            <field name="view_mode">tree,form</field>
+             <field name="domain">[('cancel_res','=',False)]</field>
+            <field name="context">{'default_cancel_res':False}</field>
+        </record>
+        <record model="ir.actions.act_window" id="customer_payment_list_action_for_cancel">
+            <field name="name">Customer Payment For Cancel</field>
+            <field name="res_model">customer.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('cancel_res','=',True)]</field>
+            <field name="context">{'default_cancel_res':True}</field>
+        </record>
+        <menuitem id="customer_payment_menu_item"
+                  name="Customer Payments"
+                  parent="account.menu_finance_receivables"
+                  action="customer_payment_list_action" sequence="2" groups="add_real_estate.group_customer_payment_menuitem"/>
+        <menuitem id="customer_payment_menu_item_for_cancel"
+                  name="Customer Payments For Cancel"
+                  parent="account.menu_finance_receivables"
+                  action="customer_payment_list_action_for_cancel" sequence="3" groups="add_real_estate.group_customer_payment_menuitem"/>
+
+    </data>
+</odoo>

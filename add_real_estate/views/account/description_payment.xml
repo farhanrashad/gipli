@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_description_payment" model="ir.actions.act_window">
+            <field name="name">Description Payment Strategy </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">description.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_description_payment_action" name="Description Payment Strategy" parent="configuration_sub" action="action_description_payment" sequence="100"/>
+
+
+    </data>
+</odoo>

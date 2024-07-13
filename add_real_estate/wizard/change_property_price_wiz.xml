@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_change_property_price_wiz_form" model="ir.ui.view">
+            <field name="name">Change Property Price</field>
+            <field name="model">change.property.price.wiz</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <field name="is_factor_price_unit" invisible="1"/>
+                        <group attrs="{'invisible':[('is_factor_price_unit','=',True)]}">
+                            <group>
+                                <field name="property_id"/>
+                            </group>
+                            <group colspan="1">
+                                <field name="plot_area"/>
+                                <field name="sellable"/>
+                                <field name="total_garden_area"/>
+                                <field name="back_yard"/>
+                                <field name="front_yard"/>
+                            </group>
+                            <group colspan="1">
+                                <field name="price_m_a"/>
+                                <field name="price_m"/>
+                                <field name="price_garden_new"/>
+                            </group>
+
+                            <group colspan="1">
+                                <field name="is_garage"/>
+                                <field name="price_garage_for_one"
+                                       attrs="{'invisible': [('is_garage', '=', False)],'required': [('is_garage', '=', True)]}"/>
+                                <field name="number_of_garage"
+                                       attrs="{'invisible': [('is_garage', '=', False)],'required': [('is_garage', '=', True)]}"/>
+                                <field name="is_finish"/>
+                                <field name="finish_of_property_id"
+                                       attrs="{'required': [('is_finish', '=', True)],'invisible': [('is_finish', '=', False)]}"/>
+                                <field name="price_finishing_for_m"
+                                       attrs="{'required': [('is_finish', '=', True)],'invisible': [('is_finish', '=', False)]}"/>
+                                <field name="is_pool"/>
+                                <field name="price_pool_for_one"
+                                       attrs="{'required': [('is_pool', '=', True)],'invisible': [('is_pool', '=', False)]}"/>
+                                <field name="number_of_pool"
+                                       attrs="{'required': [('is_pool', '=', True)],'invisible': [('is_pool', '=', False)]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                              <page string="Unit Price Factors" name="unit_factor" attrs="{'invisible':[('is_factor_price_unit','=',False)]}" >
+                            <field name="unit_price_lines" >
+                                <tree editable="bottom">
+                                    <field name="factor_id"/>
+                                    <field name="space"/>
+                                    <field name="price"/>
+                                    <field name="total" sum="Total"/>
+                                </tree>
+                            </field>
+                        </page>
+                        </notebook>
+
+                    </sheet>
+                    <footer>
+                        <button name="change" string="Change" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_change_property_price_wiz" model="ir.actions.act_window">
+            <field name="name">Change Property Price</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">change.property.price.wiz</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_change_property_price_wiz_form"/>
+            <field name="target">new</field>
+        </record>
+
+
+    </data>
+</odoo>

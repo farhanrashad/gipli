@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="payment_strg_tree_payment_not_received" model="ir.ui.view">
+            <field name="name">payment.strg tree</field>
+            <field name="model">payment.strg</field>
+            <field name="arch" type="xml">
+                <tree string="Payment Not Received" create="0" delete="0" edit="0">
+                    <field name="reserve_id"/>
+                    <field name="unit_id"/>
+                    <field name="name" />
+                    <field name="is_selected_to_action"/>
+                    <field name="is_no_enter_total" />
+                    <field name="add_to_paid_amount" />
+                    <field name="is_print"/>
+                    <field name="payment_code"/>
+                    <field name="receipt_date" />
+                    <field name="move_check"
+                           invisible="1" optional="show"/>
+                    <field name="project_id"
+                           invisible="1" optional="show"/>
+                    <field name="payment_method_id"
+                           invisible="1" optional="show"/>
+                    <field name="type"
+                           invisible="1" optional="show"/>
+                    <field name="cancelled"
+                           invisible="1" optional="show"/>
+                    <field name="description"
+                           optional="show"/>
+                    <field name="currency_id"
+                           sum="Amount"
+                           optional="show"/>
+                    <field name="amount_currency"
+                           sum="Amount"
+                           optional="show"/>
+                    <field name="amount"
+                           sum="Amount"
+                           optional="show"/>
+                    <field name="base_amount"  string="Amount Base" optional="hide"
+                           />
+                    <field name="amount_due"
+                           sum="Amount Due" optional="show"/>
+                    <field name="amount_pay"
+                           sum="Pay" optional="show" />
+                    <field name="date"
+                           optional="show"/>
+                    <field name="journal_id"
+                           string="Payment Method"
+                           optional="show"/>
+                    <field name="state_payment"
+                           string="State Payment" optional="show" />
+
+                    <field name="bank_name"
+                           optional="show"/>
+                    <field name="cheque"
+                           optional="show"/>
+                    <field name="deposite"
+                           optional="show"/>
+                    <field name="is_maintainance" optional="show"
+                           />
+                    <field name="is_no_enter_total" optional="show"
+                           />
+
+                    <field name="is_receive" optional="show"
+                           />
+
+                    <field name="is_pay" optional="show" />
+                    <field name="bank_ids" widget="many2many_tags" optional="show"
+                           />
+                    <field name="payments_ids" widget="many2many_tags" optional="show"
+                           />
+                    <field name="state" optional="show"/>
+
+
+                </tree>
+
+            </field>
+        </record>
+
+        <record id="payment_not_received_action" model="ir.actions.act_window">
+            <field name="name">Payment Not Received</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">payment.strg</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('reserve_id','!=',False),('payments_ids','=',False)]</field>
+            <field name="view_id" ref="payment_strg_tree_payment_not_received"/>
+        </record>
+        <menuitem id="payment_not_received_menu" name="Payment Not Received" parent="account.menu_finance_receivables"
+                  action="payment_not_received_action" sequence="3"/>
+
+
+    </data>
+</odoo>

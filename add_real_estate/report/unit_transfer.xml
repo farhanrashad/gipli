@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+
+        <template id="report_transfer_unit_temp">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page" dir="rtl"
+                        >
+                            <div class="row">
+                                <div class="col-4 text-right">
+                                    <strong> التاريخ:</strong>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <strong t-esc="doc.date"/>
+                                </div>
+                            </div>
+                            <center>
+                                <h1>Unit Transfer Form</h1>
+                            </center>
+                            <div class="row">
+                                <div class="col-4 text-right">
+                                    <strong> بيانات العميل:</strong>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-4 text-right">
+                                    <strong> الاسم:</strong>
+                                </div>
+                                <div class="col-8 text-right">
+                                    <strong t-esc="doc.partner_id.name"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-4 text-right">
+                                    <strong> رقم الموبايل:</strong>
+                                </div>
+                                <div class="col-8 text-right">
+                                    <strong t-esc="doc.partner_id.phone"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-4 text-right">
+                                    <strong> بريد الالكتروني:</strong>
+                                </div>
+                                <div class="col-8 text-right">
+                                    <strong t-esc="doc.partner_id.email"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-4 text-right">
+                                    <strong> بطاقة رقم قومي /جواز سفر:</strong>
+                                </div>
+                                <div class="col-8 text-right">
+                                    <strong t-esc="doc.partner_id.id_def"/>
+                                </div>
+                            </div>
+
+
+
+                            <div class="row">
+                                <div class="col-4 text-right">
+                                    <strong> بيانات الوحدة:</strong>
+                                </div>
+
+                            </div>
+                            <table class="table table-sm o_main_table" name="invoice_line_table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">
+                                            <span></span>
+                                        </th>
+                                        <th class="text-left">
+                                            <span>الوحدة المحول منها</span>
+                                        </th>
+                                        <th class="text-left">
+                                            <span>الوحدة المحول اليها</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="invoice_tbody">
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>المشروع</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-field="doc.reservation_id.property_id.project_id"/>
+                                        </td>
+                                        <td class="text-left">
+                                           <strong t-field="doc.reservation_id_2.property_id.project_id"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>رقم الوحدة</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-field="doc.reservation_id.property_id.property_code"/>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-field="doc.reservation_id.property_id.property_code"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>نموذج الوحدة</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-field="doc.reservation_id.property_id.type_of_property_id"/>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-field="doc.reservation_id_2.property_id.type_of_property_id"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>تاريخ الحجز</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-field="doc.reservation_id.date"/>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-field="doc.reservation_id_2.date"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>قيمة الوحدة</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-esc="doc.reservation_id.net_price"/>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-esc="doc.reservation_id_2.net_price"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>المسددة</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-esc="sum(doc.payments_collected_ids.mapped('amount'))"/>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong t-esc="sum(doc.payments_post_res1_ids.mapped('amount'))"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>طريقة السداد</strong>
+                                        </td>
+                                        <td class="text-left">
+                                        </td>
+                                        <td class="text-left">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row">
+                                <div class="col-4 text-right">
+                                    <strong> ملاحظات:</strong>
+                                </div>
+
+                            </div>
+                                          <div class="row">
+                                <div class="col-3">
+                                    <strong>توقيع العميل</strong>
+
+                                </div>
+                                <div class="col-3">
+                                    <strong>توقيع مسئول المبيعات</strong>
+                                </div>
+                                <div class="col-3">
+                                    <strong>توقيع مدير المبيعات</strong>
+                                </div>
+                                <div class="col-3">
+                                    <strong>توقيع ادارة المبيعات</strong>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </t>
+                </t>
+
+            </t>
+        </template>
+
+
+<!--        <report-->
+<!--                id="report_action_transfer_unit"-->
+<!--                string="Transfer  Unit"-->
+<!--                model="transfer.unit"-->
+<!--                report_type="qweb-pdf"-->
+<!--                file="add_real_estate.report_transfer_unit_temp"-->
+<!--                name="add_real_estate.report_transfer_unit_temp"-->
+<!--        />-->
+
+         <record id="report_action_transfer_unit" model="ir.actions.report">
+        <field name="name">Transfer  Unit</field>
+        <field name="model">transfer.unit</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">add_real_estate.report_transfer_unit_temp</field>
+        <field name="report_file">add_real_estate.report_transfer_unit_temp</field>
+        <field name="binding_model_id" ref="add_real_estate.model_transfer_unit"/>
+        <field name="binding_type">report</field>
+    </record>
+
+
+    </data>
+</odoo>

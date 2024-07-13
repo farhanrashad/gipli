@@ -1,0 +1,215 @@
+<odoo>
+    <data>
+
+
+
+        <record id="check_cycle_accounts_form" model="ir.ui.view">
+            <field name="name">check.cycle.accounts.default.form</field>
+            <field name="model">check.cycle.accounts.default</field>
+<!--            <field name="view_type">form</field>-->
+            <field name="arch" type="xml">
+                <form>
+                    <h1>
+                        <field name="name" invisible="context.get('action_wiz',False)!='depoist'"/>
+                        <field name="name_cancel" invisible="context.get('action_wiz',False)!='cancel'"/>
+                        <field name="name_reject" invisible="context.get('action_wiz',False)!='reject'"/>
+                        <field name="name_return" invisible="context.get('action_wiz',False)!='return'"/>
+                        <field name="name_approve" invisible="context.get('action_wiz',False)!='approve'"/>
+                        <field name="name_debit" invisible="context.get('action_wiz',False)!='debit'"/>
+                        <field name="name_csreturn" invisible="context.get('action_wiz',False)!='cs_return'"/>
+                        <field name="name_split_merge" invisible="context.get('action_wiz',False)!='split_merge'"/>
+                    </h1>
+                    <group col="2">
+                                           <field name="action_wiz" invisible="1" />
+                                           <field name="journal_id" options="{'no_create':1,'no_edit':1}"
+                               invisible="context.get('action_wiz',False) not in ('depoist','approve','debit','send_to_lagel','deliver')"/>
+                        <field name="date"/>
+                    </group>
+                    <h3 invisible="context.get('action_wiz',False) != 'reject'"
+                        required="context.get('action_wiz',False) == 'reject'">Rejection Reason
+                    </h3>
+                    <field name="reject_reason" invisible="context.get('action_wiz',False) != 'reject'"
+
+                    />
+                      <h3 invisible="context.get('action_wiz',False) != 'return'"
+                        required="context.get('action_wiz',False) == 'return'">Rejection Reason
+                    </h3>
+                       <field name="reject_reason" invisible="context.get('action_wiz',False) != 'return'"
+                           required="context.get('action_wiz',False) == 'return'"
+
+                    />
+                    <h3 invisible="context.get('action_wiz',False) != 'split_merge'">Total Checks Amount</h3>
+                    <field name="total_amt_checks" invisible="context.get('action_wiz',False) != 'split_merge'"/>
+                    <!--<field name="investor_spilt" invisible="context.get('action_wiz',False) != 'split_merge'"/>-->
+
+                    <field name="merge_split_checks" invisible="context.get('action_wiz',False) != 'split_merge'" widget="one2many">
+                        <tree editable="bottom">
+                            <field name="check_number" />
+                            <field name="check_date" />
+                            <field name="amount" />
+                            <field name="bank" />
+                            <field name="dep_bank" />
+                        </tree>
+                    </field>
+
+                    <field name="approve_check" invisible="context.get('action_wiz',False) != 'approve'">
+                        <tree create="false" delete="false" editable="top">
+                            <field name="check_number" readonly="1"/>
+                            <field name="check_amt" readonly="1" sum="Total"/>
+                            <field name="open_amt" readonly="1"/>
+                            <field name="paid_amt"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button name="action_save" type="object" string="Submit" class="oe_highlight"/>
+                        <button special="cancel" string="Cancel" class="oe_highlight"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <act_window
+                id="check_cycle_wizard_action1"
+                name="Depoist Checks"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'depoist','default_action_wiz':'depoist'}"
+        />
+
+
+        <act_window
+                id="check_cycle_wizard_action2"
+                name="Reject Checks"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                binding_views="list"
+                view_mode="form" target="new"
+                context="{'action_wiz' : 'reject','default_action_wiz':'reject'}"
+        />
+
+
+        <act_window
+                id="check_cycle_wizard_action3"
+                name="Approve Checks"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                binding_views="list"
+                view_mode="form" target="new"
+                context="{'action_wiz' : 'approve','default_action_wiz':'approve'}"
+        />
+
+        <act_window
+                id="check_cycle_wizard_action4"
+                name="Cancel Checks"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                binding_views="list"
+                view_mode="form" target="new"
+                context="{'action_wiz' : 'cancel','default_action_wiz':'cancel'}"
+        />
+
+        <act_window
+                id="check_cycle_wizard_action5"
+                name="Company Return"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'return','default_action_wiz':'return'}"
+        />
+
+        <act_window
+                id="check_cycle_wizard_action6"
+                name="Withdrawal Payable Checks"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'debit','default_action_wiz':'debit'}"
+        />
+
+        <act_window
+                id="check_cycle_wizard_action7"
+                name="Customer Return"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'cs_return','default_action_wiz':'cs_return'}"
+        />
+
+        <act_window
+                id="check_cycle_wizard_action8"
+                name="Split-Merge"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'split_merge','default_action_wiz':'split_merge'}"
+        />
+
+          <act_window
+                id="check_cycle_wizard_action9"
+                name="Send To Legal"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'send_to_lagel','default_action_wiz':'send_to_lagel'}"
+        />
+          <act_window
+                id="check_cycle_wizard_action10"
+                name="Refund Send To Legal"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'refund_send_to_lagel','default_action_wiz':'refund_send_to_lagel'}"
+        />
+
+           <act_window
+                id="check_cycle_wizard_action11"
+                name="Deliver"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'deliver','default_action_wiz':'deliver'}"
+        />
+
+           <act_window
+                id="check_cycle_wizard_action12"
+                name="Refund Deliver"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'refund_deliver','default_action_wiz':'refund_deliver'}"
+        />
+           <act_window
+                id="check_cycle_wizard_action13"
+                name="Refund"
+                res_model="check.cycle.accounts.default"
+                binding_model="check.management"
+                view_mode="form" target="new"
+                binding_views="list"
+                context="{'action_wiz' : 'refund','default_action_wiz':'refund'}"
+        />
+    <act_window
+                    id="check_cycle_wizard_action14"
+                    name="Deliver To Customer"
+                    res_model="check.cycle.accounts.default"
+                    binding_model="check.management"
+                    view_mode="form" target="new"
+                    binding_views="list"
+                    context="{'action_wiz' : 'deliver_to_customer','default_action_wiz':'deliver_to_customer'}"
+            />
+
+
+
+
+    </data>
+</odoo>

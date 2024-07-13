@@ -1,0 +1,392 @@
+<odoo>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+        <record id="account_payment_inherit_form_id_res" model="ir.ui.view">
+            <field name="name">account payment</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='action_post']" position="attributes">
+                    <attribute name="groups">add_real_estate.group_confirm_payment</attribute>
+                </xpath>
+                <xpath expr="//field[@name='check_amount_in_words']" position="attributes">
+                    <attribute name="readonly">1</attribute>
+                </xpath>
+
+
+                <xpath expr="//button[1]" position="before">
+                    <button name="%(add_real_estate.merge_customer_wizard_action)d" id="merge_customer_payment_btn"
+                            type="action" class="oe_highlight"
+                            context="{'search_default_parent_id': active_id,
+                                 'default_parent_id': active_id,
+                                 'default_partner_id': partner_id,
+                                 'default_date': date,
+                                 'default_amount_paid': split_amount,
+                                 'default_amount_due': split_amount_due,
+                                 'default_journal_id': journal_id,
+                                 'default_reservation_id': reservation_id,
+                                 'default_amount': amount
+                                 }"
+                            string="Split Customer"
+                            attrs="{'invisible': ['|',('payment_type','!=','inbound'),('state', 'not in', ['posted','refunded_under_collection','deliver'])]}"/>
+                    <button name="%(add_real_estate.merge_vendor_wizard_action)d" id="merge_vendor_payment_btn"
+                            type="action" class="oe_highlight"
+                            context="{'search_default_parent_id': active_id,
+                                 'default_parent_id': active_id,
+                                 'default_amount_paid': split_amount,
+                                                                 'default_amount_due': split_amount_due,
+                                 'default_date': date,
+                                 'default_partner_id': partner_id,
+                                 'default_journal_id': journal_id,
+                                 'default_reservation_id': reservation_id,
+                                 'default_amount': amount
+                                 }"
+                            string="Split Vendor"
+                            attrs="{'invisible': ['|',('payment_type','!=','outbound'),('state', 'not in', ['posted','refunded_under_collection','deliver'])]}"/>
+
+                </xpath>
+                <xpath expr="//field[@name='journal_id']" position="after">
+
+                    <field name="reservation_id" options="{'no_create': True, 'no_open': True}" force_save="1"
+                           readonly="1"
+                           domain="[('customer_id','=',partner_id),('customer_id','!=',False)]"
+                    />
+                    <field name="property_id" options="{'no_create': True, 'no_open': True}" force_save="1" readonly="0"
+                           domain="['|',('policy_nts_id','!=',False),'|',('policy_bonous_id','!=',False),('policy_commission_id','!=',False)]"
+                    />
+                    <field name="send_to_legal"/>
+                    <field name="custoemr_payment_id"/>
+                    <field name="state_payment2" readonly="1"/>
+                    <field name="payment_strg_id"/>
+                    <field name="request_id"/>
+                    <field name="is_main"/>
+                    <field name="is_payment_lines"/>
+                    <field name="split_amount" invisible="1"/>
+                    <field name="split_amount_due" invisible="1"/>
+                    <field name="remaining_amount" invisible="1"/>
+                    <field name="parent_id_split"/>
+                    <field name="group_commision_with_payment" invisible="1"/>
+                    <field name="policy_commission_id" options="{'no_create': True, 'no_open': True}" force_save="1"
+                           attrs="{'readonly' : [('group_commision_with_payment', '=',False )]}"/>
+                    <field name="policy_bonous_id" options="{'no_create': True, 'no_open': True}" force_save="1"
+                           attrs="{'readonly' : [('group_commision_with_payment', '=',False )]}"/>
+                    <field name="policy_nts_id" options="{'no_create': True, 'no_open': True}" force_save="1"
+                           attrs="{'readonly' : [('group_commision_with_payment', '=',False )]}"/>
+
+
+                </xpath>
+                <xpath expr="//field[@name='currency_id']" position="before">
+                    <field name="custom_rate"/>
+                </xpath>
+                <xpath expr="//field[@name='journal_id']" position="after">
+                    <field name="document_type_id"
+                           options="{'no_quick_create': True, 'no_create_edit' : True,'on_open   ' : True}"/>
+                    <field name="external_document_number"/>
+                    <field name="external_document_type"/>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="account_emp_type"
+                           attrs="{'invisible':[('partner_type','!=','employee')],'required':[('partner_type','=','employee')],'readonly':[('state','!=','draft')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="custom_account_id"
+                           domain="[('deprecated', '=', False) ,('company_id', '=',company_id)]"
+                           force_save="1" attrs="{'invisible':[('partner_type','!=','employee')]}"/>
+                </xpath>
+
+
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="analytic_account_id" invisible="1"/>
+                    <field name="expenses_for_unit_check" invisible="1"/>
+                    <field name="select_account_id"
+                           domain="[('deprecated', '=', False) ,('company_id', '=',company_id)]"
+                           attrs="{'invisible':['|',('partner_type','!=','select_account'),('multi_accounts','=',True)],'required':[('partner_type','=','select_account')]}"/>
+                    <field name="expenses_for_unit"
+                           attrs="{'invisible':['|',('is_select_account','=',False),('expenses_for_unit_check','=',False)]}"/>
+                    <field name="is_select_account" invisible="1"/>
+                    <field name="multi_accounts" attrs="{'invisible':[('is_select_account','=',False)]}"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('payment_type', 'not in',
+                        ('inbound', 'outbound'))]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//group[@name='group2']" position="after">
+                    <group attrs="{'invisible':[('multi_accounts','=',False)]}">
+                        <field name="multi_account_ids" attrs="{'invisible':[('multi_accounts','=',False)]}">
+                            <tree editable="bottom">
+                                <field name="account_id"/>
+                                <field name="partner_id"/>
+                                <field name="analytic_account_id"/>
+                                <field name="label"/>
+                                <field name="amount"/>
+                            </tree>
+                        </field>
+                    </group>
+
+                </xpath>
+                <xpath expr="//button" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+
+                <xpath expr="//button[@name='action_cancel']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+<!--                <xpath expr="//header" position="inside">-->
+
+<!--                    <button attrs="{'invisible':['|',('state','not in',['posted']),('payment_method_code','!=','check_printing')]}"-->
+<!--                            name="refund_payable"-->
+<!--                            type="object" context="{'refund':1}" string="Refund"/>-->
+
+<!--                    <button attrs="{'invisible':['|',('state','not in',['deliver']),('payment_method_code','!=','check_printing')]}"-->
+<!--                            name="refund_payable"-->
+<!--                            type="object" context="{'refund_delivery':1}" string="Refund Delivery"/>-->
+
+
+<!--                    <button attrs="{'invisible':['|',('payment_type','in',['transfer','inbound']),-->
+<!--                                    ('state','!=','draft'),('hide_del','=',True)-->
+<!--                                    ]}"-->
+<!--                            name="post" type="object" context="{'delivery_aml':1}" string="Delivery Check"/>-->
+<!--                    <button attrs="{'invisible':['|',('payment_type','in',['transfer','inbound']),-->
+<!--                    ('state','!=','draft'),('hide_bank','=',True)]}" name="post"-->
+
+<!--                            type="object" context="{'bank_aml':1}" string="Bank Withdrawal"/>-->
+
+
+<!--                    <button attrs="{'invisible':[('state','not in',['posted','refunded_under_collection'])]}"-->
+<!--                            name="refund_notes"-->
+<!--                            type="object" context="{'ref_notes_batch':1}" string="Refund Notes"/>-->
+<!--                    <button attrs="{'invisible':[('state','=','delivery_to_customer')]}"-->
+<!--                            name="to_delivery_to_customer"-->
+<!--                            type="object" context="{'ref_notes_batch':1}" string="Delivery To Customer"/>-->
+
+<!--                    <button attrs="{'invisible':[('state','not in',['posted','refunded_under_collection'])]}"-->
+<!--                            name="send_to_leagle"-->
+<!--                            type="object" string="Send To Leagle"/>-->
+<!--                    <button attrs="{'invisible':[('state','!=','send_to_leagle')]}"-->
+<!--                            name="return_from_leagle2"-->
+<!--                            type="object" string="Return From Leagle"/>-->
+
+
+<!--                </xpath>-->
+                <xpath expr="//field[@name='check_number']" position="after">
+
+                    <!-- Add your fields or attributes here -->
+                    <field name="hide_bank" invisible="1"/>
+                    <field name="hide_del" invisible="1"/>
+                    <field name="cheque_books_id"
+                           string="Check Book"
+
+                           attrs="{'invisible':[('payment_method_code','!=','check_printing')],
+                           'readonly':[('state','!=','draft')],
+                           'required':[('payment_method_code','in',['check_printing'])]}"
+                           options="{'limit': 10, 'create': false, 'create_edit': false}"
+                           widget="selection"
+                    />
+
+
+                    <field name="payment_bank_id"
+                           options='{"no_open": True, "no_create": True}'
+                           attrs="{
+                                                       'readonly':[('state','!=','draft')],
+                                                       'required':[('payment_method_code','=','batch_payment')]}"/>
+                    <field name="bank_name" invisible="1" force_save="1"/>
+                    <field name="check_number" attrs="{
+                                                        'readonly':[('state','!=','draft')],
+                                                        'required':[('payment_method_code','=','batch_payment')]}"/>
+                    <field name="check_type" attrs="{'invisible':[('payment_method_code','!=','batch_payment')],
+                                                    'readonly':[('state','!=','draft')]}"/>
+                    <field name="ref_coll_batch" string="[Refund/Collect] Date"
+                           attrs="{'invisible':[('payment_method_code','!=','batch_payment')]}" readonly="1"/>
+                    <field name="move_date" attrs="{'readonly':[('state','in',['draft','under_coll','collected'])]}"
+                           string="Notes Refund Date"/>
+                    <field name="delivery_to_customer_date"/>
+
+                    <field name="multi_check_payment" invisible="1"/>
+                    <field name="cheque_number_rel"
+                           string="Check Number"
+                           attrs="{'invisible':['|',('payment_method_code','!=','check_printing'),('multi_check_payment','=',True)],
+
+                          }"
+                           readonly="1"
+                    />
+
+                    <field name="cheque_number"
+                           string="Check Number"
+                           attrs="{'invisible':['|',('payment_method_code','!=','check_printing'),('multi_check_payment','=',False)],
+                            'readonly':[('state','!=','draft')],
+                           'required':[('payment_method_code','=','check_printing')]}"
+                    />
+
+                    <field name="active_cheque"
+                           string="Cheque number"
+                           invisible="1"
+
+                    />
+                    <field name="active_cheque_number"
+                           string="Check Number"
+                           attrs="{'invisible':[('payment_method_code','!=','check_printing')],
+                           'readonly':[('active_cheque','=',True)],
+                           }"
+                           invisible="1"
+                    />
+
+                </xpath>
+                <xpath expr="//field[@name='check_number']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form/sheet" position="inside">
+                    <notebook>
+                        <page string="Dates">
+                            <group>
+                                <group>
+                                    <field name="due_date"
+                                           string="Due Date"
+                                           attrs="{
+                                    'readonly':[('state','!=','draft')],
+                                    'required':[('payment_method_code','in',['batch_payment','check_printing'])]
+                                    }"
+                                    />
+                                    <field name="delivery_date"
+                                           attrs="{'invisible':[('payment_method_code','not in',['check_printing'])],
+                                    'readonly':[('state','not in',['posted'])],
+
+                                    }"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="actual_date"
+                                           string="Actual Date"
+                                           attrs="{
+                                           'readonly':[('state','in',['collected','cancel','refunded_from_notes','check_refund'])],
+                           'required':[('payment_method_code','in',['batch_payment','check_printing'])]}"
+
+                                    />
+
+                                    <field name="withdrawal_date"
+                                           attrs="{'invisible':[('payment_method_code','not in',['check_printing'])],
+                                    'readonly':[('state','not in',['deliver'])],
+
+
+                                    }"
+                                    />
+
+
+                                </group>
+                                <group>
+                                    <field name="refund_date"
+                                           attrs="{'invisible':[('payment_method_code','not in',['check_printing'])],
+                                    'readonly':[('state','not in',['posted'])],}"/>
+
+                                    <field name="refund_delivery_date"
+                                           attrs="{'invisible':['|',('payment_type','!=','outbound'),('payment_method_code','not in',['check_printing',''])],
+                                           'readonly':[('state','!=','deliver')]}"
+
+
+                                    />
+                                </group>
+                                <group>
+                                    <field name="journal_to_leagle" domain="[('is_leagle','=',True)]"/>
+                                    <field name="send_to_leagle_date"/>
+                                    <field name="journal_from_leagle" domain="[('is_leagle','=',True)]"
+                                           attrs="{'invisible':[('state','!=','send_to_leagle')]}"/>
+                                    <field name="return_from_leagle"
+                                           attrs="{'invisible':[('state','!=','send_to_leagle')]}"/>
+                                </group>
+                            </group>
+
+                        </page>
+                    </notebook>
+
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="customer_account_type"
+                           attrs="{'invisible':[('partner_type','!=','customer')],'readonly':[('state','!=','draft')]}"/>
+                    <field name="vendor_account_type"
+                           attrs="{'invisible':[('partner_type','!=','supplier')],'readonly':[('state','!=','draft')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="partner_account_id" force_save="1"
+                           attrs="{'invisible':[('partner_type','in',['select_account','employee'])]}"/>
+
+                </xpath>
+
+
+            </field>
+        </record>
+        <!--        <record id="account_payment_inherit_form_id_res_5550" model="ir.ui.view">-->
+        <!--            <field name="name">account payment</field>-->
+        <!--            <field name="model">account.payment</field>-->
+        <!--            <field name="groups_id" eval="[(4, ref('add_real_estate.group_payments_reservation_unit_field'))]"/>-->
+        <!--            <field name="inherit_id" ref="account.view_account_payment_form"/>-->
+        <!--            <field name="arch" type="xml">-->
+
+        <!--                <xpath expr="//field[@name='reservation_id']" position="attributes">-->
+        <!--                    <attribute name="readonly">0</attribute>-->
+        <!--                    <attribute name="attrs">{'readonly':['|',('payment_type','!=','outbound'),('partner_type','!=','customer')]}</attribute>-->
+        <!--                </xpath>-->
+
+        <!--            </field>-->
+        <!--        </record>-->
+
+        <record id="account.action_account_payments" model="ir.actions.act_window">
+            <field name="name">Payments</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,kanban,form,graph</field>
+            <field name="domain">[('is_select_account','=',False)]</field>
+            <field name="context">{
+                'default_payment_type': 'inbound',
+                'default_partner_type': 'customer',
+                'search_default_inbound_filter': 1,
+                'res_partner_search_mode': 'customer',
+                }
+            </field>
+            <field name="view_id" ref="account.view_account_payment_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Register a payment
+                </p>
+                <p>
+                    Payments are used to register liquidity movements. You can process those payments by your own means
+                    or by using installed facilities.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_direct_expenses" model="ir.actions.act_window">
+            <field name="name">Direct Expenses</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,kanban,form,graph</field>
+            <field name="domain">[('is_select_account','=',True)]</field>
+            <field name="context">{
+                'default_payment_type': 'outbound',
+                'default_partner_type': 'select_account',
+                'default_is_select_account':True,
+                'res_partner_search_mode': 'customer',
+                }
+            </field>
+            <field name="view_id" ref="account.view_account_payment_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Register a payment
+                </p>
+                <p>
+                    Payments are used to register liquidity movements. You can process those payments by your own means
+                    or by using installed facilities.
+                </p>
+            </field>
+        </record>
+<!--        <menuitem action="action_direct_expenses"-->
+<!--                  name="Direct Payment"-->
+<!--                  groups="add_real_estate.group_direct_expenses"-->
+<!--                  id="menu_action_direct_expenses" parent="account_accountant.menu_accounting"-->
+<!--                  sequence="5"/>-->
+
+
+    </data>
+</odoo>
