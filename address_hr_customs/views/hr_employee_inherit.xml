@@ -90,11 +90,11 @@
 
             <xpath expr="//field[@name='address_id']" position="after">
                 <field name="bank_application"/>
-                <field name="bank_application_date" attrs="{'invisible': [('bank_application', '!=', True)]}"/>
+                <field name="bank_application_date" invisible="bank_application !=  True"/>
 
             </xpath>
 
-            <xpath expr="//field[@name='phone']" position="replace">
+            <xpath expr="//field[@name='mobile_phone']" position="replace">
                 <field name="phone_num"/>
 
             </xpath>
