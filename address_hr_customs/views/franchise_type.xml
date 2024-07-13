@@ -1,0 +1,25 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="franchise_type_form_view">
+      <field name="name">franchise_type form</field>
+      <field name="model">franchise.type</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="franchise_type_action_window">
+      <field name="name">franchise_type</field>
+      <field name="res_model">franchise.type</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <menuitem name="Franchise Type" id="franchise_type_menu_item" parent="hr.menu_human_resources_configuration"
+              action="franchise_type_action_window"/>
+
+   </data>
+</odoo>

@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="hr_employee_view_form_int" model="ir.ui.view">
+        <field name="name">hr.employee.form.int</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+
+
+            <xpath expr="//field[@name='job_title']" position="before">
+                <field name="employee_arabic_name" placeholder="Arabic name"/>
+            </xpath>
+
+
+            <xpath expr="//page[@name='hr_settings']" position="after">
+                <page name="work_documents" string="Work Documents">
+                    <group>
+                        <group>
+
+
+                            <label for="national_id"/>
+                            <div class="o_row">
+                                <field name="national_id_file_name" invisible="1"/>
+                                <field name="national_id"/>
+                                <field name="national_id_file" widget="binary" filename="national_id_file_name"/>
+                            </div>
+                            <label for="graduation_cert"/>
+                            <div class="o_row">
+                                <field name="graduation_cert_file_name" invisible="1"/>
+                                <field name="graduation_cert"/>
+                                <field name="graduation_cert_file" widget="binary"
+                                       filename="graduation_cert_file_name"/>
+                            </div>
+                            <label for="birth_cert"/>
+                            <div class="o_row">
+                                <field name="birth_cert_file_name" invisible="1"/>
+                                <field name="birth_cert"/>
+                                <field name="birth_cert_file" widget="binary" filename="birth_cert_file_name"/>
+                            </div>
+                            <label for="criminal_records_cert"/>
+                            <div class="o_row">
+                                <field name="criminal_records_cert_file_name" invisible="1"/>
+                                <field name="criminal_records_cert"/>
+                                <field name="criminal_records_cert_file" widget="binary"
+                                       filename="criminal_records_cert_file_name"/>
+                            </div>
+                            <label for="work_stub"/>
+                            <div class="o_row">
+                                <field name="work_stub_file_name" invisible="1"/>
+                                <field name="work_stub"/>
+                                <field name="work_stub_file" widget="binary" filename="work_stub_file_name"/>
+                            </div>
+                            <label for="six_photos"/>
+                            <div class="o_row">
+                                <field name="six_photos_file_name" invisible="1"/>
+                                <field name="six_photos"/>
+                                <field name="six_photos_file" widget="binary" filename="six_photos_file_name"/>
+                            </div>
+                            <label for="insurance_form"/>
+                            <div class="o_row">
+                                <field name="insurance_form_file_name" invisible="1"/>
+                                <field name="insurance_form"/>
+                                <field name="insurance_form_file" widget="binary" filename="insurance_form_file_name"/>
+                            </div>
+                            <label for="cv_form"/>
+                            <div class="o_row">
+                                <field name="cv_form_file_name" invisible="1"/>
+                                <field name="cv_form"/>
+                                <field name="cv_form_file" widget="binary" filename="cv_form_file_name"/>
+                            </div>
+                            <label for="army_cert"/>
+                            <div class="o_row">
+                                <field name="army_cert_file_name" invisible="1"/>
+                                <field name="army_cert"/>
+                                <field name="army_cert_file" widget="binary" filename="army_cert_file_name"/>
+                            </div>
+
+
+                            <field name="completed_docs"/>
+                        <field name="not_completed_docs"/>
+                        </group>
+                        <group>
+                            <field name="docs_progress" widget="percentpie"/>
+                        </group>
+
+                    </group>
+                </page>
+            </xpath>
+
+            <xpath expr="//field[@name='address_id']" position="after">
+                <field name="bank_application"/>
+                <field name="bank_application_date" attrs="{'invisible': [('bank_application', '!=', True)]}"/>
+
+            </xpath>
+
+            <xpath expr="//field[@name='phone']" position="replace">
+                <field name="phone_num"/>
+
+            </xpath>
+
+
+            <xpath expr="//field[@name='parent_id']" position="attributes">
+                <attribute name="string">Department Head</attribute>
+            </xpath>
+            <xpath expr="//field[@name='coach_id']" position="attributes">
+                <attribute name="string">Direct Supervisor</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='address_id']" position="after">
+                <field name="hire_date"/>
+                <field name="hiring_source"/>
+                <field name="resignation_date"/>
+                <field name="franchise"/>
+                <field name="old_code"/>
+                <field name="old_code_1"/>
+                <field name="egy_bank_account"/>
+                <field name="cib_bank_account"/>
+                <field name="transfer_date"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
