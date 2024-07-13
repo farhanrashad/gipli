@@ -144,15 +144,16 @@ class AccountMove(models.Model):
     # @api.depends('amount_by_group')
     def _calc_tax_add(self):
         tax_add=tax_sub=0
+        
         for rec in self:
-            for  amount_by_group in rec.amount_by_group:
-                print('D>D>D>',amount_by_group)
-                if float(amount_by_group[1]) > 0:
-                    tax_add += float(amount_by_group[1])
-                else:
-                    tax_sub += float(amount_by_group[1])
-        rec.tax_add=round(abs(tax_add),2)
-        rec.tax_sub=round(abs(tax_sub),2)
+            #for  amount_by_group in rec.amount_by_group:
+            #    if float(amount_by_group[1]) > 0:
+            #        tax_add += float(amount_by_group[1])
+            #    else:
+            #        tax_sub += float(amount_by_group[1])
+        
+            rec.tax_add=round(abs(tax_add),2)
+            rec.tax_sub=round(abs(tax_sub),2)
 
 
     
@@ -217,7 +218,7 @@ class AccountMove(models.Model):
             if len(self.search([("draft_no", "=", self.draft_no)])) > 1:
                 raise ValidationError("Draft No already exists")
 
-    def _compute_payments_widget_to_reconcile_info(self):
+    def _compute_payments_widget_to_reconcile_info1(self):
         for move in self:
             move.invoice_outstanding_credits_debits_widget = False
             move.invoice_has_outstanding = False
@@ -268,15 +269,15 @@ class AccountMove(models.Model):
                 show_add=True
 
                 ref = line.move_id.ref or ""
+                """
                 if line.move_id.check_id.check_number:
                     move.check_payment_state=line.move_id.check_id.state
-                    print("D>D>D3333333>D",line.move_id,line.move_id.check_id,line.move_id.check_id.state)
                     if line.move_id.check_id.state in ['cs_return','delivery_to_customer']:
                         show_add=False
-                    print("D>D>D>D>",show_add)
                     ref += ',' + str(line.move_id.check_id.check_number)
                     if line.move_id.check_id.check_date:
                         ref += ',' + str(line.move_id.check_id.check_date)
+                """
 
 
 

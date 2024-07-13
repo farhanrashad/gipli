@@ -6,7 +6,7 @@
             <field name="arch" type="xml">
                 <form string="Customer Payment">
                     <header>
-                        <button name="approved" type="object" string="Approved" attrs="{'invisible': [('state', '!=', 'draft')]}" status="draft"/>
+                        <button name="approved" type="object" string="Approved" invisible="state != 'draft'" />
                         <field name="state" widget="statusbar" />
                     </header>
                     <sheet>
@@ -23,26 +23,26 @@
                     </div>
                         <group>
                             <group colspan="2" >
-                            <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="state_payment" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="accounting_allocation"   attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="journal_id" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="ref" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="partner_id" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="date" readonly="state != 'draft'" />
+                            <field name="state_payment" readonly="state != 'draft'" />
+                            <field name="accounting_allocation"   readonly="state != 'draft'" />
+                            <field name="journal_id" readonly="state != 'draft'" />
+                            <field name="ref" readonly="state != 'draft'" />
+                            <field name="partner_id" readonly="state != 'draft'" />
                                 <field name="cancel_res" invisible="1"/>
-                            <field name="reservation_id"  attrs="{'readonly': [('state', '!=', 'draft')],'invisible':[('cancel_res', '=', False)]}"
+                            <field name="reservation_id"   readonly="state != 'draft'" invisible="cancel_res ==False"
                                    />
-                            <field name="reservation_id"  attrs="{'readonly': [('state', '!=', 'draft')],'invisible':[('cancel_res', '=', True)]}"
+                            <field name="reservation_id"  readonly="state != 'draft'" invisible="cancel_res ==True"
                                    />
                         </group>
                         <group colspan="2">
-                            <field name="bank_name" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="start_cheque" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="end_cheque" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <button name="update_bank_data"    attrs="{'readonly': [('state', '!=', 'draft')]}" type="object" string="Update Bank and check Number"  />
+                            <field name="bank_name" readonly="state != 'draft'" />
+                            <field name="start_cheque" readonly="state != 'draft'" />
+                            <field name="end_cheque" readonly="state != 'draft'" />
+                            <button name="update_bank_data"    readonly="state != 'draft'" type="object" string="Update Bank and check Number"  />
                         </group>
                         <group colspan="2">
-                            <field name="is_select_all" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="is_select_all" readonly="state != 'draft'"/>
                         </group>
 
                         </group>
@@ -54,7 +54,7 @@
                                        widget="one2many_list"
                                        nolabel="1"
                                        class="oe_inline oe_no_button"
-                                       attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                       readonly="state != 'draft'"
                                 >
                                     <tree string="Payment"
                                           editable="buttom">
@@ -72,7 +72,7 @@
                                         <field name="amount_currency"/>
                                         <field name="amount"/>
                                         <field name="amount_due" readonly="1" force_save="1" />
-                                        <button name="button_journal_entries" type="object" string="Journal Items"  attrs="{'column_invisible': [('parent.state', '!=', 'approved')]}" />
+                                        <button name="button_journal_entries" type="object" string="Journal Items"  column_invisible="parent.state != 'approved'" />
                                     </tree>
                                 </field>
                             </page>

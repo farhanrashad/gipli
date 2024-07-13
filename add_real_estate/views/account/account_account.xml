@@ -54,7 +54,7 @@
                 </xpath>
                 <xpath expr="//field[@name='team_id']" position="after">
                     <field name="source_doc_readonly" invisible="1"/>
-                    <field name="source_doc" attrs="{'readonly':[('source_doc_readonly','=',True)]}"/>
+                    <field name="source_doc" readonly="source_doc_readonly == True"/>
                     <field name="tax_code" force_save="1" readonly="0"/>
                     <field name="deal" force_save="1" readonly="0"/>
                     <field name="tax_discount_percentage" force_save="1" readonly="0"/>
@@ -144,7 +144,7 @@
                     <label for="account_ref"/>
                     <div class="o_row">
                         <field name="account_ref"/>
-                        <field name="account_ref_id" attrs="{'invisible':[('account_ref','=',False)]}"/>
+                        <field name="account_ref_id" invisible="account_ref == False"/>
                     </div>
                     <field name="paid_or_no"/>
 

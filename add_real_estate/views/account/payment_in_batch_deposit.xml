@@ -26,7 +26,7 @@
                 <xpath expr="//group" position="before">
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" name="related_journal_button" string="Journals"
-                                attrs="{'invisible':[('payment_ids','=',[])]}"
+                                invisible="payment_ids == []"
                                 type="object" icon="fa-bars"/>
                     </div>
                 </xpath>
@@ -40,19 +40,20 @@
                            />
                     <button name="post_under_collection" context="{'delivery_aml_batch':1}"
                             type="object" string="Multi Under Collection"
-                            attrs="{'invisible':[('state','!=','draft')]}"/>
+                            invisible="state != 'draft'"/>
                     <button name="refund_under_collections" context="{'ref_und_coll_batch':1}"
                             type="object" string="Multi Refund"
-                            attrs="{'invisible':[('state','in',['draft','discount','collected','done'])]}"/>
+                            invisible="state in ['draft','discount','collected','done']"/>
 
                     <button name="post_bank_entrie" context="{'bank_aml_batch':1}" type="object"
                             string="Multi Collection"
-                            attrs="{'invisible':[('state','in',['draft','discount','collected','done'])]}"/>
+                            invisible="state','in',['draft','discount','collected','done'])]}"/>
                     <field name="read_only" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='payment_ids']" position="after">
                     <field name="payment_ids_rel" widget="many2many"
-                           attrs="{'readonly':[('state','in',['collect','done'])],'invisible':[('state','=','draft')]}"
+                           readonly="state in ['collect','done']"
+                        invisible="state == 'draft'"
                            domain="['|',('batch_payment_id', '=',False), ('state', 'in', ['reconciled',
                         'posted', 'refunded_under_collection','refund_from_discount']), ('payment_method_id.code', '=','batch_payment'),
                         ('journal_id.is_notes_receivable', '=','1'),('journal_id','=',journal_id)]"
@@ -60,28 +61,35 @@
                         <tree string="Payments" editable="top" delete="false" create="false">
                             <field name="company_id" invisible="0"/>
                             <field name="partner_id" string="Partner"
-                                   attrs="{'readonly':[('state','!=','draft')]}"/>
+                                   readonly="state != 'draft'"/>
                             <field name="check_number" readonly="1"/>
                             <field name="bank_name" readonly="1"/>
                             <field name="amount" sum="Total"
-                                   attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                   invisible="state in ['collect','done']" 
+                                readonly="state != 'draft'"/>
                             <field name="date"
-                                   attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                   invisible="state in ['collect','done']"
+                                readonly="state != 'draft'"/>
                             <field name="due_date"
-                                   attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                   invisible="state in ['collect','done']"
+                                readonly="state != 'draft'"/>
 
                             <field name="ref_coll_batch" string="[Refund/Collect] Date"
-                                   attrs="{'readonly':[('state','in',['collected','refunded_under_collection']),('batch_state','=','under_collection')]}"/>
+                                   readonly="state in ['collected','refunded_under_collection'
+                                and batch_state == 'under_collection'"/>
                             <field name="multi_select"
-                                   attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','in',['collected','done'])]}"/>
+                                   invisible="state in ['collect','done']"
+                                readonly="state in ['collected','done']"/>
                             <field name="state"
-                                   attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                   invisible="state in ['collect','done']"
+                                readonly="state != 'draft'"/>
                             <field name="batch_state" invisible="1"/>
                             <field name="communication"
-                                   attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                   invisible="state in ['collect','done']"
+                                readonly="state != 'draft'"/>
                             <field name="currency_id" invisible="1"
-                                   attrs="{'invisible':[('state','in',['collect','done'])],
-                                                            'readonly':[('state','!=','draft')]}"/>
+                                   invisible="state in ['collect','done']"
+                                readonly="state != 'draft'"/>
 
                         </tree>
                         <form string="Register Payment">
@@ -94,21 +102,21 @@
                                     <field name="state" invisible="1"/>
 
                                     <field name="partner_type" widget="selection" required="1"
-                                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                           readonly="state != 'draft'"/>
                                     <field name="partner_id" required="1"
-                                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                           readonly="state != 'draft'"/>
                                     <label for="amount"/>
                                     <div>
                                         <field name="amount" class="oe_inline" required="1"
-                                               attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                               readonly="state != 'draft'"/>
                                         <field name="currency_id" options="{'no_create': True}"
                                                groups="base.group_multi_currency" class="oe_inline"
-                                               attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                               readonly="state != 'draft'"/>
                                     </div>
                                 </group>
                                 <group>
-                                    <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                    <field name="communication" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="date" readonly="state != 'draft'"/>
+                                    <field name="communication" readonly="state != 'draft'"/>
                                 </group>
                             </group>
                         </form>
@@ -118,32 +126,37 @@
                     <tree string="Payments" editable="top">
   <field name="company_id" invisible="0"/>
                         <field name="partner_id" string="Partner"
-                               attrs="{'readonly':[('state','!=','draft')]}"/>
+                               readonly="state != 'draft'"/>
                         <field name="check_number" readonly="1"/>
                         <field name="bank_name" readonly="1"/>
                         <field name="amount" sum="Total"
-                               attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                               invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
                         <field name="date"
-                               attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                               invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
                         <field name="due_date"
-                               attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                               invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
 
                         <field name="ref_coll_batch" string="[Refund/Collect] Date"
-                               attrs="{'readonly':[('batch_state','=','draft'),('state','=','posted')]}"
+                               readonly="batch_state == 'draft' and state == 'posted'"
                         />
                         <field name="multi_select"
-
-                               attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','in',['collected','done'])]}"/>
+                               invisible="state in ['collect','done']"
+                            readonly="state in ['collected','done']"/>
                         <field name="state"
-                               attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"
+                               invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"
                         />
                         <field name="batch_state" invisible="1"/>
 
                         <field name="communication"
-                               attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                               invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
                         <field name="currency_id" invisible="1"
-                               attrs="{'invisible':[('state','in',['collect','done'])],
-                                                            'readonly':[('state','!=','draft')]}"/>
+                               invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
 
 
                         <!--<button name="delete_check_from_batch" type="object" icon="fa-archive"/>-->
@@ -155,17 +168,13 @@
                 <xpath expr="//field[@name='journal_id']" position="after">
                     <field name="bank_id"
                            required="1"
-                           attrs="{'readonly':[('read_only','=',True)]}"
+                           readonly="read_only == True"
                            domain="[('type','=','bank'),('is_notes_receivable','=',False)]"
                            string="Collect Bank"/>
-
                 </xpath>
-
                 <xpath expr="//field[@name='payment_ids']" position="attributes">
-
-                    <attribute name="attrs">{'readonly':[('state','=','done')],'invisible':[('state','!=','draft')]}
-                    </attribute>
-
+                    <attribute name="readonly">state == 'done'</attribute>
+                    <attribute name="invisible">state != 'draft'</attribute>
                 </xpath>
                 <xpath expr="//field[@name='payment_ids']/tree" position="attributes">
                     <attribute name="editable">bottom</attribute>
@@ -187,7 +196,7 @@
 
                 <xpath expr="//field[@name='journal_id']" position="attributes">
                     <attribute name="domain">[('is_notes_receivable','=','1')]</attribute>
-                    <attribute name="attrs">{'readonly':[('read_only','=',True)]}</attribute>
+                    <attribute name="readonly">read_only == True</attribute>
                     <attribute name="string">Notes Bank</attribute>
 
                 </xpath>
@@ -202,10 +211,10 @@
                 </xpath>
 
                 <xpath expr="//field[@name='date']" position="attributes">
-                    <attribute name="attrs">{'readonly':[('read_only','=',True)]}</attribute>
+                    <attribute name="readonly">read_only == True</attribute>
                 </xpath>
                 <xpath expr="//field[@name='name']" position="attributes">
-                    <attribute name="attrs">{'readonly':[('read_only','=',True)]}</attribute>
+                    <attribute name="readonly">read_only == True</attribute>
                 </xpath>
             </field>
         </record>
@@ -274,20 +283,20 @@
                         <!--<button name="print_batch_deposit" class="oe_highlight" string="Print" type="object"/>-->
                         <button name="discount_all" class="oe_highlight" context="{'discount_check':1}"
                                 string="Multi Discount"
-                                attrs="{'invisible':[('state','in',['discount','loan','collected','done'])]}"
+                                invisible="state in ['discount','loan','collected','done']"
                                 type="object"/>
                         <button name="receive_all"
-                                attrs="{'invisible':[('state','in',['draft','collected','done'])]}"
+                                invisible = "state in ['draft','collected','done']"
                                 context="{'loan_check':1}"
                                 class="oe_highlight" string="Multi Receive Loan" type="object"/>
 
                         <button name="refund_discount"
                                 context="{'ref_disc_batch':1}"
-                                attrs="{'invisible':[('state','in',['draft','discount','collected','done'])]}"
+                                invisible="state in ['draft','discount','collected','done']"
                                 class="oe_highlight" string="Multi Refund" type="object"/>
 
                         <button name="collect_discount"
-                                attrs="{'invisible':[('state','in',['draft','collected','done'])]}"
+                                invisible="state in ['draft','collected','done']"
                                 context="{'collect_disc_batch':1}"
                                 class="oe_highlight" string="Multi Collection"
                                 type="object"
@@ -299,7 +308,7 @@
                         <xpath expr="//group" position="before">
                             <div class="oe_button_box" name="button_box">
                                 <button class="oe_stat_button" name="related_journal_button" string="Journals"
-                                        attrs="{'invisible':[('payment_ids','=',[])]}"
+                                        invisible="payment_ids == []"
                                         type="object" icon="fa-bars"/>
                             </div>
                         </xpath>
@@ -307,25 +316,26 @@
                             <group>
                                 <field name="journal_id" string="Notes Bank"
                                        domain="[('type', '=', 'bank'),('is_notes_receivable','=','1')]"
-                                       attrs="{'readonly':[('state','!=','draft')]}"
+                                       readonly="state != 'draft'"
                                        widget="selection"/>
 
                                 <field name="bank_id" string="Discounted Bank" required="1"
-                                       attrs="{'readonly':[('state','!=','draft')]}"
+                                       readonly="state != 'draft'"
 
                                        domain="[('type','=','bank'),('is_notes_receivable','=',False)]"/>
                                 <field name="currency_id" invisible="1"/>
                             </group>
                             <group>
-                                <field name="date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="date" readonly="state != 'draft'"/>
                                 <field name="name" placeholder="auto ..." required="0"
-                                       attrs="{'readonly':[('state','!=','draft')]}"/>
+                                       readonly="state != 'draft'"/>
                                 <field name="read_only" invisible="1"/>
                             </group>
                         </group>
 
                         <field name="payment_ids" widget="many2many"
-                               attrs="{'readonly':[('state','in',['collect','done'])],'invisible':[('state','!=','draft')]}"
+                               readonly="state in ['collect','done']"
+                            invisible="state != 'draft'"
                                domain="['|',('batch_payment_id', '=',False), ('state', 'in', ['reconciled',
                         'posted', 'refunded_under_collection','refund_from_discount']), ('payment_method_id.code', '=','batch_payment'),
                         ('journal_id.is_notes_receivable', '=','1'),('journal_id','=',journal_id)]"
@@ -333,33 +343,39 @@
                             <tree string="Payments" editable="top">
                               <field name="company_id" invisible="0"/>
                                 <field name="partner_id" string="Partner"
-                                       attrs="{'readonly':[('state','!=','draft')]}"/>
+                                       readonly="state != 'draft'"/>
                                 <field name="check_number" readonly="1"/>
                                 <field name="bank_name" readonly="1"/>
                                 <field name="amount" sum="Total"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state != 'draft'"/>
                                 <field name="date"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state != 'draft'"/>
                                 <field name="due_date"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done'"
+                                    readonly="state != 'draft'"/>
 
                                 <field name="loan_date"
-                                       attrs="{'readonly':[('state','in',['loan','collected','done','refund_from_discount'])]}"/>
+                                       readonly="state in ['loan','collected','done','refund_from_discount']"/>
                                 <field name="ref_coll_batch" string="[Refund/Collect] Date"
-                                       attrs="{'readonly':[('state','in',['collected','done','refund_from_discount'])]}"
+                                       readonly="state in ['collected','done','refund_from_discount']"
                                 />
                                 <field name="multi_select"
 
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','in',['collected','done'])]}"/>
+                                       invisible="state in ['collect','done']" 
+                                    readonly="state in ['collected','done']"/>
                                 <field name="state"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"
+                                       invisible="state in ['collect','done'])]" 
+                                    readonly="state != 'draft'"
                                 />
                                 <field name="batch_state" invisible="1"/>
                                 <field name="communication"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state != 'draft'"/>
                                 <field name="currency_id" invisible="1"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],
-                                                            'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state != 'draft'"/>
                                 <!--<button name="delete_check_from_batch" type="object" icon="fa-archive"/>-->
 
                             </tree>
@@ -373,28 +389,30 @@
                                         <field name="state" invisible="1"/>
 
                                         <field name="partner_type" widget="selection" required="1"
-                                               attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                               readonly="state != 'draft'"/>
                                         <field name="partner_id" required="1"
-                                               attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                               readonly="state != 'draft'"/>
                                         <label for="amount"/>
                                         <div>
                                             <field name="amount" class="oe_inline" required="1"
-                                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                                   readonly="state != 'draft'"/>
                                             <field name="currency_id" options="{'no_create': True}"
                                                    groups="base.group_multi_currency" class="oe_inline"
-                                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                                   readonly="state != 'draft'"/>
                                         </div>
                                     </group>
                                     <group>
-                                        <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                        <field name="communication" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                        <field name="date" readonly="state != 'draft'"/>
+                                        <field name="communication" 
+                                            readonly="state != 'draft'"/>
                                     </group>
                                 </group>
                             </form>
                         </field>
 
                         <field name="payment_ids_rel" widget="many2many"
-                               attrs="{'readonly':[('state','in',['collect','done'])],'invisible':[('state','=','draft')]}"
+                               readonly="state in ['collect','done']"
+                            invisible="state == 'draft'"
                                domain="['|',('batch_payment_id', '=',False), ('state', 'in', ['reconciled',
                         'posted', 'refunded_under_collection','refund_from_discount']), ('payment_method_id.code', '=','batch_payment'),
                         ('journal_id.is_notes_receivable', '=','1'),('journal_id','=',journal_id)]"
@@ -402,35 +420,41 @@
                             <tree string="Payments" editable="top" delete="false" create="false">
                               <field name="company_id" invisible="0"/>
                                 <field name="partner_id" string="Partner"
-                                       attrs="{'readonly':[('state','!=','draft')]}"/>
+                                       readonly="state != 'draft'"/>
                                 <field name="check_number" readonly="1"/>
                                 <field name="bank_name" readonly="1"/>
                                 <field name="amount" sum="Total"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state != 'draft'"/>
                                 <field name="date"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state != 'draft'"/>
                                 <field name="due_date"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state != draft'"/>
 
                                 <field name="loan_date"
-                                       attrs="{'readonly':[('state','in',['loan','collected','done','refund_from_discount'])]}"/>
+                                       readonly="state in ['loan','collected','done','refund_from_discount']"/>
                                 <field name="ref_coll_batch" string="[Refund/Collect] Date"
-                                       attrs="{'readonly':[('state','in',['collected','done','refund_from_discount'])]}"
+                                       readonly="state in ['collected','done','refund_from_discount']"
                                 />
                                 <field name="multi_select"
 
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','in',['collected','done'])]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state in ['collected','done']"/>
                                 <field name="state"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"
+                                       invisible="state in ['collect','done']" 
+                                    readonly="state != 'draft'"
                                 />
 
                                 <field name="batch_state" invisible="1"/>
 
                                 <field name="communication"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                    readonly="state != 'draft'"/>
                                 <field name="currency_id" invisible="1"
-                                       attrs="{'invisible':[('state','in',['collect','done'])],
-                                                            'readonly':[('state','!=','draft')]}"/>
+                                       invisible="state in ['collect','done']"
+                                        readonly="state != 'draft'"/>
 
                             </tree>
                             <form string="Register Payment">
@@ -443,21 +467,21 @@
                                         <field name="state" invisible="1"/>
 
                                         <field name="partner_type" widget="selection" required="1"
-                                               attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                               readonly="state != 'draft'"/>
                                         <field name="partner_id" required="1"
-                                               attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                               readonly="state != 'draft'"/>
                                         <label for="amount"/>
                                         <div>
                                             <field name="amount" class="oe_inline" required="1"
-                                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                                   readonly="state != 'draft'"/>
                                             <field name="currency_id" options="{'no_create': True}"
                                                    groups="base.group_multi_currency" class="oe_inline"
-                                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                                   readonly="state != 'draft'"/>
                                         </div>
                                     </group>
                                     <group>
-                                        <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                        <field name="communication" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                        <field name="date" readonly="state != 'draft'"/>
+                                        <field name="communication" readonly="state !='draft'"/>
                                     </group>
                                 </group>
                             </form>

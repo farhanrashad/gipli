@@ -37,7 +37,7 @@
                         <button name="approved_payment"
                                 string="Approved"
                                 type="object"
-                                class="oe_highlight" attrs="{'invisible':[('state','=','approved')]}"/>
+                                class="oe_highlight" invisible="state == 'approved'"/>
                         <field name="state" widget="statusbar"
                                statusbar_visible="draft,approved"/>
                     </header>
@@ -83,11 +83,11 @@
                             </group>
                             <group string="Calculator" groups="add_real_estate.group_payment_term_calculator">
                                 <field name="unit_price"
-                                       attrs="{'required' : [('calculate_by', '=', 'value')]}"/>
+                                       required="calculate_by == 'value'"/>
                                 <field name="amount"
-                                       attrs="{'required' : [('calculate_by', '=', 'value')]}"/>
+                                       required="calculate_by == 'value'"/>
                                 <field name="calc_no_inst"
-                                       attrs="{'required' : [('calculate_by', '=', 'value')]}"/>
+                                       required="calculate_by == 'value'"/>
                                 <field name="inst_value"/>
                             </group>
                             <group string="Installment Range">
@@ -99,16 +99,15 @@
                                 <field name="inst_range"
                                        widget="radio"/>
                                 <field name="by_days"
-                                       attrs="{'invisible' : [('inst_range', '=', 2)],'required' : [('inst_range', '=', 1)]}"/>
+                                       invisible="inst_range == 2" required="inst_range == 1"/>
                                 <field name="by_period"
-                                       attrs="{'invisible' : [('inst_range', '=', 1)],'required' : [('inst_range', '=', 2)]}"/>
-                                <!--<field name="date" attrs="{'invisible' : [('by_period', '!=', 5)]}"/>-->
+                                    invisible="inst_range == 1" required="inst_range == 2"/>
                                 <field name="shift_by"
-                                       attrs="{'invisible' : [('inst_range', '=', 1)]}"/>
+                                       nvisible="inst_range == 1"/>
                                 <field name="shifting_days"
-                                       attrs="{'invisible' : ['|', ('inst_range', '=', 1), ('shift_by', '=', 2)]}"/>
+                                       invisible="inst_range == 1 or shift_by == 2"/>
                                 <field name="shifting_months"
-                                       attrs="{'invisible' : ['|', ('inst_range', '=', 1), ('shift_by', '=', 1)]}"/>
+                                       invisible="inst_range == 1 or shift_by == 1"/>
                             </group>
                         </group>
                     </sheet>
@@ -139,29 +138,12 @@
             <field name="model">payment.strg.request</field>
             <field name="arch" type="xml">
                 <form string="Payment Strategy Detail">
-                    <header attrs="{'invisible' : ['|',('type', '!=', 'bank')]}">
-<!--                        <button name="under_collection_deposit"-->
-<!--                                type="object"-->
-<!--                                attrs="{'invisible' : ['|','|',('deposite', '=', False),('cheque_status','!=','received'),('is_bank_transfer', '=', False)]}"-->
-<!--                                string="Under Collection"-->
-<!--                                class="oe_highlight"/>-->
-
-<!--                        <button string="Collection"-->
-<!--                                name="penalty_fees_check"-->
-<!--                                type="object"-->
-<!--                                class="oe_highlight"-->
-<!--                                attrs="{'invisible' : ['|',('is_bank_transfer', '=', False),('collected_journal_entry_id', '!=', False)]}"/>-->
-
-<!--                        <button string="Reject"-->
-<!--                                name="rejected_check"-->
-<!--                                type="object"-->
-<!--                                class="oe_highlight"-->
-<!--                                attrs="{'invisible' : ['|','|',('rejected', '=', True),('cheque_status','=','collection'),('is_bank_transfer', '=', False)]}"/>-->
+                    <header invisible="type != 'bank'">
 
                         <field name="cheque_status"
                                widget="statusbar"
                                statusbar_visible="received,under_collection,rejected,collection"
-                               attrs="{'invisible' : [('is_bank_transfer', '=', False)]}"/>
+                               invisible="is_bank_transfer == False"/>
 
                     </header>
                     <sheet>
@@ -202,11 +184,11 @@
                             <field name="maintainance_fees" readonly="1"/>
                             <field name="payment_method_id" invisible="1"/>
                             <field name="under_collected_journal_entry_id"
-                                   attrs="{'invisible' : ['|',('type', '!=', 'bank')]}" readonly="1"/>
+                                   invisible="type != 'bank'" readonly="1"/>
                             <field name="collected_journal_entry_id"
-                                   attrs="{'invisible' : ['|',('type', '!=', 'bank')]}" readonly="1"/>
+                                   invisible="type != == 'bank'" readonly="1"/>
                             <field name="penalty_journal_entry_id"
-                                   attrs="{'invisible' : [('apply_penalty', '=', False)]}" readonly="1"/>
+                                   invisible="apply_penalty == False" readonly="1"/>
                             <field name="rejected" invisible="1"/>
                             <field name="apply_penalty" invisible="1"/>
                             <field name="deduction_amount" invisible="1"/>
@@ -214,10 +196,9 @@
                         </group>
                         <group>
                             <field name="rejection_action" readonly="1"
-                                   attrs="{'invisible' : ['|',('type', '!=', 'bank'),('cheque_status','!=','rejected')]}"/>
+                                   invisible="type != 'bank' or cheque_status != 'rejected'"/>
                             <field name="rejection_cash_payment_id" readonly="1"
-                                   attrs="{'invisible' : ['|',('type', '!=', 'bank'),
-                                    ('cheque_status','!=','rejected'),('rejection_action','!=','transfer')]}"/>
+                                   invisible="type != 'bank' or cheque_status != 'rejected' or rejection_action != 'transfer'"/>
                         </group>
                         <group class="oe_subtotal_footer oe_right">
                             <h1>

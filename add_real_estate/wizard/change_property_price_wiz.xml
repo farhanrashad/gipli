@@ -9,7 +9,7 @@
                 <form string="">
                     <sheet>
                         <field name="is_factor_price_unit" invisible="1"/>
-                        <group attrs="{'invisible':[('is_factor_price_unit','=',True)]}">
+                        <group invisible="is_factor_price_unit == True">
                             <group>
                                 <field name="property_id"/>
                             </group>
@@ -29,23 +29,23 @@
                             <group colspan="1">
                                 <field name="is_garage"/>
                                 <field name="price_garage_for_one"
-                                       attrs="{'invisible': [('is_garage', '=', False)],'required': [('is_garage', '=', True)]}"/>
+                                       invisible="is_garage == False" required="is_garage == True"/>
                                 <field name="number_of_garage"
-                                       attrs="{'invisible': [('is_garage', '=', False)],'required': [('is_garage', '=', True)]}"/>
+                                       invisible="is_garage == False" required="is_garage == True"/>
                                 <field name="is_finish"/>
                                 <field name="finish_of_property_id"
-                                       attrs="{'required': [('is_finish', '=', True)],'invisible': [('is_finish', '=', False)]}"/>
+                                       required="is_finish == True" invisible="is_finish == False"/>
                                 <field name="price_finishing_for_m"
-                                       attrs="{'required': [('is_finish', '=', True)],'invisible': [('is_finish', '=', False)]}"/>
+                                       required="is_finish == True" invisible="is_finish == False"/>
                                 <field name="is_pool"/>
                                 <field name="price_pool_for_one"
-                                       attrs="{'required': [('is_pool', '=', True)],'invisible': [('is_pool', '=', False)]}"/>
+                                       required="is_pool == True" invisible="is_pool == False"/>
                                 <field name="number_of_pool"
-                                       attrs="{'required': [('is_pool', '=', True)],'invisible': [('is_pool', '=', False)]}"/>
+                                       required = "is_pool == True" invisible="is_pool == False"/>
                             </group>
                         </group>
                         <notebook>
-                              <page string="Unit Price Factors" name="unit_factor" attrs="{'invisible':[('is_factor_price_unit','=',False)]}" >
+                              <page string="Unit Price Factors" name="unit_factor" invisible="is_factor_price_unit == False" >
                             <field name="unit_price_lines" >
                                 <tree editable="bottom">
                                     <field name="factor_id"/>

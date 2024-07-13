@@ -37,7 +37,7 @@
                                     <field name="end_in"/>
                                     <field name="last_use" readonly="1"/>
                                     <field name="used_book" readonly="1"/>
-                                    <field name="activate" attrs="{'readonly':[('read_only_data','=',True)]}"/>
+                                    <field name="activate" readonly="read_only_data == True"/>
                                     <button name="delete_line" type="object" icon="fa-archive"/>
                                     <field name="read_only_data" invisible="1"/>
                                 </tree>

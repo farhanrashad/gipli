@@ -74,7 +74,7 @@ access_warning_discount_wizard,warning_discount_wizard,model_warning_discount_wi
 access_payment_multi_accounts,payment_multi_accounts,model_payment_multi_accounts,,1,1,1,1
 sale.access_res_partner_sale_manager,res.partner.sale.manager,base.model_res_partner,sales_team.group_sale_manager,1,1,0,0
 sale.access_res_partner_sale_manager,res.partner.sale.manager,base.model_res_partner,sales_team.group_sale_manager,1,1,0,0
-stock.access_product_group_res_partner_stock_manager,res_partner group_stock_manager,base.model_res_partner,stock.group_stock_manager,1,1,0,0
-stock.access_product_group_res_partner_stock_manager,res_partner group_stock_manager,base.model_res_partner,stock.group_stock_manager,1,1,0,0
+stock.access_product_group_res_partner_stock_manager,res_partner group_stock_manager,base.model_res_partner,account.group_account_manager,1,1,0,0
+stock.access_product_group_res_partner_stock_manager,res_partner group_stock_manager,base.model_res_partner,account.group_account_manager,1,1,0,0
 hr_recruitment.access_res_partner_hr_user,res.partner.user,base.model_res_partner,hr_recruitment.group_hr_recruitment_user,1,1,0,1
 access_edit_analytic_after,edit_analytic_after,model_edit_analytic_after,,1,1,1,1

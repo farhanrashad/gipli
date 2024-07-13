@@ -1,6 +1,6 @@
 from odoo import api, fields, models
 
-from odoo.exceptions import except_orm, Warning, RedirectWarning, ValidationError
+from odoo.exceptions import RedirectWarning, ValidationError
 
 
 class Journal(models.Model):

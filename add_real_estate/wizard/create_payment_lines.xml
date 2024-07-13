@@ -21,12 +21,12 @@
                         <group>
                             <field name="no_of_cheques"/>
                             <field name="cheque_start_date"/>
-                            <field name="cheque_no_start" attrs="{'invisible':[('type','=','cash')],'required':[('type','=','visa')]}"/>
+                            <field name="cheque_no_start" invisible="type == 'cash'" required="type == 'visa'"/>
                             <field name="state_payment" />
                             <field name="bank_name" />
                             <field name="add_to_paid_amount" />
                             <field name="merge_in_one_installment" />
-                            <field name="due_amount" readonly="1"  attrs="{'invisible':[('add_to_paid_amount','=',False)]}"/>
+                            <field name="due_amount" readonly="1"  invisible="add_to_paid_amount == False"/>
                             <field name="amount" readonly="1"/>
                             <field name="receipt_date" readonly="0"/>
 
