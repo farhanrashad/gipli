@@ -14,7 +14,7 @@
             <field name="arch" type="xml">
                 <form string="Change Customer">
                     <header>
-                        <button name="approved" type="object" string="Approved" attrs="{'invisible': [('state', '!=', 'draft')]}" status="draft" class="btn btn-primary"/>
+                        <button name="approved" type="object" string="Approved" invisible="state != 'draft'"  class="btn btn-primary"/>
                         <field name="state" widget="statusbar" />
                     </header>
                     <sheet>
@@ -41,8 +41,12 @@
                             <field name="partner_id"/>
                             <field name="realse_unit" invisible="1"/>
                             <field name="reservation_id" domain="[ ('customer_id', '=', partner_id)]"/>
-                            <field name="release_partner_id" domain="[ ('id', '!=', partner_id)]" attrs="{'invisible':[('realse_unit','=',True)],'required':[('realse_unit','=',False)]}" />
-                            <field name="release_property_id" domain="[('state','=','available')]" attrs="{'invisible':[('realse_unit','=',False)],'required':[('realse_unit','=',True)]}" />
+                            <field name="release_partner_id" domain="[ ('id', '!=', partner_id)]" 
+                                invisible="realse_unit == True"
+                                required="realse_unit == False" />
+                            <field name="release_property_id" domain="[('state','=','available')]"
+                               invisible="realse_unit == False"
+                                required="realse_unit == True" />
                             <field name="new_reservation_id"/>
 
                         </group>

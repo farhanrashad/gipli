@@ -7,11 +7,11 @@
                 <form string="Request Form">
                     <header>
                         <button name="convert_to_block" type="object" string="Canceled"
-                                attrs="{'invisible': [('state', 'not in', ['reserved','draft'])]}"/>
+                                invisible="state not in ['reserved','draft']"/>
                         <button name="convert_to_reserved" type="object" string="Convert To Reserved"
-                                attrs="{'invisible': [('state', '!=', 'draft')]}" status="draft"/>
+                                invisible="state != 'draft'" status="draft"/>
                         <button class="btn btn-primary" name="create_reservation" type="object"
-                                string="Create Reservation" attrs="{'invisible': [('state', 'not in', ['reserved'])]}"/>
+                                string="Create Reservation" invisible="state not in ['reserved'])"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
@@ -37,9 +37,9 @@
                         <group groups="add_real_estate.group_real_state_inventory">
                             <group colspan="1" string="Property Details">
                                 <field name="date"/>
-                                <field name="project_id" attrs="{'required' : [('is_eoi', '!=',True )]}"/>
-                                <field name="phase_id" attrs="{'required' : [('is_eoi', '!=',True )]}"/>
-                                <field name="property_id" attrs="{'required' : [('is_eoi', '!=',True )]}"
+                                <field name="project_id" required="is_eoi != True"/>
+                                <field name="phase_id" required="is_eoi != True"/>
+                                <field name="property_id" required="is_eoi != True"
                                        options="{'no_quick_create': True, 'no_create_edit' : True,'no_open':True}"
                                        />
                                 <field name="property_code"/>
@@ -50,7 +50,7 @@
                             <group colspan="1" string="Sales Details">
                                 <field name="sales_type"/>
                                 <field name="broker_id"
-                                       attrs="{'invisible' : [('sales_type', '=', 'direct')]}"
+                                       invisible="sales_type == 'direct'"
                                        options="{'no_create': True,'no_open': True}" domain="[('is_broker','=',True)]"/>
                                 <field name="is_eoi"/>
 
@@ -69,7 +69,7 @@
                                 <div class="o_row">
                                       <field name="customer_id"
                                            domain="[('is_customer','=',True)]"
-                                       attrs="{'readonly' : ['|',('state', 'in',['contracted','release'] ),('customer_details_readonly','=',True)]}"/>
+                                       readonly="state in ['contracted','release'] or customer_details_readonly ==True"/>
 <!--                                    <button name="get_childs_of_contact" type="object" string="Other Owners"-->
 <!--                                    />-->
                                 </div>
@@ -111,21 +111,15 @@
                         <group invisible="1" string="Attachments" style="color:#893b74;"/>
                         <group invisible="1">
                             <field name="id_no"
-                                   attrs="{'readonly' : [('state', '=', 'create_so')]}"/>
+                                   readonly="state == 'create_so'"/>
                             <field name="id_type"
-                                   attrs="{'readonly' : [('state', '=', 'create_so')]}"/>
+                                   readonly="state == 'create_so'"/>
                             <field name="id_photo"
-                                   attrs="{'readonly' : [('state', '=', 'create_so')]}"/>
+                                   readonly="state == 'create_so'"/>
                         </group>
                         <notebook groups="add_real_estate.group_real_state_payment">
                             <page name="payment" string="Payment">
                                 <ul class="list-inline">
-                                    <!--                                   <li class="list-inline-item">-->
-                                    <!--                                       <button name="%(fill_payment_wizard_action)d"-->
-                                    <!--                                        string="Update Bank and check Number"-->
-                                    <!--                                        type="action"-->
-                                    <!--                                        class="btn-primary"-->
-                                    <!--                                               context="{'default_reservation_id':active_id,}"/></li>-->
                                     <li class="list-inline-item">
                                         <button name="create_payment_lines_selected" type="object"
                                                 string="Create Payment" class="btn btn-primary"/>
@@ -174,15 +168,15 @@
                                         <field name="cancelled"
                                                invisible="1"/>
                                         <field name="description"
-                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                               readonly="move_check == True"/>
                                         <field name="currency_id"
-                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                               readonly="move_check == True"/>
                                         <field name="amount_currency"
-                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                                readonly="move_check == True"/>
                                         <field name="amount"
-                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                                readonly="move_check == True"/>
                                         <field name="base_amount" invisible="1"
-                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                                readonly="move_check == True"/>
                                         <field name="amount_due" invisible="1"
                                                readonly="1"/>
                                         <field name="amount_pay" invisible="1"
@@ -190,29 +184,28 @@
                                         <field name="is_part"
                                                invisible="1"/>
                                         <field name="date"
-                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                                readonly="move_check == True"/>
                                         <field name="add_to_paid_amount"/>
                                         <field name="journal_id"
                                                domain="[('type','in',['bank', 'cash'])]"
                                                string="Payment Method"
-                                               attrs="{'readonly' : [('move_check', '=', True)]}"/>
+                                                readonly="move_check == True"/>
                                         <field name="state_payment"
                                                string="State Payment" optional="show" required="1"/>
                                         <field name="is_cheque"/>
                                         <field name="Due_Date"
-                                               attrs="{'readonly':[('is_cheque','!=',True)],'required':[('is_cheque','=',True)]}"/>
+                                                readonly="move_check == True" 
+                                            required="is_cheque == True"/>
                                         <field name="bank_name"
-                                               attrs="{'readonly':[('is_cheque','!=',True)],'required':[('is_cheque','=',True)]}"/>
+                                               readonly="move_check == True" 
+                                            required="is_cheque == True"/>
                                         <field name="cheque"
-                                               attrs="{'readonly':[('is_cheque','!=',True)],'required':[('is_cheque','=',True)]}"/>
+                                               readonly="move_check == True" 
+                                            required="is_cheque == True"/>
                                         <field name="deposite"
-                                               attrs="{'readonly':[('move_check','=',True)]}"/>
+                                               readonly="move_check == True" />
                                         <field name="add_extension"
-                                               attrs="{'readonly':[('move_check','=',True)]}"/>
-                                        <!--                                        <field name="maintainance_fees"-->
-                                        <!--                                               attrs="{'readonly':[('add_extension','=',True)]}"/>-->
-                                        <!--                                        <field name="move_id"-->
-                                        <!--                                               readonly="1"/>-->
+                                               readonly="move_check == True" />
                                                                                                                         <field name="is_receive" />
 
                                         <field name="is_pay"/>

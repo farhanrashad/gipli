@@ -11,7 +11,7 @@
                             <field name="name"/>
                             <field name="is_print"/>
                             <field name="is_finish"/>
-                            <field name="finish_of_property_id" attrs="{'invisible':[('is_finish','=',False)]}"/>
+                            <field name="finish_of_property_id" invisible="is_finish == False"/>
                         </group>
                     </sheet>
                 </form>

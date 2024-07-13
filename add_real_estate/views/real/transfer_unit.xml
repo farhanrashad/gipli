@@ -13,7 +13,7 @@
                 <form string="Transfer Unit">
                     <header>
                         <button name="approved" type="object" string="Approved"
-                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                                invisible="state != 'draft'"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
