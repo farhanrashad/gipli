@@ -15,10 +15,10 @@
                 <form string="MODEL">
                     <header>
                         <button name="return_action" string="Returned" type="object"
-                                attrs="{'invisible':[('state','!=','delivered')]}" class="oe_highlight" />
+                                invisible="state != 'delivered'" class="oe_highlight" />
 
                         <button name="deliver_action" string="Delivered" type="object"
-                                attrs="{'invisible':[('state','!=','draft')]}" class="oe_highlight" />
+                                invisible="state != 'draft'" class="oe_highlight" />
                         <field name="state" widget="statusbar"/>
                     </header>
 
@@ -35,19 +35,16 @@
                             <group>
                                 <field name="employee_id" required="True"/>
                                 <field name="type" required="True"/>
-<!--                                <field name="is_asset" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>-->
-<!--                                <field name="asset_id" attrs="{'required':[('is_asset','=',True)],'invisible':[('is_asset','!=',True)]}" domain="[('is_custody','=',False)]"/>-->
-                                <field name="item_name" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>
-                                <field name="serial_number" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>
+                                <field name="item_name" required="type == 'item'" invisible="type != 'item'"/>
+                                <field name="serial_number" required="type == 'item'" invisible="type != 'item'"/>
                             </group>
                             <group>
-                                <field name="currency_id" attrs="{'required':[('type','=','money')],'invisible':[('type','!=','money')]}"/>
-<!--                                <field name="value_residual" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>-->
+                                <field name="currency_id" required="type == 'money'" invisible="type != 'money'"/>
                                 <field name="delivery_date" required="True"/>
-                                <field name="return_date" attrs="{'required':[('state','=','return')],'invisible':[('state','!=','return')]}"/>
+                                <field name="return_date" required="state == 'return'" invisible="state != 'return'"/>
                                 <field name="amount"/>
-                                <field name="return_amount" attrs="{'readonly':[('type','=','money')],'invisible':['|',('state','!=','return'),('type','!=','money')]}"/>
-                                <field name="status" attrs="{'required':[('state','=','return')],'invisible':['|',('state','!=','return'),('type','!=','item')]}"/>
+                                <field name="return_amount" readonly="type == 'money'" invisible="state != 'return' or type != 'money'"/>
+                                <field name="status" required="state == 'return'" invisible="state != 'return' or type != 'item'"/>
                             </group>
                         </group>
                     </sheet>

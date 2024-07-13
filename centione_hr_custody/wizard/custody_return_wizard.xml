@@ -13,7 +13,7 @@
                             <field name="return_date" required="True"/>
                             <field name="currency_id" />
                             <field name="amount" />
-                            <field name="status" attrs="{'invisible':[('type','!=','item')],'required':[('type','=','item')]}"/>
+                            <field name="status" invisible="type != 'item'" required="type == 'item'"/>
                         </group>
                     </sheet>
                     <footer>
