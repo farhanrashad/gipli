@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="custom_view_set_invoice_draft_form_multi" model="ir.ui.view">
+        <field name="name">set.invoice.draft.form.multi</field>
+        <field name="model">set.invoice.draft</field>
+        <field name="arch" type="xml">
+            <form string="Register Payment">
+                <sheet>
+                    <group>
+                        <field name="invoice_ids" nolabel="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Set To Draft" name="set_invoice_draft" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="custom_action_set_invoice_draft_from_list" model="ir.actions.server">
+        <field name="name">Set To Draft</field>
+        <field name="model_id" ref="set_invoice_to_draft.model_set_invoice_draft"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('set_invoice_to_draft.set_invoice_to_draft_group'))]"/>
+        <field name="code">
+            action = model.action_set_invoice_draft()
+        </field>
+    </record>
+</odoo>
