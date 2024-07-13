@@ -19,10 +19,10 @@
                             </group>
                             <group>
                                 <field name="calculation_method" required="1"/>
-                                <field name="fixed_amount" attrs="{'invisible': [('calculation_method', '!=', 'fixed')]}"/>
-                                <field name="percentage_amount" attrs="{'invisible': [('calculation_method', '!=', 'percentage')]}"/>
-                                <field name="work_day_amount" attrs="{'invisible': [('calculation_method', '!=', 'work_day')]}"/>
-                                <field name="work_hour_amount" attrs="{'invisible': [('calculation_method', '!=', 'work_hour')]}" widget="float_time"/>
+                                <field name="fixed_amount" invisible="calculation_method != 'fixed'"/>
+                                <field name="percentage_amount" invisible="calculation_method !=  'percentage'"/>
+                                <field name="work_day_amount" invisible="calculation_method !=  'work_day'"/>
+                                <field name="work_hour_amount" invisible="calculation_method != 'work_hour'" widget="float_time"/>
                             </group>
                         </group>
                         <group>

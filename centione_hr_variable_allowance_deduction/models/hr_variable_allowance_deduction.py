@@ -5,7 +5,7 @@ class HrVariableAllowanceDeduction(models.Model):
     _name = 'hr.variable.allowance.deduction'
 
     employee_id = fields.Many2one('hr.employee', required=True,domain="['|', ('active','=',True), ('active','=',False)]")
-    zk_emp_id = fields.Char(string="Code", related='employee_id.zk_emp_id')
+    #zk_emp_id = fields.Char(string="Code", related='employee_id.zk_emp_id')
     contract_id = fields.Many2one('hr.contract', compute='_get_contract_id', store=True)
     date = fields.Date()
     amount = fields.Float()

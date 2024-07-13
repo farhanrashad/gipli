@@ -13,7 +13,9 @@
                         </div>
                         <group>
                             <group>
+                                <!--
                                 <field name="zk_emp_id"/>
+                                -->
                                 <field name="contract_id"/>
                                 <field name="date"/>
                             </group>
@@ -36,7 +38,9 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="employee_id"/>
+                    <!--
                     <field name="zk_emp_id"/>
+                    -->
                     <field name="date"/>
                     <field name="type" required="1"/>
                     <field name="amount"/>
@@ -50,7 +54,9 @@
             <field name="arch" type="xml">
                 <search>
                     <field name="employee_id"/>
+                    <!--
                     <field name="zk_emp_id"/>
+                    -->
                 </search>
             </field>
         </record>

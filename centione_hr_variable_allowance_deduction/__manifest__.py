@@ -18,7 +18,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['centione_hr_contract', 'centione_hr_payroll_base','hr_work_entry_contract_enterprise'],
+    'depends': ['hr','centione_hr_contract', 'centione_hr_payroll_base','hr_work_entry_contract_enterprise'],
 
     # always loaded
     'data': [
