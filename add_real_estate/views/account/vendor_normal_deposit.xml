@@ -7,22 +7,26 @@
                 <form string="Vendor Normal Deposit">
 
                     <header>
-                        <button name="multi_delivery" type="object" string="Multi Delivery" attrs="{'invisible': [('state', '!=', 'draft')]}" status="draft"/>
-                        <button name="multi_withdrawal" type="object" string="Multi Withdrawal" attrs="{'invisible': [('state', '=', 'draft')]}" />
-                        <button name="multi_refund_delivery" type="object" string="Multi Refund Delivery" attrs="{'invisible': [('state', '=', 'draft')]}" />
+                        <button name="multi_delivery" type="object" string="Multi Delivery" 
+                            invisible="state != 'draft'" status="draft"/>
+                        <button name="multi_withdrawal" type="object" string="Multi Withdrawal" 
+                            invisible="state =='draft'" />
+                        <button name="multi_refund_delivery" type="object" string="Multi Refund Delivery" 
+                            invisible="state == 'draft'" />
                         <field name="state" widget="statusbar" />
                     </header>
                     <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" name="related_journal_button" string="Journals" attrs="{'invisible':[('payment_ids','=',[])]}" type="object" icon="fa-bars"/>
+                        <button class="oe_stat_button" name="related_journal_button" string="Journals" 
+                            invisible="payment_ids == []" type="object" icon="fa-bars"/>
                     </div>
                         <div class="oe_title" >
                             <h2><field name="name" placeholder="Vendor Normal Deposit" readonly="1"/></h2>
                     </div>
                         <group>
                             <group colspan="2" >
-                            <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="partner_id" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field name="date" readonly="state != 'draft'" />
+                            <field name="partner_id" readonly="state != 'draft'" />
                             <field name="delivery_date"  />
                             <field name="cheque_number"  invisible="1" />
                             <field name="cheque_number_rel"  invisible="1" />
@@ -41,25 +45,31 @@
                                    >
                     <tree string="Payments" editable="top">
   <field name="company_id" invisible="0"/>
-                        <field name="partner_id" string="Partner" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="partner_id" string="Partner" readonly="state != 'draft'"/>
                     <field name="cheque_books_id" readonly="1"/>
                     <field name="cheque_number" readonly="1"/>
-                        <field name="amount" sum="Total" attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
-                        <field name="date" attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
-                        <field name="due_date" attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                        <field name="amount" sum="Total" 
+                            invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
+                        <field name="date" 
+                            invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
+                        <field name="due_date" invisible="state in ['collect','done']" 
+                            readonly="state != 'draft'"/>
 
-                        <field name="ref_coll_vendor"  attrs="{'readonly':[('batch_state','=','draft'),('state','=','posted')]}"/>
-                        <field name="multi_select" attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','in',['draft'])]}"/>
-                        <field name="state" attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>
+                        <field name="ref_coll_vendor"  readonly="batch_state == 'draft' and state == 'posted'"/>
+                        <field name="multi_select" 
+                            invisible="state in ['collect','done']"
+                            readonly="state in ['draft']"/>
+                        <field name="state" 
+                            invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
                         <field name="batch_state" invisible="1"/>
 
-<!--                        <field name="communication" attrs="{'invisible':[('state','in',['collect','done'])],'readonly':[('state','!=','draft')]}"/>-->
-                        <field name="currency_id" invisible="1" attrs="{'invisible':[('state','in',['collect','done'])],                                                             'readonly':[('state','!=','draft')]}"/>
+                        <field name="currency_id"  
+                            invisible="state in ['collect','done']"
+                            readonly="state != 'draft'"/>
                         <field name="payment_method_id"/>
-
-
-                        <!--<button name="delete_check_from_batch" type="object" icon="fa-archive"/>-->
-
                     </tree>
                                 <form string="Register Payment"><group>
                                     <group>
@@ -70,18 +80,19 @@
                                         <field name="payment_method_id" invisible="1"/>
                                         <field name="state" invisible="1"/>
 
-                                        <field name="partner_type" widget="selection" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                        <field name="partner_id" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                        <field name="partner_type" widget="selection" required="1" 
+                                            readonly="state != 'draft'"/>
+                                        <field name="partner_id" required="1" 
+                                            readonly="state != 'draft'"/>
                                         <label for="amount"/>
                                         <div>
-                                            <field name="amount" class="oe_inline" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                            <field name="currency_id" options="{'no_create': True}" groups="base.group_multi_currency" class="oe_inline" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                            <field name="amount" class="oe_inline" required="1" 
+                                                readonly="state != 'draft'"/>
+                                            <field name="currency_id" options="{'no_create': True}" groups="base.group_multi_currency" class="oe_inline" readonly="state != 'draft'"/>
                                         </div>
                                     </group>
                                     <group>
-                                        <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-<!--                                        <field name="communication" attrs="{'readonly': [('state', '!=', 'draft')]}"/>-->
-<!--                                        <field name="partner_bank_account_id" attrs="{'invisible': [('show_partner_bank_account', '!=', True)], 'required': [('show_partner_bank_account', '=', True)]}" context="{'default_partner_id': partner_id}"/>-->
+                                        <field name="date" readonly="state != 'draft'"/>
                                         <field name="show_partner_bank_account" invisible="1"/>
                                     </group>
                                 </group></form>

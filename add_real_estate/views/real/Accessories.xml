@@ -39,9 +39,9 @@
                             <field name="date" required="1" readonly="state in ['reserved','release']" optional="{'datepicker':{'minDate': 0}}" />
                             <field name="related_res_id" required="1" />
                             <field name="related_unit_id" readonly="1" force_save="1" />
-                            <field name="project_id" readonly="1" force_save="1"  
+                            <field name="project_id" force_save="1"  
                                 readonly="state in ['contracted','release']" />
-                            <field name="phase_id" readonly="1" force_save="1"  
+                            <field name="phase_id" force_save="1"  
                                 readonly="state in ['contracted','release']" />
                             <field name="property_id"  string="Accessories" optional="{'no_quick_create': True, 'no_create_edit' : True,'on_open   ' : True}" domain="[('state','=','available')]"/>
                             <field name="property_code"  />
@@ -68,7 +68,7 @@
                         </group>
                         <group>
                             <group colspan="1" string="Customer Details">
-                                <field name="customer_id"  readonly="1" force_save="1" 
+                                <field name="customer_id"   force_save="1" 
                                     readonly="state in ['contracted','release'] "/>
                                 <field name="address"
                                        readonly="1"/>
@@ -86,7 +86,7 @@
                                        readonly="1"/>
                             </group>
                         <group colspan="1" string="Sales Details">
-                            <field name="sale_person_2_id" readonly="1" force_save="1" 
+                            <field name="sale_person_2_id" force_save="1" 
                                 readonly="state in ['contracted','release']"/>
 <!--                            <field name="lead_id"/>-->
 
@@ -99,7 +99,7 @@
                             <field name="id_no"
                                    readonly = "state in ['contracted','release']"/>
                             <field name="id_type"
-                                   readonly="state in [contracted','release']"/>
+                                   readonly="state in ['contracted','release']"/>
                             <field name="id_photo"
                                    readonly="state in ['contracted','release']"/>
                         </group>
@@ -110,7 +110,7 @@
                                 readonly="state in ['contracted','release']"/>
                             <field name="start_cheque" 
                                 readonly="state in ['contracted','release']"/>
-                            <field name="end_cheque" readonly' : [('state', 'in',['contracted','release'] )]}"/>
+                            <field name="end_cheque" readonly="state in ['contracted','release']"/>
                             <field name="date_start_installment" readonly="state in ['contracted','release']"/>
                             <button name="update_bank_data" type="object" string="Update Bank and check Number"  />
                             <field name="amount_ins" readonly="state in ['contracted','release']"/>
@@ -163,7 +163,7 @@ readonly="state in ['contracted','release']"
                                         <field name="amount_pay"
                                                readonly="1" sum="Pay" optional="show"/>
                                         <field name="date"
-                                               readonly=move_check == True"  optional="show"/>
+                                               readonly="move_check == True"  optional="show"/>
                                         <field name="journal_id"
                                                domain="[('type','in',['bank', 'cash'])]"
                                                string="Payment Method"

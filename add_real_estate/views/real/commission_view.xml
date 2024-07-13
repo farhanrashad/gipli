@@ -31,25 +31,25 @@
                     </group>
                     <group string="Rates definition">
                         <field name="fix_qty"
-                               attrs="{'invisible': [('commission_type', '!=', 'fixed')]}" />
+                               invisible="commission_type != 'fixed'" />
                        <field name="leader_fix_qty"
-                               attrs="{'invisible': [('commission_type', '!=', 'fixed')]}" />
+                               invisible="commission_type != 'fixed'" />
                         <field name="sections" widget="one2many_list"
-                               attrs="{'invisible': [('commission_type', '!=', 'section')]}">
+                               invisible="commission_type != 'section'">
                             <tree string="sections" editable="bottom">
                                 <field name="amount_from" />
                                 <field name="amount_to" />
                                 <field name="percent" />
-                                <field name="leader_percent" attrs="{'invisible': [('parent.apply_to', '!=', 'team')]}"/>
+                                <field name="leader_percent" invisible="parent.apply_to != 'team'"/>
                             </tree>
                         </field>
                     </group>
                     <group string="Sales representatives">
                         <field name="salesmen2"
-                       attrs="{'invisible': [('apply_to', '!=', 'salesman')]}" />
+                       invisible="apply_to != 'salesman'" />
 
                         <field name="sales_team"
-                       attrs="{'invisible': [('apply_to', '!=', 'team')]}"/>
+                       invisible="apply_to != 'team'"/>
                     </group>
                     </sheet>
                 </form>

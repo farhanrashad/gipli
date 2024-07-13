@@ -88,7 +88,7 @@
 
                 <xpath expr="//field[@name='partner_id']" position="before">
                     <field name="account_emp_type"
-                           invisible=partner_type != 'employee'" 
+                           invisible="partner_type != 'employee'" 
                         required="partner_type == 'employee'"
                         readonly="state != 'draft'"/>
                 </xpath>
@@ -166,7 +166,7 @@
                     <field name="ref_coll_batch" string="[Refund/Collect] Date"
                            invisible="payment_method_code != 'batch_payment'" readonly="1"/>
                     <field name="move_date" 
-                        readonly="state in  ['draft','under_coll','collected'"
+                        readonly="state in  ['draft','under_coll','collected']"
                            string="Notes Refund Date"/>
                     <field name="delivery_to_customer_date"/>
 
@@ -193,7 +193,6 @@
                            string="Check Number"
                            invisible="payment_method_code != 'check_printing'"
                            readonly="active_cheque == True"
-                           invisible="1"
                     />
 
                 </xpath>
@@ -209,7 +208,7 @@
                                            string="Due Date"
                                            
                                     readonly="state != 'draft'"
-                                    required="payment_method_code in ['batch_payment','check_printing'"
+                                    required="payment_method_code in ['batch_payment','check_printing']"
                                     />
                                     <field name="delivery_date"
                                            invisible="payment_method_code not in ['check_printing']"
@@ -237,8 +236,8 @@
                                     readonly="state not in ['posted']"/>
 
                                     <field name="refund_delivery_date"
-                                           invisible="payment_type != 'outbound' or ),('payment_method_code','not in',['check_printing',''])],
-                                           'readonly':[('state','!=','deliver')]}"
+                                invisible="payment_type != 'outbound' or payment_method_code not in['check_printing','']"        
+                                           readonly="state != 'deliver'"
 
 
                                     />

@@ -8,9 +8,9 @@
             <field name="arch" type="xml">
                 <form string="">
                      <header>
-                        <button name="reset_to_draft" type="object" string="Reset To Draft" states="cancel,confirmed" groups="add_real_estate.group_contract_manager"/>
-                        <button name="confirmed" type="object" string="Confirmed" states="draft"  groups="add_real_estate.group_contract_manager"/>
-                        <button name="cancel" type="object" string="Cancel" states="draft,confirmed"  groups="add_real_estate.group_contract_manager"/>
+                        <button name="reset_to_draft" type="object" string="Reset To Draft" invisible="state not in ('cancel','confirmed')" groups="add_real_estate.group_contract_manager"/>
+                        <button name="confirmed" type="object" string="Confirmed" invisible="state != 'draft'"  groups="add_real_estate.group_contract_manager"/>
+                        <button name="cancel" type="object" string="Cancel" invisible="state not in ('draft','confirmed')"  groups="add_real_estate.group_contract_manager"/>
                          <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>

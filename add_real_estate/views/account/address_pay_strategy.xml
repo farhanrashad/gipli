@@ -42,7 +42,7 @@
                                statusbar_visible="draft,approved"/>
                     </header>
                 </xpath>
-<xpath expr="//field[@name='line_ids']//tree//field[@name='days']" position="after">
+<xpath expr="//field[@name='line_ids']//tree[1]" position="inside">
                     <field name="journal_id"
                            domain="[('type','in',['bank', 'cash'])]"
                            widget="selection"
@@ -186,7 +186,7 @@
                             <field name="under_collected_journal_entry_id"
                                    invisible="type != 'bank'" readonly="1"/>
                             <field name="collected_journal_entry_id"
-                                   invisible="type != == 'bank'" readonly="1"/>
+                                   invisible="type != 'bank'" readonly="1"/>
                             <field name="penalty_journal_entry_id"
                                    invisible="apply_penalty == False" readonly="1"/>
                             <field name="rejected" invisible="1"/>
