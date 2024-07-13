@@ -10,8 +10,8 @@
                     <sheet>
                         <group>
                             <field name="is_incentive_calc" invisible="True"/>
-                            <field name="end_incentive" attrs="{'invisible':[('is_incentive_calc','=',True)]}"/>
-                            <field name="end_incentive_month" attrs="{'invisible':[('is_incentive_calc','=',False)]}"/>
+                            <field name="end_incentive" invisible="is_incentive_calc == True"/>
+                            <field name="end_incentive_month" invisible="is_incentive_calc == False"/>
                         </group>
                     </sheet>
                     <footer>

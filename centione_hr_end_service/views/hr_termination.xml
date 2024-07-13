@@ -33,13 +33,13 @@
             <field name="arch" type="xml">
                 <form string="MODEL">
                     <header>
-                        <button name="%(view_end_service_incentive_action)d" string="Confirm" type="action" groups="hr.group_hr_manager" attrs="{'invisible':[('state','=','approved')]}"/>
-                        <button name="action_cancel" string="Cancel" type="object" groups="hr.group_hr_manager" attrs="{'invisible':[('state','=','approved')]}"/>
+                        <button name="%(view_end_service_incentive_action)d" string="Confirm" type="action" groups="hr.group_hr_manager" invisible="state == 'approved'"/>
+                        <button name="action_cancel" string="Cancel" type="object" groups="hr.group_hr_manager" invisible="state == 'approved'"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button name="action_custody" type="object" string="Custody" class="oe_stat_button" icon="fa-archive" attrs="{'invisible':[('state', 'not in', ('draft'))]}">
+                            <button name="action_custody" type="object" string="Custody" class="oe_stat_button" icon="fa-archive" invisible="state not in ('draft')">
                                 <field name="num_custody" />
                             </button>
                         </div>
@@ -63,8 +63,8 @@
                                 <field name="approve_date" readonly="True"/>
                                 <field name="is_incentive_calc" invisible="True"/>
                                 <field name="legal_leaves_incentive" readonly="1"/>
-                                <field name="end_incentive" readonly="True" attrs="{'invisible':[('is_incentive_calc','=',True)]}"/>
-                                <field name="end_incentive_month" readonly="True" attrs="{'invisible':[('is_incentive_calc','=',False)]}"/>
+                                <field name="end_incentive" readonly="True" invisible="is_incentive_calc == True"/>
+                                <field name="end_incentive_month" readonly="True" invisible="is_incentive_calc == False"/>
                             </group>
                         </group>
                     </sheet>

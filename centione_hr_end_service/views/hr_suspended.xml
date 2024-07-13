@@ -8,8 +8,8 @@
             <field name="arch" type="xml">
                 <form string="MODEL">
                     <header>
-                        <button name="action_approved" string="Confirm" type="object" groups="hr.group_hr_manager" attrs="{'invisible':[('state','=','approved')]}"/>
-                        <button name="action_cancel" string="Cancel" type="object" groups="hr.group_hr_manager" attrs="{'invisible':[('state','=','approved')]}"/>
+                        <button name="action_approved" string="Confirm" type="object" groups="hr.group_hr_manager" invisible="state == 'approved'"/>
+                        <button name="action_cancel" string="Cancel" type="object" groups="hr.group_hr_manager" invisible="state == 'approved'"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
