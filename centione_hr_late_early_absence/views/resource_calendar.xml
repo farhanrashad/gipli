@@ -9,7 +9,7 @@
                 <xpath expr="//field[@name='tz']" position="after">
                     <field name="schedule_type"/>
                     <field name="flexible_hours" widget="float_time"
-                           attrs="{'invisible': [('schedule_type', '!=', 'flexible')]}"/>
+                           invisible="schedule_type != 'flexible'"/>
                 </xpath>
 
                 <xpath expr="//field[@name='hours_per_day']" position="attributes">
@@ -17,7 +17,7 @@
                 </xpath>
 
                 <xpath expr="//field[@name='attendance_ids']" position="replace">
-                    <field name="attendance_flexible_ids" attrs="{'invisible': [('schedule_type', '!=', 'flexible')]}">
+                    <field name="attendance_flexible_ids" invisible="schedule_type != 'flexible'">
                         <tree editable="top">
                             <field name="schedule_type" invisible="True"/>
                             <field name="name"/>
@@ -32,7 +32,7 @@
                         </tree>
                     </field>
 
-                    <field name="attendance_ids" attrs="{'invisible': [('schedule_type', '!=', 'fixed')]}">
+                    <field name="attendance_ids" invisible="schedule_type != 'fixed'">
                         <tree editable="top">
                             <field name="schedule_type" invisible="True"/>
                             <field name="name"/>
@@ -46,7 +46,7 @@
                     </field>
 
                     <group>
-                        <field name="hours_per_day" attrs="{'invisible': [('schedule_type', '!=', 'open')]}"/>
+                        <field name="hours_per_day" invisible="schedule_type != 'open'"/>
                     </group>
 
                 </xpath>
@@ -58,10 +58,10 @@
                                 <group>
                                     <field name="absence_penalty_type"/>
                                     <field name="absence_penalty_fixed_rate"
-                                           attrs="{'invisible': [('absence_penalty_type', '!=', 'fixed')]}"/>
+                                           invisible="absence_penalty_type != 'fixed'"/>
                                 </group>
                                 <field name="absence_penalty_line_ids" nolabel="1"
-                                       attrs="{'invisible': [('absence_penalty_type', '!=', 'cumulative')]}">
+                                       invisible="absence_penalty_type != 'cumulative'">
                                     <tree editable="bottom">
                                         <field name="sequence"/>
                                         <field name="penalty_rate"/>
@@ -72,10 +72,10 @@
                                 <group>
                                     <field name="late_arrive_penalty_type"/>
                                     <field name="late_arrive_penalty_fixed_rate"
-                                           attrs="{'invisible': [('late_arrive_penalty_type', '!=', 'fixed')]}"/>
+                                           invisible="late_arrive_penalty_type != 'fixed'"/>
                                 </group>
                                 <field name="late_arrive_penalty_line_ids"
-                                       attrs="{'invisible': [('late_arrive_penalty_type', '!=', 'cumulative')]}">
+                                       invisible="late_arrive_penalty_type != 'cumulative'">
                                     <tree>
                                         <field name="time_interval"/>
                                         <field name="late_early_penalty_line_ids"/>
@@ -86,10 +86,10 @@
                                 <group>
                                     <field name="early_leave_penalty_type"/>
                                     <field name="early_leave_penalty_fixed_rate"
-                                           attrs="{'invisible': [('early_leave_penalty_type', '!=', 'fixed')]}"/>
+                                           invisible="early_leave_penalty_type != 'fixed'"/>
                                 </group>
                                 <field name="early_leave_penalty_line_ids"
-                                       attrs="{'invisible': [('early_leave_penalty_type', '!=', 'cumulative')]}">
+                                       invisible="early_leave_penalty_type != 'cumulative'">
                                     <tree>
                                         <field name="time_interval"/>
                                         <field name="late_early_penalty_line_ids"/>

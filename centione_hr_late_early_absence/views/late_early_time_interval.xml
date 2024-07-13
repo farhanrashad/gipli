@@ -12,9 +12,9 @@
                             <field name="first_operator" nolabel="1" class="oe_inline" required="1"/>
                             <span class="oe_inline">T</span>
                             <field name="second_operator" nolabel="1" class="oe_inline"
-                                   attrs="{'invisible': [('first_operator', '=', False)]}"/>
+                                   invisible="first_operator == False"/>
                             <field name="second_operand" widget="float_time" nolabel="1" class="oe_inline"
-                                   attrs="{'invisible': [('second_operator', '=', False)]}"/>
+                                   invisible = "second_operator == False"/>
                         </div>
                     </group>
                     <group>
