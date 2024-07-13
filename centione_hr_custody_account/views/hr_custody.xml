@@ -7,12 +7,12 @@
             <field name="inherit_id" ref="centione_hr_custody.view_hr_custody_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='type']" position="after">
-                    <field name="is_asset" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>
-                    <field name="asset_id" attrs="{'required':[('is_asset','=',True)],'invisible':[('is_asset','!=',True)]}"
+                    <field name="is_asset" required="type == 'item'" invisible="type != 'item'"/>
+                    <field name="asset_id" required="is_asset == True" invisible="is_asset != True"
                            domain="[('is_custody','=',False)]"/>
                 </xpath>
                 <xpath expr="//field[@name='currency_id']" position="after">
-                    <field name="value_residual" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>
+                    <field name="value_residual" required="type == 'item'" invisible="type != 'item'"/>
                 </xpath>
             </field>
         </record>
