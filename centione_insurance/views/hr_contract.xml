@@ -11,8 +11,8 @@
 
                  <xpath expr="//field[@name='wage']" position="after">
                       <field name="is_insured" />
-                      <field name="fixed_insurance" attrs="{'invisible':[('is_insured','!=',True)]}"  string="Insurance Amount"/>
-                      <field name="variable_insurance" attrs="{'invisible':[('is_insured','!=',True)]}" invisible="1"/>
+                      <field name="fixed_insurance" invisible="is_insured != True"  string="Insurance Amount"/>
+                      <field name="variable_insurance" invisible="1"/>
                  </xpath>
 
              </field>
