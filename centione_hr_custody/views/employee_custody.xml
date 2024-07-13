@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    THIS MODULE WAS DEPENDING ON ACCOUNT MODULE BUT DUE TO CHANGE IN REQUIREMENTS ACCOUNT MODULE WAS REMOVED.
+
+     THE COMMENTED LINES ARE THE PART OF CODE THAT DEPENDS ON ACCOUNT MODULE, THEY ARE COMMENTED FOR NOW UNTIL
+        THE MODULE IS TESTED AND TO BE VERIFIED THAT IT IS STABLE.
+-->
+<odoo>
+    <data>
+
+        <record id="view_hr_custody_form" model="ir.ui.view">
+            <field name="name">hr.custody.form</field>
+            <field name="model">hr.custody</field>
+            <field name="arch" type="xml">
+                <form string="MODEL">
+                    <header>
+                        <button name="return_action" string="Returned" type="object"
+                                attrs="{'invisible':[('state','!=','delivered')]}" class="oe_highlight" />
+
+                        <button name="deliver_action" string="Delivered" type="object"
+                                attrs="{'invisible':[('state','!=','draft')]}" class="oe_highlight" />
+                        <field name="state" widget="statusbar"/>
+                    </header>
+
+                    <sheet>
+
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" readonly="True"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="employee_id" required="True"/>
+                                <field name="type" required="True"/>
+<!--                                <field name="is_asset" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>-->
+<!--                                <field name="asset_id" attrs="{'required':[('is_asset','=',True)],'invisible':[('is_asset','!=',True)]}" domain="[('is_custody','=',False)]"/>-->
+                                <field name="item_name" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>
+                                <field name="serial_number" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>
+                            </group>
+                            <group>
+                                <field name="currency_id" attrs="{'required':[('type','=','money')],'invisible':[('type','!=','money')]}"/>
+<!--                                <field name="value_residual" attrs="{'required':[('type','=','item')],'invisible':[('type','!=','item')]}"/>-->
+                                <field name="delivery_date" required="True"/>
+                                <field name="return_date" attrs="{'required':[('state','=','return')],'invisible':[('state','!=','return')]}"/>
+                                <field name="amount"/>
+                                <field name="return_amount" attrs="{'readonly':[('type','=','money')],'invisible':['|',('state','!=','return'),('type','!=','money')]}"/>
+                                <field name="status" attrs="{'required':[('state','=','return')],'invisible':['|',('state','!=','return'),('type','!=','item')]}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_hr_custody_tree" model="ir.ui.view">
+            <field name="name">hr.custody.tree</field>
+            <field name="model">hr.custody</field>
+            <field name="arch" type="xml">
+                <tree string="MODEL">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="item_name"/>
+                    <field name="serial_number"/>
+                    <field name="delivery_date"/>
+                    <field name="return_date"/>
+                    <field name="status"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_hr_custody_search" model="ir.ui.view">
+            <field name="name">hr.custody.search</field>
+            <field name="model">hr.custody</field>
+            <field name="arch" type="xml">
+                 <search string="Search Employee Custody">
+                    <field name="employee_id"/>
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="view_hr_custody_action" model="ir.actions.act_window">
+            <field name="name">Employee Custody</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.custody</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_employee_custody" name="Custody" parent="hr.menu_hr_root" action="view_hr_custody_action" sequence="15"/>
+
+    </data>
+</odoo>

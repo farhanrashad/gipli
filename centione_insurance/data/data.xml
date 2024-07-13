@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+            <record id="ANET" model="hr.salary.rule.category">
+                <field name="name">After Net</field>
+                <field name="code">ANET</field>
+            </record>
+
+           <record id="hr_rule__social_insurance" model="hr.salary.rule">
+                <field name="name">Social Insurance Salary Rule</field>
+                <field name="sequence" eval="78"/>
+                <field name="code">SIC</field>
+                <field name="category_id" ref="hr_payroll.DED"/>
+                <field name="struct_id" ref="centione_hr_payroll_base.custom_default_payroll_structure"/>
+                <field name="condition_select">none</field>
+                <field name="amount_select">code</field>
+                <field name="amount_python_compute">
+insurance_fixed_config = employee.env['hr.insurance.year'].search([('type', '=', 'fixed')],order="year desc", limit=1)
+employee_fixed_ratio = insurance_fixed_config and (insurance_fixed_config.employee_ratio/100.0) or 0.11
+result = -1*(employee_fixed_ratio*contract.get_insurance_primary_wage(payslip.date_from,payslip.date_to))
+                </field>
+           </record>
+
+        <record id="company_insurance_subscription_alw" model="hr.salary.rule">
+            <field name="name">Company Insurance Subscription Alw</field>
+            <field name="code">CISAC</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="struct_id" ref="centione_hr_payroll_base.custom_default_payroll_structure"/>
+            <field name="sequence" eval="81"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+insurance_fixed_config = employee.env['hr.insurance.year'].search([('type', '=', 'fixed')],order="year desc", limit=1)
+company_fixed_ratio = insurance_fixed_config and (insurance_fixed_config.company_ratio/100.0) or 0.1875
+result = (company_fixed_ratio*contract.get_insurance_primary_wage(payslip.date_from,payslip.date_to))
+            </field>
+        </record>
+         <record id="company_insurance_subscription_ded" model="hr.salary.rule">
+            <field name="name">Company Insurance Subscription DED</field>
+            <field name="code">CISDC</field>
+            <field name="category_id" ref="centione_insurance.ANET"/>
+            <field name="struct_id" ref="centione_hr_payroll_base.custom_default_payroll_structure"/>
+            <field name="sequence" eval="250"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+insurance_fixed_config = employee.env['hr.insurance.year'].search([('type', '=', 'fixed')],order="year desc", limit=1)
+company_fixed_ratio = insurance_fixed_config and (insurance_fixed_config.company_ratio/100.0) or 0.1875
+result = -1*(company_fixed_ratio*contract.get_insurance_primary_wage(payslip.date_from,payslip.date_to))
+
+            </field>
+        </record>
+
+         <record id="employee_emergency_relief_fund" model="hr.salary.rule">
+            <field name="name">Employee Emergency Relief Fund</field>
+            <field name="code">EERF</field>
+            <field name="category_id" ref="centione_insurance.ANET"/>
+            <field name="struct_id" ref="centione_hr_payroll_base.custom_default_payroll_structure"/>
+            <field name="sequence" eval="234"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+result = -1*0.01*(contract.get_insurance_primary_wage(payslip.date_from,payslip.date_to))
+            </field>
+        </record>
+
+         <record id="employer_over_sixty" model="hr.salary.rule">
+            <field name="name">Employer Over 60</field>
+            <field name="code">ERO60</field>
+            <field name="category_id" ref="centione_insurance.ANET"/>
+            <field name="struct_id" ref="centione_hr_payroll_base.custom_default_payroll_structure"/>
+            <field name="sequence" eval="223"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+result = -1*0.07*(contract.get_insurance_primary_wage(payslip.date_from,payslip.date_to))
+            </field>
+        </record>
+
+         <record id="employee_over_sixty" model="hr.salary.rule">
+            <field name="name">Employee Over 60</field>
+            <field name="code">Emp60</field>
+            <field name="category_id" ref="centione_insurance.ANET"/>
+            <field name="struct_id" ref="centione_hr_payroll_base.custom_default_payroll_structure"/>
+            <field name="sequence" eval="225"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+result = -1*0.08*(contract.get_employee_over_sixty_rule(payslip.date_from,payslip.date_to))
+            </field>
+        </record>
+
+         <record id="employer_insurance" model="hr.salary.rule">
+            <field name="name">Employer Insurance</field>
+            <field name="code">EMPRI</field>
+            <field name="category_id" ref="centione_insurance.ANET"/>
+            <field name="struct_id" ref="centione_hr_payroll_base.custom_default_payroll_structure"/>
+            <field name="sequence" eval="222"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+result = -1*0.15*(contract.get_insurance_primary_wage(payslip.date_from,payslip.date_to))
+            </field>
+        </record>
+
+    </data>
+</odoo>

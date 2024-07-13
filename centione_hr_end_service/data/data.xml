@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="seq_hr_retirement" model="ir.sequence">
+            <field name="name">Hr Retirement</field>
+            <field name="code">hr.retirement</field>
+            <field name="prefix">RTR/</field>
+            <field name="padding">4</field>
+        </record>
+        <record id="seq_hr_resignation" model="ir.sequence">
+            <field name="name">Hr Resignation</field>
+            <field name="code">hr.resignation</field>
+            <field name="prefix">RSGN/</field>
+            <field name="padding">5</field>
+        </record>
+        <record id="seq_hr_suspended" model="ir.sequence">
+            <field name="name">Hr Suspended</field>
+            <field name="code">hr.suspended</field>
+            <field name="prefix">SUS/</field>
+            <field name="padding">5</field>
+        </record>
+        <record id="seq_hr_termination" model="ir.sequence">
+            <field name="name">Hr Termination</field>
+            <field name="code">hr.termination</field>
+            <field name="prefix">TRM/</field>
+            <field name="padding">5</field>
+        </record>
+
+
+
+        <record id="ir_employee_retirement_notify" model="ir.cron">
+            <field name="name">Retirement Notify</field>
+            <field name="model_id" ref="model_hr_employee"/>
+            <field name="state">code</field>
+            <field name="code">model.retirement_notification()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall" />
+        </record>
+
+        <record id="ir_employee_contract_expire_notify" model="ir.cron">
+            <field name="name">Contract Expire Notification</field>
+            <field name="model_id" ref="model_hr_contract"/>
+            <field name="state">code</field>
+            <field name="code">model.end_of_contract_notification()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall" />
+        </record>
+
+        <record id="mail_template_end_of_service" model="mail.template">
+            <field name="name">End Of Service</field>
+            <field name="subject">Employee ${object.name} Retire Notification</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="email_to">${ctx['email_to']|safe}</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="body_html"><![CDATA[
+<p>Employee ${object.name} will retire On ${object.birthday} .</p>
+<p>Best regards,</p>]]></field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+        <record id="mail_template_end_of_contract" model="mail.template">
+            <field name="name">End Of Contract</field>
+            <field name="subject">Employee ${object.name} End Of Contract Notification</field>
+            <field name="model_id" ref="hr_contract.model_hr_contract"/>
+            <field name="email_to">${ctx['email_to']|safe}</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="body_html"><![CDATA[
+<p>The Contract ${object.name} of Employee ${object.employee_id.name} will Expire On ${object.date_end} .</p>
+<p>Best regards,</p>]]></field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+
+    </data>
+</odoo>

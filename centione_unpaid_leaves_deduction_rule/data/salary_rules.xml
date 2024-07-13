@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+
+        <record id="unpaid_leave_salary_rule" model="hr.salary.rule">
+            <field name="name">Unpaid Leaves Deduction</field>
+            <field name="code">UNPAIDLV</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result=-1*employee.get_unpaid_leaves_deduction(payslip)</field>
+                <field name="struct_id" ref="centione_hr_payroll_base.custom_default_payroll_structure"/>
+
+        </record>
+
+    </data>
+        </odoo>

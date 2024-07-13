@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hr_retirement_form" model="ir.ui.view">
+            <field name="name">hr.retirement.form</field>
+            <field name="model">hr.retirement</field>
+            <field name="arch" type="xml">
+                <form string="MODEL">
+                    <header>
+                        <button name="action_approved" string="Confirm" type="object" groups="hr.group_hr_manager" attrs="{'invisible':[('state','=','approved')]}"/>
+                        <button name="action_cancel" string="Cancel" type="object" groups="hr.group_hr_manager" attrs="{'invisible':[('state','=','approved')]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                         <div class="oe_button_box" name="button_box">
+                            <button name="action_custody" type="object" string="Custody" class="oe_stat_button" icon="fa-archive" attrs="{'invisible':[('state', 'not in', ('draft'))]}">
+                                <field name="num_custody" />
+                            </button>
+                         </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" required="True"/>
+                                <field name="retirement_date" required="True"/>
+                                <field name="reason"/>
+                            </group>
+                            <group>
+<!--                                <field name="attendance_id"/>-->
+                                <field name="department_id"/>
+                                <field name="job_id"/>
+                                <field name="approve_date" readonly="True"/>
+                                <field name="is_incentive_calc" invisible="True"/>
+                                <field name="end_incentive" attrs="{'invisible':[('is_incentive_calc','=',True)]}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_hr_retirement_tree" model="ir.ui.view">
+            <field name="name">hr.retirement.tree</field>
+            <field name="model">hr.retirement</field>
+            <field name="arch" type="xml">
+                <tree string="MODEL">
+                    <field name="employee_id"/>
+<!--                    <field name="attendance_id"/>-->
+                    <field name="department_id"/>
+                    <field name="job_id"/>
+                    <field name="retirement_date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_hr_retirement_action" model="ir.actions.act_window">
+            <field name="name">Employee Retirement</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.retirement</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <!--<menuitem id="menu_retirement" name="Retirement" parent="hr.menu_hr_root" action="view_hr_retirement_action" sequence="20"/>-->
+
+    </data>
+</odoo>

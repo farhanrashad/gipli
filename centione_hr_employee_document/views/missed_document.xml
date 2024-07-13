@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+
+        <record id="view_missed_document_action" model="ir.actions.act_window">
+            <field name="name">Missed Documents</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">missed.document</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_missed_document"
+                  name="Missed Documents"
+                  parent="hr.menu_human_resources_configuration"
+                  action="view_missed_document_action"
+                  sequence="15"/>
+    </data>
+</odoo>

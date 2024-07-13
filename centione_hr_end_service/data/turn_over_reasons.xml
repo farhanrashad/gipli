@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="turnover_reason_better_offer" model="turnover.reason">
+            <field name="name">Better Offer</field>
+        </record>
+
+        <record id="turnover_reason_work_conditions" model="turnover.reason">
+            <field name="name">Work Conditions</field>
+        </record>
+
+        <record id="turnover_reason_manager" model="turnover.reason">
+            <field name="name">Manager</field>
+        </record>
+
+        <record id="turnover_reason_other" model="turnover.reason">
+            <field name="name">Other</field>
+        </record>
+
+        <record id="turnover_reason_personal" model="turnover.reason">
+            <field name="name">Personal Reason</field>
+        </record>
+
+        <record id="turnover_reason_investigation" model="turnover.reason">
+            <field name="name">Investigation / Termination</field>
+        </record>
+
+    </data>
+</odoo>
