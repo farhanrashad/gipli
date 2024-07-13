@@ -99,7 +99,7 @@
 
                         </group>
                                             <notebook>
-                        <page attrs="{'invisible':[('multi_image','!=',True)]}" name="product multi image" string="Property Multiple Images">
+                        <page invisible="multi_image != True" name="product multi image" string="Property Multiple Images">
                                 <field name="images_type" nolabel="1" context="{'default_type_id': id, 'tree_view_ref':'add_real_estate.list_view_product_images', 'form_view_ref':'add_real_estate.form_view_product_images'}"/>
 
                             </page>

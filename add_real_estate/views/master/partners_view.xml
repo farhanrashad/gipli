@@ -22,9 +22,9 @@
                     <field name="nationality"/>
                     <field name="id" string="Data Base ID" optional="hide"/>
                     <field name="id_def"
-                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                           invisible="is_broker == True and is_supplier == False and is_customer == False"/>
                     <field name="social_status"
-                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                           invisible="is_broker == True and is_supplier == False and is_customer == False"/>
                     <label for="national_issue_date_month" string="National Issue Date"
                     />
                     <div class="o_row">
@@ -33,11 +33,11 @@
                     </div>
                     <field name="positon"/>
                     <field name="work_side"
-                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                           invisible="is_broker == True and is_supplier == False and is_customer == False"/>
                     <field name="partner_ttype_id" optional="{'no_create': True,'no_open': True}"
-                           attrs="{'invisible':[('is_supplier','=',False)]}"/>
-                    <field name="c_r" attrs="{'invisible':[('is_broker','=',False)]}"/>
-                    <field name="acc_manager" attrs="{'invisible':[('is_broker','=',False)]}"/>
+                           invisible="is_supplier == False"/>
+                    <field name="c_r" invisible="is_broker == False"/>
+                    <field name="acc_manager" invisible="is_broker ==  False"/>
                 </xpath>
                 <xpath expr="//field[@name='child_ids']//form//field[@name='comment']" position="after">
                     <field name="is_customer"/>
@@ -45,9 +45,9 @@
                     <field name="is_broker"/>
                     <field name="nationality"/>
                     <field name="id_def"
-                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                           invisible = is_broker == True and is_supplier == False and is_customer == False"/>
                     <field name="social_status"
-                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                           invisible="is_broker == True and is_supplier == False and is_customer == False"/>
                     <label for="national_issue_date_month" string="National Issue Date"
                     />
                     <div class="o_row">
@@ -56,11 +56,11 @@
                     </div>
                     <field name="positon"/>
                     <field name="work_side"
-                           attrs="{'invisible':[('is_broker','=',True),('is_supplier','=',False),('is_customer','=',False)]}"/>
+                           invisible="is_broker == True and is_supplier == False and is_customer == False"/>
                     <field name="partner_ttype_id" optional="{'no_create': True,'no_open': True}"
-                           attrs="{'invisible':[('is_supplier','=',False)]}"/>
-                    <field name="c_r" attrs="{'invisible':[('is_broker','=',False)]}"/>
-                    <field name="acc_manager" attrs="{'invisible':[('is_broker','=',False)]}"/>
+                           invisible=is_supplier == False"/>
+                    <field name="c_r" invisible="is_broker == False"/>
+                    <field name="acc_manager" invisible="is_broker == False"/>
                 </xpath>
                 <xpath expr="//notebook/page[2]/group/group/field[@name='property_supplier_payment_term_id']"
                        position="after">
@@ -72,30 +72,21 @@
                 </xpath>
 
                 <xpath expr="//field[@name='website']" position="attributes">
-                    <attribute name="attrs">{'invisible':[('is_supplier','=',False)]}</attribute>
+                    <attribute name="invisible">is_supplier == False</attribute>
                 </xpath>
-<!--                <xpath expr="//field[@name='lang']" position="attributes">-->
-<!--                    <attribute name="attrs">{'invisible':[('is_supplier','=',False)]}</attribute>-->
-<!--                </xpath>-->
-<!--                <xpath expr="//label[@for='lang']" position="attributes">-->
-<!--                    <attribute name="attrs">{'invisible':[('is_supplier','=',False)]}</attribute>-->
-<!--                </xpath>-->
-<!--                <xpath expr="//button[@name='%(base.res_lang_act_window)d']" position="attributes">-->
-<!--                    <attribute name="attrs">{'invisible':[('is_supplier','=',False)]}</attribute>-->
-<!--                </xpath>-->
                 <xpath expr="//field[@name='city']" position="attributes">
-                    <attribute name="attrs">
-                        {'invisible':[('is_customer','=',True),('is_supplier','=',False),('is_broker','=',False)]}
+                    <attribute name="invisible">
+                        is_customer == True and is_supplier == False and is_broker == False
                     </attribute>
                 </xpath>
                 <xpath expr="//field[@name='zip']" position="attributes">
-                    <attribute name="attrs">
-                        {'invisible':[('is_customer','=',True),('is_supplier','=',False),('is_broker','=',False)]}
+                    <attribute name="invisible">
+                        is_customer == True and is_supplier == False and is_broker == False
                     </attribute>
                 </xpath>
                 <xpath expr="//field[@name='state_id']" position="attributes">
-                    <attribute name="attrs">
-                        {'invisible':[('is_customer','=',True),('is_supplier','=',False),('is_broker','=',False)]}
+                    <attribute name="invisible">
+                        is_customer == True and is_supplier == False and is_broker == False
                     </attribute>
                 </xpath>
                 <xpath expr="//group[@name='purchase']/field[@name='property_supplier_payment_term_id']"
@@ -106,25 +97,25 @@
                 </xpath>
                 <xpath expr="//field[@name='property_account_payable_id']" position="after">
                     <field name="is_employee"/>
-                    <field name="petty_account" attrs="{'invisible':[('is_employee','=',False)]}"
+                    <field name="petty_account" invisible="is_employee == False"
                            domain="[('petty','=',True)]"/>
-                    <field name="custody_account" attrs="{'invisible':[('is_employee','=',False)]}"
+                    <field name="custody_account" invisible="is_employee == False"
                            domain="[('custody','=',True)]"/>
-                    <field name="accrued_account" attrs="{'invisible':[('is_employee','=',False)]}"
+                    <field name="accrued_account" invisible="is_employee == False"
                            domain="[('accrued','=',True)]"/>
-                    <field name="other_account" attrs="{'invisible':[('is_employee','=',False)]}"
+                    <field name="other_account" invisible="is_employee == False"
                            domain="[('other','=',True)]"/>
                 </xpath>
                 <xpath expr="//field[@name='user_id']" position="after">
-                    <field name="is_unit_payments" attrs="{'invisible':[('is_customer','=',False)]}"/>
-                    <field name="is_business_insurance" attrs="{'invisible':[('is_customer','=',False)]}"/>
-                    <field name="is_maintenance" attrs="{'invisible':[('is_customer','=',False)]}"/>
-                    <field name="is_eoi" attrs="{'invisible':[('is_customer','=',False)]}"/>
+                    <field name="is_unit_payments" invisible="is_customer == False"/>
+                    <field name="is_business_insurance" invisible="is_customer == False"/>
+                    <field name="is_maintenance" invisible="is_customer == False"/>
+                    <field name="is_eoi" invisible="is_customer == False"/>
 
 
-                    <field name="engineering_services" attrs="{'invisible':[('is_supplier','=',False)]}"/>
-                    <field name="marketing" attrs="{'invisible':[('is_supplier','=',False)]}"/>
-                    <field name="generally" attrs="{'invisible':[('is_supplier','=',False)]}"/>
+                    <field name="engineering_services" invisible="is_supplier','=',False)]}"/>
+                    <field name="marketing" invisible=is_supplier == False"/>
+                    <field name="generally" invisible="is_supplier == False"/>
                 </xpath>
 
 
