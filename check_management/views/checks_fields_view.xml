@@ -53,14 +53,10 @@
                 <form string="" create="false">
                     <header>
                         <field name="state" widget="statusbar"/>
-                        <!--                        <button name="action_cancel" string="Cancel" type="object" class="oe_highlight"-->
-                        <!--                                states="draft,holding,handed"/>-->
-                        <!--                        <button name="action_reset_draft" string="Reset To Draft" type="object" class="oe_highlight"-->
-                        <!--                                states="draft,holding,handed"/>-->
                         <button name="%(check_split_action)d" type="action"
                                 context="{'default_check_id':active_id,'default_amount_paid':amount_paid,'default_amount_due':amount_due,'default_amount':amount}"
                                 string="Split"
-                                states="holding,send_to_lagel,returned"
+                                invisible="state not in ('holding','send_to_lagel,returned')"
                                 class="oe_highlight"/>
                     </header>
                     <sheet>

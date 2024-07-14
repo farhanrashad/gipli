@@ -14,10 +14,10 @@
             <field name="arch" type="xml">
                 <form string="petty_cash_form">
                             <header>
-                        <button name="posted" type="object" states="draft" string="Posted" class="oe_highlight" />
-                        <button name="reset" type="object" states="canceled" string="Reset To Draft" class="oe_highlight"
+                        <button name="posted" type="object" invisible="state != 'draft'" string="Posted" class="oe_highlight" />
+                        <button name="reset" type="object" invisible="state != 'canceled'" string="Reset To Draft" class="oe_highlight"
                                 groups="add_real_estate.group_resest_to_draft_inv"/>
-                        <button name="cancel" type="object" states="posted" string="Cancel" class="oe_highlight"/>
+                        <button name="cancel" type="object" invisible="state != 'posted'" string="Cancel" class="oe_highlight"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,posted,canceled"/>
                     </header>
                     <sheet>

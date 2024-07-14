@@ -35,10 +35,12 @@
             <field name="arch" type="xml">
                 <form string="">
                     <header>
-                        <button name="action_confirm" string="Confirm" class="oe_highlight" states="draft"
+                        <button name="action_confirm" string="Confirm" class="oe_highlight" invisible="state != 'draft'"
                                 type="object"/>
-                          <button name="action_cancel" string="Cancel" type="object"  class="oe_highlight"  states="draft"/>
-                        <button name="action_reset_draft" string="Reset To Draft" type="object"  class="oe_highlight"  states="posted"/>
+                          <button name="action_cancel" string="Cancel" type="object"  class="oe_highlight"  
+                              invisible="state != 'draft'"/>
+                        <button name="action_reset_draft" string="Reset To Draft" type="object"  class="oe_highlight"  
+                            invisible="state != 'posted'"/>
 
                         <field name="state" widget="statusbar"/>
                     </header>
@@ -79,7 +81,7 @@
                             <div name="amount_div" class="o_row">
                                 <field name="amount1" widget='monetary' options="{'currency_field': 'currency_id'}"
                                 invisible="payment_subtype == 'issue_check' or payment_subtype == 'rece_check'"
-                                ,'readonly': [('state', '!=', 'draft')]}"/>
+                                readonly="state != 'draft'"/>
                                 <field name="amount" widget='monetary' options="{'currency_field': 'currency_id'}"
                                 invisible="payment_subtype != 'issue_check' and payment_subtype != 'rece_check'"/>
                             </div>
@@ -91,7 +93,8 @@
                                 invisible="partner_type == 'select_account'" />
                             <field name="select_account_id" 
                                 readonly="state != 'draft'"
-                                required="partner_type == 'select_account' and ),('multi_accounts','=',False)],'invisible':[('partner_type','!=','select_account')]}" />
+                                required="partner_type == 'select_account' and multi_accounts == False"
+                                invisible="partner_type != 'select_account'" />
                              <field name="multi_accounts" 
                                  invisible="partner_type != 'select_account'"/>
                             <field name="payment_date"  
