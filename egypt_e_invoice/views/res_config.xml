@@ -37,48 +37,56 @@
                                         </div>
                                     </div>
                                     <br />
-                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Same Server')]}" >
+                                    <div class="content-group" 
+                                        invisible="e_invoice_signature_type != 'Same Server'" >
                                         <button string="Get Card Info" type="object" name="get_card_info" class="oe_highlight"/>
                                     </div>
-                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Same Server')]}" >
+                                    <div class="content-group" 
+                                        invisible="e_invoice_signature_type != 'Same Server'" >
                                         <div class="mt16 row">
                                             <label for="e_invoice_card_name" string="Card Name" class="col-lg-3 o_light_label"/>
                                             <field name="e_invoice_card_name" class="oe_inline" />
                                         </div>
                                     </div>
-                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Same Server')]}" >
+                                    <div class="content-group" 
+                                        invisible="e_invoice_signature_type != 'Same Server'" >
                                         <div class="mt16 row">
                                             <label for="e_invoice_certificate" string="Certificate subjectCN" class="col-lg-3 o_light_label"/>
                                             <field name="e_invoice_certificate"  class="oe_inline" />
                                         </div>
                                     </div>
-                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Same Server')]}" >
+                                    <div class="content-group" 
+                                        invisible="e_invoice_signature_type != 'Same Server'" >
                                         <div class="mt16 row">
                                             <label for="e_invoice_token_pin" string="Token Pin" class="col-lg-3 o_light_label"/>
                                             <field name="e_invoice_token_pin" password="True" class="col-5 oe_inline" />
                                         </div>
                                     </div>
 
-                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Middleware With Accessable IP')]}" >
+                                    <div class="content-group" 
+                                        invisible="e_invoice_signature_type != 'Middleware With Accessable IP'" >
                                         <div class="mt16 row">
                                             <label for="middleware_url" string="Middleware URL" class="col-lg-3 o_light_label"/>
                                             <field name="middleware_url"  class="col-5 oe_inline" />
                                         </div>
                                     </div>
-                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Middleware With Accessable IP')]}" >
+                                    <div class="content-group" 
+                                invisible="e_invoice_signature_type != 'Middleware With Accessable IP'" >
                                         <div class="mt16 row">
                                             <label for="middleware_database" string="Middleware Database" class="col-lg-3 o_light_label"/>
                                             <field name="middleware_database"  class="col-5 oe_inline" />
                                         </div>
                                     </div>
-                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Middleware With Accessable IP')]}" >
+                                    <div class="content-group" 
+                            invisible="e_invoice_signature_type != 'Middleware With Accessable IP'" >
                                         <div class="mt16 row">
                                             <label for="middleware_user" string="Middleware User" class="col-lg-3 o_light_label"/>
                                             <field name="middleware_user"  class="col-5 oe_inline" />
                                         </div>
                                     </div>
 
-                                    <div class="content-group" attrs="{'invisible':[('e_invoice_signature_type','!=','Middleware With Accessable IP')]}" >
+                                    <div class="content-group" 
+                                        invisible="e_invoice_signature_type != 'Middleware With Accessable IP'" >
                                         <div class="mt16 row">
                                             <label for="middleware_pass" string="Middleware Pass" class="col-lg-3 o_light_label"/>
                                             <field name="middleware_pass" password="True" class="col-5 oe_inline" />

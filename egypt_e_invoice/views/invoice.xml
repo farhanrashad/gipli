@@ -13,7 +13,7 @@
                         class="oe_highlight"
                         string="Send To E-Invoice Portal"
                         groups="egypt_e_invoice.group_send_to_e_invoice"
-                        attrs="{'invisible':['|','|',('move_type', 'in', ['in_invoice']),('state','!=','posted'),('einvoice_state','not in',['Invalid','Not Set Yet'])]}"
+                        invisible="move_type in ['in_invoice'] or state != 'posted' or einvoice_state not in ['Invalid','Not Set Yet']"
                     />
                 </button>
 
@@ -26,7 +26,7 @@
                 </field>
                 <notebook position="inside">
                     <page string="ETA" groups="egypt_e_invoice.group_send_to_e_invoice">
-                        <header attrs="{'invisible':[('einvoice_sent', '=', False)]}">
+                        <header invisible="einvoice_sent == False">
                             <button
                                 name="update_e_invoice_status"
                                 type="object"
@@ -41,17 +41,23 @@
                                 <field name="is_signed" readonly="1" force_save="1" />
 <!--                                <field name="e_signature" readonly="1" force_save="1" />-->
                                 <button name="get_e_invoice_pdf" type="object" class="oe_highlight"
-                                    string="Get PDF" attrs="{'invisible':[('einvoice_sent', '=', False)]}" />
+                                    string="Get PDF" 
+                                    invisible="einvoice_sent == False" />
 
-                                <field name="einvoice_pdf" readonly="1" force_save="1" attrs="{'invisible':[('einvoice_sent', '=', False)]}" />
+                                <field name="einvoice_pdf" readonly="1" force_save="1" 
+                                    invisible="einvoice_sent == False" />
                                 <field name="note_origin_id" readonly="1" force_save="1" />
                             </group>
                             <group>
                                 <field name="einvoice_sent" readonly="1" force_save="1" />
-                                <field name="einvoice_submission_id" readonly="1" force_save="1" attrs="{'invisible':[('einvoice_sent', '=', False)]}"/>
-                                <field name="einvoice_uuid" attrs="{'readonly':[('move_type', 'not in', ['in_invoice'])]}"  force_save="1" />
-                                <field name="einvoice_long_id" readonly="1" force_save="1" attrs="{'invisible':[('einvoice_sent', '=', False)]}" />
-                                <field name="einvoice_hash_key" readonly="1" force_save="1" attrs="{'invisible':[('einvoice_sent', '=', False)]}" />
+                                <field name="einvoice_submission_id" readonly="1" force_save="1" 
+                                    invisible="einvoice_sent == False"/>
+                                <field name="einvoice_uuid" 
+                                    readonly="move_type not in ['in_invoice']"  force_save="1" />
+                                <field name="einvoice_long_id" readonly="1" force_save="1" 
+                                    invisible="einvoice_sent == False" />
+                                <field name="einvoice_hash_key" readonly="1" force_save="1" 
+                                    invisible="einvoice_sent == False" />
                             </group>
                         </group>
                     </page>
