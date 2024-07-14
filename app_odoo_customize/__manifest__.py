@@ -45,8 +45,8 @@
         # 'web_mobile'
     ],
     'data': [
-        'security/res_groups.xml',
-        'security/ir.model.access.csv',
+        #'security/res_groups.xml',
+        #'security/ir.model.access.csv',
         #'views/app_odoo_customize_views.xml',
         #'views/app_theme_config_settings_views.xml',
         #'views/res_config_settings_views.xml',
