@@ -5,7 +5,7 @@
         <field name="model">ir.actions.server</field>
         <field name="inherit_id" ref="base.view_server_action_form" />
         <field name="arch" type="xml">
-            <page name="security" position="before">
+            <xpath expr="//notebook" position="inside">
                 <page
                     name="mass_edit_line_ids"
                     string="Fields"
@@ -41,7 +41,7 @@
                 >
                     <field name="mass_edit_message" />
                 </page>
-            </page>
+            </xpath>
         </field>
     </record>
 
