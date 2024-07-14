@@ -46,7 +46,7 @@
                         <div class="oe_button_box" name="button_box">
                             <button class="oe_stat_button" name="button_journal_entries"
                                     string="Journal Items" type="object"
-                                    attrs="{'invisible':[('state','=','draft')]}" icon="fa-bars"/>
+                                    invisible="state == 'draft'" icon="fa-bars"/>
                         </div>
                         <div class="oe_title">
                             <label for="name" string="Title"/>
@@ -55,46 +55,80 @@
                             </h1>
                         </div>
                         <group col="4">
-                            <field name="partner_type" attrs="{'readonly': ['|',('state', '!=', 'draft'),('partner_type','=','select_account')],'required':True}" />
-                                      <field name="account_emp_type" attrs="{'invisible':[('partner_type','!=','employee')],'required':[('partner_type','=','employee')],'readonly':[('state','!=','draft')]}"/>
-                            <field name="partner_id" attrs="{'readonly': [('state', '!=', 'draft')],'required':[('partner_type','not in',['select_account','internal'])]}"/>
+                            <field name="partner_type" 
+                             readonly="state != 'draft' or partner_type == 'select_account'"
+                                required="1" />
+                                      <field name="account_emp_type" 
+                                          invisible="partner_type != 'employee'"
+                                          required="partner_type == 'employee'"
+                                          readonly="state != 'draft'"/>
+                            <field name="partner_id" 
+                                readonly="state != 'draft'"
+                                required="partner_type not in ['select_account','internal']"/>
                            <field name="custom_account_id"
                          domain="[('deprecated', '=', False)]"
                          force_save="1" invisible="1"/>
-                            <field name="payment_method" widget="selection" options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="destination_journal_id" attrs="{'readonly': [('state', '!=', 'draft')],'required':[('partner_type','=','internal')],'invisible':[('partner_type','!=','internal')]}"/>
+                            <field name="payment_method" widget="selection" 
+                                options="{'no_open': True, 'no_create': True}"
+                                readonly="state != 'draft'"/>
+                            <field name="destination_journal_id" 
+                                readonly="state != 'draft'"
+                                required="partner_type == 'internal'"
+                                invisible="partner_type != 'internal'"/>
                             <label for="amount"/>
                             <div name="amount_div" class="o_row">
                                 <field name="amount1" widget='monetary' options="{'currency_field': 'currency_id'}"
-                                attrs="{'invisible' : ['|',('payment_subtype', '=', 'issue_check'),('payment_subtype', '=', 'rece_check')]
+                                invisible="payment_subtype == 'issue_check' or payment_subtype == 'rece_check'"
                                 ,'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="amount" widget='monetary' options="{'currency_field': 'currency_id'}"
-                                attrs="{'invisible' : [('payment_subtype', '!=', 'issue_check'),('payment_subtype', '!=', 'rece_check')]}"/>
+                                invisible="payment_subtype != 'issue_check' and payment_subtype != 'rece_check'"/>
                             </div>
-                            <field name="accounting_allocation"  attrs="{'readonly': [('state', '!=', 'draft')]}" />
-                            <field name="account_id" attrs="{'readonly': [('state', '!=', 'draft')],'required':True,'invisible':[('partner_type','=','select_account')]}" />
-                            <field name="select_account_id" attrs="{'readonly': [('state', '!=', 'draft')],'required':[('partner_type', '=', 'select_account'),('multi_accounts','=',False)],'invisible':[('partner_type','!=','select_account')]}" />
-                             <field name="multi_accounts" attrs="{'invisible':[('partner_type','!=','select_account')]}"/>
-                            <field name="payment_date"  attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="analyitc_id" attrs="{'readonly': [('state', '!=', 'draft')]}" invisible="1"/>
-                            <field name="send_rec_money" widget="radio" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="receipt_number" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="reservation_id" attrs="{'readonly': [('state', '!=', 'draft')]}" domain="[('customer_id','=',partner_id)]"/>
-                            <field name="request_reservation_id" attrs="{'readonly': [('state', '!=', 'draft')]}" domain="[('customer_id','=',partner_id)]"/>
+                            <field name="accounting_allocation"  
+                                readonly="state != 'draft'" />
+                            <field name="account_id" 
+                                readonly="state != 'draft'" 
+                                required="1"
+                                invisible="partner_type == 'select_account'" />
+                            <field name="select_account_id" 
+                                readonly="state != 'draft'"
+                                required="partner_type == 'select_account' and ),('multi_accounts','=',False)],'invisible':[('partner_type','!=','select_account')]}" />
+                             <field name="multi_accounts" 
+                                 invisible="partner_type != 'select_account'"/>
+                            <field name="payment_date"  
+                                readonly="state != 'draft'"/>
+                            <field name="analyitc_id" 
+                                readonly="state != 'draft'" invisible="1"/>
+                            <field name="send_rec_money" widget="radio" 
+                                readonly="state != 'draft'"/>
+                            <field name="receipt_number" 
+                                readonly="state != 'draft'"/>
+                            <field name="reservation_id" 
+                                readonly="state != 'draft'" 
+                                domain="[('customer_id','=',partner_id)]"/>
+                            <field name="request_reservation_id" 
+                                readonly="state != 'draft'" domain="[('customer_id','=',partner_id)]"/>
                             <field name="property_id"  readonly="1"/>
-                            <field name="custoemr_payment_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="state_payment" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="description" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="payment_method_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="company_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="currency_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="custoemr_payment_id" 
+                                readonly="state != 'draft'"/>
+                            <field name="state_payment" 
+                                readonly="state != 'draft'
+                                "/>
+                            <field name="description" 
+                                readonly="state != 'draft'"/>
+                            <field name="payment_method_id" 
+                                readonly="state != 'draft'"/>
+                            <field name="company_id" 
+                                readonly="state != 'draft'"/>
+                            <field name="currency_id" 
+                                readonly="state != 'draft'"/>
                             <field name="bank_required" invisible="1"/>
                             <field name="user_id" invisible="1"/>
                             <field name="payment_subtype" invisible="1"/>
                             <field name="document_type_id" />
                             <field name="external_document_number" />
                             <field name="external_document_type" />
-                            <field name="customer_type_id"  options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="customer_type_id"  options='{"no_open": True, "no_create": True}' 
+                                readonly="state != 'draft'"/>
                               <field name="from_check_number" readonly="1"/>
                              <field name="from_check_date" readonly="1"/>
                             <field name="parent_payment_id"  readonly="1"/>
@@ -105,28 +139,31 @@
 
                         </group>
                         <notebook>
-                            <page string="Checks" attrs="{'invisible': [('payment_subtype', '!=', 'issue_check'),('payment_subtype', '!=', 'rece_check')]}" >
-                                <field name="pay_check_ids" attrs="{'readonly': [('state', '!=', 'draft')]}">
+                            <page string="Checks" invisible="payment_subtype != 'issue_check' and payment_subtype != 'rece_check'" >
+                                <field name="pay_check_ids" readonly="state != 'draft'">
                                     <tree editable="bottom">
                                         <field name="cheque_books_id"
                                                domain="[('id','in',parent.cheque_books_ids)]"
-                                               attrs="{'column_invisible': [('parent.payment_subtype', '!=', 'issue_check')]}"
+                                               column_invisible="parent.payment_subtype != 'issue_check'"
                                                options='{"no_open": True, "no_create": True}'/>
                                         <field name="check_number" required="1"/>
                                         <field name="check_date"/>
                                         <field name="amount"/>
-                                        <field name="bank" attrs="{'required':[('parent.bank_required','=',True)]}"/>
+                                        <field name="bank" 
+                                            required="parent.bank_required == True"/>
                                         <field name="dep_bank"/>
                                     </tree>
                                 </field>
                             </page>
-                            <page string="Multi Accounts" attrs="{'invisible':[('multi_accounts','=',False)]}">
-                                 <field name="multi_account_ids" attrs="{'invisible':[('multi_accounts','=',False)]}">
+                            <page string="Multi Accounts" 
+                                invisible="multi_accounts == False">
+                                 <field name="multi_account_ids" 
+                                     invisible="multi_accounts == False">
                             <tree editable="bottom">
                                 <field name="account_id"/>
                                 <field name="analyitc_id" invisible="1"/>
                                 <field name="partner_required_in_journal_entry" invisible="1"/>
-                                <field name="partner_id" attrs="{'required':[('partner_required_in_journal_entry','=',True)]}"/>
+                                <field name="partner_id" required="partner_required_in_journal_entry == True"/>
                                 <field name="label"/>
                                 <field name="amount"/>
                             </tree>

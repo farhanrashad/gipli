@@ -94,7 +94,8 @@
                                 <field name="request_reservation_id"/>
                                 <field name="payment_method"/>
                                 <field name="receipt_number"/>
-                                <field name="customer_type_id"  options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="customer_type_id"  options='{"no_open": True, "no_create": True}' 
+                                    readonly="state != 'draft'"/>
                                 <field name="from_check_number" readonly="1"/>
                                 <field name="from_check_date" readonly="1"/>
 

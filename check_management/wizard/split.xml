@@ -32,9 +32,12 @@
                             <field name="payment_subtype" invisible="0" force_save="1"/>
                             <field name="payment_date" invisible="0" force_save="1"/>
                             <field name="journal_id" force_save="1"/>
-                            <field name="check_number"  force_save="1" attrs="{'invisible': [('payment_subtype', '!=', 'issue_check'),('payment_subtype', '!=', 'rece_check')]}" />
-                            <field name="check_date"  force_save="1" attrs="{'invisible': [('payment_subtype', '!=', 'issue_check'),('payment_subtype', '!=', 'rece_check')]}"/>
-                            <field name="bank" force_save="1" attrs="{'invisible': [('payment_subtype', '!=', 'issue_check'),('payment_subtype', '!=', 'rece_check')]}" />
+                            <field name="check_number"  force_save="1" 
+                                invisible="payment_subtype != 'issue_check' and payment_subtype != 'rece_check'" />
+                            <field name="check_date"  force_save="1" 
+                                invisible="payment_subtype != 'issue_check' and payment_subtype != 'rece_check'"/>
+                            <field name="bank" force_save="1" 
+                                invisible="payment_subtype != 'issue_check' and payment_subtype != 'rece_check'" />
                             <field name="amount" force_save="1" />
                         </tree>
                     </field>

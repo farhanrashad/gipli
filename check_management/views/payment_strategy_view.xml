@@ -64,7 +64,7 @@
                         <field name="flag" invisible="1"/>
                         <field name="sum_reaming" invisible="1"/>
                         <notebook>
-                            <page string="Payment Strategy Details" attrs="{'invisible' : [('flag', '=',False)]}">
+                            <page string="Payment Strategy Details" invisible="flag == False">
                                 <group>
                                     <field name="payment_details_ids" nolabel="1"
                                            context="{'default_payment_id':id,'rem_amount':sum_reaming}"/>
@@ -132,7 +132,8 @@
                             <field name="type"/>
 
 
-                            <field name="occurrence" attrs="{'readonly' : [('type', 'in', ['reservation','contracting'])]}"/>
+                            <field name="occurrence" 
+                                readonly="type in ['reservation','contracting']"/>
                             <field name="sum_reaming" invisible="1"/>
 
 
@@ -144,37 +145,33 @@
 							</group><newline/>
 							<group colspan='6' col='4'>
                             <field name="days"
-                                   attrs="{'readonly':[('interval_radio_button', '=', 'period')],'required':[('interval_radio_button', '=', 'days')]}"/>
+                                   readonly="interval_radio_button == 'period'"
+                                required="interval_radio_button == 'days'"/>
                             <field name="period"
-                                   attrs="{'readonly' : ['|',('interval_radio_button', '=', 'days'),
-                                   ('type', 'in', ['reservation','contracting'])],
-                                   'required':[('interval_radio_button', '=', 'period')]}"/>
+                                   readonly="interval_radio_button == 'days' or type in ['reservation','contracting']"
+                                   required="interval_radio_button == 'period'"/>
                             </group>
                         </group>
-                        <!--attrs="{'invisible' : [('type', '!=', 'regular')]}"-->
                         <group string="First instalment Date">
                         	<group>
                             <field name="f_date_radio_button" widget="radio" nolabel="1" colspan="4"
                                    options="{'horizontal': true}"/>
                             </group>
-                            <group colspan='6' col='2' attrs="{'invisible' : [('f_date_radio_button', '=', 'relative')]}">
+                            <group colspan='6' col='2' 
+                                invisible="f_date_radio_button == 'relative'">
                             <field name="absolute_inst_date"
-                                   attrs="{'invisible' : [('f_date_radio_button', '=', 'relative')],'required' : [('f_date_radio_button', '=', 'absolute')]}"/>
+                                   invisible="f_date_radio_button == 'relative'"
+                                required="f_date_radio_button == 'absolute'"/>
                             </group>
                             <!--<field name="absolute_day"-->
-                                   <!--attrs="{'invisible' : [('f_date_radio_button', '=', 'relative')],'required' : [('f_date_radio_button', '=', 'absolute'),('type', '=', 'regular')]}"-->
-                                   <!--placeholder="1-31"/>-->
-                            <!--<field name="relative_months"-->
-                                   <!--attrs="{'invisible' : [('f_date_radio_button', '=', 'absolute')],'required' : [('f_date_radio_button', '=', 'relative'),('type', '=', 'regular')]}"-->
-                                   <!--placeholder="1-12"/>-->
-                            <group colspan='6' col='4' attrs="{'invisible' : [('f_date_radio_button', '=', 'absolute')]}">
+                            <group colspan='6' col='4' 
+                                invisible="f_date_radio_button == 'absolute'">
                             <field name="contract_date"
-                                   attrs="{'invisible' : [('f_date_radio_button', '=', 'absolute')],'required' : [('f_date_radio_button', '=', 'relative')]}"/>
-                            <!--<field name="relative_day"-->
-                                   <!--attrs="{'invisible' : [('f_date_radio_button', '=', 'absolute')],'required' : [('f_date_radio_button', '=', 'relative'),('type', '=', 'regular')]}"-->
-                                   <!--placeholder="1-31"/>-->
+                                   invisible="f_date_radio_button == 'absolute'"
+                                required="f_date_radio_button == 'relative'"/>
                             <field name="first_ins_date"
-                                   attrs="{'invisible' : [('f_date_radio_button', '=', 'absolute')],'required' : [('f_date_radio_button', '=', 'relative')]}"/>
+                                   invisible="f_date_radio_button == 'absolute'"
+                                required="f_date_radio_button == 'relative'"/>
                              </group>
                         </group>
                     </sheet>
