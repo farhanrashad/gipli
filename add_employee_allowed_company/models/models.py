@@ -112,7 +112,7 @@ class HrEmployee(models.Model):
         return record
 
 
-    def write(self, vals):
+    def write1(self, vals):
         old_zk_emp_id=self.zk_emp_id
         res = super(HrEmployee, self).write(vals)
         if 'company_id' in vals:
