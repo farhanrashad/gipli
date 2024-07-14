@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <record id="invoice_form_inherit_custom" model="ir.ui.view">
+            <field name="name">account.invoice.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <field name="draft_no" position="after">
+                    <field name="po_ref" invisible="0"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
