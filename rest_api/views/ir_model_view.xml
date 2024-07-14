@@ -26,11 +26,13 @@
                         <group colspan="4" col="2">
                             <field name="rest_api__used"/>
                         </group>
-                        <group colspan="4" col="4" attrs="{'invisible': [('rest_api__used', '!=', True)]}">
+                        <group colspan="4" col="4" 
+                            invisible="rest_api__used != True">
                             <field name="rest_api__read_all__schema" widget="ace" options="{'mode': 'python'}" colspan="2"/>
                             <field name="rest_api__read_one__schema" widget="ace" options="{'mode': 'python'}" colspan="2"/>
                         </group>
-                        <group colspan="4" col="4" attrs="{'invisible': [('rest_api__used', '!=', True)]}">
+                        <group colspan="4" col="4" 
+                            invisible="rest_api__used != True">
                             <field name="rest_api__create_one__schema" widget="ace" options="{'mode': 'python'}" colspan="2"/>
                             <field name="rest_api__create_one__defaults" widget="ace" options="{'mode': 'python'}" colspan="2"/>
                         </group>
