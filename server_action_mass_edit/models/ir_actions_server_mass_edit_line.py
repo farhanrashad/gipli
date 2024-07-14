@@ -1,12 +1,12 @@
 # Copyright (C) 2019 - Today: GRAP (http://www.grap.coop)
 # Copyright (C) 2020 Iván Todorovich (https://twitter.com/ivantodorovich)
-# @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
+# Author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
-MAGIC_FIELDS = models.MAGIC_COLUMNS + [models.BaseModel.CONCURRENCY_CHECK_FIELD]
+MAGIC_FIELDS = models.MAGIC_COLUMNS  # Removed models.BaseModel.CONCURRENCY_CHECK_FIELD
 
 
 class IrActionsServerMassEditLine(models.Model):
