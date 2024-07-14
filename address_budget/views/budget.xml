@@ -50,18 +50,25 @@
 
                 <xpath expr="//field[@name='line_ids']//tree//field[@name='analytic_distribution']" position="after">
                     <field name="budget_company_id" options='{"no_open": True, "no_create": True}'/>
-                    <field name="branch_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" attrs="{'readonly':[('budget_company_id','=',False)]}"/>
-                    <field name="project_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" attrs="{'readonly':[('budget_company_id','=',False)]}"/>
-                    <field name="department_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" attrs="{'readonly':[('budget_company_id','=',False)]}"/>
-                    <field name="franchise_id" options='{"no_open": True, "no_create": True}' domain="[('x_company_id','=',budget_company_id)]" attrs="{'readonly':[('budget_company_id','=',False)]}"/>
+                    <field name="branch_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" 
+                        readonly="budget_company_id == False"/>
+                    <field name="project_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" 
+                        readonly="budget_company_id == False"/>
+                    <field name="department_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" 
+                        readonly="budget_company_id == False"/>
+                    <field name="franchise_id" options='{"no_open": True, "no_create": True}' domain="[('x_company_id','=',budget_company_id)]" 
+                        readonly="budget_company_id == False"/>
                     <field name="conconcatenate_cost_code"/>
                 </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='analytic_distribution']" position="after">
                     <field name="budget_company_id"/>
-                    <field name="branch_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" attrs="{'readonly':[('budget_company_id','=',False)]}"/>
-                    <field name="project_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" attrs="{'readonly':[('budget_company_id','=',False)]}"/>
-                    <field name="department_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" attrs="{'readonly':[('budget_company_id','=',False)]}"/>
-                    <field name="franchise_id" options='{"no_open": True, "no_create": True}' domain="[('x_company_id','=',budget_company_id)]" attrs="{'readonly':[('budget_company_id','=',False)]}"/>
+                    <field name="branch_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" readonly="budget_company_id == False"/>
+                    <field name="project_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" 
+                        readonly="budget_company_id == False"/>
+                    <field name="department_id" options='{"no_open": True, "no_create": True}' domain="[('company_id','=',budget_company_id)]" 
+                        readonly="budget_company_id == False"/>
+                    <field name="franchise_id" options='{"no_open": True, "no_create": True}' domain="[('x_company_id','=',budget_company_id)]" 
+                        readonly="budget_company_id == False"/>
                      <field name="conconcatenate_cost_code"/>
 
                 </xpath>
