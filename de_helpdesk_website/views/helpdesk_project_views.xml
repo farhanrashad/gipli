@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_helpdesk_website_publish" model="ir.ui.view">
+        <field name="name">project.helpdesk.website.publish</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="model">project.project</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <field name="is_published" widget="website_redirect_button" invisible="not is_helpdesk_team"/>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>
