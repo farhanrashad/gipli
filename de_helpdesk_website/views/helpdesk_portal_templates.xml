@@ -7,12 +7,111 @@
          </li>
       </xpath>
    </template>
-   <template id="web_faq" name="FAQ">
-      <t t-call="website.layout">
-         <h1 id="header_title_text">
-            <b>Submit A Ticket</b>
-         </h1>
+    <template id="website_helpdesk_form" name="Helpdesk: Submit a Ticket">
+        <t t-call="website.layout">
+            <section class="s_text_block pt40 pb40 o_colored_level" data-snippet="s_text_block" data-name="Text" style="background-image: none;">
+                <div class="container s_allow_columns">
+                    <div class="row">
+                        <div class="o_colored_level col-lg-9">
+                            <form action="/support/ticket/submit" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <div class="s_website_form_rows container mb64 s_col_no_bgcolor">
+                                    <div class="form-group s_website_form_field col-12 " data-type="char" data-name="Field">
+                                        <div class="row mt8 s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="oipksency77">
+                                                <span class="s_website_form_label_content">Subject</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <div class="col-sm">
+                                                <input class="form-control s_website_form_input" type="text" name="name" required="" id=""/>
+                                            </div>
+                                        </div>
+            
+                                        <div class="row mt8 s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="oyeqxalhpua9">
+                                                <span class="s_website_form_label_content">Your Email</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <div class="col-sm">
+                                                <input class="form-control s_website_form_input" type="email" name="email_from" required="1" data-fill-with="email" id=""/>
+                                            </div>
+                                        </div>
+            
+                                        <div class="row mt8 s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="oasqhckekzy6">
+                                                <span class="s_website_form_label_content">Your Name</span>
+                                            </label>
+                                            <div class="col-sm">
+                                                <input class="form-control s_website_form_input" type="text" name="Your Name" placeholder="" id="" data-fill-with="undefined"/>
+                                            </div>
+                                        </div>
+            
+                                        <div class="row mt8 s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="orm63y4u8cqk">
+                                                <span class="s_website_form_label_content">Description</span>
+                                            </label>
+                                            <div class="col-sm">
+                                                <textarea id="description" name="description" class="form-control s_website_form_input" rows="4" cols="50" placeholder="Wirte your ticket details" />
+                                            </div>
+                                        </div>
+            
+                                        <div class="row mt8 s_col_no_resize s_col_no_bgcolor">
+                                            <label class="col-sm-auto s_website_form_label" style="width: 200px" for="okd29t29r1wo">
+                                                <span class="s_website_form_label_content">Attachment(s)</span>
+                                            </label>
+                                            <div class="col-sm">
+                                                <input type="file" class="form-control s_website_form_input" name="Attachment(s)" multiple="" id="" data-max-files-number="3" data-max-file-size="25" data-fill-with="undefined"/>
+                                            </div>
+                                        </div>
+            
+                                        
+                                    </div>
+                                    
+                                    <div class="form-group s_website_form_field col-12 mt8" data-type="char" data-name="Field">
+                                        <input type="hidden" class="form-control s_website_form_input" id="project" name="project" t-att-value="project.id" />
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </div>
+                                </div>
+                            </form> 
+                        </div>
+                        <div t-if="project.description" class="o_colored_level col-lg-3">
+                            <h3>About Our Team</h3>
+                            <p class="o_default_snippet_text"><span t-esc="project.description" /></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
          
       </t>
    </template>
+
+    <template id="support_ticket_submited" name="Ticket Received">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty h-100">
+                <div class="container d-flex flex-column justify-content-center h-100">
+                    <div class="oe_structure" id="oe_structure_website_helpdesk_thanks_you"/>
+                    <div class="row justify-content-center mb16">
+                        <t t-if="request.session.get('form_builder_model_model', '') == 'helpdesk.ticket'">
+                            <t t-set="ticket" t-value="request.website._website_form_last_record()"/>
+                        </t>
+                        <h1 class="text-center">
+                            <i class="fa fa-check-circle fa-1x text-success me-2" role="img" aria-label="Success" title="Success"/>
+                            <t t-if="ticket">
+                                <span>Your Ticket Number is <a t-if="request.session.uid" t-attf-href="/helpdesk/ticket/#{ticket.id}">#<span t-field="ticket.sudo().ticket_no"/></a><t t-if="not request.session.get('uid')">#<span t-field="ticket.sudo().ticket_no"/></t>.</span>
+                            </t>
+                        </h1>
+                        <h2 class="text-center">Thank you for contacting us, our team will get right on it!</h2>
+                        <div class="text-center">
+                            <a class="btn btn-primary" t-if="ticket and request.session.uid" t-attf-href="/helpdesk/ticket/#{ticket.id}">View Ticket</a>
+                            <a class="btn btn-primary" href='/'>Go to the Homepage</a>
+                        </div>
+                    </div>
+                    <div class="oe_structure" id="oe_structure_website_helpdesk_thanks_you_bottom"/>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Sumbit Ticket Page -->
+    
 </odoo>
