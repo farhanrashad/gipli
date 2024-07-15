@@ -9,9 +9,21 @@
    </template>
     <template id="website_helpdesk_form" name="Helpdesk: Submit a Ticket">
         <t t-call="website.layout">
+            <section class="s_text_block o_colored_level pb0 pt40" data-snippet="s_text_block" data-name="Text" style="background-image: none;">
+                <div class="container s_allow_columns">
+                    <div class="row">
+                        <div class="o_colored_level col-lg-8 offset-lg-2">
+                            <h1 class="o_default_snippet_text" style="text-align: center;"><span t-esc="project.name" /></h1>
+                            <h3 class="o_default_snippet_text" style="text-align: center;">Sumbit a Ticket</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
             <section class="s_text_block pt40 pb40 o_colored_level" data-snippet="s_text_block" data-name="Text" style="background-image: none;">
                 <div class="container s_allow_columns">
                     <div class="row">
+                        
                         <div class="o_colored_level col-lg-9">
                             <form action="/support/ticket/submit" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
