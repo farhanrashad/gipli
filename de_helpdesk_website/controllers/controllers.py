@@ -8,24 +8,28 @@ from odoo.exceptions import UserError, ValidationError
 
 class WebsiteHelpdesk(http.Controller):
 
-    
-    #@http.route(['/support/'], type="http", auth="public", website=True, sitemap=True)
-    #def faq_ans(self, **kw):
-    #    obj = request.env["project.project"].search([('is_published', '=', True)])
-    #    return request.render("de_helpdesk_website.web_faq", {"object": obj, })
 
     @http.route(['/support/<string:url>'], type="http", auth="public", website=True)
     def website_helpdesk(self, url, **kw):
-        # Search for the project with the given URL
-        #raise UserError('/support/'+url)
+        
         project = request.env["project.project"].sudo()._get_project_by_website_url('/support/'+url)
-        #search([('website_url', '=', 'support/'+url)], limit=1)
+
+        user_name = user_email = ''
         
         if not project:
             return request.not_found()
 
+        if request.env.user.id == request.env.ref('base.public_user').id:
+            user_name = ''
+            user_email = ''
+        else:
+            user_name = request.env.user.name
+            user_email = request.env.user.email
+
         vals = {
             'project': project,
+            'user_name': user_name,
+            'user_email': user_email
         }
         
         return request.render("de_helpdesk_website.website_helpdesk_form", vals)
@@ -33,6 +37,30 @@ class WebsiteHelpdesk(http.Controller):
 
     @http.route('/support/ticket/submit', type="http", website=True, auth='public', csrf=False)
     def ticket_submit(self, **kw):
-        ticket = request.env['project.task'].browse(1)
+
+        partner_id = request.env['res.partner']
+        
+        if request.env.user.id == request.env.ref('base.public_user').id:
+            partner_id = request.env['res.partner'].sudo().create({
+                'name': kw.get('contact_name'),
+                'email': kw.get('email_from'),
+                'company_type': 'person',
+            })
+        else:
+            partner_id = request.env.user.partner_id
+        
+        vals = {
+            'project_id' : int(kw.get('project_id')),
+            'partner_id': partner_id.id,
+            'name' : kw.get('name'),
+            'email_from': kw.get('email_from'),
+            'contact_name': kw.get('contact_name'),
+            'description': kw.get('description'),
+            'attachment_files': request.httprequest.files.getlist('attachments')
+        }
+        #raise UserError(kw.get('project_id'))
+        ticket = request.env['project.project'].sudo()._create_ticket(vals)
+
+        #ticket = request.env['project.task'].browse(1)
         return request.render("de_helpdesk_website.support_ticket_submited", {"ticket": ticket})
         
