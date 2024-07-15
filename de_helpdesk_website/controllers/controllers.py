@@ -1,22 +1,13 @@
 # -*- coding: utf-8 -*-
-# from odoo import http
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+from odoo import http, _
+from odoo.http import request
 
 
-# class DeHelpdeskWebsite(http.Controller):
-#     @http.route('/de_helpdesk_website/de_helpdesk_website', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
+class WebsiteHelpdesk(http.Controller):
 
-#     @http.route('/de_helpdesk_website/de_helpdesk_website/objects', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('de_helpdesk_website.listing', {
-#             'root': '/de_helpdesk_website/de_helpdesk_website',
-#             'objects': http.request.env['de_helpdesk_website.de_helpdesk_website'].search([]),
-#         })
-
-#     @http.route('/de_helpdesk_website/de_helpdesk_website/objects/<model("de_helpdesk_website.de_helpdesk_website"):obj>', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('de_helpdesk_website.object', {
-#             'object': obj
-#         })
-
+    @http.route(['/support'], type="http", auth="public", website=True, sitemap=True)
+    def faq_ans(self, **kw):
+        obj = request.env["project.project"].search([('is_published', '=', True)])
+        return request.render("de_helpdesk_website.web_faq", {"object": obj, })

@@ -13,7 +13,8 @@ This module allows users to easily generate helpdesk tickets directly from the w
     'category': 'Services/Helpdesk',
     'version': '17.0.0.1',
     'depends': [
-        'de_helpdesk'       
+        'de_helpdesk',
+        'website',
     ],
     'data': [
         # 'security/ir.model.access.csv',
