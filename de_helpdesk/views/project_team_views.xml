@@ -242,7 +242,7 @@
                     <h2>Help Center</h2>
                     <div class="row mt16 o_settings_container" id="website_form_channel">
                         <setting help="Get tickets through an online form">
-                            <field name="allow_submit_ticket_from_web"/>
+                            <field name="module_helpdesk_website"/>
                         </setting>
                         <setting>
                         </setting>

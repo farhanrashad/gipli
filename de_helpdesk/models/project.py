@@ -5,6 +5,11 @@ from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
+
 TICKET_PRIORITY = [
     ('0', 'Low priority'),
     ('1', 'Medium priority'),
@@ -96,7 +101,7 @@ class Project(models.Model):
     module_helpdesk_website = fields.Boolean('Website Form', default=False)
     module_website_helpdesk_forum = fields.Boolean('Forum', default=False)
     module_website_helpdesk_slides = fields.Boolean('Slides', default=False)
-    module_website_helpdesk_knowledg = fields.Boolean('Knowledge', default=False)
+    module_website_helpdesk_knowledge = fields.Boolean('Knowledge', default=False)
     module_helpdesk_account = fields.Boolean('Account', default=False)
     module_helpdesk_stock = fields.Boolean('Stock', default=False)
     module_helpdesk_repair = fields.Boolean('Repair', default=False)
@@ -169,6 +174,8 @@ class Project(models.Model):
             self.sudo()._compute_group_project_sla()
         if 'is_ticket_approvals' in vals:
             self.sudo()._handle_ticket_approvals()
+
+        self._install_helpdesk_modules()
         return res
 
     # Schedule Action
@@ -278,28 +285,29 @@ class Project(models.Model):
     # Modules to Install
     
     def _get_modules_list(self):
-        vals = {
-            'de_helpdesk_timesheet': self.module_helpdesk_website,
-            'sale_timesheet': self.module_sale_timesheet,
-            'de_helpdesk_website': self.module_helpdesk_website,
-            'de_helpdesk_website_forum': self.module_website_helpdesk_forum,
-            'de_helpdesk_website_slides': self.module_website_helpdesk_slides,
-            'de_helpdesk_website_knowledge': self.module_website_helpdesk_knowledge,
-            'de_helpdesk_account': self.module_helpdesk_account,
-            'de_helpdesk_stock': self.module_helpdesk_stock,
-            'de_helpdesk_repairs': self.module_helpdesk_repair,
-
-            #'de_helpdesk_whatsapp': self.module_helpdesk_whatsapp,
-            #'de_helpdesk_slack': self.module_helpdesk_slack,
-            #'de_helpdesk_discord': self.module_helpdesk_discord,
-        }
+        vals = {}
+        for record in self:
+            vals = {
+                #'de_helpdesk_timesheet': self.module_helpdesk_timesheet,
+                'sale_timesheet': record.module_sale_timesheet,
+                'de_helpdesk_website': record.module_helpdesk_website,
+                'de_helpdesk_website_forum': record.module_website_helpdesk_forum,
+                'de_helpdesk_website_slides': record.module_website_helpdesk_slides,
+                'de_helpdesk_website_knowledge': record.module_website_helpdesk_knowledge,
+                'de_helpdesk_account': record.module_helpdesk_account,
+                'de_helpdesk_stock': record.module_helpdesk_stock,
+                'de_helpdesk_repairs': record.module_helpdesk_repair,
+    
+                #'de_helpdesk_whatsapp': self.module_helpdesk_whatsapp,
+                #'de_helpdesk_slack': self.module_helpdesk_slack,
+                #'de_helpdesk_discord': self.module_helpdesk_discord,
+            }
         return vals
 
     def _install_helpdesk_modules(self):
         module_list = self._get_modules_list()
         module_names = [key for key, value in module_list.items() if value]
 
-        
         if module_names:
             modules_to_isntall = self.env['ir.module.module'].search([
                 ('name', 'in', module_names),
