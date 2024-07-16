@@ -12,14 +12,13 @@ from odoo.addons.http_routing.models.ir_http import slug
 class Project(models.Model):
     _inherit = 'project.project'
 
-    is_published = fields.Boolean("Web Published", store=True,
-                                  compute='_compute_is_published')
+    is_published = fields.Boolean("Web Published", store=True, )
 
     website_id = fields.Many2one('website', domain="[('company_id', '=?', company_id)]", compute='_compute_website_id', store=True, readonly=False)
     website_url = fields.Char('Url', store=True,
                               compute='_compute_website_url',)
 
-    @api.depends('module_helpdesk_website')
+    #@api.depends('module_helpdesk_website')
     def _compute_is_published(self):
         for record in self:
             record.is_published = record.module_helpdesk_website
@@ -58,11 +57,11 @@ class Project(models.Model):
     def write(self, vals):
         res = super(Project, self).write(vals)
         self._manage_website_menu()
+        self._enable_published()
         return res
 
     
     def _manage_website_menu(self):
-        
         for project in self:
             parent_menu = project.website_id.menu_id
             existing_menu = self.env['website.menu'].search([('url', '=', project.website_url)], limit=1)
@@ -80,6 +79,10 @@ class Project(models.Model):
                     existing_menu.unlink()
             #raise UserError('hello')
 
+    def _enable_published(self):
+        for project in self:
+            if project.is_published != project.module_helpdesk_website:
+                project.write({'is_published': project.module_helpdesk_website})
     
     def _create_ticket(self, vals):
         # Create a new task
