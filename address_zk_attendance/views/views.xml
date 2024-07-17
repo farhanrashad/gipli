@@ -177,8 +177,8 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='check_out']" position="after">
-                    <field name="no_checkout" attrs="{'invisible':[('no_checkout','=',False)]}"/>
-                    <field name="no_check_in" attrs="{'invisible':[('no_check_in','=',False)]}"/>
+                    <field name="no_checkout" invisible="no_checkout == False"/>
+                    <field name="no_check_in" invisible="no_check_in == False"/>
                 </xpath>
             </field>
         </record>

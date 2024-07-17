@@ -14,9 +14,9 @@
             <field name="model">res.company</field>
             <field name="inherit_id" ref="base.view_company_form"/>
             <field name="arch" type="xml">
-                <field name="favicon" position="after">
+                <xpath expr="//sheet" position="inside">
                     <field name="seq_prefix" required="1"/>
-                </field>
+                </xpath>
             </field>
         </record>
 
