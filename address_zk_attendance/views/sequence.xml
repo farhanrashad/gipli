@@ -1,0 +1,54 @@
+<odoo>
+    <record id="multicompany_employee_sequnce" model="ir.sequence">
+        <field name="name">Multi Company Employee Sequence</field>
+        <field name="code">multi.company.employee.sequene</field>
+<!--        <field name="prefixx">TAI/</field>-->
+        <field name="padding">5</field>
+<!--        <field name="company_id" eval="1"/>-->
+    </record>
+
+
+
+<record id="base_view_employee_multi_company_form_sequence" model="ir.ui.view">
+            <field name="name">res.company.form.inherit</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <field name="favicon" position="after">
+                    <field name="seq_prefix" required="1"/>
+                </field>
+            </field>
+        </record>
+
+<!--    <record id="the_address_holding_sequnce" model="ir.sequence">-->
+<!--        <field name="name">The Address Holding Sequence</field>-->
+<!--        <field name="code">the.address.holding</field>-->
+<!--        <field name="prefix">TAH/</field>-->
+<!--        <field name="padding">5</field>-->
+<!--&lt;!&ndash;        <field name="company_id" eval="3"/>&ndash;&gt;-->
+<!--    </record>-->
+
+<!--    <record id="the_address_developments_sequnce" model="ir.sequence">-->
+<!--        <field name="name">The Address Developments Sequence</field>-->
+<!--        <field name="code">the.address.developments</field>-->
+<!--        <field name="prefix">TAD/</field>-->
+<!--        <field name="padding">5</field>-->
+<!--&lt;!&ndash;        <field name="company_id" eval="2"/>&ndash;&gt;-->
+<!--    </record>-->
+
+<!--    <record id="the_address_marq2_sequnce" model="ir.sequence">-->
+<!--        <field name="name">MARQ 2 Sequence</field>-->
+<!--        <field name="code">MARQ2.sequence</field>-->
+<!--        <field name="prefix">MARQ2/</field>-->
+<!--        <field name="padding">5</field>-->
+<!--&lt;!&ndash;        <field name="company_id" eval="9"/>&ndash;&gt;-->
+<!--    </record>-->
+
+<!--    <record id="the_address_marq_man_sequnce" model="ir.sequence">-->
+<!--        <field name="name">THE MARQ PROJECTS MANAGEMENT Sequence</field>-->
+<!--        <field name="code">THE.MARQ.PROJECTS.MANAGEMENT.sequence</field>-->
+<!--        <field name="prefix">MARQ/</field>-->
+<!--        <field name="padding">5</field>-->
+<!--&lt;!&ndash;        <field name="company_id" eval="4"/>&ndash;&gt;-->
+<!--    </record>-->
+</odoo>
