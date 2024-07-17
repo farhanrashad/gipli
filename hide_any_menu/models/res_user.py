@@ -64,22 +64,21 @@ class IrUiMenu(models.Model):
         return super(IrUiMenu, self).write(values)
 
     @api.model
-    def search(self, args, offset=0, limit=None, order=None, count=False):
+    def search(self, args, offset=0, limit=None, order=None):
         if self.env.user == self.env.ref('base.user_root'):
-            return super(IrUiMenu, self).search(args, offset=0, limit=None, order=order, count=False)
+            return super(IrUiMenu, self).search(args, offset=offset, limit=limit, order=order)
         else:
-            menus = super(IrUiMenu, self).search(args, offset=0, limit=None, order=order, count=False)
+            menus = super(IrUiMenu, self).search(args, offset=offset, limit=limit, order=order)
             if menus:
-                menu_ids = [menu for menu in self.env.user.menu_ids]
-                menu_ids2 = [menu for group in self.env.user.groups_id for menu in group.menu_ids]
-                for menu in list(set(menu_ids).union(menu_ids2)):
-                    if menu in menus:
-                        menus -= menu
+                menu_ids = [menu.id for menu in self.env.user.menu_ids]
+                menu_ids2 = [menu.id for group in self.env.user.groups_id for menu in group.menu_ids]
+                menu_ids_to_hide = set(menu_ids).union(menu_ids2)
+                menus = menus.filtered(lambda menu: menu.id not in menu_ids_to_hide)
                 if offset:
                     menus = menus[offset:]
                 if limit:
                     menus = menus[:limit]
-            return len(menus) if count else menus
+            return menus
 
 
 class IrModel(models.Model):
