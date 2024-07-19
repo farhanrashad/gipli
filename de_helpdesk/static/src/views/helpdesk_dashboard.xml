@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
     <t t-name="de_helpdesk.HelpdeskDashboard" owl="1">
-        <div class="o_helpdesk_dashboard container-fluid py-4 border-bottom bg-white">
-            <div class="row">
-                <div class="col-6">
+        <div class="o_helpdesk_content flex-column d-flex mw-100">
+            <div class="o_helpdesk_banner align-items-start flex-column flex-lg-row flex-shrink-0 d-flex py-4 border-bottom bg-view">
+                <div class="w-100">
                     <table class="o_helpdesk_banner_table table table-sm table-borderless px-3 mb-0 text-center">
                         <tbody>
                             <tr class="">
@@ -171,7 +171,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-6">
+                <div class="w-100 mt-3 mt-lg-0">
                     <table class="o_helpdesk_banner_table table table-sm table-borderless px-3 mb-0 text-center">
                         <tbody>
                             <tr class="">

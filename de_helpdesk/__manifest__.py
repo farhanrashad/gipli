@@ -23,7 +23,7 @@ Features:
     'support': "info@dynexcel.com",
     'live_test_url': 'https://youtu.be/PJEkGzyCQ2Q',
     'category': 'Services/Helpdesk',
-    'version': '17.0.0.9',
+    'version': '17.0.1.0',
     
     'depends': [
         'project',
