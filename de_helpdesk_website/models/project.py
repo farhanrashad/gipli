@@ -113,6 +113,7 @@ class Project(models.Model):
                         'type': 'binary',
                         'datas': base64.b64encode(attached_file).decode('ascii'),
                     })
+                    attachment_id.generate_access_token()
                     attachment_ids.append(attachment_id.id)
 
         # Create a message with attachments

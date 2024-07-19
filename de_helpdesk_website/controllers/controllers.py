@@ -35,7 +35,8 @@ class WebsiteHelpdesk(http.Controller):
         return request.render("de_helpdesk_website.website_helpdesk_form", vals)
 
 
-    @http.route('/support/ticket/submit', type="http", website=True, auth='public', csrf=False)
+    @http.route('/my/desk/ticket/submit', 
+                type="http", website=True, auth='public', csrf=False)
     def ticket_submit(self, **kw):
 
         partner_id = request.env['res.partner']
@@ -61,6 +62,9 @@ class WebsiteHelpdesk(http.Controller):
         #raise UserError(kw.get('project_id'))
         ticket = request.env['project.project'].sudo()._create_ticket(vals)
 
-        #ticket = request.env['project.task'].browse(1)
-        return request.render("de_helpdesk_website.support_ticket_submited", {"ticket": ticket})
+        values = {
+            'ticket': ticket
+        }
+        return request.render("de_helpdesk_website.support_ticket_submited", values)
+
         

@@ -8,7 +8,7 @@ This module allows users to easily generate helpdesk tickets directly from the w
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Services/Helpdesk',
-    'version': '17.0.0.2',
+    'version': '17.0.0.3',
     'depends': [
         'de_helpdesk',
         'website',

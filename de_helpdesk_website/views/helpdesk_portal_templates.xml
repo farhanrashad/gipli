@@ -25,7 +25,7 @@
                     <div class="row">
                         
                         <div class="o_colored_level col-lg-9">
-                            <form action="/support/ticket/submit" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
+                            <form action="/my/desk/ticket/submit" method="post" enctype="multipart/form-data" class="o_mark_required row" data-mark="*" data-success-page="">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <input type="hidden" class="form-control s_website_form_input" id="project_id" name="project_id" t-att-value="project.id" />
                                 <div class="s_website_form_rows container mb64 s_col_no_bgcolor">
