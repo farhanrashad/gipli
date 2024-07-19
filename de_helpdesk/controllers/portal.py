@@ -229,6 +229,10 @@ class TicketCustomerPortal(CustomerPortal):
         
         # Add 'ticket' to the values dictionary
         values = self._get_ticket_page_view_values(ticket_sudo, access_token, **kw)
+
+        #raise UserError(ticket_id)
+        ticket = request.env['project.task'].browse(ticket_id)
+        values['ticket'] = ticket
         
         #request.session['my_tickets_history'] = ticket_sudo.ids
         return request.render("de_helpdesk.portal_my_ticket", values)

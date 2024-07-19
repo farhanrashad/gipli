@@ -233,11 +233,13 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <header class="modal-header">
-                        <h4 class="modal-title">
-                            <span t-field="ticket.name" class="text-primary"/>
-                        </h4>
+                        <t t-if="ticket">
+                            <h4 class="modal-title">
+                                <span t-field="ticket.name" class="text-primary"/>
+                            </h4>
+                        </t>
                     </header>
-                    <form method="post" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
+                    <form method="post"  t-if="ticket" t-attf-action="/my/desk/ticket/close/#{ticket.id}?access_token=#{ticket.access_token}">
                         <t t-call="de_helpdesk.customer_feedback_template"/>
                         <footer class="modal-footer">
                                 <button class="btn btn-primary">Close Ticket</button>
@@ -256,12 +258,14 @@
         <div role="dialog" class="modal fade" id="modal-ticket-open" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <header class="modal-header">
-                            <h4 class="modal-title">
-                                <span t-field="ticket.name" class="text-primary"/>
-                            </h4>
-                        </header>
-                        <form method="post" t-attf-action="/my/desk/ticket/reopen/#{ticket.id}?access_token=#{ticket.access_token}">
+                        <t t-if="ticket">
+                            <header class="modal-header">
+                                <h4 class="modal-title">
+                                    <span t-field="ticket.name" class="text-primary"/>
+                                </h4>
+                            </header>
+                        </t>
+                        <form method="post" t-if="ticket" t-attf-action="/my/desk/ticket/reopen/#{ticket.id}?access_token=#{ticket.access_token}">
                             <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
                             <main class="modal-body">
                                 <h3 class="text-center">Reopen Your Ticket</h3>
@@ -296,9 +300,9 @@
             <div class="row o_project_portal_sidebar">
                 <t t-call="portal.portal_record_sidebar">
                     <t t-set="classes" t-value="'col-lg-3 col-xl-4 d-print-none'"/>
-                    <t t-set="entries">
+                    <t t-set="entries" t-if="ticket">
                         <div class="d-flex flex-column gap-4">
-                            <div class="d-flex flex-column gap-2" id="ticket_close_sidebar_button">
+                            <div  class="d-flex flex-column gap-2" id="ticket_close_sidebar_button">
                                 <a role="button" t-if="ticket.allow_portal_user_close_ticket" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#modal-ticket-close" href="#">
                                     <i class="fa fa-check"/> Close Ticket
                                 </a>
