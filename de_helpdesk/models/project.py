@@ -340,7 +340,7 @@ class Project(models.Model):
         return action
 
     def action_open_tickets_rating_view(self):
-        action = self.env.ref('de_helpdesk.action_ticket_customer_rating').read()[0]
+        action = self.env.ref('de_helpdesk.action_ticket_customer_rating').sudo().read()[0]
         ticket_ids = self.task_ids.filtered(lambda x:x.customer_rating)
         action.update({
             'name': 'Customer Rating',
@@ -357,7 +357,7 @@ class Project(models.Model):
         return action
 
     def action_open_tickets_sla_view(self):
-        action = self.env.ref('de_helpdesk.action_ticket_sla').read()[0]
+        action = self.env.ref('de_helpdesk.action_ticket_sla').sudo().read()[0]
         action.update({
             'name': 'SLA',
             'view_mode': 'tree',
@@ -374,84 +374,94 @@ class Project(models.Model):
 
     
     def action_project_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_ticket').read()[0]
-        action.update({
-            'name': 'Tickets',
-            'view_mode': 'tree,form',
-            'res_model': 'project.task',
-            'type': 'ir.actions.act_window',
-            'domain': [('project_id', '=', self.id)],
-            'context': {
-                'default_project_id': self.id,
-                'search_default_my_ticket': 1,
-                'default_is_ticket': True,
-            },
-        })
+        self.ensure_one()        
+        action = self.env.ref('de_helpdesk.action_project_ticket').sudo().read()[0]
+        action['context'] = {
+            'default_project_id': self.id,
+            'search_default_my_ticket': 1,
+            'default_is_ticket': True,
+        }
+        action['domain'] = [('project_id', '=', self.id)]
         return action
+
+    def action_view_ticket(self):
+        self.ensure_one()        
+        action = self.env.ref('de_helpdesk.action_project_ticket').sudo().read()[0]
+        action['context'] = {
+            'default_project_id': self.id,
+            'default_is_ticket': True,
+        }
+        action['domain'] = [('project_id', '=', self.id)]
+        return action
+
+    def action_view_ticket_analysis(self):
+        self.ensure_one()        
+        action = self.env.ref('de_helpdesk.action_report_ticket_analysis').sudo().read()[0]
+        action['context'] = {
+            'default_team_id': self.id,
+        }
+        action['domain'] = [('team_id', '=', self.id)]
+        return action
+
+    def action_view_sla_analysis(self):
+        self.ensure_one()        
+        action = self.env.ref('de_helpdesk.action_report_sla_analysis').sudo().read()[0]
+        action['context'] = {
+            'default_team_id': self.id,
+        }
+        action['domain'] = [('team_id', '=', self.id)]
+        return action
+        
+
 
     def action_project_closed_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
-        action.update({
-            'name': 'Closed Tickets',
-            'view_mode': 'tree,form',
-            'res_model': 'project.task',
-            'type': 'ir.actions.act_window',
-            'domain': [('project_id', '=', self.id),('stage_id.fold', '=', True)],
-            'context': {
-                'default_project_id': self.id,
-                'search_default_my_ticket': 1,
-                'default_is_ticket': True,
-            },
-        })
+        self.ensure_one() 
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').sudo().read()[0]
+        
+        action['context'] = {
+            'default_project_id': self.id,
+            'search_default_my_ticket': 1,
+            'default_is_ticket': True,
+        }
+        action['domain'] = [('project_id', '=', self.id), ('stage_id.fold', '=', True)]
         return action
+        
 
     def action_project_open_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
-        action.update({
-            'name': 'Closed Tickets',
-            'view_mode': 'tree,form',
-            'res_model': 'project.task',
-            'type': 'ir.actions.act_window',
-            'domain': [('project_id', '=', self.id)],
-            'context': {
-                'default_project_id': self.id,
-                'search_default_my_ticket': 1,
-                'default_is_ticket': True,
-            },
-        })
+        self.ensure_one() 
+        # Retrieve the existing action
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').sudo().read()[0]
+
+        action['context'] = {
+            'default_project_id': self.id,
+            'search_default_my_ticket': 1,
+            'default_is_ticket': True,
+        }
+        action['domain'] = [('project_id', '=', self.id), ('stage_id.fold', '=', False)]
         return action
+
+
 
     def action_project_unassigned_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
-        action.update({
-            'name': 'Unassigned Tickets',
-            'view_mode': 'tree,form',
-            'res_model': 'project.task',
-            'type': 'ir.actions.act_window',
-            'domain': [('project_id', '=', self.id)],
-            'context': {
-                'default_project_id': self.id,
-                'search_default_unassigned_ticket': 1,
-                'default_is_ticket': True,
-            },
-        })
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').sudo().read()[0]
+        action['context'] = {
+            'default_project_id': self.id,
+            'search_default_unassigned_ticket': 1,
+            'default_is_ticket': True,
+        }
+        action['domain'] = [('project_id', '=', self.id)]
         return action
+        
 
     def action_project_urgent_tickets(self):
-        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').read()[0]
-        action.update({
-            'name': 'Urgent Tickets',
-            'view_mode': 'tree,form',
-            'res_model': 'project.task',
-            'type': 'ir.actions.act_window',
-            'domain': [('project_id', '=', self.id)],
-            'context': {
-                'default_project_id': self.id,
-                'search_default_my_ticket': 1,
-                'search_default_priority_urgent':1,
-                'default_is_ticket': True,
-            },
-        })
+        action = self.env.ref('de_helpdesk.action_project_helpdesk_all_ticket').sudo().read()[0]
+        action['context'] = {
+           'default_project_id': self.id,
+            'search_default_my_ticket': 1,
+            'search_default_priority_urgent':1,
+            'default_is_ticket': True,
+        }
+        action['domain'] = [('project_id', '=', self.id)]
         return action
 
 
