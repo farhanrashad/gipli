@@ -18,7 +18,13 @@
                             <group>
                                 <field name="partner_id"/>
                                 <field name="gp_date"/>
-                                <field name="picking_ids" widget="many2many_tags"/>
+                                <field name="picking_ids" 
+                                       widget="many2many_tags"
+                                       domain="[
+                                   ('partner_id', '=', partner_id),
+                                   ('state','in',('draft','waiting','confirmed','assigned'))
+                                   ]"
+                                       />
                                 
                             </group>
                             

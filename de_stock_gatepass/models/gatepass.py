@@ -25,7 +25,7 @@ class de_stock_gatepass(models.Model):
         tracking=True,
         default=          'draft')
     
-    picking_ids = fields.Many2many('stock.picking' , string ="pickings")
+    picking_ids = fields.Many2many('stock.picking' , string ="Pickings",)
     gatepass_line = fields.One2many('stock.gatepass.line', 'gatepass_id', string='Gatepass Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True)
     
     
@@ -75,6 +75,12 @@ class de_stock_gatepass_line(models.Model):
     
     # product_uom = fields.Many2one('uom.uom', string='Unit of Measure', domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id')
+    
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        for record in self:
+            record.uom_id = record.product_id.uom_id.id
+            
 
 #
 #     @api.onchange('gatepass_id.')
