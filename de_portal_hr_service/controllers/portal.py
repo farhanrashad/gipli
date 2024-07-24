@@ -1077,25 +1077,28 @@ class CustomerPortal(portal.CustomerPortal):
         record_id = int(kwargs.get('record_id'))
         model_id = int(kwargs.get('model_id'))
         activity_id = int(kwargs.get('activity_id'))
-        remarks = str(kwargs.get('remarks'))
+        remarks = kwargs.get('remarks')
         
         activity = request.env['mail.activity'].browse(int(activity_id))
-        raise UserError(remarks)
         if activity.exists():
-            activity.action_feedback(feedback=kwargs.get('details', ''))
+            activity.action_feedback(feedback=remarks)
         return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))
 
     @http.route('/my/record/schedule-activity-done-and-next', type='http', auth='public', website=True, csrf=False)
-    def mark_activity_done_and_schedule_next(self, service_id, record_id, model_id, activity_id, **kwargs):
-        service_id = (kwargs.get('service_id'))
-        record_id = (kwargs.get('record_id'))
-        model_id = (kwargs.get('model_id'))
+    def mark_activity_done_and_schedule_next(self, **kwargs):
+        service_id = kwargs.get('service_id')
+        record_id = kwargs.get('record_id')
+        model_id = kwargs.get('model_id')
+        activity_id = kwargs.get('activity_id')
+        remarks = kwargs.get('remarks')
+    
+        #raise UserError(remarks)  # Debugging: raise an error to see the remarks value
+    
+        activity = request.env['mail.activity'].browse(int(activity_id))
+        if activity.exists():
+            activity.action_feedback(feedback=remarks)
         
-        activity = request.env['mail.activity'].browse((activity_id))
-        #if activity.exists():
-        #    activity.action_feedback(feedback=kwargs.get('details', ''))
-        #return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))
-        #raise UserError('hello')
         return request.make_response(json.dumps({'status': 'success'}), headers={'Content-Type': 'application/json'})
+    
 
 

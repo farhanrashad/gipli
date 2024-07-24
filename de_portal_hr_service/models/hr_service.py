@@ -273,7 +273,7 @@ class HRService(models.Model):
         message_ids = self.env['mail.message'].search([
             ('res_id','=',record_id.id),
             ('model','=',self.header_model_id.model),
-            ('subtype_id','=',self.env.ref('mail.mt_note').id)
+            #('subtype_id','=',self.env.ref('mail.mt_note').id)
         ])
         return message_ids
 

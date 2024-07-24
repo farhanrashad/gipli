@@ -434,7 +434,8 @@ class CustomerPortal(CustomerPortal):
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <form method="post" action="/my/record/schedule-activity-done" id="form-done">
+                        <form method="post" action="/my/record/schedule-activity-done" id="form-done" onsubmit="copyDetailsToHiddenFields()">
+
                             <input type="hidden" id="service_id" name="service_id" value="{service_id}" />
                             <input type="hidden" id="record_id" name="record_id" value="{record_id}" />
                             <input type="hidden" id="model_id" name="model_id" value="{model_id}" />
@@ -442,7 +443,8 @@ class CustomerPortal(CustomerPortal):
                             <input type="hidden" id="remarks-done" name="remarks" value="" />
                             <button type="submit" class="btn btn-primary">Done</button>
                         </form>
-                        <form method="post" action="/my/record/schedule-activity-done-and-next" id="form-schedule-next" onsubmit="handleScheduleNext(event)">
+                        <form method="post" action="/my/record/schedule-activity-done-and-next" id="form-schedule-next" onsubmit="handleScheduleNext(event); copyDetailsToHiddenFields();">
+
                             <input type="hidden" id="service_id" name="service_id" value="{service_id}" />
                             <input type="hidden" id="record_id" name="record_id" value="{record_id}" />
                             <input type="hidden" id="model_id" name="model_id" value="{model_id}" />
