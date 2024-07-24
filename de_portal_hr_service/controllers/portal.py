@@ -1070,3 +1070,32 @@ class CustomerPortal(portal.CustomerPortal):
         
         request.env['mail.activity'].sudo().create(activity_vals)
         return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))
+
+    @http.route('/my/record/schedule-activity-done', type='http', auth='public', website=True, csrf=False)
+    def mark_activity_done(self, **kwargs):
+        service_id = int(kwargs.get('service_id'))
+        record_id = int(kwargs.get('record_id'))
+        model_id = int(kwargs.get('model_id'))
+        activity_id = int(kwargs.get('activity_id'))
+        remarks = str(kwargs.get('remarks'))
+        
+        activity = request.env['mail.activity'].browse(int(activity_id))
+        raise UserError(remarks)
+        if activity.exists():
+            activity.action_feedback(feedback=kwargs.get('details', ''))
+        return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))
+
+    @http.route('/my/record/schedule-activity-done-and-next', type='http', auth='public', website=True, csrf=False)
+    def mark_activity_done_and_schedule_next(self, service_id, record_id, model_id, activity_id, **kwargs):
+        service_id = (kwargs.get('service_id'))
+        record_id = (kwargs.get('record_id'))
+        model_id = (kwargs.get('model_id'))
+        
+        activity = request.env['mail.activity'].browse((activity_id))
+        #if activity.exists():
+        #    activity.action_feedback(feedback=kwargs.get('details', ''))
+        #return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))
+        #raise UserError('hello')
+        return request.make_response(json.dumps({'status': 'success'}), headers={'Content-Type': 'application/json'})
+
+
