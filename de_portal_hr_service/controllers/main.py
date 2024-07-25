@@ -443,12 +443,11 @@ class CustomerPortal(CustomerPortal):
                             <input type="hidden" id="remarks-done" name="remarks" value="" />
                             <button type="submit" class="btn btn-primary">Done</button>
                         </form>
-                        <form method="post" action="/my/record/schedule-activity-done-and-next" id="form-schedule-next" onsubmit="handleScheduleNext(event); copyDetailsToHiddenFields();">
-
+                        <form method="post" action="/my/record/schedule-activity-done-and-next" id="form-schedule-next" onsubmit="handleScheduleNext(event)">
                             <input type="hidden" id="service_id" name="service_id" value="{service_id}" />
                             <input type="hidden" id="record_id" name="record_id" value="{record_id}" />
                             <input type="hidden" id="model_id" name="model_id" value="{model_id}" />
-                            <input type="hidden" id="activity_id" name="activity_id" value="" />
+                    <input type="hidden" id="activity_id_next" name="activity_id" value="" />
                             <input type="hidden" id="remarks-schedule-next" name="remarks" value="" />
                             <button type="submit" class="btn btn-primary">Done & Schedule Next</button>
                         </form>
@@ -578,21 +577,18 @@ class CustomerPortal(CustomerPortal):
 function setActivityId(activityId) {
     document.getElementById('form-done').querySelector('input[name="activity_id"]').value = activityId;
     document.getElementById('form-schedule-next').querySelector('input[name="activity_id"]').value = activityId;
+
 }
 
 function copyDetailsToHiddenFields() {
                 const detailsValue = document.getElementById('details').value;
-                console.log('Copying details value to hidden fields:', detailsValue);
                 document.getElementById('remarks-done').value = detailsValue;
                 document.getElementById('remarks-schedule-next').value = detailsValue;
             }
-            
-function setActivityId(activityId) {
-    document.getElementById('activity_id').value = activityId;
-}
 
 function handleScheduleNext(event) {
     event.preventDefault();
+    copyDetailsToHiddenFields(); // Ensure the hidden fields are updated
 
     const form = event.target;
     const formData = new FormData(form);
