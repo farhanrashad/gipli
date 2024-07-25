@@ -1067,3 +1067,34 @@ class CustomerPortal(portal.CustomerPortal):
         
         request.env['mail.activity'].sudo().create(activity_vals)
         return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))
+
+    @http.route('/my/record/schedule-activity-done', type='http', auth='public', website=True, csrf=False)
+    def mark_activity_done(self, **kwargs):
+        service_id = int(kwargs.get('service_id'))
+        record_id = int(kwargs.get('record_id'))
+        model_id = int(kwargs.get('model_id'))
+        activity_id = int(kwargs.get('activity_id'))
+        remarks = kwargs.get('remarks')
+        
+        activity = request.env['mail.activity'].browse(int(activity_id))
+        if activity.exists():
+            activity.action_feedback(feedback=remarks)
+        return request.redirect('/my/model/record/%s/%s/%s' % (service_id,model_id, record_id))
+
+    @http.route('/my/record/schedule-activity-done-and-next', type='http', auth='public', website=True, csrf=False)
+    def mark_activity_done_and_schedule_next(self, **kwargs):
+        service_id = int(kwargs.get('service_id'))
+        record_id = int(kwargs.get('record_id'))
+        model_id = int(kwargs.get('model_id'))
+        activity_id = int(kwargs.get('activity_id'))
+        remarks = kwargs.get('remarks')
+    
+        #raise UserError(f"Service ID: {service_id}, Record ID: {record_id}, Model ID: {model_id}, Activity ID: {activity_id}, Remarks: {remarks}")
+
+    
+        activity = request.env['mail.activity'].browse(int(activity_id))
+        if activity.exists():
+            activity.action_feedback(feedback=remarks)
+        
+        return request.make_response(json.dumps({'status': 'success'}), headers={'Content-Type': 'application/json'})
+    

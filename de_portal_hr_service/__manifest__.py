@@ -15,7 +15,7 @@ Employee Self Service
     'website': "https://www.dynexcel.com",
     'category': 'Human Resources',
 
-    'version': '17.0.7.0',
+    'version': '17.0.7.1',
     'license': 'LGPL-3',
     'live_test_url': 'https://youtu.be/T3ZI7eh0qbg',
     'price': 149,

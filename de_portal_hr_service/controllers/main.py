@@ -415,6 +415,54 @@ class CustomerPortal(CustomerPortal):
         user_options = ''.join(f'<option value="{user.id}">{user.partner_id.name}</option>' for user in users)
 
         #raise UserError(activity_types.mapped('name'))
+        activities_output += '''
+        <div class="modal fade" id="modal-activity-done" tabindex="-1" role="dialog" aria-labelledby="modal-activity-label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-activity-label">Mark Done</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="activity-form-container">
+                            <div class="form-group">
+                                <label for="details">Details</label>
+                                <textarea class="form-control" id="details" name="details" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="post" action="/my/record/schedule-activity-done" id="form-done" onsubmit="copyDetailsToHiddenFields()">
+
+                            <input type="hidden" id="service_id" name="service_id" value="{service_id}" />
+                            <input type="hidden" id="record_id" name="record_id" value="{record_id}" />
+                            <input type="hidden" id="model_id" name="model_id" value="{model_id}" />
+                            <input type="hidden" id="activity_id" name="activity_id" value="" />
+                            <input type="hidden" id="remarks-done" name="remarks" value="" />
+                            <button type="submit" class="btn btn-primary">Done</button>
+                        </form>
+                        <form method="post" action="/my/record/schedule-activity-done-and-next" id="form-schedule-next" onsubmit="handleScheduleNext(event)">
+                            <input type="hidden" id="service_id" name="service_id" value="{service_id}" />
+                            <input type="hidden" id="record_id" name="record_id" value="{record_id}" />
+                            <input type="hidden" id="model_id" name="model_id" value="{model_id}" />
+                    <input type="hidden" id="activity_id_next" name="activity_id" value="" />
+                            <input type="hidden" id="remarks-schedule-next" name="remarks" value="" />
+                            <button type="submit" class="btn btn-primary">Done & Schedule Next</button>
+                        </form>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        '''.format(
+            service_id=service_id.id,
+            model_id=model_id,
+            record_id=record_id.id,
+        )
+        
         
         activities_output += '''
             <div class="modal fade" id="modal-activity" tabindex="-1" role="dialog" aria-labelledby="modal-activity-label" aria-hidden="true">
@@ -494,6 +542,7 @@ class CustomerPortal(CustomerPortal):
                         <th>Assigned To</th>
                         <th>Due On</th>
                         <th>Summary</th>
+                        <th/>
                     </tr>
                 </thead>
                 <tbody>
@@ -521,6 +570,48 @@ class CustomerPortal(CustomerPortal):
         
         # ----------- Message form ---------------
         js_script = '''
+
+        <script>
+function setActivityId(activityId) {
+    document.getElementById('form-done').querySelector('input[name="activity_id"]').value = activityId;
+    document.getElementById('form-schedule-next').querySelector('input[name="activity_id"]').value = activityId;
+
+}
+
+function copyDetailsToHiddenFields() {
+                const detailsValue = document.getElementById('details').value;
+                document.getElementById('remarks-done').value = detailsValue;
+                document.getElementById('remarks-schedule-next').value = detailsValue;
+            }
+
+function handleScheduleNext(event) {
+    event.preventDefault();
+    copyDetailsToHiddenFields(); // Ensure the hidden fields are updated
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: form.method,
+        body: formData
+    }).then(response => {
+        if (response.ok) {
+            response.json().then(data => {
+                // Close the current modal
+                $('#modal-activity-done').modal('hide');
+
+                // Open the schedule activity modal
+                $('#modal-activity').modal('show');
+            });
+        } else {
+            console.error('Failed to mark activity done and schedule next');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+
             <script type="text/javascript">
                 $(function () {
                   $('select').each(function () {
