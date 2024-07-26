@@ -555,6 +555,8 @@ class CustomerPortal(CustomerPortal):
             activities_output += f'<td class="mb-1">{activity.user_id.partner_id.name}</td>'
             activities_output += f'<td class="mb-1">{activity.date_deadline}</td>'
             activities_output += f'<td class="mb-1">{activity.summary}</td>'
+            activities_output += f'<td class="mb-1"><a role="button" class="btn btn-secondary pull-left" data-bs-toggle="modal" data-bs-target="#modal-activity-done" href="#" onclick="setActivityId({activity.id})">Mark Done</a></td>'
+
             activities_output += "</tr>"
         activities_output += """
             </tbody>
