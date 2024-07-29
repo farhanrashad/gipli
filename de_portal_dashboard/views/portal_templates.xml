@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_dashboard_breadcrumb" name="Portal layout: Dashboard Entry" inherit_id="portal.portal_breadcrumbs" priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li class="breadcrumb-item active text-truncate">
+                <a t-attf-href="/my/services/dashboard">
+                    <span>Dashboard</span> 
+                </a>
+            </li>
+            <t t-if="record">
+                <li class="breadcrumb-item active text-truncate">
+                    <span t-esc="record.name" />
+                </li>
+            </t>
+        </xpath>
+    </template>
+
+
+
+    <template id="portal_my_services_dashboard_menu" name="Dashboard" inherit_id="portal.portal_my_home" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between" t-attf-href="/my/services/dashboard" title="Invoices &amp; Bills">
+                <span>Dashboard</span>
+            </a>
+        </xpath>
+        
+    </template>
+    <template id="portal_my_home" name="Show Projects / Tasks" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Dashboard</t>
+                <t t-set="url" t-value="'/my/tasks'"/>
+            </t>
+        </xpath>
+    </template>
+
+
+    <template id="portal_services_dashboard" name="My Services Dashboard">
+        <t t-call="portal.portal_layout">
+            <span t-raw="output_html"/>
+        </t>
+    </template>
+
+    <template id="portal_record_detail">
+        <t t-call="portal.portal_layout">
+            <span t-raw="output_html"/>
+        </t>
+    </template>
+
+    
+</odoo>

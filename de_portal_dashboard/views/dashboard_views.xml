@@ -1,0 +1,63 @@
+<odoo>
+  <data>
+
+      <record model="ir.ui.view" id="base_dashboard_item_form_view">
+            <field name="name">base.dashboard.item.form.view</field>
+            <field name="model">base.dashboard.item</field>
+            <field name="arch" type="xml">
+                <form string="Dashboard">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="model_id" />
+                                <field name="view_type" />
+                                <field name="field_ids" 
+                                    widget="many2many_tags"
+                                    attrs="{'invisible': [('view_type', '!=', 'list')], 'required': [('view_type', '=', 'list')]}"
+                                />
+                                <field name="graph_label_field_id" 
+                                    attrs="{'invisible': [('view_type', '!=', 'graph')], 'required': [('view_type', '=', 'graph')]}"
+                                />
+                                <field name="graph_data_field_id" 
+                                    attrs="{'invisible': [('view_type', '!=', 'graph')], 'required': [('view_type', '=', 'graph')]}"
+                                />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+      
+      <record model="ir.ui.view" id="base_dashboard_item_tree_view">
+            <field name="name">base.dashboard.item.tree.view</field>
+            <field name="model">base.dashboard.item</field>
+            <field name="arch" type="xml">
+                <tree string="Dashboard" >
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+      
+     <record id="action_dashboard_config" model="ir.actions.act_window">
+            <field name="name">Dsahboard</field>
+            <field name="res_model">base.dashboard.item</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No dashboard item found. Let's create one!
+              </p>
+            </field>
+        </record>        
+        
+        <menuitem action="action_dashboard_config" 
+            name="Dashbord Config" 
+            id="dashboard_menu_root_main_dashboard_config"
+            parent="dashboard_menu_root_main" 
+            sequence="2"
+        />
+  </data>
+</odoo>
