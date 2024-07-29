@@ -6,19 +6,31 @@
             <field name="model">base.dashboard.item</field>
             <field name="arch" type="xml">
                 <form string="Dashboard">
-                    <group>
+                    <sheet>
                         <group>
-                            <field name="name"/>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="model_id" />
+                                <field name="view_type" />
+                                <field name="field_ids" 
+                                    widget="many2many_tags"
+                                    attrs="{'invisible': [('view_type', '!=', 'list')], 'required': [('view_type', '=', 'list')]}"
+                                />
+                                <field name="graph_label_field_id" 
+                                    attrs="{'invisible': [('view_type', '!=', 'graph')], 'required': [('view_type', '=', 'graph')]}"
+                                />
+                                <field name="graph_data_field_id" 
+                                    attrs="{'invisible': [('view_type', '!=', 'graph')], 'required': [('view_type', '=', 'graph')]}"
+                                />
+                            </group>
                         </group>
-                        <group>
-                            <field name="model_id" />
-                            <field name="field_ids" widget="many2many_tags" />
-                        </group>
-                    </group>
-                    
+                    </sheet>
                 </form>
             </field>
-      </record>
+        </record>
+
 
       
       <record model="ir.ui.view" id="base_dashboard_item_tree_view">
