@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import plotly.express as px
+import json
 from odoo import http
 from odoo.http import request
 
 from odoo.addons.portal.controllers.portal import CustomerPortal
-from odoo.exceptions import AccessError, MissingError, UserError, ValidationError
 
 class CustomerPortal(CustomerPortal):
 
     @http.route('/my/services/dashboard', type='http', auth='public', website=True, csrf=False)
     def my_services_dashboard(self, **kwargs):
-        dash_item_ids = request.env['base.dashboard.item'].sudo().search([])
-
+        dash_item_ids = request.env['base.dashboard.item'].search([])
+        
         output_html = '''
             <div class="container">
-                <h1>My Dashboard</h1>
+                <h1>Services Dashboard</h1>
                 <div class="row">
         '''
         
@@ -67,20 +67,18 @@ class CustomerPortal(CustomerPortal):
                 });
             </script>
         '''
-
+    
         values = {
             'output_html': output_html,
         }
         return request.render("de_portal_dashboard.portal_services_dashboard", values)
     
     def render_list_view(self, item):
-        #records = request.env[item.model_id.model].search([])
+        records = request.env[item.model_id.model].search([])
         
-        records = request.env[item.model_id.model].sudo().browse(item._get_records_filter_by_domain(request.env.user.partner_id.id))
-
         list_view_html = '''
-            <div class="col-lg-6 mb-3">
-                <div class="card">
+            <div class="col-lg-6">
+                <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title">{item_name}</h5>
                         <table id="table-{item_id}" class="display">
@@ -90,7 +88,7 @@ class CustomerPortal(CustomerPortal):
         
         # Adding table headers
         for field in item.field_ids:
-            list_view_html += '<th>{}</th>'.format(field.field_description.capitalize())
+            list_view_html += '<th>{}</th>'.format(field.name.capitalize())
         
         list_view_html += '''
                             </tr>
@@ -115,17 +113,14 @@ class CustomerPortal(CustomerPortal):
                     </table>
                 </div>
             </div>
-            </div>
         '''
         
         return list_view_html
+    
 
     def render_graph_view(self, item):
         # Fetch data from the model
-        #records = request.env[item.model_id.model].search([])
-
-        records = request.env[item.model_id.model].sudo().browse(item._get_records_filter_by_domain(request.env.user.partner_id.id))
-
+        records = request.env[item.model_id.model].search([])
     
         # Prepare data using pandas
         data = []
@@ -141,15 +136,15 @@ class CustomerPortal(CustomerPortal):
         fig = px.bar(df, x='label', y='value', title="Graph Title", color='label')
     
         # Convert Plotly figure to HTML
-        graph_html = fig.to_html(full_html=False, include_plotlyjs='cdn')
+        graph_html = fig.to_html(full_html=False)
     
         # Wrap the Plotly HTML into a div container
         graph_view_html = (
-            '<div class="col-lg-6 mb-3">'
-            '    <div class="card">'
+            '<div class="col-lg-6">'
+            '    <div class="card mb-3">'
             '        <div class="card-body">'
             '            <h5 class="card-title">' + item.name + '</h5>'
-            '            <div>' + graph_html + '</div>'
+            '            <div id="graph-' + str(item.id) + '">' + graph_html + '</div>'
             '        </div>'
             '    </div>'
             '</div>'
@@ -157,11 +152,16 @@ class CustomerPortal(CustomerPortal):
     
         return graph_view_html
 
+
+
+
+
+
     @http.route('/my/services/record/<int:model_id>/<int:record_id>', type='http', auth='public', website=True, csrf=False)
     def record_detail(self, model_id, record_id, **kwargs):
-        model = request.env['ir.model'].sudo().browse(model_id)
+        model = request.env['ir.model'].browse(model_id)
         model_name = model.model
-        record = request.env[model_name].sudo().browse(record_id)
+        record = request.env[model_name].browse(record_id)
     
         if not record.exists():
             return request.not_found()
