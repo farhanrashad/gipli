@@ -582,8 +582,9 @@ class CustomerPortal(portal.CustomerPortal):
         m2m_ids = request.env[field.field_model].sudo().search(field_domain)
         domain_filter = str(field_domain).replace("'", "&#39;") if field_domain else ""
     
-        selected_ids = record_val if record_val else []
-    
+        # Ensure selected_ids is a list of integers
+        selected_ids = [int(id) for id in (record_val or [])]
+        
         m2m_template = '''
         <select id='{field_name}' name='{field_name}' {required} data-model='{field_model}' data-field='name' data-search-fields='{search_fields}' data-label-fields='{label_fields}' data-domain='{domain_filter}' class='select2-dynamic-multiple selection-search form-control' multiple>
         '''.format(
@@ -593,6 +594,8 @@ class CustomerPortal(portal.CustomerPortal):
         )
     
         for rec in m2m_ids:
+            if not isinstance(rec.id, int):
+                raise ValueError(f"Unexpected type for record ID: {type(rec.id).__name__}")
             selected = 'selected="selected"' if rec.id in selected_ids else ''
             m2m_template += "<option value='{id}' {selected}>{name}</option>".format(id=rec.id, selected=selected, name=rec.name)
     
