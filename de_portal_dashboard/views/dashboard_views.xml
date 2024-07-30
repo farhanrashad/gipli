@@ -25,6 +25,10 @@
                                     widget="many2many_tags"
                                     attrs="{'invisible': [('view_type', '!=', 'list')], 'required': [('view_type', '=', 'list')]}"
                                 />
+                                <field name="detail_field_ids" 
+                                    widget="many2many_tags"
+                                    attrs="{'invisible': [('view_type', '!=', 'list')], 'required': [('view_type', '=', 'list')]}"
+                                />
                                 <field name="graph_label_field_id" 
                                     attrs="{'invisible': [('view_type', '!=', 'graph')], 'required': [('view_type', '=', 'graph')]}"
                                 />

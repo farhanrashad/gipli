@@ -103,10 +103,10 @@ class CustomerPortal(CustomerPortal):
             list_view_html += '<tr>'
             for field in item.field_ids:
                 record_value = getattr(record, field.name, '')
-                list_view_html += '<td><a href="/my/services/record/{model_id}/{record_id}">{record_value}</a></td>'.format(
-                    model_id=item.model_id.id,
+                list_view_html += '<td><a href="/my/dashboard/item/{item_id}/{record_id}">{record_value}</a></td>'.format(
+                    item_id=item.id,
                     record_id=record.id,
-                    record_value=record_value
+                    record_value=self._get_field_values(record,field)
                 )
             list_view_html += '</tr>'
         
@@ -120,6 +120,15 @@ class CustomerPortal(CustomerPortal):
         
         return list_view_html
 
+    def _get_field_values(self, record, field):
+        record_value = ''
+        if record[field.name]:
+            if field.ttype == 'many2one':
+                record_value = record[field.name].name
+            else:
+                record_value = record[field.name]
+        return record_value
+        
     def render_graph_view(self, item):
         # Fetch data from the model
         #records = request.env[item.model_id.model].search([])
@@ -138,7 +147,7 @@ class CustomerPortal(CustomerPortal):
         df = pd.DataFrame(data)
     
         # Create the Plotly figure
-        fig = px.bar(df, x='label', y='value', title="Graph Title", color='label')
+        fig = px.bar(df, x='label', y='value', title=item.name, color='label')
     
         # Convert Plotly figure to HTML
         graph_html = fig.to_html(full_html=False, include_plotlyjs='cdn')
@@ -157,9 +166,10 @@ class CustomerPortal(CustomerPortal):
     
         return graph_view_html
 
-    @http.route('/my/services/record/<int:model_id>/<int:record_id>', type='http', auth='public', website=True, csrf=False)
-    def record_detail(self, model_id, record_id, **kwargs):
-        model = request.env['ir.model'].sudo().browse(model_id)
+    @http.route('/my/dashboard/item/<int:item_id>/<int:record_id>', type='http', auth='public', website=True, csrf=False)
+    def record_detail(self, item_id, record_id, **kwargs):
+        item = request.env['base.dashboard.item'].sudo().browse(item_id)
+        model = item.model_id
         model_name = model.model
         record = request.env[model_name].sudo().browse(record_id)
     
@@ -176,8 +186,8 @@ class CustomerPortal(CustomerPortal):
                             <tbody>
         '''.format(record_name=record.name)
     
-        # Adding record fields dynamically
-        fields = [field for field in record._fields if field != 'id']  # Exclude ID field if not needed
+        # Correcting fields extraction
+        fields = [field.name for field in item.field_ids]  # Ensure field names are strings
     
         for i in range(0, len(fields), 4):
             output_html += '<tr>'
