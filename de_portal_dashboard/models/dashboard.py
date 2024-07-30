@@ -5,6 +5,7 @@ import ast
 import json
 import re
 
+from odoo.tools import safe_eval
 
 from odoo import models, fields, api, _
 from lxml import etree
@@ -48,7 +49,7 @@ class BaseDashboardItem(models.Model):
     graph_label_field_id = fields.Many2one(
         'ir.model.fields', 
         string='Label Field',
-        domain="[('model_id', '=', model_id), ('ttype', 'in', ['char', 'selection'])]"
+        domain="[('model_id', '=', model_id)]"
     )
     graph_data_field_id = fields.Many2one(
         'ir.model.fields', 
