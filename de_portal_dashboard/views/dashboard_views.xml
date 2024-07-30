@@ -37,6 +37,23 @@
                                 />
                             </group>
                         </group>
+                        <notebook>
+                            <page string="Lines" name="lines"
+                                attrs="{'invisible': [('view_type', '!=', 'list')]}">
+                                <field name="dash_item_line" >
+                                    <tree string="Dash Item Lines" editable="bottom">
+                                        <field name="dash_item_id" invisible="1" />
+                                        <field name="header_model_id" invisible="1" />
+                                        <field name="relational_field_id" domain="[('model_id', '=', header_model_id),('ttype','=','one2many')]" />
+                                        <field name="line_model_id" />
+                                        <field name="field_ids" 
+                                            widget="many2many_tags"
+                                            required="1"
+                                        />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>

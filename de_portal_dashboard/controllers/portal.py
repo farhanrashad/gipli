@@ -173,42 +173,92 @@ class CustomerPortal(CustomerPortal):
         model_name = model.model
         record = request.env[model_name].sudo().browse(record_id)
     
+        # Line Model
+        line_models = item.dash_item_line
+    
         if not record.exists():
             return request.not_found()
     
         output_html = '''
             <div class="container">
-                <h1>Record Details</h1>
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Details for {record_name}</h5>
-                        <table class="table">
-                            <tbody>
+                       
         '''.format(record_name=record.name)
     
-        # Correcting fields extraction
-        fields = [field.name for field in item.field_ids]  # Ensure field names are strings
-    
-        for i in range(0, len(fields), 4):
-            output_html += '<tr>'
-            for j in range(i, min(i + 4, len(fields))):
-                field = fields[j]
-                field_value = getattr(record, field, '')
-                if j % 2 == 0:
-                    # Even index - label
-                    output_html += '<th>{}</th>'.format(field.capitalize())
-                else:
-                    # Odd index - value
-                    output_html += '<td>{}</td>'.format(field_value)
-            output_html += '</tr>'
+        # Adding record fields dynamically
+        fields = [field for field in item.field_ids]  # Ensure field names are strings
+
+        output_html += '<div class="row">'
+        for field in fields:
+            output_html += '<div class="col-lg-3 mb-3"><strong>{}</strong></div>'.format(field.field_description.capitalize())
+            output_html += '<div class="col-lg-3 mb-3">{}</div>'.format(self._get_field_values(record,field))
+        output_html += '</div>'
     
         output_html += '''
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
         '''
+    
+        # Adding line items
+        
+        for model in line_models:
+            
+            line_model = request.env[model.line_model_id.model]
+
+            
+            
+            # Ensure the relational field is a valid field in the line model
+            relational_field = model.relational_field_id.name
+            parent_field = model.parent_relational_field_id.name
+          
+            domain = [(parent_field, '=', record_id)]
+
+            
+            line_records = line_model.search(domain)
+           
+            #raise UserError(str(line_records))
+            
+            if line_records:
+                output_html += '''
+                    <div class="container mt-4">
+                        <h2>Line Items for {model_name}</h2>
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                '''.format(
+                    model_name=model.line_model_id.name)
+                
+                # Assuming line model has fields `name` and `value`
+                fields = [field for field in model.field_ids]  # Ensure field names are strings
+    
+                for field in fields:
+                    output_html += '<th>{}</th>'.format(field.field_description.capitalize())
+    
+                output_html += '''
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                '''
+    
+                for line in line_records:
+                    output_html += '<tr>'
+                    for field in fields:
+                        field_value = self._get_field_values(line,field) #getattr(line, field.name, '')
+                        output_html += '<td>{}</td>'.format(field_value)
+                    output_html += '</tr>'
+    
+                output_html += '''
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                '''
     
         values = {
             'output_html': output_html,
