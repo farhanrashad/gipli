@@ -4,7 +4,7 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_invoice_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='payment_state']" position="before">
+            <xpath expr="//field[@name='state']" position="before">
                 <field name="amount_gst" optional="hide"/>
                 <field name="amount_gst_signed" optional="hide"/>
                 <field name="amount_wht" optional="hide"/>
