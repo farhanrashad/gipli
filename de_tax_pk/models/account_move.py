@@ -28,17 +28,13 @@ class AccountMove(models.Model):
     )
 
     @api.depends(
-        'line_ids.matched_debit_ids.debit_move_id.move_id.line_ids.amount_residual',
-        'line_ids.matched_debit_ids.debit_move_id.move_id.line_ids.amount_residual_currency',
-        'line_ids.matched_credit_ids.credit_move_id.move_id.line_ids.amount_residual',
-        'line_ids.matched_credit_ids.credit_move_id.move_id.line_ids.amount_residual_currency',
-        'line_ids.balance',
+        'line_ids.debit',
+        'line_ids.credit',
         'line_ids.currency_id',
         'line_ids.amount_currency',
         'line_ids.amount_residual',
         'line_ids.amount_residual_currency',
-        'line_ids.full_reconcile_id',
-        'state')
+    )
     def _compute_gst_wht_amount(self):
         for move in self:
             total_untaxed, total_untaxed_currency = 0.0, 0.0
@@ -79,7 +75,10 @@ class AccountMove(models.Model):
                         total += line.balance
                         total_currency += line.amount_currency
 
-            sign = move.direction_sign
+            if move.type == 'entry' or move.is_outbound():
+                sign = 1
+            else:
+                sign = -1
 
             # Compute amounts
             move.amount_gst = sign * (total_tax_currency - total_wht_currency)
