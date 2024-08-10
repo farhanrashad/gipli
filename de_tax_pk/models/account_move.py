@@ -10,20 +10,20 @@ class AccountMove(models.Model):
 
     amount_gst = fields.Monetary(
         string='GST',
-         store=True, readonly=True,
+        compute='_compute_gst_wht_amount', store=True, readonly=True,
     )
     amount_gst_signed = fields.Monetary(
         string='GST Signed',
-         store=True, readonly=True,
+        compute='_compute_gst_wht_amount', store=True, readonly=True,
         currency_field='company_currency_id',
     )
     amount_wht = fields.Monetary(
         string='WHT',
-         store=True, readonly=True,
+        compute='_compute_gst_wht_amount', store=True, readonly=True,
     )
     amount_wht_signed = fields.Monetary(
         string='WHT Signed',
-         store=True, readonly=True,
+        compute='_compute_gst_wht_amount', store=True, readonly=True,
         currency_field='company_currency_id',
     )
 
