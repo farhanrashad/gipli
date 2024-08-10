@@ -1,0 +1,15 @@
+<odoo>
+    <record id="view_invoice_tree_wht_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.wht.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_state']" position="before">
+                <field name="amount_gst" optional="hide"/>
+                <field name="amount_gst_signed" optional="hide"/>
+                <field name="amount_wht" optional="hide"/>
+                <field name="amount_wht_signed" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
