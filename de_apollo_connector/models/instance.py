@@ -215,7 +215,13 @@ class ApolloInstance(models.Model):
 
             #raise UserError(api_data)
             
-            response = requests.request("POST", url, headers=headers, json=api_data)   
+            response = requests.request("POST", url, headers=headers, json=api_data)  
+
+            # Check for errors due to free plan limitation
+            if response.status_code == 403:
+                raise UserError("Access denied: This endpoint is only available to Apollo users on paid plans.")
+
+            
             #raise UserError(response.text)
             json_data = json.loads(response.text)
             return json_data
