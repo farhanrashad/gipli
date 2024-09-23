@@ -44,9 +44,9 @@ class XplInstance(models.Model):
 
     def button_draft(self):
         
-        json_data = self._get_api_data('webhook/logs', api_data=None)
-        json_formatted_str = json.dumps(json_data, indent=4)  # Convert dictionary to JSON string with indentation
-        raise UserError(json_formatted_str)
+        #json_data = self._get_api_data('webhook/logs', api_data=None)
+        #json_formatted_str = json.dumps(json_data, indent=4)  # Convert dictionary to JSON string with indentation
+        #raise UserError(json_formatted_str)
         self.write({
             'state':'draft'
         })
@@ -57,9 +57,50 @@ class XplInstance(models.Model):
         })
 
     def connection_test(self):
-        self.write({
-                'state': 'verified'
+
+        notification = {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Connection to Expendless successful; explore its capabilities now.'),
+                'type': 'warning',
+                'sticky': False,  #True/False will display for few seconds if false
+            },
+        }
+        
+        url = self.url + '/kybOdoo/systemUserLogin'
+
+        # Payload with email and password
+        payload = {
+            "email": self.api_key,
+            "password": self.api_secret
+        }
+
+        # Headers for the request
+        headers = {
+            'Content-Type': 'application/json',
+            'platform': 'web'
+        }
+        response = requests.post(url, data=json.dumps(payload), headers=headers)
+
+        result = response.json()
+
+        if result.get('status') and 'data' in result and 'token' in result['data']:
+            notification['params'].update({
+                'title': _('The connection to Expendless was successful.'),
+                'type': 'success',
+                'next': {'type': 'ir.actions.act_window_close'},
             })
+            token = result['data']['token']
+            self.write({
+                'access_token': token,
+                'state': 'verified',
+            })
+            
+        else:
+            raise UserError("Error: Token not found in the response.")
+
+        return notification
         
     def connection_test1(self):
         

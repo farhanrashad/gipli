@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Define the CRM Configuration menu -->
+
+        <!-- Define the form view for Xpendless Instance -->
+        <record id="view_xpendless_instance_form" model="ir.ui.view">
+            <field name="name">xpendless.instance.form</field>
+            <field name="model">xpl.instance</field>
+            <field name="arch" type="xml">
+                <form string="Xpendless Instance">
+                    <header>
+                        <!-- Add a button in the header -->
+                        <button name="connection_test" type="object" string="Test Connection" class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="button_draft" type="object" string="Set to Draft" invisible="state not in ('verified','active')"/>
+                        <button name="button_confirm" type="object" string="Confirm" class="btn-primary" invisible="state != 'verified'"/> 
+
+
+                        <field name="state" widget="statusbar" statusbar_visible="draft,verified,active" force_save="1"/>
+
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Xpendless Connection" force_save="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="api_key" password="True" />
+                                <field name="access_token" password="True" />
+                                <field name="url" />
+                                <field name="url_sample" class="text-muted" nolabel="1" readonly="1"/>
+                                
+                            </group>
+                            <group>
+                                <field name="api_secret" password="True" />
+                                <field name="company_id" />
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <
+                            <page string="Settings" name="settings" invisible="state  != 'active'">
+                                <group>
+                                    <group name="group_import_operations" string="Import Operations" col="1" class="row mt16 o_settings_container" >
+                                        <div>
+                                            <!-- Import Contacts -->
+                                            <div class="o_setting_box" id="instance_imports" >
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_import" context="{'op_name':'companies'}" icon="fa-arrow-right" type="object" string="Import Companies" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_import_companies" class="fw-bold o_form_label" string="The last companies were imported on "/>
+                                                    <b><field name="apl_date_import_companies" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly import Companies from Xpendless into Odoo contacts.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Import Accounts -->
+                                            <div class="o_setting_box" id="instance_imports" >
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_import" context="{'op_name':'accounts'}" icon="fa-arrow-right" type="object" string="Import Employees" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_import_employees" class="fw-bold o_form_label" string="The last employees were imported on "/>
+                                                    <b><field name="apl_date_import_employees" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly import employees from Xpendless into Odoo contacts.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- import Expenses -->
+                                            <div class="o_setting_box" id="instance_imports">
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_import" icon="fa-arrow-right" type="object" string="Import expenses" context="{'op_name':'expenses'}" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_import_expenses" class="fw-bold o_form_label" string="The last Expenses were imported on "/>
+                                                    <b><field name="apl_date_import_expenses" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly import expenses from Xpendless into Odoo.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </group>
+                                    <group name="group_export_operations" string="Export Operations" col="1" class="row mt16 o_settings_container" >
+                                        <div>
+                                            <!-- Export Contacts -->
+                                            <div class="o_setting_box" id="instance_imports" >
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Companies" context="{'op_name':'comapnies'}" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_export_companies" class="fw-bold o_form_label" string="The last comapnies were exported on "/>
+                                                    <b><field name="apl_date_export_companies" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly export company contacts into Xpendess.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Export Employees -->
+                                            <div class="o_setting_box" id="instance_imports">
+                                                <div class="o_setting_left_pane">
+                                                </div>
+                                                <div class="o_setting_right_pane">
+                                                    <div class="content-group">
+                                                        <div class="mt8">
+                                                            <button name="button_export" icon="fa-arrow-right" type="object" string="Export Employees" context="{'op_name':'employees'}" class="btn-primary"/>
+                                                        </div>
+                                                    </div>
+                                                    <label for="apl_date_export_employees" class="fw-bold o_form_label" string="The last Employees were exported on "/>
+                                                    <b><field name="apl_date_export_employees" nolabel="1"/></b>
+                                                    <div class="text-muted">
+                                                        Seamlessly export employees into Xpendless.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </group>
+                                </group>
+
+                                        <!-- end -->
+                                
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Define the tree view for Xpendless Instance -->
+        <record id="view_xpendless_instance_tree" model="ir.ui.view">
+            <field name="name">xpendless.instance.tree</field>
+            <field name="model">xpl.instance</field>
+            <field name="arch" type="xml">
+                <tree string="Xpendless Instances">
+                    <field name="name"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Define the action for the Expendless Instance -->
+        <record id="action_xpendless_instance" model="ir.actions.act_window">
+            <field name="name">Xpendless Instances</field>
+            <field name="res_model">xpl.instance</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Create a menu item for xpendless Instance -->
+        <menuitem id="menu_xpendless_instance_list" name="Instances" parent="menu_xpendless_config" action="action_xpendless_instance" sequence="20"/>
+
+    </data>
+</odoo>
