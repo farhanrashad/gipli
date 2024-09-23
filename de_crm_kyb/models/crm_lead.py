@@ -63,6 +63,14 @@ class Lead(models.Model):
 
     count_contacts = fields.Integer('Contacts', computer='_compute_contacts_count')
 
+    first_stage_id = fields.Many2one('crm.stage', compute='_compute_first_kyb_stage')
+
+    def _compute_first_kyb_stage(self):
+        stage_id = self.env['crm.stage']
+        for record in self:
+            stage_id = self.env['crm.stage'].search([('is_kyb','=',True)],limit=1,order='sequence')
+            record.first_stage_id = stage_id.id
+            
     def _compute_contacts_count(self):
         partner_ids = self.env['res.partner']
         for record in self:
@@ -125,7 +133,10 @@ class Lead(models.Model):
     # Actions
     # -------------------------------------------------------------
     def action_accept_kyb_lead(self):
-        pass
+        stage_id = self.env['crm.stage'].search([('is_kyb','=',True),('sequence','>',self.stage_id.sequence)],limit=1)
+        self.write({
+            'stage_id': stage_id.id,
+        })
         
     def action_open_employees(self):
         action = self.env.ref('de_crm_kyb.action_partner_kyb_contacts').read()[0]

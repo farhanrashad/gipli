@@ -8,5 +8,4 @@ class Stage(models.Model):
 
     is_kyb = fields.Boolean(default=False)
 
-    allow_verify = fields.Boolean(default=False)
-    
+    allow_verify = fields.Boolean(default=False)    

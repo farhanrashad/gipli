@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='team_id']" position="after">
                 <field name="is_kyb" />
-                <field name="allow_verify" />
+                <field name="allow_verify" invisible="not is_kyb"/>
             </xpath>
         </field>
     </record>
