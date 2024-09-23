@@ -4,7 +4,7 @@ from odoo import api, fields, models, tools, SUPERUSER_ID
 from odoo.exceptions import UserError, ValidationError
 import base64
 import requests
-
+import json
 class Lead(models.Model):
     _inherit = "crm.lead"
 
@@ -146,6 +146,18 @@ class Lead(models.Model):
         })
 
     def action_kyb_verification(self):
+        instance_id = self.company_id._get_instance()
+        api_name = '/kybOdoo/setKybOdooStatus'
+
+        api_data = {
+            "companyId": int(self.xpl_id),
+            "kybStatus": "Verified"
+        }
+        response = instance_id._put_api_data(api_name, api_data)
+
+        formatted_response = json.dumps(response, indent=4)  # Pretty-print JSON response
+        raise UserError(formatted_response)
+    
         stage_id = self.env['crm.stage'].search([('is_kyb','=',True),('sequence','>',self.stage_id.sequence)],limit=1)
         self.write({
             'stage_id': stage_id.id,
