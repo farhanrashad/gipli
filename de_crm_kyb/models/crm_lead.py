@@ -8,7 +8,9 @@ import requests
 class Lead(models.Model):
     _inherit = "crm.lead"
 
-    is_kyb = fields.Boolean(default=False, compute='_compute_kyb', store=True)
+    is_kyb = fields.Boolean(default=False, 
+                            #compute='_compute_kyb', store=True
+    )
     xpl_id = fields.Char('Xpendless ID', readonly=True)
     
     stage_id = fields.Many2one(

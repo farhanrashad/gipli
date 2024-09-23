@@ -197,7 +197,9 @@
             <field name="name">KYB Pipeline</field>
             <field name="res_model">crm.lead</field>
             <field name="view_mode">kanban,tree,graph,pivot,form,calendar,activity</field>
+          <!--
             <field name="domain">[('type','=','opportunity'),('is_kyb','=',True)]</field>
+          -->
             <field name="context">{
                     'default_type': 'opportunity',
                     'default_is_kyb': 1,

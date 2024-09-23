@@ -25,6 +25,8 @@ Long description of module's purpose
         # 'security/ir.model.access.csv',
         'data/ir_action_data.xml',
         'data/ir_cron_actions.xml',
+        'data/kyb_stage_data.xml',
+        'data/kyb_team_data.xml',
         'views/crm_team_views.xml',
         'views/crm_stage_views.xml',
         'views/crm_lead_views.xml',
