@@ -325,10 +325,38 @@ class XplInstance(models.Model):
 
     @api.model
     def _put_api_data(self, api_name, api_data=None):
+        token = self.access_token
         headers = {
-            'Cache-Control': 'no-cache',
-            'Content-Type': 'application/json'
+            'Authorization': f'Bearer {token}'  # Add Bearer token to headers
         }
+
+        url = self.url + api_name
+        #if api_data is None:
+        #    api_data = {}
+
+        #raise UserError(json.dumps(api_data, indent=4))
+        
+        response = requests.request("PUT", url, headers=headers, json=api_data)
+        json_data = json.loads(response.text)
+        return json_data
+        
+        
+        #response_data = response.json()
+        #formatted_response = json.dumps(response_data, indent=4)  # Pretty-print JSON response
+        #raise UserError(formatted_response)
+        
+        #try:
+        #    response_data = response.json()  # Convert response to JSON
+        #except ValueError:
+        #    raise UserError(f"Invalid JSON response: {response.text}")
+
+        # Convert the response data to a formatted JSON string for display
+        #formatted_response = json.dumps(response_data, indent=4)  # Pretty-print JSON response
+
+        # Raise a UserError with the formatted JSON response
+        #raise UserError(formatted_response)
+            
+        """
         try:
             url = self.url + api_name
             # Initialize data as an empty dictionary if it's None
@@ -350,4 +378,5 @@ class XplInstance(models.Model):
         except json.JSONDecodeError as e:
             # Handle JSON decoding errors
             raise e
+        """
 
