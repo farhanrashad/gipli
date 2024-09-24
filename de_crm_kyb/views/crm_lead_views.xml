@@ -84,6 +84,25 @@
                     >
                             <field string="Employees" name="count_contacts" widget="statinfo"/>
                     </button>
+
+                    <button name="action_get_employees" 
+                        type="object" 
+                        icon="fa-users" 
+                        class="oe_stat_button"
+                        
+                    >
+                        <span>Employees</span>
+                    </button>
+
+                    <button name="action_get_documents" 
+                        type="object" 
+                        icon="fa-file" 
+                        class="oe_stat_button"
+                        
+                    >
+                        <span>Documents</span>
+                    </button>
+                
             </xpath>
 
             <xpath expr="//notebook" position="inside">

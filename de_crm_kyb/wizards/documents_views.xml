@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="xpl_kyb_docs_tree_view" model="ir.ui.view">
+        <field name="name">xpl.kyb.docs.tree.view</field>
+        <field name="model">xpl.kyb.docs</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="xpl_id" />
+                <field name="url" invisible="1"/>
+                <button name="open_document" string="Open Document"
+                            type="object" class="oe_highlight" title="Open Document"
+                />
+            </tree>
+        </field>
+    </record>
+</odoo>

@@ -22,7 +22,7 @@ Long description of module's purpose
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'data/ir_action_data.xml',
         'data/ir_cron_actions.xml',
         'data/kyb_stage_data.xml',
@@ -31,6 +31,8 @@ Long description of module's purpose
         'views/crm_stage_views.xml',
         'views/crm_lead_views.xml',
         'views/res_partner_views.xml',
+        'wizards/employees_views.xml',
+        'wizards/documents_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

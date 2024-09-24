@@ -13,7 +13,7 @@ class CRMLead(models.Model):
     is_kyb = fields.Boolean(default=False, 
                             #compute='_compute_kyb', store=True
     )
-    xpl_id = fields.Char('Xpendless ID', readonly=True)
+    xpl_id = fields.Char('Xpendless ID')
     
     stage_id = fields.Many2one(
         'crm.stage', string='Stage', index=True, tracking=True,
@@ -219,6 +219,70 @@ class CRMLead(models.Model):
             },
         })
         return action
+
+    def action_get_employees(self):
+        #for i in range(1, 11):
+        #    self.env['xpl.kyb.employees'].create({
+        #        'name': f'Employee {i}',  # Create employee records
+        #    })
+
+        self.env['xpl.kyb.employees'].search([]).unlink()
+        instance_id = self.company_id._get_instance()
+        api_name = "/kybOdoo/getCompanyInformation"
+        params_data = {
+            "companyId": int(self.xpl_id)
+        }
+        response = instance_id._get_api_data(api_name, params_data=params_data, json_data=None)
+        
+        employees = response.get('data', {}).get('Employees', [])
+
+        #raise UserError(f"API Response: {employees}")
+
+        # Loop through the employees and create records in xpl.kyb.employees
+        for employee in employees:
+            name = employee.get('fullName')
+            email = employee.get('email')
+            mobile = employee.get('mobileNumber')
+            self.env['xpl.kyb.employees'].create({
+                'name': name,
+                'email': email,
+                'mobile': mobile,
+            })
+
+        return {
+            'name': 'Employees',
+            'view_mode': 'tree',
+            'res_model': 'xpl.kyb.employees',
+            'type': 'ir.actions.act_window',
+            'target': '_blank',
+        }
+
+
+    def action_get_documents(self):
+        self.env['xpl.kyb.docs'].search([]).unlink()
+        instance_id = self.company_id._get_instance()
+        api_name = "/kybOdoo/getCompanyInformation"
+        params_data = {
+            "companyId": int(self.xpl_id)
+        }
+        response = instance_id._get_api_data(api_name, params_data=params_data, json_data=None)
+        
+        docs = response.get('data', {}).get('Attachments', [])
+        for doc in docs:
+            xpl_id = doc.get('companyDocId')
+            url = doc.get('attachmentPath')
+            self.env['xpl.kyb.docs'].create({
+                'xpl_id': xpl_id,
+                'url': url,
+            })
+            
+        return {
+            'name': 'Documents',
+            'view_mode': 'tree',
+            'res_model': 'xpl.kyb.docs',
+            'type': 'ir.actions.act_window',
+            'target': '_blank',
+        }
         
     def _cron_import_company_from_xpl(self):
         raise UserError('hello')
