@@ -294,13 +294,19 @@ class XplInstance(models.Model):
             
 
     @api.model
-    def _get_api_data(self, api_name, api_data=None):
+    def _get_api_data(self, api_name, params_data=None, json_data=None):
         token = self.access_token
         # Set the headers for the request
         headers = {
             'Authorization': f"Bearer {token}",
-            'Content-Type': 'application/json',
+            #'Content-Type': 'application/json',
         }
+        url = self.url + api_name
+        response = requests.request("GET", url, headers=headers, params=params_data,json=json_data )
+        json_data = json.loads(response.text)
+        return json_data
+        
+        """
         try:
             url = self.url + api_name
             # Initialize data as an empty dictionary if it's None
@@ -323,6 +329,7 @@ class XplInstance(models.Model):
             # Handle JSON decoding errors
             raise e
 
+        """
     @api.model
     def _put_api_data(self, api_name, api_data=None):
         token = self.access_token
