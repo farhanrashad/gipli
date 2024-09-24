@@ -76,6 +76,7 @@
             </xpath>
             -->
             <xpath expr="//div[hasclass('oe_button_box')]/button[1]" position="before">
+                <!--
                     <button name="action_open_employees" 
                         type="object" 
                         icon="fa-users" 
@@ -84,7 +85,7 @@
                     >
                             <field string="Employees" name="count_contacts" widget="statinfo"/>
                     </button>
-
+                -->
                     <button name="action_get_owners" 
                         type="object" 
                         icon="fa-user" 
@@ -168,12 +169,15 @@
                                         </div>
                           <field name="work_type" />
                     </group>
-                    <group name="usage_detail" string="Usage Detail" invisible="is_kyb != True">
+                    
+                    <group name="kyb_details" invisible="is_kyb != True">
                         <field name="stage_ids" widget="many2many_tags" invisible="1"/>
+                        <!--
                         <field name="usage_est_users" />
                         <field name="usage_est_spending" />
                         <field name="usage_card" />
                         <separator string="Sales Detail" />
+                        -->
                         <label for="date_deadline">Expected Closing</label>
                         <div class="o_lead_opportunity_form_inline_fields">
                             <field name="date_deadline" nolabel="1" class="oe_inline"/>
@@ -181,12 +185,14 @@
                         </div>
                         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                         <field name="user_id" context="{'default_sales_team_id': team_id}" widget="many2one_avatar_user"/>
-                  </group>
+                    </group>
+                    
             </group>
           </xpath>
           <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/div[2]" position="after">
             <field name="is_kyb"/>
           </xpath>
+            <!--
             <xpath expr="//notebook" position="inside" invisible="is_kyb != True">
                 <page name="documents" string="Documents">
                     <group>
@@ -200,7 +206,7 @@
                     </group>
                 </page>
             </xpath>
-
+            -->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[1]" position="attributes">
                 <attribute name="invisible">is_kyb == True</attribute>
             </xpath>
