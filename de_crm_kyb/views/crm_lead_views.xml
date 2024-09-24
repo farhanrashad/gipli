@@ -85,6 +85,15 @@
                             <field string="Employees" name="count_contacts" widget="statinfo"/>
                     </button>
 
+                    <button name="action_get_owners" 
+                        type="object" 
+                        icon="fa-user" 
+                        class="oe_stat_button"
+                        
+                    >
+                        <span>Owners</span>
+                    </button>
+
                     <button name="action_get_employees" 
                         type="object" 
                         icon="fa-users" 

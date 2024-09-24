@@ -199,7 +199,7 @@ class CRMLead(models.Model):
         api_name = '/kybOdoo/setKybOdooStatus'
 
         api_data = {
-            "companyId": 361, #int(self.xpl_id),
+            "companyId": int(self.xpl_id),
             "kybStatus": status #"Verified"
         }
         response = instance_id._put_api_data(api_name, api_data)
@@ -220,12 +220,40 @@ class CRMLead(models.Model):
         })
         return action
 
-    def action_get_employees(self):
-        #for i in range(1, 11):
-        #    self.env['xpl.kyb.employees'].create({
-        #        'name': f'Employee {i}',  # Create employee records
-        #    })
+    def action_get_owners(self):
+        self.env['xpl.kyb.employees'].search([]).unlink()
+        instance_id = self.company_id._get_instance()
+        api_name = "/kybOdoo/getCompanyInformation"
+        params_data = {
+            "companyId": int(self.xpl_id)
+        }
+        response = instance_id._get_api_data(api_name, params_data=params_data, json_data=None)
+        
+        employees = response.get('data', {}).get('Owners', [])
 
+        #raise UserError(f"API Response: {employees}")
+
+        # Loop through the employees and create records in xpl.kyb.employees
+        for employee in employees:
+            name = employee.get('fullName')
+            email = employee.get('email')
+            mobile = employee.get('mobileNumber')
+            self.env['xpl.kyb.employees'].create({
+                'name': name,
+                'email': email,
+                'mobile': mobile,
+            })
+
+        return {
+            'name': 'Employees',
+            'view_mode': 'tree',
+            'res_model': 'xpl.kyb.employees',
+            'type': 'ir.actions.act_window',
+            'target': '_blank',
+        }
+
+
+    def action_get_employees(self):
         self.env['xpl.kyb.employees'].search([]).unlink()
         instance_id = self.company_id._get_instance()
         api_name = "/kybOdoo/getCompanyInformation"
@@ -256,8 +284,7 @@ class CRMLead(models.Model):
             'type': 'ir.actions.act_window',
             'target': '_blank',
         }
-
-
+        
     def action_get_documents(self):
         self.env['xpl.kyb.docs'].search([]).unlink()
         instance_id = self.company_id._get_instance()
