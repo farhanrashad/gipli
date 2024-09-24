@@ -5,7 +5,9 @@ from odoo.exceptions import UserError, ValidationError
 import base64
 import requests
 import json
-class Lead(models.Model):
+
+
+class CRMLead(models.Model):
     _inherit = "crm.lead"
 
     is_kyb = fields.Boolean(default=False, 
@@ -66,6 +68,10 @@ class Lead(models.Model):
     first_stage_id = fields.Many2one('crm.stage', compute='_compute_first_kyb_stage')
     allow_verification_stage_id = fields.Many2one('crm.stage', compute='_compute_allow_verification_stage')
 
+    # ============================================================================
+    # Computed Methods
+    # ============================================================================
+    
     def _compute_first_kyb_stage(self):
         stage_id = self.env['crm.stage']
         for record in self:
@@ -136,32 +142,68 @@ class Lead(models.Model):
     def action_verification(self):
         pass
 
-    # -------------------------------------------------------------
+    # ============================================================================
+    # CRUD Operations
+    # =============================================================================
+    
+    def write(self, vals):
+        res = super(CRMLead, self).write(vals)
+        kyb_status = 'Submitted'
+        # Check if the stage_id field is being updated
+        if 'stage_id' in vals:
+            for lead in self:
+                # Get the updated stage name
+                stage_name = lead.stage_id.name
+
+            # Determine the KYB status based on the stage name
+                if stage_name in ['Verified', 'Unverified']:
+                    kyb_status = stage_name
+                else:
+                    kyb_status = 'Submitted'
+
+                self._update_company_status(kyb_status)
+        return res
+    
+    # ============================================================================
     # Actions
-    # -------------------------------------------------------------
+    # ============================================================================
     def action_accept_kyb_lead(self):
         stage_id = self.env['crm.stage'].search([('is_kyb','=',True),('sequence','>',self.stage_id.sequence)],limit=1)
         self.write({
             'stage_id': stage_id.id,
         })
 
-    def action_kyb_verification(self):
+    def action_kyb_verification1(self):
         instance_id = self.company_id._get_instance()
         api_name = '/kybOdoo/setKybOdooStatus'
 
         api_data = {
-            "companyId": int(self.xpl_id),
+            "companyId": 361, #int(self.xpl_id),
             "kybStatus": "Verified"
         }
         response = instance_id._put_api_data(api_name, api_data)
 
         formatted_response = json.dumps(response, indent=4)  # Pretty-print JSON response
-        raise UserError(formatted_response)
+        #raise UserError(formatted_response)
     
         stage_id = self.env['crm.stage'].search([('is_kyb','=',True),('sequence','>',self.stage_id.sequence)],limit=1)
         self.write({
             'stage_id': stage_id.id,
         })
+
+    def action_kyb_verification(self):
+        response = self._update_company_status('Verified')
+        
+    def _update_company_status(self,status):
+        instance_id = self.company_id._get_instance()
+        api_name = '/kybOdoo/setKybOdooStatus'
+
+        api_data = {
+            "companyId": 361, #int(self.xpl_id),
+            "kybStatus": status #"Verified"
+        }
+        response = instance_id._put_api_data(api_name, api_data)
+        return response
         
     def action_open_employees(self):
         action = self.env.ref('de_crm_kyb.action_partner_kyb_contacts').read()[0]
