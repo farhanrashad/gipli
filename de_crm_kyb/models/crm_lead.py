@@ -34,21 +34,16 @@ class CRMLead(models.Model):
 
     count_contacts = fields.Integer('Contacts', computer='_compute_contacts_count')
 
-    first_stage_id = fields.Many2one('crm.stage', compute='_compute_first_kyb_stage')
     allow_verification_stage_id = fields.Many2one('crm.stage', compute='_compute_allow_verification_stage')
     stage_category = fields.Selection(related='stage_id.stage_category', string="Stage Category", store=True)
+
 
     # ============================================================================
     # Computed Methods
     # ============================================================================
    
-            
-    def _compute_first_kyb_stage(self):
-        stage_id = self.env['crm.stage']
-        for record in self:
-            stage_id = self.env['crm.stage'].search([('is_kyb','=',True)],limit=1,order='sequence')
-            record.first_stage_id = stage_id.id
 
+    
     def _compute_allow_verification_stage(self):
         stage_id = self.env['crm.stage']
         for record in self:
@@ -120,19 +115,22 @@ class CRMLead(models.Model):
     def write(self, vals):
         res = super(CRMLead, self).write(vals)
         kyb_status = 'Submitted'
-        # Check if the stage_id field is being updated
-        if 'stage_id' in vals:
+        if 'stage_id' in vals and not self.env.context.get('from_api'):
             for lead in self:
-                # Get the updated stage name
-                stage_name = lead.stage_id.name
-
-            # Determine the KYB status based on the stage name
-                if stage_name in ['Verified', 'Unverified']:
-                    kyb_status = stage_name
+                if lead.stage_id.stage_category == 'close':
+                    kyb_status = 'Verified'
+                elif lead.stage_id.stage_category == 'cancel':
+                    kyb_status = 'Unverified'
                 else:
                     kyb_status = 'Submitted'
 
                 self._update_company_status(kyb_status)
+
+        # If the record is inactive and is KYB, find and set the "cancel" stage
+        if vals.get('active') is False and self.is_kyb:
+            cancel_stage = self.env['crm.stage'].sudo().search([('stage_category', '=', 'cancel')], limit=1)    
+            if cancel_stage:
+                self.sudo().write({'stage_id': cancel_stage.id})
         return res
     
     # ============================================================================
@@ -351,13 +349,16 @@ class CRMLead(models.Model):
             companyId = int(companyId)  # Convert to int if necessary
             companyName = payload.get('companyName')
             registrationNumber = payload.get('registrationNumber')
-            addressLine1 = payload.get('addressLine1')
-            addressLine2 = payload.get('addressLine2')
+            street = payload.get('addressLine1')
+            street2 = payload.get('addressLine2')
             city = payload.get('city')
             postalCode = payload.get('postalCode')
             companyEmail = payload.get('companyEmail')
             companyPhone = payload.get('companyPhone')
 
+            stage_name = payload.get('kybStatus')
+            
+            
             date_company_creation = payload.get('crCreationDate')
             date_company_expiry = payload.get('crExpiryDate')
     
@@ -368,20 +369,36 @@ class CRMLead(models.Model):
                 'reg_no': registrationNumber,
                 'phone': companyPhone,
                 'email_from': companyEmail,
-                'street': f"{addressLine1}, {addressLine2}" if addressLine2 else addressLine1,
+                'street': street,
+                'street2': street2,
                 'city': city,
                 'zip': postalCode,
                 'is_kyb': True,
                 'date_company_creation': date_company_creation,
                 'date_company_expiry':date_company_expiry,
+                'description': stage_name,
             }
+
+            stage_category = 'draft'
+            if stage_name == 'Verification in progress':
+                stage_category = 'progress'
+            elif stage_name == 'Verified':
+                stage_category = 'close'
+            elif stage_name == 'Unverified':
+                stage_category = 'cancel'
+                
+            stage_id = self.env['crm.stage'].search([('stage_category','=',stage_category),('is_kyb','=',True)],limit=1)
+
+            if stage_id:
+                opportunity_values["stage_id"] = stage_id.id
     
             # Search for an existing lead with the same xpl_id (companyId)
             existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', companyId)], limit=1)
     
             if existing_lead:
                 # Update the existing opportunity with new values
-                existing_lead.sudo().write(opportunity_values)
+                existing_lead.with_context(from_api=True).write(opportunity_values)
+                #existing_lead.sudo().write(opportunity_values)
                 lead_id = existing_lead  # Assign existing lead for further actions
             else:
                 # Set xpl_id when creating new opportunity

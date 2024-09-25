@@ -40,7 +40,7 @@
                      <header invisible="not is_kyb">
                           <button name="action_accept_kyb_lead" string="Accept"
                                 type="object" class="oe_highlight" data-hotkey="w" title="Accept"
-                                invisible="not is_kyb or stage_id != first_stage_id"/>
+                                invisible="not is_kyb or stage_category != 'draft'"/>
 
                          <button name="action_kyb_verification" string="Verify"
                                 type="object" class="oe_highlight" data-hotkey="w" title="Verify"
@@ -129,7 +129,6 @@
                     <group>
                         <group>
                             <field name="xpl_id" />
-                            <field name="first_stage_id" invisible="1" />
                             <field name="allow_verification_stage_id" invisible="1" />
                         </group>
                     </group>

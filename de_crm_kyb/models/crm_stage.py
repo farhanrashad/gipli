@@ -12,7 +12,7 @@ class Stage(models.Model):
 
     stage_category = fields.Selection([
         ('draft', 'Draft'),
-        ('inprogress', 'In Progress'),
+        ('progress', 'In Progress'),
         ('close', 'Close'),
         ('cancel', 'Cancel')
     ], string='Stage Category', default='draft')
