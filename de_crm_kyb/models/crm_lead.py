@@ -306,7 +306,7 @@ class CRMLead(models.Model):
         }
         response = instance_id._get_api_data(api_name, params_data=params_data, json_data=None)
         
-        docs = response.get('data', {}).get('Questionare', [])
+        docs = response.get('data', {}).get('Questionnaire', [])
         for doc in docs:
             question = doc.get('question')
             answer = doc.get('answer')
