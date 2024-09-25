@@ -33,6 +33,7 @@ Long description of module's purpose
         'views/res_partner_views.xml',
         'wizards/employees_views.xml',
         'wizards/documents_views.xml',
+        'wizards/questions_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

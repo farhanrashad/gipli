@@ -11,6 +11,7 @@ class Employee(models.TransientModel):
     _description = "Xpendless KYB Documents"
 
     xpl_id = fields.Char(string='Document ID')
+    name = fields.Char(string='Name')
     url = fields.Char(string='URL')
 
     def open_document(self):

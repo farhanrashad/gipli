@@ -3,3 +3,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_xpl_kyb_employees,access.xpl.kyb.employees,model_xpl_kyb_employees,,1,1,1,1
 
 access_xpl_kyb_docs_wizard,access.xpl.kyb.docs.wizard,model_xpl_kyb_docs,,1,1,1,1
+
+access_xpl_kyb_questions_wizard,access.xpl.kyb.questions.wizard,model_xpl_kyb_questions,,1,1,1,1

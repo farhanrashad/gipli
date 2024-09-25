@@ -112,6 +112,15 @@
                     >
                         <span>Documents</span>
                     </button>
+
+                    <button name="action_get_questions" 
+                        type="object" 
+                        icon="fa-question-circle" 
+                        class="oe_stat_button"
+                        
+                    >
+                        <span>Questions</span>
+                    </button>
                 
             </xpath>
 

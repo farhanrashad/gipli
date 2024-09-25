@@ -220,6 +220,11 @@ class CRMLead(models.Model):
             'res_model': 'xpl.kyb.employees',
             'type': 'ir.actions.act_window',
             'target': '_blank',
+            'context': {
+                'create': False,
+                'edit': False,
+                'delete': False,
+            },
         }
 
 
@@ -253,6 +258,11 @@ class CRMLead(models.Model):
             'res_model': 'xpl.kyb.employees',
             'type': 'ir.actions.act_window',
             'target': '_blank',
+            'context': {
+                'create': False,
+                'edit': False,
+                'delete': False,
+            },
         }
         
     def action_get_documents(self):
@@ -268,9 +278,11 @@ class CRMLead(models.Model):
         for doc in docs:
             xpl_id = doc.get('companyDocId')
             url = doc.get('attachmentPath')
+            name = doc.get('documentName')
             self.env['xpl.kyb.docs'].create({
                 'xpl_id': xpl_id,
                 'url': url,
+                'name': name,
             })
             
         return {
@@ -279,6 +291,42 @@ class CRMLead(models.Model):
             'res_model': 'xpl.kyb.docs',
             'type': 'ir.actions.act_window',
             'target': '_blank',
+            'context': {
+                'create': False,
+                'edit': False,
+                'delete': False,
+            },
+        }
+
+    def action_get_questions(self):
+        self.env['xpl.kyb.questions'].search([]).unlink()
+        instance_id = self.company_id._get_instance()
+        api_name = "/kybOdoo/getCompanyInformation"
+        params_data = {
+            "companyId": int(self.xpl_id)
+        }
+        response = instance_id._get_api_data(api_name, params_data=params_data, json_data=None)
+        
+        docs = response.get('data', {}).get('Questionare', [])
+        for doc in docs:
+            question = doc.get('question')
+            answer = doc.get('answer')
+            self.env['xpl.kyb.questions'].create({
+                'name': question,
+                'desc': answer,
+            })
+            
+        return {
+            'name': 'Questions',
+            'view_mode': 'tree',
+            'res_model': 'xpl.kyb.questions',
+            'type': 'ir.actions.act_window',
+            'target': '_blank',
+            'context': {
+                'create': False,
+                'edit': False,
+                'delete': False,
+            },
         }
         
     def _cron_import_company_from_xpl(self):
