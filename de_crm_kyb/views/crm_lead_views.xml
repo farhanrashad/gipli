@@ -165,22 +165,14 @@
                           <field name="zip" readonly="stage_category != 'draft' and is_kyb == True" placeholder="ZIP" class="o_address_zip"/>
                           <field name="country_id" readonly="stage_category != 'draft' and is_kyb == True" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
                         </div>
-                          <field name="website" readonly="stage_category != 'draft' and is_kyb == True" widget="url" placeholder="e.g. https://www.odoo.com"/>
-                          <label for="email_from" class="oe_inline"/>
-                                        <div class="o_row o_row_readonly">
-                                            <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger" title="This email is blacklisted for mass mailings. Click to unblacklist." type="object" context="{'default_email': email_from}" groups="base.group_user" invisible="not is_blacklisted"/>
-                                            <field name="email_from" readonly="stage_category != 'draft' and is_kyb == True" string="Email" widget="email"/>
-                                            <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer email will also be updated." invisible="not partner_email_update"/>
-                                        </div>
-                                        <label for="phone" class="oe_inline"/>
-                                        <div class="o_row o_row_readonly">
-                                            <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': phone}" groups="base.group_user" invisible="not phone_blacklisted"/>
-                                            <field name="phone" readonly="stage_category != 'draft' and is_kyb == True" widget="phone"/>
-                                            <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer phone number will also be updated." invisible="not partner_phone_update"/>
-                                        </div>
+
+                        <field name="date_company_creation" readonly="stage_category != 'draft' and is_kyb == True" />
+                        <field name="date_company_expiry" readonly="stage_category != 'draft' and is_kyb == True" />
+
+                          
                     </group>
                     
-                    <group name="kyb_details" invisible="is_kyb != True">
+                    <group name="kyb_details" string="Contact Details" invisible="is_kyb != True">
                         <field name="stage_ids" widget="many2many_tags" invisible="1"/>
                         <field name="stage_category" invisible="1"/>
                         <!--
@@ -196,6 +188,20 @@
                         </div>
                         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                         <field name="user_id" context="{'default_sales_team_id': team_id}" widget="many2one_avatar_user"/>
+                        <field name="website" readonly="stage_category != 'draft' and is_kyb == True" widget="url" placeholder="e.g. https://www.odoo.com"/>
+                          <label for="email_from" class="oe_inline"/>
+                                        <div class="o_row o_row_readonly">
+                                            <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger" title="This email is blacklisted for mass mailings. Click to unblacklist." type="object" context="{'default_email': email_from}" groups="base.group_user" invisible="not is_blacklisted"/>
+                                            <field name="email_from" readonly="stage_category != 'draft' and is_kyb == True" string="Email" widget="email"/>
+                                            <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer email will also be updated." invisible="not partner_email_update"/>
+                                        </div>
+                                        <label for="phone" class="oe_inline"/>
+                                        <div class="o_row o_row_readonly">
+                                            <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': phone}" groups="base.group_user" invisible="not phone_blacklisted"/>
+                                            <field name="phone" readonly="stage_category != 'draft' and is_kyb == True" widget="phone"/>
+                                            <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer phone number will also be updated." invisible="not partner_phone_update"/>
+                                        </div>
+                        
                     </group>
                     
             </group>

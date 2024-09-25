@@ -29,7 +29,8 @@ class CRMLead(models.Model):
 
     reg_no = fields.Char(string='Reg. No.')
     
-    
+    date_company_creation = fields.Date('Date Creation')
+    date_company_expiry = fields.Date('Date Expiry')
 
     count_contacts = fields.Integer('Contacts', computer='_compute_contacts_count')
 
@@ -356,6 +357,9 @@ class CRMLead(models.Model):
             postalCode = payload.get('postalCode')
             companyEmail = payload.get('companyEmail')
             companyPhone = payload.get('companyPhone')
+
+            date_company_creation = payload.get('crCreationDate')
+            date_company_expiry = payload.get('crExpiryDate')
     
             # Prepare opportunity values
             opportunity_values = {
@@ -367,7 +371,9 @@ class CRMLead(models.Model):
                 'street': f"{addressLine1}, {addressLine2}" if addressLine2 else addressLine1,
                 'city': city,
                 'zip': postalCode,
-                'is_kyb': True,  
+                'is_kyb': True,
+                'date_company_creation': date_company_creation,
+                'date_company_expiry':date_company_expiry,
             }
     
             # Search for an existing lead with the same xpl_id (companyId)
@@ -381,6 +387,7 @@ class CRMLead(models.Model):
                 # Set xpl_id when creating new opportunity
                 opportunity_values["xpl_id"] = companyId
                 opportunity_values["type"] = 'opportunity'
+                opportunity_values["user_id"] =  self.env.user.id
                 lead_id = self.env['crm.lead'].sudo().create(opportunity_values)
     
                 # Create a new partner linked to this lead (company)
