@@ -294,12 +294,8 @@ class CRMLead(models.Model):
             opportunity_values = {}
             partner_vals = {}
     
-            # Extract company details from payload safely
-            companyId = payload.get('companyId')
-            if not companyId:
-                continue  # Skip if companyId is not found
-    
-            companyId = int(companyId)  # Convert to int if necessary
+            # Extract company details from payload
+            companyId = int(payload.get('companyId'))  # xpl_id in crm.lead
             companyName = payload.get('companyName')
             registrationNumber = payload.get('registrationNumber')
             addressLine1 = payload.get('addressLine1')
@@ -308,31 +304,31 @@ class CRMLead(models.Model):
             postalCode = payload.get('postalCode')
             companyEmail = payload.get('companyEmail')
             companyPhone = payload.get('companyPhone')
+            owners = payload.get('owners', [])  # Extracting owner details
+            attachments = payload.get('attachments', [])
     
-            # Prepare opportunity values
-            opportunity_values = {
-                'name': companyName,
-                'partner_name': companyName,
-                'reg_no': registrationNumber,
-                'phone': companyPhone,
-                'email_from': companyEmail,
-                'street': f"{addressLine1}, {addressLine2}" if addressLine2 else addressLine1,
-                'city': city,
-                'zip': postalCode,
-                'is_kyb': True,  
-            }
-    
-            # Search for an existing lead with the same xpl_id (companyId)
+            # Searching for an existing lead with the same xpl_id (companyId)
             existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', companyId)], limit=1)
     
+            opportunity_values = {
+                    'name': companyName,
+                    'partner_name': companyName,
+                    'reg_no': registrationNumber,
+                    'phone': companyPhone,
+                    'email_from': companyEmail,
+                    'street': f"{addressLine1}, {addressLine2}" if addressLine2 else addressLine1,
+                    'city': city,
+                    'zip': postalCode,
+                    'is_kyb': True,  # Mark this as a KYB opportunity
+                    'type': 'opportunity',
+                }
+            
             if existing_lead:
                 # Update the existing opportunity with new values
                 existing_lead.sudo().write(opportunity_values)
                 lead_id = existing_lead  # Assign existing lead for further actions
             else:
-                # Set xpl_id when creating new opportunity
-                opportunity_values["xpl_id"] = companyId
-                opportunity_values["type"] = 'opportunity'
+                opportunity_values["xml_id"] = companyId
                 lead_id = self.env['crm.lead'].sudo().create(opportunity_values)
     
                 # Create a new partner linked to this lead (company)
@@ -354,5 +350,54 @@ class CRMLead(models.Model):
                 team_id = self.env['crm.team'].sudo().search([('is_kyb', '=', True)], limit=1)
                 if team_id:
                     lead_id.sudo().convert_opportunity(lead_id.partner_id, user_ids=[1], team_id=team_id.id)
+    
+            # Process owners (create or update associated partners)
+            for owner in owners:
+                partner_vals = {
+                    'name': owner.get('fullName'),
+                    'email': owner.get('email'),
+                    'mobile': owner.get('mobileNumber'),
+                    'xpl_id': owner.get('employeeId'),
+                    'parent_id': lead_id.partner_id.id,
+                    'company_type': 'person',
+                    'type': 'other',
+                    'is_xpendless': True,
+                }
+    
+                # Check if the owner (employee) already exists based on employeeId
+                existing_partner = self.env['res.partner'].sudo().search([('xpl_id', '=', owner.get('employeeId'))], limit=1)
+                if existing_partner:
+                    existing_partner.sudo().write(partner_vals)  # Update existing partner
+                else:
+                    self.env['res.partner'].sudo().create(partner_vals)  # Create a new partner for the owner
+    
+            # Process attachments (if any)
+            attachment_ids = []
+            for attachment in attachments:
+                if attachment.get('attachmentPath'):  # Ensure attachmentPath is present
+                    response = requests.get(attachment['attachmentPath'])
+                    if response.status_code == 200:
+                        attachment_vals = {
+                            'name': f"{attachment['companyDocId']}_{companyName}.pdf",
+                            'datas': base64.b64encode(response.content),
+                            'res_model': 'crm.lead',
+                            'res_id': lead_id.id,
+                            'mimetype': 'application/pdf',
+                        }
+                        attachment_id = self.env['ir.attachment'].sudo().create(attachment_vals)
+                        attachment_ids.append(attachment_id.id)
+    
+            # If attachments were created, log them in the message
+            if attachment_ids:
+                self.env['mail.message'].sudo().create({
+                    'body': 'Attached documents for the company.',
+                    'model': 'crm.lead',
+                    'res_id': lead_id.id,
+                    'record_name': lead_id.name,
+                    'message_type': 'comment',
+                    'subtype_id': self.env.ref('mail.mt_comment').id,
+                    'author_id': 1,
+                    'attachment_ids': [(6, 0, attachment_ids)]
+                })
     
         return lead_id

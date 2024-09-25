@@ -8,4 +8,11 @@ class Stage(models.Model):
 
     is_kyb = fields.Boolean(default=False)
 
-    allow_verify = fields.Boolean(default=False)    
+    allow_verify = fields.Boolean(default=False)
+
+    stage_category = fields.Selection([
+        ('draft', 'Draft'),
+        ('inprogress', 'In Progress'),
+        ('close', 'Close'),
+        ('cancel', 'Cancel')
+    ], string='Stage Category', default='draft')

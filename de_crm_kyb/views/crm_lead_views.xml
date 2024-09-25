@@ -142,36 +142,38 @@
             <xpath expr="//form[1]/sheet[1]/group[1]" position="after">
                 <group name="kyb">
                     <group name="company_details" string="Company Details" invisible="is_kyb != True">
-                        <field name="partner_name"/>
-                        <field name="partner_id" invisible="not partner_id"/>
-                        <field name="reg_no"/>
+                        <field name="partner_name" readonly="stage_category != 'draft' and is_kyb == True"/>
+                        <field name="partner_id" invisible="not partner_id"
+                            readonly="stage_category != 'draft' and is_kyb == True"
+                            />
+                        <field name="reg_no" readonly="stage_category != 'draft' and is_kyb == True"/>
                         <label for="street" string="Address"/>
                         <div class="o_address_format" name="studio_div_95e972">
-                          <field name="street" placeholder="Street..." class="o_address_street"/>
-                          <field name="street2" placeholder="Street 2..." class="o_address_street"/>
-                          <field name="city" placeholder="City" class="o_address_city"/>
-                          <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}"/>
-                          <field name="zip" placeholder="ZIP" class="o_address_zip"/>
-                          <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                          <field name="street" readonly="stage_category != 'draft' and is_kyb == True" placeholder="Street..." class="o_address_street"/>
+                          <field name="street2" readonly="stage_category != 'draft' and is_kyb == True" placeholder="Street 2..." class="o_address_street"/>
+                          <field name="city" readonly="stage_category != 'draft' and is_kyb == True" placeholder="City" class="o_address_city"/>
+                          <field name="state_id" readonly="stage_category != 'draft' and is_kyb == True" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}"/>
+                          <field name="zip" readonly="stage_category != 'draft' and is_kyb == True" placeholder="ZIP" class="o_address_zip"/>
+                          <field name="country_id" readonly="stage_category != 'draft' and is_kyb == True" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
                         </div>
-                          <field name="website" widget="url" placeholder="e.g. https://www.odoo.com"/>
+                          <field name="website" readonly="stage_category != 'draft' and is_kyb == True" widget="url" placeholder="e.g. https://www.odoo.com"/>
                           <label for="email_from" class="oe_inline"/>
                                         <div class="o_row o_row_readonly">
                                             <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger" title="This email is blacklisted for mass mailings. Click to unblacklist." type="object" context="{'default_email': email_from}" groups="base.group_user" invisible="not is_blacklisted"/>
-                                            <field name="email_from" string="Email" widget="email"/>
+                                            <field name="email_from" readonly="stage_category != 'draft' and is_kyb == True" string="Email" widget="email"/>
                                             <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer email will also be updated." invisible="not partner_email_update"/>
                                         </div>
                                         <label for="phone" class="oe_inline"/>
                                         <div class="o_row o_row_readonly">
                                             <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': phone}" groups="base.group_user" invisible="not phone_blacklisted"/>
-                                            <field name="phone" widget="phone"/>
+                                            <field name="phone" readonly="stage_category != 'draft' and is_kyb == True" widget="phone"/>
                                             <span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer phone number will also be updated." invisible="not partner_phone_update"/>
                                         </div>
-                          <field name="work_type" />
                     </group>
                     
                     <group name="kyb_details" invisible="is_kyb != True">
                         <field name="stage_ids" widget="many2many_tags" invisible="1"/>
+                        <field name="stage_category" invisible="1"/>
                         <!--
                         <field name="usage_est_users" />
                         <field name="usage_est_spending" />
@@ -214,7 +216,8 @@
                 <attribute name="invisible">is_kyb == True</attribute>
             </xpath>
 
-            
+
+           
             
         </field>
     </record>
