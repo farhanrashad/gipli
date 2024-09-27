@@ -52,7 +52,7 @@ class InvoiceStockMove(models.Model):
 
     picking_count = fields.Integer(string="Count")
     invoice_picking_id = fields.Many2one('stock.picking', string="Picking Id")
-    picking_type_id = fields.Many2one('stock.picking.type', 'Picking Type', required=True,
+    picking_type_id = fields.Many2one('stock.picking.type', 'Picking Type', 
                                       default=_default_picking_receive_type,
                                       help="This will determine picking type of incoming shipment")
     state = fields.Selection([
