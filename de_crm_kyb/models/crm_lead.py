@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, tools, SUPERUSER_ID
+from odoo import api, fields, models, tools, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError
 import base64
 import requests
@@ -403,6 +403,7 @@ class CRMLead(models.Model):
                 existing_lead.with_context(from_api=True).write(opportunity_values)
                 #existing_lead.sudo().write(opportunity_values)
                 lead_id = existing_lead  # Assign existing lead for further actions
+                self.action_create_kyb_activity(existing_lead)
             else:
                 # Set xpl_id when creating new opportunity
                 opportunity_values["xpl_id"] = companyId
@@ -431,3 +432,26 @@ class CRMLead(models.Model):
                     lead_id.sudo().convert_opportunity(lead_id.partner_id, user_ids=[1], team_id=team_id.id)
     
         return lead_id
+
+
+    def action_create_kyb_activity(self, lead):
+        # Ensure that 'lead' is a single record
+        if not lead:
+            _logger.warning("No lead found to create KYB activity.")
+            return
+        lead.ensure_one()
+    
+        # Schedule an activity for the KYB verification
+        activity_type = self.env.ref('mail.mail_activity_data_todo')  
+        summary_message = _('KYB Verification')
+        note = _('A new company has been created for KYB verification')
+        
+        lead.activity_schedule(
+            activity_type_id=activity_type.id,
+            summary=summary_message,
+            note=note,
+            user_id=lead.team_id.user_id.id,
+            date_deadline=fields.Date.context_today(self)
+        )
+
+
