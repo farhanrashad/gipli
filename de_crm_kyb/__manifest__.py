@@ -29,6 +29,8 @@ Long description of module's purpose
         'data/kyb_team_data.xml',
         'views/crm_team_views.xml',
         'views/crm_stage_views.xml',
+        'wizards/lost_reason_wizard_views.xml',
+        'wizards/send_message_wizard_views.xml',
         'views/crm_lead_views.xml',
         'views/res_partner_views.xml',
         'wizards/employees_views.xml',

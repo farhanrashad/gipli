@@ -5,3 +5,5 @@ access_xpl_kyb_employees,access.xpl.kyb.employees,model_xpl_kyb_employees,,1,1,1
 access_xpl_kyb_docs_wizard,access.xpl.kyb.docs.wizard,model_xpl_kyb_docs,,1,1,1,1
 
 access_xpl_kyb_questions_wizard,access.xpl.kyb.questions.wizard,model_xpl_kyb_questions,,1,1,1,1
+
+access_crm_kyb_message,access.crm.kyb.message,model_crm_kyb_message,,1,1,1,1

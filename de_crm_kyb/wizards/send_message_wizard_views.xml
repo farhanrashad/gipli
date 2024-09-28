@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<odoo>
+        <record id="crm_kyb_message_form_view" model="ir.ui.view">
+            <field name="name">crm.kyb.message.form.view</field>
+            <field name="model">crm.kyb.message</field>
+            <field name="arch" type="xml">
+                <form string="Reject Verification">
+                    <field name="lead_ids" invisible="1"></field>
+                    <group>
+                        <field name="note" placeholder="write a message here."/>
+                    </group>
+                    <footer>
+                        <button name="action_send_message" string="Send" type="object" class="btn-primary" data-hotkey="q"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    <record id="action_crm_kyb_message" model="ir.actions.act_window">
+            <field name="name">Send Message</field>
+            <field name="res_model">crm.kyb.message</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="crm_kyb_message_form_view"/>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="crm.model_crm_lead"/>
+            <field name="context">{
+                'dialog_size' : 'medium',
+                'default_lead_ids': active_ids,
+            }</field>
+        </record>
+</odoo>

@@ -46,8 +46,13 @@
                                 type="object" class="oe_highlight" data-hotkey="w" title="Verify"
                                 invisible="not is_kyb or stage_id != allow_verification_stage_id"/>
     
-                    <button name="%(crm.crm_lead_lost_action)d" string="Reject" data-hotkey="l" title="Reject"
+                    <button name="%(de_crm_kyb.action_crm_kyb_lead_lost)d" string="Reject" data-hotkey="l" title="Reject"
                                 type="action" invisible="not is_kyb"/>
+
+                    <button name="%(de_crm_kyb.action_crm_kyb_message)d" string="Request Changes" data-hotkey="l" title="Request Changes"
+                                type="action" invisible="not is_kyb"/>
+                         
+                         
                      <field name="stage_id" widget="statusbar_duration"
                             options="{'clickable': '1', 'fold_field': 'fold'}"
                             domain="[('id', 'in', stage_ids)]"
