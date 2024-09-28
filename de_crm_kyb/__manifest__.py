@@ -12,7 +12,7 @@ Long description of module's purpose
     'website': "https://www.xpendless.com",
 
     'category': 'Sales',
-    'version': '17.0.0.1',
+    'version': '17.0.0.2',
 
     'depends': [
         'crm',
