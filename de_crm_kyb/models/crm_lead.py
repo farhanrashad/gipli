@@ -124,7 +124,7 @@ class CRMLead(models.Model):
                 else:
                     kyb_status = 'Submitted'
 
-                self._update_company_status(kyb_status)
+                self._update_company_status(kyb_status, comment=False)
 
         # If the record is inactive and is KYB, find and set the "cancel" stage
         if vals.get('active') is False and self.is_kyb:
@@ -147,7 +147,7 @@ class CRMLead(models.Model):
         api_name = '/kybOdoo/setKybOdooStatus'
 
         api_data = {
-            "companyId": 361, #int(self.xpl_id),
+            "companyId": int(self.xpl_id),
             "kybStatus": "Verified"
         }
         response = instance_id._put_api_data(api_name, api_data)
@@ -161,16 +161,19 @@ class CRMLead(models.Model):
         })
 
     def action_kyb_verification(self):
-        response = self._update_company_status('Verified')
+        response = self._update_company_status('Verified', comment=False)
         
-    def _update_company_status(self,status):
+    def _update_company_status(self,status, comment=False):
         instance_id = self.company_id._get_instance()
         api_name = '/kybOdoo/setKybOdooStatus'
 
         api_data = {
             "companyId": int(self.xpl_id),
-            "kybStatus": status #"Verified"
+            "kybStatus": status,
         }
+        if comment:
+            api_date["comment"] = comment
+            
         response = instance_id._put_api_data(api_name, api_data)
         return response
         

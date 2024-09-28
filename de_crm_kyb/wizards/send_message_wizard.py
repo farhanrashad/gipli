@@ -26,12 +26,15 @@ class send_message(models.TransientModel):
             # Post the message to the chatter
             self.lead_ids.message_post(
                 body=message_content,
-                subtype_id=self.env.ref('mail.mt_note').id  # This ensures the message is marked as a note in chatter
+                subtype_id=self.env.ref('mail.mt_note').id
             )
             stage_id = self.env['crm.stage'].search([('stage_category','=','progress'),('is_kyb','=',True)],limit=1)
             self.lead_ids.write({
                 'stage_id': stage_id.id
             })
+
+            for lead in self.lead_ids:
+                lead._update_company_status('Revise')
 
         
         #res = self.lead_ids.action_set_lost(lost_reason_id=self.lost_reason_id.id)
