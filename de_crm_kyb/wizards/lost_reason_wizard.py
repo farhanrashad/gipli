@@ -34,7 +34,7 @@ class CrmLeadLost(models.TransientModel):
                 'active': False,
             })
 
-            for lead in lead_ids:
+            for lead in self.lead_ids:
                 lead._update_company_status('Verified', comment=self.lost_feedback)
         
         res = self.lead_ids.action_set_lost(lost_reason_id=self.lost_reason_id.id)

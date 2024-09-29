@@ -403,13 +403,15 @@ class CRMLead(models.Model):
                 existing_lead.with_context(from_api=True).write(opportunity_values)
                 #existing_lead.sudo().write(opportunity_values)
                 lead_id = existing_lead  # Assign existing lead for further actions
-                self.action_create_kyb_activity(existing_lead)
+                #self.action_create_kyb_activity(existing_lead)
             else:
                 # Set xpl_id when creating new opportunity
                 opportunity_values["xpl_id"] = companyId
                 opportunity_values["type"] = 'opportunity'
                 opportunity_values["user_id"] =  self.env.user.id
                 lead_id = self.env['crm.lead'].sudo().create(opportunity_values)
+
+                self.action_create_kyb_activity(lead_id)
     
                 # Create a new partner linked to this lead (company)
                 lead_id.partner_id = self.env['res.partner'].sudo().create({

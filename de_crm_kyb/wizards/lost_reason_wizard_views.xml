@@ -11,7 +11,11 @@
                         <field name="lost_feedback" placeholder="What went wrong?"/>
                     </group>
                     <footer>
-                        <button name="action_lead_kyb_lost" string="Reject" type="object" class="btn-primary" data-hotkey="q"/>
+                        <button name="action_lead_kyb_lost" 
+                            string="Reject" type="object" 
+                            class="btn-primary" 
+                            confirm="Are you sure you want to reject the verification?"
+                        />
                         <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
                     </footer>
                 </form>
