@@ -384,7 +384,7 @@ class CRMLead(models.Model):
                 'is_kyb': True,
                 'date_company_creation': date_company_creation,
                 'date_company_expiry':date_company_expiry,
-                'description': stage_name,
+                #'description': stage_name,
             }
 
             stage_category = 'draft'
