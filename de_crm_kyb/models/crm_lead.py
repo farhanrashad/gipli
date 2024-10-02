@@ -351,10 +351,13 @@ class CRMLead(models.Model):
     
             # Extract company details from payload safely
             companyId = payload.get('companyId')
+            _logger.error(f"Invalid companyId value: {companyId}. Skipping...")
+            
             if not companyId:
+                _logger.warning("Company ID is missing in the payload.")
                 continue  # Skip if companyId is not found
-    
-            companyId = int(companyId)  # Convert to int if necessary
+
+            
             companyName = payload.get('companyName')
             registrationNumber = payload.get('registrationNumber')
             street = payload.get('addressLine1')
@@ -384,7 +387,7 @@ class CRMLead(models.Model):
                 'is_kyb': True,
                 'date_company_creation': date_company_creation,
                 'date_company_expiry':date_company_expiry,
-                #'description': stage_name,
+                #'description': str(companyId) + companyName,
             }
 
             stage_category = 'draft'
@@ -402,14 +405,11 @@ class CRMLead(models.Model):
             opportunity_values["user_id"] =  self.team_id.user_id.id
             
             # Search for an existing lead with the same xpl_id (companyId)
-            existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', int(companyId))], limit=1)
+            existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', companyId)], limit=1)
     
             if existing_lead:
-                # Update the existing opportunity with new values
                 existing_lead.with_context(from_api=True).write(opportunity_values)
-                #existing_lead.sudo().write(opportunity_values)
-                lead_id = existing_lead  # Assign existing lead for further actions
-                #self.action_create_kyb_activity(existing_lead)
+                lead_id = existing_lead
             else:
                 # Set xpl_id when creating new opportunity
                 opportunity_values["xpl_id"] = companyId
@@ -438,7 +438,11 @@ class CRMLead(models.Model):
                 team_id = self.env['crm.team'].sudo().search([('is_kyb', '=', True)], limit=1)
                 if team_id:
                     lead_id.sudo().convert_opportunity(lead_id.partner_id, user_ids=[1], team_id=team_id.id)
-    
+
+                lead_id.write({
+                    'user_id': lead_id.team_id.user_id.id 
+                })
+            
         return lead_id
 
 
