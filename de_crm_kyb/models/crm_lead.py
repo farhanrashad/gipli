@@ -351,11 +351,11 @@ class CRMLead(models.Model):
     
             # Extract company details from payload safely
             companyId = payload.get('companyId')
-            _logger.error(f"Invalid companyId value: {companyId}. Skipping...")
+            _logger.error(f"Company Found Value: {companyId}")
             
             if not companyId:
                 _logger.warning("Company ID is missing in the payload.")
-                continue  # Skip if companyId is not found
+                #continue  # Skip if companyId is not found
 
             
             companyName = payload.get('companyName')
@@ -387,7 +387,7 @@ class CRMLead(models.Model):
                 'is_kyb': True,
                 'date_company_creation': date_company_creation,
                 'date_company_expiry':date_company_expiry,
-                #'description': str(companyId) + companyName,
+                'description': str(companyId) + companyName,
             }
 
             stage_category = 'draft'
@@ -402,12 +402,16 @@ class CRMLead(models.Model):
             if stage_id:
                 opportunity_values["stage_id"] = stage_id.id
 
-            opportunity_values["user_id"] =  self.team_id.user_id.id
+            #opportunity_values["user_id"] =  self.team_id.user_id.id
             
             # Search for an existing lead with the same xpl_id (companyId)
-            existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', companyId)], limit=1)
-    
+            existing_lead = self.env['crm.lead'].sudo().search([
+                '|',('xpl_id', '=', int(companyId)),('xpl_id', '=', 504)
+            ], limit=1)
+            _logger.info(f"Payload: {payload_list}")
             if existing_lead:
+                _logger.info(f"Existing Lead: {existing_lead}")
+                _logger.info(f"Existing Lead: {opportunity_values}")
                 existing_lead.with_context(from_api=True).write(opportunity_values)
                 lead_id = existing_lead
             else:

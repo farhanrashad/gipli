@@ -132,7 +132,7 @@
                 <page name="xpendless" string="Xpendless" invisible="not is_kyb">
                     <group>
                         <group>
-                            <field name="xpl_id" readonly="1"/>
+                            <field name="xpl_id" />
                             <field name="allow_verification_stage_id" invisible="1" />
                         </group>
                     </group>
