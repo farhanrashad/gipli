@@ -28,14 +28,14 @@ class CrmLeadLost(models.TransientModel):
                     subtype_id=self.env.ref('mail.mt_note').id  # This ensures the message is marked as a note in chatter
                 )
             
-            stage_id = self.env['crm.stage'].search([('stage_category','=','cancel'),('is_kyb','=',True)],limit=1)
-            self.lead_ids.write({
-                'stage_id': stage_id.id,
-                'active': False,
-            })
+        stage_id = self.env['crm.stage'].search([('stage_category','=','cancel'),('is_kyb','=',True)],limit=1)
+        self.lead_ids.with_context(from_api=True).write({
+            'stage_id': stage_id.id,
+        })
 
-            for lead in self.lead_ids:
-                lead._update_company_status('Unverified', comment=self.lost_feedback)
+        for lead in self.lead_ids:
+            lead._update_company_status('Unverified', comment=self.lost_feedback)
+            #raise UserError('hello')
         
         res = self.lead_ids.action_set_lost(lost_reason_id=self.lost_reason_id.id)
         return res

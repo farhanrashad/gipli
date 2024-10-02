@@ -34,7 +34,7 @@ class send_message(models.TransientModel):
             })
 
             for lead in self.lead_ids:
-                lead._update_company_status('Revise', comment=self.note)
+                lead.sudo()._update_company_status('Revise', comment=self.note)
 
         
         #res = self.lead_ids.action_set_lost(lost_reason_id=self.lost_reason_id.id)

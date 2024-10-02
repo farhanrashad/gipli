@@ -6,7 +6,7 @@ import base64
 import requests
 import json
 import logging
-
+import psycopg2
 _logger = logging.getLogger(__name__)
 
 class CRMLead(models.Model):
@@ -114,7 +114,7 @@ class CRMLead(models.Model):
     # CRUD Operations
     # =============================================================================
     
-    def write(self, vals):
+    def write1(self, vals):
         res = super(CRMLead, self).write(vals)
         kyb_status = 'Submitted'
         if 'stage_id' in vals and not self.env.context.get('from_api'):
@@ -399,20 +399,21 @@ class CRMLead(models.Model):
                 stage_category = 'cancel'
                 
             stage_id = self.env['crm.stage'].search([('stage_category','=',stage_category),('is_kyb','=',True)],limit=1)
-            if stage_id:
-                opportunity_values["stage_id"] = stage_id.id
+            #if stage_id:
+            #    opportunity_values["stage_id"] = stage_id.id
 
             #opportunity_values["user_id"] =  self.team_id.user_id.id
             
             # Search for an existing lead with the same xpl_id (companyId)
             existing_lead = self.env['crm.lead'].sudo().search([
-                '|',('xpl_id', '=', int(companyId)),('xpl_id', '=', 504)
+                '|', ('xpl_id', '=', int(companyId)), ('xpl_id', '=', companyId)
             ], limit=1)
+
             _logger.info(f"Payload: {payload_list}")
             if existing_lead:
                 _logger.info(f"Existing Lead: {existing_lead}")
                 _logger.info(f"Existing Lead: {opportunity_values}")
-                existing_lead.with_context(from_api=True).write(opportunity_values)
+                existing_lead.sudo().with_context(from_api=True).write(opportunity_values)
                 lead_id = existing_lead
             else:
                 # Set xpl_id when creating new opportunity
