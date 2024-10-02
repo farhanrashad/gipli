@@ -7,8 +7,10 @@
                 <form string="Reject Verification">
                     <field name="lead_ids" invisible="1"></field>
                     <group>
-                        <field name="lost_reason_id" options="{'no_create_edit': True}" />
-                        <field name="lost_feedback" placeholder="What went wrong?"/>
+                        <!--
+                        <field name="lost_reason_id" string="Reason" options="{'no_create_edit': True}" />
+                        -->
+                        <field name="lost_feedback" string="Reason" placeholder="Reason for Rejection?"/>
                     </group>
                     <footer>
                         <button name="action_lead_kyb_lost" 
@@ -23,7 +25,7 @@
         </record>
 
     <record id="action_crm_kyb_lead_lost" model="ir.actions.act_window">
-            <field name="name">Mark Lost</field>
+            <field name="name">Reject Verification</field>
             <field name="res_model">crm.lead.lost</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="crm_lead_kyb_lost_form_view"/>

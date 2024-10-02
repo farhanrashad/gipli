@@ -46,12 +46,11 @@
                                 type="object" class="oe_highlight" data-hotkey="w" title="Verify"
                                 invisible="not is_kyb or stage_id != allow_verification_stage_id"/>
     
-                    <button name="%(de_crm_kyb.action_crm_kyb_lead_lost)d" string="Reject" data-hotkey="l" title="Reject"
-                                type="action" invisible="not is_kyb"/>
+                    <button name="%(de_crm_kyb.action_crm_kyb_lead_lost)d" string="Reject" title="Reject"
+                                type="action" invisible="not is_kyb or stage_category == 'cancel'"/>
 
-                    <button name="%(de_crm_kyb.action_crm_kyb_message)d" string="Request Changes" data-hotkey="l" title="Request Changes"
-                                type="action" invisible="not is_kyb"/>
-                         
+                    <button name="%(de_crm_kyb.action_crm_kyb_message)d" string="Request Changes" title="Request Changes"
+                                type="action" invisible="not is_kyb or stage_category == 'cancel'"/>
                          
                      <field name="stage_id" widget="statusbar_duration"
                             options="{'clickable': '1', 'fold_field': 'fold'}"
@@ -133,7 +132,7 @@
                 <page name="xpendless" string="Xpendless" invisible="not is_kyb">
                     <group>
                         <group>
-                            <field name="xpl_id" />
+                            <field name="xpl_id" readonly="1"/>
                             <field name="allow_verification_stage_id" invisible="1" />
                         </group>
                     </group>

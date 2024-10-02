@@ -18,7 +18,7 @@
         </record>
 
     <record id="action_crm_kyb_message" model="ir.actions.act_window">
-            <field name="name">Send Message</field>
+            <field name="name">Request Changes</field>
             <field name="res_model">crm.kyb.message</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="crm_kyb_message_form_view"/>

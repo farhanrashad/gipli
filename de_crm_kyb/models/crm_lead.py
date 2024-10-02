@@ -5,7 +5,9 @@ from odoo.exceptions import UserError, ValidationError
 import base64
 import requests
 import json
+import logging
 
+_logger = logging.getLogger(__name__)
 
 class CRMLead(models.Model):
     _inherit = "crm.lead"
@@ -13,7 +15,7 @@ class CRMLead(models.Model):
     is_kyb = fields.Boolean(default=False, 
                             #compute='_compute_kyb', store=True
     )
-    xpl_id = fields.Char('Xpendless ID')
+    xpl_id = fields.Integer('Xpendless ID')
     
     stage_id = fields.Many2one(
         'crm.stage', string='Stage', index=True, tracking=True,
@@ -124,7 +126,7 @@ class CRMLead(models.Model):
                 else:
                     kyb_status = 'Submitted'
 
-                self._update_company_status(kyb_status, comment=False)
+                self._update_company_status(kyb_status, kyb_status)
 
         # If the record is inactive and is KYB, find and set the "cancel" stage
         if vals.get('active') is False and self.is_kyb:
@@ -161,7 +163,7 @@ class CRMLead(models.Model):
         })
 
     def action_kyb_verification(self):
-        response = self._update_company_status('Verified', comment=False)
+        response = self._update_company_status('Verified', comment)
         
     def _update_company_status(self,status, comment=False):
         instance_id = self.company_id._get_instance()
@@ -170,11 +172,14 @@ class CRMLead(models.Model):
         api_data = {
             "companyId": int(self.xpl_id),
             "kybStatus": status,
+            "comment": comment,
         }
-        if comment:
-            api_date["comment"] = comment
-            
+        #if comment:
+        #    api_date["comment"] = comment
+
+        
         response = instance_id._put_api_data(api_name, api_data)
+        _logger.info(f"Stage changed to: {response}")
         return response
         
     def action_open_employees(self):
@@ -391,12 +396,13 @@ class CRMLead(models.Model):
                 stage_category = 'cancel'
                 
             stage_id = self.env['crm.stage'].search([('stage_category','=',stage_category),('is_kyb','=',True)],limit=1)
-
             if stage_id:
                 opportunity_values["stage_id"] = stage_id.id
-    
+
+            opportunity_values["user_id"] =  self.team_id.user_id.id
+            
             # Search for an existing lead with the same xpl_id (companyId)
-            existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', companyId)], limit=1)
+            existing_lead = self.env['crm.lead'].sudo().search([('xpl_id', '=', int(companyId))], limit=1)
     
             if existing_lead:
                 # Update the existing opportunity with new values
@@ -408,7 +414,7 @@ class CRMLead(models.Model):
                 # Set xpl_id when creating new opportunity
                 opportunity_values["xpl_id"] = companyId
                 opportunity_values["type"] = 'opportunity'
-                opportunity_values["user_id"] =  self.env.user.id
+                
                 lead_id = self.env['crm.lead'].sudo().create(opportunity_values)
 
                 self.action_create_kyb_activity(lead_id)
