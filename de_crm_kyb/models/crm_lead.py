@@ -114,10 +114,10 @@ class CRMLead(models.Model):
     # CRUD Operations
     # =============================================================================
     
-    def write1(self, vals):
+    def write(self, vals):
         res = super(CRMLead, self).write(vals)
         kyb_status = 'Submitted'
-        if 'stage_id' in vals and not self.env.context.get('from_api'):
+        if 'stage_id' in vals: #and not self.env.context.get('from_api'):
             for lead in self:
                 if lead.stage_id.stage_category == 'close':
                     kyb_status = 'Verified'
@@ -126,7 +126,7 @@ class CRMLead(models.Model):
                 else:
                     kyb_status = 'Submitted'
 
-                self._update_company_status(kyb_status, kyb_status)
+                self._update_company_status(kyb_status, False)
 
         # If the record is inactive and is KYB, find and set the "cancel" stage
         if vals.get('active') is False and self.is_kyb:
@@ -172,12 +172,11 @@ class CRMLead(models.Model):
         api_data = {
             "companyId": int(self.xpl_id),
             "kybStatus": status,
-            "comment": comment,
+            #"comment": comment,
         }
-        #if comment:
-        #    api_date["comment"] = comment
+        if comment:
+            api_data["comment"] = comment
 
-        
         response = instance_id._put_api_data(api_name, api_data)
         _logger.info(f"Stage changed to: {response}")
         return response
@@ -398,7 +397,7 @@ class CRMLead(models.Model):
             elif stage_name == 'Unverified':
                 stage_category = 'cancel'
                 
-            stage_id = self.env['crm.stage'].search([('stage_category','=',stage_category),('is_kyb','=',True)],limit=1)
+            stage_id = self.env['crm.stage'].search([('stage_category','=','progress'),('is_kyb','=',True)],limit=1)
             #if stage_id:
             #    opportunity_values["stage_id"] = stage_id.id
 
@@ -406,15 +405,24 @@ class CRMLead(models.Model):
             
             # Search for an existing lead with the same xpl_id (companyId)
             existing_lead = self.env['crm.lead'].sudo().search([
-                '|', ('xpl_id', '=', int(companyId)), ('xpl_id', '=', companyId)
+                '|', 
+                ('xpl_id', '=', int(companyId)), 
+                ('xpl_id', '=', companyId),
+                ('active', 'in', [True, False]) 
             ], limit=1)
 
             _logger.info(f"Payload: {payload_list}")
             if existing_lead:
                 _logger.info(f"Existing Lead: {existing_lead}")
                 _logger.info(f"Existing Lead: {opportunity_values}")
+                
                 existing_lead.sudo().with_context(from_api=True).write(opportunity_values)
                 lead_id = existing_lead
+                if existing_lead.active == False:
+                    existing_lead.sudo().write({
+                        'active': True,
+                        'stage_id': stage_id.id,
+                    })
             else:
                 # Set xpl_id when creating new opportunity
                 opportunity_values["xpl_id"] = companyId

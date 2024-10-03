@@ -5,7 +5,7 @@
             <field name="model">crm.lead.lost</field>
             <field name="arch" type="xml">
                 <form string="Reject Verification">
-                    <field name="lead_ids" invisible="0"></field>
+                    <field name="lead_ids" invisible="1"></field>
                     <group>
                         <!--
                         <field name="lost_reason_id" string="Reason" options="{'no_create_edit': True}" />
