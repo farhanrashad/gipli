@@ -39,7 +39,9 @@ class CRMLead(models.Model):
     allow_verification_stage_id = fields.Many2one('crm.stage', compute='_compute_allow_verification_stage')
     stage_category = fields.Selection(related='stage_id.stage_category', string="Stage Category", store=True)
 
-
+    xpl_terms = fields.Boolean(default=False, 
+                               string="I hereby agree to the Terms & conditions of Xpendless")
+    
     # ============================================================================
     # Computed Methods
     # ============================================================================
@@ -144,26 +146,8 @@ class CRMLead(models.Model):
             'stage_id': stage_id.id,
         })
 
-    def action_kyb_verification1(self):
-        instance_id = self.company_id._get_instance()
-        api_name = '/kybOdoo/setKybOdooStatus'
-
-        api_data = {
-            "companyId": int(self.xpl_id),
-            "kybStatus": "Verified"
-        }
-        response = instance_id._put_api_data(api_name, api_data)
-
-        formatted_response = json.dumps(response, indent=4)  # Pretty-print JSON response
-        #raise UserError(formatted_response)
-    
-        stage_id = self.env['crm.stage'].search([('is_kyb','=',True),('sequence','>',self.stage_id.sequence)],limit=1)
-        self.write({
-            'stage_id': stage_id.id,
-        })
-
     def action_kyb_verification(self):
-        response = self._update_company_status('Verified', comment)
+        response = self._update_company_status('Verified', False)
         
     def _update_company_status(self,status, comment=False):
         instance_id = self.company_id._get_instance()
@@ -371,6 +355,8 @@ class CRMLead(models.Model):
             
             date_company_creation = payload.get('crCreationDate')
             date_company_expiry = payload.get('crExpiryDate')
+
+            terms = payload.get('termsConditions')
     
             # Prepare opportunity values
             opportunity_values = {
@@ -386,6 +372,7 @@ class CRMLead(models.Model):
                 'is_kyb': True,
                 'date_company_creation': date_company_creation,
                 'date_company_expiry':date_company_expiry,
+                'xpl_terms':xpl_terms,
                 'description': str(companyId) + companyName,
             }
 
@@ -423,6 +410,7 @@ class CRMLead(models.Model):
                         'active': True,
                         'stage_id': stage_id.id,
                     })
+                self.action_create_kyb_activity(existing_lead)
             else:
                 # Set xpl_id when creating new opportunity
                 opportunity_values["xpl_id"] = companyId

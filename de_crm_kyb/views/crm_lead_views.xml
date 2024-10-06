@@ -208,6 +208,9 @@
                     </group>
                     
             </group>
+                <group>
+                    <field name="xpl_terms" readonly="1"/>
+                </group>
           </xpath>
           <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[2]/div[2]" position="after">
             <field name="is_kyb"/>
@@ -227,6 +230,7 @@
                 </page>
             </xpath>
             -->
+            
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='lead']/group[1]/group[1]" position="attributes">
                 <attribute name="invisible">is_kyb == True</attribute>
             </xpath>
