@@ -148,6 +148,10 @@ class CRMLead(models.Model):
 
     def action_kyb_verification(self):
         response = self._update_company_status('Verified', False)
+        stage_id = self.env['crm.stage'].search([('stage_category','=','close')],limit=1)
+        self.write({
+            'stage_id': stage_id.id
+        })
         
     def _update_company_status(self,status, comment=False):
         instance_id = self.company_id._get_instance()
@@ -326,7 +330,8 @@ class CRMLead(models.Model):
     def create_or_update_opportunity(self, json_data):
         # Access the payload part of the JSON data (list)
         payload_list = json_data.get('payload', [])
-        
+
+        activity_note = ''
         # Process each company data within the payload list
         for payload in payload_list:
             opportunity_values = {}
@@ -372,8 +377,8 @@ class CRMLead(models.Model):
                 'is_kyb': True,
                 'date_company_creation': date_company_creation,
                 'date_company_expiry':date_company_expiry,
-                'xpl_terms':xpl_terms,
-                'description': str(companyId) + companyName,
+                'xpl_terms':terms,
+                'description': str(companyId) + companyName + str(terms),
             }
 
             stage_category = 'draft'
@@ -410,15 +415,16 @@ class CRMLead(models.Model):
                         'active': True,
                         'stage_id': stage_id.id,
                     })
-                self.action_create_kyb_activity(existing_lead)
+                activity_note = 'New changes has been submitted for KYB verification'
+                self.action_create_kyb_activity(existing_lead, activity_note)
             else:
                 # Set xpl_id when creating new opportunity
                 opportunity_values["xpl_id"] = companyId
                 opportunity_values["type"] = 'opportunity'
                 
                 lead_id = self.env['crm.lead'].sudo().create(opportunity_values)
-
-                self.action_create_kyb_activity(lead_id)
+                activity_note = 'A new company has been created for KYB verification'
+                self.action_create_kyb_activity(lead_id, activity_note)
     
                 # Create a new partner linked to this lead (company)
                 lead_id.partner_id = self.env['res.partner'].sudo().create({
@@ -447,7 +453,7 @@ class CRMLead(models.Model):
         return lead_id
 
 
-    def action_create_kyb_activity(self, lead):
+    def action_create_kyb_activity(self, lead, msg):
         # Ensure that 'lead' is a single record
         if not lead:
             _logger.warning("No lead found to create KYB activity.")
@@ -462,7 +468,7 @@ class CRMLead(models.Model):
         lead.activity_schedule(
             activity_type_id=activity_type.id,
             summary=summary_message,
-            note=note,
+            note=msg,
             user_id=lead.team_id.user_id.id,
             date_deadline=fields.Date.context_today(self)
         )
