@@ -12,7 +12,7 @@ Long description of module's purpose
     'website': "https://www.xpendless.com",
 
     'category': 'Sales',
-    'version': '17.0.0.2',
+    'version': '0.2',
 
     'depends': [
         'crm',
@@ -23,8 +23,8 @@ Long description of module's purpose
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'data/ir_action_data.xml',
-        'data/ir_cron_actions.xml',
+        #'data/ir_action_data.xml',
+        #'data/ir_cron_actions.xml',
         'data/kyb_stage_data.xml',
         'data/kyb_team_data.xml',
         'views/crm_team_views.xml',

@@ -22,7 +22,7 @@ Features:
     'website': "https://www.dynexcel.com",
     'support': "info@dynexcel.com",
     'category': 'Sales/Subscriptions',
-    'version': '17.0.0.4',
+    'version': '0.4',
     'live_test_url': 'https://youtu.be/PJEkGzyCQ2Q',
     'depends': [
         'sale_management',

@@ -4,11 +4,11 @@
         <field name="name">xpl.kyb.employees.tree.view</field>
         <field name="model">xpl.kyb.employees</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="email" />
                 <field name="mobile" />
-            </tree>
+            </list>
         </field>
     </record>
 </odoo>

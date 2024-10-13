@@ -4,10 +4,10 @@
         <field name="name">xpl.kyb.questions.tree.view</field>
         <field name="model">xpl.kyb.questions</field>
         <field name="arch" type="xml">
-            <tree create="0" edit="0" delete="0">
+            <list create="0" edit="0" delete="0">
                 <field name="name" />
                 <field name="desc" />
-            </tree>
+            </list>
         </field>
     </record>
 </odoo>

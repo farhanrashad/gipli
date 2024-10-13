@@ -19,10 +19,10 @@ class CRMLead(models.Model):
     
     stage_id = fields.Many2one(
         'crm.stage', string='Stage', index=True, tracking=True,
-        compute='_compute_stage_id', 
+        compute='_compute_stage_id',
         readonly=False, store=True,
-        copy=False, 
-        group_expand='_read_group_stage_ids', 
+        copy=False,
+        group_expand='_read_group_stage_ids',
         ondelete='restrict',
         domain="[('id', 'in', stage_ids)]"
     )
@@ -78,7 +78,23 @@ class CRMLead(models.Model):
                 lead.stage_id = lead._stage_find(domain=domain).id
 
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order):
+    def _read_group_stage_ids(self, stages, domain):
+        # retrieve team_id from the context and write the domain
+        # - ('id', 'in', stages.ids): add columns that should be present
+        # - OR ('fold', '=', False): add default columns that are not folded
+        # - OR ('team_ids', '=', team_id), ('fold', '=', False) if team_id: add team columns that are not folded
+        team_id = self._context.get('default_team_id')
+        if team_id:
+            search_domain = ['|', ('id', 'in', stages.ids), '|', ('team_id', '=', False), ('team_id', '=', team_id)]
+        else:
+            search_domain = ['|', ('id', 'in', stages.ids), ('team_id', '=', False)]
+
+        # perform search
+        stage_ids = stages.sudo()._search(search_domain, order=stages._order)
+        return stages.browse(stage_ids)
+
+    @api.model
+    def _read_group_stage_ids1(self, stages, domain, order):
         # retrieve team_id from the context and write the domain
         # - ('id', 'in', stages.ids): add columns that should be present
         # - OR ('fold', '=', False): add default columns that are not folded
