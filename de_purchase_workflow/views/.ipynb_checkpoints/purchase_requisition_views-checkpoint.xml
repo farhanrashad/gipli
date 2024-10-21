@@ -1,0 +1,108 @@
+<odoo>
+    <data>
+        <record id="view_purchase_requisition_tree_inherit_workflow" model="ir.ui.view">
+            <field name="name">view.purchase.requisition.tree.inherit.workflow</field>
+            <field name="model">purchase.requisition</field>
+            <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_tree"/>
+            <field name="priority">24</field>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="stage_id" string="Approval State"/>
+                </field>
+            </field>
+        </record>
+        
+        <record id="view_purchase_requisition_form_inherit_workflow" model="ir.ui.view">
+            <field name="name">view.purchase.requisition.form.inherit.workflow</field>
+            <field name="model">purchase.requisition</field>
+            <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
+            <field name="priority">24</field>
+            <field name="arch" type="xml">
+                <xpath expr="//button[1]" position="before">
+                    <button name="button_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['draft'])]}"/>
+                    <button name="button_confirm" type="object" string="Approve" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+                    <button name="button_refuse" type="object" string="Refuse" class="" attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+                </xpath>
+                <xpath expr="//button[@name='action_in_progress']" position="replace">
+                    <button name="action_in_progress" string="Confirm" type="object" class="btn-primary" attrs="{'invisible': [('stage_category', '!=', 'progress')]}" />
+                </xpath>
+                <xpath expr="//button[@name='action_open']" position="replace">
+                    <button name="action_open" string="Validate" type="object" class="btn-primary" attrs="{'invisible': ['|',('stage_category', '!=', 'confirm'),('state', '!=', 'in_progress')]}" />
+                </xpath>
+                <xpath expr="//button[@name='action_done']" position="replace">
+                    <button name="action_done" string="Close" type="object" class="btn-primary" attrs="{'invisible': ['|',('stage_category', '!=', 'confirm'),('state', 'not in', ['open','ongoing'])]}" />
+                </xpath>
+                <!--
+                <xpath expr="//field[@name='state']" position="replace">
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,open,done" attrs="{'invisible': ['|',('is_quantity_copy', '=', 'none'),('stage_category', '=', 'progress')]}" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='state_blanket_order']" position="replace">
+                    <field name="state_blanket_order" widget="statusbar" statusbar_visible="draft,ongoing,done" attrs="{'invisible': ['|',('is_quantity_copy', '!=', 'none'),('stage_category', '=', 'progress')]}" invisible="1"/>
+                </xpath>
+                 <xpath expr="//field[@name='state']" position="after">
+                    <field name="stage_id" widget="statusbar" domain="[('requisition_type_ids', '=', type_id)]" attrs="{'invisible': [('stage_category', '!=', 'progress')]}"/>
+                </xpath>
+                -->
+                <xpath expr="//group[1]/group[2]" position="inside">
+                    <field name="stage_id" string="Approval State" readony="1" invisible="1"/>
+                    <field name="stage_category" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [('stage_category', '!=', 'draft')]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_end']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [('stage_category', '!=', 'draft')]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='ordering_date']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [('stage_category', '!=', 'draft')]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='schedule_date']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [('stage_category', '!=', 'draft')]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='vendor_id']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [('stage_category', '!=', 'draft')]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='type_id']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [('stage_category', '!=', 'draft')]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='line_ids']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly': [('stage_category', '!=', 'draft')]}
+                    </attribute>
+                </xpath>
+                <xpath expr="//group[1]/group[2]" position="inside">
+                    <field name="stage_id" invisible="0" readonly="1"/>
+                    <field name="stage_category" invisible="1"/>
+                    <field name="next_stage_id" invisible="1"/>
+                    <field name="prv_stage_id" invisible="1"/>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Worfklow" id="workflow" groups="base.group_erp_manager">
+                        <field name="requisition_stage_ids" groups="base.group_erp_manager">
+                            <tree editable="bottom">
+                                <field name="sequence" readonly="1"/>
+                                <field name="stage_id" required="1" options="{'no_create': True,'no_open':True}" domain="[('requisition_type_ids','=',parent.type_id)]"/>
+                                <field name="next_stage_id" options="{'no_create': True,'no_open':True}" domain="[('requisition_type_ids','=',parent.type_id)]"/>
+                                <field name="prv_stage_id" options="{'no_create': True,'no_open':True}" domain="[('requisition_type_ids','=',parent.type_id)]"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+                
+            </field>
+        </record>
+        
+    </data>
+</odoo>

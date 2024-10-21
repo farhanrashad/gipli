@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_requisition_stage_user,purchase.requisition.stage.user,model_purchase_requisition_stage,purchase.group_purchase_user,1,0,0,0
+access_purchase_requisition_stage_manager,purchase.requisition.stage.manager,model_purchase_requisition_stage,purchase.group_purchase_manager,1,1,1,1
+access_purchase_requisition_stage_workflow_manager,purchase.requisition.stage.workflow.manager,model_purchase_requisition_stage_workflow,purchase.group_purchase_manager,1,1,1,1
+access_purchase_requisition_stage_workflow_user,purchase.requisition.stage.workflow.user,model_purchase_requisition_stage_workflow,purchase.group_purchase_user,1,0,0,0

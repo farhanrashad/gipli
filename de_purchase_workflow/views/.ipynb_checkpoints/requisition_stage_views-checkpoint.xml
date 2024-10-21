@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>	
+    <!-- Stock Transfer Stage -->
+    <record id="purchase_requisition_stage_list_view" model="ir.ui.view">
+        <field name="name">purchase.requisition.stage.list.view</field>
+        <field name="model">purchase.requisition.stage</field>
+        <field name="arch" type="xml">
+            <tree string="Stages">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="requisition_type_ids" widget="many2many_tags" />
+                <field name="stage_category" />
+            </tree>
+        </field>
+    </record>
+    
+    <record id="purchase_requisition_stage_form_view" model="ir.ui.view">
+        <field name="name">purchase.requisition.stage.form.view</field>
+        <field name="model">purchase.requisition.stage</field>
+        <field name="arch" type="xml">
+            <form string="Subscription Stage">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="sequence" groups="base.group_no_one"/>
+                            <field name="stage_code" required="1"/>
+                            <field name="requisition_type_ids" widget="many2many_tags" />
+                        </group>
+                        <group>
+                            <field name="fold"/>
+                            <field name="stage_category" widget="radio"/>
+                            <field name="group_id" options="{'no_create':True}"/>
+                        </group>
+                    </group>
+                    <separator string="Requirements"/>
+                    <field name="description"
+                           placeholder="Give your team the requirements to move a subscription to this stage."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+		<record id="action_purchase_requisition_stage" model="ir.actions.act_window">
+			<field name="name">Requisition Stage</field>
+			<field name="res_model">purchase.requisition.stage</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">
+					Create a new custom entry stage
+				</p>
+               
+			</field>
+		</record>
+		
+		<menuitem action="action_purchase_requisition_stage" name="Stages" id="purchase_requisition_config_stages_menu" groups="purchase.group_purchase_manager" parent="purchase.menu_purchase_config" sequence="4"/>
+
+		
+			
+</odoo>
+
+
