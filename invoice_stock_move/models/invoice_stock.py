@@ -68,18 +68,59 @@ class InvoiceStockMove(models.Model):
 
     def action_stock_move(self):
         for order in self:
-            if not self.invoice_picking_id:
+            # Determine the destination location based on the picking type
+            if order.picking_type_id.code == 'outgoing':
+                location_id = order.picking_type_id.default_location_src_id
+                location_dest_id = self.env['stock.location'].search([
+                    ('usage', '=', 'customer'),
+                    ('active', '=', True),
+                    '|',  # Logical OR for company_id condition
+                    ('company_id', '=', order.company_id.id),
+                    ('company_id', '=', False)
+                ], limit=1)
+            elif order.picking_type_id.code == 'incoming':
+                location_id = self.env['stock.location'].search([
+                    ('usage', '=', 'supplier'),
+                    ('active', '=', True),
+                    '|',  # Logical OR for company_id condition
+                    ('company_id', '=', order.company_id.id),
+                    ('company_id', '=', False)
+                ], limit=1)
+                location_dest_id = order.picking_type_id.default_location_dest_id
+            else:
+                ocation_id = order.picking_type_id.default_location_src_id
+                location_dest_id = order.picking_type_id.location_dest_id
+
+            # Check if location was found, raise an error if not
+            if not location_dest_id:
+                raise UserError(_("Destination location not found for the picking type: %s") % order.picking_type_id.code)
+
+            # Proceed with picking creation if no previous picking exists
+            if not order.invoice_picking_id:
+                # Prepare the picking data
                 pick = {
-                    'picking_type_id': self.picking_type_id.id,
-                    'partner_id': self.partner_id.id,
-                    'origin': self.name,
-                    'location_dest_id': self.picking_type_id.default_location_dest_id.id,
-                    'location_id': self.partner_id.property_stock_supplier.id
+                    'picking_type_id': order.picking_type_id.id,
+                    'partner_id': order.partner_id.id,
+                    'origin': order.name,
+                    'location_dest_id': location_dest_id.id,
+                    'location_id': location_id.id
                 }
+
+                # Create the picking
                 picking = self.env['stock.picking'].create(pick)
-                self.invoice_picking_id = picking.id
-                self.picking_count = len(picking)
-                moves = order.invoice_line_ids.filtered(lambda r: r.product_id.type in ['product', 'consu'])._create_stock_moves(picking)
+
+                # Link the picking to the order
+                order.invoice_picking_id = picking.id
+
+                # Update the picking count (for current order or total count)
+                order.picking_count = len(order.invoice_picking_id)
+
+                # Create stock moves for valid invoice lines
+                moves = order.invoice_line_ids.filtered(
+                    lambda r: r.product_id.type in ['product', 'consu']
+                )._create_stock_moves(picking)
+
+                # Confirm and assign the stock moves
                 move_ids = moves._action_confirm()
                 move_ids._action_assign()
 
@@ -109,8 +150,8 @@ class SupplierInvoiceLine(models.Model):
                 'name': line.name or '',
                 'product_id': line.product_id.id,
                 'product_uom': line.product_uom_id.id,
-                'location_id': line.move_id.partner_id.property_stock_supplier.id,
-                'location_dest_id': picking.picking_type_id.default_location_dest_id.id,
+                'location_id': picking.location_id.id,
+                'location_dest_id': picking.location_dest_id.id,
                 'picking_id': picking.id,
                 # 'move_dest_id': False,
                 'state': 'draft',
