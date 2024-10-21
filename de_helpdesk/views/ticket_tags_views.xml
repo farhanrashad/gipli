@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<odoo>
-    <menuitem name="Tags" id="menu_helpdesk_config_tags"
-            parent="menu_helpdesk_config" 
-            action="project.project_tags_action"
-            sequence="40"
-        />
-</odoo>
