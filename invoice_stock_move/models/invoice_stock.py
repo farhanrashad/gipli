@@ -45,15 +45,37 @@ class InvoiceStockMove(models.Model):
         return types[:4]
 
     @api.model
-    def _default_picking_receive_type(self):
-        type_obj = self.env['stock.picking.type'].search([('name', '=', 'Receipts'),('warehouse_id.name', '=', 'Head Office')], order="id desc", limit=1)
-        return type_obj
+    def _default_picking_type(self):
+        # Check the type of the invoice and apply logic based on that
+        if self.type in ['out_invoice', 'in_refund']:
+            # If out_invoice or in_refund, get outgoing picking type
+            picking_type = self.env['stock.picking.type'].search([
+                ('code', '=', 'outgoing'),
+                ('company_id', '=', self.company_id.id)
+            ], limit=1)
+        elif self.type in ['in_invoice', 'out_refund']:
+            # If in_invoice or out_refund, get incoming picking type
+            picking_type = self.env['stock.picking.type'].search([
+                ('code', '=', 'incoming'),
+                ('company_id', '=', self.company_id.id)
+            ], limit=1)
+        else:
+            picking_type = self.env['stock.picking.type'].search([
+                ('code', '=', 'internal'),
+                ('company_id', '=', self.company_id.id)
+            ], order="id desc", limit=1)
+
+        # Return the found picking type, or False if not found
+        return picking_type if picking_type else False
+
 	
 
     picking_count = fields.Integer(string="Count")
     invoice_picking_id = fields.Many2one('stock.picking', string="Picking Id")
     picking_type_id = fields.Many2one('stock.picking.type', 'Picking Type', 
-                                      default=_default_picking_receive_type,
+                                      compute='_compute_picking_type_id',
+                                      readonly=False,
+                                      store=True,
                                       help="This will determine picking type of incoming shipment")
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -66,6 +88,32 @@ class InvoiceStockMove(models.Model):
     ], string='Status', index=True, readonly=True, default='draft',
         track_visibility='onchange', copy=False)
 
+    @api.depends('type', 'company_id')  # Depends on the type of invoice and the company
+    def _compute_picking_type_id(self):
+        for order in self:
+            if order.type in ['out_invoice', 'in_refund']:
+                # If out_invoice or in_refund, get outgoing picking type
+                picking_type = self.env['stock.picking.type'].search([
+                    ('code', '=', 'outgoing'),
+                    ('company_id', '=', order.company_id.id)
+                ], limit=1)
+            elif order.type in ['in_invoice', 'out_refund']:
+                # If in_invoice or out_refund, get incoming picking type
+                picking_type = self.env['stock.picking.type'].search([
+                    ('code', '=', 'incoming'),
+                    ('company_id', '=', order.company_id.id)
+                ], limit=1)
+            else:
+                # Fallback to 'Receipts' picking type for unexpected types
+                picking_type = self.env['stock.picking.type'].search([
+                    ('code', '=', 'internal'),
+                    ('company_id', '=', order.company_id.id)
+                ], order="id desc", limit=1)
+
+            # Set the computed picking_type_id or False if no picking type found
+            order.picking_type_id = picking_type if picking_type else False
+
+        
     def action_stock_move(self):
         for order in self:
             # Determine the destination location based on the picking type
@@ -88,9 +136,12 @@ class InvoiceStockMove(models.Model):
                 ], limit=1)
                 location_dest_id = order.picking_type_id.default_location_dest_id
             else:
-                ocation_id = order.picking_type_id.default_location_src_id
+                location_id = order.picking_type_id.default_location_src_id
                 location_dest_id = order.picking_type_id.location_dest_id
 
+            if not order.picking_type_id:
+                raise UserError("Picking Type not found")
+                
             # Check if location was found, raise an error if not
             if not location_dest_id:
                 raise UserError(_("Destination location not found for the picking type: %s") % order.picking_type_id.code)
