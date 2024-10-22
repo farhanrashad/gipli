@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_budget_category_manager,purchase.budget.categoy purchase_manager,model_purchase_budget_expense_category,purchase.group_purchase_manager,1,1,1,1
+access_purchase_budget_category_user,purchase.budget.categoy purchase_user,model_purchase_budget_expense_category,purchase.group_purchase_user,1,0,0,0
+access_purchase_budget_manager,purchase.budget purchase_manager,model_purchase_budget,purchase.group_purchase_manager,1,1,1,1
+access_purchase_budget_lines_manager,purchase.budget.lines purchase_manager,model_purchase_budget_lines,purchase.group_purchase_manager,1,1,1,1
+access_purchase_budget_report_user,purchase.budget.report.user,model_purchase_budget_report,purchase.group_purchase_user,1,1,1,1
+
+

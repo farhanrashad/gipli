@@ -1,0 +1,60 @@
+<odoo>
+  <data>
+      
+      
+       <!-- Budget Category -->
+      <record model="ir.ui.view" id="purchase_budget_category_form_view">
+        <field name="name">purchase.budget.category.form.view</field>
+        <field name="model">purchase.budget.expense.category</field>
+        <field name="arch" type="xml">
+            <form string="Budget Category"> 
+                <sheet string="Budget Category">
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name"  placeholder="Budget Category"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="complete_name" />
+                            <field name="exp_category_id" />
+                        </group>
+                        <group>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                </sheet>
+            </form>
+        </field>
+    </record>
+      
+      <record model="ir.ui.view" id="purchase_budget_category_tree_view">
+        <field name="name">purchase.budget.category.tree.view</field>
+        <field name="model">purchase.budget.expense.category</field>
+        <field name="arch" type="xml">
+            <tree >
+                <field name="name" colspan="2"/>
+               <field name="complete_name" />
+                <field name="exp_category_id" />
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+      
+      
+      
+      <record id="action_purchase_budget_category" model="ir.actions.act_window">
+        <field name="name">Budget Lines</field>
+		<field name="res_model">purchase.budget.expense.category</field>
+		<field name="type">ir.actions.act_window</field>
+          <field name="view_mode">tree,form</field>
+    </record>
+      
+      
+      <menuitem parent="menu_procurement_management_budget" id="menu_act_purchase_budget_category"
+              name="Budgets Category" action="action_purchase_budget_category" sequence="120"             groups="purchase.group_purchase_manager"/>
+      
+  </data>
+</odoo>

@@ -1,0 +1,57 @@
+<odoo>
+	<record id="purchase_order_form_inherit_budget" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.budget</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+           <xpath expr="//group[1]/group[1]" position="inside">
+               <field name="budget_exception" attrs="{'invisible':[('budget_exception','=',False)]}" decoration-danger="budget_exception != False"/>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="purchase_budget_line_id" options="{'no_create':True}" optional="show"/>
+                
+            </xpath>
+            <xpath expr="//field[@name='product_qty']" position="after">
+                <field name="budget_avaiable_qty" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Purchase Order Line Views -->
+    
+    <record id="budget_purchase_order_line_tree_view" model="ir.ui.view">
+            <field name="name">budget.purchase.order.line.tree.view</field>
+            <field name="model">purchase.order.line</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="Purchase Order line" >
+                    <field name="order_id" />
+                    <field name="purchase_budget_line_id" />
+                    <field name="date_order" />
+                    <field name="partner_id" />
+                    <field name="product_id" />
+                    <field name="price_unit" />
+                    <field name="product_qty" />
+                    <field name="price_subtotal" />
+                    <field name="currency_id" />
+                    <field name="price_total_base" sum="Base Curr. Total"/>
+                    <field name="date_planned" />
+                    <field name="state" />
+                </tree>
+            </field>
+    </record>
+    
+    <record id="action_purchase_order_line_budget_view" model="ir.actions.act_window">
+        <field name="name">Budget Lines</field>
+		<field name="res_model">purchase.order.line</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('budget_purchase_order_line_tree_view')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('purchase.purchase_order_line_form2')})]"/>
+        <field name="search_view_id" ref="purchase.purchase_order_line_search"/>
+        <field name="context">{'create':False}</field>
+        <field name="domain">[('purchase_budget_line_id', '=', active_id)]</field>
+    </record>
+	
+</odoo>
