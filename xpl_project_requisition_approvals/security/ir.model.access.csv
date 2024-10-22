@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_requisition_approvals_group_manager,purchase.requisition.approvals.group.manager,model_purchase_requisition_approvals_group,purchase.group_purchase_manager,1,1,1,1
+access_purchase_requisition_approvals_group_role_manager,purchase.requisition.approvals.group.role.manager,model_purchase_requisition_approvals_group_role,purchase.group_purchase_manager,1,1,1,1
+
+access_purchase_requisition_approvals_manager,purchase.requisition.approvals.manager,model_purchase_requisition_approvals,purchase.group_purchase_manager,1,1,1,1

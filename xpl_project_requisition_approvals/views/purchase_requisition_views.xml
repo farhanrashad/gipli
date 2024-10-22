@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_requisition_form_view_inherit_project" model="ir.ui.view">
+        <field name="name">purchase.requisition.form.project</field>
+        <field name="model">purchase.requisition</field>
+        <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[1]/group[2]" position="inside">
+                <field name="project_id" groups="project.group_project_user"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Approvals" name="approvals">
+                    <field name="approval_ids" readonly="1">
+                        <list string="Roles" editable="bottom" >
+                            <field name="sequence" widget="handle"/>
+                            <field name="approval_group_id" />
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="date_approved" />
+                            <field name="approval_status" />
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

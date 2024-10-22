@@ -1,0 +1,55 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="purchase_requisition_approval_group_form_view">
+            <field name="name">purchase.requisition.approval.group.form.view</field>
+            <field name="model">purchase.requisition.approvals.group</field>
+            <field name="arch" type="xml">
+                <form string="Purchase Requisition Approvals">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_inline"/>
+                            <h1>
+                                <field name="name" placeholder="e.g "/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="project_id" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Roles" name="roles">
+                                <field name="role_ids">
+                                    <list string="Roles" editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="group_id" />
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_purchase_requisition_approvals_group">
+                <field name="name">Requisition Approvals Group</field>
+                <field name="res_model">purchase.requisition.approvals.group</field>
+                <field name="view_mode">list,form</field>
+                <field name="context">{}</field>
+                <field name="help" type="html">
+                  <p class="o_view_nocontent_smiling_face">
+                    Configure requisition approvals group
+                  </p>
+                </field>
+            </record>
+        
+            <menuitem
+                id="menu_purchase_requisition_approvals_config"
+                sequence="100"
+                parent="purchase.menu_purchase_config"
+                action="action_purchase_requisition_approvals_group"/>
+
+    </data>
+</odoo>
