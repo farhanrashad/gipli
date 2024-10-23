@@ -6,44 +6,78 @@
             <field name="arch" type="xml">
                 <form string="Purchase Requisition Approvals">
                     <header>
-                        <field name="approval_status" widget="statusbar" statusbar_visible="draft,sent,purchase" readonly="1"/>
+                        <button name="action_button_approve" class="oe_highlight" type="object" string="Approve" invisible="approval_status != 'pending'"/>
+                        <button name="action_button_reject" type="object" string="Reject"
+                            invisible="approval_status != 'pending'"
+                            />
+                        <field name="approval_status" widget="statusbar" statusbar_visible="pending, approved, rejected" readonly="1"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
-                                <field name="approval_group_id" />
-                                <field name="user_id" widget="many2one_avatar_user"/>
+                                <field name="approval_group_id" readonly="1" />
+                                <field name="user_id" readonly="1" widget="many2one_avatar_user"/>
                             </group>
                             <group>
-                                <field name="date_approved"/>
+                                <field name="date_approved" readonly="1" />
+                                <field name="requisition_id" readonly="1" />
                             </group>
                         </group>
                         <group>
-                            <field name="note" />
+                            <field name="note" readonly="approval_status != 'pending'"/>
                         </group>
                     </sheet>
                 </form>
             </field>
         </record>
 
+        
         <record id="purchase_requisition_approval_tree_view" model="ir.ui.view">
             <field name="name">purchase.order.list</field>
             <field name="model">purchase.requisition.approvals</field>
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
                 <list string="Requisition Approvals">
+                    <field name="sequence" optional="hide" />
+                    <field name="requisition_id" optional="hide" />
                     <field name="approval_group_id" />
                     <field name="user_id" widget="many2one_avatar_user"/>
                     <field name="date_approved"/>
                     <field name="approval_status"/>
+                    
                 </list>
             </field>
         </record>
+
+        <record id="purchase_requisition_approvals_filter" model="ir.ui.view">
+            <field name="name">purchase.requisition.approvals.select</field>
+            <field name="model">purchase.requisition.approvals</field>
+            <field name="arch" type="xml">
+                <search string="Search approvals">
+                    <field name="requisition_id" />
+                    <field name="user_id" />
+                    <field name="approval_status" />
+
+                    <filter string="My Approvals" name="my_approvals" domain="[('is_user_approved', '=', True)]"/>
+                    <separator/>
+                    <filter string="Pending" name="approval_pending" domain="[('approval_status', '=', 'pending')]"/>
+                    <filter string="Approved" name="approval_approved" domain="[('approval_status', '=', 'approved')]"/>
+
+                    <filter string="Rejected" name="approval_rejected" domain="[('approval_status', '=', 'rejected')]"/>     
+                </search>
+            </field>
+        </record>
+        
         <record model="ir.actions.act_window" id="action_purchase_requisition_approvals">
             <field name="name">Requisition Approvals</field>
             <field name="res_model">purchase.requisition.approvals</field>
             <field name="view_mode">list,form</field>
-            <field name="context">{'create': False, 'delete': False}</field>
+            <field name="context">{
+                'create': False, 
+                'delete': False,
+                'search_default_my_approvals': 1,
+                'search_default_approval_pending': 1
+            }</field>
         </record>
         
             <menuitem
