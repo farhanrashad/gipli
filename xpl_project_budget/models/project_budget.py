@@ -85,7 +85,6 @@ class ProjectBudgetLine(models.Model):
         required=True,
         ondelete='cascade'
     )
-
     sequence = fields.Integer(
         string='Sequence',
         default=10 
@@ -95,27 +94,23 @@ class ProjectBudgetLine(models.Model):
         string='Product',
         required=True
     )
-
     quantity = fields.Float(
         string='Quantity',
         required=True,
         default=1.0  # Default quantity
     )
-
     cost = fields.Float(
         string='Cost',
         store=True,
         readonly=False,
         compute='_compute_product_cost'
     )
-
     total = fields.Monetary(
         string='Total',
         currency_field='currency_id',
         compute='_compute_total',
         store=True
     )
-
     amount_budget = fields.Monetary(
         string='Amount Budget',
         currency_field='currency_id',
@@ -133,7 +128,6 @@ class ProjectBudgetLine(models.Model):
         compute='_compute_achieved_qty',
         help='Received Quantity + Confirmed Requisition'
     )
-
     currency_id = fields.Many2one(
         'res.currency',  # Currency model
         string='Currency',
@@ -153,6 +147,7 @@ class ProjectBudgetLine(models.Model):
     def _compute_total(self):
         for line in self:
             line.total = line.quantity * line.cost
+            line.amount_budget = line.quantity * line.cost
 
     def action_open_budget_entries(self):
         self.ensure_one()        
@@ -169,7 +164,7 @@ class ProjectBudgetLine(models.Model):
         ]
         return action
 
-    @api.depends('product_id')
+    @api.depends('product_id','quantity')
     def _compute_product_cost(self):
         for record in self:
             record.cost = record.product_id.standard_price
