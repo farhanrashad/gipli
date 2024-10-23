@@ -104,19 +104,24 @@ class ProjectBudgetLine(models.Model):
 
     cost = fields.Float(
         string='Cost',
-        required=True
+        store=True,
+        readonly=False,
+        compute='_compute_product_cost'
     )
 
     total = fields.Monetary(
         string='Total',
-        currency_field='currency_id',  # Reference to the currency field
+        currency_field='currency_id',
         compute='_compute_total',
-        store=True  # Store the computed value
+        store=True
     )
 
     amount_budget = fields.Monetary(
         string='Amount Budget',
-        currency_field='currency_id',  # Reference to the currency field
+        currency_field='currency_id',
+        compute='_compute_total',
+        store=True,
+        readonly=False
     )
     qty_committed = fields.Float(
         string='Commiteed Qty',
@@ -163,5 +168,11 @@ class ProjectBudgetLine(models.Model):
             ('state','=','done')
         ]
         return action
+
+    @api.depends('product_id')
+    def _compute_product_cost(self):
+        for record in self:
+            record.cost = record.product_id.standard_price
+            
 
     
