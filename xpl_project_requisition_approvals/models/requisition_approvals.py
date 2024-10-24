@@ -9,7 +9,7 @@ class ReqisitionApprovalGroup(models.Model):
     _order = "id desc"
 
     name = fields.Char(string='Group Name', required=True)
-    account_id = fields.Many2one('account.analytic.account')
+    account_id = fields.Many2one('account.analytic.account', copy=False)
     role_ids = fields.One2many('purchase.requisition.approvals.group.role', 'approval_group_id', string='Approval Roles')    
     description = fields.Text(string='Description')
 
