@@ -9,12 +9,12 @@ class ReqisitionApprovalGroup(models.Model):
     _order = "id desc"
 
     name = fields.Char(string='Group Name', required=True)
-    project_id = fields.Many2one('project.project')
+    account_id = fields.Many2one('account.analytic.account')
     role_ids = fields.One2many('purchase.requisition.approvals.group.role', 'approval_group_id', string='Approval Roles')    
     description = fields.Text(string='Description')
 
     _sql_constraints = [
-        ('unique_project', 'unique(project_id)', 'Each project can have only one approval group.')
+        ('unique_project', 'unique(account_id)', 'Each project can have only one approval group.')
     ]
 
 class RequisitionApprovalsGroupsRole(models.Model):

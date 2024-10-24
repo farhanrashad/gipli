@@ -27,6 +27,7 @@
                             <field name="note" readonly="approval_status != 'pending'"/>
                         </group>
                     </sheet>
+                    <chatter/>
                 </form>
             </field>
         </record>
